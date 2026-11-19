@@ -1,0 +1,11 @@
+[
+  {
+    "project": "kernel",
+    "exit": -15,
+    "watchdog": "no-progress-180s",
+    "elapsedSeconds": 261.48056366690435,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  }
+]

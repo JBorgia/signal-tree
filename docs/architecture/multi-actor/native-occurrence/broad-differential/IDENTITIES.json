@@ -1,0 +1,30 @@
+{
+  "predecessor": {
+    "source": "/private/tmp/st-native-explicit-handoff-successor/candidate",
+    "manifestSha256": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+    "dependencies": "/private/tmp/v16-transition-qualification/node_modules",
+    "versions": {
+      "nx": "23.1.0",
+      "vitest": "4.1.9",
+      "typescript": "6.0.3",
+      "@angular/core": "22.0.7",
+      "react": "19.2.8",
+      "vue": "3.5.42",
+      "solid-js": "1.9.15"
+    }
+  },
+  "successor": {
+    "source": "/private/tmp/st-prepared-paired-successor/candidate",
+    "manifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+    "dependencies": "/private/tmp/v16-transition-qualification/node_modules",
+    "versions": {
+      "nx": "23.1.0",
+      "vitest": "4.1.9",
+      "typescript": "6.0.3",
+      "@angular/core": "22.0.7",
+      "react": "19.2.8",
+      "vue": "3.5.42",
+      "solid-js": "1.9.15"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+
+> nx run kernel:test fixed-window-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs fixed-window-independent.spec.ts --maxWorkers=1
+
+(node:36144) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36151) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-fixed-window-retirement-independent/candidate/packages/kernel
+
+(node:36158) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/fixed-window-independent.spec.ts (10 tests | 2 failed) 34ms
+   × repeated cancellation of an old exact-cell observer cannot detach a newer observer 9ms
+   × stale cancellation cannot strand a real source retirement registered later for the same cell 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/fixed-window-independent.spec.ts > repeated cancellation of an old exact-cell observer cannot detach a newer observer
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/lib/fixed-window-independent.spec.ts:19:74
+     17|  const actual=life.pendingOwners().find(c=>c.owner===getPositionRegist…
+     18|  const old=life.onOwnerCellTransition(actual,()=>{});old();const next=…
+     19|  try{old();q.confirm();expect(calls).toBe(0);await flush();expect(call…
+       |                                                                          ^
+     20| });
+     21| for(const first of ['confirm','rollback'] as const)it(`late enrollment…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/fixed-window-independent.spec.ts > stale cancellation cannot strand a real source retirement registered later for the same cell
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/fixed-window-independent.spec.ts:45:253
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  20:14:01
+   Duration  777ms (transform 429ms, setup 0ms, import 514ms, tests 34ms, environment 154ms)
+
+Warning: command "node tools/run-core-vitest.mjs fixed-window-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

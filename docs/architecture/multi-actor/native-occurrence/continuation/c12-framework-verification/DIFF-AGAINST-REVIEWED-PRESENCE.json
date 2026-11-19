@@ -1,0 +1,13 @@
+[
+  "llms.txt",
+  "packages/kernel/README.md",
+  "packages/kernel/src/lib/entity-tap-reads.spec.ts",
+  "packages/kernel/src/lib/experimental-publication/entity.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts",
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts",
+  "packages/kernel/src/lib/occurrence-successor.spec.ts",
+  "packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts",
+  "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts",
+  "packages/kernel/src/lib/packet-physical-pair-work.spec.ts",
+  "packages/kernel/src/lib/structural-admission-sequence.spec.ts"
+]

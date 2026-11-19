@@ -1,0 +1,19 @@
+--- a/packages/kernel/src/lib/recipient-source-permission.spec.ts
++++ b/packages/kernel/src/lib/recipient-source-permission.spec.ts
+@@ -38,14 +38,14 @@
+ 
+ for(const cause of ['no-native','unobservedOrigin','invalidAttribution','uncapturedUpdaterInput','recipientDomain'] as const)
+ it(`recipient source separation preserves ${cause} uncertainty`,()=>{
+- const channel={};life.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});const revision={};
++ const channel={};life.registerConnection(channel,{supported:true,report:()=>{/* This fixture observes state directly. */},wake:()=>{/* Delivery is driven explicitly by this fixture. */}});const revision={};
+  try{const uncertainty=cause==='no-native'?{}:{[cause]:true};const plan=life.prepareRevision(channel,revision,[],uncertainty,[],cause==='no-native'?undefined:life.initialRequirement());
+   plan.finalize?.();installTerminalRecord(plan);expect(life.proof(channel,revision)?.unknown).toBe(true);expect(life.hasDeclaration(channel,revision)).toBe(false);
+  }finally{life.disposeConnection(channel);}
+ });
+ 
+ it('nondeclaring source requirement remains unfinished until both activation and parent finalization',()=>{
+- const parent={},recipient={};for(const channel of [parent,recipient])life.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
++ const parent={},recipient={};for(const channel of [parent,recipient])life.registerConnection(channel,{supported:true,report:()=>{/* This fixture observes state directly. */},wake:()=>{/* Delivery is driven explicitly by this fixture. */}});
+  let native!:life.NativeRequirement;const revision={};const observed:boolean[]=[];
+  try{expect(()=>life.runDeclaration(parent,{kind:'independent'},()=>{
+   const p=life.prepareNativeRequirement([],false,[]);native=p.requirement;installTerminalRecord(p.record);life.finalizeNativeRequirement(native);

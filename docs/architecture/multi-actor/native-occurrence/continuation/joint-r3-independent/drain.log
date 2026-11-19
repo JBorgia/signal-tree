@@ -1,0 +1,35 @@
+
+> nx run kernel:test joint-membership-drain-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs joint-membership-drain-independent.spec.ts --maxWorkers=1
+
+(node:60991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-r3-independent/candidate/packages/kernel
+
+(node:61005) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  21:23:27
+   Duration  811ms (transform 478ms, setup 0ms, import 576ms, tests 16ms, environment 149ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

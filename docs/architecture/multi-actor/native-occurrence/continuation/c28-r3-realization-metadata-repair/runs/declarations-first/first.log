@@ -1,0 +1,11 @@
+packages/kernel/src/enhancers/transactions/semantics-authority.ts(27,37): error TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+packages/kernel/src/enhancers/transactions/semantics-authority.ts(29,39): error TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(77,37): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(81,27): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(85,27): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(158,25): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(163,25): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(205,23): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(206,23): error TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(350,27): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+packages/kernel/src/enhancers/transactions/semantics-composition.ts(350,37): error TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].

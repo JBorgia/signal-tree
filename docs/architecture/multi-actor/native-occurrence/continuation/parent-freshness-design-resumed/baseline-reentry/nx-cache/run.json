@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test angular --skip-nx-cache bounded-reentry-baseline.spec.ts --maxWorkers=1",
+    "startTime": "2026-11-02T15:53:52.785Z",
+    "endTime": "2026-11-02T15:53:54.476Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "angular:test",
+      "target": "test",
+      "projectName": "angular",
+      "hash": "16829427739224506450",
+      "startTime": "2026-11-02T15:53:52.808Z",
+      "endTime": "2026-11-02T15:53:54.475Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

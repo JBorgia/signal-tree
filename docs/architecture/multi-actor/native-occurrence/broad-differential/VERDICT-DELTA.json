@@ -1,0 +1,834 @@
+[
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/absent-collection.spec.ts",
+      "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (restoration first)",
+      1
+    ],
+    "before": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/absent-collection.spec.ts",
+      "fullName": "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (restoration first)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/absent-collection.spec.ts",
+      "fullName": "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (restoration first)",
+      "duplicateOrdinal": 1,
+      "status": "failed",
+      "failureMessages": [
+        "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Missing live leaf for owner 5 [effect-validation-failed]\n    at createRollbackError (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:410:3)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4945:23)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4565:19)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/absent-collection.spec.ts:1293:15\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "fixtureClass": "unchanged"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/absent-collection.spec.ts",
+      "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (transactions alone)",
+      1
+    ],
+    "before": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/absent-collection.spec.ts",
+      "fullName": "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (transactions alone)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/absent-collection.spec.ts",
+      "fullName": "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (transactions alone)",
+      "duplicateOrdinal": 1,
+      "status": "failed",
+      "failureMessages": [
+        "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Missing live leaf for owner 5 [effect-validation-failed]\n    at createRollbackError (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:410:3)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4945:23)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4565:19)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/absent-collection.spec.ts:1293:15\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "fixtureClass": "unchanged"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/absent-collection.spec.ts",
+      "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (transactions first)",
+      1
+    ],
+    "before": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/absent-collection.spec.ts",
+      "fullName": "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (transactions first)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/absent-collection.spec.ts",
+      "fullName": "an absent collection publishes nothing for its hidden rows a rollback compensating hidden rows re-runs no consumer (transactions first)",
+      "duplicateOrdinal": 1,
+      "status": "failed",
+      "failureMessages": [
+        "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Missing live leaf for owner 5 [effect-validation-failed]\n    at createRollbackError (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:410:3)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4945:23)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4565:19)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/absent-collection.spec.ts:1293:15\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "fixtureClass": "unchanged"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+      "double proceed cannot reuse the same selected endpoint within one interceptor invocation",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+      "fullName": "double proceed cannot reuse the same selected endpoint within one interceptor invocation",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+      "selected continuation cannot replay after its invocation closes (first throws=false)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+      "fullName": "selected continuation cannot replay after its invocation closes (first throws=false)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+      "selected continuation cannot replay after its invocation closes (first throws=true)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+      "fullName": "selected continuation cannot replay after its invocation closes (first throws=true)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "certified absence row transport preserves actual replacement scope changed",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "fullName": "certified absence row transport preserves actual replacement scope changed",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "certified absence row transport preserves actual replacement scope equal",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "fullName": "certified absence row transport preserves actual replacement scope equal",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "certified absence row transport preserves actual replacement scope untouched",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "fullName": "certified absence row transport preserves actual replacement scope untouched",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "producer ordinary images exclude untouched inspection sibling xy",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "fullName": "producer ordinary images exclude untouched inspection sibling xy",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "producer ordinary images exclude untouched inspection sibling yx",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "fullName": "producer ordinary images exclude untouched inspection sibling yx",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "selected field plus surviving-row order restores the complete transaction",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "fullName": "selected field plus surviving-row order restores the complete transaction",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "independent callback write survives invalidated preparation; selected fields and authority remain",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "independent callback write survives invalidated preparation; selected fields and authority remain",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "inspection sibling retains ordinary baseline through composed rollback and equal-display adoption xy",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "inspection sibling retains ordinary baseline through composed rollback and equal-display adoption xy",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "inspection sibling retains ordinary baseline through composed rollback and equal-display adoption yx",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "inspection sibling retains ordinary baseline through composed rollback and equal-display adoption yx",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "mixed completed unit remains terminal after actual delivery throw",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "mixed completed unit remains terminal after actual delivery throw",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "mixed scalar/entity public refusal occurs before any selected install",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "mixed scalar/entity public refusal occurs before any selected install",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "ordered transformed sibling support xy/0",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "ordered transformed sibling support xy/0",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "ordered transformed sibling support xy/99",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "ordered transformed sibling support xy/99",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "ordered transformed sibling support yx/0",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "ordered transformed sibling support yx/0",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "ordered transformed sibling support yx/99",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "ordered transformed sibling support yx/99",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "public second interceptor block is atomic; xy/confirm",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "public second interceptor block is atomic; xy/confirm",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "public second interceptor block is atomic; xy/retry",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "public second interceptor block is atomic; xy/retry",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "public second interceptor block is atomic; yx/confirm",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "public second interceptor block is atomic; yx/confirm",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "public second interceptor block is atomic; yx/retry",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "public second interceptor block is atomic; yx/retry",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "saved selected continuation is closed after skip",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "saved selected continuation is closed after skip",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "saved selected continuation is closed after success",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "saved selected continuation is closed after success",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "saved selected continuation is closed after throw",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "saved selected continuation is closed after throw",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "second selected proceed refuses before another preparation callback",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "fullName": "second selected proceed refuses before another preparation callback",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/native-invocation-handoff.spec.ts",
+      "invocation is exact-source/lifetime, one claim before callbacks, closed after throw",
+      1
+    ],
+    "before": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/native-invocation-handoff.spec.ts",
+      "fullName": "invocation is exact-source/lifetime, one claim before callbacks, closed after throw",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "changed"
+    },
+    "after": null
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "public onUpdate refuses x inverse after y; confirm, writes=xy",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "fullName": "public onUpdate refuses x inverse after y; confirm, writes=xy",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "public onUpdate refuses x inverse after y; confirm, writes=yx",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "fullName": "public onUpdate refuses x inverse after y; confirm, writes=yx",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "public onUpdate refuses x inverse after y; retry, writes=xy",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "fullName": "public onUpdate refuses x inverse after y; retry, writes=xy",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "public onUpdate refuses x inverse after y; retry, writes=yx",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "fullName": "public onUpdate refuses x inverse after y; retry, writes=yx",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts",
+      "transformed certified removal removes ordinary-only sibling and owns equal displayed sibling",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts",
+      "fullName": "transformed certified removal removes ordinary-only sibling and owns equal displayed sibling",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "real enhancer outer coalesce refuses pending inverse and permits fresh retry (false)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "fullName": "real enhancer outer coalesce refuses pending inverse and permits fresh retry (false)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "real enhancer outer coalesce refuses pending inverse and permits fresh retry (true)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "fullName": "real enhancer outer coalesce refuses pending inverse and permits fresh retry (true)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "real enhancer synchronous selected coalesce completes both fields (false)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "fullName": "real enhancer synchronous selected coalesce completes both fields (false)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "real enhancer synchronous selected coalesce completes both fields (true)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-real-batching-review.spec.ts",
+      "fullName": "real enhancer synchronous selected coalesce completes both fields (true)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "later selected y supersedes earlier transformed sibling y support",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "fullName": "later selected y supersedes earlier transformed sibling y support",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "mixed scalar/entity public block refuses before either selected contribution installs",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "fullName": "mixed scalar/entity public block refuses before either selected contribution installs",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "ordered transformed sibling gets its own support even when equal (0)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "fullName": "ordered transformed sibling gets its own support even when equal (0)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "kernel",
+      "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "ordered transformed sibling gets its own support even when equal (99)",
+      1
+    ],
+    "before": null,
+    "after": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/selected-unit-support.spec.ts",
+      "fullName": "ordered transformed sibling gets its own support even when equal (99)",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "added"
+    }
+  },
+  {
+    "identity": [
+      "vue",
+      "packages/vue/src/lib/absent-collection.spec.ts",
+      "absent collection \u2014 Vue sync effects (v16 8e) a rollback writing hidden rows runs no effect that could see them",
+      1
+    ],
+    "before": {
+      "project": "vue",
+      "file": "packages/vue/src/lib/absent-collection.spec.ts",
+      "fullName": "absent collection \u2014 Vue sync effects (v16 8e) a rollback writing hidden rows runs no effect that could see them",
+      "duplicateOrdinal": 1,
+      "status": "passed",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    "after": {
+      "project": "vue",
+      "file": "packages/vue/src/lib/absent-collection.spec.ts",
+      "fullName": "absent collection \u2014 Vue sync effects (v16 8e) a rollback writing hidden rows runs no effect that could see them",
+      "duplicateOrdinal": 1,
+      "status": "failed",
+      "failureMessages": [
+        "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation \u2014 Missing live leaf for owner 5 [effect-validation-failed]\n    at createRollbackError (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:410:3)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4945:23)\n    at Object.rollback (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4565:19)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/vue/src/lib/absent-collection.spec.ts:393:17\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "fixtureClass": "unchanged"
+    }
+  }
+]

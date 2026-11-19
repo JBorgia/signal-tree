@@ -1,0 +1,16 @@
+[
+  "packages/kernel/src/enhancers/restoration/restoration.ts",
+  "packages/kernel/src/enhancers/transactions/transactions.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+  "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+  "packages/kernel/src/lib/internals/owned-mutation.ts",
+  "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+  "packages/kernel/src/lib/internals/scalar-admission-metadata.ts",
+  "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts"
+]

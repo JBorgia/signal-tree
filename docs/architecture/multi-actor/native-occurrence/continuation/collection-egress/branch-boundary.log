@@ -1,0 +1,88 @@
+
+> nx run kernel:test branch-omission-correctness.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts --maxWorkers=1
+
+(node:88831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88838) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-collection-egress-successor/candidate/packages/kernel
+
+(node:88845) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/branch-omission-correctness.spec.ts (35 tests | 2 failed) 107ms
+     × same-turn removal and reintroduction ends absent at Link 7ms
+     × an omission does not carry an unchanged inspection-only sibling to Link 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
++   "age": 8,
+    "name": "Ada",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:255:33
+    253|         await nextTask();
+    254|         await relation.settled();
+    255|         expect(received.at(-1)).toStrictEqual(
+       |                                 ^
+    256|           end === 'present' ? { name: 'Ada', age: undefined } : { name…
+    257|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > an omission does not carry an unchanged inspection-only sibling to Link
+AssertionError: expected { name: 'Inspected' } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
+-   "name": "Ada",
++   "name": "Inspected",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:309:31
+    307|       await relation.settled();
+    308|       expect(tree.$.profile()).toStrictEqual({ name: 'Inspected' });
+    309|       expect(received.at(-1)).toStrictEqual({ name: 'Ada' });
+       |                               ^
+    310|     } finally {
+    311|       relation.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 33 passed (35)
+   Start at  17:01:45
+   Duration  1.54s (transform 844ms, setup 0ms, import 1.02s, tests 107ms, environment 300ms)
+
+Warning: command "node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

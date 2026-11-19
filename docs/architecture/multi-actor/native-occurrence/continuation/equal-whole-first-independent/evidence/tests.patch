@@ -1,0 +1,85 @@
+--- a/packages/kernel/src/lib/native-authored-footprint.spec.ts
++++ b/packages/kernel/src/lib/native-authored-footprint.spec.ts
+@@ -10,7 +10,8 @@
+  const scope=()=>packets.at(-1)?.steps?.find(step=>step.authoredFootprint)?.authoredFootprint;
+  try{
+   rows.setAll([{id:'a',x:7,y:0}]);expect(scope()).toEqual({kind:'whole'});
+-  expect(packets.at(-1)?.ordinary[0]?.fields).toEqual([]); // Scope is not yet ownership/admission.
++  expect(packets.at(-1)?.ordinary[0]?.fields).toEqual(['id','x','y']); // Whole offers still pass through native endpoint selection.
++  expect(packets.at(-1)?.physical[0]?.fields).toEqual([]); // Equal offers are not physical value changes.
+   rows.replaceOne('a',{id:'a',x:7,y:0});expect(scope()).toEqual({kind:'whole'});
+   rows.updateMany(['a'],{x:7});expect(scope()).toEqual({kind:'fields',fields:['x']});
+   rows.upsertMany([{id:'a',x:7,y:0}]);expect(scope()?.kind).toBe('fields');
+--- /dev/null
++++ b/packages/kernel/src/lib/whole-getter-controls.spec.ts
+@@ -0,0 +1,21 @@
++import {writeFileSync} from 'node:fs';
++import {expect,it,afterAll} from 'vitest';
++import {entityMap,signalTree,link,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getPathNotifier} from './path-notifier';
++type Declared=ReturnType<typeof link>&{declare(d:{kind:'independent'},work:()=>void):unknown};
++const results:unknown[]=[];
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<100;i++)await Promise.resolve();};
++afterAll(()=>{writeFileSync(process.env.TMPDIR+'/whole-getters.json',JSON.stringify(results,null,2));});
++for(const route of ['setAll','replaceOne','row'] as const)for(const scenario of ['stable','first-throw','reentry'] as const)
++it(`whole getter ${route} ${scenario}`,async()=>{
++ const t=signalTree({rows:entityMap<{id:string;x:number},string>(),inner:0},{enhancers:[transactions()]});t.$.rows.addOne({id:'a',x:7});await flush();const rows=t.$.rows,row=rows.byIdOrFail('a');const sent:unknown[]=[];const c=link(rows,{set:v=>{sent.push(v);}}) as Declared;
++ const binding=getEntityPublicationBinding(row)!;const req=()=>binding.source.evidence()!.field(binding.subject!,'x','ordinary');const before=req();let calls=0,notices=0;const off=row.x.subscribe(()=>notices++);const sentinel=Error('whole getter sentinel');let thrown:unknown;
++ const supplied={id:'a',get x(){calls++;if(scenario==='first-throw')throw sentinel;if(scenario==='reentry'&&calls===2)t.$.inner(9);return 7;}};
++ try{try{c.declare({kind:'independent'},()=>{if(route==='setAll')rows.setAll([supplied]);else if(route==='replaceOne')rows.replaceOne('a',supplied);else row(supplied);});}catch(e){thrown=e;}
++  // Capture reads made by preparation/delivery before inspecting the resulting row.
++  await flush();const operationCalls=calls;
++  results.push({route,scenario,calls:operationCalls,thrown:thrown instanceof Error?thrown.message:String(thrown),firstIdentity:thrown===sentinel,endpointSame:req()===before,notices,inner:t.$.inner(),sent:JSON.parse(JSON.stringify(sent))});
++  if(scenario==='first-throw'){expect(thrown).toBe(sentinel);expect(req()).toBe(before);expect(sent).toEqual([]);}else if(scenario==='reentry'){expect(t.$.inner()).toBe(9);expect(thrown).toBeDefined();expect(req()).toBe(before);expect(sent).toEqual([]);}else{expect(thrown).toBeUndefined();expect(row.x()).toBe(7);expect(notices).toBe(0);}
++ }finally{off();c.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/whole-late-getter.spec.ts
+@@ -0,0 +1,16 @@
++import {writeFileSync} from 'node:fs';
++import {expect,it,afterAll} from 'vitest';
++import {entityMap,signalTree,link,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getPathNotifier} from './path-notifier';
++type Declared=ReturnType<typeof link>&{declare(d:{kind:'independent'},work:()=>void):unknown};
++const results:unknown[]=[];const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<100;i++)await Promise.resolve();};
++afterAll(()=>writeFileSync(process.env.TMPDIR+'/whole-late-getter.json',JSON.stringify(results,null,2)));
++// Exact C16 characterization reaches six reads in all three routes. The seventh
++// read is a new callback execution, not permission to change error behavior.
++for(const route of ['setAll','replaceOne','row'] as const)
++it(`whole ${route} does not newly reach a seventh-read exception`,async()=>{
++ const t=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:7});await flush();const row=rows.byIdOrFail('a'),binding=getEntityPublicationBinding(row)!;const before=binding.source.evidence()!.field(binding.subject!,'x','ordinary');const sent:unknown[]=[];const c=link(rows,{set:v=>{sent.push(v);}}) as Declared;let calls=0,thrown:unknown;const release=row.x.subscribe(()=>{});const sentinel=Error('new seventh getter read');const supplied={id:'a',get x(){if(++calls===7)throw sentinel;return 7;}};
++ try{try{c.declare({kind:'independent'},()=>{if(route==='setAll')rows.setAll([supplied]);else if(route==='replaceOne')rows.replaceOne('a',supplied);else row(supplied);});}catch(e){thrown=e;}await flush();results.push({route,calls,thrown:thrown instanceof Error?thrown.message:String(thrown),sentinel:thrown===sentinel,endpointSame:binding.source.evidence()!.field(binding.subject!,'x','ordinary')===before,sent:JSON.parse(JSON.stringify(sent))});expect(thrown).toBeUndefined();expect(calls).toBe(6);
++ }finally{release();c.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/whole-unowned-publication-authorized.spec.ts
+@@ -0,0 +1,27 @@
++import { expect, it } from 'vitest';
++import { entityMap, link, signalTree, transactions } from '../index';
++import { getPathNotifier } from './path-notifier';
++type Declared = ReturnType<typeof link> & { declare(input: {kind: 'independent'}, work: () => void): unknown };
++const flush = async () => { getPathNotifier().flushSync(); for(let i=0;i<120;i++) await Promise.resolve(); };
++for(const route of ['setAll','replaceOne','row'] as const) for(const owned of [false,true]) {
++ it(`approved whole ${route}: ${owned ? 'preserves actual pending owner' : 'refreshes unowned possible-window evidence'}`,async()=>{
++  const tree=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]});
++  const foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=tree.$.rows;
++  rows.addOne({id:'a',x:0});await flush();const row=rows.byIdOrFail('a');
++  const sent:unknown[]=[];const connection=link(rows,{set:value=>{sent.push(value);}}) as Declared;
++  const q=owned?tree.transact(()=>rows.updateOne('a',{x:7})):foreign.transact(()=>foreign.$.z(7));
++  let release=()=>{ /* Assigned after setup, always released in finally. */ };
++  try {
++   if(!owned)rows.updateOne('a',{x:7});await flush();expect(sent).toEqual([]);
++   const before=q.inspect();let notices=0;release=row.x.subscribe(()=>{notices++;});
++   connection.declare({kind:'independent'},()=>{
++    const supplied={id:'a',x:7};
++    if(route==='setAll')rows.setAll([supplied]);else if(route==='replaceOne')rows.replaceOne('a',supplied);else row(supplied);
++   });await flush();
++   expect(row.x()).toBe(7);expect(notices).toBe(0);expect(q.inspect()).toEqual(before);
++   expect(sent).toEqual(owned?[]:[[{id:'a',x:7}]]);
++   q.rollback();await flush();expect(row.x()).toBe(owned?0:7);
++   expect(sent.at(-1)).toEqual([{id:'a',x:owned?0:7}]);
++  } finally {release();connection.dispose();tree.destroy();foreign.destroy();}
++ });
++}

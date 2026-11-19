@@ -1,0 +1,67 @@
+[
+  {
+    "path": "packages/kernel/src/lib/signal-tree.ts",
+    "sha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "sha256": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "sha256": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "sha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "sha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/construction-allocation.ts",
+    "sha256": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "sha256": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "sha256": "83e9d1a6fc724b32912f7ca18a3b6514e8a952906e35c67704ab5610ca88a335",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "sha256": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+    "matchesFrozenBase": true
+  },
+  {
+    "path": "/private/tmp/st-c28-r3-dynamic-admission-trace/REVIEW.md",
+    "sha256": "e9ff9c99b8594307dd5f6ad4b239ca8a4d77c39d02d9b00ca8ff0b45e6836957"
+  },
+  {
+    "path": "/private/tmp/st-c28-r3-dynamic-admission-trace/OBSERVATIONS.jsonl",
+    "sha256": "ef9e20061fefb61a04494ea1013bf5fdf4bd62032e1f2e2cdcff23187084e188"
+  },
+  {
+    "path": "/private/tmp/st-c28-r3-dynamic-admission-trace/REPRO.json",
+    "sha256": "3526790e67d94dcb6dc2acd491c66d78bd264311bd053a86d03843b0edd8def0"
+  },
+  {
+    "path": "/private/tmp/st-c28-r3-dynamic-admission-trace/tests.patch",
+    "sha256": "60ac4ed6449833872a299ef250dc3e5bad8d0bed442194a53551fc5714eeb4cb"
+  },
+  {
+    "path": "/private/tmp/st-c28-r3-dynamic-admission-trace/BASE-MANIFEST.json",
+    "sha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  }
+]

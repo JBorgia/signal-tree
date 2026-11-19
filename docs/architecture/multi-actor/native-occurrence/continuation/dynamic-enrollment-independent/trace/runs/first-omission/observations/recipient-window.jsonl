@@ -1,0 +1,7 @@
+{"phase":"before-finalize","matches":1,"incomplete":false,"uncertainty":{"invalidAttribution":false,"unobservedOrigin":false,"uncapturedUpdaterInput":false,"recipientDomain":false},"known":[],"native":{"owners":[{"owner":2,"id":1}],"possible":[],"unknown":false},"pending":[{"owner":2,"id":1}]}
+{"phase":"before-finalize","matches":0,"incomplete":true,"uncertainty":{"invalidAttribution":false,"unobservedOrigin":false,"uncapturedUpdaterInput":false,"recipientDomain":false},"known":[],"native":{"owners":[{"owner":2,"id":1}],"possible":[],"unknown":false},"pending":[{"owner":2,"id":1}]}
+{"phase":"after-finalize","matches":0,"window":[{"owner":2,"id":1}]}
+{"phase":"before-finalize","matches":1,"incomplete":false,"uncertainty":{"invalidAttribution":false,"unobservedOrigin":false,"uncapturedUpdaterInput":false,"recipientDomain":false},"known":[],"native":{"owners":[],"possible":[],"unknown":false},"pending":[{"owner":2,"id":1}]}
+{"phase":"before-finalize","matches":1,"incomplete":false,"uncertainty":{"invalidAttribution":false,"unobservedOrigin":false},"known":[],"native":{"owners":[],"possible":[],"unknown":false},"pending":[{"owner":2,"id":1}]}
+{"phase":"before-finalize","matches":0,"incomplete":true,"uncertainty":{"invalidAttribution":false,"unobservedOrigin":false},"known":[],"native":{"owners":[],"possible":[],"unknown":false},"pending":[{"owner":2,"id":1}]}
+{"phase":"after-finalize","matches":0,"window":[{"owner":2,"id":1}]}

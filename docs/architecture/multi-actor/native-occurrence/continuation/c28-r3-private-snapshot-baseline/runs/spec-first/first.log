@@ -1,0 +1,11 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/private-snapshot-baseline.spec.ts: 2 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/private-snapshot-baseline.spec.ts(23,80): error TS7019: Rest parameter 'args' implicitly has an 'any[]' type.
+packages/kernel/src/lib/private-snapshot-baseline.spec.ts(34,84): error TS2322: Type '(v: Row[]) => number' is not assignable to type '(value: Row[]) => void | Promise<void>'.

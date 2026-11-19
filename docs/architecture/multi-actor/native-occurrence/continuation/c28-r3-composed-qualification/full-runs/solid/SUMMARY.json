@@ -1,0 +1,24 @@
+{
+  "project": "solid",
+  "run": "solid",
+  "counts": {
+    "passed": 136
+  },
+  "discoveredFiles": 22,
+  "selectedFiles": 22,
+  "startedFiles": 22,
+  "completedFiles": 22,
+  "missingCompletion": [],
+  "unexpectedModules": [],
+  "runEndSeen": true,
+  "result": {
+    "project": "solid",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 15.214834209065884,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  "failures": []
+}

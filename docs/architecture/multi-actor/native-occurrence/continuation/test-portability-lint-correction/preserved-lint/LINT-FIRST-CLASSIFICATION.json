@@ -1,0 +1,41 @@
+{
+  "exit": 1,
+  "moduleBoundaryErrors": 14,
+  "emptyFunctionErrors": 6,
+  "ignoredDemoWarnings": 5,
+  "missingGraphWarning": false,
+  "helperImportsNew": true,
+  "beforeInspection": [
+    {
+      "file": "/private/tmp/st-test-sink-cleanup/before/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+      "emptyDoublesPresentInBefore": true,
+      "candidateLintLine": 55
+    },
+    {
+      "file": "/private/tmp/st-test-sink-cleanup/before/packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "emptyDoublesPresentInBefore": true,
+      "candidateLintLine": 24
+    },
+    {
+      "file": "/private/tmp/st-test-sink-cleanup/before/packages/kernel/src/lib/recipient-window-review.spec.ts",
+      "emptyDoublesPresentInBefore": true,
+      "candidateLintLine": 34
+    },
+    {
+      "file": "/private/tmp/st-test-sink-cleanup/before/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+      "emptyDoublesPresentInBefore": true,
+      "candidateLintLine": 10
+    },
+    {
+      "file": "/private/tmp/st-test-sink-cleanup/before/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+      "emptyDoublesPresentInBefore": true,
+      "candidateLintLine": 13
+    },
+    {
+      "file": "/private/tmp/st-test-sink-cleanup/before/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+      "emptyDoublesPresentInBefore": true,
+      "candidateLintLine": 13
+    }
+  ],
+  "sourceUnchangedForIndependentRuns": true
+}

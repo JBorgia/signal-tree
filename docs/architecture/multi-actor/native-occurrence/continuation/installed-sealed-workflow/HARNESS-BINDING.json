@@ -1,0 +1,14 @@
+{
+  "recordedAt": "2026-11-03T18:18:09.799061+00:00",
+  "preLaunchSnapshot": "/private/tmp/st-v16-installed-evidence/ROOT-INPUTS-BEFORE.json",
+  "preLaunchSnapshotSha256": "4e9271dac59e97055377b63cfdebf6d4b64b7f2a051cc19d64ca18e16a37f79b",
+  "commandReceipt": "/private/tmp/st-v16-installed-evidence/runs/kernel-installed/COMMAND.json",
+  "commandReceiptSha256": "32a92957304d47070a86d591fda868466f0f295d7df9ff0853d3815151f99bdf",
+  "harnessFiles": {
+    "tools/experiments/multi-actor-operations/installed/run.mjs": "f4e0a6473af9b426ab32dc90412b4eda7780f8d3fb9ba6e32ab6a8091b9e3d22",
+    "tools/experiments/multi-actor-operations/installed/angular.mjs": "15849408457454881d88b40d80c6ae326ccd74c0d0f51fd6402903acb8906894",
+    "tools/experiments/multi-actor-operations/installed/sealed-input.mjs": "c9df5c71f54d16ee703868cfd32918182d8e387c7ee65f2174d058c4f4e36104"
+  },
+  "currentMatchesPreLaunch": true,
+  "candidateEdited": false
+}

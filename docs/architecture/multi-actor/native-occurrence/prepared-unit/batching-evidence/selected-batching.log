@@ -1,0 +1,35 @@
+
+> nx run kernel:test selected-real-batching-review.spec.ts
+
+> node tools/run-core-vitest.mjs selected-real-batching-review.spec.ts
+
+(node:60708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60715) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-94ac-batching-0a5k2l73/candidate/packages/kernel
+
+(node:60722) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  15:23:53
+   Duration  740ms (transform 424ms, setup 0ms, import 504ms, tests 19ms, environment 145ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

@@ -1,0 +1,10 @@
+{
+  "name": "react-focused",
+  "exit": 0,
+  "timeout": false,
+  "elapsedSeconds": 7.075231458991766,
+  "attempts": 1,
+  "sourceMismatches": [],
+  "ownedGroupPresent": false,
+  "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+}

@@ -1,0 +1,10 @@
+{
+  "REVIEW.md": "e737376672d9386184ee086a090aec442177396ff1ecc9f2cb1e204e1e0d5553",
+  "FREEZE.json": "f280c5ce88bc499ea6873829a4cabbbf67027e73641c84da67a1e09717b7c545",
+  "SOURCE-SHA256.json": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+  "first-runtime.log": "50dcd5f76b466b986e193a5aecde58745eb976f61837d608a49f9bd379bdb79a",
+  "replay.log": "fe99eb03036bbac70d959234f4f9d684a7054ee3de5426d7b21a53ca49f2eaab",
+  "independent-first.spec.ts": "fe2cdea95d124e3bfc97092040da29e0b12a7fe173ea5dcfcf766d15cb49484a",
+  "candidate/packages/kernel/src/lib/independent-explicit-continuation.spec.ts": "ee26f04577f70aee9b6bd3f8d83b9d583c6763f2bfde354ba3fb1632eb5215e7",
+  "candidate/packages/kernel/src/lib/main-invocation-scope.spec.ts": "619bce19f21e648a02c652c44bc0fca80101622535b7980ebffd9f510e391d14"
+}

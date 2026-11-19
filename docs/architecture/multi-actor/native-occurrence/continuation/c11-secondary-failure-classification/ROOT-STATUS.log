@@ -1,0 +1,12 @@
+$ git rev-parse HEAD
+628d302dadb082a48c58528651c9088234d0a777
+$ git branch --show-current
+fix/d1-d2-forward-port
+$ git status --short
+ M .gitignore
+ M RELEASE-CURRENT.md
+ M TODO.md
+?? docs/architecture/multi-actor/
+?? docs/audits/2026-10-29-multi-actor-product/
+?? frontier
+?? tools/experiments/multi-actor-operations/

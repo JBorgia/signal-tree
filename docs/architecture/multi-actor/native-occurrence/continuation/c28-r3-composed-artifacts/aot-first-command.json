@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "node",
+    "tools/verify-angular-aot-consumer.mjs",
+    "--kernel-tarball=/private/tmp/st-c28-r3-composed-artifacts/tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+    "--angular-tarball=/private/tmp/st-c28-r3-composed-artifacts/tarballs/signal-tree-angular-16.0.0-dev.tgz"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-composed-artifacts/candidate",
+  "noProgressSeconds": 180
+}

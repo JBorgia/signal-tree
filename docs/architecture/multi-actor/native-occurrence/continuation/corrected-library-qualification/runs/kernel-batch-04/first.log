@@ -1,0 +1,158 @@
+
+> nx run kernel:test /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-explicit-continuation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-public-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-refusal-branches.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-scalar-publication.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/indexed-source-owner-cross-baseline.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/indexed-source-owner-payload.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/indexed-source-owner-prefix.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/indexed-source-owner-prepend.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/indexed-source-owner-s4.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/indexed-source-owner-subset.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/initializer-attachment-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/initializer-owned-cleanup.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/inspection-egress-conformance.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/a1-publication-installation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/acquire-projection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/auto-batching.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/authority-assessment.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/confirmed-rollback-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/effect-applier.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/place-field-reversals-while-rows-exist.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/planner-contiguous-boundaries.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/post-application-failure.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/realization-context.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/reapply-planner.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/reclamation-eligibility.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/redo-assessment.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/target-transition-key-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/target-transition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/transaction-capture-bridge.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/turn-store.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/cell-identity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/commit-consequence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/custom-markers.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/derived.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diag-journal-1-grouping.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/diag-journal-1-1-correlation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/diag-journal-1-ownership.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/diag-journal-1-retention.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/flush-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/flush-probe.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/journal-live-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/leaf-observation-support-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/owner-scope-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/supersession-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/diagnostics/tree-capabilities-live.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/dynamic-realization-composition-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/enhancer-requirements.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/marker-materialization.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/merge-derived-guardrail.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/native-adapter-flush-error.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/native-epoch-error-drain.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/native-epoch-publication.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/native-group-error-boundary.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/native-projection-observability.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/scalar-completion-precedence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/subject-restoration-claims.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/tree-capabilities.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/utilities/deep-equal-cycles.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/utilities/deep-equal-parity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/utilities/deep-equal.property.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/utilities/shared-utils.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/utilities/shared.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-atomic-preparation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-install-boundary-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-install-validation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-membership-completion.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-membership-phase.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-membership-seal-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-mixed-seal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/joint-readiness.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/kernel-snapshot-authority.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/keyed-construction-cleanup.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-04.json
+
+kernel:  RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+kernel:  ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts (29 tests) 130ms
+kernel:  ✓ src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts (30 tests) 19ms
+kernel:  ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts (43 tests) 2264ms
+kernel:      ✓ validates known scalar positions with zero tree visits across 10 to 100k positions  2018ms
+kernel:  ✓ src/lib/internals/causal-runtime/pending-rollback.spec.ts (21 tests) 96ms
+kernel:  ✓ src/lib/internals/derived.spec.ts (24 tests | 2 skipped) 57ms
+kernel:  ✓ src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts (8 tests) 14ms
+kernel:  ✓ src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts (8 tests) 11ms
+kernel:  ✓ src/lib/internals/causal-runtime/pending-confirmation.spec.ts (9 tests) 76ms
+kernel:  ✓ src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts (11 tests) 48ms
+kernel:  ✓ src/lib/inspection-egress-conformance.spec.ts (20 tests) 62ms
+kernel:  ✓ src/lib/internals/custom-markers.spec.ts (25 tests) 24ms
+kernel:  ✓ src/lib/internals/causal-runtime/applied-turn-projection.spec.ts (10 tests) 15ms
+kernel:  ✓ src/lib/internals/provenance-spike.spec.ts (15 tests) 66ms
+kernel:  ✓ src/lib/internals/causal-runtime/turn-store.spec.ts (9 tests) 7ms
+kernel:  ✓ src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts (4 tests) 8ms
+kernel:  ✓ src/lib/internals/utilities/deep-equal.property.spec.ts (22 tests) 31ms
+kernel:  ✓ src/lib/internals/write-observation-scope.spec.ts (25 tests) 32ms
+kernel:  ✓ src/lib/internals/causal-runtime/confirmed-undo.spec.ts (5 tests) 11ms
+kernel:  ✓ src/lib/internals/causal-runtime/target-transition.spec.ts (18 tests) 134ms
+kernel:  ✓ src/lib/internals/causal-runtime/reversal-planner.spec.ts (6 tests) 7ms
+kernel:  ✓ src/lib/internals/tree-scalar-slot-runtime.spec.ts (15 tests) 14ms
+kernel:  ✓ src/lib/internals/causal-runtime/reclamation-eligibility.spec.ts (8 tests) 19ms
+kernel:  ✓ src/lib/internals/diagnostics/diag-journal-1-ownership.spec.ts (5 tests) 83ms
+kernel:  ✓ src/lib/internals/causal-runtime/authority-assessment.spec.ts (6 tests) 5ms
+kernel:  ✓ src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts (11 tests) 9ms
+kernel:  ✓ src/lib/internals/utilities/deep-equal-cycles.spec.ts (18 tests) 7ms
+kernel:  ✓ src/lib/internals/causal-runtime/confirmed-redo.spec.ts (4 tests) 6ms
+kernel:  ✓ src/lib/internals/causal-runtime/realization-context.spec.ts (5 tests) 10ms
+kernel:  ✓ src/lib/internals/diagnostics/flush-0.spec.ts (7 tests) 36ms
+kernel:  ✓ src/lib/internals/causal-runtime/redo-assessment.spec.ts (5 tests) 6ms
+kernel:  ✓ src/lib/joint-readiness.spec.ts (8 tests) 49ms
+kernel:  ✓ src/lib/internals/diagnostics/supersession-0.spec.ts (6 tests) 38ms
+kernel:  ✓ src/lib/internals/realization-admission-metadata.spec.ts (10 tests) 40ms
+kernel:  ✓ src/lib/internals/causal-runtime/confirmed-rollback-composition.spec.ts (2 tests) 5ms
+kernel:  ✓ src/lib/internals/diagnostics/owner-scope-0.spec.ts (10 tests) 48ms
+kernel:  ✓ src/lib/internals/native-epoch-error-drain.spec.ts (25 tests) 9ms
+kernel:  ✓ src/lib/internals/intercept-leaf-signals.spec.ts (9 tests) 23ms
+kernel:  ✓ src/lib/internals/commit-consequence.spec.ts (7 tests) 6ms
+kernel:  ✓ src/lib/internals/diag-journal-1-grouping.spec.ts (5 tests) 54ms
+kernel:  ✓ src/lib/internals/diagnostics/diag-journal-1-1-correlation.spec.ts (4 tests) 55ms
+kernel:  ✓ src/lib/internals/diagnostics/diag-journal-1-retention.spec.ts (3 tests) 56ms
+kernel:  ✓ src/lib/internals/location-runtime.spec.ts (10 tests) 10ms
+kernel:  ✓ src/lib/internals/diagnostics/owner-evidence-0.spec.ts (4 tests) 24ms
+kernel:  ✓ src/lib/internals/subject-restoration-claims.spec.ts (11 tests) 14ms
+kernel:  ✓ src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts (4 tests) 129ms
+kernel:  ✓ src/lib/internals/native-group-error-boundary.spec.ts (5 tests) 9ms
+kernel:  ✓ src/lib/internals/diagnostics/journal-live-0.spec.ts (6 tests) 30ms
+kernel:  ✓ src/lib/internals/native-adapter-flush-error.spec.ts (12 tests) 7ms
+kernel:  ✓ src/lib/joint-membership-phase.spec.ts (9 tests) 82ms
+kernel:  ✓ src/lib/internals/native-epoch-publication.spec.ts (3 tests) 4ms
+kernel:  ✓ src/lib/internals/scalar-install-accounting.spec.ts (8 tests) 7ms
+kernel:  ✓ src/lib/internals/utilities/deep-equal-parity.spec.ts (2 tests) 85ms
+kernel:  ✓ src/lib/internals/dynamic-realization-composition-independent.spec.ts (8 tests) 60ms
+kernel:  ✓ src/lib/internals/a1-publication-installation.spec.ts (10 tests) 9ms
+kernel: stderr | src/lib/keyed-construction-cleanup.spec.ts
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel: stderr | src/lib/keyed-construction-cleanup.spec.ts > keyed constructor refusal protects other-key nested installed identity and releases recursive cells
+kernel: SignalTree: write to "newChild" DISCARDED — key is not in the tree's initial shape. [ST2010]
+kernel: stderr | src/lib/keyed-construction-cleanup.spec.ts > keyed constructor refusal protects same-key nested installed identity and releases recursive cells
+kernel: SignalTree: write to "newChild" DISCARDED — key is not in the tree's initial shape. [ST2010]
+kernel:  ✓ src/lib/keyed-construction-cleanup.spec.ts (5 tests) 45ms
+kernel:  ✓ src/lib/internals/causal-runtime/reapply-planner.spec.ts (3 tests) 4ms
+kernel: stderr | src/lib/kernel-snapshot-authority.spec.ts > KERNEL-SNAPSHOT-AUTHORITY-0 > never caches a public custom marker without snapshot-change evidence
+kernel: [SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (6 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+kernel: SignalTree: a marker declares `snapshot` but no `hydrate`, and its node is not a writable signal. It will be captured by tree.$(), persistence(), devtools, audit and undo/redo — and every attempt to write it back is SILENTLY DISCARDED, so tree.$(tree.$()) loses its value. Add a `hydrate` hook, or mark it `transient: true` if it is genuinely not restorable. [ST2023]
+kernel:  ✓ src/lib/kernel-snapshot-authority.spec.ts (7 tests) 23ms
+kernel:  ✓ src/lib/internals/utilities/shared-utils.spec.ts (15 tests) 6ms
+kernel:  ✓ src/lib/internals/scalar-completion-precedence.spec.ts (40 tests) 22ms
+kernel:  ✓ src/lib/internals/causal-runtime/planner-contiguous-boundaries.spec.ts (9 tests) 8ms
+kernel:  ✓ src/lib/independent-scalar-publication.spec.ts (3 tests) 35ms
+kernel:  ✓ src/lib/internals/tree-physical-substrate.spec.ts (3 tests) 10ms
+kernel:  ✓ src/lib/internals/diagnostics/leaf-observation-support-0.spec.ts (6 tests) 26ms
+kernel:  ✓ src/lib/internals/causal-runtime/target-transition-key-handoff.spec.ts (6 tests) 16ms
+kernel:  ✓ src/lib/joint-install-validation.spec.ts (8 tests) 60ms
+kernel:  ✓ src/lib/internals/causal-runtime/place-field-reversals-while-rows-exist.spec.ts (7 tests) 3ms
+kernel:  ✓ src/lib/internals/auto-batching.spec.ts (10 tests) 17ms
+kernel:  ✓ src/lib/internals/causal-runtime/effect-applier.spec.ts (3 tests) 7ms
+kernel:  ✓ src/lib/joint-membership-completion.spec.ts (3 tests) 50ms
+kernel:  ✓ src/lib/internals/causal-runtime/post-application-failure.spec.ts (3 tests) 9ms
+kernel:  ✓ src/lib/indexed-source-owner-subset.spec.ts (2 tests) 82ms
+kernel:  ✓ src/lib/internals/causal-runtime/transaction-capture-bridge.spec.ts (3 tests) 6ms
+kernel:  ✓ src/lib/internals/acquire-projection.spec.ts (3 tests) 25ms
+kernel:  ✓ src/lib/initializer-owned-cleanup.spec.ts (1 test) 15ms
+kernel:  ✓ src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts (1 test) 53ms
+kernel: stdout | src/lib/joint-membership-seal-independent.spec.ts > scalar and collection seal after all sibling preparation; membership=false
+kernel: {"membership":false,"owner":2,"scalarOwners":[2],"rowOwners":[2],"a":0,"row":0}
+kernel: stdout | src/lib/joint-membership-seal-independent.spec.ts > scalar and collection seal after all sibling preparation; membership=true
+kernel: {"membership":true,"owner":4,"scalarOwners":[4],"rowOwners":[4],"a":0,"row":0}
+kernel:  ✓ src/lib/joint-membership-seal-independent.spec.ts (2 tests) 44ms
+kernel:  ✓ src/lib/indexed-source-owner-prefix.spec.ts (12 tests) 153ms
+kernel:  ✓ src/lib/internals/native-projection-observability.spec.ts (1 test) 5ms
+kernel: stdout | src/lib/independent-explicit-continuation.spec.ts > selected continuation cannot replay after its invocation closes (first throws=false)
+kernel: STALE-CONTINUATION {
+kernel:   failFirst: false,
+kernel:   value: 13,
+kernel:   baselineRestored: false,
+kernel:   error: 'Error: Selected continuation cannot replay'
+kernel: }
+kernel: stdout | src/lib/independent-explicit-continuation.spec.ts > selected continuation cannot replay after its invocation closes (first throws=true)
+kernel: STALE-CONTINUATION {
+kernel:   failFirst: true,
+kernel:   value: 13,
+kernel:   baselineRestored: false,
+kernel:   error: 'Error: Selected continuation cannot replay'
+kernel: }
+kernel: stdout | src/lib/independent-explicit-continuation.spec.ts > double proceed cannot reuse the same selected endpoint within one interceptor invocation
+kernel: DOUBLE-PROCEED { secondValue: 19, secondBaseline: false }
+kernel:  ✓ src/lib/independent-explicit-continuation.spec.ts (3 tests) 44ms
+kernel:  ✓ src/lib/internals/enhancer-requirements.spec.ts (6 tests) 6ms
+kernel:  ✓ src/lib/joint-atomic-preparation.spec.ts (3 tests) 60ms
+kernel:  ✓ src/lib/internals/utilities/shared.spec.ts (6 tests) 6ms
+kernel:  ✓ src/lib/independent-refusal-branches.spec.ts (3 tests) 9ms
+kernel:  ✓ src/lib/internals/marker-materialization.spec.ts (3 tests) 15ms
+kernel:  ✓ src/lib/internals/diagnostics/tree-capabilities-live.spec.ts (6 tests) 17ms
+kernel:  ✓ src/lib/internals/cell-identity.spec.ts (7 tests) 137ms
+kernel:  ✓ src/lib/internals/diagnostics/flush-probe.spec.ts (6 tests) 29ms
+kernel:  ✓ src/lib/joint-mixed-seal.spec.ts (2 tests) 46ms
+kernel:  ✓ src/lib/independent-public-handoff.spec.ts (2 tests) 63ms
+kernel:  ✓ src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts (1 test) 50ms
+kernel:  ✓ src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts (1 test) 49ms
+kernel:  ✓ src/lib/internals/tree-capabilities.spec.ts (6 tests) 4ms
+kernel:  ✓ src/lib/indexed-source-owner-cross-baseline.spec.ts (1 test) 46ms
+kernel:  ✓ src/lib/indexed-source-owner-s4.spec.ts (1 test) 59ms
+kernel:  ✓ src/lib/initializer-attachment-independent.spec.ts (1 test) 9ms
+kernel: stdout | src/lib/joint-install-boundary-independent.spec.ts > prepared mixed source refuses enroll before any installation
+kernel: {"change":"enroll","refused":true,"values":[0,0]}
+kernel: stdout | src/lib/joint-install-boundary-independent.spec.ts > prepared mixed source refuses dispose before any installation
+kernel: {"change":"dispose","refused":true,"values":[0,0]}
+kernel:  ✓ src/lib/joint-install-boundary-independent.spec.ts (2 tests) 27ms
+kernel:  ✓ src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts (1 test) 59ms
+kernel:  ✓ src/lib/internals/merge-derived-guardrail.spec.ts (2 tests) 10ms
+kernel:  ✓ src/lib/indexed-source-owner-payload.spec.ts (1 test) 51ms
+kernel:  ✓ src/lib/indexed-source-owner-prepend.spec.ts (1 test) 38ms
+kernel:  Test Files  100 passed (100)
+kernel:       Tests  822 passed | 4 expected fail | 2 skipped (828)
+kernel:    Start at  12:30:10
+kernel:    Duration  51.02s (transform 4.62s, setup 0ms, import 18.47s, tests 5.71s, environment 57.47s)
+kernel: JSON report written to /private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-04.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      52.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     52.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    52.4s

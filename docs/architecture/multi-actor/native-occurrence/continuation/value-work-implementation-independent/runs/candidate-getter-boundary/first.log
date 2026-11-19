@@ -1,0 +1,59 @@
+
+> nx run kernel:test independent-value-work-getter --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-value-work-getter --maxWorkers=1
+
+(node:97533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/value-work-implementation-review/candidate/packages/kernel
+
+(node:97547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-value-work-getter.spec.ts (2 tests | 1 failed) 16ms
+   × inbound branch accessors are read during source application rather than retained on reduced ancestor payload 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-value-work-getter.spec.ts > inbound branch accessors are read during source application rather than retained on reduced ancestor payload
+AssertionError: expected 3 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 3
+
+ ❯ src/lib/independent-value-work-getter.spec.ts:15:409
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  12:04:27
+   Duration  1.45s (transform 820ms, setup 0ms, import 975ms, tests 16ms, environment 352ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-value-work-getter --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

@@ -1,0 +1,22 @@
+{
+  "emittedJavaScriptEqual": true,
+  "typescript": "6.0.3",
+  "options": {
+    "target": 9,
+    "module": 99,
+    "removeComments": true
+  },
+  "inputs": [
+    {
+      "path": "originals/entity-before-unused-type.ts",
+      "sourceSha256": "d4d90edf1ffca7316cf814c3decb229760ea7f49e937638dcf286d0cd86fd177",
+      "emittedSha256": "5480a812d355a7c13ba353b0fa6f2cddca6b34f588d3e74127511ed2d72d7bd5"
+    },
+    {
+      "path": "candidate/packages/kernel/src/lib/experimental-publication/entity.ts",
+      "sourceSha256": "f213cf2f1f7095a9e6881416a3dd685714bb678a68dd31929d6871817d7557c6",
+      "emittedSha256": "5480a812d355a7c13ba353b0fa6f2cddca6b34f588d3e74127511ed2d72d7bd5"
+    }
+  ],
+  "removed": "unused EntityPublicationPacket type import"
+}

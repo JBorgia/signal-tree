@@ -1,0 +1,40 @@
+--- a/packages/kernel/src/lib/cold-row-responsibility.spec.ts
++++ b/packages/kernel/src/lib/cold-row-responsibility.spec.ts
+@@ -15,7 +15,7 @@
+ const replacement: Row[] = [{ id: 'c', n: 3 }, { id: 'd', n: 4 }];
+ function record(name: string, value: unknown) {
+   const path = process.env['ST_COLD_OUTPUT'];
+-  if (!path) throw Error('Missing ST_COLD_OUTPUT');
++  if (!path) return;
+   appendFileSync(path, JSON.stringify({ name, value }) + '\n');
+ }
+ function watch(tree: ReturnType<typeof make>) {
+--- a/packages/kernel/src/lib/preparation-reader-comparison.spec.ts
++++ b/packages/kernel/src/lib/preparation-reader-comparison.spec.ts
+@@ -17,15 +17,14 @@
+ type Row = {id:string;n:number;extra?:number};
+ type PrivateRows = {__acquireEntityHandleForTesting(key:string):AcquiredSubjectHandle;__retireSubjectRetainedValueBackingForTesting(subject:number):void;__inspectSubjectResources(subject:number):{nodeFacadeMaterialized:boolean;fieldFacadesMaterialized:string[]};__prepareOrdinaryRealization(e:readonly ReversalEffect[],after:undefined,physical:readonly ReversalEffect[]):{install():void}};
+ const priv = (rows:unknown) => rows as PrivateRows;
+-const candidate = process.env['ST_READER_CANDIDATE'] === '1';
+ const capability = (rows:object) => Object.getOwnPropertySymbols(rows).find(s=>s.description==='signaltree.entityPreparationReader');
+ function read(rows:{byIdOrFail(key:string):unknown},key:string):unknown {
+   const symbol=capability(rows);
+-  if(candidate) expect(symbol).toBeDefined();
++  expect(symbol).toBeDefined();
+   if(symbol) return (Reflect.get(rows,symbol) as (key:string)=>unknown)(key);
+   const node=rows.byIdOrFail(key);return typeof node==='function'?node():node;
+ }
+-function record(name:string,value:unknown){const sink=process.env['ST_SNAPSHOT_OUTPUT'];if(!sink)throw Error('Missing sink');appendFileSync(sink,JSON.stringify({name,value})+'\n');}
++function record(name:string,value:unknown){const sink=process.env['ST_SNAPSHOT_OUTPUT'];if(!sink)return;appendFileSync(sink,JSON.stringify({name,value})+'\n');}
+ const nativeMake=()=>{const native=createReactiveTestRealization();return createSignalTreeFactory(native,undefined,bound=>createLocationRuntime(bound));};
+ const handle=(rows:unknown,key:string)=>priv(rows).__acquireEntityHandleForTesting(key);
+ function adapterFor(rows:object,subject:number,owner:number,tree?:object){
+@@ -97,7 +96,7 @@
+   expect(adapter.validateEffects([{owner:7,subjectId:11,structural:'remove',before:'a',after:undefined}])).toBeUndefined();expect(calls).toBeGreaterThan(0);expect(gets).toBe(0);
+   record('absent-fallback',{calls,gets});
+  });
+- it.skipIf(!candidate)('present capability errors propagate and undefined is not fallback',()=>{
++ it('present capability errors propagate and undefined is not fallback',()=>{
+   const tree=signalTree({rows:entityMap<Row,string>()});try{
+    const symbol=capability(tree.$.rows);expect(symbol).toBeDefined();const sentinel=Error('reader sentinel');let reads=0,fallbacks=0;
+    const rows={byIdOrFail(){fallbacks++;return {id:'a',n:1};},changeId(){},removeOne(){},__findKeyBySubjectId(){return 'a';},[symbol!]:()=>{reads++;throw sentinel;}};

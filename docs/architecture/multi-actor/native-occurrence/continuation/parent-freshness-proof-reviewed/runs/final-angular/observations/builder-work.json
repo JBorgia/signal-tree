@@ -1,0 +1,6 @@
+{
+  "initialTrackedBuilds": 1,
+  "beforeDelivery": 1,
+  "afterDelivery": 2,
+  "limit": "tracked derived callback executions only; direct fallback builds not counted"
+}

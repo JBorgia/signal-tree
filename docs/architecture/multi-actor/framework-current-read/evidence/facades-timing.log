@@ -1,0 +1,241 @@
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/st-selected-projection-repair/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/st-selected-projection-repair/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/st-selected-projection-repair/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///private/tmp/st-selected-projection-repair/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+ NX   Running target test for 5 projects:
+
+- kernel
+- angular
+- vue
+- solid
+- react
+
+With additional flags:
+  selected-callback-facade
+  --maxWorkers=2
+
+
+(node:60692) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run kernel:test selected-callback-facade --maxWorkers=2
+
+> node tools/run-core-vitest.mjs selected-callback-facade --maxWorkers=2
+
+(node:60873) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60880) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/kernel
+
+(node:60887) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:43:30
+   Duration  687ms (transform 342ms, setup 0ms, import 409ms, tests 14ms, environment 187ms)
+
+
+> nx run react:test selected-callback-facade --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/react/tsconfig.spec.json && npx vitest run --config packages/react/vitest.config.ts selected-callback-facade --maxWorkers=2
+
+(node:60889) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:61083) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:262:8[90m)[39m
+    at parseExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24[90m)[39m
+[90m    ... 3 lines matching cause stack trace ...[39m
+    at async Promise.all (index 2)
+    at async resolveConfig [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3[90m)[39m
+    at async _createServer [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66[90m)[39m
+    at async createViteServer [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:8835:17[90m)[39m
+    at async createVitest [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:14221:18[90m)[39m {
+  code: [32m'EXTENDS_RESOLVE'[39m,
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+  [90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)[39m
+  [90m    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)[39m
+  [90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)[39m
+  [90m    at require.resolve (node:internal/modules/helpers:171:31)[39m
+      at resolveExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:250:14[90m)[39m
+      at parseExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24[90m)[39m
+      at Module.parse [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:54:23[90m)[39m
+      at async Promise.all (index 9)
+      at async configResolved [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/[4mvite-tsconfig-paths[24m/dist/index.js:117:9[90m)[39m
+      at async Promise.all (index 2) {
+    code: [32m'MODULE_NOT_FOUND'[39m,
+    requireStack: [
+      [32m'/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+    ]
+  },
+  tsconfigFile: [32m'/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+}
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/react
+
+(node:61458) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:43:33
+   Duration  1.17s (transform 473ms, setup 0ms, import 578ms, tests 16ms, environment 493ms)
+
+
+> nx run angular:test selected-callback-facade --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:61485) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/angular
+
+(node:61517) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  12:43:35
+   Duration  1.14s (transform 498ms, setup 351ms, import 518ms, tests 19ms, environment 154ms)
+
+
+> nx run vue:test selected-callback-facade --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts selected-callback-facade --maxWorkers=2
+
+(node:61549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:61575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/vue
+
+(node:61609) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  12:43:40
+   Duration  813ms (transform 558ms, setup 0ms, import 706ms, tests 18ms, environment 0ms)
+
+
+> nx run solid:test selected-callback-facade --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts selected-callback-facade --maxWorkers=2
+
+(node:61613) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:62105) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/solid
+
+(node:62135) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  12:43:44
+   Duration  707ms (transform 506ms, setup 0ms, import 604ms, tests 20ms, environment 0ms)
+
+
+
+
+ NX   Successfully ran target test for 5 projects
+
+
+  Run duration:      14.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.0s (1 task)
+  Recoverable time:  10.6s (72% of the run)
+
+  Recommendations:
+    - Increase parallelism to recover up to 10.6s → https://nx.dev/docs/concepts/ci-concepts/parallelization-distribution?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=parallelization.
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.

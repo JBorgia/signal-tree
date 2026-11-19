@@ -1,0 +1,16 @@
+{
+  "status": "Frozen scalar-only prototype; independent review and unchanged focused replay pending",
+  "base": "9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02",
+  "manifest": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+  "runtimePatch": "843b04c9370164a7d20d8a590b5b8148592ea928aa95e1353d3123a59a1cd7ac",
+  "instrumentationPatch": "0a104c0ed79cf2bff257daed2c096da0aa70d6967208964d40483b53740a1f9e",
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "C25Unchanged": true,
+  "firstGate": "7 tests pass; roots did not yet include retirement-summary weak edges",
+  "firstGateComplete": "8 tests pass; adds no-recipient disposal; root graph includes retirement summary",
+  "sourceEditsClosed": true
+}

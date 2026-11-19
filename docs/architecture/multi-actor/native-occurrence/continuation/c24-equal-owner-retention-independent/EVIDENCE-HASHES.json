@@ -1,0 +1,22 @@
+{
+  "REPORT.md": "018409984f998c2b9fcdafe80eba110e1fd79ea19c0ebf03d491e5f66b1ce4e6",
+  "CAPTURE.json": "f734b443665af32aa47abd4607eaa461fb9bef7168803ad2802e6c652aa3d4e5",
+  "INSTRUMENTATION.patch": "98db3a1012fb6d96a14eb02d061d6fbd9435e1b6555f91faa84572b7ae8d027a",
+  "instrument.mjs": "48d1cf0f72cfee3525cdeff94d014b83ba0deb7cbf25b87fb5d4ee62e4365b56",
+  "capture.mjs": "f94d859e7a47ef4db7bb98bc36076c97799891fb3f5cb65db04d1dbd23ef9238",
+  "specs/retention.spec.ts": "896912b2d96e83b510f7640f83109f4de15ec62ea35ad1dc1e8732d271f9f62f",
+  "vitest.config.mjs": "eb42ea4d88d2ba6ac1300f97b465ac3bb960677a3a6aaf5899a3bc6cf1ca873d",
+  "COUNTS.jsonl": "40590e0eb4ef3409fb81e0b207573b0002771ea4e37557b70d92c7a75a4ef4f3",
+  "FIRST-RUN-COUNTS.json": "787ca72244af0955051daff727c52c5d20843c18c08ca2c05a884f01c75be43c",
+  "private.uninstrumented.ts": "e149c3a27faba6092ea16f9ef9d785f1598529e8446da8fa38df6e82c3b439dd",
+  "lifecycle.uninstrumented.ts": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8",
+  "run.py": "ab04dc2da50d069d9f3287e80a230928892c4fe132b9c3cd0b77c6c75b05abd9",
+  "ownership.py": "1d73883dca029f279ed0456065f0fc26a265c42e4e5b0ce98c9a1edf9780ffe1",
+  "runs/neutral/COMMAND.json": "9fdb97d3ba925ac67670123f3ea29bbe25b9050ceb4198c971bb10940cdaf710",
+  "runs/neutral/MANUAL-STOP.txt": "8f9a92cb9d88389427c1f6f243b1387842d3c9701bd6c5b61289a0c2322bcfee",
+  "runs/neutral/OWNERSHIP.json": "d24e7c6f3dac795b840e6aabaa91a07947d8c5430692b77fcbfb079447a59516",
+  "runs/neutral/RESULT.json": "22afd1bc1902389c5ad0db443011fce0ce6d7abe27063132b5a0892f36039984",
+  "runs/neutral/SIGNALS.json": "8e8ebd767eecfe5184226308763ec870e81d78aa067e39d6eab552e68bb88895",
+  "runs/neutral/first.log": "96a204c50d4b4e10ad43c7208dd4564bd765ce2d1957c34f26af0b1abcf12136",
+  "runs/neutral/ownership.jsonl": "e8b0587febdb0138539b7e416fbd525a23ce97913b2bb9922485ef11c5777c0b"
+}

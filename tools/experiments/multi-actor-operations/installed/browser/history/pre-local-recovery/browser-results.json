@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "name": "AG-UI draft needs review/apply; server receipt and native settlement remain separate",
+      "outcome": "PASS"
+    },
+    {
+      "name": "rejecting a reviewed proposal preserves an independent note without server execution",
+      "outcome": "PASS"
+    },
+    {
+      "name": "stale authoritative input version rejects ABA after review and preserves note",
+      "outcome": "PASS"
+    },
+    {
+      "name": "definitive persistence error rolls back locally without a server commit",
+      "outcome": "PASS"
+    },
+    {
+      "name": "lost acknowledgment retains authority; disposal refuses; retry commits once",
+      "outcome": "PASS"
+    },
+    {
+      "name": "disposing an unsent draft rejects it and destroys tree exactly once",
+      "outcome": "PASS"
+    },
+    {
+      "name": "settled session disposes without erasing accepted server state",
+      "outcome": "PASS"
+    }
+  ],
+  "pageErrors": []
+}

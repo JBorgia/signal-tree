@@ -1,0 +1,37 @@
+Creating project graph nodes with @nx/vitest
+
+
+> nx run kernel:test independent-occurrence-completion.spec.ts --testNamePattern=exact replacement cancels|finalization work is independent|hidden unresolved support --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-occurrence-completion.spec.ts --testNamePattern="exact replacement cancels|finalization work is independent|hidden unresolved support" --maxWorkers=1
+
+(node:21890) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/packages/kernel
+
+(node:21908) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed | 13 skipped (16)
+   Start at  10:10:35
+   Duration  9.63s (transform 1.83s, setup 0ms, import 2.22s, tests 13ms, environment 6.11s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      13.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     13.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    13.1s

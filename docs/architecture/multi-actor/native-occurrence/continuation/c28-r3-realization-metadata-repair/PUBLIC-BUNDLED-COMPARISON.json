@@ -1,0 +1,13 @@
+{
+  "baseline": {
+    "index": "cd3549447e0d016643234d15b0478145f37a6ccfbd192b359aa0635b9f33c468",
+    "adapter": "c9921fe9e6e03aecf508c9eec9adb1b7d8c1176d993e0e0b505c082e471f8783",
+    "internals": "51b0ec838c39ee73e504941af63090c878192a74fbf2c58a6d823ca09df69fc4"
+  },
+  "candidate": {
+    "index": "cd3549447e0d016643234d15b0478145f37a6ccfbd192b359aa0635b9f33c468",
+    "adapter": "c9921fe9e6e03aecf508c9eec9adb1b7d8c1176d993e0e0b505c082e471f8783",
+    "internals": "51b0ec838c39ee73e504941af63090c878192a74fbf2c58a6d823ca09df69fc4"
+  },
+  "equal": true
+}

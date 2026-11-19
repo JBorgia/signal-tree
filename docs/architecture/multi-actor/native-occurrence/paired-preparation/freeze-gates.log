@@ -1,0 +1,73 @@
+
+> nx run kernel:test independent-prepared-unit.spec.ts independent-prepared-boundary.spec.ts batching.behavior.spec.ts batching-context-safety.spec.ts batching-semantic-scopes.spec.ts batching-adversarial.spec.ts external-baseline-coalescing.spec.ts batching-detachment.spec.ts batching-ownership.spec.ts main-invocation-scope.spec.ts native-invocation-handoff.spec.ts native-explicit-handoff.spec.ts selected-real-batching-review.spec.ts selected-ordinary-domain-removal.spec.ts
+
+> node tools/run-core-vitest.mjs independent-prepared-unit.spec.ts independent-prepared-boundary.spec.ts batching.behavior.spec.ts batching-context-safety.spec.ts batching-semantic-scopes.spec.ts batching-adversarial.spec.ts external-baseline-coalescing.spec.ts batching-detachment.spec.ts batching-ownership.spec.ts main-invocation-scope.spec.ts native-invocation-handoff.spec.ts native-explicit-handoff.spec.ts selected-real-batching-review.spec.ts selected-ordinary-domain-removal.spec.ts
+
+(node:78645) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-prepared-paired-successor/candidate/packages/kernel
+
+(node:78663) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78661) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78664) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78666) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78667) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78669) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▲ [WARNING] Ignoring this import because "src/lib/experimental-publication/entity.ts" was marked as having no side effects [ignored-bare-import]
+
+    src/lib/link.ts:1:7:
+      1 │ import './experimental-publication/entity';
+        ╵        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  "sideEffects" is false in the enclosing "package.json" file:
+
+    package.json:7:2:
+      7 │   "sideEffects": false,
+        ╵   ~~~~~~~~~~~~~
+
+(node:78675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78679) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78678) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  14 passed (14)
+      Tests  139 passed (139)
+   Start at  15:29:09
+   Duration  1.85s (transform 3.65s, setup 0ms, import 5.87s, tests 982ms, environment 5.37s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.3s

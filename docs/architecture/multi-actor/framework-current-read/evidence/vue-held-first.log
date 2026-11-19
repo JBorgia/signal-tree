@@ -1,0 +1,75 @@
+
+> nx run vue:test src/lib/selected-callback-facade.spec.ts
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts src/lib/selected-callback-facade.spec.ts
+
+(node:26614) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:26629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26651) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/vue
+
+(node:26658) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/selected-callback-facade.spec.ts (1 test | 1 failed) 18ms
+   × realizes fresh tap reads and preserves later callback writes 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-callback-facade.spec.ts > realizes fresh tap reads and preserves later callback writes
+AssertionError: expected 'A' to be 'C' // Object.is equality
+
+Expected: "C"
+Received: "A"
+
+ ❯ Object.onRemove src/lib/selected-callback-facade.spec.ts:37:26
+     35|     rows.updateOne('C', { n: 9 });
+     36|     // The tap-fresh readers remain fresh even if retained across a ne…
+     37|     expect(heldId.value).toBe('C');
+       |                          ^
+     38|     expect(heldActive.value?.n).toBe(9);
+     39|     expect(heldAll.value.find(row => row.id === 'C')?.n).toBe(9);
+ ❯ emitTap ../kernel/src/lib/entity-signal.ts:2053:24
+ ❯ Object.publish ../kernel/src/lib/entity-signal.ts:1524:9
+ ❯ ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1204:26
+ ❯ run ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1199:51
+ ❯ Object.publish ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1204:11
+ ❯ ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:700:33
+ ❯ run ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:694:55
+ ❯ Object.publish ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:700:9
+ ❯ installPreparedCompensation ../kernel/src/enhancers/transactions/transactions.ts:2704:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  12:36:12
+   Duration  587ms (transform 391ms, setup 0ms, import 496ms, tests 18ms, environment 0ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts src/lib/selected-callback-facade.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project vue failed
+
+Failed tasks:
+
+- vue:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    3.1s

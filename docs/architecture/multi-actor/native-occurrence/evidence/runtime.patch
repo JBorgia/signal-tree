@@ -1,0 +1,512 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -333,4 +333,4 @@
+ 
+ export function completeDeclarationContext(channel:object):boolean{return stack.some(f=>f.channel===channel)&&stack.every(f=>f.declaredOwners!==undefined&&!frameUnknown(f));}
+ 
+-export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>):void{const op=connections.get(channel)?.ops.get(revision);if(op){op.projectionPending=false;op.proof=proof;for(const cell of [...proof.owners,...(proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}refresh(op);}}
++export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending=false):void{const op=connections.get(channel)?.ops.get(revision);if(op){op.projectionPending=projectionPending;op.proof=proof;for(const cell of [...proof.owners,...(proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}refresh(op);}}
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -1,3 +1,4 @@
++import { RecipientOccurrences, type OccurrenceHandle } from './recipient-occurrence';
+ import type { EntityContributorEdit } from '../internals/entity-egress-projection';
+ import { currentEntityPublicationInputs, getEntityPublicationBinding, type EntityPublicationEvidence } from '../internals/entity-publication';
+ import { isWritableLocation } from '../internals/location-runtime';
+@@ -21,9 +22,8 @@
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+-type Summary={rejected:Map<number,number>;unavailableInput:number;historicalWindow:number;owners:Map<Cell,number>;destination:Map<Cell,number>;input:Map<Cell,number>;validation:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
+-type CollectionSupport={payload:unknown;relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>;summary:Summary};
+-type Binding={watches:Map<object,()=>void>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
++type CollectionSupport={occurrence:OccurrenceHandle;payload:unknown;relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>};
++type Binding={index:RecipientOccurrences;occurrences:Map<object,OccurrenceHandle>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+ const ownProofs=new WeakMap<Fact,Proof>();
+@@ -53,15 +53,6 @@
+ function collect(node:Trie|undefined,result:object[]):void{if(!node)return;result.push(...node.channels);for(const child of node.children.values())collect(child,result);}
+ function reaches(child:object,suffix:readonly string[],source:object):boolean{let node:unknown=child;for(const key of suffix){if((typeof node!=='object'||node===null)&&typeof node!=='function')return false;const descriptor=Object.getOwnPropertyDescriptor(node,key);if(!descriptor||!('value'in descriptor))return false;node=descriptor.value;}return node===source;}
+ const combineProofs=lifecycle.combineProofs;
+-function adjust(summary:Summary,proof:Proof|undefined,direction:number):void {
+- if(!proof){summary.unknown+=direction;return;}
+- for(const bit of [1,2,4,8])if((proof.terminalRejectedRoles??0)&bit){const count=(summary.rejected.get(bit)??0)+direction;if(count)summary.rejected.set(bit,count);else summary.rejected.delete(bit);}
+- if(proof.unavailableInput)summary.unavailableInput+=direction;if(proof.historicalWindow)summary.historicalWindow+=direction;
+- if(proof.unknown)summary.unknown+=direction;if(proof.invalid)summary.invalid+=direction;
+- for(const role of ['owners','destination','input','validation','possible'] as const){
+-  for(const owner of proof[role]??[]){const count=(summary[role].get(owner)??0)+direction;if(count)summary[role].set(owner,count);else summary[role].delete(owner);}
+- }
+-}
+ function own(fact:Fact,channel:object):Proof|undefined{return ownProofs.get(fact)??lifecycle.proof(factChannels.get(fact)??channel,fact);}
+ function fieldAt(root:FieldTrie,path:readonly string[],create=false):FieldTrie|undefined{let node:FieldTrie|undefined=root;for(const key of path){let next:FieldTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map()});node=next;}return node;}
+ function fieldNodes(node:FieldTrie|undefined,out:object[]):void{if(!node)return;if(node.field)out.push(node.field);for(const child of node.children.values())fieldNodes(child,out);}
+@@ -153,45 +144,25 @@
+  const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied))};branchInputs.push(input);return input;
+ }
+ function endBranchInput(token:object):void{if(branchInputs.at(-1)!==token)throw new Error('Branch publication input scope mismatch');branchInputs.pop();}
+-const emptySummary=():Summary=>({rejected:new Map(),owners:new Map(),destination:new Map(),input:new Map(),validation:new Map(),possible:new Map(),unknown:0,invalid:0,unavailableInput:0,historicalWindow:0});
+-const summaryProof=(summary:Summary):Proof=>({terminalRejectedRoles:[...summary.rejected.keys()].reduce((all,bit)=>all|bit,0),owners:[...summary.owners.keys()],destination:[...summary.destination.keys()],input:[...summary.input.keys()],validation:[...summary.validation.keys()],possible:[...summary.possible.keys()],unknown:summary.unknown>0,invalid:summary.invalid>0,unavailableInput:summary.unavailableInput>0,historicalWindow:summary.historicalWindow>0});
+-function rebuildEnrollmentSummary(channel:object,b:Binding):void {
+- b.summary=emptySummary();
+- for(const [field,fact]of b.completedFields)if(exposed(b,b.fields.get(field)!.address))adjust(b.summary,own(fact,channel),1);
+- for(const [slot,state]of b.completedPresence)if(internalSlot(b,slot)&&exposed(b,slot.address!,slot))adjust(b.summary,own(state.fact,channel),1);
+-}
+-function watchFact(channel:object,b:Binding,fact:Fact):void {
+- const requirement=factRequirements.get(fact);if(!requirement||lifecycle.nativeRequirementReady(requirement)||b.watches.has(fact))return;
+- const off=lifecycle.onNativeRequirementReady(requirement,()=>{
+-  b.watches.delete(fact);if(bindings.get(channel)?.watches!==b.watches)return;
+-  const proof=lifecycle.nativeProof(requirement);ownProofs.set(fact,proof);proofs.set(fact,proof);
+-  rebuildEnrollmentSummary(channel,bindings.get(channel)!);wakeChannel(channel);
+- });b.watches.set(fact,off);
++function requirementOf(proof:Proof):lifecycle.NativeRequirement {
++ return {proof,inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};
++}
++function installFact(b:Binding,node:object,key:unknown,fact:Fact,requirement:lifecycle.NativeRequirement):void {
++ const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('Support has no enrolled occurrence');
++ factRequirements.set(fact,requirement);
++ b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);});
+ }
+ function collectionSelected(b:Binding,collection:CollectionSupport):boolean {
+- const relative=collection.relative??[];
+- return exposed(b,[...(b.address??[]),...relative])&&(!relative.length||pathValue(b.valuePayload,relative).present);
+-}
+-function setCollectionEntry(channel:object,b:Binding,collection:CollectionSupport,key:string,requirement?:lifecycle.NativeRequirement):void {
+- const old=collection.entries.get(key);if(old){b.watches.get(old)?.();b.watches.delete(old);adjust(collection.summary,old.proof,-1);}
+- if(!requirement){collection.entries.delete(key);return;}
+- const entry={requirement,proof:lifecycle.nativeProof(requirement)};collection.entries.set(key,entry);adjust(collection.summary,entry.proof,1);
+- if(!lifecycle.nativeRequirementReady(requirement)){
+-  const off=lifecycle.onNativeRequirementReady(requirement,()=>{
+-   b.watches.delete(entry);if(bindings.get(channel)?.watches!==b.watches||collection.entries.get(key)!==entry)return;
+-   adjust(collection.summary,entry.proof,-1);entry.proof=lifecycle.nativeProof(requirement);adjust(collection.summary,entry.proof,1);wakeChannel(channel);
+-  });b.watches.set(entry,off);
+- }
+-}
+-function selectedReady(b:Binding):boolean {
+- const ready=(fact:Fact)=>{const requirement=factRequirements.get(fact);return !requirement||lifecycle.nativeRequirementReady(requirement);};
+- for(const [slot,state]of b.completedPresence)if(exposed(b,slot.address??[],slot)&&!ready(state.fact))return false;
+- for(const [field,fact]of b.completedFields)if(exposed(b,b.fields.get(field)!.address)&&!ready(fact))return false;
+- if(!b.aggregate&&!ready(b.completedValueFact))return false;
+- for(const collection of b.collections.values())if(collectionSelected(b,collection))for(const entry of collection.entries.values())if(!lifecycle.nativeRequirementReady(entry.requirement))return false;
+- return true;
+-}
+-function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base=combineProofs([summaryProof(b.summary),...[...b.collections.values()].filter(value=>collectionSelected(b,value)).map(value=>summaryProof(value.summary))]);const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
++ return b.index.exposed(collection.occurrence);
++}
++function setCollectionEntry(_channel:object,b:Binding,collection:CollectionSupport,key:string,requirement?:lifecycle.NativeRequirement):void {
++ b.index.replace(collection.occurrence,key,requirement);
++ if(requirement)collection.entries.set(key,{requirement,proof:lifecycle.nativeProof(requirement)});else collection.entries.delete(key);
++}
++function projectionSupport(b:Binding):{proof:Proof;present:boolean}{
++ const source=b.source&&b.occurrences.get(b.source);
++ return {proof:b.index.proof(),present:!source||b.index.exposed(source)};
++}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+@@ -220,10 +191,11 @@
+ function completeMembership(completion:object):void{for(const {channel,unit}of(completion as {parts:{channel:object;unit:Unit}[]}).parts)completeScalar({channel,unit});}
+ function ready(channel:object,b:Binding):void{
+  for(const unit of b.pending){
+-  if(!unit.complete||!selectedReady(b)||unit.selected&&!lifecycle.nativeRequirementReady(unit.selected))break;
++  if(!unit.complete)break;
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+-  const authoredProof=combineProofs([proof,...(unit.native?[lifecycle.nativeProof(unit.native)]:[])]);ownProofs.set(unit.fact,authoredProof);
++  const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(proof),...(unit.native?[unit.native]:[])]);
++  const authoredProof=lifecycle.nativeProof(authoredRequirement);ownProofs.set(unit.fact,authoredProof);
+   if(unit.collection){
+    const collection=b.collections.get(unit.collection.key);
+    if(collection){for(const edit of unit.collection.edits){
+@@ -232,33 +204,33 @@
+    collection.payload=unit.payload;
+    if(collectionSelected(b,collection))b.valuePayload=collection.relative?applyAtRelativePath(b.valuePayload,collection.relative,{all:unit.payload}):unit.payload;}
+   }else if(unit.presence){
+-   const slot=unit.presence.slot;const relative=slot.address&&relativeSourceAddress(b.address??[],slot.address);const affected:object[]=[];if(b.aggregate&&relative!==undefined)fieldNodes(fieldAt(b.fieldTrie,relative),affected);
+-   for(const field of affected){const info=b.fields.get(field)!;if(exposed(b,info.address))adjust(b.summary,own(b.completedFields.get(field)!,channel),-1);}
+-   const affectedSlots:Slot[]=[];if(b.aggregate&&slot.address)descendantSlots(slotNode(b,slot.address),affectedSlots);
+-   for(const dependent of affectedSlots){const old=b.completedPresence.get(dependent);if(old&&internalSlot(b,dependent)&&exposed(b,dependent.address!,dependent))adjust(b.summary,own(old.fact,channel),-1);}
++   const slot=unit.presence.slot;const occurrence=b.occurrences.get(slot.child);
++   if(!occurrence)throw Error('Membership support has no enrolled occurrence');
+    b.completedPresence.set(slot,unit.presence.state);
+-   const after=unit.presence.ordinary?.after;
++   b.index.setPresence(occurrence,unit.presence.state.present,authoredRequirement);
++   const ownCollection=b.source&&b.collections.get(b.source);
++   if(ownCollection&&collectionSelected(b,ownCollection))b.valuePayload=ownCollection.payload;
++   const relative=slot.address&&relativeSourceAddress(b.address??[],slot.address),after=unit.presence.ordinary?.after;
+    if(after?.present&&relative!==undefined){
+-    for(const collection of b.collections.values()){
+-     if(collection.relative&&relativeSourceAddress(relative,collection.relative)!==undefined&&exposed(b,[...(b.address??[]),...collection.relative])){
+-      const below=relativeSourceAddress(relative,collection.relative)!;
+-      if(pathValue(after.value,below).present)b.valuePayload=applyAtRelativePath(b.valuePayload,collection.relative,{all:collection.payload});
+-     }
++    // The source supplied this ordinary selection before completion. Its value
++    // does not come from a later physical read or notification reseed.
++    b.valuePayload=applyAtRelativePath(b.valuePayload,relative,after.value);
++    for(const collection of b.collections.values())if(collection.relative&&relativeSourceAddress(relative,collection.relative)!==undefined&&collectionSelected(b,collection)){
++     b.valuePayload=applyAtRelativePath(b.valuePayload,collection.relative,{all:collection.payload});
+     }
++   }else if(after?.present&&!b.aggregate&&!b.valueInitialized&&slot.address&&b.address){
++    const below=relativeSourceAddress(slot.address,b.address),supplied=below&&pathValue(after.value,below);
++    if(supplied?.present){b.valuePayload=supplied.value;b.valueInitialized=true;}
+    }
+-   if(after?.present&&slot.address){
+-    if(b.aggregate&&relative!==undefined){for(const field of affected){if(b.initialized.has(field))continue;const info=b.fields.get(field)!;const below=relativeSourceAddress(slot.address,info.address);const supplied=below&&pathValue(after.value,below);if(supplied?.present){b.valuePayload=applyAtRelativePath(b.valuePayload,info.relative,supplied.value);b.initialized.add(field);}}}
+-    else if(!b.aggregate&&!b.valueInitialized&&b.address){const below=relativeSourceAddress(slot.address,b.address);const supplied=below&&pathValue(after.value,below);if(supplied?.present){b.valuePayload=supplied.value;b.valueInitialized=true;}}
+-   }
+-
+-   for(const dependent of affectedSlots){const current=b.completedPresence.get(dependent);if(current&&internalSlot(b,dependent)&&exposed(b,dependent.address!,dependent))adjust(b.summary,own(current.fact,channel),1);}
+-   for(const field of affected){const info=b.fields.get(field)!;if(exposed(b,info.address))adjust(b.summary,own(b.completedFields.get(field)!,channel),1);}
+   }else if(unit.field){
+-   const previous=b.completedFields.get(unit.field);if(exposed(b,b.fields.get(unit.field)!.address)){if(previous)adjust(b.summary,own(previous,channel),-1);adjust(b.summary,authoredProof,1);}
++   installFact(b,unit.field,'value',unit.fact,authoredRequirement);
+    b.completedFields.set(unit.field,unit.fact);b.initialized.add(unit.field);b.valuePayload=applyAtRelativePath(b.valuePayload,unit.relative??[],unit.payload);
+-  }else{b.completedValueFact=unit.fact;b.valuePayload=unit.payload;}
++  }else{
++   if(b.source)installFact(b,b.source,'value',unit.fact,unit.selected?lifecycle.combineNativeRequirements([authoredRequirement,unit.selected]):authoredRequirement);
++   b.completedValueFact=unit.fact;b.valuePayload=unit.payload;
++  }
+   const support=projectionSupport(b);const effective=unit.selected?combineProofs([support.proof,lifecycle.nativeProof(unit.selected)]):support.proof;
+-  proofs.set(unit.fact,effective);lifecycle.projectRevision(channel,unit.fact,effective);
++  proofs.set(unit.fact,effective);lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0);
+   const prior=unit.previous&&proofs.get(unit.previous);
+   const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior,effective);
+   if(noop){
+@@ -272,7 +244,7 @@
+    // is already current. That setter may collapse to this exact revision.
+    const predecessor=effectivePredecessor(unit.previous);
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+-   b.projected=Object.freeze({fact:unit.fact,changed:unit.changed,payload:support.present?(b.aggregate?maskPayload(b):b.valuePayload):undefined});
++   b.projected=Object.freeze({fact:unit.fact,changed:unit.changed,payload:support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined)});
+   }
+   unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+@@ -311,10 +283,11 @@
+ /** Entity sources use the same receipt, validation and delivery lifecycle. */
+ export function registerSourceProjectionField(channel:object,field:object,relative:readonly string[]):void {
+  const b=bindings.get(channel);if(!b||b.fields.has(field))return;
++ const occurrence=b.index.enroll(field);b.occurrences.set(field,occurrence);
+  const address=[...(b.address??[]),...relative];
+  b.fields.set(field,{address,relative});b.fieldFacts.set(field,b.baselineStructure);b.completedFields.set(field,b.baselineStructure);b.initialized.add(field);
+  fieldAt(b.fieldTrie,relative,true)!.field=field;
+- if(exposed(b,address))adjust(b.summary,own(b.baselineStructure,channel),1);
++ installFact(b,field,'value',b.baselineStructure,lifecycle.initialRequirement());
+ }
+ export function prepareSourceProjection(channel:object,mutation:IntrinsicMutation<unknown>,requirement:lifecycle.NativeRequirement,field?:object,collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean},selected?:lifecycle.NativeRequirement):PreparedPublicationUnit|undefined {
+  const prepared=prepareScalar(channel,mutation,undefined,field,{requirement});
+@@ -334,9 +307,10 @@
+  };
+  return {exclusions:()=>source.exclusions?.().map(([id,fact])=>[id,baseline(fact)] as const)??[],member:(id,view)=>baseline(source.member(id,view)),field:(id,key,view)=>baseline(source.field(id,key,view)),placement:(id,view)=>baseline(source.placement(id,view)),keyMapping:(id,view)=>baseline(source.keyMapping(id,view))};
+ }
+-export function registerCollectionProjection(channel:object,key:object,relative:readonly string[]|undefined,initial:ReadonlyMap<string,object>,payload:unknown):void {
++export function registerCollectionProjection(channel:object,key:object,relative:readonly string[]|undefined,initial:ReadonlyMap<string,object>,payload?:unknown):void {
+  const b=bindings.get(channel);if(!b)return;
+- const support:CollectionSupport={payload,relative,entries:new Map(),summary:emptySummary()};
++ const occurrence=b.index.enroll(key);b.occurrences.set(key,occurrence);
++ const support:CollectionSupport={occurrence,payload:payload??pathValue(b.valuePayload,relative??[]).value,relative,entries:new Map()};
+  for(const [slot,reference]of initial)setCollectionEntry(channel,b,support,slot,reference as lifecycle.NativeRequirement);
+  b.collections.set(key,support);
+ }
+@@ -357,27 +331,49 @@
+   const fact=Object.freeze({...baseline,revision:++serial});const proof=lifecycle.nativeProof(requirement);
+   proofs.set(fact,proof);ownProofs.set(fact,proof);factRequirements.set(fact,requirement);return fact;
+  };
+- const presence=new Map<Slot,Presence>();for(const entry of context?.presence??[])presence.set(slotFor(entry.parent,entry.key,entry.child),{present:entry.present,fact:nativeFact(nativeMembers.get(entry.child))});
+- const binding:Binding={watches:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:emptySummary(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
++ let binding!:Binding;
++ const index=new RecipientOccurrences(()=>{
++  if(bindings.get(channel)?.index!==index)return;
++  const current=bindings.get(channel)!;
++  if(current.projected&&current.current===current.projected.fact){
++   const support=projectionSupport(current);proofs.set(current.current,support.proof);
++   lifecycle.projectRevision(channel,current.current,support.proof,index.unresolved()!==0);
++  }
++  wakeChannel(channel);
++ },edge=>nativeMembers.get(edge.child)??lifecycle.initialRequirement(),(edge,occurrence,requirement)=>{
++  const slot=slotFor(edge.parent,edge.key,edge.child),fact=nativeFact(requirement);
++  const state={present:edge.present,fact};binding.occurrences.set(edge.child,occurrence);
++  binding.presence.set(slot,state);binding.completedPresence.set(slot,state);indexSlot(binding,slot);
++  return proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);};
++ });
++ binding={index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
+  if(identity.supported&&source){
+-  // Membership has native identity even when it predates every recipient.
+-  // Seed only this source's retained paths; never infer from another binding.
+-  const enrollMembership=(candidate:object):void=>{
+-   for(const entry of getRetainedMembershipPath(candidate)){
+-    const requirement=nativeMembers.get(entry.child);if(!requirement)continue;
+-    const address=getNodeAddress(entry.parent);if(!address)continue;
+-    const memberAddress=[...address,entry.key];const indexed=slotNode(binding,memberAddress,true)!;
+-    if(indexed.slots.has(entry.child))continue;
+-    const slot=slotFor(entry.parent,entry.key,entry.child);const state={present:entry.present,fact:nativeFact(requirement)};
+-    indexed.slots.set(entry.child,slot);binding.presence.set(slot,state);binding.completedPresence.set(slot,state);
+-    if(internalSlot(binding,slot)&&exposed(binding,memberAddress,slot))adjust(binding.summary,own(state.fact,channel),1);
+-   }
+-  };
++  const enroll=(node:object)=>{const occurrence=index.enroll(node);binding.occurrences.set(node,occurrence);return occurrence;};
++  enroll(source);
+   if(binding.aggregate){
+-   const seen=new Set<object>();const visit=(candidate:unknown):void=>{if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);enrollMembership(candidate);if(getEntityPublicationBinding(candidate))return;if(isWritableLocation(candidate)){const address=getNodeAddress(candidate);const relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)return;slotNode(binding,address,true);binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);const requirement=nativeValues.get(candidate);const nativeProof=requirement&&lifecycle.nativeProof(requirement);const fieldFact=nativeProof?Object.freeze({...baseline,revision:++serial}):baseline;if(nativeProof){proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);factRequirements.set(fieldFact,requirement!);}binding.fieldFacts.set(candidate,fieldFact);binding.completedFields.set(candidate,fieldFact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;if(exposed(binding,address))adjust(binding.summary,nativeProof??baselineProof,1);const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;}const storage=nodeStoreOf(candidate)??candidate;for(const key of Object.getOwnPropertyNames(storage)){const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor&&isTraversableNode(descriptor.value))visit(descriptor.value);}};visit(source);
+-  }else {const requirement=nativeValues.get(source);if(requirement){const nativeProof=lifecycle.nativeProof(requirement);const fieldFact=Object.freeze({...baseline,revision:++serial});proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);factRequirements.set(fieldFact,requirement);binding.valueFact=fieldFact;binding.completedValueFact=fieldFact;}binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));}
+- }
+- for(const fact of new Set([binding.completedValueFact,...binding.completedFields.values(),...[...binding.completedPresence.values()].map(state=>state.fact)]))watchFact(channel,binding,fact);
++   const seen=new Set<object>();const visit=(candidate:unknown):void=>{
++    if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);
++    // Every native occurrence enrolls ancestry before its payload adapter branches.
++    enroll(candidate);
++    if(getEntityPublicationBinding(candidate))return;
++    if(isWritableLocation(candidate)){
++     const address=getNodeAddress(candidate),relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)throw Error('Enrolled field has no relative address');
++     binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);
++     const requirement=nativeValues.get(candidate)??lifecycle.initialRequirement(),fact=nativeFact(requirement);
++     binding.fieldFacts.set(candidate,fact);binding.completedFields.set(candidate,fact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;
++     installFact(binding,candidate,'value',fact,requirement);
++     const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;
++    }
++    const storage=nodeStoreOf(candidate)??candidate;
++    for(const key of Object.getOwnPropertyNames(storage)){
++     const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor&&isTraversableNode(descriptor.value)&&(getNodeAddress(descriptor.value)||getEntityPublicationBinding(descriptor.value)))visit(descriptor.value);
++    }
++   };visit(source);
++  }else{
++   const requirement=nativeValues.get(source)??lifecycle.initialRequirement(),fact=nativeFact(requirement);binding.valueFact=fact;binding.completedValueFact=fact;installFact(binding,source,'value',fact,requirement);
++   binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));
++  }
++ }
+  if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);indexedBindings++;}
+ }
+ export function onEligibility(_owner:number,cb:()=>void,channel:object):()=>void{callbacks.set(channel,cb);return()=>{callbacks.delete(channel);};}
+@@ -392,23 +388,23 @@
+  const p=proofs.get(fact);if(!p)return {early:false,pending:true};
+  return {early:!p.invalid&&!p.unknown&&!p.terminalRejectedRoles&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+-export function pendingDecision(fact:Fact|undefined,channel:object):boolean{return (bindings.get(channel)?.pending.size??0)>0||decision(fact,channel).pending;}
++export function pendingDecision(fact:Fact|undefined,channel:object):boolean{return (bindings.get(channel)?.pending.size??0)>0||(bindings.get(channel)?.index.unresolved()??0)>0||decision(fact,channel).pending;}
+ export function allowed(fact:Fact|undefined,_owner:number,_position:number,channel:object):boolean{
+- return !enabled||!lifecycle.isValidating()&&!!fact&&bindings.get(channel)?.current===fact&&!bindings.get(channel)?.pending.size&&(fact.clean||decision(fact,channel).early||grants.get(fact)?.has(channel)===true);
++ return !enabled||!lifecycle.isValidating()&&!!fact&&bindings.get(channel)?.current===fact&&!bindings.get(channel)?.pending.size&&!bindings.get(channel)?.index.unresolved()&&(fact.clean||decision(fact,channel).early||grants.get(fact)?.has(channel)===true);
+ }
+ type Request={claimant:unknown;key:object;run:()=>void};
+ export function admit(original:(r:Request)=>void,fact:Fact|undefined,_owner:number,_position:number,channel:object,r:Request):boolean{
+  if(!enabled){original(r);return true;}
+  if(!bindings.has(channel))throw new Error("Enabled publication source has no binding");
+  if(!fact)return false;
+- if(lifecycle.isValidating()||bindings.get(channel)?.pending.size)return false;
++ if(lifecycle.isValidating()||bindings.get(channel)?.pending.size||bindings.get(channel)?.index.unresolved())return false;
+  const d=decision(fact,channel);
+  if(fact&&(fact.clean||d.early)&&bindings.get(channel)?.current===fact){r.run();return true;}
+  if(d.pending||fact?.blockers.some(x=>x.outcome==='pending'))return false;
+  original({...r,run:()=>{if(fact){let set=grants.get(fact);if(!set)grants.set(fact,set=new Set());set.add(channel);}r.run();}});return true;
+ }
+ export function started(fact:Fact|undefined,channel:object):void{if(fact)lifecycle.started(channel,fact,grants.get(fact)?.has(channel)?'surviving':'declared');}
+-export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();for(const release of b?.watches.values()??[])release();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
++export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
+ export function heldCount():number{return lifecycle.diagnostics().operations;}
+ export function diagnostics(){return {...lifecycle.diagnostics(),...projection.projectionCounts(),listeners:callbacks.size,latest:bindings.size};}
+ export function declare(channel:object,_owner:number,_position:number,input:unknown,work:()=>unknown,_disposed:()=>boolean){return lifecycle.runDeclaration(channel,input,work);}
+@@ -419,7 +415,14 @@
+ export function project(channel:object,_meta:unknown,payload:unknown,relative?:readonly string[]):Fact|undefined{
+  const b=bindings.get(channel);if(!b||b.pending.size)return undefined;
+  const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);
+- const unknownProof={owners:[],unknown:true,invalid:false};proofs.set(fact,unknownProof);ownProofs.set(fact,unknownProof);if(b.aggregate){const field=relative&&fieldAt(b.fieldTrie,relative)?.field;if(field){const previous=b.completedFields.get(field);if(previous)adjust(b.summary,own(previous,channel),-1);adjust(b.summary,unknownProof,1);b.completedFields.set(field,fact);b.fieldFacts.set(field,fact);}else{for(const [node,previous]of b.completedFields){adjust(b.summary,own(previous,channel),-1);adjust(b.summary,unknownProof,1);b.completedFields.set(node,fact);b.fieldFacts.set(node,fact);}}}b.valuePayload=payload;b.valueFact=fact;b.completedValueFact=fact;
++ const unknownProof={owners:[],unknown:true,invalid:false};proofs.set(fact,unknownProof);ownProofs.set(fact,unknownProof);
++ const requirement=requirementOf(unknownProof);
++ if(b.aggregate){
++  const field=relative&&fieldAt(b.fieldTrie,relative)?.field;
++  const fields=field?[field]:[...b.completedFields.keys()];
++  for(const node of fields){installFact(b,node,'value',fact,requirement);b.completedFields.set(node,fact);b.fieldFacts.set(node,fact);}
++ }else if(b.source)installFact(b,b.source,'value',fact,requirement);
++ b.valuePayload=payload;b.valueFact=fact;b.completedValueFact=fact;
+  if(b.current)lifecycle.supersede(channel,b.current);
+  b.current=fact;b.projected=Object.freeze({fact,payload,changed:true});
+  return fact;
+--- /dev/null
++++ b/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts
+@@ -0,0 +1,89 @@
++import { captureNativeOccurrence, isNativeOccurrence, occurrenceIdentity, type NativeOccurrence, type NativeOccurrenceEdge } from '../internals/native-occurrence';
++import * as lifecycle from './lifecycle';
++type Proof = Readonly<lifecycle.Proof>;
++type Requirement = lifecycle.NativeRequirement;
++const roles = ['owners','destination','input','validation','possible'] as const;
++type Counts = { owners:Map<lifecycle.OwnerCell,number>;destination:Map<lifecycle.OwnerCell,number>;input:Map<lifecycle.OwnerCell,number>;validation:Map<lifecycle.OwnerCell,number>;possible:Map<lifecycle.OwnerCell,number>; flags:Map<string,number>;rejected:Map<number,number>;unresolved:number };
++const empty = ():Counts => ({owners:new Map(),destination:new Map(),input:new Map(),validation:new Map(),possible:new Map(),flags:new Map(),rejected:new Map(),unresolved:0});
++function count<K>(map:Map<K,number>,key:K,delta:number):void {const next=(map.get(key)??0)+delta;if(next<0)throw Error('Negative occurrence contribution');if(next)map.set(key,next);else map.delete(key);}
++function add(target:Counts,source:Counts,direction:number):void {
++ for(const role of roles)for(const [key,n]of source[role])count(target[role],key,n*direction);
++ for(const [key,n]of source.flags)count(target.flags,key,n*direction);
++ for(const [key,n]of source.rejected)count(target.rejected,key,n*direction);
++ target.unresolved+=source.unresolved*direction;if(target.unresolved<0)throw Error('Negative occurrence readiness');
++}
++function contribution(proof:Proof,unresolved:boolean):Counts {
++ const result=empty();result.unresolved=Number(unresolved);
++ for(const role of roles)for(const owner of proof[role]??[])count(result[role],owner,1);
++ for(const key of ['unknown','invalid','unavailableInput','historicalWindow'] as const)if(proof[key])count(result.flags,key,1);
++ for(const bit of [1,2,4,8])if((proof.terminalRejectedRoles??0)&bit)count(result.rejected,bit,1);
++ return result;
++}
++type Entry={requirement:Requirement;proof:Proof;counts:Counts;release?:()=>void;onProof?:(proof:Proof)=>void};
++export interface OccurrenceHandle { readonly identity:object }
++type Group=OccurrenceHandle & {parent?:Group;edge?:NativeOccurrenceEdge;guard:object;present:boolean;entries:Map<unknown,Entry>;children:Set<Group>;summary:Counts};
++
++/** One index per recipient. All contributor kinds have the same exact-slot lifecycle. */
++export class RecipientOccurrences {
++ private readonly groups=new Map<object,Group>();
++ private root?:Group;
++ private disposed=false;
++ private counters={propagated:0,finalized:0,subscriptions:0};
++ constructor(private readonly wake:()=>void,private readonly membership:(edge:NativeOccurrenceEdge)=>Requirement,private readonly enrolled?:(edge:NativeOccurrenceEdge,handle:OccurrenceHandle,requirement:Requirement)=>((proof:Proof)=>void)|void){}
++ enroll(source:object):OccurrenceHandle {return this.enrollCaptured(captureNativeOccurrence(source));}
++ enrollCaptured(occurrence:NativeOccurrence):OccurrenceHandle {
++  if(this.disposed||!isNativeOccurrence(occurrence))throw Error('Invalid occurrence enrollment');
++  const rootId=occurrenceIdentity(occurrence.root);
++  if(this.root&&this.root.identity!==rootId)throw Error('Recipient occurrence belongs to another root');
++  if(!this.root){this.root=this.group(rootId);this.groups.set(rootId,this.root);}
++  let parent=this.root;
++  for(const edge of occurrence.edges){
++   const identity=occurrenceIdentity(edge.child);let child=this.groups.get(identity);
++   if(child&&child.parent!==parent)throw Error('Native occurrence ancestry mismatch');
++   if(!child){
++    child=this.group(identity,parent,edge);this.groups.set(identity,child);parent.children.add(child);
++    if(!edge.entity){const requirement=this.membership(edge);const update=this.enrolled?.(edge,child,requirement);this.replaceEntry(parent,child.guard,requirement,update??undefined);}
++   }
++   parent=child;
++  }
++  return parent;
++ }
++ private group(identity:object,parent?:Group,edge?:NativeOccurrenceEdge):Group {return {identity,parent,edge,guard:{},present:edge?.present??true,entries:new Map(),children:new Set(),summary:empty()};}
++ private get(handle:OccurrenceHandle):Group {const group=this.groups.get(handle.identity);if(this.disposed||group!==handle)throw Error('Stale occurrence handle');return group;}
++ private propagate(group:Group,counts:Counts,direction:number):boolean {
++  let current:Group|undefined=group;
++  while(current){this.counters.propagated++;add(current.summary,counts,direction);if(!current.parent)return true;if(!current.present)return false;current=current.parent;}
++  return false;
++ }
++ private cancel(entry:Entry):void {if(entry.release){entry.release();entry.release=undefined;this.counters.subscriptions--;}}
++ private replaceEntry(group:Group,key:unknown,requirement?:Requirement,onProof?:(proof:Proof)=>void):void {
++  const old=group.entries.get(key);if(old){this.cancel(old);this.propagate(group,old.counts,-1);group.entries.delete(key);}
++  if(!requirement)return;
++  const proof=lifecycle.nativeProof(requirement),unresolved=!lifecycle.nativeRequirementReady(requirement);
++  const entry:Entry={requirement,proof,counts:contribution(proof,unresolved),onProof};group.entries.set(key,entry);this.propagate(group,entry.counts,1);onProof?.(proof);
++  if(unresolved){
++   this.counters.subscriptions++;
++   entry.release=lifecycle.onNativeRequirementReady(requirement,()=>{
++    if(this.disposed||group.entries.get(key)!==entry)return;
++    this.cancel(entry);this.counters.finalized++;
++    this.propagate(group,entry.counts,-1);entry.proof=lifecycle.nativeProof(requirement);entry.counts=contribution(entry.proof,false);
++    const selected=this.propagate(group,entry.counts,1);entry.onProof?.(entry.proof);if(selected)this.wake();
++   });
++  }
++ }
++ replace(handle:OccurrenceHandle,key:unknown,requirement?:Requirement,onProof?:(proof:Proof)=>void):void {this.replaceEntry(this.get(handle),key,requirement,onProof);}
++ setPresence(handle:OccurrenceHandle,present:boolean,requirement:Requirement):void {
++  const group=this.get(handle);if(!group.parent)throw Error('Root has no membership edge');
++  this.replaceEntry(group.parent,group.guard,requirement);
++  if(group.present===present)return;
++  this.propagate(group.parent,group.summary,present?1:-1);group.present=present;
++ }
++ exposed(handle:OccurrenceHandle):boolean {let group:Group|undefined=this.get(handle);while(group){if(!group.present)return false;group=group.parent;}return true;}
++ unresolved():number {return this.root?.summary.unresolved??0;}
++ proof():Proof {
++  const summary=this.root?.summary??empty();
++  return {owners:[...summary.owners.keys()],destination:[...summary.destination.keys()],input:[...summary.input.keys()],validation:[...summary.validation.keys()],possible:[...summary.possible.keys()],terminalRejectedRoles:[...summary.rejected.keys()].reduce((a,b)=>a|b,0),unknown:summary.flags.has('unknown'),invalid:summary.flags.has('invalid'),unavailableInput:summary.flags.has('unavailableInput'),historicalWindow:summary.flags.has('historicalWindow')};
++ }
++ inspect(){return {...this.counters,groups:this.groups.size,slots:[...this.groups.values()].reduce((n,g)=>n+g.entries.size,0)};}
++ dispose():void {if(this.disposed)return;for(const group of this.groups.values())for(const entry of group.entries.values())this.cancel(entry);this.groups.clear();this.root=undefined;this.disposed=true;}
++}
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -131,6 +131,8 @@
+   }
+ }
+ const ENTITY_PUBLICATION = Symbol('signaltree.entityPublication');
++const anchors = new WeakMap<EntityPublicationSource, object>();
++export function getEntityPublicationAnchor(source: EntityPublicationSource): object | undefined { return anchors.get(source); }
+ export interface EntityPublicationBinding {
+   readonly source: EntityPublicationSource;
+   readonly subject?: number;
+@@ -138,6 +140,7 @@
+ }
+ export function defineEntityPublicationBinding(node: object, binding: EntityPublicationBinding): void {
+   Object.defineProperty(node, ENTITY_PUBLICATION, { value: binding });
++  if (binding.subject === undefined && binding.field === undefined) anchors.set(binding.source, node);
+ }
+ export function getEntityPublicationBinding(node: unknown): EntityPublicationBinding | undefined {
+   return node !== null && (typeof node === 'object' || typeof node === 'function')
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/native-occurrence.ts
+@@ -0,0 +1,50 @@
++import { getEntityPublicationAnchor, getEntityPublicationBinding } from './entity-publication';
++import { isTraversableNode, nodeStoreOf } from './node-shape';
++import { getNodeAddress, getPositionRegistry } from './position-registry';
++
++// Cold enrollment only. These are source identities, never publication permission.
++const roots = new WeakMap<object, WeakRef<object>>();
++const issued = new WeakSet<object>();
++export interface NativeOccurrenceEdge {
++  readonly parent: object;
++  readonly key: string;
++  readonly child: object;
++  readonly address: readonly string[];
++  readonly present: boolean;
++  readonly entity?: boolean;
++}
++export interface NativeOccurrence {
++  readonly root: object;
++  readonly source: object;
++  readonly edges: readonly NativeOccurrenceEdge[];
++}
++export function registerNativeOccurrenceRoot(registry: object, root: object): void {
++  roots.set(registry, new WeakRef(root));
++}
++export const occurrenceIdentity = (node: object): object => nodeStoreOf(node) ?? node;
++export function captureNativeOccurrence(source: object): NativeOccurrence {
++  const entity = getEntityPublicationBinding(source);
++  const anchor = entity && entity.subject !== undefined ? getEntityPublicationAnchor(entity.source) : source;
++  if (!anchor) throw new Error('Native occurrence has no collection anchor');
++  const registry = getPositionRegistry(anchor), address = getNodeAddress(anchor);
++  const root = registry && roots.get(registry)?.deref();
++  if (!root || !address) throw new Error('Native occurrence has no verified root/address');
++  const edges: NativeOccurrenceEdge[] = [];
++  let parent = root;
++  for (let i = 0; i < address.length; i++) {
++    const storage = occurrenceIdentity(parent), key = address[i];
++    const descriptor = Object.getOwnPropertyDescriptor(storage, key);
++    if (!descriptor || !('value' in descriptor) || !isTraversableNode(descriptor.value)) throw new Error('Native occurrence ancestry changed');
++    const child = descriptor.value;
++    edges.push(Object.freeze({ parent, key, child, address: address.slice(0, i + 1), present: descriptor.enumerable === true }));
++    parent = child;
++  }
++  if (occurrenceIdentity(parent) !== occurrenceIdentity(anchor)) throw new Error('Native occurrence address names another lifetime');
++  if (anchor !== source) {
++    // Entity bindings are source-issued and lifetime-specific; do not resolve a reused public key.
++    edges.push(Object.freeze({ parent: anchor, key: `${entity!.subject}:${entity!.field ?? ''}`, child: source, address, present: true, entity: true }));
++  }
++  const result = Object.freeze({ root, source, edges: Object.freeze(edges) });
++  issued.add(result);return result;
++}
++export function isNativeOccurrence(value: NativeOccurrence): boolean { return issued.has(value); }
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -847,7 +847,7 @@
+           // No remaining work needs no permission. Read only the eligible
+           // projection, once per attempt; deferred admission restarts here.
+           const researchTicket = researchFact;
+-          const now = entityProjection
++          const now = entityProjection && !research.enabled
+             ? (entityProjection.value() as unknown as T)
+             : eligible;
+           if (knownY !== undefined && deepEqual(now, knownY.value)) {
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -1,3 +1,4 @@
++import { registerNativeOccurrenceRoot } from './internals/native-occurrence';
+ import { beginBranchPublicationInput, endBranchPublicationInput, hasPublicationPreparation } from './internals/intrinsic-mutation';
+ import {needsLocationAuthorityAdmission} from './internals/location-runtime';
+ import { reportContainedObserverError } from './internals/error-reporter';
+@@ -1914,6 +1915,7 @@
+     materializationContext.locationRuntime
+   );
+ 
++  registerNativeOccurrenceRoot(materializationContext.positionRegistry, rootAccessor as object);
+   const tree = {} as ISignalTree<T>;
+   defineNodeAddress(tree, []);
+ 

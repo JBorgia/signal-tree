@@ -1,0 +1,28 @@
+{
+  "requested": [
+    "npx",
+    "vitest",
+    "run",
+    "--root",
+    "packages/kernel",
+    "--config",
+    "vitest.retention.config.ts",
+    "src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts",
+    "src/lib/link-lifetime.spec.ts",
+    "src/lib/internals/location-runtime-retention.spec.ts"
+  ],
+  "resolved": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/private/tmp/st-parent-freshness-implementation-independent/c13-retention-composition/candidate/node_modules/vitest/vitest.mjs",
+    "run",
+    "--root",
+    "packages/kernel",
+    "--config",
+    "vitest.retention.config.ts",
+    "src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts",
+    "src/lib/link-lifetime.spec.ts",
+    "src/lib/internals/location-runtime-retention.spec.ts"
+  ],
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c13-retention-composition/candidate",
+  "exit": 0
+}

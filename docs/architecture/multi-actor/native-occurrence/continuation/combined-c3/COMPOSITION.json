@@ -1,0 +1,14 @@
+{
+  "base": "C2",
+  "packetSource": "/private/tmp/st-packet-point-admission-successor/SOURCE-SHA256.json",
+  "preserved": "ordinaryPlacements readonly packet property from C2; sole producer freezes nonempty array/rows, empty result is mutable and unchanged. Existing consumers do not mutate it. No native order mutation or missed runtime delta.",
+  "oracle": "/private/tmp/st-occurrence-contract-alignment/ORACLE.patch",
+  "addedTests": [
+    "packages/kernel/src/lib/admission-refusal.spec.ts",
+    "packages/kernel/src/lib/independent-refusal-branches.spec.ts",
+    "packages/kernel/src/lib/packet-admission-r1.spec.ts",
+    "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+    "packages/kernel/src/lib/packet-index-review.spec.ts",
+    "packages/kernel/src/lib/point-admission-followup.spec.ts"
+  ]
+}

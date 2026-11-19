@@ -1,0 +1,41 @@
+
+> nx run kernel:test scalar-install-accounting.spec.ts tree-scalar-slot-runtime.spec.ts production-scalar-substrate.benchmark.spec.ts omission-reason-companion.spec.ts --testNamePattern=scalar slot runtime|counts|stale install|reentry counts|ordinary authority-only|recorded shadow|proves compiled scalar reads|refuses, typed, when the collection changed while omitted --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-install-accounting.spec.ts tree-scalar-slot-runtime.spec.ts production-scalar-substrate.benchmark.spec.ts omission-reason-companion.spec.ts --testNamePattern="scalar slot runtime|counts|stale install|reentry counts|ordinary authority-only|recorded shadow|proves compiled scalar reads|refuses, typed, when the collection changed while omitted" --maxWorkers=1
+
+(node:83205) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-instrumentation-successor/candidate/packages/kernel
+
+(node:83234) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:86878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88885) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  27 passed | 78 skipped (105)
+   Start at  20:34:22
+   Duration  52.29s (transform 5.00s, setup 0ms, import 9.10s, tests 7.86s, environment 30.59s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      54.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     54.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    54.4s

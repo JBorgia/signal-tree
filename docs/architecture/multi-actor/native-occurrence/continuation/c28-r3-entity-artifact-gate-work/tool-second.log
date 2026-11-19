@@ -1,0 +1,8 @@
+Entity artifact evidence: /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-UzLnuw
+FAIL: AssertionError [ERR_ASSERTION]: mutant/production: incomplete or unrecognized runtime failure
+    at replay (file:///private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-entity-registration-artifacts.mjs:220:7)
+    at file:///private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-entity-registration-artifacts.mjs:260:5
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Evidence: /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-UzLnuw

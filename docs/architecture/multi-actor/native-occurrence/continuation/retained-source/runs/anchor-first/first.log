@@ -1,0 +1,68 @@
+
+> nx run kernel:test native-anchor-diagnostic.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-anchor-diagnostic.spec.ts --maxWorkers=1
+
+(node:41296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41303) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-retained-source-successor/candidate/packages/kernel
+
+(node:41310) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-anchor-diagnostic.spec.ts (2 tests | 2 failed) 14ms
+   × native anchor source identity diagnostic enhanced=false 10ms
+   × native anchor source identity diagnostic enhanced=true 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-anchor-diagnostic.spec.ts > native anchor source identity diagnostic enhanced=false
+ FAIL  src/lib/native-anchor-diagnostic.spec.ts > native anchor source identity diagnostic enhanced=true
+AssertionError: expected undefined to deeply equal [ 'rows' ]
+
+- Expected:
+[
+  "rows",
+]
+
++ Received:
+undefined
+
+ ❯ src/lib/native-anchor-diagnostic.spec.ts:19:36
+     17|     expect(getPositionRegistry(anchor)).toBe(getPositionRegistry(rows)…
+     18|     expect(getNodeAddress(rows)).toEqual(['rows']);
+     19|     expect(getNodeAddress(anchor)).toEqual(['rows']);
+       |                                    ^
+     20|     expect(captureNativeOccurrence(field).source).toBe(field);
+     21|   } finally { tree.destroy(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  16:41:13
+   Duration  970ms (transform 517ms, setup 0ms, import 618ms, tests 14ms, environment 246ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-anchor-diagnostic.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

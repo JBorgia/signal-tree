@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "tools/check-spec-types.mjs"
+  ],
+  "cwd": "/private/tmp/st-c23-declare-public-successor/candidate",
+  "manifestSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+  "node": "24.15.0",
+  "noProgressSeconds": 180,
+  "progressDefinition": "gate output bytes or new stage (compiler child first observed, compiler child exits); unchanged process census is not progress",
+  "tmp": "/private/tmp/st-c23-declare-spec-types-final-retry/tmp"
+}

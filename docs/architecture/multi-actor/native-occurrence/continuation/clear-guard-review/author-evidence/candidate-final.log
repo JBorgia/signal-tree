@@ -1,0 +1,37 @@
+Creating project graph nodes with @nx/vitest
+
+
+> nx run kernel:test entity-large-batches-v16-controls.spec.ts --testNamePattern=search work --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-large-batches-v16-controls.spec.ts --testNamePattern="search work" --maxWorkers=1
+
+(node:54090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54097) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c19-clear-guard-successor/candidate/packages/kernel
+
+(node:54116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  15 passed | 3 skipped (18)
+   Start at  13:03:21
+   Duration  13.29s (transform 3.74s, setup 0ms, import 4.60s, tests 2.78s, environment 5.13s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      17.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     17.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    17.2s

@@ -1,0 +1,9 @@
+{
+  "cwd": "/private/tmp/st-c12-independent-framework-verification/candidate",
+  "argv": [
+    "node",
+    "tools/check-spec-types.mjs"
+  ],
+  "env_file": "/private/tmp/st-c12-independent-framework-verification/ENVIRONMENT.json",
+  "ST_PREPARED_REVIEW_OUTPUT": "unset"
+}

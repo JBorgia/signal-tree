@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=clear-find-attribution-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=clear-find-attribution-review.spec.ts --maxWorkers=1
+
+(node:24974) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:24991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-other-frameworks/clear-adjudication/c8a/packages/kernel
+
+(node:25000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:16:45
+   Duration  1.58s (transform 812ms, setup 0ms, import 973ms, tests 141ms, environment 362ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.4s

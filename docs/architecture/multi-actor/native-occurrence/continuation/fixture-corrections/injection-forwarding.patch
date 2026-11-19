@@ -1,0 +1,81 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts
+@@ -1,3 +1,19 @@
++import type { EntityRealizationEdit, EntityValueTransition } from '../entity-value-transition';
++import type { PublicationPreparation } from '../publication-preparation';
++import type { SelectedInstallation, SelectedRowEdit } from '../selected-write-operation';
++type PointPort = {
++  __preparePointValues(
++    values: readonly {
++      subjectId: number;
++      key: string | number;
++      value: unknown;
++      edits: readonly EntityRealizationEdit[];
++      transition?: EntityValueTransition<{ id: string; n: number }>;
++    }[],
++    selectedSteps?: readonly SelectedRowEdit[],
++    publicationPhase?: PublicationPreparation
++  ): SelectedInstallation;
++};
+ import { expect, it, vi } from 'vitest';
+ import { entityMap, restoration, signalTree, undoable } from '../../../index';
+ it('attempts later live lifetime invalidation after first installed row invalidation fails', async () => {
+@@ -7,11 +23,11 @@
+   for(let i=0;i<32;i++)await Promise.resolve();
+   undoable(()=>{t.$.left.removeOne('a');t.$.right.byIdOrFail('a').n(50);t.$.right.byIdOrFail('b').n(60);});
+   for(let i=0;i<32;i++)await Promise.resolve();
+-  type Plan={install():void;invalidate():void;publish():void};
+-  const port=t.$.right as unknown as {__preparePointValues(values:readonly {subjectId:number}[]):Plan};
++  const port=t.$.right as unknown as PointPort;
+   const original=port.__preparePointValues;const attempts:number[]=[];const sentinel=new Error('controlled installed lifetime invalidation');
+-  const spy=vi.spyOn(port,'__preparePointValues').mockImplementation(function(values){
+-   const plan=original.call(port,values);
++  const spy=vi.spyOn(port,'__preparePointValues').mockImplementation(function(this: PointPort, ...args: Parameters<PointPort['__preparePointValues']>){
++   const [values] = args;
++   const plan=original.apply(this,args);
+    return {...plan,invalidate(){attempts.push(values[0]!.subjectId);plan.invalidate();if(attempts.length===1)throw sentinel;}};
+   });
+   try {expect(()=>t.undo()).toThrow(sentinel);}finally{spy.mockRestore();}
+--- a/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts
+@@ -1,3 +1,19 @@
++import type { EntityRealizationEdit, EntityValueTransition } from '../entity-value-transition';
++import type { PublicationPreparation } from '../publication-preparation';
++import type { SelectedInstallation, SelectedRowEdit } from '../selected-write-operation';
++type PointPort = {
++  __preparePointValues(
++    values: readonly {
++      subjectId: number;
++      key: string | number;
++      value: unknown;
++      edits: readonly EntityRealizationEdit[];
++      transition?: EntityValueTransition<{ id: string; n: number }>;
++    }[],
++    selectedSteps?: readonly SelectedRowEdit[],
++    publicationPhase?: PublicationPreparation
++  ): SelectedInstallation;
++};
+ import { expect, it, vi } from 'vitest';
+ import { entityMap, restoration, signalTree, undoable } from '../../../index';
+ import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
+@@ -28,16 +44,14 @@
+     const runtime = getTreeScalarSlotRuntime(tree.$)!;
+     expect(runtime).toBeDefined();
+     const scalar = vi.spyOn(runtime, 'publishPrepared');
+-    type Plan = { install(): void; invalidate(): void; publish(): void };
+-    const port = tree.$.right as unknown as {
+-      __preparePointValues(values: readonly { subjectId: number }[]): Plan;
+-    };
++    const port = tree.$.right as unknown as PointPort;
+     const original = port.__preparePointValues;
+     const attempts: number[] = [];
+     const first = new Error('first installed invalidation');
+     const second = new Error('second installed invalidation');
+-    const spy = vi.spyOn(port, '__preparePointValues').mockImplementation(function(values) {
+-      const plan = original.call(port, values);
++    const spy = vi.spyOn(port, '__preparePointValues').mockImplementation(function(this: PointPort, ...args: Parameters<PointPort['__preparePointValues']>) {
++      const [values] = args;
++      const plan = original.apply(this, args);
+       return { ...plan, invalidate() {
+         attempts.push(values[0]!.subjectId);
+         plan.invalidate();

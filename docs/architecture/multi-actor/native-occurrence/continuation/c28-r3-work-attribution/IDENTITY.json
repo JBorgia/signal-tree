@@ -1,0 +1,8 @@
+{
+  "baseManifestSha256": "fa371d221f9904c4feec2d8f684360c73ccb7e30b98bf03a18d0dea5768bf791",
+  "changedPaths": [
+    "packages/kernel/src/lib/entity-granular-reactivity.spec.ts"
+  ],
+  "specSha256": "420c472d968bcbaccb3490a72ca0b6354d6c265f94ab4d9c2aeba8441990b924",
+  "runtimeUnchanged": true
+}

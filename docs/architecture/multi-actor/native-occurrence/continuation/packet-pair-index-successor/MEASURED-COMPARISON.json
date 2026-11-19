@@ -1,0 +1,35 @@
+{
+  "work": [
+    {
+      "rows": 32,
+      "beforePairing": 528,
+      "afterPairing": 0,
+      "beforeTotal": 593,
+      "afterTotal": 65
+    },
+    {
+      "rows": 256,
+      "beforePairing": 32896,
+      "afterPairing": 0,
+      "beforeTotal": 33409,
+      "afterTotal": 513
+    },
+    {
+      "rows": 1024,
+      "beforePairing": 524800,
+      "afterPairing": 0,
+      "beforeTotal": 526849,
+      "afterTotal": 2049
+    }
+  ],
+  "singletonMapAllocationParity": [
+    {
+      "stepped": false,
+      "allocations": 16
+    },
+    {
+      "stepped": true,
+      "allocations": 16
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "baseManifestSha256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "verifiedUnchangedPathsInBothCopies": 3065,
+  "addedProbeSha256": "f15a4589e30b477cc928f31b62c13ff59b32562a4ae75de5fa7e1bc44f793733",
+  "snapshotSha256": "a13a5e9a2fbbbf89dd0679f712c95c3054f95acd90305170c8e3abcf66eba025",
+  "patchSha256": "6e383bfca1fd4c16d98d6d7a2e577df71572e1df9b6d57c2bde08955d7655c78",
+  "exactImportPredicateTotalsMatchPrior": true
+}

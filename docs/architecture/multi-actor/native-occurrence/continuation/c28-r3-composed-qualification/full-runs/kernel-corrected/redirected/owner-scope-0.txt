@@ -1,0 +1,10 @@
+scalar authored             1/ 1 owned
+external scalar             1/ 1 owned
+transaction authored        1/ 1 owned
+transaction rollback        2/ 2 owned
+entity add                  2/ 2 owned
+entity field authored       2/ 2 owned
+entity field external       1/ 2 owned  UNSCOPED: rows (external) [no value]
+entity remove               2/ 2 owned
+
+OUTCOME B: unscoped frames exist (1) but carry NO value -> filtering on ownerId is SAFE for S2

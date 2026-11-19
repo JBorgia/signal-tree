@@ -1,0 +1,38 @@
+{
+  "row": {
+    "manifest": "/private/tmp/st-row-source-successor/SOURCE-SHA256.json",
+    "manifestSHA256": "45f6d1d91c7a51bd51a1d715d2fe7514b5b2158e846bf7a97439c265ba9b4574",
+    "checkedKernelNonSpec": 172,
+    "originalDifferences": [],
+    "diagnosticDifferences": [
+      "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "packages/kernel/src/lib/internals/entity-publication.ts"
+    ],
+    "artifacts": {
+      "row.jsonl": "b2d99a8324eccb76feed6cc5abef1475266e4e33278d6f4bd6c7c88e6bc511ae",
+      "row.log": "7457d6608980851e0ffb321892599526aea3ae386cd58c716629455c67475c30",
+      "row-instrumentation.patch": "5e039f29303270a75153ae61fcc9dd850bbb4b5e15fcc731147a4faf093d5e48"
+    }
+  },
+  "retirement": {
+    "manifest": "/private/tmp/st-publication-retirement-successor/SOURCE-SHA256.json",
+    "manifestSHA256": "3be20bcf4550cd79eeb36cabd6842f5a025365665d651625b05ee5b32b8ed9f9",
+    "checkedKernelNonSpec": 172,
+    "originalDifferences": [],
+    "diagnosticDifferences": [
+      "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "packages/kernel/src/lib/internals/entity-publication.ts"
+    ],
+    "artifacts": {
+      "retirement.jsonl": "263da088c7c1fd0e7089b11e0bbd2f040a65440131f5d829947baffaa7bbdd92",
+      "retirement.log": "d328c056219f710ce9c1a0ea7bfa720cd6732fcc14ce9857d97704f5bf442f10",
+      "retirement-instrumentation.patch": "6cb4d572dbff000551e12ca30b3e87fb4597d2e617e03d43b00779c33d700741"
+    }
+  },
+  "sharedArtifacts": {
+    "instrument.py": "4ef7b61900be5df6573865f74185ded517687daee531af3ad84e206d8feb7843",
+    "allocation.spec.ts": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7",
+    "row/packages/kernel/src/lib/allocation-diagnostic.ts": "88580d57b10cded2e2230d66559919ab77862234704829ba248dfc29b95a6de3",
+    "retirement/packages/kernel/src/lib/allocation-diagnostic.ts": "88580d57b10cded2e2230d66559919ab77862234704829ba248dfc29b95a6de3"
+  }
+}

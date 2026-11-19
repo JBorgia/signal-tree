@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,os,json
+r=Path(__file__).parent;env=os.environ.copy();env.update(PATH='/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:'+env['PATH'],NX_DAEMON='false',NX_ISOLATE_PLUGINS='false',NX_TUI='false')
+commands=[('final-runtime', ['corepack', 'pnpm', 'nx', 'test', 'kernel', '--skip-nx-cache', 'fixed-window-retirement.spec.ts', 'entity-negative-publication-retirement.spec.ts', 'publication-retirement-acceptance.spec.ts', 'entity-publication-work-lifetime.spec.ts', 'publication-retirement-boundaries.spec.ts', 'entity-lifetime-ledger-null.spec.ts', 'entity-selection-lifetime.spec.ts', 'subject-reclamation-coordinator.spec.ts', 'reclamation-eligibility.spec.ts', 'publication-proof-retirement.spec.ts', 'publication-terminal-obligation.spec.ts', 'publication-native-provenance.spec.ts', 'fixed-window-independent.spec.ts', 'owner-transition-cancellation.spec.ts', '--maxWorkers=1'], {}), ('source-types', ['corepack', 'pnpm', 'run', 'typecheck:source'], {}), ('spec-types', ['node', 'tools/check-spec-types.mjs'], {}), ('naive-negative', ['corepack', 'pnpm', 'nx', 'test', 'kernel', '--skip-nx-cache', 'publication-retirement-acceptance.spec.ts', '--testNamePattern=foreign pending exclusion', '--maxWorkers=1'], {'ST_RETIREMENT_FAULT': 'naive-retire'})]
+results=[]
+for name,argv,overrides in commands:
+ with (r/(name+'.log')).open('w') as log:result=subprocess.run(argv,cwd=r/'candidate',env={**env,**overrides},stdout=log,stderr=subprocess.STDOUT)
+ results.append(dict(name=name,cwd=str(r/'candidate'),argv=argv,env=overrides,exit=result.returncode));(r/'COMMAND-RESULTS.json').write_text(json.dumps(results,indent=2)+'\n');print(name,result.returncode,flush=True)

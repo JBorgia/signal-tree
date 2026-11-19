@@ -1,0 +1,7 @@
+{
+  "manifest": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "verifiedFiles": 3066,
+  "reporter": "c9b26fc7821b8349c8505980eec6345ffabb6d6b0cd29997c297b86aa31526f6",
+  "preloadOnlyChange": "diagnostic destination relocated to own scratch",
+  "oldGroup60688": "ps inspection returned no members; initial sandbox ps denial, read-only escalation succeeded"
+}

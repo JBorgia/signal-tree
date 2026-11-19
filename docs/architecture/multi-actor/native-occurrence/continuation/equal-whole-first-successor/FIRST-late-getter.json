@@ -1,0 +1,47 @@
+[
+  {
+    "route": "setAll",
+    "calls": 7,
+    "thrown": "undefined",
+    "sentinel": false,
+    "endpointSame": false,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "replaceOne",
+    "calls": 7,
+    "thrown": "undefined",
+    "sentinel": false,
+    "endpointSame": false,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "row",
+    "calls": 7,
+    "thrown": "undefined",
+    "sentinel": false,
+    "endpointSame": false,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  }
+]

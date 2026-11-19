@@ -1,0 +1,11 @@
+{
+  "sourceManifestSha256": "775d46a051cc72bff3d7759311f59e2d41d631420392b7581a1eeb2f4a19d28c",
+  "exit": 0,
+  "timeout": false,
+  "guardReason": null,
+  "maxObservedOwnedRssBytes": 239845376,
+  "minObservedHostFreePercentage": 45.0,
+  "sourceMismatches": [],
+  "remainingOwned": [],
+  "completedAt": "2026-11-03T23:04:30.864309+00:00"
+}

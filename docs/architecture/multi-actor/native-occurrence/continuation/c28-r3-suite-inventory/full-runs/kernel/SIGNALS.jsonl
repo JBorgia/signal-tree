@@ -1,0 +1,11 @@
+{"pid": 14667, "birth": "Mon Nov 2 21:20:39 2026", "signal": "SIGTERM"}
+{"pid": 6943, "birth": "Mon Nov 2 21:14:53 2026", "signal": "SIGTERM"}
+{"pid": 6937, "birth": "Mon Nov 2 21:14:53 2026", "signal": "SIGTERM"}
+{"pid": 6901, "birth": "Mon Nov 2 21:14:52 2026", "signal": "SIGTERM"}
+{"pid": 6883, "birth": "Mon Nov 2 21:14:52 2026", "signal": "SIGTERM"}
+{"pid": 6608, "birth": "Mon Nov 2 21:14:49 2026", "signal": "SIGTERM"}
+{"pid": 6596, "birth": "Mon Nov 2 21:14:46 2026", "signal": "SIGTERM"}
+{"pid": 6594, "birth": "Mon Nov 2 21:14:46 2026", "signal": "SIGTERM"}
+{"pid": 6608, "birth": "Mon Nov 2 21:14:49 2026", "signal": "SIGKILL"}
+{"pid": 6596, "birth": "Mon Nov 2 21:14:46 2026", "signal": "SIGKILL"}
+{"pid": 6594, "birth": "Mon Nov 2 21:14:46 2026", "signal": "SIGKILL"}

@@ -1,0 +1,38 @@
+
+> nx run angular:test selected-prepared-facade.spec.ts
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-prepared-facade.spec.ts
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:92951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93007) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c47b-facade-controls/candidate/packages/angular
+
+(node:93014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  15:31:55
+   Duration  3.32s (transform 1.27s, setup 601ms, import 1.45s, tests 29ms, environment 981ms)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      4.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    4.4s

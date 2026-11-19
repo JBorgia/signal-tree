@@ -1,0 +1,420 @@
+{
+  "angular-unchanged": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "absent-collection.spec.ts",
+      "parent-snapshot-currentness.spec.ts",
+      "parent-freshness-focused.spec.ts",
+      "parent-freshness-entity.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "baseline-angular-install-reentry": {
+    "cwd": "/private/tmp/st-effective-presence-successor/baseline",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "effective-presence-install-reentry.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-baseline",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-baseline"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "baseline-kernel-controls": {
+    "cwd": "/private/tmp/st-effective-presence-successor/baseline",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-successor.spec.ts",
+      "effective-presence-reentry.spec.ts",
+      "effective-presence-install-reentry.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-baseline",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-baseline"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "cold-controls-kernel": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-successor.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "cold-proof-kernel": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-successor.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "final-controls-angular": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "effective-presence-",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "final-controls-kernel": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "first-ordinary": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "absent-collection.spec.ts",
+      "--testNamePattern=a held consumer sees the re-adding write",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "install-reentry-angular": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "effective-presence-install-reentry.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "install-reentry-kernel": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-install-reentry.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "kernel-unchanged": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "absent-collection.spec.ts",
+      "parent-snapshot-currentness.spec.ts",
+      "parent-freshness-focused.spec.ts",
+      "parent-freshness-entity.spec.ts",
+      "marker-snapshot-memo.spec.ts",
+      "snapshot-builder.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "new-controls-angular": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "effective-presence-successor.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "new-controls-kernel": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-successor.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "react-absent": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "react",
+      "--skip-nx-cache",
+      "absent-collection.spec.tsx",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "reentry-kernel": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "effective-presence-reentry.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "solid-absent": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "solid",
+      "--skip-nx-cache",
+      "absent-collection.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "source-types": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "tsc",
+      "--noEmit",
+      "--pretty",
+      "false",
+      "-p",
+      "tsconfig.typecheck-all.json"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "spec-types": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "node",
+      "tools/check-spec-types.mjs"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  },
+  "spec-types-corrected-fixtures": {
+    "cwd": "/private/tmp/st-effective-presence-successor/candidate",
+    "argv": [
+      "node",
+      "tools/check-spec-types.mjs"
+    ],
+    "env": {
+      "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+      "NX_DAEMON": "false",
+      "NX_ISOLATE_PLUGINS": "false",
+      "NX_TUI": "false",
+      "NX_CACHE_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-cache-candidate",
+      "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-effective-presence-successor/nx-data-candidate"
+    },
+    "ST_PREPARED_REVIEW_OUTPUT": "unset"
+  }
+}

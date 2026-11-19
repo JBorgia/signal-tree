@@ -1,0 +1,35 @@
+
+> nx run kernel:test retained-source-public-controls.spec.ts
+
+> node tools/run-core-vitest.mjs retained-source-public-controls.spec.ts
+
+(node:43621) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-retained-source-controls/main-copy/packages/kernel
+
+(node:43636) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  16:43:16
+   Duration  1.03s (transform 559ms, setup 0ms, import 676ms, tests 39ms, environment 202ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

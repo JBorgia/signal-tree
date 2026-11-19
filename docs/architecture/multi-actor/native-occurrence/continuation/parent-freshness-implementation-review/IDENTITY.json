@@ -1,0 +1,16 @@
+{
+  "candidate": {
+    "manifestSHA256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+    "files": 3047,
+    "mismatches": []
+  },
+  "base": {
+    "manifestSHA256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+    "files": 3031,
+    "mismatches": []
+  },
+  "patches": {
+    "RUNTIME.patch": "19e8c5dbd6208da35754e97244c389ade7f199548d6c81610ce309669cc78c6d",
+    "tests.patch": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463"
+  }
+}

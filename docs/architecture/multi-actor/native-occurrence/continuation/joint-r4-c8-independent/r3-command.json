@@ -1,0 +1,13 @@
+{
+  "cwd": "/private/tmp/st-r4-review-resumed/r3-control",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "entity-membership-view-v16-controls.spec.ts",
+    "--maxWorkers=1"
+  ]
+}

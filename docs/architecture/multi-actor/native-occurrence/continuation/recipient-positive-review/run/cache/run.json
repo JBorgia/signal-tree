@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel recipient-progress-positive-counterparts.spec.ts recipient-source-permission.spec.ts recipient-cause-classification.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T21:06:06.091Z",
+    "endTime": "2026-11-02T21:06:11.540Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "3313377789891389304",
+      "startTime": "2026-11-02T21:06:06.147Z",
+      "endTime": "2026-11-02T21:06:11.539Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "baselinePaths": 3095,
+  "finalPaths": 3098,
+  "changedOnly": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts"
+  ],
+  "newOnly": [
+    "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+    "packages/kernel/src/lib/dynamic-admission-minimal.spec.ts",
+    "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts"
+  ],
+  "allOtherBaselinePathsMatch": true,
+  "runtimeCheckpointUnchanged": true,
+  "frameworkFixturesUnchanged": true,
+  "specTypeBaselineUnchanged": true
+}

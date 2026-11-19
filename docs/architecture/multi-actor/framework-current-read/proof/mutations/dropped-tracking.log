@@ -1,0 +1,66 @@
+
+> nx run angular:test current-read-capability -t source-linked producer preserves held --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular current-read-capability -t "source-linked producer preserves held" --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:69748) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/angular
+
+(node:69779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/current-read-capability.spec.ts (4 tests | 1 failed | 3 skipped) 4ms
+   × current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/current-read-capability.spec.ts > current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors
+AssertionError: expected 'X' to be 'C' // Object.is equality
+
+Expected: "C"
+Received: "X"
+
+ ❯ src/lib/current-read-capability.spec.ts:42:81
+     40|   }
+     41|   left.set(1); let before = calls;
+     42|   expect(c.read()).toBe(latest); expect(calls-before).toBe(1); expect(…
+       |                                                                                 ^
+     43|   let deliveries = 0, cleanups = 0;
+     44|   const stop = observe(cleanup => {deliveries++; c.read(); cleanup(() …
+ ❯ new ZoneAwarePromise ../../node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 skipped (4)
+   Start at  13:25:12
+   Duration  403ms (transform 29ms, setup 136ms, import 18ms, tests 4ms, environment 163ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular current-read-capability -t "source-linked producer preserves held" --maxWorkers=2" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      918ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     909ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    909ms

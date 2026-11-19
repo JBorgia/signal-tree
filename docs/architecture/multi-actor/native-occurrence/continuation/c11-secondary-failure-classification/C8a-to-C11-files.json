@@ -1,0 +1,110 @@
+{
+  "packages/angular/src/lib/parent-freshness-entity.spec.ts": {
+    "C8a": null,
+    "C11": "6237c55ebbcf910b70bb43c266d4ffbfdf410241093b615ddaa5195a1fec36d4"
+  },
+  "packages/angular/src/lib/parent-freshness-focused.spec.ts": {
+    "C8a": null,
+    "C11": "af32a888645ffde5cfeb47758109bbb22fe20dd10cef17e6d01dd5529e4b3794"
+  },
+  "packages/angular/src/lib/parent-snapshot-currentness.spec.ts": {
+    "C8a": null,
+    "C11": "db3835be6a83b6f2191eb2c5c68bf3895b749b7f1a582e8a3b85d6364cdd93ec"
+  },
+  "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts": {
+    "C8a": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4",
+    "C11": "7fd43cdf9d714cc6d1b66a5b87b8041c782b2356cba9710abc3569b8d6399946"
+  },
+  "packages/kernel/src/lib/entity-signal.ts": {
+    "C8a": "d6b3ec2c4ef3a8ecb1e8e46dc98082c3924837ce183d078eb832976ce0b79bd4",
+    "C11": "8a301cc1ee1e87fdf37c33508197d3019f3c6e38b6fed88c209285de05006d70"
+  },
+  "packages/kernel/src/lib/internals/entity-membership-inventory.ts": {
+    "C8a": "f04d2e639d67a923f88e69091d61f629ecaaf17be4d6aceb3d3cfcbc95afdd89",
+    "C11": "82c306630ab0b1be88111a21bda76ed769c275240030e9f8e90bf1d9862bcf3e"
+  },
+  "packages/kernel/src/lib/internals/entity-membership-source.ts": {
+    "C8a": "099b2d5ad23ae5f7a75f691577bf45221aa18c1276d09ca1dacf2324b3eb6dc1",
+    "C11": "0c1df9a0ec396539566f82a671b2a643631e148a4e0a5cddd21fcd4b77080aa2"
+  },
+  "packages/kernel/src/lib/internals/location-runtime.ts": {
+    "C8a": "cad5bf20f795c98c3df6dd9bb01260815e1a170beef54dc435ffab05546c6cbd",
+    "C11": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5"
+  },
+  "packages/kernel/src/lib/internals/materialize-markers.ts": {
+    "C8a": "ef06b600fb9a990b03df9965b2e412bcd780a99d0daf347f314bdd429981a5f6",
+    "C11": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381"
+  },
+  "packages/kernel/src/lib/internals/member-membership.ts": {
+    "C8a": "dc7cb7c8e61f57ea05784ad751fa395d6c32ed5f23bf43734787e0894b57263e",
+    "C11": "9cae2ffcb93f5fff3d503989d12a0cffd772969f8ce549649c9861d09edc7c30"
+  },
+  "packages/kernel/src/lib/internals/native-location-realization.ts": {
+    "C8a": "6a85bce4173de5889f649cbde90a0ca0d8351debf2dcf87bc99512e157573dd0",
+    "C11": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680"
+  },
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+    "C8a": "54f604a566f1b48809711a8a83dc041dc91f00a0f834fd3d66b89e8bb4acb45d",
+    "C11": "2845404e89069c33f5131e2b2aa6404ebdbb88ade92173371bbc98f590862d55"
+  },
+  "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+    "C8a": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954",
+    "C11": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354"
+  },
+  "packages/kernel/src/lib/internals/snapshot-installation.ts": {
+    "C8a": null,
+    "C11": "02ffc94a1b4150bb108a5ed4bd01e3bfd36bbef86af2c1bf96552d7e41f67a7b"
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": {
+    "C8a": "ba970fee4b8c5843404743621171ee5b90608e59dfd73bdb38ed6b5624f22831",
+    "C11": "2954b77e477ed7177b2580ce2d7ea55caa07d88e374adb5191f6ed5676c1a01c"
+  },
+  "packages/kernel/src/lib/membership-prepared-order.spec.ts": {
+    "C8a": null,
+    "C11": "a3c6690ae62a1c85f235de5fb89c4305628cd5a680262e85ec8f164d027bd4c2"
+  },
+  "packages/kernel/src/lib/parent-freshness-entity.spec.ts": {
+    "C8a": null,
+    "C11": "7e224cb7c28f9b2f6878a30a1c9c33d60a726717573892e4c513cac0f8a85bc3"
+  },
+  "packages/kernel/src/lib/parent-freshness-focused.spec.ts": {
+    "C8a": null,
+    "C11": "c31ab537a83917af1211f5ae863d4847f393032f480c50296fddc20ab9d6ba72"
+  },
+  "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts": {
+    "C8a": null,
+    "C11": "93273e3668f2e1ef1d78fbc4c93a415e16949e0f273f5eb0f033cb809d6200d4"
+  },
+  "packages/kernel/src/lib/point-result-allocation.spec.ts": {
+    "C8a": null,
+    "C11": "281196216b92dc418f5236624ce7d631d56c8393f5b950793492b17100930b0b"
+  },
+  "packages/kernel/src/lib/point-result-demand.spec.ts": {
+    "C8a": null,
+    "C11": "58a97dba8907644e10d9bf289747ad31b705f75391cd932bf2f4eb34917e9baf"
+  },
+  "packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts": {
+    "C8a": null,
+    "C11": "229fdf26cbc654ad7e7367d45e71f7fc656925b16a588065a7ba2578c68793bc"
+  },
+  "packages/kernel/src/lib/utils.ts": {
+    "C8a": "307f39dfe11febe766c3d1b30bc30c9f9dec8d93cdf59c1f717479966e95b460",
+    "C11": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232"
+  },
+  "packages/kernel/src/lib/whole-value-new-keys.spec.ts": {
+    "C8a": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606",
+    "C11": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11"
+  },
+  "packages/react/src/parent-freshness-counterparts.spec.tsx": {
+    "C8a": null,
+    "C11": "2431b05bc5dfb20caf5dc9fc070e372961fc52d3bb6231172fd1aa26c8e87596"
+  },
+  "packages/solid/src/lib/parent-freshness-counterparts.spec.ts": {
+    "C8a": null,
+    "C11": "9be14e49e2849f084e61384034d5919695b2c8c5478204bcc4dd44cee454f126"
+  },
+  "packages/vue/src/lib/parent-freshness-counterparts.spec.ts": {
+    "C8a": null,
+    "C11": "8cdac84212260f1dea2964c75b96927b70476248dd62a858a5ab7e762767f073"
+  }
+}

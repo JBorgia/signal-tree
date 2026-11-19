@@ -1,0 +1,40 @@
+{
+  "followup": "retry",
+  "before": {
+    "value": {
+      "x": 7,
+      "y": 11
+    },
+    "inspection": "{\"changes\":[{\"path\":\"rows.a.x\",\"address\":[\"rows\",\"x\"],\"subject\":1,\"status\":\"current\"},{\"path\":\"rows.a.y\",\"address\":[\"rows\",\"y\"],\"subject\":1,\"status\":\"current\"}]}"
+  },
+  "calls": [
+    {
+      "changes": {
+        "x": 0
+      },
+      "value": {
+        "x": 7,
+        "y": 11
+      }
+    }
+  ],
+  "afterFailure": {
+    "value": {
+      "x": 7,
+      "y": 11
+    },
+    "inspection": "{\"changes\":[{\"path\":\"rows.a.x\",\"address\":[\"rows\",\"x\"],\"subject\":1,\"status\":\"current\"},{\"path\":\"rows.a.y\",\"address\":[\"rows\",\"y\"],\"subject\":1,\"status\":\"current\"}]}"
+  },
+  "afterFollowup": {
+    "value": {
+      "x": 0,
+      "y": 0
+    },
+    "inspection": "{\"changes\":[{\"path\":\"rows.a.x\",\"address\":[\"rows\",\"x\"],\"subject\":1,\"status\":\"current\"},{\"path\":\"rows.a.y\",\"address\":[\"rows\",\"y\"],\"subject\":1,\"status\":\"current\"}]}"
+  },
+  "firstError": {
+    "name": "SignalTreeRollbackError",
+    "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Cannot update entity: public x inverse refused [effect-validation-failed]"
+  },
+  "followupError": "undefined"
+}

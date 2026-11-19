@@ -1,0 +1,11 @@
+{
+  "status": "point-in-time; final worker manifest not supplied",
+  "baseManifest": "42280bba7bc92b75ae3f252742de5b7f78e4cce0b61c1d935212d7e438f2baf1",
+  "source": {
+    "tools/verify-entity-registration-artifacts.mjs": "a73bd9e58aeccee5cb5969432326b9de0e1b4025fc8f897b99ec61787732c828",
+    "tools/verify-gates.mjs": "c5ce068a0c54d8b3353a6451bffcb5346d885639f68f58ce746dc8a35fb02ef9",
+    "tools/experiments/entity-registration/README.md": "adbcf2e7f0c8e2b867569d3452712d60b25bb004ac80a10f1aa20ff017101b49"
+  },
+  "distRegularFiles": 192,
+  "distMatchesDiagnostic": true
+}

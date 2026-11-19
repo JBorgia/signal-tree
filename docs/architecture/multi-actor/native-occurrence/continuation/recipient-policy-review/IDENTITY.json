@@ -1,0 +1,14 @@
+{
+  "recipient": {
+    "manifest": "/private/tmp/st-recipient-window-successor/SOURCE-SHA256.json",
+    "sha256": "f7138509c91316ab5b1cdc5d7bb9276d55637e8c88d3123b5e4d1596fc70fe55",
+    "files": 2968,
+    "differences": []
+  },
+  "known-input": {
+    "manifest": "/private/tmp/st-known-input-contract/SOURCE.json",
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "files": 2967,
+    "differences": []
+  }
+}

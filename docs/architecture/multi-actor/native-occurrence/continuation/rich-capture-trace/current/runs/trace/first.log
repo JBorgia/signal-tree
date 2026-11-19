@@ -1,0 +1,79 @@
+
+> nx run kernel:test rich-capture-trace.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs rich-capture-trace.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:36112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-rich-capture-boundary/current/candidate/packages/kernel
+
+(node:36128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ × src/lib/internals/causal-runtime/rich-capture-trace.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth 30ms
+   → expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/internals/causal-runtime/rich-capture-trace.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth
+AssertionError: expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+
+- Expected
++ Received
+
+@@ -7,14 +7,14 @@
+        },
+      ],
+      "right": [
+        {
+          "id": "a",
+-         "n": 11,
++         "n": 50,
+        },
+        {
+          "id": "b",
+-         "n": 12,
++         "n": 60,
+        },
+      ],
+    },
+  ]
+
+ ❯ src/lib/internals/causal-runtime/rich-capture-trace.spec.ts:43:22
+     41|     trace({phase:'after-undo',left:tree.$.left.all(),right:tree.$.righ…
+     42|     expect(armed).toBe(false);
+     43|     expect(observed).toEqual([{
+       |                      ^
+     44|       left: [{ id: 'a', n: 1 }],
+     45|       right: [{ id: 'a', n: 11 }, { id: 'b', n: 12 }],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  17:16:29
+   Duration  784ms (transform 435ms, setup 0ms, import 521ms, tests 31ms, environment 151ms)
+
+Warning: command "node tools/run-core-vitest.mjs rich-capture-trace.spec.ts --reporter=verbose --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

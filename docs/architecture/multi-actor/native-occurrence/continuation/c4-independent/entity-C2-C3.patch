@@ -1,0 +1,62 @@
+--- C2/packages/kernel/src/lib/experimental-publication/entity.ts
++++ C3/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,7 +1,7 @@
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+-import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
++import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
+ import * as lifecycle from './lifecycle';
+ import { currentNativePublicationInputs } from './private';
+ 
+@@ -62,10 +62,20 @@
+       const inputs=[...currentNativePublicationInputs(),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])];
+       const prepared=inspection?undefined:lifecycle.prepareNativeRequirement(owner?[owner]:[],!valid||meta?.origin!==undefined,inputs);
+       const requirement=prepared?.requirement??unavailable();
++      // This source-owned prepared packet has one ordered admitted sequence.
++      // Keep duplicates/tombstones in that sequence; only proposal lookup uses
++      // the last subject occurrence, exactly as the former reverse/find did.
++      // The index belongs to this preparation, never a source or observer cache.
++      // Admission owns stable metadata; reuse point membership directly.
++      // The stepped helper builds exactly one ordered sequence.
++      const ordinaryEdits=entityPublicationOrdinary(packet);
++      const singleton=ordinaryEdits.length===1?ordinaryEdits[0]:undefined;
++      const lastOrdinaryBySubject=singleton?undefined:new Map<number,EntityPublicationEdit>();
++      if(lastOrdinaryBySubject)for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
+       const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
+       const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
+-        const edit=[...entityPublicationOrdinary(packet)].reverse().find(edit=>edit.subject===subject);
++        const edit=singleton?.subject===subject?singleton:lastOrdinaryBySubject?.get(subject);
+         if(!edit)throw new Error('Missing admitted field publication');
+         return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
+       };
+@@ -111,7 +121,7 @@
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+       if(packet.physicalOrder)for(const subject of packet.physicalOrder){physicalPlacements.set(subject,{requirement});writes.push({map:placementViews,key:subject,value:{requirement}});}
+-      for(const edit of entityPublicationOrdinary(packet)){
++      for(const edit of ordinaryEdits){
+         if(edit.structural?.kind==='remove'){
+           removed.add(edit.subject);nextFields.delete(edit.subject);nextViews.delete(edit.subject);
+           nextMembers.set(edit.subject,{present:false,requirement});
+@@ -160,7 +170,7 @@
+       selected.forEdit=edit=>selectedAt.get(edit)??selected;
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+-        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...entityPublicationOrdinary(packet).map(edit=>edit.subject)])]:[subject];
++        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject!.keys())])]:[subject];
+         if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+         for(const id of selected){
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+@@ -172,7 +182,9 @@
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+         return lifecycle.combineNativeRequirements(sources);
+       };
+-      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
++      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
++        if(prepared)lifecycle.finalizeNativeRequirement(requirement);
++      }};
+     },
+     complete(){},
+     prepareRetirement(subject){

@@ -1,0 +1,26 @@
+{
+  "nx": {
+    "version": "23.1.0",
+    "originalResolved": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx",
+    "copyResolved": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx",
+    "packageJsonSha256": "1ece57bedcaaa587f62e81194878fa9859e69af0ab830a68769a8b316785afed"
+  },
+  "vitest": {
+    "version": "4.1.9",
+    "originalResolved": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest",
+    "copyResolved": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest",
+    "packageJsonSha256": "e12762a5b629bea6cbb2b0540a8a15c50f3098bb3193d3e319293b58b64c4ed9"
+  },
+  "vite": {
+    "version": "6.4.3",
+    "originalResolved": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite",
+    "copyResolved": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite",
+    "packageJsonSha256": "a1d0149fd986fd34b6d35503d2c0d8d9f743c4dbaaf94fbc11812bc84b05884d"
+  },
+  "typescript": {
+    "version": "6.0.3",
+    "originalResolved": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/typescript@6.0.3/node_modules/typescript",
+    "copyResolved": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/typescript@6.0.3/node_modules/typescript",
+    "packageJsonSha256": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9"
+  }
+}

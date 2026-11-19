@@ -1,0 +1,15 @@
+{
+  "scope": "eight changed/new paths; no new full-tree hash claim",
+  "candidateManifestSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+  "hashes": {
+    "packages/kernel/src/index.ts": "08f93fa7aa7f67281f26f8d7e7591cd9c294b29e44ed04f176da804943c5f790",
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts": "4a1ec6941b086135ab6233b506c0815d1db16d3a8c429d70689a68ef85b530be",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "03163f60dcd5667eb2805aeebd715c724b9e50c5596fe9866373a5f6e29852c4",
+    "packages/kernel/src/lib/link.ts": "0f077671df81bead221d76a9ed302a207107f91f06020bd7ad685e00c1f50be4",
+    "packages/kernel/src/lib/tree-error-public-contract.spec.ts": "ba57c2d624c7d1dfa09c01f7eabf1dac0999b76fb15a32e5755631466916ec9d",
+    "packages/kernel/src/lib/publication-declaration.ts": "46e468e60e102f16e54f8170b954cd0ec60207cd09806baea5d2bc270b757247",
+    "packages/kernel/src/lib/link-declaration-public.spec.ts": "dbd54bf992ac94dc19c7efff7837138b8e557830328f7f51454a4b742930960a",
+    "packages/kernel/src/lib/link-declaration.typing.spec.ts": "8307a4acf3243b9e550b24f53824b2b897ce636bfaf2bf7b19d25ca3cb1ed192"
+  },
+  "match": true
+}

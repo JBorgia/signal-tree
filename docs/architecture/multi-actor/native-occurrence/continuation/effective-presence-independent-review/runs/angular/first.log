@@ -1,0 +1,40 @@
+
+> nx run angular:test effective-presence-successor.spec.ts effective-presence-install-reentry.spec.ts --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular effective-presence-successor.spec.ts effective-presence-install-reentry.spec.ts --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:45999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-effective-presence-independent-review/candidate/packages/angular
+
+(node:46114) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46164) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  13 passed (13)
+   Start at  10:38:47
+   Duration  4.61s (transform 1.52s, setup 862ms, import 2.08s, tests 95ms, environment 1.11s)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      7.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    7.5s

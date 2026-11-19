@@ -1,0 +1,11 @@
+
+· building packages — 2 gate(s) read dist/
+
+Gate self-test — each gate must FAIL against its own mutation
+
+  · entity-registration-artifacts awaiting validated entity-registration-artifacts:self
+  · entity-registration-artifacts:self mutating tools/verify-entity-registration-artifacts.mjs ... caught it (exit 42) ✓
+  · entity-registration-artifacts proven via validated entity-registration-artifacts:self ✓
+
+──────────────────────────────────────────────────────────────────────────────
+2/2 gates PROVEN able to fail (1 indirectly, via a companion self-test gate). 0 unproven, 0 vacuous, 0 blind, 0 errored.

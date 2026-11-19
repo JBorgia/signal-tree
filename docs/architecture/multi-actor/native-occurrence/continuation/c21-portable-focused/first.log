@@ -1,0 +1,39 @@
+(node:85666) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run kernel:test --maxWorkers=1 src/lib/readonly.spec.ts src/lib/fixed-window-retirement.spec.ts
+
+> node tools/run-core-vitest.mjs --maxWorkers=1 src/lib/readonly.spec.ts src/lib/fixed-window-retirement.spec.ts
+
+(node:85736) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85743) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c21-portable-reconstructed-r2/packages/kernel
+
+(node:85751) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85755) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  18 passed (18)
+   Start at  13:46:51
+   Duration  1.69s (transform 757ms, setup 0ms, import 955ms, tests 80ms, environment 437ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.3s

@@ -1,0 +1,9 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c11-occupancy-validity/candidate",
+  "argv": [
+    "git",
+    "apply",
+    "--check",
+    "/private/tmp/st-parent-freshness-implementation-independent/c11-occupancy-validity/OCCUPANCY-SETUP.patch"
+  ]
+}

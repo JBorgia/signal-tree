@@ -1,0 +1,163 @@
+[
+  {
+    "arm": "baseline",
+    "size": 128,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      40667
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 61532256,
+    "firstSampleHeapUsed": 44213336,
+    "sampledPositiveGrowth": 17318920,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1,
+    "boundaryCount": 30,
+    "selectedBoundaryHeapUsed": {
+      "restoration:after-replace": 47407240,
+      "restoration:before-undo": 48968480,
+      "restoration:after-undo": 48559712,
+      "restoration:after-redo": 58949408,
+      "restoration:after-destroy": 61182392,
+      "restoration:after-final-drain": 61532256
+    }
+  },
+  {
+    "arm": "reader",
+    "size": 128,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      42727
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 62336416,
+    "firstSampleHeapUsed": 38942720,
+    "sampledPositiveGrowth": 23393696,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1,
+    "boundaryCount": 30,
+    "selectedBoundaryHeapUsed": {
+      "restoration:after-replace": 42280048,
+      "restoration:before-undo": 43844632,
+      "restoration:after-undo": 51844536,
+      "restoration:after-redo": 60106768,
+      "restoration:after-destroy": 61986568,
+      "restoration:after-final-drain": 62336416
+    }
+  },
+  {
+    "arm": "reader",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      43928
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 65962688,
+    "firstSampleHeapUsed": 38985736,
+    "sampledPositiveGrowth": 26976952,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1,
+    "boundaryCount": 30,
+    "selectedBoundaryHeapUsed": {
+      "restoration:after-replace": 50260488,
+      "restoration:before-undo": 56149744,
+      "restoration:after-undo": 51541088,
+      "restoration:after-redo": 54035112,
+      "restoration:after-destroy": 63088704,
+      "restoration:after-final-drain": 63897176
+    }
+  },
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      44609
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 76739632,
+    "firstSampleHeapUsed": 44301256,
+    "sampledPositiveGrowth": 32438376,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1,
+    "boundaryCount": 30,
+    "selectedBoundaryHeapUsed": {
+      "restoration:after-replace": 58069632,
+      "restoration:before-undo": 63968488,
+      "restoration:after-undo": 52573672,
+      "restoration:after-redo": 65618128,
+      "restoration:after-destroy": 75339528,
+      "restoration:after-final-drain": 76739632
+    }
+  },
+  {
+    "arm": "baseline",
+    "size": 2048,
+    "replicate": 1,
+    "exit": -15,
+    "watchdog": "no-progress180s",
+    "counts": {},
+    "workerPids": [],
+    "heapSizeLimits": [],
+    "maxSampledHeapUsed": 0,
+    "firstSampleHeapUsed": 0,
+    "sampledPositiveGrowth": 0,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": false,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1,
+    "boundaryCount": 0,
+    "selectedBoundaryHeapUsed": {}
+  }
+]

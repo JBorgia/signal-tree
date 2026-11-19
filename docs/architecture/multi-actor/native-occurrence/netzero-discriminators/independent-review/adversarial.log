@@ -1,0 +1,63 @@
+✖ distinct occurrence/field pairs containing separators remain distinct (0.362375ms)
+✖ an own __proto__ field is emitted as data without changing prototype (0.3465ms)
+✖ rebind insertion carries a certified absent before endpoint for inverse (0.122375ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35.122125
+
+✖ failing tests:
+
+test at ../../../../private/tmp/st-native-netzero-discriminators/independent-review/adversarial.test.mjs:5:1
+✖ distinct occurrence/field pairs containing separators remain distinct (0.362375ms)
+  Error: stale/missing exact slot
+      at take (file:///private/tmp/st-native-netzero-discriminators/model/model.mjs:69:53)
+      at render (file:///private/tmp/st-native-netzero-discriminators/model/model.mjs:75:15)
+      at TestContext.<anonymous> (file:///private/tmp/st-native-netzero-discriminators/independent-review/adversarial.test.mjs:10:19)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17)
+
+test at ../../../../private/tmp/st-native-netzero-discriminators/independent-review/adversarial.test.mjs:12:1
+✖ an own __proto__ field is emitted as data without changing prototype (0.3465ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///private/tmp/st-native-netzero-discriminators/independent-review/adversarial.test.mjs:15:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../private/tmp/st-native-netzero-discriminators/independent-review/adversarial.test.mjs:19:1
+✖ rebind insertion carries a certified absent before endpoint for inverse (0.122375ms)
+  AssertionError [ERR_ASSERTION]: inverse absence lost selection identity and support
+      at TestContext.<anonymous> (file:///private/tmp/st-native-netzero-discriminators/independent-review/adversarial.test.mjs:24:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:831:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

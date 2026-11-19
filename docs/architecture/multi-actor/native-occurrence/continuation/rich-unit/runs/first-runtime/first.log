@@ -1,0 +1,133 @@
+
+> nx run kernel:test committed-entity-selected-unit.spec.ts rich-source-completion-boundary.spec.ts rich-source-preparation-boundary.spec.ts rich-capture-getter-boundary.spec.ts rich-capture-participant-boundary.spec.ts rich-unit-source-group.spec.ts independent-public-handoff.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs committed-entity-selected-unit.spec.ts rich-source-completion-boundary.spec.ts rich-source-preparation-boundary.spec.ts rich-capture-getter-boundary.spec.ts rich-capture-participant-boundary.spec.ts rich-unit-source-group.spec.ts independent-public-handoff.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:97884) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97891) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-rich-unit-successor/candidate/packages/kernel
+
+(node:97898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ × src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts > private source completion sees the complete selected mixed inverse before authoring newer truth 32ms
+   → expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+(node:97900) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/independent-public-handoff.spec.ts > public undo/redo removes numeric destination before restoring rekey; string key remains independent 22ms
+ ✓ src/lib/independent-public-handoff.spec.ts > public rollback removes numeric destination before restoring rekey; string key remains independent 6ms
+(node:97901) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/rich-unit-source-group.spec.ts > same-source restores retain proposed anchors, all rows and ordinary membership before observation 17ms
+(node:97902) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ × src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth 22ms
+   → expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+(node:97903) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/rich-source-preparation-boundary.spec.ts > private source preparation after scalar installation cannot refuse a partial inverse 14ms
+(node:97904) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/rich-capture-getter-boundary.spec.ts > public retained getter does not observe a partial two-collection inverse 16ms
+(node:97905) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/rich-capture-participant-boundary.spec.ts > private source preparation cannot expose a partially installed mixed inverse 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts > rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth
+AssertionError: expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+
+- Expected
++ Received
+
+@@ -7,14 +7,14 @@
+        },
+      ],
+      "right": [
+        {
+          "id": "a",
+-         "n": 11,
++         "n": 50,
+        },
+        {
+          "id": "b",
+-         "n": 12,
++         "n": 60,
+        },
+      ],
+    },
+  ]
+
+ ❯ src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts:39:22
+     37|     await drain();
+     38|     expect(armed).toBe(false);
+     39|     expect(observed).toEqual([{
+       |                      ^
+     40|       left: [{ id: 'a', n: 1 }],
+     41|       right: [{ id: 'a', n: 11 }, { id: 'b', n: 12 }],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts > private source completion sees the complete selected mixed inverse before authoring newer truth
+AssertionError: expected [ { …(2) } ] to deeply equal [ { …(2) } ]
+
+- Expected
++ Received
+
+@@ -7,14 +7,14 @@
+        },
+      ],
+      "right": [
+        {
+          "id": "a",
+-         "n": 11,
++         "n": 50,
+        },
+        {
+          "id": "b",
+-         "n": 12,
++         "n": 60,
+        },
+      ],
+    },
+  ]
+
+ ❯ src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts:42:22
+     40|     await drain();
+     41|     expect(armed).toBe(false);
+     42|     expect(observed).toEqual([{
+       |                      ^
+     43|       left: [{ id: 'a', n: 1 }],
+     44|       right: [{ id: 'a', n: 11 }, { id: 'b', n: 12 }],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 5 passed (7)
+      Tests  2 failed | 6 passed (8)
+   Start at  17:37:20
+   Duration  2.57s (transform 492ms, setup 0ms, import 936ms, tests 146ms, environment 1.02s)
+
+Warning: command "node tools/run-core-vitest.mjs committed-entity-selected-unit.spec.ts rich-source-completion-boundary.spec.ts rich-source-preparation-boundary.spec.ts rich-capture-getter-boundary.spec.ts rich-capture-participant-boundary.spec.ts rich-unit-source-group.spec.ts independent-public-handoff.spec.ts --reporter=verbose --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.9s

@@ -1,0 +1,24 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-work-attribution/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "restoration-site-attribution.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-work-attribution/restoration-sites/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-work-attribution/restoration-sites/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-work-attribution/restoration-sites/data",
+    "ST_RESTORATION_WORK": "/private/tmp/st-c28-r3-work-attribution/restoration-sites/counts.jsonl",
+    "ST_RESTORATION_ATTRIBUTION": "/private/tmp/st-c28-r3-work-attribution/restoration-sites/observations.jsonl"
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "source": "/private/tmp/st-c26-scalar-finalized-role/candidate",
+    "manifest": "SNAPSHOT-C26.json",
+    "sha256": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+    "verifiedFiles": 3083
+  },
+  {
+    "source": "/private/tmp/st-c23-declare-public-successor/candidate",
+    "manifest": "SNAPSHOT-CANDIDATE.json",
+    "sha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+    "verifiedFiles": 3070
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "lib/experimental-publication/private.ts": true,
+  "lib/experimental-publication/lifecycle.ts": true,
+  "lib/internals/native-scalar-selection.ts": true,
+  "enhancers/transactions/transactions.ts": true
+}

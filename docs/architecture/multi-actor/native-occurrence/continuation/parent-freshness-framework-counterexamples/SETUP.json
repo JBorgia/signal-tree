@@ -1,0 +1,6 @@
+{
+  "source": "/private/tmp/st-parent-freshness-resumed/c8-proof",
+  "manifest": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+  "verified": 3047,
+  "dependencies": "isolated dependency copy from previous review, pinned lock verified separately"
+}

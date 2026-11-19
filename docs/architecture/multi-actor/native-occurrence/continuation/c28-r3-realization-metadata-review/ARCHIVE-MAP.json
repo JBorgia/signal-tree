@@ -1,0 +1,26 @@
+[
+  {
+    "source": "UNION-CHECK.json",
+    "archive": "UNION-CHECK.json",
+    "sourceSha256": "7a925d154b8f16aa902483a24f4c72290c8b9e919971395483360a4da454607d",
+    "archiveSha256": "7a925d154b8f16aa902483a24f4c72290c8b9e919971395483360a4da454607d"
+  },
+  {
+    "source": "PACKET-SHA256.json",
+    "archive": "PACKET-SHA256.json",
+    "sourceSha256": "48f3634750162beb47186982cddc7e976c139e2b058c23fe933c664bb06b27f9",
+    "archiveSha256": "48f3634750162beb47186982cddc7e976c139e2b058c23fe933c664bb06b27f9"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "17a1a11800fc75eb0ca772c49a6c23f3f9c721d0fb3488fb70dcfe74399ad828",
+    "archiveSha256": "17a1a11800fc75eb0ca772c49a6c23f3f9c721d0fb3488fb70dcfe74399ad828"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "3a35f58d3b5b054088769a693601f5d2cf731a6384ee3c590a3a65ddc394f4c0",
+    "archiveSha256": "3a35f58d3b5b054088769a693601f5d2cf731a6384ee3c590a3a65ddc394f4c0"
+  }
+]

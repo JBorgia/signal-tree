@@ -1,0 +1,81 @@
+--- /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts
++++ /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate/packages/kernel/src/lib/internals/independent-intercept-leaf-signals.spec.ts
+@@ -1,3 +1,4 @@
++import { withScalarPublicationCoverage } from './scalar-publication-coverage';
+ import { describe, expect, it } from 'vitest';
+ 
+ import { createReactiveTestRealization } from '../../reactive-test-realization';
+@@ -51,11 +52,11 @@
+     expect(list[0].ownerPath).toBe('count');
+     expect(list[0].next).toBe(1);
+     expect(list[0].prev).toBe(0);
+-    expect(list[0].meta).toEqual({
++    expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       intent: 'hydrate',
+       origin: 'external',
+       mutationIntent: 'replace',
+-    });
++    }, undefined));
+ 
+     restore();
+   });
+@@ -70,10 +71,10 @@
+     });
+ 
+     expect(list).toHaveLength(1);
+-    expect(list[0].meta).toEqual({
++    expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       intent: 'user',
+       mutationIntent: 'derive',
+-    });
++    }, undefined));
+     expect(list[0].ownerPath).toBe('count');
+     expect(list[0].next).toBe(11);
+     expect(list[0].prev).toBe(10);
+@@ -89,7 +90,7 @@
+     tree.count(5); // no context
+ 
+     expect(list).toHaveLength(1);
+-    expect(list[0].meta).toEqual({ mutationIntent: 'replace' });
++    expect(list[0].meta).toEqual(withScalarPublicationCoverage({ mutationIntent: 'replace' }, undefined));
+     expect(list[0].ownerPath).toBe('count');
+ 
+     restore();
+@@ -131,14 +132,14 @@
+     });
+ 
+     expect(list).toHaveLength(2);
+-    expect(list[0].meta).toEqual({
++    expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       intent: 'bulk',
+       mutationIntent: 'replace',
+-    });
+-    expect(list[1].meta).toEqual({
++    }, undefined));
++    expect(list[1].meta).toEqual(withScalarPublicationCoverage({
+       intent: 'bulk',
+       mutationIntent: 'replace',
+-    });
++    }, undefined));
+ 
+     restore();
+   });
+@@ -156,14 +157,14 @@
+     });
+ 
+     expect(list).toHaveLength(2);
+-    expect(list[0].meta).toEqual({
++    expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       intent: 'hydrate',
+       mutationIntent: 'replace',
+-    });
+-    expect(list[1].meta).toEqual({
++    }, undefined));
++    expect(list[1].meta).toEqual(withScalarPublicationCoverage({
+       intent: 'user',
+       mutationIntent: 'replace',
+-    });
++    }, undefined));
+ 
+     restore();
+   });

@@ -1,0 +1,17 @@
+[
+  [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--test",
+    "/private/tmp/st-observation-review-hngwwlyp/protocol/input-evidence.test.mjs"
+  ],
+  [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--test",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/coordinator.test.mjs",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/review.test.mjs",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/cleanup.test.mjs",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/ag-ui.test.mjs",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/review.test.mjs",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/input-evidence.test.mjs"
+  ]
+]

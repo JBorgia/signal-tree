@@ -1,0 +1,31 @@
+{
+  "manifestSha256": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+  "runtimePatchSha256": "843b04c9370164a7d20d8a590b5b8148592ea928aa95e1353d3123a59a1cd7ac",
+  "instrumentationPatchSha256": "0a104c0ed79cf2bff257daed2c096da0aa70d6967208964d40483b53740a1f9e",
+  "candidateManifestMismatches": [],
+  "deltaVsC25": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "patchExit": 0,
+  "instrumentedRunMismatches": [],
+  "otherRunRuntimeMismatches": [],
+  "runResults": {
+    "first-gate-complete": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "unchanged-focused": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "source-types": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

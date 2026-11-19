@@ -1,0 +1,118 @@
+[
+  {
+    "arm": "baseline",
+    "pid": 79258,
+    "samples": [
+      {
+        "stage": "restoration:post-workload-drain",
+        "heapUsed": 75385888,
+        "rss": 210993152,
+        "heapTotal": 196952064,
+        "external": 3958070,
+        "arrayBuffers": 65301,
+        "gcCalls": 0,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:post-destroy-drain",
+        "heapUsed": 59882992,
+        "rss": 214269952,
+        "heapTotal": 199540736,
+        "external": 3956981,
+        "arrayBuffers": 64678,
+        "gcCalls": 0,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:gc-drain-1",
+        "heapUsed": 41595960,
+        "rss": 214482944,
+        "heapTotal": 198754304,
+        "external": 3956981,
+        "arrayBuffers": 64633,
+        "gcCalls": 1,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:gc-drain-2",
+        "heapUsed": 40489864,
+        "rss": 214728704,
+        "heapTotal": 179879936,
+        "external": 3956936,
+        "arrayBuffers": 64633,
+        "gcCalls": 2,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:gc-drain-3",
+        "heapUsed": 40490192,
+        "rss": 214745088,
+        "heapTotal": 179355648,
+        "external": 3956936,
+        "arrayBuffers": 64633,
+        "gcCalls": 3,
+        "heapSizeLimit": 4496293888
+      }
+    ],
+    "exit": 0,
+    "remainingOwned": []
+  },
+  {
+    "arm": "indexed",
+    "pid": 79334,
+    "samples": [
+      {
+        "stage": "restoration:post-workload-drain",
+        "heapUsed": 74486168,
+        "rss": 210010112,
+        "heapTotal": 195641344,
+        "external": 3957972,
+        "arrayBuffers": 65203,
+        "gcCalls": 0,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:post-destroy-drain",
+        "heapUsed": 84288680,
+        "rss": 211402752,
+        "heapTotal": 195903488,
+        "external": 3958062,
+        "arrayBuffers": 65293,
+        "gcCalls": 0,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:gc-drain-1",
+        "heapUsed": 41363760,
+        "rss": 211419136,
+        "heapTotal": 179617792,
+        "external": 3956936,
+        "arrayBuffers": 64633,
+        "gcCalls": 1,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:gc-drain-2",
+        "heapUsed": 40511456,
+        "rss": 211435520,
+        "heapTotal": 179617792,
+        "external": 3956936,
+        "arrayBuffers": 64633,
+        "gcCalls": 2,
+        "heapSizeLimit": 4496293888
+      },
+      {
+        "stage": "restoration:gc-drain-3",
+        "heapUsed": 40496360,
+        "rss": 211435520,
+        "heapTotal": 179617792,
+        "external": 3956936,
+        "arrayBuffers": 64633,
+        "gcCalls": 3,
+        "heapSizeLimit": 4496293888
+      }
+    ],
+    "exit": 0,
+    "remainingOwned": []
+  }
+]

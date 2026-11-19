@@ -1,0 +1,18 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: disposed coordinator retains the adapter dependency
+
+false !== true
+
+    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/lifecycle/gc.mjs:24:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

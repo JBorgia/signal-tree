@@ -1,0 +1,23 @@
+{
+  "snapshotSha256": "11c093b513c2b75d82f9c4ef3c2c71970ebb66aaba722419fe351a046c3c7b88",
+  "patchSha256": "76ab5435fe551ec17a44911a6840d6c06c25a6b326cabe5308cfd0ad66e73a19",
+  "verifiedPaths": 3066,
+  "changedPaths": [
+    "apps/react-reference/vite.config.mts",
+    "packages/react/vitest.config.ts"
+  ],
+  "projects": {
+    "held-continuation-probe": "tools/held-continuation-probe",
+    "react-reference": "apps/react-reference",
+    "angular": "packages/angular",
+    "kernel": "packages/kernel",
+    "react": "packages/react",
+    "solid": "packages/solid",
+    "demo-e2e": "apps/demo-e2e",
+    "vue": "packages/vue",
+    "demo": "apps/demo",
+    "@signaltree/source": "."
+  },
+  "fullNodesEqualAfterCheckoutNormalization": true,
+  "dependenciesEqual": true
+}

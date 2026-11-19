@@ -1,0 +1,317 @@
+[
+  {
+    "stage": "test-start",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650168956,
+    "memory": {
+      "rss": 122077184,
+      "heapTotal": 66895872,
+      "heapUsed": 42795288,
+      "external": 4041432,
+      "arrayBuffers": 129472
+    }
+  },
+  {
+    "stage": "setAll-initial:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650168964,
+    "memory": {
+      "rss": 122372096,
+      "heapTotal": 66895872,
+      "heapUsed": 43050800,
+      "external": 4041472,
+      "arrayBuffers": 129472
+    }
+  },
+  {
+    "stage": "setAll-initial:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650172492,
+    "memory": {
+      "rss": 698892288,
+      "heapTotal": 615333888,
+      "heapUsed": 502002320,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "setAll-replace:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650172492,
+    "memory": {
+      "rss": 698892288,
+      "heapTotal": 615333888,
+      "heapUsed": 502008656,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "setAll-replace:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650180428,
+    "memory": {
+      "rss": 872857600,
+      "heapTotal": 1289355264,
+      "heapUsed": 1155226024,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "setAll-clear:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650180430,
+    "memory": {
+      "rss": 873398272,
+      "heapTotal": 1289355264,
+      "heapUsed": 1155241088,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "setAll-clear:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650184891,
+    "memory": {
+      "rss": 1084145664,
+      "heapTotal": 1893433344,
+      "heapUsed": 1777145848,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "finalassert:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650184897,
+    "memory": {
+      "rss": 1084751872,
+      "heapTotal": 1893433344,
+      "heapUsed": 1777147816,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "finalassert:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650184907,
+    "memory": {
+      "rss": 1087193088,
+      "heapTotal": 1893433344,
+      "heapUsed": 1777183104,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "stop:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650184919,
+    "memory": {
+      "rss": 1086963712,
+      "heapTotal": 1893433344,
+      "heapUsed": 1777192888,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "stop:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650184929,
+    "memory": {
+      "rss": 1087045632,
+      "heapTotal": 1893433344,
+      "heapUsed": 1777195320,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "destroy:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650184936,
+    "memory": {
+      "rss": 1087045632,
+      "heapTotal": 1893433344,
+      "heapUsed": 1777197608,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "destroy:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650185008,
+    "memory": {
+      "rss": 1098858496,
+      "heapTotal": 1900625920,
+      "heapUsed": 1794966088,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "drain:before",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650185021,
+    "memory": {
+      "rss": 1098809344,
+      "heapTotal": 1900625920,
+      "heapUsed": 1794968088,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  {
+    "stage": "drain:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650185057,
+    "memory": {
+      "rss": 1113964544,
+      "heapTotal": 1900625920,
+      "heapUsed": 1794980976,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  }
+]

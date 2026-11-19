@@ -1,0 +1,122 @@
+[
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "09c86d304f1a4dfa873d197f453f3b9afb4799f1b9ee20cc5ce5310e513daf25",
+    "archiveSha256": "09c86d304f1a4dfa873d197f453f3b9afb4799f1b9ee20cc5ce5310e513daf25"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "40d2bb3d7c7db1b60e1f7a0ed8507bb235585e588fc2550c4bfe9820a2e7e011",
+    "archiveSha256": "40d2bb3d7c7db1b60e1f7a0ed8507bb235585e588fc2550c4bfe9820a2e7e011"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "c7fc2830954f122236b26054082e1a79f3d0e1d21bae1e373f1ecf91fbcd10a8",
+    "archiveSha256": "c7fc2830954f122236b26054082e1a79f3d0e1d21bae1e373f1ecf91fbcd10a8"
+  },
+  {
+    "source": "inputs/derived-fixture.ts",
+    "archive": "inputs/derived-fixture.ts",
+    "sourceSha256": "f37542afc66d0ef3092b947e3132f8d9996673f90b9e79e9b159540f4469a7e9",
+    "archiveSha256": "f37542afc66d0ef3092b947e3132f8d9996673f90b9e79e9b159540f4469a7e9"
+  },
+  {
+    "source": "inputs/C25-EXPECTATIONS.md",
+    "archive": "inputs/C25-EXPECTATIONS.md",
+    "sourceSha256": "d164232edc696dd3eb2e36ccb8539e563c8c19ca9d299693d93d6b980094c550",
+    "archiveSha256": "d164232edc696dd3eb2e36ccb8539e563c8c19ca9d299693d93d6b980094c550"
+  },
+  {
+    "source": "inputs/derived-COMMAND.json",
+    "archive": "inputs/derived-COMMAND.json",
+    "sourceSha256": "c9a5b2e59ccd477e38beeac9cf5487668d64cd472eb858f8b0852ec821bdf3f8",
+    "archiveSha256": "c9a5b2e59ccd477e38beeac9cf5487668d64cd472eb858f8b0852ec821bdf3f8"
+  },
+  {
+    "source": "inputs/derived-RESULT.json",
+    "archive": "inputs/derived-RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "inputs/literal-ROOTS-LARGE.jsonl",
+    "archive": "inputs/literal-ROOTS-LARGE.jsonl",
+    "sourceSha256": "9b8a1bcf8542bc08061359bd7c4773ac996880affa4967d6068cfdded39fc4f4",
+    "archiveSha256": "9b8a1bcf8542bc08061359bd7c4773ac996880affa4967d6068cfdded39fc4f4"
+  },
+  {
+    "source": "inputs/derived-SOURCE.json",
+    "archive": "inputs/derived-SOURCE.json.gz",
+    "sourceSha256": "5528578d343934c63631e548322ccc5c8b8761f0b058fd0c29de83ee040b88d3",
+    "archiveSha256": "5d8cf89c31df2e55243a03dda0b8ba07e2d7227e0480ef61f71c96603ddad69a"
+  },
+  {
+    "source": "inputs/instrument-roots.py",
+    "archive": "inputs/instrument-roots.py",
+    "sourceSha256": "699194e280dcd0af6609e2ea556eb37f66248ae91ceddd054cc201268ac06928",
+    "archiveSha256": "699194e280dcd0af6609e2ea556eb37f66248ae91ceddd054cc201268ac06928"
+  },
+  {
+    "source": "inputs/literal-fixture.ts",
+    "archive": "inputs/literal-fixture.ts",
+    "sourceSha256": "31520de0dbdd368c721c25a5fda71fe79e773ad436889516d9ae40a7da43a436",
+    "archiveSha256": "31520de0dbdd368c721c25a5fda71fe79e773ad436889516d9ae40a7da43a436"
+  },
+  {
+    "source": "inputs/instrumentation-final.patch",
+    "archive": "inputs/instrumentation-final.patch",
+    "sourceSha256": "bf8f6361083e88203dc8729e73af020575ac50562e7e510abb450c8c958491b1",
+    "archiveSha256": "bf8f6361083e88203dc8729e73af020575ac50562e7e510abb450c8c958491b1"
+  },
+  {
+    "source": "inputs/C24-RETENTION-OBSERVATIONS.jsonl",
+    "archive": "inputs/C24-RETENTION-OBSERVATIONS.jsonl",
+    "sourceSha256": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d",
+    "archiveSha256": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d"
+  },
+  {
+    "source": "inputs/ROOTS-DERIVED.jsonl",
+    "archive": "inputs/ROOTS-DERIVED.jsonl",
+    "sourceSha256": "88a396b8fabb73b3dab3451079f3604438b2746888d4df1487f989510ada35c4",
+    "archiveSha256": "88a396b8fabb73b3dab3451079f3604438b2746888d4df1487f989510ada35c4"
+  },
+  {
+    "source": "inputs/C24-fixture.ts",
+    "archive": "inputs/C24-fixture.ts",
+    "sourceSha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f",
+    "archiveSha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f"
+  },
+  {
+    "source": "inputs/derived-first.log",
+    "archive": "inputs/derived-first.log",
+    "sourceSha256": "2152717282bea2b735b64c713191b4c778ce15db2c1c4e804e9f4eecc7fd76e3",
+    "archiveSha256": "2152717282bea2b735b64c713191b4c778ce15db2c1c4e804e9f4eecc7fd76e3"
+  },
+  {
+    "source": "inputs/instrumented/enhancers/transactions/transactions.ts",
+    "archive": "inputs/instrumented/enhancers/transactions/transactions.ts.gz",
+    "sourceSha256": "79e41d25b785b98daae85c58ef2f398cd0b7835230648b41fd2c9b7bf18cb32a",
+    "archiveSha256": "308775d040a0a29e6f6000889c00f6c15d9b98e311cce514b1991738cce2b459"
+  },
+  {
+    "source": "inputs/instrumented/lib/experimental-publication/private.ts",
+    "archive": "inputs/instrumented/lib/experimental-publication/private.ts",
+    "sourceSha256": "7447a9cc5fae7989427183265611da7885cba2fb66023b934d2102b1480ded47",
+    "archiveSha256": "7447a9cc5fae7989427183265611da7885cba2fb66023b934d2102b1480ded47"
+  },
+  {
+    "source": "inputs/instrumented/lib/experimental-publication/lifecycle.ts",
+    "archive": "inputs/instrumented/lib/experimental-publication/lifecycle.ts",
+    "sourceSha256": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23",
+    "archiveSha256": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23"
+  },
+  {
+    "source": "inputs/instrumented/lib/internals/native-scalar-selection.ts",
+    "archive": "inputs/instrumented/lib/internals/native-scalar-selection.ts",
+    "sourceSha256": "5fc14ca9ff02b7f433d62fa4372384c708022289369e0371852b571e76ae50ab",
+    "archiveSha256": "5fc14ca9ff02b7f433d62fa4372384c708022289369e0371852b571e76ae50ab"
+  }
+]

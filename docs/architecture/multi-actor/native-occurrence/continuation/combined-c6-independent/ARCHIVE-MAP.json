@@ -1,0 +1,44 @@
+[
+  {
+    "source": "PATCH-AND-GATES.json",
+    "archive": "PATCH-AND-GATES.json",
+    "sourceSha256": "6d86641a8017693f70f238825051bb963c12cb3c2c9b1d83896ebf68c1818b4a",
+    "archiveSha256": "6d86641a8017693f70f238825051bb963c12cb3c2c9b1d83896ebf68c1818b4a"
+  },
+  {
+    "source": "final-verification.log",
+    "archive": "final-verification.log",
+    "sourceSha256": "f481ced3a8aa8df349e1e7c5b8719ef1a56f4a357c697697f3cecfa40a3532a7",
+    "archiveSha256": "f481ced3a8aa8df349e1e7c5b8719ef1a56f4a357c697697f3cecfa40a3532a7"
+  },
+  {
+    "source": "C7a-VERIFICATION.json",
+    "archive": "C7a-VERIFICATION.json",
+    "sourceSha256": "69fbf33dcf5ca444830dbab797a5e1c551bf880c55a5ddbbb8333fbd570b6311",
+    "archiveSha256": "69fbf33dcf5ca444830dbab797a5e1c551bf880c55a5ddbbb8333fbd570b6311"
+  },
+  {
+    "source": "patch-apply.log",
+    "archive": "patch-apply.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "f481ced3a8aa8df349e1e7c5b8719ef1a56f4a357c697697f3cecfa40a3532a7",
+    "archiveSha256": "f481ced3a8aa8df349e1e7c5b8719ef1a56f4a357c697697f3cecfa40a3532a7"
+  },
+  {
+    "source": "verify.py",
+    "archive": "verify.py",
+    "sourceSha256": "f77394e6bf4898d577937b2ebd4cd6085aac7055e9eeb982bb213be83f487f2c",
+    "archiveSha256": "f77394e6bf4898d577937b2ebd4cd6085aac7055e9eeb982bb213be83f487f2c"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "7ab2f6d837399eb5d5c183c121a42c18bffbd010ec98e1ecf86b6daf487b4363",
+    "archiveSha256": "7ab2f6d837399eb5d5c183c121a42c18bffbd010ec98e1ecf86b6daf487b4363"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "reason": "no-progress-180s",
+  "lastEvent": {
+    "at": 1793679647056,
+    "kind": "case-result",
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "name": "entity batches larger than the argument limit > setAll, replace and clear with membership observed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  "elapsedSeconds": 541.8572906249901
+}

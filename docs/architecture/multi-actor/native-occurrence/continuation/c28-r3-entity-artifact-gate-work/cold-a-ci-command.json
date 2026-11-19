@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "npm",
+    "ci",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a",
+  "env": {
+    "npm_config_cache": "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a-cache",
+    "npm_config_fetch_retries": "0",
+    "npm_config_fetch_timeout": "20000"
+  }
+}

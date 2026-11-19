@@ -1,0 +1,35 @@
+
+> nx run kernel:test native-certificate-successor --testNamePattern=composite readiness|released readiness --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-certificate-successor --testNamePattern="composite readiness|released readiness" --maxWorkers=1
+
+(node:58149) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-occupancy-review/candidate/packages/kernel
+
+(node:58166) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 3 skipped (5)
+   Start at  10:57:22
+   Duration  2.05s (transform 940ms, setup 0ms, import 1.13s, tests 5ms, environment 422ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.9s

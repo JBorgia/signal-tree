@@ -1,0 +1,25 @@
+{
+  "predecessorFreezeSha256": "01137391b260429fe6e2669bc17309fa779b412712a153ccd64c26ccbcc4608a",
+  "reviewSha256": "a2a51d58d79b57e1c89f1978b6704d5be18cabdbb6ebb66df8cea88bf61cbd9d",
+  "reviewFailureLogSha256": "e05dd6e01874a728b5842e3fa1f915f297865ea99788536ae5e02c681f770e83",
+  "unchangedTestFiles": [
+    "model.test.mjs",
+    "normalizer.test.mjs",
+    "source-oracle.test.mjs",
+    "independent-review/adversarial.test.mjs",
+    "reviewer-replay/composition.test.mjs"
+  ],
+  "files": {
+    "model.patch": "47b86f08cc16a058001a844f72f114600bd02c23dc012c4ed838208b39e8c06b",
+    "all-39.log": "3d558296db67fee7047d51af5c4f1d43184c91532558a795e0c5d707374b3045",
+    "model.test.mjs": "36cb387ecf22ddcee62b10008348ea48e3fcae072bfacdfe601fb72ce77affc5",
+    "source-oracle.test.mjs": "365acc25395d4de0f4ffc9e7ea3a15aae1f7912fcc2e1d78817c57c9d6fae6b6",
+    "RESULTS.md": "d0d199d758d65b4cc26074afe335471b7df88e9c875736468f633e318ce5eade",
+    "normalizer.test.mjs": "4005f75df4f0a6bdedfb86d6c204ca57ea5f5788abd870eb1e1a87c1434b8611",
+    "composition-controls.test.mjs": "3bcdfc456cacbecf32ada169c9e95ebec414b3d06f00ea1485c734b9e0949bd3",
+    "unchanged-35.log": "7487454940657569194ca102feea8b1ec647c3a852a1b20f75d199613afe297b",
+    "model.mjs": "5560e6e08ebee27f15107be58400169629ba96caf7db2b0e6c662bea94f786e0",
+    "independent-review/adversarial.test.mjs": "67b252ec1da76f91356d9c92ab3c3878c8f1083feb32ebc5bef76a77ac2c6f09",
+    "reviewer-replay/composition.test.mjs": "cce882e18faed4348f737344832a54d53cc92839f2c9b6bbd5477910ee64afe5"
+  }
+}

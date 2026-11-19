@@ -1,0 +1,9 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/original",
+  "argv": [
+    "git",
+    "apply",
+    "--check",
+    "/private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/TESTS.patch"
+  ]
+}

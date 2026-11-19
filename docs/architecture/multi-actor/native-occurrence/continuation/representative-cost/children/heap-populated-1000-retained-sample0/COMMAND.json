@@ -1,0 +1,18 @@
+{
+  "ordinal": 63,
+  "id": "heap-populated-1000-retained-sample0",
+  "profile": "heap-populated",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample0",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--expose-gc",
+    "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+    "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+    "heap-populated",
+    "1000"
+  ],
+  "cwd": "/private/tmp/st-v16-representative-cost/harness",
+  "childTimeoutSeconds": 180
+}

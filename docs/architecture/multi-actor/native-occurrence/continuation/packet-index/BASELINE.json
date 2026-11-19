@@ -1,0 +1,14 @@
+{
+  "source": "/private/tmp/st-native-combined-b/candidate",
+  "manifestSHA256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+  "files": 2967,
+  "excludedDirectories": [
+    ".git",
+    ".nx",
+    "coverage",
+    "dist",
+    "node_modules"
+  ],
+  "fileSymlinks": {},
+  "git": "snapshot has no .git; no HEAD/branch available"
+}

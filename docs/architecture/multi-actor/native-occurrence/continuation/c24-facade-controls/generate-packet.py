@@ -1,0 +1,156 @@
+from pathlib import Path
+import json,hashlib,difflib
+r=Path(__file__).resolve().parent
+common='''// Test-only C23 counterpart packet. Not executed; no shipping typing claim.
+// The existing runtime method is reached through a local capability cast only.
+// Public/native observations and authentic handles; no publication internals.
+TYPEIMPORTS
+
+type Shape = 'leaf' | 'whole';
+type State = Readonly<{
+  state: string;
+  basis?: string;
+  reason?: string;
+}>;
+type Receipt = Readonly<{ read: () => State }>;
+type DeclarationLink = ReturnType<typeof link> & {
+  declare(input: { kind: 'independent' }, work: () => void): Receipt;
+};
+function declarationLink(connection: ReturnType<typeof link>): DeclarationLink {
+  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
+  return connection as DeclarationLink;
+}
+const drain = async () => {
+  for (let i = 0; i < 120; i++) await Promise.resolve();
+};
+STEP
+const cases = (['leaf', 'whole'] as const).flatMap((shape) =>
+  ([true, false] as const).flatMap((owned) =>
+    (['confirm', 'rollback'] as const).map((terminal) => ({ shape, owned, terminal }))
+  )
+);
+const expected = (shape: Shape, x: number): number | { x: number; y: number } =>
+  shape === 'leaf' ? x : { x, y: 0 };
+
+it.each(cases)(
+  'FACADE equal $shape / actual-owned=$owned / $terminal',
+  async ({ shape, owned, terminal }) => {
+    const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
+    const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
+    const sent: (number | { x: number; y: number })[] = [];
+    const writeX = (value: number): void => { WRITEX };
+    const writeOwner = (value: number): void => { WRITEOWNER };
+    const readX = (): number => READX;
+    const readOwner = (): number => READOWNER;
+NATIVE
+    // Separate calls preserve the actual facade source typing, avoiding a union cast.
+    const c = declarationLink(shape === 'leaf'
+      ? link(tree.$.pair.x, { set: (value) => { sent.push(value); } })
+      : link(tree.$.pair, { set: (value) => { sent.push({ x: value.x, y: value.y }); } })
+    );
+    try {
+      await step(() => { /* Settle construction/native observation before setup. */ });
+      expect(readNative()).toBe(0);
+      let pending!: ReturnType<typeof tree.transact>;
+      await step(() => {
+        pending = owned
+          ? tree.transact(() => { writeX(7); })
+          : owner.transact(() => { writeOwner(7); });
+        if (!owned) writeX(7);
+      });
+      expect(readX()).toBe(7);
+      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+      expect(readNative()).toBe(7);
+      expect(sent).toEqual([]); // Required predecessor hold, not a cleared log.
+      const pendingBefore = pending.inspect();
+      let receipt: Receipt | undefined;
+      let calls = 0;
+      await step(() => {
+        receipt = c.declare({ kind: 'independent' }, () => {
+          calls++;
+          if (shape === 'leaf') writeX(7);
+          else tree.$.pair({ x: 7, y: 0 }); // explicit whole literal, no updater read
+        });
+      });
+      expect(calls).toBe(1);
+      if (!receipt) throw new Error('Declaration did not return a receipt');
+      expect(Object.isFrozen(receipt)).toBe(true);
+      const admission = receipt.read();
+      expect(Object.isFrozen(admission)).toBe(true);
+      expect(pending.inspect()).toEqual(pendingBefore);
+      expect(readX()).toBe(7);
+      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+      expect(readNative()).toBe(7);
+      expect(readOwner()).toBe(owned ? 0 : 7);
+      if (owned) {
+        expect(sent).toEqual([]);
+        expect(['held', 'conservative']).toContain(admission.state);
+        if (admission.state === 'held') expect(admission.reason).toBe('pending-dependency');
+        else expect(['invalid-declaration', 'unknown', 'rejected-dependency']).toContain(admission.reason);
+      } else {
+        expect(sent).toEqual([expected(shape, 7)]);
+        expect(admission).toEqual({ state: 'started', basis: 'declared' });
+      }
+      const admissionCopy = { ...admission };
+      let settled = false;
+      const wait = c.settled().then(() => { settled = true; });
+      await step(() => { /* Observe settlement without awaiting an intentionally held Link. */ });
+      expect(settled).toBe(!owned);
+      expect(pending.inspect()).toEqual(pendingBefore);
+      await step(() => { pending[terminal](); });
+      const final = owned && terminal === 'rollback' ? 0 : 7;
+      expect(readX()).toBe(final);
+      expect(tree.$.pair()).toEqual({ x: final, y: 0 });
+      expect(readNative()).toBe(final);
+      expect(readOwner()).toBe(!owned && terminal === 'confirm' ? 7 : 0);
+      expect(sent).toEqual([expected(shape, final)]);
+      expect(settled).toBe(true);
+      await wait;
+      const terminalState = receipt.read();
+      if (owned && terminal === 'rollback') {
+        // A rollback replacement may supersede the original held operation.
+        // Exact surviving payload/settlement above remains mandatory.
+        expect(['started', 'superseded']).toContain(terminalState.state);
+      } else {
+        expect(terminalState.state).toBe('started');
+      }
+      if (!owned) expect(terminalState).toEqual(admissionCopy);
+      expect(admission).toEqual(admissionCopy); // retained snapshot never mutated
+      expect(Object.isFrozen(terminalState)).toBe(true);
+      expect(Reflect.set(terminalState, 'state', 'forged')).toBe(false);
+      await step(() => { /* No duplicate after terminal settlement. */ });
+      expect(sent).toEqual([expected(shape, final)]);
+      await step(() => { writeX(8); });
+      await c.settled();
+      expect(readNative()).toBe(8);
+      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
+      expect(receipt.read()).toEqual(terminalState);
+      c.dispose();
+      await step(() => { writeX(9); });
+      expect(readNative()).toBe(9);
+      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
+      expect(receipt.read()).toEqual(terminalState);
+    } finally {
+      c.dispose();
+      stopNative();
+      tree.destroy();
+      owner.destroy();
+    }
+  }
+);
+'''
+settings={
+ 'angular':dict(path='packages/angular/src/lib/equal-owner-facade-controls.spec.ts',imports="import { expect, it } from 'vitest';\nimport { computed } from '@angular/core';\nimport { signalTree, transactions, link } from '../index';",step="const step = async (work: () => void) => { work(); await drain(); };",write='tree.$.pair.x.set(value);',owner='owner.$.z.set(value);',read='tree.$.pair.x()',readowner='owner.$.z()',native="    const native = computed(() => tree.$.pair.x());\n    const readNative = () => native();\n    const stopNative = () => { /* Lazy computed has no effect/root teardown. */ };"),
+ 'vue':dict(path='packages/vue/src/lib/equal-owner-facade-controls.spec.ts',imports="import { expect, it } from 'vitest';\nimport { computed, nextTick } from 'vue';\nimport { signalTree, transactions, link } from '../index';",step="const step = async (work: () => void) => { work(); await drain(); await nextTick(); };",write='tree.$.pair.x.value = value;',owner='owner.$.z.value = value;',read='tree.$.pair.x.value',readowner='owner.$.z.value',native="    const native = computed(() => tree.$.pair.x.value);\n    const readNative = () => native.value;\n    const stopNative = () => { /* Lazy computed; no watch/effect was installed. */ };"),
+ 'solid':dict(path='packages/solid/src/lib/equal-owner-facade-controls.spec.ts',imports="import { expect, it } from 'vitest';\nimport { createMemo, createRoot } from 'solid-js';\nimport { signalTree, transactions, link } from '../index';",step="const step = async (work: () => void) => { work(); await drain(); };",write='tree.$.pair.x.set(value);',owner='owner.$.z.set(value);',read='tree.$.pair.x()',readowner='owner.$.z()',native="    const native = createRoot((dispose) => ({ read: createMemo(() => tree.$.pair.x()), dispose }));\n    const readNative = () => native.read();\n    const stopNative = () => native.dispose();"),
+ 'react':dict(path='packages/react/src/equal-owner-facade-controls.spec.tsx',imports="import { expect, it } from 'vitest';\nimport { act, renderHook } from '@testing-library/react';\nimport { signalTree, transactions, link, useSignalTree } from './index';",step="const step = async (work: () => void) => { await act(async () => { work(); await drain(); }); };",write='tree.$.pair.x(value);',owner='owner.$.z(value);',read='tree.$.pair.x()',readowner='owner.$.z()',native="    const mounted = renderHook(() => useSignalTree(tree, ($) => $.pair.x()));\n    const readNative = () => mounted.result.current;\n    const stopNative = () => mounted.unmount();"),
+}
+patch=[];entries={}
+for name,d in settings.items():
+ text=common
+ for key,value in {'TYPEIMPORTS':d['imports'],'STEP':d['step'],'WRITEX':d['write'],'WRITEOWNER':d['owner'],'READX':d['read'],'READOWNER':d['readowner'],'NATIVE':d['native'],'FACADE':name}.items():text=text.replace(key,value)
+ path=r/'files'/d['path'];path.parent.mkdir(parents=True,exist_ok=True);path.write_text(text)
+ patch.extend(difflib.unified_diff([],text.splitlines(True),fromfile='/dev/null',tofile='b/'+d['path']))
+ entries[d['path']]={'sha256':hashlib.sha256(text.encode()).hexdigest(),'cases':8,'executed':False}
+(r/'TESTS.patch').write_text(''.join(patch));(r/'TEST-FILES.json').write_text(json.dumps(entries,indent=2)+'\n')
+print('created four files, 32 generated cases; not executed')

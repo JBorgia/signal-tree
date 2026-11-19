@@ -1,0 +1,13 @@
+{
+  "source": "/private/tmp/st-native-explicit-handoff-successor/candidate",
+  "manifest": "/private/tmp/st-native-explicit-handoff-successor/SOURCE-SHA256.json",
+  "manifestSha256": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+  "fixtureSha256": "616248859fd38ce19943e2069ecd5069f8b853c64c63d971c8d157df15b2ae12",
+  "preregistrationSha256": "7ae18c02b8f080f9ca496a8b71a0d71019eb59d32a77cd90ae970c9a293126d7",
+  "versions": {
+    "typescript": "6.0.3",
+    "vitest": "4.1.9",
+    "nx": "23.1.0"
+  },
+  "started": "2026-10-29T21:18:14.617948+00:00"
+}

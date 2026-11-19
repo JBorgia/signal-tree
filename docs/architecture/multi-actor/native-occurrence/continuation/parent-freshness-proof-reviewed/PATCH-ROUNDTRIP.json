@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "git",
+    "apply",
+    "/private/tmp/st-parent-freshness-resumed/c8-proof/FROM-C8.patch"
+  ],
+  "exit": 0,
+  "changedFiles": 25,
+  "allAppliedBytesMatch": true
+}

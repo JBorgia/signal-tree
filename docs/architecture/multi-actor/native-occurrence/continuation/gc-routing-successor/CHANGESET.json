@@ -1,0 +1,11 @@
+{
+  "changed": [
+    "packages/kernel/vitest.config.ts",
+    "packages/kernel/vitest.retention.config.ts",
+    "tools/check-forwarding-retention.mjs",
+    "tools/verify-gates.mjs",
+    "tools/lib/forwarding-retention-matrix.mjs"
+  ],
+  "runtimeUnchanged": true,
+  "allSpecsUnchanged": true
+}

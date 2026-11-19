@@ -1,0 +1,5 @@
+
+> @signaltree/workspace@16.0.0-dev typecheck /private/tmp/st-c21-recipient-positive-counterparts/candidate
+> node tools/generate-deep-typing-proofs.mjs --check && tsc --noEmit -p packages/kernel/tsconfig.typecheck.json && tsc --noEmit -p tsconfig.typecheck-all.json
+
+Deep-typing generated files are current (1-40).

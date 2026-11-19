@@ -1,0 +1,67 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts native-projection-observability.spec.ts batching.spec.ts batching-detachment.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts native-projection-observability.spec.ts batching.spec.ts batching-detachment.spec.ts
+
+(node:73416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-explicit-handoff-successor/candidate/packages/kernel
+
+(node:73432) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73433) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73434) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73436) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73438) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73437) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73431) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▲ [WARNING] Ignoring this import because "src/lib/experimental-publication/entity.ts" was marked as having no side effects [ignored-bare-import]
+
+    src/lib/link.ts:1:7:
+      1 │ import './experimental-publication/entity';
+        ╵        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  "sideEffects" is false in the enclosing "package.json" file:
+
+    package.json:7:2:
+      7 │   "sideEffects": false,
+        ╵   ~~~~~~~~~~~~~
+
+(node:73443) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73442) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  11 passed (11)
+      Tests  66 passed (66)
+   Start at  14:54:27
+   Duration  1.62s (transform 4.82s, setup 0ms, import 6.54s, tests 630ms, environment 4.28s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

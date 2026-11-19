@@ -1,0 +1,38 @@
+{
+  "inputs": [
+    "/private/tmp/st-native-combined-c11/SNAPSHOT-COUNTERPARTS.json",
+    "/private/tmp/st-effective-presence-successor/SNAPSHOT.json",
+    "/private/tmp/st-c11-packet-pair-index-review/SNAPSHOT-PAIR-INDEX.json"
+  ],
+  "changes": [
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "base": "f07cab1698b8d6f859e9f836072971b656eabe8508e69085e3d0a67139b09189",
+      "left": "f07cab1698b8d6f859e9f836072971b656eabe8508e69085e3d0a67139b09189",
+      "right": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "0aa146a7cc90e0a89fe8b74f49eb052860af917ba98838e8e5ae78a2bef40611",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "93679a448adf9a5b0cd06f4c3298021c22a96fbcf34255fed6c5b23ad7333e66",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/packet-physical-pair-work.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "02efb70a00a0377d06b517e10d95a5c8c40d60eb8d741a1a6ff5dabc8a14c110",
+      "method": "incoming"
+    }
+  ],
+  "conflicts": []
+}

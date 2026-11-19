@@ -1,0 +1,120 @@
+✖ composed insertion preserves first certified absent baseline (1.046875ms)
+✖ composed remove then re-add restores original present selection rather than intermediate absence (0.531542ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 0
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35.069292
+
+✖ failing tests:
+
+test at ../../../../private/tmp/st-native-paired-normalizer/reviewer-replay/composition.test.mjs:6:1
+✖ composed insertion preserves first certified absent baseline (1.046875ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
+  + actual - expected
+  
+    {
+      D: [
+  +     'r'
+  -     'q'
+      ],
+      W: [],
+      domain: {
+  +     D: [],
+  -     D: [
+  -       'q'
+  -     ],
+        W: [],
+  +     value: {
+  +       x: {
+  +         D: [
+  +           'r'
+  +         ],
+  +         W: [],
+  +         value: 1
+  +       }
+  +     }
+  -     value: {}
+      },
+      key: 'x',
+  +   present: true,
+  -   present: false,
+      selection: {
+        D: [
+  +       'r'
+  -       'q'
+        ],
+        W: [],
+  +     value: 1
+  -     value: {}
+      },
+      value: {
+  +     present: true,
+  +     value: 1
+  -     present: false
+      }
+    }
+  
+      at TestContext.<anonymous> (file:///private/tmp/st-native-paired-normalizer/reviewer-replay/composition.test.mjs:9:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { present: true, value: { present: true, value: 1 }, D: [ 'r' ], W: [], selection: { value: 1, D: [Array], W: [] }, domain: { value: [Object], D: [], W: [] }, key: 'x' },
+    expected: { present: false, value: { present: false }, D: [ 'q' ], W: [], selection: { value: {}, D: [Array], W: [] }, domain: { value: {}, D: [Array], W: [] }, key: 'x' },
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at ../../../../private/tmp/st-native-paired-normalizer/reviewer-replay/composition.test.mjs:12:1
+✖ composed remove then re-add restores original present selection rather than intermediate absence (0.531542ms)
+  AssertionError [ERR_ASSERTION]: Expected "actual" to be reference-equal to "expected":
+  + actual - expected
+  
+    {
+      D: [
+  +     'r'
+  -     'q'
+      ],
+      W: [],
+  +   domain: {
+  +     D: [
+  +       'r'
+  +     ],
+  +     W: [],
+  +     value: {}
+  +   },
+  +   key: 'x',
+  +   present: false,
+  +   selection: {
+  +     D: [
+  +       'r'
+  +     ],
+  +     W: [],
+  +     value: {}
+  +   },
+  +   value: {
+  +     present: false
+  +   }
+  -   value: 7
+    }
+  
+      at TestContext.<anonymous> (file:///private/tmp/st-native-paired-normalizer/reviewer-replay/composition.test.mjs:15:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { present: false, value: { present: false }, D: [ 'r' ], W: [], selection: { value: {}, D: [Array], W: [] }, domain: { value: {}, D: [Array], W: [] }, key: 'x' },
+    expected: { value: 7, D: [ 'q' ], W: [] },
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

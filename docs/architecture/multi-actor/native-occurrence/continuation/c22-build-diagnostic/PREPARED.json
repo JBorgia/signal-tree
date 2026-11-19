@@ -1,0 +1,11 @@
+{
+  "manifest": "9ed147cfe0b48c0287c38a20a86a84a825b41741d1e5ea5daa2b917af3633d5d",
+  "sourceFiles": 3066,
+  "nodeModulesLink": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "resolvedLink": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "kernelWorkspaceLink": "/Users/jonathanborgia/code/signaltree/packages/kernel",
+  "initialPackageArtifacts": false,
+  "preloadChange": "only diagnostic file output destination relocated to own scratch; interception behavior unchanged",
+  "mainPreloadSha256": "1181e438e8c5a368f18503b9d85ef5e919a09b6c99a05feac80a2965e5c06a79",
+  "ownPreloadSha256": "b2f630f5289aa78fafa4a43e14bb7f0012d245f11b5371c2f1f25d884f4165d9"
+}

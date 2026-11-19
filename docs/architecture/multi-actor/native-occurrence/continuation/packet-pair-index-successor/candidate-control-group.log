@@ -1,0 +1,182 @@
+
+> nx run kernel:test --testFile=packet-index-adversarial.spec.ts --testFile=packet-index-review.spec.ts --testFile=packet-admission-r1.spec.ts --testFile=singleton-row-reuse.spec.ts --testFile=entity-native-input-independent.spec.ts --testFile=native-admission-handoff.spec.ts --testFile=native-invocation-handoff.spec.ts --testFile=native-explicit-handoff.spec.ts --testFile=native-authored-footprint.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=publication-membership-provenance.spec.ts --testFile=publication-evidence-scope-controls.spec.ts --testFile=publication-retirement-boundaries.spec.ts --testFile=entity-negative-publication-retirement.spec.ts --testFile=entity-publication-work-lifetime.spec.ts --testFile=publication-enrollment-adjudicated.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=packet-index-adversarial.spec.ts --testFile=packet-index-review.spec.ts --testFile=packet-admission-r1.spec.ts --testFile=singleton-row-reuse.spec.ts --testFile=entity-native-input-independent.spec.ts --testFile=native-admission-handoff.spec.ts --testFile=native-invocation-handoff.spec.ts --testFile=native-explicit-handoff.spec.ts --testFile=native-authored-footprint.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=publication-membership-provenance.spec.ts --testFile=publication-evidence-scope-controls.spec.ts --testFile=publication-retirement-boundaries.spec.ts --testFile=entity-negative-publication-retirement.spec.ts --testFile=entity-publication-work-lifetime.spec.ts --testFile=publication-enrollment-adjudicated.spec.ts --maxWorkers=1
+
+(node:29070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29077) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c11-packet-pair-index-review/candidate/packages/kernel
+
+(node:29084) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29098) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29174) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29198) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29248) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 3 failed) 68ms
+   × composite readiness follows parent finalization without a recipient operation 9ms
+   × enrollment retains parent invalidation for scalar support 24ms
+   × omission then restored retained collection selects matching payload and support 23ms
+(node:29275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-enrollment-adjudicated.spec.ts (16 tests | 6 failed) 110ms
+   × adjudicated enrollment invariance branch: before-pending 11ms
+   × adjudicated enrollment invariance branch: during-pending 4ms
+   × adjudicated enrollment invariance branch: enroll-in-updater 13ms
+   × adjudicated enrollment invariance root: before-pending 2ms
+   × adjudicated enrollment invariance root: during-pending 3ms
+   × adjudicated enrollment invariance root: enroll-in-updater 2ms
+(node:29325) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29339) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29340) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29341) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/native-certificate-successor.spec.ts:23:55
+     21|    throw sentinel;
+     22|   })).toThrow(sentinel);
+     23|   expect(lifecycle.nativeRequirementReady(composite)).toBe(true);expec…
+       |                                                       ^
+     24|  }finally{lifecycle.disposeConnection(channel);}
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for scalar support
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/native-certificate-successor.spec.ts:45:88
+     43|    throw new Error('parent invalid');
+     44|   })).toThrow('parent invalid');
+     45|   child!.declare({kind:'independent'},()=>tree.$.pair.y(8));await flus…
+       |                                                                                        ^
+     46|   q.confirm();await flush();expect(sent).toEqual([membership?{y:8}:{x:…
+     47|  }finally{child?.dispose();parent.dispose();tree.destroy();foreign.des…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: before-pending
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: during-pending
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: enroll-in-updater
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: before-pending
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: during-pending
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: enroll-in-updater
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/lib/publication-enrollment-adjudicated.spec.ts:42:22
+     40|   expect(otherStarts.every(call=>call[2]==='surviving')).toBe(true);
+     41|   if(['before-pending','during-pending','enroll-in-updater'].includes(…
+     42|    expect(otherSent).toHaveLength(1);expect(otherSent[0]).toMatchObjec…
+       |                      ^
+     43|   }else if(variant==='dispose-after-declaration'){
+     44|    expect(otherSent.length).toBeLessThanOrEqual(1);if(otherSent.length…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+
+ Test Files  2 failed | 14 passed (16)
+      Tests  9 failed | 105 passed (114)
+   Start at  10:27:38
+   Duration  21.17s (transform 1.58s, setup 0ms, import 5.99s, tests 966ms, environment 10.48s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=packet-index-adversarial.spec.ts --testFile=packet-index-review.spec.ts --testFile=packet-admission-r1.spec.ts --testFile=singleton-row-reuse.spec.ts --testFile=entity-native-input-independent.spec.ts --testFile=native-admission-handoff.spec.ts --testFile=native-invocation-handoff.spec.ts --testFile=native-explicit-handoff.spec.ts --testFile=native-authored-footprint.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=publication-membership-provenance.spec.ts --testFile=publication-evidence-scope-controls.spec.ts --testFile=publication-retirement-boundaries.spec.ts --testFile=entity-negative-publication-retirement.spec.ts --testFile=entity-publication-work-lifetime.spec.ts --testFile=publication-enrollment-adjudicated.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      22.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     22.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    22.1s

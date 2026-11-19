@@ -1,0 +1,74 @@
+{
+  "jointManifest": "289e25b0aeb5ab0d936c81b7ba77bf6994929c1a081418f6c0f6996e8c198a99",
+  "constructionManifest": "f63ade892aa381b827f1db54986fbb2ca787cb1bde497847104bd0a40bd9dffe",
+  "cleanupRuntimeFiles": [
+    "packages/kernel/src/lib/internals/construction-allocation.ts",
+    "packages/kernel/src/lib/internals/materialize-markers.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "packages/kernel/src/lib/internals/position-registry.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "packages/kernel/src/lib/signal-tree.ts"
+  ],
+  "directOverlap": [
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts"
+  ],
+  "fullBranchOverlapAgainstJointBase": [
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts"
+  ],
+  "identities": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "jointBase": "eddf7a756dfa0b38a87a40f756341fdb63da4909f59af4aa2775425fe7623644",
+      "joint": "a2719b620781cde8d0defde8441851a3add4c8d87109b6b84281c43529be28eb",
+      "constructionBase": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b",
+      "construction": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b"
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "jointBase": "3cc8cb86f8bff03abbe088729aab5ac1191cd5a075d3b332b3dc34c4a0df81ee",
+      "joint": "e9a056e4e148b17d4a7d7b1b6ca82a69bb6cdd2e7786d82127b6c6fbbb1de958",
+      "constructionBase": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b",
+      "construction": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b"
+    },
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+      "jointBase": "eaa9850c22851a0d8887e9f69060e8724f2b7c6f12d577d847439ee3cfc4ada4",
+      "joint": "603f975dd808e61e0ec830cbb811aa71fbbd79cdef945e911337f59930848b6d",
+      "constructionBase": "eaa9850c22851a0d8887e9f69060e8724f2b7c6f12d577d847439ee3cfc4ada4",
+      "construction": "76e8d645a8652ab9528cde87547c45623ca73ff146451cc39f2773c14a01bf5e"
+    },
+    "packages/kernel/src/lib/internals/owned-mutation.ts": {
+      "jointBase": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+      "joint": "1d6ac5f7f6de7b5627d4920915e9e798aa66298eabbee599602d0213d2123c94",
+      "constructionBase": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+      "construction": "fee66b9718415de7466a9e8427f9d37d731715584037b668750a9d72205541ef"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+      "jointBase": "e900f7ab3d50eb89f5776ade9c653885301bbad298c4853a90d6d06d511983f5",
+      "joint": "f5fe3c0cbde6fbc154da9a0dd42f5f20b7ad5c3f175afa7210918bb798b21852",
+      "constructionBase": "e900f7ab3d50eb89f5776ade9c653885301bbad298c4853a90d6d06d511983f5",
+      "construction": "af7ec0a4ea50235c7cf93831bc154b64cb4b6cf5f82b5ad335916f06ba56012c"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": {
+      "jointBase": "ebff3a34de705f308cb7822d842bdd0afcb3fbb516cd6dd9e89b8f1933d09469",
+      "joint": "7ec7c8006e5df03c93695c3ecf637abd2779c761414c83788bc18159310ebc7f",
+      "constructionBase": "ebff3a34de705f308cb7822d842bdd0afcb3fbb516cd6dd9e89b8f1933d09469",
+      "construction": "f26908891177e9c6cbab9231976f954ea96ce50ae2875c8bb7ada43487c11a9a"
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": {
+      "jointBase": "766a3f606b3f2ff59492c45a0748f69b07739262e213cbd9baa91eb10b3b9165",
+      "joint": "e4aa30ac16bf620f28bb3d2ee4de3aa781f201d1ace86996bf830b3967fd6471",
+      "constructionBase": "766a3f606b3f2ff59492c45a0748f69b07739262e213cbd9baa91eb10b3b9165",
+      "construction": "766a3f606b3f2ff59492c45a0748f69b07739262e213cbd9baa91eb10b3b9165"
+    }
+  },
+  "jointMismatches": [],
+  "constructionMismatches": []
+}

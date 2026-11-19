@@ -1,0 +1,1 @@
+const fs=require('node:fs');const {createRequire}=require('node:module');const r=createRequire(process.cwd()+'/package.json');const {createProjectGraphAsync}=r('@nx/devkit');(async()=>{const graph=await createProjectGraphAsync({exitOnError:false});fs.writeFileSync(process.argv[2],JSON.stringify(graph,null,2));})().catch(e=>{console.error(e);process.exitCode=1});

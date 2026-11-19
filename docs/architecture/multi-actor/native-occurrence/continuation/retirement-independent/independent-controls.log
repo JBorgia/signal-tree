@@ -1,0 +1,62 @@
+
+> nx run kernel:test publication-retirement-independent.spec.ts
+
+> node tools/run-core-vitest.mjs publication-retirement-independent.spec.ts
+
+(node:15090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:15097) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-publication-retirement-independent/candidate/packages/kernel
+
+(node:15104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-retirement-independent.spec.ts (2 tests | 1 failed) 11ms
+   × independent: later completions and membership delivery run after exact first thrown value 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-retirement-independent.spec.ts > independent: later completions and membership delivery run after exact first thrown value
+AssertionError: expected [ 'first', 'second' ] to deeply equal [ 'first', 'second', 'tap' ]
+
+- Expected
++ Received
+
+  [
+    "first",
+    "second",
+-   "tap",
+  ]
+
+ ❯ src/lib/publication-retirement-independent.spec.ts:14:112
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  17:09:27
+   Duration  758ms (transform 427ms, setup 0ms, import 509ms, tests 11ms, environment 168ms)
+
+Warning: command "node tools/run-core-vitest.mjs publication-retirement-independent.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

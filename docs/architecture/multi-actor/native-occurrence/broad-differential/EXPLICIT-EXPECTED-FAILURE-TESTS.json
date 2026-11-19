@@ -1,0 +1,56 @@
+{
+  "predecessor": [
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "4. transaction rolls back \u2014 effects become rolled-back, not committed",
+      "line": 109
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "6. committed effect + later rolled-back transaction => partial",
+      "line": 154
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "10. SUB-PREDICTION A: one transaction may contain two provenance scopes",
+      "line": 248
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "12. a reversal names its cause and does not implicate the other scope",
+      "line": 265
+    },
+    {
+      "file": "packages/kernel/src/lib/open-key-reachability.spec.ts",
+      "title": "a promised arbitrary descendant is a usable location",
+      "line": 17
+    }
+  ],
+  "successor": [
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "4. transaction rolls back \u2014 effects become rolled-back, not committed",
+      "line": 109
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "6. committed effect + later rolled-back transaction => partial",
+      "line": 154
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "10. SUB-PREDICTION A: one transaction may contain two provenance scopes",
+      "line": 248
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "title": "12. a reversal names its cause and does not implicate the other scope",
+      "line": 265
+    },
+    {
+      "file": "packages/kernel/src/lib/open-key-reachability.spec.ts",
+      "title": "a promised arbitrary descendant is a usable location",
+      "line": 17
+    }
+  ]
+}

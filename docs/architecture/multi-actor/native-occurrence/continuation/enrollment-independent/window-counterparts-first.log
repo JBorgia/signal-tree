@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=window-counterparts.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=window-counterparts.spec.ts --maxWorkers=1
+
+(node:69364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-enrollment-independent-review/independent/packages/kernel
+
+(node:69378) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  11:18:21
+   Duration  2.37s (transform 1.25s, setup 0ms, import 1.49s, tests 65ms, environment 649ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

@@ -1,0 +1,7 @@
+{
+  "packages/kernel/src/lib/entity-signal.ts": "1ee41e63bbfdc7d7bcca56e1f816d4dab041d4ffe5fe3709804a112508f3c051",
+  "packages/kernel/src/lib/constants.ts": "dca84d80c06290aa139172821fa3aabfa6a6a89581fb5b1a098b1325c72d3209",
+  "packages/kernel/src/lib/internals/predicate-churn-warning.ts": "c51c8b60f55bea8ca2e0fd501a970a2097d046b7c09cd5765719af801fb2d93e",
+  "packages/kernel/src/lib/entity-diagnostic-folding.spec.ts": "531b5289bf45fb44871d8a0d308f8477009e5dd70a49eebc5b9c0fdcda52f436",
+  "tools/check-devmode-foldable.mjs": "7abc79952aa6a8e131fb0db7235d0d94483fd1def081ad3ee3594d785e3b4078"
+}

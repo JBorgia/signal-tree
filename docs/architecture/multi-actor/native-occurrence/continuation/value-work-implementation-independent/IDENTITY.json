@@ -1,0 +1,26 @@
+{
+  "base": "893effd2a669e7658fa34f89aecd0d1633488465bb3c32ddea98dd7a9d87aa47",
+  "candidate": "e87715deeebe1392fb4d8996376b6cb2e2a9e9678d47e8dbcf864857560d8382",
+  "counts": [
+    3061,
+    3062
+  ],
+  "changed": {
+    "packages/kernel/src/lib/recipient-window-independent.spec.ts": {
+      "base": "10b501481e6d4259fc7b5dbc9dadb128290213fc9ccad11408e49d46b6b447e8",
+      "candidate": "886c2626b1a5f0892a4610577d798039795133b1103ddfe3a5af2c065c741dae"
+    },
+    "packages/kernel/src/lib/value-work-handoff.spec.ts": {
+      "base": null,
+      "candidate": "52b1395ab6a1a2dad2bb94e2a4e9c32f7f3dc385af2ceb3f75af5e839af6dc57"
+    },
+    "packages/kernel/src/lib/link.ts": {
+      "base": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+      "candidate": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65"
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "base": "13cf4d134d217fc744284bec6237b5ccfeac3ff59468b86894f0cf94496024a3",
+      "candidate": "e022f8ce37bb23c659c27b342023b361ba11e4a8dcb16a783ab44f51ad3e9c28"
+    }
+  }
+}

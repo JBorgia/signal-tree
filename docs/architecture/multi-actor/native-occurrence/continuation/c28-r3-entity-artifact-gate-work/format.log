@@ -1,0 +1,3 @@
+tools/verify-entity-registration-artifacts.mjs 91ms
+tools/fixtures/entity-registration-consumer/package.json 3ms
+tools/fixtures/entity-registration-consumer/package-lock.json 7ms

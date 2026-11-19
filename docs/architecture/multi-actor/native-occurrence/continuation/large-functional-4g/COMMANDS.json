@@ -1,0 +1,65 @@
+[
+  {
+    "id": "original-replacement-undo-redo",
+    "arm": "original",
+    "cwd": "/private/tmp/st-v16-integration-candidate",
+    "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "expectedName": "entity batches larger than the argument limit > undo and redo of a setAll that replaced every row",
+    "originalTestTimeoutMs": 120000,
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-large-qualification-4g/reporter.mjs"
+    ]
+  },
+  {
+    "id": "original-restoration-jumps",
+    "arm": "original",
+    "cwd": "/private/tmp/st-v16-integration-candidate",
+    "file": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "expectedName": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit",
+    "originalTestTimeoutMs": 120000,
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "--testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-large-qualification-4g/reporter.mjs"
+    ]
+  },
+  {
+    "id": "original-restoration-truncation",
+    "arm": "original",
+    "cwd": "/private/tmp/st-v16-integration-candidate",
+    "file": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "expectedName": "v16 restoration of turns larger than the argument limit > releases the claims of a truncated turn that cleared more rows than the argument limit",
+    "originalTestTimeoutMs": 120000,
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "--testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-large-qualification-4g/reporter.mjs"
+    ]
+  }
+]

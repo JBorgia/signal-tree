@@ -1,0 +1,47 @@
+{
+  "COMMANDS.md": {
+    "sha256": "649351f55c0448f018543cedc98335f52547dbab147b2f221e48a1af46039bd8",
+    "archive": "COMMANDS.md",
+    "archiveSha256": "649351f55c0448f018543cedc98335f52547dbab147b2f221e48a1af46039bd8"
+  },
+  "SOURCE-SHA256.json": {
+    "sha256": "2aab56bae322344427d91edfe1e3834717ba698b97a3c766c127cdc7136c89e5",
+    "archive": "SOURCE-SHA256.json.gz",
+    "archiveSha256": "b0207b1fe3d4b52e7b40fc05b5d7b1bb22d2fc8247c4dd01a3e2993109d2c3fe"
+  },
+  "runtime.patch": {
+    "sha256": "30638fc746016fce66c7b2d47bc9abe9e3a10e21561f7526b47b38f216bc7235",
+    "archive": "runtime.patch",
+    "archiveSha256": "30638fc746016fce66c7b2d47bc9abe9e3a10e21561f7526b47b38f216bc7235"
+  },
+  "scalar-oracle.patch": {
+    "sha256": "06ca48d72073b9eb14f6f6408585bdfbe14871bfe0c62ebe1ba15a618c56fe66",
+    "archive": "scalar-oracle.patch",
+    "archiveSha256": "06ca48d72073b9eb14f6f6408585bdfbe14871bfe0c62ebe1ba15a618c56fe66"
+  },
+  "VERIFICATION.json": {
+    "sha256": "02e4e281c4cad483b1666a25a1984d5c2f1a95365eb326a6fc0f1a5a06de3847",
+    "archive": "VERIFICATION.json",
+    "archiveSha256": "02e4e281c4cad483b1666a25a1984d5c2f1a95365eb326a6fc0f1a5a06de3847"
+  },
+  "independent.log": {
+    "sha256": "36af363c4a9c2e5dc5f47b0c252a1e1a16d3a10aeea3c5f87a2130c60623aaaf",
+    "archive": "independent.log",
+    "archiveSha256": "36af363c4a9c2e5dc5f47b0c252a1e1a16d3a10aeea3c5f87a2130c60623aaaf"
+  },
+  "REVIEW.md": {
+    "sha256": "770e3ed5a60a923f0e344f804f048c61dada82d6b508788bef73d70d5a6f6cb6",
+    "archive": "REVIEW.md",
+    "archiveSha256": "770e3ed5a60a923f0e344f804f048c61dada82d6b508788bef73d70d5a6f6cb6"
+  },
+  "focused.log": {
+    "sha256": "050cce5964e538fb8cdb0bbf5254c10f013059c3e84ce840d732b5080902695f",
+    "archive": "focused.log",
+    "archiveSha256": "050cce5964e538fb8cdb0bbf5254c10f013059c3e84ce840d732b5080902695f"
+  },
+  "FREEZE.json": {
+    "sha256": "f161195c96c0b2b5344250f6424a0f1e7fb30017ddc0ff7b5adbec6662de400c",
+    "archive": "FREEZE.json",
+    "archiveSha256": "f161195c96c0b2b5344250f6424a0f1e7fb30017ddc0ff7b5adbec6662de400c"
+  }
+}

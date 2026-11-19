@@ -1,0 +1,25 @@
+📦 Packing SignalTree packages and type-checking a real consumer
+
+  installing tarball...
+node:internal/errors:985
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npm install --no-audit --no-fund --silent /private/tmp/st-c28-r3-composed-artifacts/tmp/st-consumer-tsc-iQoYuS/signal-tree-kernel-16.0.0-dev.tgz /private/tmp/st-c28-r3-composed-artifacts/tmp/st-consumer-tsc-iQoYuS/signal-tree-angular-16.0.0-dev.tgz /private/tmp/st-c28-r3-composed-artifacts/tmp/st-consumer-tsc-iQoYuS/signal-tree-react-16.0.0-dev.tgz /private/tmp/st-c28-r3-composed-artifacts/tmp/st-consumer-tsc-iQoYuS/signal-tree-vue-16.0.0-dev.tgz /private/tmp/st-c28-r3-composed-artifacts/tmp/st-consumer-tsc-iQoYuS/signal-tree-solid-16.0.0-dev.tgz @angular/core@^22.0.0 rxjs@^7.0.0 react@^19.0.0 react-dom@^19.0.0 @types/react@^19.0.0 @types/react-dom@^19.0.0 vue@^3.5.0 typescript@^5.6.0
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at file:///private/tmp/st-c28-r3-composed-artifacts/candidate/tools/verify-consumer-typecheck.mjs:632:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  status: 1,
+  signal: null,
+  output: [ null, Buffer(0) [Uint8Array] [], Buffer(0) [Uint8Array] [] ],
+  pid: 91655,
+  stdout: Buffer(0) [Uint8Array] [],
+  stderr: Buffer(0) [Uint8Array] []
+}
+
+Node.js v24.15.0

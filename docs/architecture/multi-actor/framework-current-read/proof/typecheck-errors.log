@@ -1,0 +1,7 @@
+
+> @signaltree/workspace@16.0.0-dev typecheck /private/tmp/st-current-read-capability-proof
+> node tools/generate-deep-typing-proofs.mjs --check && tsc --noEmit -p packages/kernel/tsconfig.typecheck.json && tsc --noEmit -p tsconfig.typecheck-all.json
+
+Deep-typing generated files are current (1-40).
+packages/angular/src/lib/observation-adapter.ts(32,47): error TS2339: Property 'error' does not exist on type 'never'.
+ ELIFECYCLE  Command failed with exit code 2.

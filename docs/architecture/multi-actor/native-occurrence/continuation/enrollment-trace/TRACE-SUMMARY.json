@@ -1,0 +1,1241 @@
+[
+  {
+    "test": "enrollment invariance branch: before-pending",
+    "events": 36,
+    "declaredChannels": [
+      1
+    ],
+    "nativeWindows": [
+      {
+        "seq": 8,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 5,
+          "frames": [
+            {
+              "channel": 1,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 4,
+              "owner": 1,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 4,
+              "owner": 1,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 12,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 10,
+          "frames": [
+            {
+              "channel": 1,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 4,
+              "owner": 1,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 4,
+              "owner": 1,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 30,
+        "kind": "started",
+        "channel": 1,
+        "revision": 8,
+        "basis": "declared"
+      },
+      {
+        "seq": 34,
+        "kind": "started",
+        "channel": 2,
+        "revision": 9,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 27,
+        "kind": "fallback.scheduler",
+        "channel": 2,
+        "fact": 9,
+        "pendingNow": [
+          {
+            "id": 4,
+            "owner": 1,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 33,
+        "kind": "fallback.scheduler",
+        "channel": 2,
+        "fact": 9,
+        "pendingNow": [
+          {
+            "id": 4,
+            "owner": 1,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 2,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "enrollment invariance branch: during-pending",
+    "events": 36,
+    "declaredChannels": [
+      13
+    ],
+    "nativeWindows": [
+      {
+        "seq": 8,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 17,
+          "frames": [
+            {
+              "channel": 13,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 15,
+              "owner": 3,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 15,
+              "owner": 3,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 12,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 22,
+          "frames": [
+            {
+              "channel": 13,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 15,
+              "owner": 3,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 15,
+              "owner": 3,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 30,
+        "kind": "started",
+        "channel": 13,
+        "revision": 20,
+        "basis": "declared"
+      },
+      {
+        "seq": 34,
+        "kind": "started",
+        "channel": 16,
+        "revision": 21,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 27,
+        "kind": "fallback.scheduler",
+        "channel": 16,
+        "fact": 21,
+        "pendingNow": [
+          {
+            "id": 15,
+            "owner": 3,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 33,
+        "kind": "fallback.scheduler",
+        "channel": 16,
+        "fact": 21,
+        "pendingNow": [
+          {
+            "id": 15,
+            "owner": 3,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 2,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "enrollment invariance branch: enroll-in-updater",
+    "events": 36,
+    "declaredChannels": [
+      25
+    ],
+    "nativeWindows": [
+      {
+        "seq": 8,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 29,
+          "frames": [
+            {
+              "channel": 25,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 27,
+              "owner": 5,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 27,
+              "owner": 5,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 12,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 34,
+          "frames": [
+            {
+              "channel": 25,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 27,
+              "owner": 5,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 27,
+              "owner": 5,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 30,
+        "kind": "started",
+        "channel": 25,
+        "revision": 32,
+        "basis": "declared"
+      },
+      {
+        "seq": 34,
+        "kind": "started",
+        "channel": 28,
+        "revision": 33,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 27,
+        "kind": "fallback.scheduler",
+        "channel": 28,
+        "fact": 33,
+        "pendingNow": [
+          {
+            "id": 27,
+            "owner": 5,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 33,
+        "kind": "fallback.scheduler",
+        "channel": 28,
+        "fact": 33,
+        "pendingNow": [
+          {
+            "id": 27,
+            "owner": 5,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 2,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "enrollment invariance root: before-pending",
+    "events": 52,
+    "declaredChannels": [
+      37
+    ],
+    "nativeWindows": [
+      {
+        "seq": 8,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 41,
+          "frames": [
+            {
+              "channel": 37,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 12,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 48,
+          "frames": [
+            {
+              "channel": 37,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 16,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 51,
+          "frames": [
+            {
+              "channel": 37,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 20,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 54,
+          "frames": [
+            {
+              "channel": 37,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 40,
+              "owner": 7,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 46,
+        "kind": "started",
+        "channel": 37,
+        "revision": 52,
+        "basis": "declared"
+      },
+      {
+        "seq": 50,
+        "kind": "started",
+        "channel": 38,
+        "revision": 53,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 43,
+        "kind": "fallback.scheduler",
+        "channel": 38,
+        "fact": 53,
+        "pendingNow": [
+          {
+            "id": 40,
+            "owner": 7,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 49,
+        "kind": "fallback.scheduler",
+        "channel": 38,
+        "fact": 53,
+        "pendingNow": [
+          {
+            "id": 40,
+            "owner": 7,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 2,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "enrollment invariance root: during-pending",
+    "events": 52,
+    "declaredChannels": [
+      57
+    ],
+    "nativeWindows": [
+      {
+        "seq": 8,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 61,
+          "frames": [
+            {
+              "channel": 57,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 12,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 68,
+          "frames": [
+            {
+              "channel": 57,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 16,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 71,
+          "frames": [
+            {
+              "channel": 57,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 20,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 74,
+          "frames": [
+            {
+              "channel": 57,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 59,
+              "owner": 9,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 46,
+        "kind": "started",
+        "channel": 57,
+        "revision": 72,
+        "basis": "declared"
+      },
+      {
+        "seq": 50,
+        "kind": "started",
+        "channel": 60,
+        "revision": 73,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 43,
+        "kind": "fallback.scheduler",
+        "channel": 60,
+        "fact": 73,
+        "pendingNow": [
+          {
+            "id": 59,
+            "owner": 9,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 49,
+        "kind": "fallback.scheduler",
+        "channel": 60,
+        "fact": 73,
+        "pendingNow": [
+          {
+            "id": 59,
+            "owner": 9,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 2,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "enrollment invariance root: enroll-in-updater",
+    "events": 52,
+    "declaredChannels": [
+      77
+    ],
+    "nativeWindows": [
+      {
+        "seq": 8,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 81,
+          "frames": [
+            {
+              "channel": 77,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 12,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 88,
+          "frames": [
+            {
+              "channel": 77,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 16,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 91,
+          "frames": [
+            {
+              "channel": 77,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 20,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 94,
+          "frames": [
+            {
+              "channel": 77,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 79,
+              "owner": 11,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 46,
+        "kind": "started",
+        "channel": 77,
+        "revision": 92,
+        "basis": "declared"
+      },
+      {
+        "seq": 50,
+        "kind": "started",
+        "channel": 80,
+        "revision": 93,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 43,
+        "kind": "fallback.scheduler",
+        "channel": 80,
+        "fact": 93,
+        "pendingNow": [
+          {
+            "id": 79,
+            "owner": 11,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 49,
+        "kind": "fallback.scheduler",
+        "channel": 80,
+        "fact": 93,
+        "pendingNow": [
+          {
+            "id": 79,
+            "owner": 11,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 2,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "authorized existing-key branch/root installed publication > ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof",
+    "events": 23,
+    "declaredChannels": [
+      97
+    ],
+    "nativeWindows": [
+      {
+        "seq": 6,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 100,
+          "frames": [
+            {
+              "channel": 97,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 99,
+              "owner": 13,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 99,
+              "owner": 13,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      },
+      {
+        "seq": 9,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 108,
+          "frames": [
+            {
+              "channel": 97,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 99,
+              "owner": 13,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 99,
+              "owner": 13,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 21,
+        "kind": "started",
+        "channel": 97,
+        "revision": 107,
+        "basis": "surviving"
+      }
+    ],
+    "schedulerFallback": [
+      {
+        "seq": 17,
+        "kind": "fallback.scheduler",
+        "channel": 97,
+        "fact": 107,
+        "pendingNow": [
+          {
+            "id": 99,
+            "owner": 13,
+            "outcome": "pending"
+          }
+        ]
+      },
+      {
+        "seq": 20,
+        "kind": "fallback.scheduler",
+        "channel": 97,
+        "fact": 107,
+        "pendingNow": [
+          {
+            "id": 99,
+            "owner": 13,
+            "outcome": "pending"
+          }
+        ]
+      }
+    ],
+    "notificationFallbackCalls": 1,
+    "notificationFallbackCreatedFacts": 0
+  },
+  {
+    "test": "A1 installed scalar publication operations (prewritten contract) > publishes an independent existing value while unrelated owner remains pending",
+    "events": 16,
+    "declaredChannels": [
+      110
+    ],
+    "nativeWindows": [
+      {
+        "seq": 6,
+        "kind": "native.finalize",
+        "requirement": {
+          "id": 113,
+          "frames": [
+            {
+              "channel": 110,
+              "declared": []
+            }
+          ],
+          "captureWindow": false,
+          "rawPossible": [
+            {
+              "id": 112,
+              "owner": 15,
+              "outcome": "pending"
+            }
+          ],
+          "pendingNow": [
+            {
+              "id": 112,
+              "owner": 15,
+              "outcome": "pending"
+            }
+          ],
+          "proof": {
+            "owners": [],
+            "destination": [],
+            "input": [],
+            "validation": [],
+            "possible": [],
+            "unknown": false,
+            "invalid": false,
+            "rejected": 0,
+            "unavailable": false,
+            "historical": false
+          }
+        }
+      }
+    ],
+    "starts": [
+      {
+        "seq": 14,
+        "kind": "started",
+        "channel": 110,
+        "revision": 114,
+        "basis": "declared"
+      }
+    ],
+    "schedulerFallback": [],
+    "notificationFallbackCalls": 1,
+    "notificationFallbackCreatedFacts": 0
+  }
+]

@@ -1,0 +1,59 @@
+
+> nx run kernel:test independent-refusal-branches.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-refusal-branches.spec.ts --maxWorkers=1
+
+(node:30302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30309) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-admission-refusal-independent/candidate/packages/kernel
+
+(node:30316) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-refusal-branches.spec.ts (3 tests | 1 failed) 8ms
+   × caught refused first point fragment does not register phantom preparation callbacks 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-refusal-branches.spec.ts > caught refused first point fragment does not register phantom preparation callbacks
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/independent-refusal-branches.spec.ts:9:206
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  20:12:27
+   Duration  1.12s (transform 664ms, setup 0ms, import 788ms, tests 8ms, environment 233ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-refusal-branches.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

@@ -1,0 +1,194 @@
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildViteTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:113:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:63:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+(node:63242) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-c26-scalar-finalized-role/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+> nx run kernel:test scalar-finalized-derived-roots.spec.ts scalar-finalized-lifecycle.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-finalized-derived-roots.spec.ts scalar-finalized-lifecycle.spec.ts --maxWorkers=1
+
+(node:63792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63800) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel
+
+(node:63841) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  16:55:47
+   Duration  2.82s (transform 1.38s, setup 0ms, import 1.68s, tests 34ms, environment 808ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.6s

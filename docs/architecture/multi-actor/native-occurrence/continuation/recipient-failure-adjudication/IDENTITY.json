@@ -1,0 +1,18 @@
+{
+  "C21": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "verifiedFiles": {
+    "packages/kernel/src/lib/aggregate-independent-input.spec.ts": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "packages/kernel/src/lib/recipient-cause-classification.spec.ts": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+    "packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts": "43d91b8f25b3d0b347e545ac2d1d744d8c8e8145979df7e1f612355d45233e5b",
+    "packages/kernel/src/lib/recipient-source-permission.spec.ts": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a",
+    "packages/kernel/src/lib/recipient-window-independent.spec.ts": "886c2626b1a5f0892a4610577d798039795133b1103ddfe3a5af2c065c741dae",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "e022f8ce37bb23c659c27b342023b361ba11e4a8dcb16a783ab44f51ad3e9c28",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "a621673bb7a4df5aca0113e59b1ec40c8b5a1d5cd2dfef7299e59642a7f57ad2",
+    "partition/REVIEW.md": "ff4e87d1c67c5b7983766d3c8da83980534037be94beeaf8f28f726b436aa068",
+    "partition/FAILURE-STACKS.txt": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a",
+    "partition/COMMAND.json": "f1e87942c014e495dd38b79b4b41902b217a220ecc975176c020032e1fcbdbac",
+    "partition/RESULT.json": "1ce7bf82677cbb71bac2f8298e4da7334fae09504c9499ecd51b375a50b6412b",
+    "partition/full-first.log": "3526ea717616cfa7a011b35183c0dbfe9aaf6d811b94bc6313dfc3ed1d5e58b8"
+  },
+  "newRuntimeTestsRun": false
+}

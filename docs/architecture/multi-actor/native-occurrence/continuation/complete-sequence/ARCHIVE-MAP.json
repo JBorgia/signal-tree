@@ -1,0 +1,47 @@
+{
+  "PLAN.md": {
+    "sha256": "429ba98f91050d48f96b4eea1303f19fcb94c35990f912fe03ef53b3a1213201",
+    "archive": "PLAN.md",
+    "archiveSha256": "429ba98f91050d48f96b4eea1303f19fcb94c35990f912fe03ef53b3a1213201"
+  },
+  "RESULTS.md": {
+    "sha256": "4f16273e8fc33ea248f96ec351e84a3c1ccb87a93cb359dc1c9e0930227961e8",
+    "archive": "RESULTS.md",
+    "archiveSha256": "4f16273e8fc33ea248f96ec351e84a3c1ccb87a93cb359dc1c9e0930227961e8"
+  },
+  "original.spec.ts": {
+    "sha256": "e6154fc6e1159571839a93edc4dac3ed8f29cb81ad04fbecf312e220ec568a72",
+    "archive": "original.spec.ts",
+    "archiveSha256": "e6154fc6e1159571839a93edc4dac3ed8f29cb81ad04fbecf312e220ec568a72"
+  },
+  "run-gate.py": {
+    "sha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archive": "run-gate.py",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  "runs/complete-recipes/COMMAND.json": {
+    "sha256": "33ce1c8018635943c0108a2d76c13c0cc98327f8db9fdb35e663f0c49796fd94",
+    "archive": "runs/complete-recipes/COMMAND.json",
+    "archiveSha256": "33ce1c8018635943c0108a2d76c13c0cc98327f8db9fdb35e663f0c49796fd94"
+  },
+  "runs/complete-recipes/RESULT.json": {
+    "sha256": "3859b43fa446fbfc8fa14f535b4d7068f41bee84ae47dce729c1d2aa32043e37",
+    "archive": "runs/complete-recipes/RESULT.json",
+    "archiveSha256": "3859b43fa446fbfc8fa14f535b4d7068f41bee84ae47dce729c1d2aa32043e37"
+  },
+  "runs/complete-recipes/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/complete-recipes/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/complete-recipes/SOURCE-BEFORE.json": {
+    "sha256": "fb9bd1701566f8b2d6eb1bcfdc5d04feb717e8345b9e5f8ce4d4e01038ac3efe",
+    "archive": "runs/complete-recipes/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "9c05f434e469b277f5bcb970f0191b3347acb18464a07224094b50de2465aa02"
+  },
+  "runs/complete-recipes/first.log": {
+    "sha256": "740fb825aaee1bc3c3264f963add9c86515c1b82352e495a9d92a6fbd0c58915",
+    "archive": "runs/complete-recipes/first.log",
+    "archiveSha256": "740fb825aaee1bc3c3264f963add9c86515c1b82352e495a9d92a6fbd0c58915"
+  }
+}

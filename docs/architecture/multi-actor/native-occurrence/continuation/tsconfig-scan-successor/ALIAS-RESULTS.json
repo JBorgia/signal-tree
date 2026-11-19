@@ -1,0 +1,44 @@
+[
+  {
+    "configFile": "packages/react/vitest.config.ts",
+    "specifier": "@signal-tree/kernel",
+    "importer": "packages/react/src/index.ts",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/kernel/src/index.ts"
+  },
+  {
+    "configFile": "packages/react/vitest.config.ts",
+    "specifier": "@signal-tree/kernel/adapter",
+    "importer": "packages/react/src/use-signal-tree.ts",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/kernel/src/adapter.ts"
+  },
+  {
+    "configFile": "apps/react-reference/vite.config.mts",
+    "specifier": "@signal-tree/react",
+    "importer": "apps/react-reference/src/app/app.tsx",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/react/src/index.ts"
+  },
+  {
+    "configFile": "apps/react-reference/vite.config.mts",
+    "specifier": "@signal-tree/kernel",
+    "importer": "apps/react-reference/src/app/reference-store.ts",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/kernel/src/index.ts"
+  },
+  {
+    "configFile": "apps/react-reference/vite.config.mts",
+    "specifier": "@signal-tree/kernel/adapter",
+    "importer": "apps/react-reference/src/app/reference-store.spec.ts",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/kernel/src/adapter.ts"
+  },
+  {
+    "configFile": "apps/react-reference/vite.config.mts",
+    "specifier": "@signal-tree/kernel",
+    "importer": "packages/react/src/index.ts",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/kernel/src/index.ts"
+  },
+  {
+    "configFile": "apps/react-reference/vite.config.mts",
+    "specifier": "@signal-tree/kernel/adapter",
+    "importer": "packages/react/src/use-signal-tree.ts",
+    "resolved": "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/kernel/src/adapter.ts"
+  }
+]

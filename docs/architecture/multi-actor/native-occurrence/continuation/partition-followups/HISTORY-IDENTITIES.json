@@ -1,0 +1,14 @@
+{
+  "packages/kernel/src/lib/held-continuation-probe.spec.ts": {
+    "c21sha": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+    "c8sha": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362"
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts": {
+    "c21sha": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544",
+    "c8sha": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544"
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts": {
+    "c21sha": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02",
+    "c8sha": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02"
+  }
+}

@@ -1,0 +1,82 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/native-anchor-independent.spec.ts
+@@ -0,0 +1,79 @@
++import {expect,it} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {createEntitySignal} from './entity-signal';
++import {PathNotifier} from './path-notifier';
++import {getEntityPublicationAnchor,getEntityPublicationBinding} from './internals/entity-publication';
++import {captureNativeOccurrence,occurrenceIdentity} from './internals/native-occurrence';
++import {getNodeAddress,getPositionRegistry} from './internals/position-registry';
++
++type Row={id:string;n:number};
++for(const enhanced of [false,true]) {
++ it(`anchors collection, row and field to exact published identity enhanced=${enhanced}`,()=>{
++  const tree=signalTree({rows:entityMap<Row,string>()},{enhancers:enhanced?[transactions()]:[]});
++  try {
++   const rows=tree.$.rows;rows.addOne({id:'a',n:1});
++   const row=rows.byIdOrFail('a'),field=row.n;
++   const collectionBinding=getEntityPublicationBinding(rows);
++   if(!collectionBinding)throw Error('missing collection binding');
++   expect(getEntityPublicationAnchor(collectionBinding.source)).toBe(rows);
++   expect(collectionBinding.subject).toBeUndefined();expect(collectionBinding.field).toBeUndefined();
++   const collectionOccurrence=captureNativeOccurrence(rows);
++   expect(collectionOccurrence.source).toBe(rows);
++   expect(collectionOccurrence.edges).toHaveLength(1);
++   expect(collectionOccurrence.edges[0]?.child).toBe(rows);
++   expect(collectionOccurrence.edges[0]?.entity).toBeUndefined();
++   for(const [location,key] of [[row,undefined],[field,'n']] as const){
++    const binding=getEntityPublicationBinding(location);
++    if(!binding)throw Error('missing lifetime binding');
++    expect(binding.source).toBe(collectionBinding.source);
++    expect(binding.subject).toBeTypeOf('number');expect(binding.field).toBe(key);
++    expect(getEntityPublicationAnchor(binding.source)).toBe(rows);
++    const occurrence=captureNativeOccurrence(location);
++    expect(occurrence.source).toBe(location);expect(occurrence.root).toBe(collectionOccurrence.root);
++    expect(occurrence.edges).toHaveLength(2);
++    expect(occurrence.edges[1]).toMatchObject({parent:rows,child:location,key:`${binding.subject}:${key??''}`,address:['rows'],present:true,entity:true});
++    expect(getEntityPublicationBinding(location)).toBe(binding);
++   }
++  } finally {tree.destroy();}
++ });
++ it(`nested literal-dot keys retain exact address segments enhanced=${enhanced}`,()=>{
++  const tree=signalTree({'outer.dot':{'rows.dot':entityMap<Row,string>()}},{enhancers:enhanced?[transactions()]:[]});
++  try {
++   const rows=tree.$['outer.dot']['rows.dot'];rows.addOne({id:'a',n:1});
++   const field=rows.byIdOrFail('a').n,binding=getEntityPublicationBinding(field);
++   if(!binding)throw Error('missing field binding');
++   const anchor=getEntityPublicationAnchor(binding.source);
++   expect(anchor).toBe(rows);expect(getNodeAddress(anchor)).toEqual(['outer.dot','rows.dot']);
++   const occurrence=captureNativeOccurrence(field);
++   expect(occurrence.edges.map(e=>e.address)).toEqual([['outer.dot'],['outer.dot','rows.dot'],['outer.dot','rows.dot']]);
++   expect(occurrence.edges.map(e=>e.key).slice(0,2)).toEqual(['outer.dot','rows.dot']);
++   expect(occurrence.edges[1]?.child).toBe(rows);expect(occurrence.edges[2]?.parent).toBe(rows);
++   expect(occurrence.edges[2]?.child).toBe(field);
++  }finally{tree.destroy();}
++ });
++ it(`equal paths in different trees cannot share anchor/root enhanced=${enhanced}`,()=>{
++  const make=()=>signalTree({rows:entityMap<Row,string>()},{enhancers:enhanced?[transactions()]:[]});
++  const left=make(),right=make();
++  try {
++   left.$.rows.addOne({id:'a',n:1});right.$.rows.addOne({id:'a',n:2});
++   const lf=left.$.rows.byIdOrFail('a').n,rf=right.$.rows.byIdOrFail('a').n;
++   const lb=getEntityPublicationBinding(lf),rb=getEntityPublicationBinding(rf);
++   if(!lb||!rb)throw Error('missing lifetime binding');
++   expect(lb.source).not.toBe(rb.source);
++   expect(getEntityPublicationAnchor(lb.source)).toBe(left.$.rows);
++   expect(getEntityPublicationAnchor(rb.source)).toBe(right.$.rows);
++   expect(getPositionRegistry(left.$.rows)).not.toBe(getPositionRegistry(right.$.rows));
++   const lo=captureNativeOccurrence(lf),ro=captureNativeOccurrence(rf);
++   expect(occurrenceIdentity(lo.root)).not.toBe(occurrenceIdentity(ro.root));
++   expect(lo.edges.at(-1)?.parent).toBe(left.$.rows);expect(ro.edges.at(-1)?.parent).toBe(right.$.rows);
++  }finally{left.destroy();right.destroy();}
++ });
++}
++it('standalone bound collection still refuses unverified root/address',()=>{
++ const rows=createEntitySignal<Row,string>({},new PathNotifier(),'rows');
++ const binding=getEntityPublicationBinding(rows);
++ if(!binding)throw Error('missing standalone collection binding');
++ expect(getEntityPublicationAnchor(binding.source)).toBe(rows);
++ expect(getPositionRegistry(rows)).toBeUndefined();expect(getNodeAddress(rows)).toBeUndefined();
++ expect(()=>captureNativeOccurrence(rows)).toThrow('Native occurrence has no verified root/address');
++});

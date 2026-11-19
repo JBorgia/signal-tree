@@ -1,0 +1,29 @@
+{
+  "rootHead": "628d302dadb082a48c58528651c9088234d0a777",
+  "rootBranch": "fix/d1-d2-forward-port",
+  "manifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+  "entries": 2934,
+  "frozenUnchanged": true,
+  "predecessor94acUnchanged": true,
+  "disposableManifestFilesUnchanged": true,
+  "changedFiles": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/selected-write-operation.ts",
+    "packages/kernel/src/lib/native-explicit-handoff.spec.ts",
+    "packages/kernel/src/lib/native-invocation-handoff.spec.ts",
+    "packages/kernel/src/lib/physical/entity-value-store.ts",
+    "packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts",
+    "packages/kernel/src/lib/selected-real-batching-review.spec.ts"
+  ],
+  "versions": {
+    "typescript": "6.0.3",
+    "vitest": "4.1.9",
+    "nx": "23.1.0"
+  },
+  "presenceFixtureSha256": "6c90087592d75dd20bdc111c0876db967ddc68735fc34041ad6c39016ac4e5f2",
+  "diffSha256": "85e9eb49fee77f22b4f65dc58859708916cb0c153de2018c0026de5c63a6429f"
+}

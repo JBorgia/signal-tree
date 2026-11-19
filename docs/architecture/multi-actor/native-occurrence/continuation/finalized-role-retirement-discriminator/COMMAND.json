@@ -1,0 +1,12 @@
+{
+  "preparation": [
+    "python3",
+    "/private/tmp/st-finalized-role-retirement-discriminator/prepare.py"
+  ],
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/private/tmp/st-finalized-role-retirement-discriminator/model.ts"
+  ],
+  "stdoutAndStderr": "/private/tmp/st-finalized-role-retirement-discriminator/first.log",
+  "nodeVersionObserved": "v24.15.0"
+}

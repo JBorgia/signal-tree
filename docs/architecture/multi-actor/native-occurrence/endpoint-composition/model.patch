@@ -1,0 +1,45 @@
+--- predecessor/model.mjs
++++ successor/model.mjs
+@@ -1,10 +1,16 @@
+ // Pure proposed metadata algorithms. No production imports or mutable source reads.
+ export const selection = (value, D = [], W = []) => Object.freeze({value, D:Object.freeze(D), W:Object.freeze(W)});
++// Capture and selected structural compilation share exactly the same endpoint rule.
++// Explicit undefined clears a later certificate when the earliest input has none.
++function composeEndpoints(first, last) {
++  return Object.freeze({...last, before:first.before, beforeKey:first.beforeKey,
++    beforeEndpoint:first.beforeEndpoint, fieldBefore:first.fieldBefore});
++}
+ export function append(previous, next) {
+   if (!previous) return Object.freeze({...next});
+   if (previous.slot !== next.slot || previous.segment !== next.segment || previous.kind !== next.kind)
+     throw Error('capture identity mismatch');
+-  return Object.freeze({...next, before:previous.before, beforeKey:previous.beforeKey});
++  return composeEndpoints(previous,next);
+ }
+ export function compileSelected(selected) {
+   // Input is already disposition-filtered. Never consult omitted history.
+@@ -13,7 +19,7 @@
+     if (e.kind === 'field') { out.push(e); continue; }
+     const prior = runs.get(e.slot);
+     const continuous = prior && Object.is(prior.effect.afterKey, e.beforeKey);
+-    const merged = continuous ? Object.freeze({...e, beforeKey:prior.effect.beforeKey, before:prior.effect.before}) : e;
++    const merged = continuous ? composeEndpoints(prior.effect,e) : e;
+     const index = continuous ? prior.index : out.length;
+     out[index] = merged;
+     runs.set(e.slot, {index, effect:merged});
+@@ -21,13 +27,13 @@
+   // Canceled occupancy remains in capture state until drain, not inverse output.
+   return out.filter(e => e.kind === 'field' || !Object.is(e.beforeKey,e.afterKey));
+ }
+-export const inverse = e => Object.freeze({...e, before:e.afterEndpoint?.present===false?e.afterEndpoint:e.after, after:e.beforeEndpoint?.present===false?e.beforeEndpoint:e.before, beforeEndpoint:e.afterEndpoint, afterEndpoint:e.beforeEndpoint, beforeKey:e.afterKey, afterKey:e.beforeKey});
++export const inverse = e => Object.freeze({...e, before:e.afterEndpoint?.present===false?e.afterEndpoint:e.after, after:e.beforeEndpoint?.present===false?e.beforeEndpoint:e.before, beforeEndpoint:e.afterEndpoint, afterEndpoint:e.beforeEndpoint, fieldBefore:e.fieldAfter, fieldAfter:e.fieldBefore, beforeKey:e.afterKey, afterKey:e.beforeKey});
+ export function rebindFields(removal, addition, fieldSlot) {
+   if (removal.slot !== addition.slot || removal.segment !== addition.segment) throw Error('rebind identity');
+   const fields = [];
+   for (const key of new Set([...Object.keys(removal.before.value), ...Object.keys(addition.after.value)])) {
+     const a=Object.hasOwn(removal.before.value,key)?removal.before.value[key]:undefined, b=Object.hasOwn(addition.after.value,key)?addition.after.value[key]:undefined;
+-    if (Object.hasOwn(removal.before.value,key) !== Object.hasOwn(addition.after.value,key) || !Object.is(a?.value,b?.value)) fields.push(Object.freeze({kind:'field',slot:fieldSlot(removal.slot,key),segment:addition.segment,before:a,after:b,beforeEndpoint:fieldEndpoint(removal.before,key),afterEndpoint:fieldEndpoint(addition.after,key)}));
++    if (Object.hasOwn(removal.before.value,key) !== Object.hasOwn(addition.after.value,key) || !Object.is(a?.value,b?.value)) fields.push(Object.freeze({kind:'field',slot:fieldSlot(removal.slot,key),segment:addition.segment,before:a,after:b,fieldBefore:Object.hasOwn(removal.before.value,key),fieldAfter:Object.hasOwn(addition.after.value,key),beforeEndpoint:fieldEndpoint(removal.before,key),afterEndpoint:fieldEndpoint(addition.after,key)}));
+   }
+   return fields;
+ }

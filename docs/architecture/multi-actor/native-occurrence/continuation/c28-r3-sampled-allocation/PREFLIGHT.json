@@ -1,0 +1,26 @@
+[
+  {
+    "method": "HeapProfiler.startSampling",
+    "args": {
+      "samplingInterval": 32768,
+      "includeObjectsCollectedByMajorGC": true,
+      "includeObjectsCollectedByMinorGC": true
+    },
+    "synchronous": true
+  },
+  {
+    "method": "HeapProfiler.stopSampling",
+    "args": {},
+    "synchronous": true
+  },
+  {
+    "samples": 0,
+    "node": "v24.15.0",
+    "v8": "13.6.233.17-node.48",
+    "execArgv": [],
+    "NODE_OPTIONS": null,
+    "depth": 128,
+    "depthSource": "pinned implementation",
+    "manualGC": false
+  }
+]

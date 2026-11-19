@@ -1,0 +1,14 @@
+{
+  "FROZEN-IDENTITY.json": "6089a1a21ac747836b40af0f7d837f9bf9e938d6ae900fd871fbf9cdbc60fcd5",
+  "FROZEN-WORKING-MANIFEST.json": "f367cd3d25ea18715c9192a98ff52c932d73cf4790fe22c71b280bc5c1f25de4",
+  "READER-MECHANISM.md": "141bdd34f24ea3a7f0593fa989411dec70865c319984027de2b50a290d4ee643",
+  "REVIEW-CAPTURE-COMPARISON.json": "cb8da17432afbf6fcd4540ae3066aac1766c204ab265b9d4d1a1a6487683549b",
+  "STOP-REVIEW.md": "946185646830943cb5a1ea038f3a6aa6d6759106f7b33ca77f67281a0b7e997e",
+  "runtime-only-replay/AFTER.json": "a73c279b077dfbf6f2e19819ec0bfdf7d5510edfbd08d66571e18f8588a82974",
+  "runtime-only-replay/IDENTITY.json": "723ec8b9a0f130ffab887584830adbe7014736caa08d623512e7b0e45558e86f",
+  "runtime-only-replay/MANIFEST.json": "986f7a94c80734070fc51395ca8eee63d808a4fbf949dadc48f5de1e4c48b3b2",
+  "runtime-only-replay/REMOVE-OVERLAY.log": "1f26e5a43899cdfe206ffc41f727188f645198a5b2e08d9be2ff93bbd3c1ac0d",
+  "runtime-only-replay/observations.jsonl": "d4a5db8e54f6ff429c79a299806c53e5c69713404d0822cc337bf63a0cb20073",
+  "runtime-uninstrumented.patch": "6f899a4464552c2dd6e4b6fb25441a92afa06378f6c8e217a43edb2cf40afeb5",
+  "runtime-working-instrumented.patch": "5db881b307f31ec411a95229fc3edd0feec010fc53f3e53a8e153a19e503cadb"
+}

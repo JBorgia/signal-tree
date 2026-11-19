@@ -1,0 +1,18 @@
+{
+  "private.ts": {
+    "traceSha": "af712a66fd2e568d03c827c22151b8f6df9af85f844ec236b16ae6cf01116aac",
+    "baseSha": "3ee4cd8a4882daf7e49d03cc96f1ac3d36e564925c41a205910feca15dace667",
+    "matchesAfterRemovingTraceAndTrailingWhitespace": true
+  },
+  "lifecycle.ts": {
+    "traceSha": "45ea083c5c163b24af908c610f604f98c900cc8bdc2376586d0a64fd801d89b6",
+    "baseSha": "7a7324d6c0da4db45aecc67dc99ae05d935d36caebd669fdb8cd7eafd1c37f04",
+    "matchesAfterRemovingTraceAndTrailingWhitespace": true
+  },
+  "originalFixtureUnchanged": true,
+  "N2-FIRST.jsonl": "e3ac0ced33a5e71f3c22e910d1c7da16516855895aa006e6d3c47797e3a4d14f",
+  "trace-overlay.patch": "052694481df6aa58f2fb27d1ea3bcf54f18037e365e689cd3a1a530f0eacc7d6",
+  "candidate/packages/kernel/src/lib/n2-observational-trace.spec.ts": "db1674beda2adbfa3b420d53df99cc1355519feb272611fc1551def46dcc0437",
+  "runs/observational-first/first.log": "0d8c3a10f1dc09ec937acd11949c0e8b726d2a179cc700baaba4961e68963792",
+  "runs/observational-first/result.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+}

@@ -1,0 +1,72 @@
+{"case":"clean+clean","original":{"ready":true,"canRelease":true,"canRetire":true,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattened":{"ready":true,"canRelease":true,"canRetire":true,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+{"case":"own-window-confirmed+clean","original":{"ready":true,"canRelease":true,"canRetire":true,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattened":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+{"case":"own-window-rolled-back+clean","original":{"ready":true,"canRelease":true,"canRetire":true,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattened":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+{"case":"arbitrary-unknown+clean","original":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattened":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+{"case":"own-window+arbitrary-unknown","original":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattened":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+{"case":"unsafe-promoted-provenance","original":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattenedWithInventedTrue":{"ready":true,"canRelease":true,"canRetire":true,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]}}
+{"case":"own-window-pending-present+clean","original":{"ready":true,"canRelease":true,"canRetire":false,"waiting":["1:1"],"wouldSubscribe":true,"subscriptionCells":[{"owner":1,"id":1,"outcome":"pending","dependents":{}}]},"flattened":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+{"case":"source-disappearance-same-leaf","before":{"ready":true,"canRelease":true,"canRetire":false,"waiting":["1:1"],"wouldSubscribe":true,"subscriptionCells":[{"owner":1,"id":1,"outcome":"pending","dependents":{}}]},"after":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"outcomeUnchanged":"pending","proofIdentityUnchanged":true}
+{"case":"own-window-pending-disappeared+clean","original":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"flattened":{"ready":true,"canRelease":false,"canRetire":false,"waiting":[],"wouldSubscribe":false,"subscriptionCells":[]},"rootProvenance":"absent"}
+PASS: 7 original/flattened comparisons plus unsafe-provenance and source-disappearance controls; predicate model only.
+{"summaryCase":"clean+clean","ready":true,"canRelease":true,"canRetire":true,"wouldSubscribe":false,"subscriptions":[]}
+{"summaryCase":"empty-composite","ready":true,"canRelease":true,"canRetire":true,"wouldSubscribe":false,"subscriptions":[]}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: exact role proof preserved
++ actual - expected
+... Skipped lines
+
+  {
++   destination: [],
++   historicalWindow: false,
++   input: [],
+    invalid: true,
+    owners: [
+      {
+        dependents: Set(0) {},
+        id: 1,
+...
+    ],
++   possible: [],
++   terminalRejectedRoles: 0,
++   unavailableInput: false,
+    unknown: true,
++   validation: []
+  }
+
+    at summarize (file:///private/tmp/st-c26-independent-review/exact-helper-model.ts:210:9)
+    at check (file:///private/tmp/st-c26-independent-review/exact-helper-model.ts:227:50)
+    at file:///private/tmp/st-c26-independent-review/exact-helper-model.ts:240:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: {
+    owners: [
+      { owner: 101, id: 1, outcome: 'pending', dependents: Set(0) {} }
+    ],
+    destination: [],
+    input: [],
+    validation: [],
+    possible: [],
+    terminalRejectedRoles: 0,
+    unavailableInput: false,
+    historicalWindow: false,
+    unknown: true,
+    invalid: true
+  },
+  expected: {
+    owners: [
+      { owner: 101, id: 1, outcome: 'pending', dependents: Set(0) {} }
+    ],
+    unknown: true,
+    invalid: true
+  },
+  operator: 'deepStrictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

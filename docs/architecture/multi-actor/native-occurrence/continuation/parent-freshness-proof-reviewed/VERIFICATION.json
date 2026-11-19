@@ -1,0 +1,164 @@
+{
+  "finalRuns": [
+    "final-kernel",
+    "final-angular",
+    "source-types-final",
+    "spec-types-final",
+    "reentry-kernel-final",
+    "reentry-angular-final",
+    "callbacks-kernel-final",
+    "callbacks-angular-final",
+    "grouped-kernel-final",
+    "grouped-angular-final"
+  ],
+  "assertions": "passed",
+  "comparisons": [
+    {
+      "case": "ungrouped-kernel-false",
+      "exactTraceMatch": true,
+      "comparisons": 8
+    },
+    {
+      "case": "grouped-kernel-false",
+      "baselineComparisons": 8,
+      "candidateComparisons": 8,
+      "difference": "fresh explicit parent read; same error object if comparer throws"
+    },
+    {
+      "case": "ungrouped-kernel-true",
+      "exactTraceMatch": true,
+      "comparisons": 11
+    },
+    {
+      "case": "grouped-kernel-true",
+      "baselineComparisons": 9,
+      "candidateComparisons": 10,
+      "difference": "fresh explicit parent read; same error object if comparer throws"
+    },
+    {
+      "case": "ungrouped-angular-false",
+      "exactTraceMatch": true,
+      "comparisons": 8
+    },
+    {
+      "case": "grouped-angular-false",
+      "baselineComparisons": 10,
+      "candidateComparisons": 10,
+      "difference": "fresh explicit parent read; same error object if comparer throws"
+    },
+    {
+      "case": "ungrouped-angular-true",
+      "exactTraceMatch": true,
+      "comparisons": 10
+    },
+    {
+      "case": "grouped-angular-true",
+      "baselineComparisons": 9,
+      "candidateComparisons": 10,
+      "difference": "fresh explicit parent read; same error object if comparer throws"
+    },
+    {
+      "case": "reentry-kernel-marker-E5-child",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-kernel-sort-E4",
+      "firstCallExactMatch": true,
+      "baselineCalls": 6,
+      "candidateCalls": 8,
+      "laterValuesMayDiffer": true
+    },
+    {
+      "case": "reentry-kernel-marker-E5-self",
+      "firstCallExactMatch": true,
+      "baselineCalls": 6,
+      "candidateCalls": 6,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-kernel-marker-E1",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-kernel-marker-E3",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-kernel-marker-E4",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-angular-marker-E5-child",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": true
+    },
+    {
+      "case": "reentry-angular-sort-E4",
+      "firstCallExactMatch": true,
+      "baselineCalls": 4,
+      "candidateCalls": 4,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-angular-marker-E5-self",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": true
+    },
+    {
+      "case": "reentry-angular-marker-E1",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": false
+    },
+    {
+      "case": "reentry-angular-marker-E3",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": true
+    },
+    {
+      "case": "reentry-angular-marker-E4",
+      "firstCallExactMatch": true,
+      "baselineCalls": 5,
+      "candidateCalls": 5,
+      "laterValuesMayDiffer": true
+    },
+    {
+      "case": "warm-marker-E5-self",
+      "exactTraceMatch": true
+    },
+    {
+      "case": "warm-marker-E4",
+      "exactTraceMatch": true
+    },
+    {
+      "case": "warm-marker-E5-child",
+      "exactTraceMatch": true
+    },
+    {
+      "case": "warm-marker-E3",
+      "exactTraceMatch": true
+    }
+  ],
+  "oracleBaselineFilesUnchanged": 3031,
+  "originalParentPatchUnchanged": true,
+  "limits": "No release, universal callback or retention claim. Grouped error-path and next-explicit-read deltas are exposed for independent review."
+}

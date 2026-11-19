@@ -1,0 +1,11 @@
+# B — not implemented: no shared equivalent untracked read at these call sites
+
+Reviewed exact C21 entity-signal.ts419/2297/3504/5400, location-runtime.ts470–573, native-location-realization.ts94–166 and Angular observation-adapter.ts72–88. No B runtime edits or B count claim.
+
+The neutral version counter is kernel-owned createCell storage and its writer discards the publication preparation callback. For that implementation, reading its source once via cell.peek(), adding1 and replaceLocation could avoid the currently discarded capture. Generic application derive capture must remain.
+
+But EntityMap receives locations from the tree realization. Native createCell also stores a private number yet exposes a different read surface: createWritable obtains {cell,peek,...} from observation.createWritableCell; `realized.peek` is used by derive. The returned Location is `realized.cell`, and native-location-realization does not install a `.peek` method on it. Angular constructs `const cell=signal(read())` and returns `peek:read` separately. Therefore the obvious `replaceLocation(version,version.peek()+1)` is not valid for that actual supported native carrier, despite the asserted Location type.
+
+Using version() instead is not equivalent: it performs a reactive native read and can return the previously notified mirror while source storage has already advanced inside grouped invalidation. `derive` deliberately reads realized.peek() (source read) before writing. `readSnapshotTerminal` is not a drop-in untracked port either; it first invokes the reactive cell. Subject-state activation cells have the same createCell split; framework-owned epoch handles have their own advancement contract and are not interchangeable with Location bindings.
+
+A neutral-runtime identity guard, newly exposed private backing-read port, or revised carrier design could be investigated separately. None is the authorized simple shared call-site substitution with demonstrated equivalent read/error order. This experiment stops B at that concrete boundary rather than implementing a potentially stale/tracking read or extending API/realization scope. It does not prove the neutral discarded capture necessary. B remains unqualified, with no13000/12800/etc result attributed to it. A remains independent.

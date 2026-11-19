@@ -1,0 +1,10 @@
+{
+  "label": "mutant-installed-no-link",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "no-link.mjs"
+  ],
+  "cwd": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-AAslZt/mutant",
+  "status": 0,
+  "signal": null
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "source": "AUDIT.json",
+    "archive": "AUDIT.json",
+    "sourceSha256": "069022e167984c348ddd1795a3cf76a8af72c6a1bf3b534522d8d605b7ea5bfd",
+    "archiveSha256": "069022e167984c348ddd1795a3cf76a8af72c6a1bf3b534522d8d605b7ea5bfd"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "38a96371ee32beef8f64a44d0156a6a6ffaf5dc82afdc13f3fe24447aa2b3520",
+    "archiveSha256": "38a96371ee32beef8f64a44d0156a6a6ffaf5dc82afdc13f3fe24447aa2b3520"
+  },
+  {
+    "source": "patch-replay/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "archive": "patch-replay/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "sourceSha256": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c",
+    "archiveSha256": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c"
+  },
+  {
+    "source": "patch-replay/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "archive": "patch-replay/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "sourceSha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac",
+    "archiveSha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac"
+  }
+]

@@ -1,0 +1,23 @@
+{
+  "compiler": "6.0.3",
+  "options": {
+    "target": 9,
+    "module": 99,
+    "removeComments": true
+  },
+  "results": [
+    {
+      "file": "packages/kernel/src/lib/link.ts",
+      "equal": true,
+      "beforeSha256": "558cd2c6b7d4bfcfe8dcef9f9a2d50796bbcede27545770c12555d38692478d9",
+      "afterSha256": "558cd2c6b7d4bfcfe8dcef9f9a2d50796bbcede27545770c12555d38692478d9"
+    },
+    {
+      "file": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "equal": true,
+      "beforeSha256": "977d3fcda083afba204a5a46c88de1e532cb2773c855861356ec549f161ca4ee",
+      "afterSha256": "977d3fcda083afba204a5a46c88de1e532cb2773c855861356ec549f161ca4ee"
+    }
+  ],
+  "limit": "Single-file compiler emission comparison, not runtime test or package build. Barrel intentionally adds approved error value export."
+}

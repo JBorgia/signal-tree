@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "node",
+    "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/build-consumers.mjs",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+  "env": {}
+}

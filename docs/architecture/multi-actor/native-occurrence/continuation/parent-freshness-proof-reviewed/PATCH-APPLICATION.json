@@ -1,0 +1,18 @@
+{
+  "patchSource": "/private/tmp/st-parent-snapshot-c8-controls/tests.patch",
+  "sha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463",
+  "check": [
+    "git",
+    "apply",
+    "--check",
+    "/private/tmp/st-parent-freshness-resumed/c8-proof/tests.patch"
+  ],
+  "apply": [
+    "git",
+    "apply",
+    "/private/tmp/st-parent-freshness-resumed/c8-proof/tests.patch"
+  ],
+  "stdout": "",
+  "stderr": "",
+  "exit": 0
+}

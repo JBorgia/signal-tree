@@ -1,0 +1,63 @@
+
+> nx run kernel:test independent-dynamic-enrollment.spec.ts independent-occurrence-terminal.spec.ts independent-enrollment-diagnostics.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-dynamic-enrollment.spec.ts independent-occurrence-terminal.spec.ts independent-enrollment-diagnostics.spec.ts --maxWorkers=1
+
+(node:54641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54730) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-enrollment-independent/candidate/packages/kernel
+
+(node:54933) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-dynamic-enrollment.spec.ts (7 tests | 1 failed) 94ms
+   × repeated preinstall refusal leaves no child observer and no scalar slot growth 9ms
+(node:55636) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:55638) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-dynamic-enrollment.spec.ts > repeated preinstall refusal leaves no child observer and no scalar slot growth
+AssertionError: expected 3 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 3
+
+ ❯ src/lib/independent-dynamic-enrollment.spec.ts:56:104
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 17 passed (18)
+   Start at  20:19:37
+   Duration  4.23s (transform 1.48s, setup 0ms, import 2.05s, tests 232ms, environment 1.43s)
+
+Warning: command "node tools/run-core-vitest.mjs independent-dynamic-enrollment.spec.ts independent-occurrence-terminal.spec.ts independent-enrollment-diagnostics.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.3s

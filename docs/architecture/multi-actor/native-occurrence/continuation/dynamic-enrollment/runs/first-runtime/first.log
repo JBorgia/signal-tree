@@ -1,0 +1,115 @@
+
+> nx run kernel:test whole-value-new-keys.spec.ts dynamic-member-enrollment.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs whole-value-new-keys.spec.ts dynamic-member-enrollment.spec.ts --maxWorkers=1
+
+(node:59689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59696) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-member-enrollment-successor/candidate/packages/kernel
+
+(node:59703) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/whole-value-new-keys.spec.ts (26 tests | 3 failed) 55ms
+     × installs inherited-name keys as own state while rejecting prototype pollution 6ms
+     × captures creation of name despite callable metadata 11ms
+     × captures creation of length despite callable metadata 1ms
+(node:59775) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/dynamic-member-enrollment.spec.ts (5 tests | 1 failed) 22ms
+     × inspection construction stays absent until ordinary whole-member adoption 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/dynamic-member-enrollment.spec.ts > dynamic member enrollment > inspection construction stays absent until ordinary whole-member adoption
+AssertionError: expected {} to deeply equal { a: { n: 2 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 2,
+-   },
+- }
++ {}
+
+ ❯ src/lib/dynamic-member-enrollment.spec.ts:20:57
+     18|   const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=…
+     19|   try{withWriteContext({participation:'inspection'},()=>t.$.rows({a:{n…
+     20|    t.$.rows({a:{n:2}});await tick();expect(sent.at(-1)).toEqual({a:{n:…
+       |                                                         ^
+     21|   }finally{l.dispose();t.destroy();}
+     22|  });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > installs inherited-name keys as own state while rejecting prototype pollution
+Error: Fresh membership preparation reentered installation
+ ❯ Object.validate src/lib/internals/member-membership.ts:1023:104
+    1021|  const edit=source.prepare(key,child,false,true,getActiveWriteContext(…
+    1022|  return {present:edit.after,validate:()=>{
+    1023|   if(ordinaryPresenceSources.get(parent)!==previous||Object.getOwnProp…
+       |                                                                                                        ^
+    1024|   source.validate(edit);
+    1025|  },install:()=>{
+ ❯ installPreparedMember src/lib/internals/materialize-markers.ts:810:10
+ ❯ recursiveUpdate src/lib/signal-tree.ts:1046:9
+ ❯ src/lib/signal-tree.ts:512:9
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyGrouped src/lib/signal-tree.ts:425:30
+ ❯ Object.node src/lib/signal-tree.ts:511:7
+ ❯ src/lib/whole-value-new-keys.spec.ts:165:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > captures creation of name despite callable metadata
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > captures creation of length despite callable metadata
+Error: Fresh membership preparation reentered installation
+ ❯ Object.validate src/lib/internals/member-membership.ts:1023:104
+    1021|  const edit=source.prepare(key,child,false,true,getActiveWriteContext(…
+    1022|  return {present:edit.after,validate:()=>{
+    1023|   if(ordinaryPresenceSources.get(parent)!==previous||Object.getOwnProp…
+       |                                                                                                        ^
+    1024|   source.validate(edit);
+    1025|  },install:()=>{
+ ❯ installPreparedMember src/lib/internals/materialize-markers.ts:810:10
+ ❯ recursiveUpdate src/lib/signal-tree.ts:1046:9
+ ❯ src/lib/signal-tree.ts:512:9
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyGrouped src/lib/signal-tree.ts:425:30
+ ❯ Object.node src/lib/signal-tree.ts:511:7
+ ❯ src/lib/whole-value-new-keys.spec.ts:187:50
+ ❯ withWriteContext src/lib/write-context.ts:65:12
+ ❯ executeTransaction src/enhancers/transactions/transactions.ts:4664:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 27 passed (31)
+   Start at  19:51:18
+   Duration  2.29s (transform 1.40s, setup 0ms, import 1.72s, tests 77ms, environment 335ms)
+
+Warning: command "node tools/run-core-vitest.mjs whole-value-new-keys.spec.ts dynamic-member-enrollment.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.7s

@@ -1,0 +1,46 @@
+--- /private/tmp/st-c28-r3-disposition-index/original.ts	2026-11-02 21:46:27
++++ /private/tmp/st-c28-r3-disposition-index/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts	2026-11-02 21:48:00
+@@ -1590,7 +1590,21 @@
+         owner,
+         node.__prepareOrdinaryRealization(group, undefined, physicalGroup,undefined,undefined,publicationPhase)
+       );
++    }
++  }
++  // The prepared ordinary plan is stable for this unit. Index once rather than
++  // scanning every lifetime's changes for each publication effect.
++  const dispositionByOwner = new Map<PositionId, Map<number, CommittedEntityMutation[]>>();
++  for (const [owner, plan] of ordinaryPlans) {
++    const subjects = new Map<number, CommittedEntityMutation[]>();
++    for (const change of plan.changes) {
++      // Match the previous strict-equality filter even for malformed NaN IDs.
++      if (change.subject !== change.subject) continue;
++      const group = subjects.get(change.subject);
++      if (group) group.push(change);
++      else subjects.set(change.subject, [change]);
+     }
++    dispositionByOwner.set(owner, subjects);
+   }
+   const publicationMeta = (effect: ReversalEffect): WriteMetadata => {
+     const meta: WriteMetadata = {
+@@ -1599,12 +1613,15 @@
+       participation: 'realized',
+     };
+     const plan = ordinaryPlans.get(effect.owner);
+-    return plan
+-      ? withSelectedEntityDisposition(
+-          meta,
+-          plan.changes.filter((change) => change.subject === effect.subjectId)
+-        )
+-      : meta;
++    if (!plan) return meta;
++    const subjects = dispositionByOwner.get(effect.owner)!;
++    // Preserve the old per-call array identity; metadata consumers never share
++    // a mutable grouping array, and same-lifetime edit order stays unchanged.
++    return withSelectedEntityDisposition(meta,
++      typeof effect.subjectId === 'number'
++        ? subjects.get(effect.subjectId)?.slice() ?? []
++        : []);
++
+   };
+ 
+   const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false,publicationPhase});

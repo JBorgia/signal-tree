@@ -1,0 +1,41 @@
+
+> nx run kernel:test independent-value-work-controls scalar-native-support parent-proof-safety-falsifier publication-evidence-scope-controls --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-value-work-controls scalar-native-support parent-proof-safety-falsifier publication-evidence-scope-controls --maxWorkers=1
+
+(node:94534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/value-work-implementation-review/candidate/packages/kernel
+
+(node:94548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94550) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94551) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  18 passed (18)
+   Start at  11:59:33
+   Duration  3.56s (transform 935ms, setup 0ms, import 1.59s, tests 159ms, environment 1.24s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.3s

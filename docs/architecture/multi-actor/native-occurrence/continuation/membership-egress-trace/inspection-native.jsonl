@@ -1,0 +1,7 @@
+["module-loaded"]
+["TRACE bind","{\"address\":[\"profile\"],\"payload\":{\"name\":\"Ada\",\"age\":42},\"identity\":{\"supported\":true}}"]
+["TRACE scalar","{\"address\":[\"profile\"],\"field\":[\"name\"],\"intent\":\"replace\",\"before\":\"Ada\",\"after\":\"Ada\",\"participation\":\"inspection\",\"branchInputs\":0}"]
+["TRACE membership","{\"address\":[\"profile\",\"age\"],\"present\":false,\"participation\":\"inspection\"}"]
+["TRACE scalar","{\"address\":[\"profile\"],\"field\":[\"name\"],\"intent\":\"replace\",\"before\":\"Ada\",\"after\":\"Grace\",\"branchInputs\":0}"]
+["TRACE ready-before","{\"address\":[\"profile\"],\"payload\":{\"name\":\"Ada\",\"age\":42},\"unitPayload\":\"Grace\",\"field\":[\"name\"],\"collection\":false}"]
+["TRACE ready-after","{\"address\":[\"profile\"],\"payload\":{\"name\":\"Grace\",\"age\":42},\"projected\":{\"name\":\"Grace\",\"age\":42},\"present\":true,\"aggregate\":true}"]

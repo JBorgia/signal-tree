@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/lib/disposition-index-independent.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:55:54.494Z",
+    "endTime": "2026-11-03T04:55:58.810Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "9777770801627660501",
+      "startTime": "2026-11-03T04:55:54.553Z",
+      "endTime": "2026-11-03T04:55:58.807Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

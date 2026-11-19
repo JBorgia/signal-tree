@@ -1,0 +1,38 @@
+[
+  {
+    "project": "source-types",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 6.595699541969225,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "public-types",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 3.760524791898206,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "spec-types",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 16.005152166006155,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "affected-lint",
+    "exit": 1,
+    "watchdog": null,
+    "elapsedSeconds": 6.029307625023648,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  }
+]

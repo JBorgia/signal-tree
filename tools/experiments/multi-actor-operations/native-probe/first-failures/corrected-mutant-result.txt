@@ -1,0 +1,31 @@
+Secondary cleanup failures: [
+  Error: Cannot dispose unresolved operations
+      at OperationCoordinator.dispose (file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12172:75)
+      at file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12375:46
+      at withCleanup (file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12094:13)
+      at async file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12358:3
+      at async check (file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12298:3)
+      at async file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12346:1
+]
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+0 !== 1
+
+    at file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12365:12
+    at async withCleanup (file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12086:14)
+    at async file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12358:3
+    at async check (file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12298:3)
+    at async file:///private/tmp/st-workflow-independent-review/premature-confirm.mjs:12346:1 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 0,
+  expected: 1,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

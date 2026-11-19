@@ -1,0 +1,34 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "src/lib/entity-large-batches.spec.ts",
+    "--testNamePattern=^entity batches larger than the argument limit",
+    "--skip-nx-cache",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=/private/tmp/st-r3-compatibility-inventory/full-reporter.mjs"
+  ],
+  "env": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-sampled-allocation/runs/baseline-2048-r1/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-sampled-allocation/runs/baseline-2048-r1/data",
+    "TMPDIR": "/private/tmp/st-c28-r3-sampled-allocation/runs/baseline-2048-r1/tmp",
+    "ST_MEMORY_OUTPUT": "/private/tmp/st-c28-r3-sampled-allocation/runs/baseline-2048-r1/memory.jsonl",
+    "ST_SUITE_EVENTS": "/private/tmp/st-c28-r3-sampled-allocation/runs/baseline-2048-r1/events.jsonl"
+  },
+  "arm": "baseline",
+  "size": 2048,
+  "replicate": 1,
+  "noHeapLimitOverride": true,
+  "testSha256": "aabc87c03405ce2e9eabd43dfaa313fa445ea680d077f814024f68f5cb9a299c",
+  "manifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+}

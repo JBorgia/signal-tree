@@ -1,0 +1,19 @@
+{
+  "calls": 2,
+  "seen": [
+    "x",
+    "y"
+  ],
+  "after": {
+    "x": 7,
+    "y": 11,
+    "z": 4
+  },
+  "final": {
+    "x": 0,
+    "y": 0,
+    "z": 4
+  },
+  "error": "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Cannot update entity: second required inverse refused [effect-validation-failed]",
+  "followError": "undefined"
+}

@@ -1,0 +1,15 @@
+{
+  "calls": 1,
+  "seen": {},
+  "physical": 1,
+  "supplied": {
+    "b": {
+      "n": 2
+    }
+  },
+  "after": {
+    "b": {
+      "n": 2
+    }
+  }
+}

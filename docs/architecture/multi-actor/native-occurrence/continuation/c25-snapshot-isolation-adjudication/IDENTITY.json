@@ -1,0 +1,22 @@
+{
+  "sourceObserved": "/private/tmp/st-c25-equal-owner/candidate",
+  "sourceHashes": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": "7740647fba2eb590a71c64c3bf2a3cfc9d88c980a5eb45c4f1f90adc421bc9e2",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts": "11ed1ee5de87db332a9e12501ee4bd2427546863ca4f262ee3bd4549e25db179",
+    "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts": "dd3a96166f3f0987ec191b26201c7b98ae93e7d44025c4ef50935c5b2d0a6341",
+    "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts": "616faea3d7cf11b7dddcf533a81cd55c2cd0b6f675ecc72a0869edb3a9d8adf4",
+    "packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f"
+  },
+  "log": "/private/tmp/st-c25-equal-owner/runs/saved-snapshot-first/first.log",
+  "logSha256": "a3f94322f6b866f2458ebc22663f7e4dc445ba3dfd9f44846df3ed319aefe4b5",
+  "originalPacketManifest": "/private/tmp/st-c25-snapshot-isolation-controls/SNAPSHOT.json",
+  "originalPacketAllHashesVerified": true,
+  "runSourceManifestUnavailableAtCandidateTopLevel": true,
+  "noExecutionByReviewer": true
+}

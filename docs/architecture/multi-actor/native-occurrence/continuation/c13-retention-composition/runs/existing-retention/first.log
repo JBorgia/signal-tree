@@ -1,0 +1,7 @@
+
+Running 1 gates
+
+  · retention-gc         pass ✓  (the GC-requiring retention proofs: diagnostic and Link owners release values at their boundaries, and source locations do not retain abandoned derived recipes)
+
+──────────────────────────────────────────────────────────────────────────────
+1/1 passed, 0 failed, 0 known-red.

@@ -1,0 +1,17 @@
+{
+  "DESIGN-reviewed.md": {
+    "sha256": "1cbe0464630c7a8dce9917e1ea5743999d19f9acc5c9311a085d084b94574f4d",
+    "archive": "DESIGN-reviewed.md",
+    "archiveSha256": "1cbe0464630c7a8dce9917e1ea5743999d19f9acc5c9311a085d084b94574f4d"
+  },
+  "INPUTS.json": {
+    "sha256": "850e8f87ecbf1ad4af9654ebe232a8d777acb7a5f0cad5e9159275db377d1c97",
+    "archive": "INPUTS.json",
+    "archiveSha256": "850e8f87ecbf1ad4af9654ebe232a8d777acb7a5f0cad5e9159275db377d1c97"
+  },
+  "REVIEW.md": {
+    "sha256": "74e2134ad20ae44225d498992806850699c2d25959811a1df7e881c70535b7e2",
+    "archive": "REVIEW.md",
+    "archiveSha256": "74e2134ad20ae44225d498992806850699c2d25959811a1df7e881c70535b7e2"
+  }
+}

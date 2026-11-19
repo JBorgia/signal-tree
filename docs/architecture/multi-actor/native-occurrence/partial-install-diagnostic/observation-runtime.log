@@ -1,0 +1,35 @@
+
+> nx run kernel:test native-partial-install-diagnostic.spec.ts
+
+> node tools/run-core-vitest.mjs native-partial-install-diagnostic.spec.ts
+
+(node:92578) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92585) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-partial-install-diagnostic/candidate/packages/kernel
+
+(node:92592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  15:04:00
+   Duration  792ms (transform 408ms, setup 0ms, import 489ms, tests 25ms, environment 199ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

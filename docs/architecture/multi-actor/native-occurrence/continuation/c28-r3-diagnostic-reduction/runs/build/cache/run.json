@@ -1,0 +1,65 @@
+{
+  "run": {
+    "command": "nx run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache --output-style=stream --nxBail",
+    "startTime": "2026-11-03T14:43:35.994Z",
+    "endTime": "2026-11-03T14:43:51.579Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:build",
+      "target": "build",
+      "projectName": "kernel",
+      "hash": "5238926884803390902",
+      "startTime": "2026-11-03T14:43:36.033Z",
+      "endTime": "2026-11-03T14:43:43.156Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "react:build",
+      "target": "build",
+      "projectName": "react",
+      "hash": "4172964279717651618",
+      "startTime": "2026-11-03T14:43:43.157Z",
+      "endTime": "2026-11-03T14:43:46.027Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "angular:build",
+      "target": "build",
+      "projectName": "angular",
+      "hash": "543549885125870128",
+      "startTime": "2026-11-03T14:43:46.027Z",
+      "endTime": "2026-11-03T14:43:48.266Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "vue:build",
+      "target": "build",
+      "projectName": "vue",
+      "hash": "4274507019042906749",
+      "startTime": "2026-11-03T14:43:48.267Z",
+      "endTime": "2026-11-03T14:43:50.105Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "solid:build",
+      "target": "build",
+      "projectName": "solid",
+      "hash": "7565484603523669146",
+      "startTime": "2026-11-03T14:43:50.106Z",
+      "endTime": "2026-11-03T14:43:51.578Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

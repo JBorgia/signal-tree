@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "solid",
+    "--skip-nx-cache",
+    "--reporter=json",
+    "--outputFile=/private/tmp/st-native-broad-differential/predecessor/solid/vitest.json",
+    "--maxWorkers=2"
+  ],
+  "cwd": "/private/tmp/st-native-broad-differential/predecessor/candidate",
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "workerLimit": 2,
+  "purpose": "correctness only",
+  "outputEnvironment": {
+    "ST_OBSERVATIONS": "/private/tmp/st-native-broad-differential/predecessor/solid/observations/native.jsonl",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-native-broad-differential/predecessor/solid/observations/prepared",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-native-broad-differential/predecessor/solid/observations/public"
+  }
+}

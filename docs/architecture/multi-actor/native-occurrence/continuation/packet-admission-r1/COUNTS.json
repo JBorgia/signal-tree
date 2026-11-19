@@ -1,0 +1,2449 @@
+{
+  "batch": [
+    {
+      "n": 32,
+      "baseline-b": {
+        "arrayEntries": 4128,
+        "nativeMaps": 180,
+        "nativeMapSets": 928,
+        "ownershipShells": 0,
+        "sealing": null,
+        "sites": {
+          "entity.ts:19:16": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:20:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:21:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:22:15": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:23:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 64,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:24:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 64,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:25:18": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:26:22": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:65:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:79:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:80:23": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:81:25": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:82:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:84:26": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:84:73": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:85:29": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:85:71": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:86:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:93:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:96:108": {
+            "containers": 32,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:109:29": {
+            "containers": 32,
+            "copiedEntries": 64,
+            "sets": 0,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ordinary-flatMap": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 65,
+            "arrayEntries": 2080
+          },
+          "entity.ts:95:126": {
+            "containers": 32,
+            "copiedEntries": 0,
+            "sets": 64,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "proposal-copy": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 64,
+            "arrayEntries": 2048
+          },
+          "entity.ts:141:27": {
+            "containers": 32,
+            "copiedEntries": 64,
+            "sets": 0,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:141:52": {
+            "containers": 32,
+            "copiedEntries": 64,
+            "sets": 64,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          }
+        }
+      },
+      "optimized": {
+        "arrayEntries": 64,
+        "nativeMaps": 181,
+        "nativeMapSets": 960,
+        "ownershipShells": 225,
+        "sealing": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 292,
+          "slots": 1678
+        },
+        "sites": {
+          "ownership-mark:packets.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1
+          },
+          "ownership-mark:arrays.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 66
+          },
+          "ownership-mark:edits.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 128
+          },
+          "ownership-mark:isFrozen-edit": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 96
+          },
+          "ownership-shell:structural": {
+            "containers": 96,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 576
+          },
+          "ownership-sealing": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 292,
+            "slots": 1678
+          },
+          "ownership-shell:property-descriptor": {
+            "containers": 96,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 192
+          },
+          "ownership-mark:defineProperty": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 96
+          },
+          "ownership-mark:edits.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 96
+          },
+          "ownership-mark:arrays.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 66
+          },
+          "ownership-shell:step": {
+            "containers": 32,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 160
+          },
+          "ownership-copy:steps": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 1,
+            "arrayEntries": 32
+          },
+          "ownership-shell:packet": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 11
+          },
+          "ownership-mark:packets.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1
+          },
+          "entity.ts:19:16": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:20:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:21:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:22:15": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:23:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 64,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:24:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 64,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:25:18": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:26:22": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ordinary-flatMap": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 1,
+            "arrayEntries": 32
+          },
+          "entity.ts:73:55": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:75:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:89:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:90:23": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:91:25": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:92:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:26": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:73": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:95:29": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:95:71": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:96:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:103:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:104:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 32,
+            "newEntries": 32,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:106:108": {
+            "containers": 32,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:119:29": {
+            "containers": 32,
+            "copiedEntries": 64,
+            "sets": 0,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:105:126": {
+            "containers": 32,
+            "copiedEntries": 0,
+            "sets": 64,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ownership-mark:proposal-lookup": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 64
+          },
+          "entity.ts:151:27": {
+            "containers": 32,
+            "copiedEntries": 64,
+            "sets": 0,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:151:52": {
+            "containers": 32,
+            "copiedEntries": 64,
+            "sets": 64,
+            "newEntries": 64,
+            "arrays": 0,
+            "arrayEntries": 0
+          }
+        }
+      }
+    },
+    {
+      "n": 128,
+      "baseline-b": {
+        "arrayEntries": 65664,
+        "nativeMaps": 660,
+        "nativeMapSets": 3712,
+        "ownershipShells": 0,
+        "sealing": null,
+        "sites": {
+          "entity.ts:19:16": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:20:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:21:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:22:15": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:23:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 256,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:24:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 256,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:25:18": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:26:22": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:65:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:79:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:80:23": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:81:25": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:82:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:84:26": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:84:73": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:85:29": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:85:71": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:86:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:93:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:96:108": {
+            "containers": 128,
+            "copiedEntries": 0,
+            "sets": 512,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:109:29": {
+            "containers": 128,
+            "copiedEntries": 256,
+            "sets": 0,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ordinary-flatMap": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 257,
+            "arrayEntries": 32896
+          },
+          "entity.ts:95:126": {
+            "containers": 128,
+            "copiedEntries": 0,
+            "sets": 256,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "proposal-copy": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 256,
+            "arrayEntries": 32768
+          },
+          "entity.ts:141:27": {
+            "containers": 128,
+            "copiedEntries": 256,
+            "sets": 0,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:141:52": {
+            "containers": 128,
+            "copiedEntries": 256,
+            "sets": 256,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          }
+        }
+      },
+      "optimized": {
+        "arrayEntries": 256,
+        "nativeMaps": 661,
+        "nativeMapSets": 3840,
+        "ownershipShells": 897,
+        "sealing": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 1156,
+          "slots": 6670
+        },
+        "sites": {
+          "ownership-mark:packets.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1
+          },
+          "ownership-mark:arrays.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 258
+          },
+          "ownership-mark:edits.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 512
+          },
+          "ownership-mark:isFrozen-edit": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 384
+          },
+          "ownership-shell:structural": {
+            "containers": 384,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 2304
+          },
+          "ownership-sealing": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1156,
+            "slots": 6670
+          },
+          "ownership-shell:property-descriptor": {
+            "containers": 384,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 768
+          },
+          "ownership-mark:defineProperty": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 384
+          },
+          "ownership-mark:edits.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 384
+          },
+          "ownership-mark:arrays.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 258
+          },
+          "ownership-shell:step": {
+            "containers": 128,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 640
+          },
+          "ownership-copy:steps": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 1,
+            "arrayEntries": 128
+          },
+          "ownership-shell:packet": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 11
+          },
+          "ownership-mark:packets.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1
+          },
+          "entity.ts:19:16": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:20:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:21:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:22:15": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:23:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 256,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:24:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 256,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:25:18": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:26:22": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ordinary-flatMap": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 1,
+            "arrayEntries": 128
+          },
+          "entity.ts:73:55": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:75:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:89:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:90:23": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:91:25": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:92:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:26": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:73": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:95:29": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:95:71": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:96:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:103:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:104:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 128,
+            "newEntries": 128,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:106:108": {
+            "containers": 128,
+            "copiedEntries": 0,
+            "sets": 512,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:119:29": {
+            "containers": 128,
+            "copiedEntries": 256,
+            "sets": 0,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:105:126": {
+            "containers": 128,
+            "copiedEntries": 0,
+            "sets": 256,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ownership-mark:proposal-lookup": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 256
+          },
+          "entity.ts:151:27": {
+            "containers": 128,
+            "copiedEntries": 256,
+            "sets": 0,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:151:52": {
+            "containers": 128,
+            "copiedEntries": 256,
+            "sets": 256,
+            "newEntries": 256,
+            "arrays": 0,
+            "arrayEntries": 0
+          }
+        }
+      }
+    },
+    {
+      "n": 1024,
+      "baseline-b": {
+        "arrayEntries": 4195328,
+        "nativeMaps": 5140,
+        "nativeMapSets": 29696,
+        "ownershipShells": 0,
+        "sealing": null,
+        "sites": {
+          "entity.ts:19:16": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:20:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:21:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:22:15": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:23:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 2048,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:24:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 2048,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:25:18": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:26:22": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:65:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:79:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:80:23": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:81:25": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:82:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:84:26": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:84:73": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:85:29": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:85:71": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:86:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:93:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:96:108": {
+            "containers": 1024,
+            "copiedEntries": 0,
+            "sets": 4096,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:109:29": {
+            "containers": 1024,
+            "copiedEntries": 2048,
+            "sets": 0,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ordinary-flatMap": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 2049,
+            "arrayEntries": 2098176
+          },
+          "entity.ts:95:126": {
+            "containers": 1024,
+            "copiedEntries": 0,
+            "sets": 2048,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "proposal-copy": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 2048,
+            "arrayEntries": 2097152
+          },
+          "entity.ts:141:27": {
+            "containers": 1024,
+            "copiedEntries": 2048,
+            "sets": 0,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:141:52": {
+            "containers": 1024,
+            "copiedEntries": 2048,
+            "sets": 2048,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          }
+        }
+      },
+      "optimized": {
+        "arrayEntries": 2048,
+        "nativeMaps": 5141,
+        "nativeMapSets": 30720,
+        "ownershipShells": 7169,
+        "sealing": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 9220,
+          "slots": 53262
+        },
+        "sites": {
+          "ownership-mark:packets.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1
+          },
+          "ownership-mark:arrays.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 2050
+          },
+          "ownership-mark:edits.has": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 4096
+          },
+          "ownership-mark:isFrozen-edit": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 3072
+          },
+          "ownership-shell:structural": {
+            "containers": 3072,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 18432
+          },
+          "ownership-sealing": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 9220,
+            "slots": 53262
+          },
+          "ownership-shell:property-descriptor": {
+            "containers": 3072,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 6144
+          },
+          "ownership-mark:defineProperty": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 3072
+          },
+          "ownership-mark:edits.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 3072
+          },
+          "ownership-mark:arrays.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 2050
+          },
+          "ownership-shell:step": {
+            "containers": 1024,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 5120
+          },
+          "ownership-copy:steps": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 1,
+            "arrayEntries": 1024
+          },
+          "ownership-shell:packet": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "slots": 11
+          },
+          "ownership-mark:packets.add": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 1
+          },
+          "entity.ts:19:16": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:20:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:21:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:22:15": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:23:17": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 2048,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:24:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 2048,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:25:18": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:26:22": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ordinary-flatMap": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 1,
+            "arrayEntries": 1024
+          },
+          "entity.ts:73:55": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:75:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:89:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:90:23": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:91:25": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:92:28": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:26": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:94:73": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:95:29": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:95:71": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:96:20": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:103:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:104:24": {
+            "containers": 1,
+            "copiedEntries": 0,
+            "sets": 1024,
+            "newEntries": 1024,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:106:108": {
+            "containers": 1024,
+            "copiedEntries": 0,
+            "sets": 4096,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:119:29": {
+            "containers": 1024,
+            "copiedEntries": 2048,
+            "sets": 0,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:105:126": {
+            "containers": 1024,
+            "copiedEntries": 0,
+            "sets": 2048,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "ownership-mark:proposal-lookup": {
+            "containers": 0,
+            "copiedEntries": 0,
+            "sets": 0,
+            "newEntries": 0,
+            "arrays": 0,
+            "arrayEntries": 0,
+            "operations": 2048
+          },
+          "entity.ts:151:27": {
+            "containers": 1024,
+            "copiedEntries": 2048,
+            "sets": 0,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          },
+          "entity.ts:151:52": {
+            "containers": 1024,
+            "copiedEntries": 2048,
+            "sets": 2048,
+            "newEntries": 2048,
+            "arrays": 0,
+            "arrayEntries": 0
+          }
+        }
+      }
+    }
+  ],
+  "point": [
+    {
+      "size": 2000,
+      "updates": 200,
+      "allocation": {
+        "ownership-mark:packets.has": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 200
+        },
+        "ownership-copy:footprint-fields": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 200,
+          "arrayEntries": 200
+        },
+        "ownership-sealing": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 3000,
+          "slots": 10600
+        },
+        "ownership-shell:footprint": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 400
+        },
+        "ownership-mark:arrays.has": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 800
+        },
+        "ownership-mark:edits.has": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 800
+        },
+        "ownership-mark:isFrozen-edit": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-mark:isFrozen-fields": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-copy:fields": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 600,
+          "arrayEntries": 600
+        },
+        "ownership-shell:property-descriptor": {
+          "containers": 600,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 1200
+        },
+        "ownership-mark:defineProperty": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-mark:edits.add": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-mark:arrays.add": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 800
+        },
+        "ownership-shell:step": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 800
+        },
+        "ownership-copy:steps": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 200,
+          "arrayEntries": 200
+        },
+        "ownership-shell:packet": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 2200
+        },
+        "ownership-mark:packets.add": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 200
+        },
+        "ordinary-flatMap": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 200,
+          "arrayEntries": 200
+        },
+        "entity.ts:75:28": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:89:24": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:90:23": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:91:25": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:92:28": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:94:26": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:94:73": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:95:29": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:95:71": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:96:20": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:103:24": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:104:24": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:106:108": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 400,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:119:29": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 0,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:105:126": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 200,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "ownership-mark:proposal-lookup": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 200
+        },
+        "entity.ts:151:27": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 0,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:151:52": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 200,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:19:16": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:22:15": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        }
+      }
+    },
+    {
+      "size": 20000,
+      "updates": 200,
+      "allocation": {
+        "ownership-mark:packets.has": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 200
+        },
+        "ownership-copy:footprint-fields": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 200,
+          "arrayEntries": 200
+        },
+        "ownership-sealing": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 3000,
+          "slots": 10600
+        },
+        "ownership-shell:footprint": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 400
+        },
+        "ownership-mark:arrays.has": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 800
+        },
+        "ownership-mark:edits.has": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 800
+        },
+        "ownership-mark:isFrozen-edit": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-mark:isFrozen-fields": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-copy:fields": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 600,
+          "arrayEntries": 600
+        },
+        "ownership-shell:property-descriptor": {
+          "containers": 600,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 1200
+        },
+        "ownership-mark:defineProperty": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-mark:edits.add": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 600
+        },
+        "ownership-mark:arrays.add": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 800
+        },
+        "ownership-shell:step": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 800
+        },
+        "ownership-copy:steps": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 200,
+          "arrayEntries": 200
+        },
+        "ownership-shell:packet": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "slots": 2200
+        },
+        "ownership-mark:packets.add": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 200
+        },
+        "ordinary-flatMap": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 200,
+          "arrayEntries": 200
+        },
+        "entity.ts:75:28": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:89:24": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:90:23": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:91:25": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:92:28": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:94:26": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:94:73": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:95:29": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:95:71": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:96:20": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:103:24": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:104:24": {
+          "containers": 200,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 200,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:106:108": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 400,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:119:29": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 0,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:105:126": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 200,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "ownership-mark:proposal-lookup": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 0,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0,
+          "operations": 200
+        },
+        "entity.ts:151:27": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 0,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:151:52": {
+          "containers": 200,
+          "copiedEntries": 400,
+          "sets": 200,
+          "newEntries": 400,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:19:16": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        },
+        "entity.ts:22:15": {
+          "containers": 0,
+          "copiedEntries": 0,
+          "sets": 200,
+          "newEntries": 0,
+          "arrays": 0,
+          "arrayEntries": 0
+        }
+      }
+    }
+  ]
+}

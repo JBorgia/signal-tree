@@ -1,0 +1,15 @@
+{
+  "FIXTURE-SHA256.json": "ffd68bc8d082af010f621607dc6542328d37ae5d370e965f98a8bf7fffd32b63",
+  "PREREGISTERED.md": "5e37f308bfb65cdd5ff5a717286dc8b7e8e94396626241142404af08e7980e4e",
+  "RESULTS.md": "9bbcefdad11624a098b3fd6dbd828a6f76d22a0a2dc9a4a8486465a3af300447",
+  "SOURCE-SHA256.json": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+  "angular-first.log": "155033b04920d888fb19234b6818ca36aad52f8ae57c8fc57904d1f5084d1baf",
+  "fixtures/angular-selected-prepared-facade.spec.ts": "693003bb6c4570e07dfe50042b96f243bac25090525c2d52822cfe35f4378169",
+  "fixtures/react-selected-prepared-facade.spec.tsx": "532e9c7ed8f42bd3915429fcc57b78cea6804aa53aab9bad3f1b9d87efd60ff8",
+  "fixtures/solid-selected-prepared-facade.spec.ts": "d851bca66364b774e8b486d228a7fe942d704442dcc31f48d8450ff992a2a724",
+  "fixtures/vue-selected-prepared-facade.spec.ts": "2b7586d597c68d295aba589f181b7c58eada5ee7f3148a9a2c6fbff43e8c7394",
+  "react-first.log": "0f9a597eb17c59354ca50da2eacac76a6aeec6b88341d0a6587c7930bbaa831d",
+  "solid-first.log": "51f4724f5a4d58f028676819a53840707f6b2476fb9b57b8f9b7209922da5d7a",
+  "vue-first.log": "d389636dabab356604373305491bad5f360fc9219b40c90dc67a25875ca0cd66",
+  "write-fixtures.py": "fc359a2a92ed023691b9935d92f5655fd8d108238b5dd15969ed417ec5489505"
+}

@@ -1,0 +1,21 @@
+{
+  "id": "heap-pending-1000-selected-sample2",
+  "ordinal": 80,
+  "profile": "heap-pending",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample2",
+  "exit": 0,
+  "pid": 71298,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 2.0049742918927222,
+  "telemetrySamples": 3,
+  "maxObservedOwnedRssBytes": 254459904,
+  "minimumObservedHostFreePercentage": 39.0,
+  "attempts": 1
+}

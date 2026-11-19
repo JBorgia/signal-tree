@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack",
+    "pnpm",
+    "nx",
+    "build",
+    "react",
+    "--skip-nx-cache",
+    "--excludeTaskDependencies"
+  ],
+  "cwd": "/private/tmp/st-c20-react-build-baseline-discriminator/candidate",
+  "explicitFlags": [
+    "--report-on-signal",
+    "--report-signal=SIGUSR2",
+    "--report-exclude-env",
+    "--report-exclude-network",
+    "--report-directory=/private/tmp/st-c20-react-build-baseline-discriminator/reports"
+  ],
+  "nxFlags": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c20-react-build-baseline-discriminator/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c20-react-build-baseline-discriminator/nx-data"
+  },
+  "deadlineSeconds": 180,
+  "reportEligibility": "output emitted, verified own-group Rollup child, at least ten seconds since output observation and two low-CPU samples",
+  "watch": false
+}

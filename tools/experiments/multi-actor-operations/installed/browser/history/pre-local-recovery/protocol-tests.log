@@ -1,0 +1,17 @@
+✔ fragmented tool output creates a proposal; finished run does not grant approval (1.403209ms)
+✔ transport metadata and state events cannot approve or mutate canonical data (0.1365ms)
+✔ invalid and oversize arguments leave no operation (0.071292ms)
+✔ duplicate calls, unrelated finishes and incomplete runs are refused (0.068417ms)
+✔ host actor context is declared; tool-provided actor and permission are rejected (0.061458ms)
+✔ review: forged approval fields and tool result never grant consent (0.563708ms)
+✔ review: byte boundary, tool count, tool identity and terminal run checks (0.572125ms)
+✔ review: disposing stream from proposal callback prevents later operation creation (0.153375ms)
+✔ review: recursive tool end is refused before invoking builder twice (0.116458ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39.235416

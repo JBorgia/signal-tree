@@ -1,0 +1,4 @@
+{
+  "ST_OBSERVATIONS": "/private/tmp/st-c11-native-diagnostic-observations.jsonl",
+  "scope": "Characterization harness requires sink. Passing setup/recording does not assert all recorded outcomes or establish conformance. Original no-sink failures preserved in incomplete C10 run."
+}

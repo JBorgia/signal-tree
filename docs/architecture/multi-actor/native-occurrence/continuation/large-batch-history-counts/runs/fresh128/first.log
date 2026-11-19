@@ -1,0 +1,35 @@
+
+> nx run kernel:test large-batch-history-count-probe.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs large-batch-history-count-probe.spec.ts --maxWorkers=1
+
+(node:54641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54702) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c19-bounded-history-counts/candidate/packages/kernel
+
+(node:54833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  13:04:16
+   Duration  7.90s (transform 2.20s, setup 0ms, import 2.95s, tests 173ms, environment 3.78s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      10.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     10.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    10.3s

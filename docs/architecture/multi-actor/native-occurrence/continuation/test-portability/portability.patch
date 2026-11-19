@@ -1,0 +1,360 @@
+--- a/packages/kernel/src/lib/approved-current-obligation.spec.ts
++++ b/packages/kernel/src/lib/approved-current-obligation.spec.ts
+@@ -1,10 +1,10 @@
+-import {appendFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {expect,it} from 'vitest';
+ import {link,signalTree,transactions,type PublicationReceipt,type PendingTransaction} from '../index';
+ const drain=async()=>{for(let i=0;i<160;i++)await Promise.resolve();};
+ const errorData=(error:unknown)=>error instanceof Error?{name:error.name,message:error.message,...Object.fromEntries(['code','stage','reason','cause'].filter(key=>key in error).map(key=>[key,(error as unknown as Record<string,unknown>)[key]]))}:{thrown:error};
+ it.each(['A','B'] as const)('approved current-obligation counterpart %s',async(history)=>{
+- const output=process.env['ST_TWO_HISTORY_OUTPUT'];if(!output)throw Error('Observation output required');
++ const output=process.env['ST_TWO_HISTORY_OUTPUT'];
+  const tree=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});
+  const sent:unknown[]=[];const errors:unknown[]=[];const historyReads:unknown[]=[];const freshReads:unknown[]=[];
+  const c=link(tree.$.pair,{set:value=>{sent.push(value);}});
+@@ -12,7 +12,7 @@
+  let p!:PendingTransaction,a!:PendingTransaction,b!:PendingTransaction;let settled=false;let settleError:unknown;let notices=0;
+  const off=tree.$.pair.x.subscribe(()=>notices++);
+  const inspect=(handle:PendingTransaction|undefined)=>{if(!handle)return null;try{return handle.inspect();}catch(error){return {inspectionError:errorData(error)};}};
+- const record=(phase:string)=>appendFileSync(output,JSON.stringify({history,phase,state:tree.$(),sent,receipts:{historical:historical?.read()??null,fresh:fresh?.read()??null},settled,settleError:settleError??null,notices,historyReads,freshReads,errors,inspection:{p:inspect(p),a:inspect(a),b:inspect(b)}})+'\n');
++ const record=(phase:string)=>writeDiagnostic(output,JSON.stringify({history,phase,state:tree.$(),sent,receipts:{historical:historical?.read()??null,fresh:fresh?.read()??null},settled,settleError:settleError??null,notices,historyReads,freshReads,errors,inspection:{p:inspect(p),a:inspect(a),b:inspect(b)}})+'\n',true);
+  const admitHistory=(owner:PendingTransaction)=>{
+   try{historical=c.declare({kind:'dependent',owners:[p,owner]},()=>tree.$(input=>{
+    historyReads.push({q:input.q,x:input.pair.x});
+--- a/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
+@@ -1,4 +1,4 @@
+-import {appendFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {expect,it,vi} from 'vitest';
+ import {link,signalTree,transactions} from '../index';
+ import * as selection from './internals/native-scalar-selection';
+@@ -34,7 +34,7 @@
+   for(let i=0;i<n;i++)equal();await drain();
+   // Probe captures the source BEFORE one further equal declaration; no receipt is retained.
+   captured=undefined;equal();if(!captured)throw Error('Source selection probe did not run');
+-  const counts=structure(captured);const output=process.env['ST_EQUAL_OWNER_TRACE'];if(!output)throw Error('Research diagnostic requires ST_EQUAL_OWNER_TRACE');appendFileSync(output,JSON.stringify({route,n,inheritedQ,captured:'before extra probe declaration',...counts})+'\n');
++  const counts=structure(captured);const output=process.env['ST_EQUAL_OWNER_TRACE'];writeDiagnostic(output,JSON.stringify({route,n,inheritedQ,captured:'before extra probe declaration',...counts})+'\n',true);
+   expect(counts.owners).toBe(inheritedQ?2:1);expect(counts.ready).toBe(true);expect(node()).toBe(7);expect(notices).toBe(0);expect(sent).toEqual([]);
+   p.confirm();await drain();if(q){expect(sent).toEqual([]);q.confirm();await drain();}
+   expect(sent).toEqual([{x:7,y:0}]);await c.settled();
+--- a/packages/kernel/src/lib/fixed-window-retirement.spec.ts
++++ b/packages/kernel/src/lib/fixed-window-retirement.spec.ts
+@@ -1,11 +1,12 @@
+ import {expect,it,vi} from 'vitest';
+-import {writeFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ import {getEntityPublicationBinding} from './internals/entity-publication';
+ import {getPathNotifier} from './path-notifier';
+ import {getPositionRegistry} from './internals/position-registry';
+ import {withWriteContext} from './write-context';
+ import * as life from './experimental-publication/lifecycle';
++const diagnosticDirectory=process.env['ST_FIXED_WINDOW_OUTPUT'];
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+ const make=()=>signalTree({rows:entityMap<{id:string;n:number},string>()});
+ const owner=()=>signalTree({x:0},{enhancers:[transactions()]});
+@@ -27,7 +28,7 @@
+  if(cause==='external'){q=o.transact(()=>o.$.x(7));withWriteContext({origin:'external'},()=>tree.$.rows.removeOne('a'));}else q=o.transact(()=>tree.$.rows.removeOne('a'));
+  const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;
+  try{await flush();expect(fact.retirementOwnWindowOnly).toBe(false);q.confirm();await flush();expect(source.evidence()!.member(id,'ordinary')).toBe(fact);expect(source.inspect().negativePresence).toBe(1);expect(source.inspect().retirementRequests).toBe(0);
+- writeFileSync(`/private/tmp/st-fixed-window-retirement-cancellation-successor/provenance-${cause}.json`,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}))}},(_key,value)=>value instanceof Set?[...value]:value,2)+'\n');
++ writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/provenance-${cause}.json` : undefined,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}))}},(_key,value)=>value instanceof Set?[...value]:value,2)+'\n');
+  }finally{tree.destroy();o.destroy();}
+ });
+ it('owner disappearance retains exact unresolved proof but drops unavailable subscription',async()=>{
+--- a/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
++++ b/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
+@@ -1,4 +1,4 @@
+-import {appendFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {expect,it} from 'vitest';
+ import {signalTree,link,transactions,entityMap} from '../index';
+ import {withWriteContext} from './write-context';
+@@ -7,7 +7,7 @@
+ import {getTreeScalarSlotRuntime} from './internals/tree-scalar-slot-port';
+ import {diagnostics} from './experimental-publication/private';
+ const tick=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+-const log=(v:unknown)=>appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/independent.jsonl',JSON.stringify(v)+'\n');
++const log=(v:unknown)=>writeDiagnostic(process.env.ST_PREPARED_REVIEW_OUTPUT ? process.env.ST_PREPARED_REVIEW_OUTPUT+'/independent.jsonl' : undefined,JSON.stringify(v)+'\n',true);
+ type Declaration=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly object[]},work:()=>unknown):unknown};
+ type Leaf={():number;(v:number):void};
+ type Row={n:Leaf};
+--- a/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
++++ b/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
+@@ -1,4 +1,4 @@
+-import {appendFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {expect,it} from 'vitest';
+ import {signalTree,link,transactions,entityMap} from '../index';
+ import {getPathNotifier} from './path-notifier';
+@@ -9,7 +9,7 @@
+  const rootSent:unknown[]=[],childSent:unknown[]=[];const root=link(t.$ as unknown as (()=>{other:number;branch?:unknown}),{set:v=>{rootSent.push(v);}}) as Declaration;const child=link((kind==='scalar'?t.$.branch.x:kind==='mixed'?t.$.branch:t.$.branch.rows) as never,{set:(v:unknown)=>{childSent.push(v);}});const q=owner.transact(()=>owner.$.z(7));
+  try{root.declare({kind:'dependent',owners:[q]},()=>kind==='scalar'?t.$.branch.x(7):kind==='empty'?t.$.branch.rows.addOne({id:'a',x:7}):t.$.branch.rows.updateOne('a',{x:7}));await tick();expect(rootSent).toEqual([]);
+   root.declare({kind:'independent'},()=>(t.$ as unknown as (value:{other:number})=>void)({other:1}));await tick();expect(rootSent).toEqual([{other:1}]);const immediate=[...childSent];q[outcome]();await tick();
+-  appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/terminal.jsonl',JSON.stringify({kind,outcome,immediate,terminal:childSent,root:rootSent})+'\n');
++  writeDiagnostic(process.env.ST_PREPARED_REVIEW_OUTPUT ? process.env.ST_PREPARED_REVIEW_OUTPUT+'/terminal.jsonl' : undefined,JSON.stringify({kind,outcome,immediate,terminal:childSent,root:rootSent})+'\n',true);
+   expect(childSent).toEqual([kind==='empty'||kind==='collection'?[]:undefined]);
+  }finally{root.dispose();child.dispose();t.destroy();owner.destroy();}
+ });
+--- a/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
++++ b/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
+@@ -1,5 +1,5 @@
+ import {it,expect} from 'vitest';
+-import {writeFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ import {getPathNotifier} from './path-notifier';
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+@@ -10,7 +10,7 @@
+  try{
+   const pending=rows.all();let error:unknown;try{q.rollback();}catch(e){error=e;}await flush();const after=rows.all();
+   let confirmError:unknown;try{q.confirm();}catch(e){confirmError=e;}
+-  writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order.json',JSON.stringify({pending,after,error:String(error),confirmError:String(confirmError)},null,2));
++  writeDiagnostic(process.env['ST_PREPARED_REVIEW_OUTPUT'] ? process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order.json' : undefined,JSON.stringify({pending,after,error:String(error),confirmError:String(confirmError)},null,2));
+   expect(pending).toEqual([{id:'b',x:0},{id:'a',x:7}]);expect(error).toBeUndefined();expect(after).toEqual([{id:'a',x:0},{id:'b',x:0}]);
+  }finally{t.destroy();}
+ });
+@@ -22,7 +22,7 @@
+  const row=r.byIdOrFail('a');withWriteContext({participation:'inspection'},()=>r.updateOne('a',{z:99}));
+  const q=t.transact(()=>{for(const k of order)r.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();
+  const packets:EntityPublicationPacket[]=[];const off=getEntityPublicationBinding(row)!.source.subscribe({prepare(p){packets.push(p);return undefined;},complete(){}});
+- try{q.rollback();const data=packets.map(p=>({physical:p.physical,ordinary:p.ordinary,steps:p.steps}));writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/packet-${order}.json`,JSON.stringify(data,null,2));
++ try{q.rollback();const data=packets.map(p=>({physical:p.physical,ordinary:p.ordinary,steps:p.steps}));writeDiagnostic(process.env['ST_PREPARED_REVIEW_OUTPUT'] ? process.env['ST_PREPARED_REVIEW_OUTPUT']+`/packet-${order}.json` : undefined,JSON.stringify(data,null,2));
+  expect(packets).toHaveLength(1);const p=packets[0]!;expect(p.steps).toHaveLength(2);
+  for(const edit of p.steps!.flatMap(s=>s.ordinary)){expect((edit.before as {z:number}).z).toBe(7);expect((edit.after as {z:number}).z).toBe(7);}
+  for(const edit of p.physical){expect((edit.before as {z:number}).z).toBe(99);expect((edit.after as {z:number}).z).toBe(99);}
+@@ -33,7 +33,7 @@
+  withWriteContext({participation:'inspection'},()=>r.updateOne('a',{z:99}));const q=t.transact(()=>r.updateOne('a',{x:7}));await flush();let calls=0;
+  const off=r.intercept({onUpdate(_id,p,ctx){calls++;if(mode!=='untouched')ctx.transform({...p,z:mode==='equal'?99:55});}});
+  try{q.rollback();off();await flush();const after=row(),sameSupport=req()===base;const adopted=mode==='changed'?55:99;const a=t.transact(()=>r.updateOne('a',{z:adopted}));await flush();a.rollback();await flush();
+- const data={calls,after,sameSupport,afterAdoptionReject:row()};writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/absence-${mode}.json`,JSON.stringify(data,null,2));
++ const data={calls,after,sameSupport,afterAdoptionReject:row()};writeDiagnostic(process.env['ST_PREPARED_REVIEW_OUTPUT'] ? process.env['ST_PREPARED_REVIEW_OUTPUT']+`/absence-${mode}.json` : undefined,JSON.stringify(data,null,2));
+  expect(calls).toBe(1);expect(Object.prototype.hasOwnProperty.call(after,'x')).toBe(false);expect(after.z).toBe(adopted);expect(sameSupport).toBe(mode==='untouched');expect(row().z).toBe(mode==='untouched'?7:adopted);
+  }finally{off();t.destroy();}
+ });
+--- a/packages/kernel/src/lib/independent-prepared-unit.spec.ts
++++ b/packages/kernel/src/lib/independent-prepared-unit.spec.ts
+@@ -1,5 +1,5 @@
+ import {expect,it} from 'vitest';
+-import {writeFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ import {getEntityPublicationBinding} from './internals/entity-publication';
+ import {interceptLocationWrites} from './internals/location-runtime';
+@@ -8,7 +8,7 @@
+ import {link} from './link';
+ type Row={id:string;x:number;y:number;z:number};
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+-const record=(name:string,data:unknown)=>{const dir=process.env['ST_PREPARED_REVIEW_OUTPUT'];if(!dir)throw new Error('fresh output directory required');writeFileSync(`${dir}/${name}.json`,JSON.stringify(data,null,2));};
++const record=(name:string,data:unknown)=>{const dir=process.env['ST_PREPARED_REVIEW_OUTPUT'];writeDiagnostic(dir ? `${dir}/${name}.json` : undefined,JSON.stringify(data,null,2));};
+ const make=async()=>{const tree=signalTree({plain:0,rows:entityMap<Row,string>()},{enhancers:[transactions()]});tree.$.rows.addOne({id:'a',x:0,y:0,z:4});await flush();const rows=tree.$.rows,row=rows.byIdOrFail('a'),b=getEntityPublicationBinding(row)!;const req=(k:string)=>b.source.evidence()!.field(b.subject!,k,'ordinary');const value=()=>({x:row.x(),y:row.y(),z:row.z()});return {tree,rows,row,req,value};};
+ for(const order of ['xy','yx'] as const)for(const followup of ['retry','confirm'] as const)it(`public second interceptor block is atomic; ${order}/${followup}`,async()=>{
+  const {tree,rows,value}=await make();const q=tree.transact(()=>{for(const k of order)rows.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();let calls=0;const seen:string[]=[];
+--- a/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
+@@ -1,8 +1,9 @@
+-import { appendFileSync } from 'node:fs';
++import { writeDiagnostic } from '../../../../../../tools/testing/optional-diagnostic';
+ import { getEntityPublicationBinding } from '../entity-publication';
+ import { expect, it } from 'vitest';
+ import { entityMap, restoration, signalTree, undoable } from '../../../index';
+ import { getMutationCaptureRuntime } from '../mutation-capture-runtime';
++const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+ 
+ const drain = async () => { for (let i = 0; i < 32; i++) await Promise.resolve(); };
+ it('private source completion sees the complete selected mixed inverse before authoring newer truth', async () => {
+@@ -33,7 +34,7 @@
+       if (!armed) return;
+       armed = false;
+       observed.push({ left: tree.$.left.all(), right: tree.$.right.all() });
+-      appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/completion.jsonl',JSON.stringify({observed,stack:new Error().stack})+'\n');
++      writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/completion.jsonl` : undefined,JSON.stringify({observed,stack:new Error().stack})+'\n',true);
+       tree.$.right.byIdOrFail('a').n(777);
+     }});
+     tree.undo();
+--- /dev/null
++++ b/packages/kernel/src/lib/optional-diagnostic.spec.ts
+@@ -0,0 +1,50 @@
++import * as fs from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join } from 'node:path';
++import { afterEach, beforeEach, expect, it, vi } from 'vitest';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++
++vi.mock('node:fs', async (importOriginal) => {
++  const actual = await importOriginal<typeof import('node:fs')>();
++  return {
++    ...actual,
++    mkdirSync: vi.fn(actual.mkdirSync),
++    appendFileSync: vi.fn(actual.appendFileSync),
++    writeFileSync: vi.fn(actual.writeFileSync),
++  };
++});
++
++let directory: string | undefined;
++beforeEach(() => { vi.clearAllMocks(); });
++afterEach(() => {
++  if (directory) fs.rmSync(directory, { recursive: true, force: true });
++  directory = undefined;
++});
++
++it('an unset or empty sink performs no filesystem operations', () => {
++  writeDiagnostic(undefined, 'already serialized\n');
++  writeDiagnostic(undefined, 'already serialized\n', true);
++  writeDiagnostic('', 'already serialized\n', true);
++  expect(fs.mkdirSync).not.toHaveBeenCalled();
++  expect(fs.appendFileSync).not.toHaveBeenCalled();
++  expect(fs.writeFileSync).not.toHaveBeenCalled();
++});
++
++it('creates nested parents and preserves exact append and replace bytes', () => {
++  directory = fs.mkdtempSync(join(tmpdir(), 'st-optional-diagnostic-'));
++  const file = join(directory, 'nested', 'deeper', 'trace.jsonl');
++  writeDiagnostic(file, '{"n":1}\n', true);
++  writeDiagnostic(file, '{"n":2}\n', true);
++  expect(fs.readFileSync(file, 'utf8')).toBe('{"n":1}\n{"n":2}\n');
++  writeDiagnostic(file, 'replacement without newline');
++  expect(fs.readFileSync(file, 'utf8')).toBe('replacement without newline');
++});
++
++it('propagates filesystem failures for an explicit sink', () => {
++  directory = fs.mkdtempSync(join(tmpdir(), 'st-optional-diagnostic-'));
++  const blocker = join(directory, 'file-not-directory');
++  fs.writeFileSync(blocker, 'occupied');
++  expect(() => writeDiagnostic(join(blocker, 'trace.json'), '{}')).toThrow();
++  expect(() => writeDiagnostic(directory, '{}', true)).toThrow();
++  expect(() => writeDiagnostic(directory, '{}')).toThrow();
++});
+--- a/packages/kernel/src/lib/public-selected-unit.spec.ts
++++ b/packages/kernel/src/lib/public-selected-unit.spec.ts
+@@ -1,5 +1,5 @@
+ import {expect,it} from 'vitest';
+-import {writeFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ const flush=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
+ for(const order of ['xy','yx'] as const)for(const followup of ['retry','confirm'] as const)it(`public onUpdate refuses x inverse after y; ${followup}, writes=${order}`,async()=>{
+@@ -18,8 +18,8 @@
+   const afterFollowup={value:value(),inspection:inspection()};
+   const describe=(e:unknown)=>e instanceof Error?{name:e.name,message:e.message}:String(e);
+   const result={order,followup,before,calls,afterFailure,afterFollowup,firstError:describe(firstError),followupError:describe(followupError)};
+-  const directory=process.env['ST_PUBLIC_DIAGNOSTIC_OUTPUT'];if(!directory)throw new Error('unique evidence output directory required');
+-  writeFileSync(`${directory}/${order}-${followup}.json`,JSON.stringify(result,null,2));
++  const directory=process.env['ST_PUBLIC_DIAGNOSTIC_OUTPUT'];
++  writeDiagnostic(directory ? `${directory}/${order}-${followup}.json` : undefined,JSON.stringify(result,null,2));
+   expect(firstError).toBeDefined();expect(calls.some(c=>c.changes.x===0)).toBe(true);
+   // Existing atomic-refusal safety: refusing a required inverse cannot leave a partial selected write.
+   expect(afterFailure.value).toEqual({x:7,y:11});
+--- a/packages/kernel/src/lib/recipient-window-review.spec.ts
++++ b/packages/kernel/src/lib/recipient-window-review.spec.ts
+@@ -1,16 +1,17 @@
+ import {expect,it,vi} from 'vitest';
+-import {appendFileSync} from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import {signalTree,transactions,link} from '../index';
+ import * as life from './experimental-publication/lifecycle';
+ import {getPathNotifier} from './path-notifier';
++const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+ type Receipt={read():Readonly<{state:string;basis?:string;reason?:string}>};
+ type Declared=ReturnType<typeof link>&{declare(input:{kind:'independent'|'unknown'},work:()=>unknown):Receipt};
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<100;i++)await Promise.resolve();};
+-const output='/private/tmp/st-joint-phase-successor-r4/runs/recipient-traces.jsonl';
++const output=diagnosticDirectory ? `${diagnosticDirectory}/recipient-traces.jsonl` : undefined;
+ for(const scope of ['scalar','branch'] as const)it(`equal unknown proof retains pending predecessor and no-write receipt: ${scope}`,async()=>{
+  const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0,pair:{x:0,y:0}});const sent:unknown[]=[];const c=link(scope==='scalar'?t.$.x:t.$.pair,{set:v=>{sent.push(v);}}) as Declared;const p=o.transact(()=>o.$.z(7));
+  const write=()=>{if(scope==='scalar')t.$.x(1);else t.$.pair({x:1,y:0});};
+- try{const first=c.declare({kind:'unknown'},write);await flush();expect(sent).toEqual([]);const second=c.declare({kind:'unknown'},write);await flush();appendFileSync(output,JSON.stringify({scope,first:first.read(),second:second.read(),sent})+'\n');expect(second.read()).toMatchObject({state:'no-write'});expect(first.read()).toMatchObject({state:'conservative'});expect(sent).toEqual([]);p.confirm();await flush();expect(sent).toEqual([scope==='scalar'?1:{x:1,y:0}]);expect(first.read()).toMatchObject({state:'started',basis:'surviving'});expect(second.read()).toMatchObject({state:'no-write'});}finally{c.dispose();t.destroy();o.destroy();}
++ try{const first=c.declare({kind:'unknown'},write);await flush();expect(sent).toEqual([]);const second=c.declare({kind:'unknown'},write);await flush();writeDiagnostic(output,JSON.stringify({scope,first:first.read(),second:second.read(),sent})+'\n',true);expect(second.read()).toMatchObject({state:'no-write'});expect(first.read()).toMatchObject({state:'conservative'});expect(sent).toEqual([]);p.confirm();await flush();expect(sent).toEqual([scope==='scalar'?1:{x:1,y:0}]);expect(first.read()).toMatchObject({state:'started',basis:'surviving'});expect(second.read()).toMatchObject({state:'no-write'});}finally{c.dispose();t.destroy();o.destroy();}
+ });
+ 
+ for(const known of [false,true])it(`trace actual native input vs recipient-only wider uncertainty: known=${known}`,async()=>{
+@@ -23,7 +24,7 @@
+   return original(...args);
+  });
+  try{let error:unknown,receipt:Receipt|undefined;try{receipt=c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x+(known?0:1),y:input.pair.y}})));}catch(e){error=e;}
+- await flush();appendFileSync(output,JSON.stringify({known,records,error:error&&{code:(error as {code?:string}).code,stage:(error as {stage?:string}).stage,reason:(error as {reason?:string}).reason},receipt:receipt?.read(),sent})+'\n');
++ await flush();writeDiagnostic(output,JSON.stringify({known,records,error:error&&{code:(error as {code?:string}).code,stage:(error as {stage?:string}).stage,reason:(error as {reason?:string}).reason},receipt:receipt?.read(),sent})+'\n',true);
+  expect(sawCoverage).toBe(true);expect(sawKnown).toBe(known);expect(sent).toEqual(known?[]:[{x:1,y:0}]);if(known)expect(error).toMatchObject({stage:'after-callback',reason:'contradiction'});else{expect(error).toBeUndefined();expect(receipt?.read()).toMatchObject({state:'started',basis:'surviving'});}p.confirm();await flush();expect(sent).toEqual([{x:known?7:1,y:0}]);
+  }finally{spy.mockRestore();c.dispose();t.destroy();o.destroy();}
+ });
+--- a/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
+@@ -1,6 +1,7 @@
+ import { it, expect } from 'vitest';
+-import { appendFileSync } from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import { entityMap, signalTree, restoration, undoable } from '../index';
++const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+ const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
+ it('public retained getter does not observe a partial two-collection inverse',async()=>{
+  type Row={id:string;value:number;opaque:()=>void};
+@@ -12,7 +13,7 @@
+  undoable(()=>{t.$.left.removeOne('a');t.$.right.removeOne('b');});await drain();
+  expect(t.$.left.ids()).toEqual([]);expect(t.$.right.ids()).toEqual([]);
+  armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;await drain();
+- appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/getter.jsonl',JSON.stringify({partial,reads,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
++ writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/getter.jsonl` : undefined,JSON.stringify({partial,reads,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n',true);
+  expect(error).toBeUndefined();expect(partial).toBe(false);
+  }finally{armed=false;t.destroy();}
+ });
+--- a/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
+@@ -1,7 +1,8 @@
+ import { it, expect } from 'vitest';
+-import { appendFileSync } from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import { entityMap, signalTree, restoration, undoable } from '../index';
+ import { getEntityPublicationBinding } from './internals/entity-publication';
++const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+ const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
+ it('private source preparation cannot expose a partially installed mixed inverse',async()=>{
+  const t=signalTree({left:entityMap<{id:string},string>(),right:entityMap<{id:string},string>()},{enhancers:[restoration()]});
+@@ -11,7 +12,7 @@
+  undoable(()=>{t.$.left.removeOne('a');t.$.right.removeOne('b');});await drain();
+  for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){seen.push({left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){}}));
+  armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;
+- appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/participant.jsonl',JSON.stringify({seen,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
++ writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/participant.jsonl` : undefined,JSON.stringify({seen,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n',true);
+  expect(seen).toEqual([]);
+  }finally{armed=false;for(const off of release)off();t.destroy();}
+ });
+--- a/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
+@@ -1,7 +1,8 @@
+ import { it, expect } from 'vitest';
+-import { appendFileSync } from 'node:fs';
++import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
+ import { entityMap, signalTree, restoration, undoable } from '../index';
+ import { getEntityPublicationBinding } from './internals/entity-publication';
++const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+ const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
+ it('private source preparation after scalar installation cannot refuse a partial inverse',async()=>{
+  const t=signalTree({n:0,left:entityMap<{id:string},string>(),right:entityMap<{id:string},string>()},{enhancers:[restoration()]});
+@@ -11,7 +12,7 @@
+  undoable(()=>{t.$.n(9);t.$.left.removeOne('a');});await drain();
+  for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if(t.$.n()===0&&left.length===0){seen.push({n:t.$.n(),left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){}}));
+  armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;
+- appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/preparation-scalar.jsonl',JSON.stringify({seen,error,n:t.$.n(),left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
++ writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/preparation-scalar.jsonl` : undefined,JSON.stringify({seen,error,n:t.$.n(),left:t.$.left.ids(),right:t.$.right.ids()})+'\n',true);
+  expect(seen).toEqual([]);
+  }finally{armed=false;for(const off of release)off();t.destroy();}
+ });
+--- /dev/null
++++ b/tools/testing/optional-diagnostic.ts
+@@ -0,0 +1,14 @@
++import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
++import { dirname } from 'node:path';
++
++// Test-only: callers serialize eagerly; only disk persistence is optional.
++export function writeDiagnostic(
++  file: string | undefined,
++  text: string,
++  append = false,
++): void {
++  if (!file) return;
++  mkdirSync(dirname(file), { recursive: true });
++  if (append) appendFileSync(file, text);
++  else writeFileSync(file, text);
++}

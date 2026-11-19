@@ -1,0 +1,43 @@
+{
+  "run": {
+    "command": "nx build demo --configuration=production --skip-nx-cache --output-style=stream",
+    "startTime": "2026-11-03T14:53:04.017Z",
+    "endTime": "2026-11-03T14:53:16.961Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "demo:generate-versions",
+      "target": "generate-versions",
+      "projectName": "demo",
+      "hash": "4177569887167945130",
+      "startTime": "2026-11-03T14:53:04.182Z",
+      "endTime": "2026-11-03T14:53:04.251Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "demo:generate-deep-typing-proofs",
+      "target": "generate-deep-typing-proofs",
+      "projectName": "demo",
+      "hash": "15194795480627972165",
+      "startTime": "2026-11-03T14:53:04.182Z",
+      "endTime": "2026-11-03T14:53:04.510Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    },
+    {
+      "taskId": "demo:build:production",
+      "target": "build",
+      "projectName": "demo",
+      "hash": "1699855304314987357",
+      "startTime": "2026-11-03T14:53:04.510Z",
+      "endTime": "2026-11-03T14:53:16.958Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+--- candidate/packages/kernel/src/lib/experimental-publication/private.ts
++++ branch-trace/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -1,3 +1,5 @@
++import {appendFileSync} from 'node:fs';
++const trace=(v:unknown)=>appendFileSync('/private/tmp/st-collection-egress-successor/branch-native-v3.jsonl',JSON.stringify(v)+'\n');
+ import { RecipientOccurrences, type OccurrenceHandle } from './recipient-occurrence';
+ import type { EntityContributorEdit } from '../internals/entity-egress-projection';
+ import { currentEntityPublicationInputs, getEntityPublicationBinding, type EntityPublicationEvidence } from '../internals/entity-publication';
+@@ -165,6 +167,7 @@
+ }
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
++ trace({event:'membership-prepare',address:[...edit.address,edit.key],present:edit.present,ordinary:edit.ordinary});
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+  const physicalView={requirement:unavailableInput()};
+  const viewDomain=negativeViews.get(domainKey)??new Map<object,NativeView>();
+@@ -196,6 +199,7 @@
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+   const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(proof),...(unit.native?[unit.native]:[])]);
+   const authoredProof=lifecycle.nativeProof(authoredRequirement);ownProofs.set(unit.fact,authoredProof);
++  trace({event:'ready-before',address:b.address,payload:b.valuePayload,unitPayload:unit.payload,presence:unit.presence&&{address:unit.presence.slot.address,present:unit.presence.state.present},changed:unit.changed,completed:[...b.completedPresence].map(([slot,state])=>({address:slot.address,present:state.present}))});
+   if(unit.collection){
+    const collection=b.collections.get(unit.collection.key);
+    if(collection){for(const edit of unit.collection.edits){
+@@ -236,6 +240,7 @@
+   proofs.set(unit.fact,effective);lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0);
+   const prior=unit.previous&&proofs.get(unit.previous);
+   const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior,effective);
++  trace({event:'noop-check',noop,changed:unit.changed,payload:b.valuePayload,masked:maskPayload(b),completed:[...b.completedPresence].map(([slot,state])=>({address:slot.address,present:state.present}))});
+   if(noop){
+    lifecycle.noWrite(channel,unit.fact);
+    const predecessor=effectivePredecessor(unit.previous);noopPredecessors.set(unit.fact,predecessor);
+@@ -249,6 +254,7 @@
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+    b.projected=Object.freeze({fact:unit.fact,changed:unit.changed,payload:support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined)});
+   }
++  trace({event:'ready-after',payload:b.valuePayload,projected:b.projected?.payload,current:b.current?.revision,projectedFact:b.projected?.fact.revision,unitFact:unit.fact.revision});
+   unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+ }
+@@ -416,7 +422,7 @@
+  * an older installed unit's permission. Prepared source units reduce separately.
+  */
+ export function project(channel:object,_meta:unknown,payload:unknown,relative?:readonly string[]):Fact|undefined{
+- const b=bindings.get(channel);if(!b||b.pending.size)return undefined;
++ const b=bindings.get(channel);trace({event:'fallback-project',payload,relative,pending:b?.pending.size});if(!b||b.pending.size)return undefined;
+  const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);
+  const unknownProof={owners:[],unknown:true,invalid:false};proofs.set(fact,unknownProof);ownProofs.set(fact,unknownProof);
+  const requirement=requirementOf(unknownProof);
+@@ -430,7 +436,7 @@
+  b.current=fact;b.projected=Object.freeze({fact,payload,changed:true});
+  return fact;
+ }
+-export function refreshSource(channel:object):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined{const b=bindings.get(channel);if(b)ready(channel,b);return b?.projected&&b.projected.fact===b.current?b.projected:undefined;}
++export function refreshSource(channel:object):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined{const b=bindings.get(channel);if(b)ready(channel,b);trace({event:'refresh',current:b?.current?.revision,projectedFact:b?.projected?.fact.revision,payload:b?.projected?.payload});return b?.projected&&b.projected.fact===b.current?b.projected:undefined;}
+ export function pendingWork(channel:object):readonly Promise<void>[]{return [...(bindings.get(channel)?.pending??[])].map(x=>x.promise);}
+ 
+ // Native scope admission is independent of recipient registration and disposal.
+--- candidate/packages/kernel/src/lib/link.ts
++++ branch-trace/packages/kernel/src/lib/link.ts
+@@ -1,3 +1,5 @@
++import {appendFileSync} from 'node:fs';
++const traceLink=(v:unknown)=>appendFileSync('/private/tmp/st-collection-egress-successor/branch-native-v3.jsonl',JSON.stringify(v)+'\n');
+ import './experimental-publication/entity';
+ import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+ import { entityValueTransition } from './internals/entity-value-transition';
+@@ -906,6 +908,7 @@
+                   // Invoke inside the authority's callback. Awaiting permission
+                   // first would let a new scope open before the actual send.
+                   research.started(researchTicket, consequenceKey);
++                  traceLink({event:'send',payload:now});
+                   Promise.resolve(endpoint.set?.(now)).then(
+                     () => {
+                       sending = false;
+@@ -1034,6 +1037,7 @@
+   };
+   const researchRefresh = (): void => {
+     const receipt = research.refreshSource(consequenceKey);
++    traceLink({event:'link-refresh',payload:receipt?.payload});
+     if (!receipt || receipt.fact === researchFact) return;
+     researchFact = receipt.fact;
+     eligible = receipt.payload as T;

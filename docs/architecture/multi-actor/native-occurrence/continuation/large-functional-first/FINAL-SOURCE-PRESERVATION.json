@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-03T18:16:21.597972+00:00",
+  "checks": [
+    {
+      "candidate": "/private/tmp/st-v16-integration-candidate",
+      "manifestSha256": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+      "filesChecked": 3127,
+      "mismatches": []
+    },
+    {
+      "candidate": "/private/tmp/st-large-qualification/screen-candidate",
+      "manifestSha256": "69d5bcd26e5cf8cc1c3884dba159436ee23b386eeace2c8046a667550905d459",
+      "filesChecked": 3127,
+      "mismatches": []
+    }
+  ]
+}

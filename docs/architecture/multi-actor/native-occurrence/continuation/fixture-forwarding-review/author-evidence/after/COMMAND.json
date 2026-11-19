@@ -1,0 +1,29 @@
+{
+  "cwd": "/private/tmp/st-c21-fixture-corrections/after/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=/private/tmp/st-c21-fixture-corrections/after/progress-reporter.mjs",
+    "src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts"
+  ],
+  "settings": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c21-fixture-corrections/after/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c21-fixture-corrections/after/nx-data",
+    "TMPDIR": "/private/tmp/st-c21-fixture-corrections/after/tmp",
+    "ST_VERIFY_PROGRESS": "/private/tmp/st-c21-fixture-corrections/after/progress",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-c21-fixture-corrections/after/observations",
+    "NODE_OPTIONS": "--require=/private/tmp/st-c21-fixture-corrections/after/diagnostic-redirect.cjs"
+  },
+  "nodeBin": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin",
+  "noProgressSeconds": 180
+}

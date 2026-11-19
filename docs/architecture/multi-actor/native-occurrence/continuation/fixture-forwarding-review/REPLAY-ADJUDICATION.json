@@ -1,0 +1,18 @@
+{
+  "childExit": 0,
+  "passed": [
+    "restores ordinary membership with a foreign live-row field before the next transaction captures",
+    "attempts mixed installed invalidation and delivery while preserving the first failure",
+    "attempts later live lifetime invalidation after first installed row invalidation fails"
+  ],
+  "filtered": [
+    "contains a throwing row callback without dropping another live-row inverse publication",
+    "keeps mixed inverse atomic after live-row preparation throw",
+    "keeps mixed inverse atomic after live-row preparation reentry"
+  ],
+  "recorderEventsIncludeSkipped": true,
+  "originalWrapperExit": 1,
+  "originalWrapperFailure": "expected3 case starts, observed6 including3 filtered events",
+  "noTestRerun": true,
+  "sourceUnchanged": true
+}

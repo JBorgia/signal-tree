@@ -1,0 +1,100 @@
+
+> nx run kernel:test native-certificate-successor.spec.ts core-independent-review.spec.ts collection-contributor-core.spec.ts
+
+> node tools/run-core-vitest.mjs native-certificate-successor.spec.ts core-independent-review.spec.ts collection-contributor-core.spec.ts
+
+(node:1931) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-projection-certificate-successor/packages/kernel
+
+(node:1949) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1950) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/core-independent-review.spec.ts > review omitted ancestor removes nested collection contributors from outgoing support
+REVIEW-OMITTED-COLLECTION {"sent":[],"receipt":{"state":"held","reason":"pending-dependency"},"value":{"other":1}}
+
+ ❯ src/lib/core-independent-review.spec.ts (2 tests | 1 failed) 35ms
+   × review omitted ancestor removes nested collection contributors from outgoing support 11ms
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 36ms
+   × omission then restored retained collection selects matching payload and support 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/core-independent-review.spec.ts > review omitted ancestor removes nested collection contributors from outgoing support
+AssertionError: expected [] to deeply equal [ { other: 1 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "other": 1,
+-   },
+- ]
++ []
+
+ ❯ src/lib/core-independent-review.spec.ts:46:16
+     44|   console.info('REVIEW-OMITTED-COLLECTION',JSON.stringify({sent,receip…
+     45|   expect(tree.$()).toEqual({other:1});
+     46|   expect(sent).toEqual([{other:1}]);
+       |                ^
+     47|  }finally{c.dispose();tree.destroy();foreign.destroy();}
+     48| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected [] to deeply equal [ { other: 1 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "other": 1,
+-   },
+- ]
++ []
+
+ ❯ src/lib/native-certificate-successor.spec.ts:58:84
+     56|  try{
+     57|   rows.updateOne('a',{x:7});await flush();expect(sent).toEqual([]);
+     58|   c.declare({kind:'independent'},()=>tree.$({other:1}));await flush();…
+       |                                                                                    ^
+     59|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     60|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 16 passed (18)
+   Start at  12:30:46
+   Duration  1.56s (transform 2.10s, setup 0ms, import 2.67s, tests 130ms, environment 1.50s)
+
+Warning: command "node tools/run-core-vitest.mjs native-certificate-successor.spec.ts core-independent-review.spec.ts collection-contributor-core.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.0s

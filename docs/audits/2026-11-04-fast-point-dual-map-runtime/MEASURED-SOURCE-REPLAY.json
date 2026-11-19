@@ -1,0 +1,10 @@
+{
+  "baseCommit": "eef7dfc0b95c16658b825d7b1466c95b1cf43c20",
+  "verifiedFiles": 2,
+  "mismatches": [],
+  "payloadHashes": {
+    "packages/kernel/src/lib/fast-point-dual-map.spec.ts": "dbbebddd00c6dca3154878d13b5a12c38706888bec656e6eecf3e847086fde2e",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "377be337bb777aa464e3f2e34d0f0d325f1cdc5391278b4372d816f1bb9a1137"
+  },
+  "scope": "Only entity.ts implementation and new dualMapspec differ under packages fromeef7; all other pointpipeline source unchanged."
+}

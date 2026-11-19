@@ -1,0 +1,18 @@
+{
+  "forwarding-mutant": {
+    "file": "packages/kernel/src/lib/forwarding-retention-probe.spec.ts",
+    "beforeSha256": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "afterSha256": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "baselineSha256": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "restored": true,
+    "selfTestExit": 0
+  },
+  "existing-mutant": {
+    "file": "packages/kernel/src/lib/link-lifetime.spec.ts",
+    "beforeSha256": "fd7ca65a920211167c0cb51d6cf5eed8d9ae0a6737af2890cd593474c9cf2300",
+    "afterSha256": "fd7ca65a920211167c0cb51d6cf5eed8d9ae0a6737af2890cd593474c9cf2300",
+    "baselineSha256": "fd7ca65a920211167c0cb51d6cf5eed8d9ae0a6737af2890cd593474c9cf2300",
+    "restored": true,
+    "selfTestExit": 0
+  }
+}

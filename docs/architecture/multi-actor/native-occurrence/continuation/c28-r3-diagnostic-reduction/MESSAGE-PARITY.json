@@ -1,0 +1,134 @@
+[
+  {
+    "arm": "baseline",
+    "mode": "undefined",
+    "env": "undefined",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "undefined",
+    "env": "development",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "undefined",
+    "env": "production",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "false",
+    "env": "undefined",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "false",
+    "env": "development",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "false",
+    "env": "production",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "true",
+    "env": "undefined",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "true",
+    "env": "development",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "mode": "true",
+    "env": "production",
+    "pass": true
+  },
+  {
+    "arm": "baseline",
+    "accessor": "process",
+    "reads": 3,
+    "threw": true
+  },
+  {
+    "arm": "baseline",
+    "accessor": "ngDevMode",
+    "reads": 3,
+    "threw": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "undefined",
+    "env": "undefined",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "undefined",
+    "env": "development",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "undefined",
+    "env": "production",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "false",
+    "env": "undefined",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "false",
+    "env": "development",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "false",
+    "env": "production",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "true",
+    "env": "undefined",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "true",
+    "env": "development",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "mode": "true",
+    "env": "production",
+    "pass": true
+  },
+  {
+    "arm": "candidate",
+    "accessor": "process",
+    "reads": 0,
+    "threw": false
+  },
+  {
+    "arm": "candidate",
+    "accessor": "ngDevMode",
+    "reads": 0,
+    "threw": false
+  }
+]

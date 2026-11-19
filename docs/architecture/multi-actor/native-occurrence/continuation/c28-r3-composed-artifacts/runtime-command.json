@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "runtime.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-composed-artifacts/consumer",
+  "noProgressSeconds": 180
+}

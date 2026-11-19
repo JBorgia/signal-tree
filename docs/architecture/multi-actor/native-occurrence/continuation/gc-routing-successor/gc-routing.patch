@@ -1,0 +1,163 @@
+--- a/packages/kernel/vitest.config.ts
++++ b/packages/kernel/vitest.config.ts
+@@ -65,6 +65,8 @@
+       '**/link-lifetime.spec.ts',
+       '**/location-runtime-retention.spec.ts',
+       '**/forwarding-retention-probe.spec.ts',
++      // All three unchanged arms are required by forwarding-retention-gc.
++      '**/held-continuation-probe.spec.ts',
+     ],
+     coverage: {
+       provider: 'v8',
+--- a/packages/kernel/vitest.retention.config.ts
++++ b/packages/kernel/vitest.retention.config.ts
+@@ -18,6 +18,7 @@
+       'src/lib/link-lifetime.spec.ts',
+       'src/lib/internals/location-runtime-retention.spec.ts',
+       'src/lib/forwarding-retention-probe.spec.ts',
++      'src/lib/held-continuation-probe.spec.ts',
+     ],
+   },
+   define: { __DEV__: true },
+--- a/tools/check-forwarding-retention.mjs
++++ b/tools/check-forwarding-retention.mjs
+@@ -4,9 +4,10 @@
+ import { join, relative } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { spawnSync } from 'node:child_process';
++import { retentionModes, validateRetentionSample, validateRetentionMatrix } from './lib/forwarding-retention-matrix.mjs';
+ 
+ const ROOT = fileURLToPath(new URL('../', import.meta.url));
+-if (process.argv.length !== 2) throw new Error('The forwarding retention gate requires all nine modes; no filters are accepted.');
++if (process.argv.length !== 2) throw new Error('The forwarding retention gate requires all twelve modes; no filters are accepted.');
+ const base = join(ROOT, 'artifacts/forwarding-retention');
+ mkdirSync(base, { recursive: true });
+ const output = mkdtempSync(join(base, 'run-'));
+@@ -23,35 +24,33 @@
+   }
+ }
+ hashRuntime(join(ROOT, 'packages/kernel/src'));
+-for (const name of ['tools/check-forwarding-retention.mjs', 'tools/lib/heap-quiescence.mjs', 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts', 'packages/kernel/vitest.retention.config.ts', '.nvmrc', 'package.json', 'pnpm-lock.yaml']) hashFile(join(ROOT, name));
++for (const name of ['tools/check-forwarding-retention.mjs', 'tools/lib/heap-quiescence.mjs', 'tools/lib/forwarding-retention-matrix.mjs', 'packages/kernel/src/lib/held-continuation-probe.spec.ts', 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts', 'packages/kernel/vitest.retention.config.ts', '.nvmrc', 'package.json', 'pnpm-lock.yaml']) hashFile(join(ROOT, name));
+ save('SOURCE.json', sourceHashes);
+ console.log(`Forwarding retention artifacts: ${output}`);
+ const results = [];
+-for (const arm of ['hold-proceed', 'drop-proceed', 'hold-value']) {
+-  for (const scenario of ['success', 'skip', 'caught']) {
+-    const name = `${arm}-${scenario}`;
+-    const artifact = join(output, `${name}.json`);
+-    const env = { NODE_OPTIONS: '--expose-gc', ST_GC_ARM: arm, ST_GC_SCENARIO: scenario, ST_GC_OUTPUT: artifact };
+-    const argv = [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', '--root', 'packages/kernel', '--config', 'vitest.retention.config.ts', 'src/lib/forwarding-retention-probe.spec.ts', '--maxWorkers=1'];
+-    save(`${name}-COMMAND.json`, { executable: process.execPath, argv, cwd: ROOT, node: process.version, env });
+-    const run = spawnSync(process.execPath, argv, { cwd: ROOT, env: { ...process.env, ...env }, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+-    const raw = `${run.stdout ?? ''}${run.stderr ?? ''}`;
+-    writeFileSync(join(output, `${name}.log`), raw);
+-    const errors = [];
+-    if (run.error || run.signal || run.status !== 0) errors.push(run.error?.message ?? `child exit=${run.status} signal=${run.signal}`);
+-    try {
+-      const sample = JSON.parse(readFileSync(artifact, 'utf8'));
+-      if (sample.arm !== arm || sample.scenario !== scenario || sample.node !== process.version ||
+-          !Array.isArray(sample.held) || sample.held.length !== 12 ||
+-          !Array.isArray(sample.released) || sample.released.length !== 12)
+-        errors.push('Missing, mismatched or incomplete original sampling artifact');
+-    } catch (error) { errors.push(`Sampling output: ${error.message}`); }
+-    results.push({ arm, scenario, exit: errors.length ? 1 : 0, errors, artifact, log: join(output, `${name}.log`) });
+-    console.log(`${name}: ${errors.length ? 'FAIL' : 'PASS'}`);
+-    if (errors.length) process.stdout.write(raw);
+-  }
++for (const mode of retentionModes) {
++  const { name, kind, arm, scenario, file } = mode;
++  const artifact = join(output, `${name}.json`);
++  const env = { NODE_OPTIONS: '--expose-gc', ST_GC_ARM: arm, ST_GC_OUTPUT: artifact };
++  if (scenario !== undefined) env.ST_GC_SCENARIO = scenario;
++  const childEnv = { ...process.env, ...env };
++  if (scenario === undefined) delete childEnv.ST_GC_SCENARIO;
++  const argv = [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', '--root', 'packages/kernel', '--config', 'vitest.retention.config.ts', file, '--maxWorkers=1'];
++  save(`${name}-COMMAND.json`, { executable: process.execPath, argv, cwd: ROOT, node: process.version, env });
++  const run = spawnSync(process.execPath, argv, { cwd: ROOT, env: childEnv, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
++  const raw = `${run.stdout ?? ''}${run.stderr ?? ''}`;
++  writeFileSync(join(output, `${name}.log`), raw);
++  const errors = [];
++  if (run.error || run.signal || run.status !== 0) errors.push(run.error?.message ?? `child exit=${run.status} signal=${run.signal}`);
++  try { validateRetentionSample(mode, JSON.parse(readFileSync(artifact, 'utf8')), process.version); }
++  catch (error) { errors.push(`Sampling output: ${error.message}`); }
++  results.push({ name, kind, arm, scenario, processExit: run.status, signal: run.signal, exit: errors.length ? 1 : 0, errors, artifact, log: join(output, `${name}.log`) });
++  console.log(`${name}: ${errors.length ? 'FAIL' : 'PASS'}`);
++  if (errors.length) process.stdout.write(raw);
+ }
+-const failed = results.length !== 9 || results.some(result => result.exit !== 0);
+-save('RESULT.json', { exit: failed ? 1 : 0, requiredModes: 9, executedModes: results.length, results, scope: 'Original nine-mode forwarding collectibility fixtures, not universal reclamation or heap cost.' });
+-console.log(`Forwarding retention: ${results.filter(result => !result.exit).length}/9 passed`);
++const matrixErrors = validateRetentionMatrix(results, result => JSON.parse(readFileSync(result.artifact, 'utf8')), process.version);
++const failed = matrixErrors.length !== 0;
++save('RESULT.json', { exit: failed ? 1 : 0, requiredModes: retentionModes.length, executedModes: results.length, matrixErrors, results, scope: 'Original nine forwarding and three held-continuation GC fixtures, not universal reclamation or heap cost.' });
++console.log(`Forwarding retention: ${results.filter(result => !result.exit).length}/${retentionModes.length} passed`);
++for (const error of matrixErrors) console.error(error);
+ process.exitCode = failed ? 1 : 0;
+--- a/tools/verify-gates.mjs
++++ b/tools/verify-gates.mjs
+@@ -1205,7 +1205,7 @@
+   {
+     name: 'forwarding-retention-gc',
+     covers:
+-      'nine forwarding GC fixtures: closed callbacks release sampled receivers/errors, explicit held values survive until release, with positive/negative controls',
++      'nine forwarding plus three held-continuation GC fixtures: closed callbacks refuse replay, sampled receivers/errors release, explicit held values/rows survive, with positive/negative controls',
+     cmd: ['node', 'tools/check-forwarding-retention.mjs'],
+     env: { NODE_OPTIONS: '--expose-gc' },
+     // Deliberately retain the destroyed receiver in the fixture, not runtime.
+--- /dev/null
++++ b/tools/lib/forwarding-retention-matrix.mjs
+@@ -0,0 +1,53 @@
++/** Exact required execution matrix; no filters or recording-only success. */
++export const retentionModes = Object.freeze([
++  ...['hold-proceed', 'drop-proceed', 'hold-value'].flatMap(arm =>
++    ['success', 'skip', 'caught'].map(scenario => Object.freeze({
++      name: `${arm}-${scenario}`, kind: 'forwarding', arm, scenario,
++      file: 'src/lib/forwarding-retention-probe.spec.ts',
++    }))),
++  ...['hold-proceed', 'drop-proceed', 'hold-row'].map(arm => Object.freeze({
++    name: `held-${arm}`, kind: 'held', arm,
++    file: 'src/lib/held-continuation-probe.spec.ts',
++  })),
++]);
++
++export function validateRetentionSample(mode, sample, node) {
++  if (!sample || sample.node !== node ||
++      (mode.kind === 'forwarding'
++        ? sample.arm !== mode.arm || sample.scenario !== mode.scenario
++        : sample.mode !== mode.arm) ||
++      !Array.isArray(sample.held) || sample.held.length !== 12 ||
++      !Array.isArray(sample.released) || sample.released.length !== 12)
++    throw new Error(`Missing, mismatched or incomplete sampling artifact: ${mode.name}`);
++  // The unchanged fixtures enforce behavior. This rejects malformed recording
++  // artifacts independently of process status; neither can replace the other.
++  for (const round of [...sample.held, ...sample.released]) {
++    if (!round || typeof round !== 'object' ||
++        !Object.hasOwn(round, 'positive') || !Object.hasOwn(round, 'negative') ||
++        !Object.values(round).every(value => typeof value === 'boolean'))
++      throw new Error(`Malformed sampling round: ${mode.name}`);
++  }
++}
++
++export function validateRetentionMatrix(results, readSample, node) {
++  const errors = [];
++  if (!Array.isArray(results)) return ['Missing execution matrix'];
++  if (results.length !== retentionModes.length) errors.push('Incomplete execution matrix');
++  const seen = new Set();
++  for (const result of results) {
++    const mode = retentionModes.find(item => item.name === result?.name);
++    if (!mode || seen.has(result.name)) {
++      errors.push(`Unexpected or duplicate mode: ${result?.name}`);
++      continue;
++    }
++    seen.add(result.name);
++    if (result.kind !== mode.kind || result.arm !== mode.arm || result.scenario !== mode.scenario ||
++        result.exit !== 0 || result.processExit !== 0 || result.signal != null ||
++        !Array.isArray(result.errors) || result.errors.length)
++      errors.push(`Failed or mismatched execution: ${mode.name}`);
++    try { validateRetentionSample(mode, readSample(result), node); }
++    catch (error) { errors.push(`${mode.name}: ${error.message}`); }
++  }
++  for (const mode of retentionModes) if (!seen.has(mode.name)) errors.push(`Missing mode: ${mode.name}`);
++  return errors;
++}

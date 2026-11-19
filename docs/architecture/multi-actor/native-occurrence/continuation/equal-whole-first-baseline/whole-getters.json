@@ -1,0 +1,101 @@
+[
+  {
+    "route": "setAll",
+    "scenario": "stable",
+    "calls": 6,
+    "thrown": "undefined",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "setAll",
+    "scenario": "first-throw",
+    "calls": 1,
+    "thrown": "whole getter sentinel",
+    "firstIdentity": true,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "setAll",
+    "scenario": "reentry",
+    "calls": 3,
+    "thrown": "Entity frame responsibility preparation reentered installation",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 9,
+    "sent": []
+  },
+  {
+    "route": "replaceOne",
+    "scenario": "stable",
+    "calls": 6,
+    "thrown": "undefined",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "replaceOne",
+    "scenario": "first-throw",
+    "calls": 1,
+    "thrown": "whole getter sentinel",
+    "firstIdentity": true,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "replaceOne",
+    "scenario": "reentry",
+    "calls": 3,
+    "thrown": "Entity frame responsibility preparation reentered installation",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 9,
+    "sent": []
+  },
+  {
+    "route": "row",
+    "scenario": "stable",
+    "calls": 6,
+    "thrown": "undefined",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "row",
+    "scenario": "first-throw",
+    "calls": 1,
+    "thrown": "whole getter sentinel",
+    "firstIdentity": true,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "row",
+    "scenario": "reentry",
+    "calls": 3,
+    "thrown": "Entity frame responsibility preparation reentered installation",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 9,
+    "sent": []
+  }
+]

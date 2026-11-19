@@ -1,0 +1,57 @@
+
+> nx run kernel:test committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts recipient-cause-classification.spec.ts publication-enrollment-invariance.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts recipient-cause-classification.spec.ts publication-enrollment-invariance.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts --maxWorkers=1
+
+(node:45774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45781) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c1/candidate/packages/kernel
+
+(node:45788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45790) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45793) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45794) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45796) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45797) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45798) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45799) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45809) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  12 passed (12)
+      Tests  84 passed (84)
+   Start at  19:47:47
+   Duration  4.03s (transform 519ms, setup 0ms, import 1.21s, tests 393ms, environment 1.61s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.4s

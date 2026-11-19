@@ -1,0 +1,76 @@
+[
+  {
+    "id": "@signal-tree/solid@16.0.0-dev",
+    "name": "@signal-tree/solid",
+    "version": "16.0.0-dev",
+    "size": 12783,
+    "unpackedSize": 34231,
+    "shasum": "3e717aa60fa9e3c6bca2cd87179dc4042598cddf",
+    "integrity": "sha512-CK5sk03Ut8sQl3t3maQ5EVkNiaCvU7L99JhHyzJEKCApeOKbSlztjo+XmM3TZmieEQDrtCeVWtq22EiGEQULhQ==",
+    "filename": "signal-tree-solid-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 3592,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 632,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/construction-input.js",
+        "size": 724,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/solid-observation.js",
+        "size": 1659,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 11671,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 908,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 1608,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/carrier.d.ts",
+        "size": 585,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/construction-input.d.ts",
+        "size": 514,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/solid-observation.d.ts",
+        "size": 758,
+        "mode": 420
+      }
+    ],
+    "entryCount": 12,
+    "bundled": []
+  }
+]

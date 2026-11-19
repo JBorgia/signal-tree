@@ -1,0 +1,20 @@
+[
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "94d72686feca44c401b33683f1da669064b4ff4e1a71007ccbaaf2747f038359",
+    "archiveSha256": "94d72686feca44c401b33683f1da669064b4ff4e1a71007ccbaaf2747f038359"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "26bbbc5982aecb4037c3c42014654d4ecac41ae6c1de47feab46061c615168aa",
+    "archiveSha256": "26bbbc5982aecb4037c3c42014654d4ecac41ae6c1de47feab46061c615168aa"
+  },
+  {
+    "source": "DESIGN.md",
+    "archive": "DESIGN.md",
+    "sourceSha256": "79de64f85467b0822ec9a542f0c5feaaf7af255d940b7ad2299f457ad59f1f6d",
+    "archiveSha256": "79de64f85467b0822ec9a542f0c5feaaf7af255d940b7ad2299f457ad59f1f6d"
+  }
+]

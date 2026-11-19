@@ -1,0 +1,172 @@
+
+> nx run kernel:test native-certificate-successor.spec.ts entity-publication-work-lifetime.spec.ts native-structural-composition-gates.spec.ts
+
+> node tools/run-core-vitest.mjs native-certificate-successor.spec.ts entity-publication-work-lifetime.spec.ts native-structural-composition-gates.spec.ts
+
+(node:3712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-reviewed-successor/baseline-control/packages/kernel
+
+(node:3750) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3747) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3749) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts (3 tests | 3 failed) 23ms
+   × fixed field capture and rollback metadata work does not grow with unrelated rows 17ms
+   × ordinary churn retires new metadata while retained receipts and old references stay detached 2ms
+   × recipient disposal cannot retire source facts still needed by a pending structural inverse 3ms
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts (3 tests | 1 failed) 38ms
+     × keeps compound inspection membership and order consistent with inspect and ordinary Link rejection 17ms
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 41ms
+   × omission then restored retained collection selects matching payload and support 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > fixed field capture and rollback metadata work does not grow with unrelated rows
+Error: Native occurrence has no verified root/address
+ ❯ captureNativeOccurrence src/lib/internals/native-occurrence.ts:31:32
+     29|   const registry = getPositionRegistry(anchor), address = getNodeAddre…
+     30|   const root = registry && roots.get(registry)?.deref();
+     31|   if (!root || !address) throw new Error('Native occurrence has no ver…
+       |                                ^
+     32|   const edges: NativeOccurrenceEdge[] = [];
+     33|   let parent = root;
+ ❯ RecipientOccurrences.enroll src/lib/experimental-publication/recipient-occurrence.ts:33:69
+ ❯ enroll src/lib/experimental-publication/private.ts:351:55
+ ❯ Module.bindSource src/lib/experimental-publication/private.ts:352:3
+ ❯ link src/lib/link.ts:555:12
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:19:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > ordinary churn retires new metadata while retained receipts and old references stay detached
+Error: Native occurrence has no verified root/address
+ ❯ captureNativeOccurrence src/lib/internals/native-occurrence.ts:31:32
+     29|   const registry = getPositionRegistry(anchor), address = getNodeAddre…
+     30|   const root = registry && roots.get(registry)?.deref();
+     31|   if (!root || !address) throw new Error('Native occurrence has no ver…
+       |                                ^
+     32|   const edges: NativeOccurrenceEdge[] = [];
+     33|   let parent = root;
+ ❯ RecipientOccurrences.enroll src/lib/experimental-publication/recipient-occurrence.ts:33:69
+ ❯ enroll src/lib/experimental-publication/private.ts:351:55
+ ❯ Module.bindSource src/lib/experimental-publication/private.ts:352:3
+ ❯ link src/lib/link.ts:555:12
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:44:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > recipient disposal cannot retire source facts still needed by a pending structural inverse
+Error: Native occurrence has no verified root/address
+ ❯ captureNativeOccurrence src/lib/internals/native-occurrence.ts:31:32
+     29|   const registry = getPositionRegistry(anchor), address = getNodeAddre…
+     30|   const root = registry && roots.get(registry)?.deref();
+     31|   if (!root || !address) throw new Error('Native occurrence has no ver…
+       |                                ^
+     32|   const edges: NativeOccurrenceEdge[] = [];
+     33|   let parent = root;
+ ❯ RecipientOccurrences.enroll src/lib/experimental-publication/recipient-occurrence.ts:33:69
+ ❯ enroll src/lib/experimental-publication/private.ts:351:55
+ ❯ Module.bindSource src/lib/experimental-publication/private.ts:352:3
+ ❯ link src/lib/link.ts:555:12
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:61:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > keeps compound inspection membership and order consistent with inspect and ordinary Link rejection
+AssertionError: expected [ { id: 'b', n: 4 }, …(2) ] to deeply equal [ { id: 'a', n: 1 }, …(2) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "id": "a",
+-     "n": 1,
+-   },
+-   {
+      "id": "b",
+      "n": 4,
+    },
+    {
+      "id": "c",
+      "n": 3,
++   },
++   {
++     "id": "a",
++     "n": 1,
+    },
+  ]
+
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts:79:65
+     77|       expect(rows.ids()).toEqual(['a','b','c']); expect(rows.byIdOrFai…
+     78|       expect(freshA()).toBeUndefined(); expect(x()).toBeUndefined();
+     79|       expect(rows.all()).toEqual(baseline); expect(sent.at(-1)).toEqua…
+       |                                                                 ^
+     80|       expect(sent.some(value=>value.some(row=>row.id==='x'||row.n===9)…
+     81|       rows.updateOne('b',{n:5}); await tick(); await connection.settle…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  5 failed | 6 passed (11)
+   Start at  13:49:24
+   Duration  1.10s (transform 1.58s, setup 0ms, import 1.93s, tests 101ms, environment 866ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-certificate-successor.spec.ts entity-publication-work-lifetime.spec.ts native-structural-composition-gates.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

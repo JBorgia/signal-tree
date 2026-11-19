@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": false,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "outDir": "out",
+    "types": [],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true,
+    "strictInjectionParameters": true,
+    "compilationMode": "full"
+  },
+  "files": [
+    "reference.component.ts"
+  ]
+}

@@ -1,0 +1,256 @@
+{
+  "predecessor": [
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 42,
+      "source": "todo.id === id ? { ...todo, completed: !todo.completed } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 51,
+      "source": "todo.id === id ? { ...todo, ...changes } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 93,
+      "source": "todo.id === id ? { ...todo, completed: !todo.completed } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 102,
+      "source": "todo.id === id ? { ...todo, ...changes } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/performance.spec.ts",
+      "line": 37,
+      "source": "// \u26a0\ufe0f NOT `describe.runIf` \u2014 that is Vitest, and the demo runs JEST. Core's"
+    },
+    {
+      "file": "apps/demo/src/app/performance.spec.ts",
+      "line": 39,
+      "source": "// verbatim threw `describe.runIf is not a function` and the suite silently"
+    },
+    {
+      "file": "apps/demo/src/app/performance.spec.ts",
+      "line": 42,
+      "source": "const timingDescribe = RUN_TIMING ? describe : describe.skip;"
+    },
+    {
+      "file": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
+      "line": 41,
+      "source": "describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', () => {"
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/reversal-known-limitations.spec.ts",
+      "line": 20,
+      "source": "* - `... \u2014 desired` states the correct behaviour and is marked `it.fails`."
+    },
+    {
+      "file": "packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts",
+      "line": 29,
+      "source": "* `it.fails` so the release tag could be verified without the contract's own"
+    },
+    {
+      "file": "packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts",
+      "line": 34,
+      "source": "* Which is exactly what the marker was for. `it.fails` turns RED when a case"
+    },
+    {
+      "file": "packages/kernel/src/lib/benchmarks.spec.ts",
+      "line": 26,
+      "source": "const timingDescribe = describe.runIf(RUN_TIMING);"
+    },
+    {
+      "file": "packages/kernel/src/lib/e-granularity.spec.ts",
+      "line": 117,
+      "source": "// \u26a0\ufe0f WHEN THIS STARTS PASSING, THE SUITE GOES RED and `.fails` must be"
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-restoration-authority.spec.ts",
+      "line": 188,
+      "source": "* ZERO-OWNER RECLAMATION. Was an `it.todo` while nothing drove reclamation;"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/derived.spec.ts",
+      "line": 939,
+      "source": "describe.runIf(process.env['ST_PERF'] === '1')("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 34,
+      "source": "* The four still-red cases are marked `it.fails` as executable evidence. If a"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 35,
+      "source": "* future seam makes one pass, `it.fails` flips it RED and forces a re-read."
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 110,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 155,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 248,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 266,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/nested-structural-rollback-1.spec.ts",
+      "line": 231,
+      "source": "const runner = stillRed ? it.fails : it;"
+    },
+    {
+      "file": "packages/kernel/src/lib/open-key-reachability.spec.ts",
+      "line": 17,
+      "source": "it.fails('a promised arbitrary descendant is a usable location', () => {"
+    },
+    {
+      "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+      "line": 25,
+      "source": "const timingDescribe = describe.runIf(RUN_TIMING);"
+    },
+    {
+      "file": "scripts/playwright/hover-language.spec.ts",
+      "line": 23,
+      "source": "'a[href]:not(.skip-link)',"
+    }
+  ],
+  "successor": [
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 42,
+      "source": "todo.id === id ? { ...todo, completed: !todo.completed } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 51,
+      "source": "todo.id === id ? { ...todo, ...changes } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 93,
+      "source": "todo.id === id ? { ...todo, completed: !todo.completed } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts",
+      "line": 102,
+      "source": "todo.id === id ? { ...todo, ...changes } : todo"
+    },
+    {
+      "file": "apps/demo/src/app/performance.spec.ts",
+      "line": 37,
+      "source": "// \u26a0\ufe0f NOT `describe.runIf` \u2014 that is Vitest, and the demo runs JEST. Core's"
+    },
+    {
+      "file": "apps/demo/src/app/performance.spec.ts",
+      "line": 39,
+      "source": "// verbatim threw `describe.runIf is not a function` and the suite silently"
+    },
+    {
+      "file": "apps/demo/src/app/performance.spec.ts",
+      "line": 42,
+      "source": "const timingDescribe = RUN_TIMING ? describe : describe.skip;"
+    },
+    {
+      "file": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
+      "line": 41,
+      "source": "describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', () => {"
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/reversal-known-limitations.spec.ts",
+      "line": 20,
+      "source": "* - `... \u2014 desired` states the correct behaviour and is marked `it.fails`."
+    },
+    {
+      "file": "packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts",
+      "line": 29,
+      "source": "* `it.fails` so the release tag could be verified without the contract's own"
+    },
+    {
+      "file": "packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts",
+      "line": 34,
+      "source": "* Which is exactly what the marker was for. `it.fails` turns RED when a case"
+    },
+    {
+      "file": "packages/kernel/src/lib/benchmarks.spec.ts",
+      "line": 26,
+      "source": "const timingDescribe = describe.runIf(RUN_TIMING);"
+    },
+    {
+      "file": "packages/kernel/src/lib/e-granularity.spec.ts",
+      "line": 117,
+      "source": "// \u26a0\ufe0f WHEN THIS STARTS PASSING, THE SUITE GOES RED and `.fails` must be"
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-restoration-authority.spec.ts",
+      "line": 188,
+      "source": "* ZERO-OWNER RECLAMATION. Was an `it.todo` while nothing drove reclamation;"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/derived.spec.ts",
+      "line": 939,
+      "source": "describe.runIf(process.env['ST_PERF'] === '1')("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 34,
+      "source": "* The four still-red cases are marked `it.fails` as executable evidence. If a"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 35,
+      "source": "* future seam makes one pass, `it.fails` flips it RED and forces a re-read."
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 110,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 155,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 248,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+      "line": 266,
+      "source": "it.fails("
+    },
+    {
+      "file": "packages/kernel/src/lib/nested-structural-rollback-1.spec.ts",
+      "line": 231,
+      "source": "const runner = stillRed ? it.fails : it;"
+    },
+    {
+      "file": "packages/kernel/src/lib/open-key-reachability.spec.ts",
+      "line": 17,
+      "source": "it.fails('a promised arbitrary descendant is a usable location', () => {"
+    },
+    {
+      "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+      "line": 25,
+      "source": "const timingDescribe = describe.runIf(RUN_TIMING);"
+    },
+    {
+      "file": "scripts/playwright/hover-language.spec.ts",
+      "line": 23,
+      "source": "'a[href]:not(.skip-link)',"
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "capturedAt": "2026-10-29T18:28:25.112Z",
+  "node": "v24.15.0",
+  "executable": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+  "platform": "darwin",
+  "architecture": "arm64",
+  "tanstack": {
+    "version": "1.0.0-rc.1",
+    "resolvedEntry": "file:///Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/comparison/node_modules/@tanstack/db/dist/esm/index.js",
+    "installedEntrySha256": "0068077a43cfc0bf41cbdbe990a88f2a8aa5469e60fbe4410a55edb8900507d6"
+  },
+  "command": "node --test comparison.test.mjs",
+  "c2Inputs": {
+    "../coordinator.mjs": "6ac34cb63e85db9af0fe90b3da6c42dd0ff81ae1a904b810c847c4a34879db11",
+    "../dispatch-fixture.mjs": "95907c0437a2f35067787775cd38c5853c5391a372718e200e50dc8832254b57"
+  },
+  "sourceFiles": {
+    "c0.mjs": "8393c88bd6c7ff4561464aaaf86815598c37aa24d4c50fbbf4ab1657e185b6e3",
+    "c3.mjs": "e0bd5f307f44376a0469274220ef55bd24cb693c8d0e3d2d005e2362ffafd106",
+    "data.mjs": "46f47350ff7bf623c4b100c96e2eed3c57dcf86c05ccd4b019f8168a7982cd62",
+    "reference-server.mjs": "3cda8fae17ea9344dce4b06d1b33d97af7388e7efc4baf4ba2777cae9fa85899",
+    "comparison.test.mjs": "4782b9bf4598c684fc0e2f832b7a68f4d59a58dfee942756c0f4811457018bdc",
+    "package-lock.json": "d4fa62ac4aacf71f25800aab7a2cc8f326c92b0b9a40d819035f4907484a4221"
+  },
+  "outcome": {
+    "tests": 27,
+    "passed": 27,
+    "failed": 0,
+    "skipped": 0
+  }
+}

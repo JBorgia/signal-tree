@@ -1,0 +1,35 @@
+
+> nx run kernel:test r4-review-prepend-payload.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs r4-review-prepend-payload.spec.ts --maxWorkers=1
+
+(node:30549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30556) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-r4-review-resumed/candidate/packages/kernel
+
+(node:30563) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  08:43:43
+   Duration  988ms (transform 569ms, setup 0ms, import 677ms, tests 10ms, environment 212ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

@@ -1,0 +1,41 @@
+
+> nx run kernel:test structural-completeness.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs structural-completeness.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:8611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8655) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-structural-completeness-successor/candidate/packages/kernel
+
+(node:8662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-completeness.spec.ts > incomplete ordinary removal refuses whole unit scalarFirst=false 12ms
+ ✓ src/lib/structural-completeness.spec.ts > incomplete ordinary removal refuses whole unit scalarFirst=true 2ms
+ ✓ src/lib/structural-completeness.spec.ts > complete removal context installs ordinary absence and cannot replay 3ms
+ ✓ src/lib/structural-completeness.spec.ts > descriptor-resolved add carries captured recipe into ordinary installation 15ms
+ ✓ src/lib/structural-completeness.spec.ts > legacy unlowered subject removal remains supported 2ms
+ ✓ src/lib/structural-completeness.spec.ts > complete ordered remove permits subject-based obsolete key followed by rekey 3ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  17:07:17
+   Duration  1.74s (transform 885ms, setup 0ms, import 1.07s, tests 38ms, environment 468ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.5s

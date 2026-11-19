@@ -1,0 +1,39 @@
+
+> nx run kernel:test src/lib/internals/diagnostics/owner-evidence-0.spec.ts src/lib/internals/location-runtime.spec.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/progress-reporter.mjs --reporter=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/recorder-reporter-v2.mjs
+
+> node tools/run-core-vitest.mjs src/lib/internals/diagnostics/owner-evidence-0.spec.ts src/lib/internals/location-runtime.spec.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/progress-reporter.mjs --reporter=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/recorder-reporter-v2.mjs
+
+(node:92728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92753) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel
+
+(node:92789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/owner-evidence-0.spec.ts (4 tests) 49ms
+(node:93118) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/location-runtime.spec.ts (10 tests) 15ms
+
+ Test Files  2 passed (2)
+      Tests  14 passed (14)
+   Start at  13:54:24
+   Duration  57.29s (transform 19.50s, setup 0ms, import 24.18s, tests 64ms, environment 27.12s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1m 4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1m 3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1m 3s

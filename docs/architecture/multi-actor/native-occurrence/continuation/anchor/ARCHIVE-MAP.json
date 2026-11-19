@@ -1,0 +1,52 @@
+{
+  "DESIGN-REVIEW.md": {
+    "sha256": "0b12d075f6240533d82b5bd64ac9631eac298a325c3d4a06858236bf06711aa1",
+    "archive": "DESIGN-REVIEW.md",
+    "archiveSha256": "0b12d075f6240533d82b5bd64ac9631eac298a325c3d4a06858236bf06711aa1"
+  },
+  "SOURCE-SHA256.json": {
+    "sha256": "be7d08cc099b5bb1a6198103c14aa51dcdaffecc052b6000088873df818a8b7e",
+    "archive": "SOURCE-SHA256.json.gz",
+    "archiveSha256": "8bce9ac608aa225d77f0fc293b4aaf991bc7351efe0c07d44a48eae0c5cc7969"
+  },
+  "run-gate.py": {
+    "sha256": "c233569f9b68eef4ea1a5c964d3efdf51c7d77725ee9b3603f2b0ece56a1f9e4",
+    "archive": "run-gate.py",
+    "archiveSha256": "c233569f9b68eef4ea1a5c964d3efdf51c7d77725ee9b3603f2b0ece56a1f9e4"
+  },
+  "runs/anchor-first/COMMAND.json": {
+    "sha256": "b2082b679c98df0178db07dab8d2ec26bbf7f763da375c57d22dfd54c0e84214",
+    "archive": "runs/anchor-first/COMMAND.json",
+    "archiveSha256": "b2082b679c98df0178db07dab8d2ec26bbf7f763da375c57d22dfd54c0e84214"
+  },
+  "runs/anchor-first/RESULT.json": {
+    "sha256": "74f2ca95d66c97540ab1218de67574a3419880f4e1587beee2b2f5ff5c420964",
+    "archive": "runs/anchor-first/RESULT.json",
+    "archiveSha256": "74f2ca95d66c97540ab1218de67574a3419880f4e1587beee2b2f5ff5c420964"
+  },
+  "runs/anchor-first/first.log": {
+    "sha256": "5cefef0c44cc050f0afeeda0c2365fc927a847eff53ab0f56f21892ab445d026",
+    "archive": "runs/anchor-first/first.log",
+    "archiveSha256": "5cefef0c44cc050f0afeeda0c2365fc927a847eff53ab0f56f21892ab445d026"
+  },
+  "runs/source-types/COMMAND.json": {
+    "sha256": "62c6dab0c41ceb1a3e855fd617461d2dce61146d2d533006ed94a8ee728d308f",
+    "archive": "runs/source-types/COMMAND.json",
+    "archiveSha256": "62c6dab0c41ceb1a3e855fd617461d2dce61146d2d533006ed94a8ee728d308f"
+  },
+  "runs/source-types/RESULT.json": {
+    "sha256": "1e676e234d163beed320e1b7cb0ff31d6b14cf6f1d307b90f457507ec7d9c24c",
+    "archive": "runs/source-types/RESULT.json",
+    "archiveSha256": "1e676e234d163beed320e1b7cb0ff31d6b14cf6f1d307b90f457507ec7d9c24c"
+  },
+  "runs/source-types/first.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archive": "runs/source-types/first.log",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source.patch": {
+    "sha256": "776e1a2ea3a2166429d060e7f2413b3d6766c7dc8dd711d6686e3e36a53b913a",
+    "archive": "source.patch",
+    "archiveSha256": "776e1a2ea3a2166429d060e7f2413b3d6766c7dc8dd711d6686e3e36a53b913a"
+  }
+}

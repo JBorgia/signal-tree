@@ -1,0 +1,282 @@
+{
+  "mode": "hold-row",
+  "node": "v24.15.0",
+  "execArgv": [
+    "--experimental-import-meta-resolve",
+    "--require",
+    "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+    "--conditions",
+    "node",
+    "--conditions",
+    "development"
+  ],
+  "nodeOptions": "--expose-gc --require=/private/tmp/st-c21-held-gc/hold-row/diagnostic-redirect.cjs",
+  "held": [
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    }
+  ],
+  "released": [
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    }
+  ]
+}

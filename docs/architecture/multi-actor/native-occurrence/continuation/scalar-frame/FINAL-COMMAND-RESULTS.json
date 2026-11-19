@@ -1,0 +1,154 @@
+{
+  "final-focused-kernel": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 8.333132290979847
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "scalar-frame-publication.spec.ts",
+      "scalar-frame-finalize.spec.ts",
+      "branch-omission-correctness.spec.ts",
+      "oracle-alignment-independent.spec.ts",
+      "a1-installed-publication.spec.ts",
+      "membership-input-contract.spec.ts",
+      "publication-membership-provenance.spec.ts",
+      "publication-terminal-consumer-independent.spec.ts",
+      "link-native-address.spec.ts",
+      "tree-scalar-slot-runtime.spec.ts",
+      "reversal-delivery-coherence.spec.ts",
+      "target-transition.spec.ts",
+      "restoration-paired-composition.spec.ts",
+      "--maxWorkers=1"
+    ]
+  },
+  "final-required-diagnostics": {
+    "result": {
+      "exit": 1,
+      "elapsedSeconds": 13.875815416977275
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "publication-enrollment-invariance.spec.ts",
+      "whole-value-new-keys.spec.ts",
+      "--maxWorkers=1"
+    ]
+  },
+  "final-source-types": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 3.127212874998804
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "node",
+      "node_modules/typescript/bin/tsc",
+      "--noEmit",
+      "-p",
+      "tsconfig.typecheck-all.json"
+    ]
+  },
+  "final-spec-types": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 7.007018374977633
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "node",
+      "tools/check-spec-types.mjs"
+    ]
+  },
+  "final-angular": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 5.092596500006039
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "scalar-frame-publication.spec.ts",
+      "transaction-realization.spec.ts",
+      "--maxWorkers=1"
+    ]
+  },
+  "final-vue": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 6.209293083054945
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "vue",
+      "--skip-nx-cache",
+      "scalar-frame-publication.spec.ts",
+      "transaction-realization.spec.ts",
+      "--maxWorkers=1"
+    ]
+  },
+  "final-solid": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 6.025541583017912
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "solid",
+      "--skip-nx-cache",
+      "scalar-frame-publication.spec.ts",
+      "transaction-realization.spec.ts",
+      "--maxWorkers=1"
+    ]
+  },
+  "final-react": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 6.51913762500044
+    },
+    "sourceUnchanged": true,
+    "freezeMismatches": [],
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "react",
+      "--skip-nx-cache",
+      "scalar-frame-publication.spec.tsx",
+      "transaction-realization.spec.tsx",
+      "--maxWorkers=1"
+    ]
+  }
+}

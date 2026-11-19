@@ -1,0 +1,1 @@
+First static discovery command failed MODULE_NOT_FOUND: fast-glob is not exposed at isolated node_modules root. No discovery or tests executed. Corrected resolution to the installed .pnpm/node_modules/fast-glob; no source/config changes.

@@ -1,0 +1,7 @@
+
+Running 1 gates
+
+  · forwarding-retention-gc pass ✓  (nine forwarding GC fixtures: closed callbacks release sampled receivers/errors, explicit held values survive until release, with positive/negative controls)
+
+──────────────────────────────────────────────────────────────────────────────
+1/1 passed, 0 failed, 0 known-red.

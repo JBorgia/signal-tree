@@ -1,0 +1,26 @@
+[
+  {
+    "route": "setAll",
+    "calls": 5,
+    "thrown": "undefined",
+    "sentinel": false,
+    "endpointSame": true,
+    "sent": []
+  },
+  {
+    "route": "replaceOne",
+    "calls": 5,
+    "thrown": "undefined",
+    "sentinel": false,
+    "endpointSame": true,
+    "sent": []
+  },
+  {
+    "route": "row",
+    "calls": 5,
+    "thrown": "undefined",
+    "sentinel": false,
+    "endpointSame": true,
+    "sent": []
+  }
+]

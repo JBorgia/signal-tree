@@ -1,0 +1,69 @@
+{
+  "sourceAgreement": {
+    "packages/kernel/src/lib/link.ts": {
+      "composition": "0f077671df81bead221d76a9ed302a207107f91f06020bd7ad685e00c1f50be4",
+      "artifactBuildSource": "0f077671df81bead221d76a9ed302a207107f91f06020bd7ad685e00c1f50be4"
+    },
+    "packages/kernel/src/lib/experimental-publication/entity.ts": {
+      "composition": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+      "artifactBuildSource": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db"
+    },
+    "packages/kernel/src/lib/internals/entity-publication.ts": {
+      "composition": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+      "artifactBuildSource": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79"
+    },
+    "packages/kernel/src/lib/entity-signal.ts": {
+      "composition": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+      "artifactBuildSource": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d"
+    },
+    "packages/kernel/package.json": {
+      "composition": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206",
+      "artifactBuildSource": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206"
+    }
+  },
+  "emittedPackage": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206",
+  "emittedLink": "423bd2bd3486e230f4afbc7d2615caa154ea386dc90dabca84a7a9a4d782d0ab",
+  "emittedEntityPublication": "3d8e16fc6e31120a45142cf387e0d37ef9fedec43cc06c86a25f3ad447910c16",
+  "registrationModuleEmitted": false,
+  "factoryExcerpt": "let factory;class EntityPublicationSource{admission=new AdmissionMetadata;native;recipients=new Set;",
+  "registrationExportPresent": false,
+  "graphs": {
+    "signaltree-bare-dev.json": {
+      "hash": "e8be37d5cf240299cf7e96f0a65454ce40e737d5999dd44b66c5a531c7692f25",
+      "registrationModuleInputs": [],
+      "entityPublicationRetained": [
+        {
+          "dist/packages/kernel/dist/lib/internals/entity-publication.js": 227
+        }
+      ]
+    },
+    "signaltree-bare-prod.json": {
+      "hash": "a16907b55a75ed246e6a5dc243615e14875594c7c31950acbcac1af7eb68f787",
+      "registrationModuleInputs": [],
+      "entityPublicationRetained": [
+        {
+          "dist/packages/kernel/dist/lib/internals/entity-publication.js": 227
+        }
+      ]
+    },
+    "signaltree-entities-dev.json": {
+      "hash": "7e7b6f3f7c5a97b7176290fe1d0fd10e2cce386bef4083a0839b0a61e7e677e8",
+      "registrationModuleInputs": [],
+      "entityPublicationRetained": [
+        {
+          "dist/packages/kernel/dist/lib/internals/entity-publication.js": 5950
+        }
+      ]
+    },
+    "signaltree-entities-prod.json": {
+      "hash": "4119d57839af460c91acc4410ef066091dcff00f31013e512a40b2c96d459c4f",
+      "registrationModuleInputs": [],
+      "entityPublicationRetained": [
+        {
+          "dist/packages/kernel/dist/lib/internals/entity-publication.js": 5950
+        }
+      ]
+    }
+  },
+  "warningLog": "90679059d98d439de7dfcdd4dcd7c367843af22be57576a85c4d2efba77f7969"
+}

@@ -1,0 +1,18 @@
+{
+  "candidate": {
+    "source": "/private/tmp/st-native-combined-c11/candidate",
+    "manifest": "/private/tmp/st-native-combined-c11/SNAPSHOT-COUNTERPARTS.json",
+    "sha256": "dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148",
+    "files": 3045,
+    "dependencies": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules",
+    "lock": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+  },
+  "oracle": {
+    "source": "/private/tmp/st-native-combined-c8a/candidate",
+    "manifest": "/private/tmp/st-native-combined-c8a/SNAPSHOT-C8a.json",
+    "sha256": "04ba51dec86f537921521cf0a8ef5276c788e48b9a4e4abc24c7c5d14eda9652",
+    "files": 3031,
+    "dependencies": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules",
+    "lock": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+  }
+}

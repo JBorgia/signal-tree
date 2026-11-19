@@ -1,0 +1,15 @@
+{
+  "verifiedPriorEvidenceFiles": 163,
+  "evidenceManifestHash": "2624300521edba305ba00bfbaffd878b31b927a9498833183d23bdfab70f5db5",
+  "rawProfiles": {
+    "runs/baseline-2048-r1/redo.heapprofile.json": "ad5abfb786b2deb8ccea6f6a1f28beee3fb388f07f6394db30cfd839bebc9d0e",
+    "runs/baseline-2048-r1/replacement.heapprofile.json": "731bf40edc0d9809d007f527deeaaf9e3e1d44a853e0cce03827cbf451d78a49",
+    "runs/baseline-2048-r1/undo.heapprofile.json": "00031404cb8179bf344d61ce56668979dad71174fe3c204a1d1596b0f92ece0d",
+    "runs/indexed-2048-r1/redo.heapprofile.json": "64dc98e3bc871a583d2dd15dfe0db534b1a41d3253b3b9d745118dd235f4d041",
+    "runs/indexed-2048-r1/replacement.heapprofile.json": "bd6f6bbef55a45618370008a81357380a5a28d81a2be3e618bb0779f593d9a25",
+    "runs/indexed-2048-r1/undo.heapprofile.json": "8164943d25fb096c4a7afe3a6b3c63437b786410141f59814fc5f7e3711bf5bc"
+  },
+  "samplingPacketModified": false,
+  "testsRun": false,
+  "runtimeImplemented": false
+}

@@ -1,0 +1,28 @@
+
+> nx run solid:test scalar-frame-publication.spec.ts transaction-realization.spec.ts --maxWorkers=1
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts scalar-frame-publication.spec.ts transaction-realization.spec.ts --maxWorkers=1
+
+(node:74373) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+packages/kernel/src/lib/internals/scalar-publication-coverage.ts(25,30): error TS2353: Object literal may only specify known properties, and '[CONTRIBUTIONS]' does not exist in type 'WriteMetadata'.
+Warning: command "pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts scalar-frame-publication.spec.ts transaction-realization.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project solid failed
+
+Failed tasks:
+
+- solid:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        solid:test    5.1s

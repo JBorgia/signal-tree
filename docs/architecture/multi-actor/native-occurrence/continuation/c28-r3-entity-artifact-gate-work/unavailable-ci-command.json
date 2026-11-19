@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "npm",
+    "ci",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund",
+    "--offline"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-work/unavailable",
+  "env": {
+    "npm_config_cache": "/private/tmp/st-c28-r3-entity-artifact-gate-work/empty-cache"
+  }
+}

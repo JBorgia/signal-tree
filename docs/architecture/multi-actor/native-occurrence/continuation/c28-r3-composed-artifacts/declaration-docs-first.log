@@ -1,0 +1,9 @@
+package      unique src   unique shipped .d.ts   retained   files
+────────────────────────────────────────────────────────────────
+angular      13         11                     85%       7  ✓
+kernel       1142       263                    23%       5  ✓
+react        2          2                     100%       3  ✓
+solid        8          5                      63%       5  ✓
+vue          5          3                      60%       5  ✓
+
+✅ every documented package ships current, documented declarations.

@@ -1,0 +1,13 @@
+{
+  "candidate": {
+    "manifestSHA256": "a801391e26f62d725a99bda9deb1267020482604d67202e810687811fb017b38",
+    "files": 2943,
+    "mismatches": []
+  },
+  "predecessor": {
+    "manifestSHA256": "9603fac79e7c39ddd1a28bc1d52c3b02b952258ff954377ba170496ee82332a8",
+    "files": 2943,
+    "mismatches": []
+  },
+  "specSHA256": "2fb4d898962a899945bb5d24031368899f9b059a3ff84cc143802b57dacdf50c"
+}

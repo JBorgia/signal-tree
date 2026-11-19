@@ -1,0 +1,11 @@
+{
+  "packages/kernel/src/lib/entity-signal.ts": "d88a717430732d76e7a3c6cfcba3211a707ae9adee1b7731f4b5fd9ed176cd22",
+  "packages/kernel/src/lib/link.ts": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+  "packages/kernel/src/lib/experimental-publication/entity.ts": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+  "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+  "packages/kernel/src/lib/internals/entity-egress-projection.ts": "b5e5e6009112701abe83f93582c78c1d5b362f08163b059f34894f236b319e13",
+  "packages/kernel/src/lib/physical/entity-value-store.ts": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+  "packages/kernel/src/lib/packet-index-adversarial.spec.ts": "7ac49f1fa9a5d6461f226af11a4421aec4dbdedd1013e5ba218ab9bae5fe7b85",
+  "packages/kernel/src/lib/native-authored-footprint.spec.ts": "930fe011c978ca82ed406b662e31a0916265c446e6d97e01403984f616710183",
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "7c4b9d481e481db43fba92f1e32789c36300bcbda2a3cf0316f437c41f291fff"
+}

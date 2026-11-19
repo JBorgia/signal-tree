@@ -1,0 +1,1338 @@
+[
+  {
+    "workload": "signaltree-bare-dev",
+    "r3GzipBytes": 20480,
+    "composedGzipBytes": 20745,
+    "gzipDeltaBytes": 265,
+    "r3MinifiedBytes": 60846,
+    "composedMinifiedBytes": 61862,
+    "moduleDeltas": [
+      {
+        "module": "dist/lib/internals/scalar-responsibility-attachment.js",
+        "r3Bytes": 0,
+        "composedBytes": 319,
+        "delta": 319
+      },
+      {
+        "module": "dist/lib/internals/intrinsic-mutation.js",
+        "r3Bytes": 2932,
+        "composedBytes": 3134,
+        "delta": 202
+      },
+      {
+        "module": "dist/lib/internals/scalar-admission-metadata.js",
+        "r3Bytes": 0,
+        "composedBytes": 129,
+        "delta": 129
+      },
+      {
+        "module": "dist/lib/internals/owned-mutation.js",
+        "r3Bytes": 1335,
+        "composedBytes": 1456,
+        "delta": 121
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-leaf-runtime.js",
+        "r3Bytes": 2357,
+        "composedBytes": 2455,
+        "delta": 98
+      },
+      {
+        "module": "dist/lib/internals/owned-metadata.js",
+        "r3Bytes": 222,
+        "composedBytes": 290,
+        "delta": 68
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-runtime.js",
+        "r3Bytes": 4488,
+        "composedBytes": 4545,
+        "delta": 57
+      },
+      {
+        "module": "dist/lib/signal-tree.js",
+        "r3Bytes": 14689,
+        "composedBytes": 14710,
+        "delta": 21
+      },
+      {
+        "module": "dist/lib/internals/member-membership.js",
+        "r3Bytes": 6649,
+        "composedBytes": 6652,
+        "delta": 3
+      },
+      {
+        "module": "dist/lib/internals/plain-branch-membership.js",
+        "r3Bytes": 519,
+        "composedBytes": 518,
+        "delta": -1
+      },
+      {
+        "module": "dist/lib/internals/materialize-markers.js",
+        "r3Bytes": 3986,
+        "composedBytes": 3985,
+        "delta": -1
+      },
+      {
+        "module": "dist/lib/utils.js",
+        "r3Bytes": 1678,
+        "composedBytes": 1678,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-port.js",
+        "r3Bytes": 171,
+        "composedBytes": 171,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/deep-equal.js",
+        "r3Bytes": 1517,
+        "composedBytes": 1517,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/is-built-in-object.js",
+        "r3Bytes": 1074,
+        "composedBytes": 1074,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/write-context.js",
+        "r3Bytes": 30,
+        "composedBytes": 30,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/scalar-publication-coverage.js",
+        "r3Bytes": 125,
+        "composedBytes": 125,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-adapter.js",
+        "r3Bytes": 89,
+        "composedBytes": 89,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/physical-commit-clock.js",
+        "r3Bytes": 213,
+        "composedBytes": 213,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/position-registry.js",
+        "r3Bytes": 1210,
+        "composedBytes": 1210,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/publication-preparation.js",
+        "r3Bytes": 411,
+        "composedBytes": 411,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-substrate.js",
+        "r3Bytes": 190,
+        "composedBytes": 190,
+        "delta": 0
+      },
+      {
+        "module": "entry",
+        "r3Bytes": 121,
+        "composedBytes": 121,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/node-shape.js",
+        "r3Bytes": 282,
+        "composedBytes": 282,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/owner-invalidation-port.js",
+        "r3Bytes": 97,
+        "composedBytes": 97,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/merge-derived.js",
+        "r3Bytes": 999,
+        "composedBytes": 999,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/error-reporter.js",
+        "r3Bytes": 1207,
+        "composedBytes": 1207,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/construction-allocation.js",
+        "r3Bytes": 650,
+        "composedBytes": 650,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/mutation-capture-runtime.js",
+        "r3Bytes": 1249,
+        "composedBytes": 1249,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/constants.js",
+        "r3Bytes": 399,
+        "composedBytes": 399,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/leaf.js",
+        "r3Bytes": 297,
+        "composedBytes": 297,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/enhancer-types.js",
+        "r3Bytes": 42,
+        "composedBytes": 42,
+        "delta": 0
+      },
+      {
+        "module": "dist/enhancers/index.js",
+        "r3Bytes": 1398,
+        "composedBytes": 1398,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/cell-identity.js",
+        "r3Bytes": 193,
+        "composedBytes": 193,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/native-occurrence.js",
+        "r3Bytes": 2105,
+        "composedBytes": 2105,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/root-source.js",
+        "r3Bytes": 48,
+        "composedBytes": 48,
+        "delta": 0
+      },
+      {
+        "module": "dist/index.js",
+        "r3Bytes": 0,
+        "composedBytes": 0,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-installation.js",
+        "r3Bytes": 253,
+        "composedBytes": 253,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/path-observation-port.js",
+        "r3Bytes": 223,
+        "composedBytes": 223,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/runtime-tree-plan.js",
+        "r3Bytes": 143,
+        "composedBytes": 143,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/location-runtime.js",
+        "r3Bytes": 4809,
+        "composedBytes": 4809,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-capabilities.js",
+        "r3Bytes": 934,
+        "composedBytes": 934,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-authority.js",
+        "r3Bytes": 1284,
+        "composedBytes": 1284,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-publication.js",
+        "r3Bytes": 227,
+        "composedBytes": 227,
+        "delta": 0
+      }
+    ]
+  },
+  {
+    "workload": "signaltree-bare-prod",
+    "r3GzipBytes": 18081,
+    "composedGzipBytes": 18337,
+    "gzipDeltaBytes": 256,
+    "r3MinifiedBytes": 54128,
+    "composedMinifiedBytes": 55144,
+    "moduleDeltas": [
+      {
+        "module": "dist/lib/internals/scalar-responsibility-attachment.js",
+        "r3Bytes": 0,
+        "composedBytes": 319,
+        "delta": 319
+      },
+      {
+        "module": "dist/lib/internals/intrinsic-mutation.js",
+        "r3Bytes": 2932,
+        "composedBytes": 3134,
+        "delta": 202
+      },
+      {
+        "module": "dist/lib/internals/scalar-admission-metadata.js",
+        "r3Bytes": 0,
+        "composedBytes": 129,
+        "delta": 129
+      },
+      {
+        "module": "dist/lib/internals/owned-mutation.js",
+        "r3Bytes": 1335,
+        "composedBytes": 1456,
+        "delta": 121
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-leaf-runtime.js",
+        "r3Bytes": 2357,
+        "composedBytes": 2455,
+        "delta": 98
+      },
+      {
+        "module": "dist/lib/internals/owned-metadata.js",
+        "r3Bytes": 222,
+        "composedBytes": 290,
+        "delta": 68
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-runtime.js",
+        "r3Bytes": 4488,
+        "composedBytes": 4545,
+        "delta": 57
+      },
+      {
+        "module": "dist/lib/signal-tree.js",
+        "r3Bytes": 10005,
+        "composedBytes": 10026,
+        "delta": 21
+      },
+      {
+        "module": "dist/lib/internals/member-membership.js",
+        "r3Bytes": 6417,
+        "composedBytes": 6420,
+        "delta": 3
+      },
+      {
+        "module": "dist/lib/internals/plain-branch-membership.js",
+        "r3Bytes": 519,
+        "composedBytes": 518,
+        "delta": -1
+      },
+      {
+        "module": "dist/lib/internals/materialize-markers.js",
+        "r3Bytes": 3271,
+        "composedBytes": 3270,
+        "delta": -1
+      },
+      {
+        "module": "dist/lib/utils.js",
+        "r3Bytes": 1417,
+        "composedBytes": 1417,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-port.js",
+        "r3Bytes": 171,
+        "composedBytes": 171,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/deep-equal.js",
+        "r3Bytes": 1517,
+        "composedBytes": 1517,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/is-built-in-object.js",
+        "r3Bytes": 1074,
+        "composedBytes": 1074,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/write-context.js",
+        "r3Bytes": 30,
+        "composedBytes": 30,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/scalar-publication-coverage.js",
+        "r3Bytes": 125,
+        "composedBytes": 125,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-adapter.js",
+        "r3Bytes": 89,
+        "composedBytes": 89,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/physical-commit-clock.js",
+        "r3Bytes": 213,
+        "composedBytes": 213,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/position-registry.js",
+        "r3Bytes": 1210,
+        "composedBytes": 1210,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/publication-preparation.js",
+        "r3Bytes": 411,
+        "composedBytes": 411,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-substrate.js",
+        "r3Bytes": 190,
+        "composedBytes": 190,
+        "delta": 0
+      },
+      {
+        "module": "entry",
+        "r3Bytes": 121,
+        "composedBytes": 121,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/node-shape.js",
+        "r3Bytes": 282,
+        "composedBytes": 282,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/owner-invalidation-port.js",
+        "r3Bytes": 97,
+        "composedBytes": 97,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/merge-derived.js",
+        "r3Bytes": 581,
+        "composedBytes": 581,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/error-reporter.js",
+        "r3Bytes": 995,
+        "composedBytes": 995,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/construction-allocation.js",
+        "r3Bytes": 650,
+        "composedBytes": 650,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/mutation-capture-runtime.js",
+        "r3Bytes": 1249,
+        "composedBytes": 1249,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/constants.js",
+        "r3Bytes": 365,
+        "composedBytes": 365,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/leaf.js",
+        "r3Bytes": 297,
+        "composedBytes": 297,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/enhancer-types.js",
+        "r3Bytes": 42,
+        "composedBytes": 42,
+        "delta": 0
+      },
+      {
+        "module": "dist/enhancers/index.js",
+        "r3Bytes": 1398,
+        "composedBytes": 1398,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/cell-identity.js",
+        "r3Bytes": 193,
+        "composedBytes": 193,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/native-occurrence.js",
+        "r3Bytes": 2105,
+        "composedBytes": 2105,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/root-source.js",
+        "r3Bytes": 48,
+        "composedBytes": 48,
+        "delta": 0
+      },
+      {
+        "module": "dist/index.js",
+        "r3Bytes": 0,
+        "composedBytes": 0,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-installation.js",
+        "r3Bytes": 253,
+        "composedBytes": 253,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/path-observation-port.js",
+        "r3Bytes": 223,
+        "composedBytes": 223,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/runtime-tree-plan.js",
+        "r3Bytes": 143,
+        "composedBytes": 143,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/location-runtime.js",
+        "r3Bytes": 4809,
+        "composedBytes": 4809,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-capabilities.js",
+        "r3Bytes": 934,
+        "composedBytes": 934,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-authority.js",
+        "r3Bytes": 1122,
+        "composedBytes": 1122,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-publication.js",
+        "r3Bytes": 227,
+        "composedBytes": 227,
+        "delta": 0
+      }
+    ]
+  },
+  {
+    "workload": "signaltree-entities-dev",
+    "r3GzipBytes": 47498,
+    "composedGzipBytes": 47747,
+    "gzipDeltaBytes": 249,
+    "r3MinifiedBytes": 156221,
+    "composedMinifiedBytes": 157229,
+    "moduleDeltas": [
+      {
+        "module": "dist/lib/internals/scalar-responsibility-attachment.js",
+        "r3Bytes": 0,
+        "composedBytes": 321,
+        "delta": 321
+      },
+      {
+        "module": "dist/lib/internals/intrinsic-mutation.js",
+        "r3Bytes": 2935,
+        "composedBytes": 3137,
+        "delta": 202
+      },
+      {
+        "module": "dist/lib/internals/scalar-admission-metadata.js",
+        "r3Bytes": 0,
+        "composedBytes": 129,
+        "delta": 129
+      },
+      {
+        "module": "dist/lib/internals/owned-mutation.js",
+        "r3Bytes": 1338,
+        "composedBytes": 1459,
+        "delta": 121
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-leaf-runtime.js",
+        "r3Bytes": 2359,
+        "composedBytes": 2457,
+        "delta": 98
+      },
+      {
+        "module": "dist/lib/internals/owned-metadata.js",
+        "r3Bytes": 224,
+        "composedBytes": 294,
+        "delta": 70
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-runtime.js",
+        "r3Bytes": 4551,
+        "composedBytes": 4613,
+        "delta": 62
+      },
+      {
+        "module": "dist/lib/signal-tree.js",
+        "r3Bytes": 14771,
+        "composedBytes": 14795,
+        "delta": 24
+      },
+      {
+        "module": "dist/lib/entity-signal.js",
+        "r3Bytes": 59613,
+        "composedBytes": 59599,
+        "delta": -14
+      },
+      {
+        "module": "dist/lib/internals/location-runtime.js",
+        "r3Bytes": 5626,
+        "composedBytes": 5615,
+        "delta": -11
+      },
+      {
+        "module": "dist/lib/internals/member-membership.js",
+        "r3Bytes": 6711,
+        "composedBytes": 6717,
+        "delta": 6
+      },
+      {
+        "module": "dist/lib/utils.js",
+        "r3Bytes": 1765,
+        "composedBytes": 1765,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-port.js",
+        "r3Bytes": 172,
+        "composedBytes": 172,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/deep-equal.js",
+        "r3Bytes": 1517,
+        "composedBytes": 1517,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/structural-store.js",
+        "r3Bytes": 8286,
+        "composedBytes": 8286,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-placement-stage.js",
+        "r3Bytes": 1982,
+        "composedBytes": 1982,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/is-built-in-object.js",
+        "r3Bytes": 1075,
+        "composedBytes": 1075,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/prepared-placement-visibility.js",
+        "r3Bytes": 1498,
+        "composedBytes": 1498,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/write-context.js",
+        "r3Bytes": 31,
+        "composedBytes": 31,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-adapter.js",
+        "r3Bytes": 90,
+        "composedBytes": 90,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/physical-commit-clock.js",
+        "r3Bytes": 213,
+        "composedBytes": 213,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/position-registry.js",
+        "r3Bytes": 1215,
+        "composedBytes": 1215,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/publication-preparation.js",
+        "r3Bytes": 411,
+        "composedBytes": 411,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/order-restores-for-placement.js",
+        "r3Bytes": 935,
+        "composedBytes": 935,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-membership-source.js",
+        "r3Bytes": 210,
+        "composedBytes": 210,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/ordinary-key-evidence.js",
+        "r3Bytes": 232,
+        "composedBytes": 232,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/markers/entity-map.js",
+        "r3Bytes": 2146,
+        "composedBytes": 2146,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/node-shape.js",
+        "r3Bytes": 287,
+        "composedBytes": 287,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/merge-derived.js",
+        "r3Bytes": 999,
+        "composedBytes": 999,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/ordinary-restoration-placement.js",
+        "r3Bytes": 743,
+        "composedBytes": 743,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/construction-allocation.js",
+        "r3Bytes": 650,
+        "composedBytes": 650,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/causal-runtime/ordinary-realization.js",
+        "r3Bytes": 51,
+        "composedBytes": 51,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/mutation-capture-runtime.js",
+        "r3Bytes": 1253,
+        "composedBytes": 1253,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-handle-resolution.js",
+        "r3Bytes": 230,
+        "composedBytes": 230,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/materialize-markers.js",
+        "r3Bytes": 4934,
+        "composedBytes": 4934,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/enhancer-types.js",
+        "r3Bytes": 42,
+        "composedBytes": 42,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-value-transition.js",
+        "r3Bytes": 188,
+        "composedBytes": 188,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-value-store.js",
+        "r3Bytes": 2561,
+        "composedBytes": 2561,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/cell-identity.js",
+        "r3Bytes": 193,
+        "composedBytes": 193,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/native-occurrence.js",
+        "r3Bytes": 2115,
+        "composedBytes": 2115,
+        "delta": 0
+      },
+      {
+        "module": "dist/index.js",
+        "r3Bytes": 0,
+        "composedBytes": 0,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/physical-rows.js",
+        "r3Bytes": 23,
+        "composedBytes": 23,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-installation.js",
+        "r3Bytes": 257,
+        "composedBytes": 257,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/path-observation-port.js",
+        "r3Bytes": 223,
+        "composedBytes": 223,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/runtime-tree-plan.js",
+        "r3Bytes": 143,
+        "composedBytes": 143,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-capabilities.js",
+        "r3Bytes": 934,
+        "composedBytes": 934,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-authority.js",
+        "r3Bytes": 1289,
+        "composedBytes": 1289,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-ordinary-topology.js",
+        "r3Bytes": 1820,
+        "composedBytes": 1820,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/selected-entity-disposition.js",
+        "r3Bytes": 98,
+        "composedBytes": 98,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/plain-branch-membership.js",
+        "r3Bytes": 522,
+        "composedBytes": 522,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-projection-seed.js",
+        "r3Bytes": 235,
+        "composedBytes": 235,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/scalar-publication-coverage.js",
+        "r3Bytes": 125,
+        "composedBytes": 125,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-substrate.js",
+        "r3Bytes": 190,
+        "composedBytes": 190,
+        "delta": 0
+      },
+      {
+        "module": "entry",
+        "r3Bytes": 137,
+        "composedBytes": 137,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/owner-invalidation-port.js",
+        "r3Bytes": 97,
+        "composedBytes": 97,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/error-reporter.js",
+        "r3Bytes": 1208,
+        "composedBytes": 1208,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/deep-clone.js",
+        "r3Bytes": 1182,
+        "composedBytes": 1182,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/selected-write-operation.js",
+        "r3Bytes": 171,
+        "composedBytes": 171,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/constants.js",
+        "r3Bytes": 399,
+        "composedBytes": 399,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/leaf.js",
+        "r3Bytes": 297,
+        "composedBytes": 297,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-mutation-frame.js",
+        "r3Bytes": 5322,
+        "composedBytes": 5322,
+        "delta": 0
+      },
+      {
+        "module": "dist/enhancers/index.js",
+        "r3Bytes": 1398,
+        "composedBytes": 1398,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/root-source.js",
+        "r3Bytes": 48,
+        "composedBytes": 48,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-publication.js",
+        "r3Bytes": 5950,
+        "composedBytes": 5950,
+        "delta": 0
+      }
+    ]
+  },
+  {
+    "workload": "signaltree-entities-prod",
+    "r3GzipBytes": 44508,
+    "composedGzipBytes": 44756,
+    "gzipDeltaBytes": 248,
+    "r3MinifiedBytes": 148175,
+    "composedMinifiedBytes": 149183,
+    "moduleDeltas": [
+      {
+        "module": "dist/lib/internals/scalar-responsibility-attachment.js",
+        "r3Bytes": 0,
+        "composedBytes": 321,
+        "delta": 321
+      },
+      {
+        "module": "dist/lib/internals/intrinsic-mutation.js",
+        "r3Bytes": 2935,
+        "composedBytes": 3137,
+        "delta": 202
+      },
+      {
+        "module": "dist/lib/internals/scalar-admission-metadata.js",
+        "r3Bytes": 0,
+        "composedBytes": 129,
+        "delta": 129
+      },
+      {
+        "module": "dist/lib/internals/owned-mutation.js",
+        "r3Bytes": 1338,
+        "composedBytes": 1459,
+        "delta": 121
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-leaf-runtime.js",
+        "r3Bytes": 2359,
+        "composedBytes": 2457,
+        "delta": 98
+      },
+      {
+        "module": "dist/lib/internals/owned-metadata.js",
+        "r3Bytes": 224,
+        "composedBytes": 294,
+        "delta": 70
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-runtime.js",
+        "r3Bytes": 4551,
+        "composedBytes": 4613,
+        "delta": 62
+      },
+      {
+        "module": "dist/lib/signal-tree.js",
+        "r3Bytes": 10080,
+        "composedBytes": 10104,
+        "delta": 24
+      },
+      {
+        "module": "dist/lib/entity-signal.js",
+        "r3Bytes": 59051,
+        "composedBytes": 59037,
+        "delta": -14
+      },
+      {
+        "module": "dist/lib/internals/location-runtime.js",
+        "r3Bytes": 5626,
+        "composedBytes": 5615,
+        "delta": -11
+      },
+      {
+        "module": "dist/lib/internals/member-membership.js",
+        "r3Bytes": 6479,
+        "composedBytes": 6485,
+        "delta": 6
+      },
+      {
+        "module": "dist/lib/utils.js",
+        "r3Bytes": 1504,
+        "composedBytes": 1504,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-scalar-slot-port.js",
+        "r3Bytes": 172,
+        "composedBytes": 172,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/deep-equal.js",
+        "r3Bytes": 1517,
+        "composedBytes": 1517,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/structural-store.js",
+        "r3Bytes": 8286,
+        "composedBytes": 8286,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-placement-stage.js",
+        "r3Bytes": 1982,
+        "composedBytes": 1982,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/is-built-in-object.js",
+        "r3Bytes": 1075,
+        "composedBytes": 1075,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/prepared-placement-visibility.js",
+        "r3Bytes": 1498,
+        "composedBytes": 1498,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/write-context.js",
+        "r3Bytes": 31,
+        "composedBytes": 31,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-adapter.js",
+        "r3Bytes": 90,
+        "composedBytes": 90,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/physical-commit-clock.js",
+        "r3Bytes": 213,
+        "composedBytes": 213,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/position-registry.js",
+        "r3Bytes": 1215,
+        "composedBytes": 1215,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/publication-preparation.js",
+        "r3Bytes": 411,
+        "composedBytes": 411,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/order-restores-for-placement.js",
+        "r3Bytes": 935,
+        "composedBytes": 935,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-membership-source.js",
+        "r3Bytes": 210,
+        "composedBytes": 210,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/ordinary-key-evidence.js",
+        "r3Bytes": 232,
+        "composedBytes": 232,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/markers/entity-map.js",
+        "r3Bytes": 1824,
+        "composedBytes": 1824,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/node-shape.js",
+        "r3Bytes": 287,
+        "composedBytes": 287,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/merge-derived.js",
+        "r3Bytes": 581,
+        "composedBytes": 581,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/ordinary-restoration-placement.js",
+        "r3Bytes": 743,
+        "composedBytes": 743,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/construction-allocation.js",
+        "r3Bytes": 650,
+        "composedBytes": 650,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/causal-runtime/ordinary-realization.js",
+        "r3Bytes": 51,
+        "composedBytes": 51,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/mutation-capture-runtime.js",
+        "r3Bytes": 1253,
+        "composedBytes": 1253,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-handle-resolution.js",
+        "r3Bytes": 230,
+        "composedBytes": 230,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/materialize-markers.js",
+        "r3Bytes": 3782,
+        "composedBytes": 3782,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/enhancer-types.js",
+        "r3Bytes": 42,
+        "composedBytes": 42,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-value-transition.js",
+        "r3Bytes": 188,
+        "composedBytes": 188,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-value-store.js",
+        "r3Bytes": 2561,
+        "composedBytes": 2561,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/cell-identity.js",
+        "r3Bytes": 193,
+        "composedBytes": 193,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/native-occurrence.js",
+        "r3Bytes": 2115,
+        "composedBytes": 2115,
+        "delta": 0
+      },
+      {
+        "module": "dist/index.js",
+        "r3Bytes": 0,
+        "composedBytes": 0,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/physical-rows.js",
+        "r3Bytes": 23,
+        "composedBytes": 23,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-installation.js",
+        "r3Bytes": 257,
+        "composedBytes": 257,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/path-observation-port.js",
+        "r3Bytes": 223,
+        "composedBytes": 223,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/runtime-tree-plan.js",
+        "r3Bytes": 143,
+        "composedBytes": 143,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/tree-capabilities.js",
+        "r3Bytes": 934,
+        "composedBytes": 934,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/snapshot-authority.js",
+        "r3Bytes": 1127,
+        "composedBytes": 1127,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-ordinary-topology.js",
+        "r3Bytes": 1820,
+        "composedBytes": 1820,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/selected-entity-disposition.js",
+        "r3Bytes": 98,
+        "composedBytes": 98,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/plain-branch-membership.js",
+        "r3Bytes": 522,
+        "composedBytes": 522,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-projection-seed.js",
+        "r3Bytes": 235,
+        "composedBytes": 235,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/scalar-publication-coverage.js",
+        "r3Bytes": 125,
+        "composedBytes": 125,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/observation-substrate.js",
+        "r3Bytes": 190,
+        "composedBytes": 190,
+        "delta": 0
+      },
+      {
+        "module": "entry",
+        "r3Bytes": 137,
+        "composedBytes": 137,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/owner-invalidation-port.js",
+        "r3Bytes": 97,
+        "composedBytes": 97,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/error-reporter.js",
+        "r3Bytes": 996,
+        "composedBytes": 996,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/utilities/deep-clone.js",
+        "r3Bytes": 1182,
+        "composedBytes": 1182,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/selected-write-operation.js",
+        "r3Bytes": 171,
+        "composedBytes": 171,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/constants.js",
+        "r3Bytes": 365,
+        "composedBytes": 365,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/leaf.js",
+        "r3Bytes": 297,
+        "composedBytes": 297,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/physical/entity-mutation-frame.js",
+        "r3Bytes": 5322,
+        "composedBytes": 5322,
+        "delta": 0
+      },
+      {
+        "module": "dist/enhancers/index.js",
+        "r3Bytes": 1398,
+        "composedBytes": 1398,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/root-source.js",
+        "r3Bytes": 48,
+        "composedBytes": 48,
+        "delta": 0
+      },
+      {
+        "module": "dist/lib/internals/entity-publication.js",
+        "r3Bytes": 5950,
+        "composedBytes": 5950,
+        "delta": 0
+      }
+    ]
+  }
+]

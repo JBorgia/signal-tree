@@ -1,0 +1,23 @@
+{
+  "status": "test-only checkpoint; runtime R1 remains blocked on approved A/B receipts",
+  "manifestSha256": "8845040f287d4062ff368d558e713edd5b30ad684b51d67d10ed93a9189c3f22",
+  "patchSha256": "4e1831819b392175a2e82fa8b635cc1e23f7c342ea9a89c109d01e76aaabb519",
+  "changed": [
+    "packages/kernel/src/lib/cached-current-input.spec.ts",
+    "packages/kernel/src/lib/current-capture-r1.spec.ts",
+    "packages/kernel/src/lib/opaque-current-input.spec.ts"
+  ],
+  "allNonTestBasePathsUnchanged": true,
+  "results": {
+    "affected-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "spec-types-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

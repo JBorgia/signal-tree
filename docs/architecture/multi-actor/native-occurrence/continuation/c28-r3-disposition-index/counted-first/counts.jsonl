@@ -1,0 +1,4 @@
+{"n":32,"counts":{"initial":2698,"replace":5483,"undo":10544,"redo":11408}}
+{"n":64,"counts":{"initial":5386,"replace":10955,"undo":21040,"redo":22768}}
+{"n":128,"counts":{"initial":10762,"replace":21899,"undo":42032,"redo":45488}}
+{"n":256,"counts":{"initial":21514,"replace":43787,"undo":84016,"redo":90928}}

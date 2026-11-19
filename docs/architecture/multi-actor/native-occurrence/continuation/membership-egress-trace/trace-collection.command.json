@@ -1,0 +1,15 @@
+{
+  "cwd": "/private/tmp/st-membership-egress-trace/instrumented",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "link-absent-locations.spec.ts",
+    "--testNamePattern=a collection.*no enhancers.*an omission",
+    "--maxWorkers=1"
+  ],
+  "exit": 1
+}

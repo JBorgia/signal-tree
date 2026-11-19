@@ -1,0 +1,118 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1151,7 +1151,7 @@
+       const prepared = valueStore.prepareValueTransition(
+         mutation.subjectId,
+         mutation.nextValue,
+-        mutation.authoredFields,
++        mutation.authoredFields === 'realization' ? undefined : mutation.authoredFields,
+         previous
+       );
+       valueTransitions.set(mutation, prepared);
+@@ -1180,6 +1180,7 @@
+         : structuralStore.subjectIdForKey(tailKey);
+     const changeIndexByMutation = new Map<unknown, number>();
+     const physicalValuesByStep=new Map<number,EntityValueTransition<E>>();
++    const authoredByStep = new Map<number, import('./internals/entity-publication').EntityAuthoredFootprint>();
+     for (const m of frame.mutations) {
+       changeIndexByMutation.set(m, changes.length);
+       const key =
+@@ -1187,6 +1188,7 @@
+       const before = valueStore.backingForSubject(m.subjectId);
+       const path = `${basePath}.${String(key)}`;
+       if (m.kind === 'replace-value') {
++        authoredByStep.set(changes.length, authoredFootprint(m.authoredFields));
+         const transition = valueTransitions.get(m)!;
+         physicalValuesByStep.set(changes.length,transition);
+         changes.push({
+@@ -1326,6 +1328,7 @@
+       frame.orderEndpoints?.after,ordinaryPlan.ordinaryEndpoints?.after,false,
+       changes.map((change, ordinal) => ({
+         ordinal,
++        authoredFootprint: authoredByStep.get(ordinal),
+         authoredRemoval: options?.publication !== 'physical' && change.structuralRecord?.kind === 'remove'
+           ? {...change, fields:null, structural:change.structuralRecord} : undefined,
+         ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => ({...effect,fields:effect.structural?null:publicationFields(effect.before,effect.after),structural:effect.structuralRecord})),
+@@ -1803,6 +1806,7 @@
+             key: from,
+             subjectId,
+             nextValue: entity,
++            authoredFields: 'realization',
+           });
+         frame.stageKeyTransfer(transfer);
+         const result = commitAndProjectEntityMutationFrame(frame, options);
+@@ -2034,6 +2038,12 @@
+    * instruction array, a `Set` and an id array per mutation regardless of size.
+    * For a one-field update that machinery is the mutation.
+    */
++  function authoredFootprint(scope: readonly string[] | null | 'derive' | 'realization'): import('./internals/entity-publication').EntityAuthoredFootprint {
++    if (scope === null) return Object.freeze({kind:'whole'});
++    if (scope === 'derive') return Object.freeze({kind:'derive'});
++    if (scope === 'realization') return Object.freeze({kind:'realization'});
++    return Object.freeze({kind:'fields',fields:Object.freeze([...scope])});
++  }
+   function publicationFields(before: unknown, after: unknown, explicit?: readonly string[] | null): readonly string[] | null {
+     if(explicit !== undefined) return explicit;
+     const a=before && typeof before==='object'?before as Record<string,unknown>:{};
+@@ -2048,7 +2058,7 @@
+   function commitExistingSubjectValue(
+     subjectId: number,
+     nextValue: E,
+-    fields?: readonly string[] | null
++    fields: readonly string[] | null
+   ): EntityValueTransition<E> {
+     const revision = physicalCommitClock?.revision();
+     const transition = valueStore.prepareValueTransition(
+@@ -2079,7 +2089,8 @@
+     });
+     const publication = prepareEntityPublication(
+       [{subject:subjectId,before:transition.physicalBefore,after:transition.physicalAfter,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields)}],
+-      ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))
++      ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord})),
++      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}]
+     );
+     const capture = committedEntityObserver(
+       undefined,
+@@ -2621,6 +2632,7 @@
+         key: id,
+         subjectId: existingSubjectId,
+         nextValue: transformedEntity,
++        authoredFields: null,
+       });
+     }
+ 
+@@ -4682,6 +4694,7 @@
+             key: id,
+             subjectId,
+             nextValue: entity,
++            authoredFields: null,
+           });
+         for (let k = 0; k < stagedAdds.length; k++)
+           frame.stageFreshSubject({
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -11,7 +11,12 @@
+   readonly fields: readonly string[] | null;
+   readonly structural?: StructuralEffect;
+ }
++/** Source declaration only: never a certificate of native effect ownership. */
++export type EntityAuthoredFootprint =
++  | {readonly kind:'whole' | 'derive' | 'realization'}
++  | {readonly kind:'fields';readonly fields:readonly string[]};
+ export interface EntityPublicationStep {
++  readonly authoredFootprint?: EntityAuthoredFootprint;
+   readonly ordinal: number;
+   readonly authoredRemoval?: EntityPublicationEdit;
+   readonly ordinary: readonly EntityPublicationEdit[];
+--- a/packages/kernel/src/lib/physical/entity-mutation-frame.ts
++++ b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+@@ -17,7 +17,8 @@
+   key: K;
+   subjectId: number;
+   nextValue: E;
+-  authoredFields?: readonly string[] | null | 'derive';
++  /** Required producer scope; realization is not new ordinary authorship. */
++  authoredFields: readonly string[] | null | 'derive' | 'realization';
+ };
+ 
+ export type PreparedRetainedValueRetirement = {

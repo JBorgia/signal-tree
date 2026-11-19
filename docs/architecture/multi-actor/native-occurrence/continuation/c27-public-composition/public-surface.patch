@@ -1,0 +1,76 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/publication-declaration.ts
+@@ -0,0 +1,31 @@
++import type { PendingTransaction } from '../enhancers/transactions/transactions.types';
++import type { SignalTreeRollbackError } from './types';
++
++type DeclarationOwner = PendingTransaction | NonNullable<SignalTreeRollbackError['recovery']>['transaction'];
++
++/** Complete contributor declaration for one synchronous Link operation.
++ * Handles identify dependencies; they do not transfer write ownership.
++ * Runtime authenticates handles. Types cannot prove hidden-input completeness.
++ */
++export type PublicationDeclaration =
++  | Readonly<{ kind: 'independent' }>
++  | Readonly<{ kind: 'dependent'; owners: readonly DeclarationOwner[] }>
++  | Readonly<{ kind: 'unknown' }>;
++
++/** Admission status, not transport acknowledgment or a publication capability. */
++export type PublicationState =
++  | Readonly<{ state: 'validating' }>
++  | Readonly<{ state: 'no-write' }>
++  | Readonly<{ state: 'held'; reason: 'pending-dependency' }>
++  | Readonly<{ state: 'eligible'; basis: 'declared' }>
++  | Readonly<{ state: 'conservative'; reason: 'invalid-declaration' | 'unknown' | 'rejected-dependency' }>
++  | Readonly<{ state: 'started'; basis: 'declared' | 'surviving' }>
++  | Readonly<{ state: 'superseded' }>
++  | Readonly<{ state: 'disposed' }>;
++
++/** Frozen handle; read returns the current detached immutable status snapshot.
++ * This is not a signal, subscription, cancellation handle or delivery promise.
++ */
++export interface PublicationReceipt {
++  readonly read: () => PublicationState;
++}
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,3 +1,4 @@
++import type { PublicationDeclaration, PublicationReceipt } from './publication-declaration';
+ import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
+ import './experimental-publication/entity';
+ import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+@@ -135,13 +136,22 @@
+ }
+ 
+ /**
+- * The handle. Deliberately three members.
++ * The handle: declaration admission and relationship lifecycle.
+  *
+  * No `subscribe()`, no `then()`, no retry/backoff/status, no `afterGet`/
+  * `afterSet`/`afterChange` — none of those were earned by a demonstrated
+  * third-party authoring need, and "might be useful" is UNPROVEN, not PUBLIC.
+  */
+ export interface Link {
++  /** Declare contributors for synchronous writes to this connection's source.
++   * The callback result is discarded. Writes may remain if validation throws.
++   * PromiseLike returns are rejected by inference; erased types and other
++   * thenables still require runtime validation. No declaration crosses await.
++   */
++  declare<R>(
++    declaration: PublicationDeclaration,
++    work: (() => R) & (Extract<R, PromiseLike<unknown>> extends never ? unknown : never)
++  ): PublicationReceipt;
+   /** Pull Y into X once. Rejects if the endpoint supplies no `get()`. */
+   retrieve(): Promise<void>;
+   /**
+--- a/packages/kernel/src/index.ts
++++ b/packages/kernel/src/index.ts
+@@ -170,6 +170,8 @@
+ // and no third-party authoring need has earned the symbol. It stays exported
+ // from `link.ts` for declaration emit only.
+ export type { Link, LinkEndpoint } from './lib/link';
++export type { PublicationDeclaration, PublicationReceipt, PublicationState } from './lib/publication-declaration';
++export { SignalTreePublicationError } from './lib/experimental-publication/lifecycle';
+ 
+ // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
+ // in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:

@@ -1,0 +1,62 @@
+[
+  {
+    "source": "summary-model.ts",
+    "archive": "summary-model.ts",
+    "sourceSha256": "d814eaabf62faefab1482a5d30e546d0ca4a75eaf8509e0b5a9109f90a98e8c3",
+    "archiveSha256": "d814eaabf62faefab1482a5d30e546d0ca4a75eaf8509e0b5a9109f90a98e8c3"
+  },
+  {
+    "source": "RESULT.json",
+    "archive": "RESULT.json",
+    "sourceSha256": "7f2bc7bbfdd3aa8504ee1018fdfe8e0ebc7510ffb4cc8658d9613626b63bfc08",
+    "archiveSha256": "7f2bc7bbfdd3aa8504ee1018fdfe8e0ebc7510ffb4cc8658d9613626b63bfc08"
+  },
+  {
+    "source": "main-replay.log",
+    "archive": "main-replay.log",
+    "sourceSha256": "6c7b9d0d2b6b24d2ee934c960a44b19a289963ac4b8610a90e7f54e0bef6c8b9",
+    "archiveSha256": "6c7b9d0d2b6b24d2ee934c960a44b19a289963ac4b8610a90e7f54e0bef6c8b9"
+  },
+  {
+    "source": "DISCRIMINATOR-IDENTITY.json",
+    "archive": "DISCRIMINATOR-IDENTITY.json",
+    "sourceSha256": "8d487228f21bd8bcb884973b0a646dcf9134b01423171c63841feae1cdecfda5",
+    "archiveSha256": "8d487228f21bd8bcb884973b0a646dcf9134b01423171c63841feae1cdecfda5"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "f40a9848ff1aa4a07c5b2e9b7dcfe87228856f2f111dc1d246802ade46c3c72b",
+    "archiveSha256": "f40a9848ff1aa4a07c5b2e9b7dcfe87228856f2f111dc1d246802ade46c3c72b"
+  },
+  {
+    "source": "COMMAND.json",
+    "archive": "COMMAND.json",
+    "sourceSha256": "8bd7b47c2ccefbe273684937fc9f83046e5716efa9da0cdf7451fb0ee2fbe906",
+    "archiveSha256": "8bd7b47c2ccefbe273684937fc9f83046e5716efa9da0cdf7451fb0ee2fbe906"
+  },
+  {
+    "source": "prepare-discriminator.py",
+    "archive": "prepare-discriminator.py",
+    "sourceSha256": "bbba5006ceaf5655c75cb5efce5daf3f050f173f63b74d2e656c0c76ec8a1d66",
+    "archiveSha256": "bbba5006ceaf5655c75cb5efce5daf3f050f173f63b74d2e656c0c76ec8a1d66"
+  },
+  {
+    "source": "DISCRIMINATOR-RESULT.md",
+    "archive": "DISCRIMINATOR-RESULT.md",
+    "sourceSha256": "ecb16a8261205b65961ead12b181314818f22f1ff07ba17ad9b312b43343c2ea",
+    "archiveSha256": "ecb16a8261205b65961ead12b181314818f22f1ff07ba17ad9b312b43343c2ea"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "b2fff1984e74cb6456bf79b21a8ebff51a5aa2fefa70a9716b76ccf4eb20dbd0",
+    "archiveSha256": "b2fff1984e74cb6456bf79b21a8ebff51a5aa2fefa70a9716b76ccf4eb20dbd0"
+  },
+  {
+    "source": "summary-first.log",
+    "archive": "summary-first.log",
+    "sourceSha256": "6c7b9d0d2b6b24d2ee934c960a44b19a289963ac4b8610a90e7f54e0bef6c8b9",
+    "archiveSha256": "6c7b9d0d2b6b24d2ee934c960a44b19a289963ac4b8610a90e7f54e0bef6c8b9"
+  }
+]

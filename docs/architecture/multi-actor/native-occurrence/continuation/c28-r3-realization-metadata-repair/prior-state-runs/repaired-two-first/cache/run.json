@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/enhancers/transactions/transaction-safety.spec.ts src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:31:46.881Z",
+    "endTime": "2026-11-03T04:31:53.923Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "3288079029383899940",
+      "startTime": "2026-11-03T04:31:46.952Z",
+      "endTime": "2026-11-03T04:31:53.921Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "manifestSha256": "04ba51dec86f537921521cf0a8ef5276c788e48b9a4e4abc24c7c5d14eda9652",
+  "files": 3031,
+  "changedFromC8": [
+    "packages/kernel/src/lib/packet-index-review.spec.ts",
+    "packages/kernel/src/lib/publication-retirement-boundaries.spec.ts",
+    "packages/kernel/src/lib/singleton-row-reuse.spec.ts"
+  ],
+  "runtimeIdentical": true,
+  "postRunUnchanged": true
+}

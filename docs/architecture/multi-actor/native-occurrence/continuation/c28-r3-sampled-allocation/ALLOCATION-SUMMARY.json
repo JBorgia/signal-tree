@@ -1,0 +1,2796 @@
+[
+  {
+    "unresolvedSampleCount": 2,
+    "unresolvedSampleBytes": 121504,
+    "unresolvedFraction": 0.001703577130609898,
+    "arm": "baseline",
+    "stage": "replacement",
+    "sampleCount": 2006,
+    "estimatedSampleBytes": 71322864,
+    "selfSizeSumCrossCheck": 71088472,
+    "totalsEqual": false,
+    "profileBytes": 133039,
+    "leafClasses": {
+      "builtin-or-unmapped": 21898072,
+      "candidate-mapped": 47827288,
+      "node-runtime": 1476000,
+      "unresolved-sample-node": 121504
+    },
+    "nearestMappedCandidateCallerBytes": {
+      "src/lib/entity-signal.ts": 19505920,
+      "src/enhancers/restoration/restoration.ts": 8128592,
+      "src/lib/path-notifier.ts": 7848200,
+      "src/lib/physical/entity-ordinary-topology.ts": 5682184,
+      "src/lib/internals/ordinary-entity-entries.ts": 5448944,
+      "src/lib/physical/entity-mutation-frame.ts": 4863792,
+      "src/lib/internals/utilities/deep-clone.ts": 4494528,
+      "src/lib/internals/restoration-eligibility.ts": 3068160,
+      "src/lib/internals/entity-publication.ts": 2886376,
+      "src/lib/internals/causal-runtime/tree-realization-adapter.ts": 1787080,
+      "src/lib/physical/entity-placement-stage.ts": 1674064,
+      "src/lib/physical/prepared-placement-visibility.ts": 1633168,
+      "src/lib/physical/structural-store.ts": 1032792,
+      "src/lib/internals/plain-branch-membership.ts": 1008232,
+      "src/lib/internals/subject-restoration-claims.ts": 873248,
+      "src/lib/internals/scalar-publication-coverage.ts": 426608,
+      "src/lib/internals/entity-value-transition.ts": 363680,
+      "src/lib/entity-large-batches.spec.ts": 311824,
+      "unresolved-sample-node": 121504,
+      "src/lib/experimental-publication/projection.ts": 98400,
+      "src/lib/internals/owned-metadata.ts": 65568
+    },
+    "topStacks": [
+      {
+        "nodeId": 181,
+        "sampleBytes": 2872160,
+        "sampleCount": 87,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 154,
+        "sampleBytes": 2740176,
+        "sampleCount": 83,
+        "leaf": {
+          "raw": {
+            "functionName": "markMetaDesignated",
+            "scriptId": "854",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+            "lineNumber": 8,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "restoration-eligibility.ts",
+            "line": 54,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "markMetaDesignated",
+            "scriptId": "854",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+            "lineNumber": 8,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "restoration-eligibility.ts",
+            "line": 54,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 22,
+        "sampleBytes": 2296544,
+        "sampleCount": 70,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 48,
+        "sampleBytes": 2241008,
+        "sampleCount": 68,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareOrdinaryTopology",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 748,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1110,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareOrdinaryTopology",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 748,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1110,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 174,
+        "sampleBytes": 2216080,
+        "sampleCount": 67,
+        "leaf": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 31,
+        "sampleBytes": 2067136,
+        "sampleCount": 63,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareEntityMutationFrame",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 957,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1392,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareEntityMutationFrame",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 957,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1392,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 145,
+        "sampleBytes": 1935600,
+        "sampleCount": 59,
+        "leaf": {
+          "raw": {
+            "functionName": "notify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 167,
+            "columnNumber": 8
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 283,
+            "column": 2,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "notify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 167,
+            "columnNumber": 8
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 283,
+            "column": 2,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 171,
+        "sampleBytes": 1641920,
+        "sampleCount": 50,
+        "leaf": {
+          "raw": {
+            "functionName": "_runNotify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 259,
+            "columnNumber": 12
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 427,
+            "column": 10,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "_runNotify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 259,
+            "columnNumber": 12
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 427,
+            "column": 10,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 33,
+        "sampleBytes": 1640384,
+        "sampleCount": 50,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 13,
+        "sampleBytes": 1513896,
+        "sampleCount": 45,
+        "leaf": {
+          "raw": {
+            "functionName": "setAll",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 3399,
+            "columnNumber": 10
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 4917,
+            "column": 4,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "setAll",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 3399,
+            "columnNumber": 10
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 4917,
+            "column": 4,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 177,
+        "sampleBytes": 1312320,
+        "sampleCount": 40,
+        "leaf": {
+          "raw": {
+            "functionName": "captureIntoBucket",
+            "scriptId": "860",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/enhancers/restoration/restoration.ts",
+            "lineNumber": 2825,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "restoration.ts",
+            "line": 4370,
+            "column": 30,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "captureIntoBucket",
+            "scriptId": "860",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/enhancers/restoration/restoration.ts",
+            "lineNumber": 2825,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "restoration.ts",
+            "line": 4370,
+            "column": 30,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 86,
+        "sampleBytes": 1246608,
+        "sampleCount": 38,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "843",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+            "lineNumber": 43,
+            "columnNumber": 56
+          },
+          "mapped": {
+            "source": "entity-ordinary-topology.ts",
+            "line": 81,
+            "column": 56,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "843",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+            "lineNumber": 43,
+            "columnNumber": 56
+          },
+          "mapped": {
+            "source": "entity-ordinary-topology.ts",
+            "line": 81,
+            "column": 56,
+            "name": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "unresolvedSampleCount": 1,
+    "unresolvedSampleBytes": 36192,
+    "unresolvedFraction": 0.00026783540152901806,
+    "arm": "baseline",
+    "stage": "undo",
+    "sampleCount": 3866,
+    "estimatedSampleBytes": 135127768,
+    "selfSizeSumCrossCheck": 134962912,
+    "totalsEqual": false,
+    "profileBytes": 319411,
+    "leafClasses": {
+      "builtin-or-unmapped": 44464784,
+      "candidate-mapped": 90003592,
+      "node-runtime": 623200,
+      "unresolved-sample-node": 36192
+    },
+    "nearestMappedCandidateCallerBytes": {
+      "src/lib/entity-signal.ts": 38123552,
+      "src/lib/internals/location-runtime.ts": 19358288,
+      "src/lib/internals/causal-runtime/tree-realization-adapter.ts": 16120384,
+      "src/lib/internals/utilities/deep-clone.ts": 9710400,
+      "src/lib/physical/entity-ordinary-topology.ts": 9104832,
+      "src/lib/physical/order-restores-for-placement.ts": 6539536,
+      "src/lib/experimental-publication/private.ts": 6043304,
+      "src/lib/physical/entity-placement-stage.ts": 5305264,
+      "src/lib/physical/entity-mutation-frame.ts": 3368144,
+      "src/lib/physical/structural-store.ts": 3207992,
+      "src/lib/internals/intrinsic-mutation.ts": 3074992,
+      "src/enhancers/restoration/restoration.ts": 2704032,
+      "src/lib/path-notifier.ts": 2609080,
+      "src/lib/internals/entity-publication.ts": 2526424,
+      "src/lib/internals/causal-runtime/pending-rollback.ts": 2142816,
+      "src/lib/internals/causal-runtime/ordinary-realization.ts": 1080976,
+      "src/lib/physical/ordinary-restoration-placement.ts": 1008520,
+      "src/lib/internals/causal-runtime/target-transition.ts": 963440,
+      "src/lib/internals/plain-branch-membership.ts": 820096,
+      "src/lib/internals/observation-adapter.ts": 360928,
+      "src/lib/experimental-publication/lifecycle.ts": 360800,
+      "src/lib/internals/cell-identity.ts": 229664,
+      "src/lib/internals/member-membership.ts": 98400,
+      "src/lib/internals/position-registry.ts": 65664,
+      "src/lib/experimental-publication/projection.ts": 65632,
+      "src/lib/internals/selected-entity-disposition.ts": 65632,
+      "unresolved-sample-node": 36192,
+      "src/lib/internals/owned-metadata.ts": 32784
+    },
+    "topStacks": [
+      {
+        "nodeId": 166,
+        "sampleBytes": 5812080,
+        "sampleCount": 176,
+        "leaf": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 170,
+        "sampleBytes": 3918704,
+        "sampleCount": 119,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 167,
+        "sampleBytes": 2461984,
+        "sampleCount": 75,
+        "leaf": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 88,
+        "sampleBytes": 2081808,
+        "sampleCount": 63,
+        "leaf": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 177,
+        "sampleBytes": 2066464,
+        "sampleCount": 63,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 175,
+        "sampleBytes": 1776816,
+        "sampleCount": 54,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 339,
+        "sampleBytes": 1771960,
+        "sampleCount": 54,
+        "leaf": {
+          "raw": {
+            "functionName": "planRemove",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 1997,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 2862,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "planRemove",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 1997,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 2862,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 343,
+        "sampleBytes": 1706520,
+        "sampleCount": 52,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 366,
+        "sampleBytes": 1673120,
+        "sampleCount": 51,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 312,
+        "sampleBytes": 1672944,
+        "sampleCount": 51,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 652,
+        "sampleBytes": 1640448,
+        "sampleCount": 50,
+        "leaf": {
+          "raw": {
+            "functionName": "publish",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 1935,
+            "columnNumber": 13
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 2787,
+            "column": 6,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "publish",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 1935,
+            "columnNumber": 13
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 2787,
+            "column": 6,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 219,
+        "sampleBytes": 1640336,
+        "sampleCount": 50,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "unresolvedSampleCount": 0,
+    "unresolvedSampleBytes": 0,
+    "unresolvedFraction": 0,
+    "arm": "baseline",
+    "stage": "redo",
+    "sampleCount": 4356,
+    "estimatedSampleBytes": 151992312,
+    "selfSizeSumCrossCheck": 151921480,
+    "totalsEqual": false,
+    "profileBytes": 319057,
+    "leafClasses": {
+      "builtin-or-unmapped": 49306288,
+      "candidate-mapped": 102226824,
+      "node-runtime": 459200,
+      "unresolved-sample-node": 0
+    },
+    "nearestMappedCandidateCallerBytes": {
+      "src/lib/entity-signal.ts": 42351968,
+      "src/lib/internals/location-runtime.ts": 21090960,
+      "src/lib/internals/causal-runtime/tree-realization-adapter.ts": 15524528,
+      "src/lib/physical/entity-ordinary-topology.ts": 9546192,
+      "src/lib/experimental-publication/private.ts": 9151136,
+      "src/lib/internals/utilities/deep-clone.ts": 8890976,
+      "src/lib/physical/order-restores-for-placement.ts": 7648248,
+      "src/lib/physical/entity-placement-stage.ts": 5957264,
+      "src/lib/internals/ordinary-entity-entries.ts": 5737776,
+      "src/lib/physical/structural-store.ts": 3785456,
+      "src/enhancers/restoration/restoration.ts": 3220216,
+      "src/lib/path-notifier.ts": 2839176,
+      "src/lib/internals/entity-publication.ts": 2837744,
+      "src/lib/physical/entity-mutation-frame.ts": 2676224,
+      "src/lib/internals/intrinsic-mutation.ts": 2661504,
+      "src/lib/internals/causal-runtime/pending-rollback.ts": 2625944,
+      "src/lib/physical/ordinary-restoration-placement.ts": 990096,
+      "src/lib/internals/causal-runtime/target-transition.ts": 955072,
+      "src/lib/internals/selected-entity-disposition.ts": 951520,
+      "src/lib/internals/plain-branch-membership.ts": 590400,
+      "src/lib/internals/causal-runtime/ordinary-realization.ts": 580264,
+      "src/lib/experimental-publication/projection.ts": 524960,
+      "src/lib/internals/entity-value-transition.ts": 397472,
+      "src/lib/internals/utilities/append-all.ts": 193968,
+      "src/lib/internals/member-membership.ts": 164000,
+      "src/lib/internals/production-substrate-stats.ts": 33600,
+      "src/lib/experimental-publication/lifecycle.ts": 32832,
+      "src/lib/internals/observation-adapter.ts": 32816,
+      "unresolved-sample-node": 0
+    },
+    "topStacks": [
+      {
+        "nodeId": 91,
+        "sampleBytes": 8292192,
+        "sampleCount": 251,
+        "leaf": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 100,
+        "sampleBytes": 4214864,
+        "sampleCount": 128,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 92,
+        "sampleBytes": 3610784,
+        "sampleCount": 110,
+        "leaf": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 30,
+        "sampleBytes": 2967168,
+        "sampleCount": 90,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 266,
+        "sampleBytes": 2966656,
+        "sampleCount": 89,
+        "leaf": {
+          "raw": {
+            "functionName": "sort",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "mapped": null
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "inspectSubjectResources",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2561,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3701,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 107,
+        "sampleBytes": 2755168,
+        "sampleCount": 84,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 101,
+        "sampleBytes": 2634096,
+        "sampleCount": 80,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 28,
+        "sampleBytes": 2475440,
+        "sampleCount": 75,
+        "leaf": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 277,
+        "sampleBytes": 2460968,
+        "sampleCount": 75,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 312,
+        "sampleBytes": 2452520,
+        "sampleCount": 73,
+        "leaf": {
+          "raw": {
+            "functionName": "orderRestoresForPlacement",
+            "scriptId": "837",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+            "lineNumber": 2,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "order-restores-for-placement.ts",
+            "line": 21,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "orderRestoresForPlacement",
+            "scriptId": "837",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+            "lineNumber": 2,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "order-restores-for-placement.ts",
+            "line": 21,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 109,
+        "sampleBytes": 2230888,
+        "sampleCount": 68,
+        "leaf": {
+          "raw": {
+            "functionName": "bindLocation",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2475,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3604,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "bindLocation",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2475,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3604,
+            "column": 25,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 189,
+        "sampleBytes": 2034496,
+        "sampleCount": 62,
+        "leaf": {
+          "raw": {
+            "functionName": "hasCollectionKey",
+            "scriptId": "884",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+            "lineNumber": 2303,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "tree-realization-adapter.ts",
+            "line": 3414,
+            "column": 9,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "hasCollectionKey",
+            "scriptId": "884",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+            "lineNumber": 2303,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "tree-realization-adapter.ts",
+            "line": 3414,
+            "column": 9,
+            "name": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "unresolvedSampleCount": 3,
+    "unresolvedSampleBytes": 154504,
+    "unresolvedFraction": 0.0021150273498125793,
+    "arm": "indexed",
+    "stage": "replacement",
+    "sampleCount": 2056,
+    "estimatedSampleBytes": 73050592,
+    "selfSizeSumCrossCheck": 72894240,
+    "totalsEqual": false,
+    "profileBytes": 133959,
+    "leafClasses": {
+      "builtin-or-unmapped": 22639928,
+      "candidate-mapped": 48616160,
+      "node-runtime": 1640000,
+      "unresolved-sample-node": 154504
+    },
+    "nearestMappedCandidateCallerBytes": {
+      "src/lib/entity-signal.ts": 22235288,
+      "src/lib/path-notifier.ts": 8433832,
+      "src/enhancers/restoration/restoration.ts": 7918144,
+      "src/lib/physical/entity-mutation-frame.ts": 5045016,
+      "src/lib/internals/utilities/deep-clone.ts": 4953808,
+      "src/lib/physical/entity-ordinary-topology.ts": 4899832,
+      "src/lib/internals/ordinary-entity-entries.ts": 4787568,
+      "src/lib/internals/restoration-eligibility.ts": 3296528,
+      "src/lib/internals/entity-publication.ts": 2886088,
+      "src/lib/internals/causal-runtime/tree-realization-adapter.ts": 1866672,
+      "src/lib/physical/prepared-placement-visibility.ts": 1783184,
+      "src/lib/physical/entity-placement-stage.ts": 1326000,
+      "src/lib/internals/plain-branch-membership.ts": 1081832,
+      "src/lib/internals/subject-restoration-claims.ts": 1075376,
+      "src/lib/physical/structural-store.ts": 666088,
+      "src/lib/entity-large-batches.spec.ts": 180560,
+      "src/lib/internals/entity-value-transition.ts": 165088,
+      "src/lib/internals/scalar-publication-coverage.ts": 163984,
+      "unresolved-sample-node": 154504,
+      "src/lib/experimental-publication/projection.ts": 131200
+    },
+    "topStacks": [
+      {
+        "nodeId": 29,
+        "sampleBytes": 3117400,
+        "sampleCount": 95,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareEntityMutationFrame",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 957,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1392,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareEntityMutationFrame",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 957,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1392,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 20,
+        "sampleBytes": 2854336,
+        "sampleCount": 87,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 143,
+        "sampleBytes": 2542128,
+        "sampleCount": 77,
+        "leaf": {
+          "raw": {
+            "functionName": "markMetaDesignated",
+            "scriptId": "854",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+            "lineNumber": 8,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "restoration-eligibility.ts",
+            "line": 54,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "markMetaDesignated",
+            "scriptId": "854",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+            "lineNumber": 8,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "restoration-eligibility.ts",
+            "line": 54,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 173,
+        "sampleBytes": 2478928,
+        "sampleCount": 75,
+        "leaf": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 46,
+        "sampleBytes": 2464512,
+        "sampleCount": 75,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareOrdinaryTopology",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 748,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1110,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareOrdinaryTopology",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 748,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 1110,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 175,
+        "sampleBytes": 2144656,
+        "sampleCount": 65,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 142,
+        "sampleBytes": 2001472,
+        "sampleCount": 61,
+        "leaf": {
+          "raw": {
+            "functionName": "notify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 167,
+            "columnNumber": 8
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 283,
+            "column": 2,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "notify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 167,
+            "columnNumber": 8
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 283,
+            "column": 2,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 164,
+        "sampleBytes": 1903984,
+        "sampleCount": 58,
+        "leaf": {
+          "raw": {
+            "functionName": "_runNotify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 259,
+            "columnNumber": 12
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 427,
+            "column": 10,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "_runNotify",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 259,
+            "columnNumber": 12
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 427,
+            "column": 10,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 13,
+        "sampleBytes": 1612192,
+        "sampleCount": 49,
+        "leaf": {
+          "raw": {
+            "functionName": "setAll",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 3399,
+            "columnNumber": 10
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 4917,
+            "column": 4,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "setAll",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 3399,
+            "columnNumber": 10
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 4917,
+            "column": 4,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 31,
+        "sampleBytes": 1410672,
+        "sampleCount": 43,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 161,
+        "sampleBytes": 1247904,
+        "sampleCount": 38,
+        "leaf": {
+          "raw": {
+            "functionName": "flush",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 300,
+            "columnNumber": 7
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 519,
+            "column": 10,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "flush",
+            "scriptId": "865",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/path-notifier.ts",
+            "lineNumber": 300,
+            "columnNumber": 7
+          },
+          "mapped": {
+            "source": "path-notifier.ts",
+            "line": 519,
+            "column": 10,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 168,
+        "sampleBytes": 1148272,
+        "sampleCount": 35,
+        "leaf": {
+          "raw": {
+            "functionName": "captureIntoBucket",
+            "scriptId": "860",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/enhancers/restoration/restoration.ts",
+            "lineNumber": 2825,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "restoration.ts",
+            "line": 4370,
+            "column": 30,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "captureIntoBucket",
+            "scriptId": "860",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/enhancers/restoration/restoration.ts",
+            "lineNumber": 2825,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "restoration.ts",
+            "line": 4370,
+            "column": 30,
+            "name": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "unresolvedSampleCount": 0,
+    "unresolvedSampleBytes": 0,
+    "unresolvedFraction": 0,
+    "arm": "indexed",
+    "stage": "undo",
+    "sampleCount": 3891,
+    "estimatedSampleBytes": 135816088,
+    "selfSizeSumCrossCheck": 135693584,
+    "totalsEqual": false,
+    "profileBytes": 320123,
+    "leafClasses": {
+      "builtin-or-unmapped": 42462008,
+      "candidate-mapped": 92467984,
+      "node-runtime": 820000,
+      "candidate-unmapped": 66096,
+      "unresolved-sample-node": 0
+    },
+    "nearestMappedCandidateCallerBytes": {
+      "src/lib/entity-signal.ts": 38733784,
+      "src/lib/internals/location-runtime.ts": 17400192,
+      "src/lib/internals/causal-runtime/tree-realization-adapter.ts": 15805352,
+      "src/lib/internals/utilities/deep-clone.ts": 9710592,
+      "src/lib/physical/entity-ordinary-topology.ts": 8915184,
+      "src/lib/physical/order-restores-for-placement.ts": 8020912,
+      "src/lib/experimental-publication/private.ts": 6404664,
+      "src/lib/physical/entity-placement-stage.ts": 5704000,
+      "src/lib/physical/structural-store.ts": 3251912,
+      "src/lib/internals/entity-publication.ts": 3215528,
+      "src/lib/path-notifier.ts": 3069752,
+      "src/enhancers/restoration/restoration.ts": 2909688,
+      "src/lib/physical/entity-mutation-frame.ts": 2797248,
+      "src/lib/internals/intrinsic-mutation.ts": 2694920,
+      "src/lib/internals/causal-runtime/pending-rollback.ts": 2492392,
+      "src/lib/internals/causal-runtime/target-transition.ts": 958776,
+      "src/lib/physical/ordinary-restoration-placement.ts": 851496,
+      "src/lib/internals/causal-runtime/ordinary-realization.ts": 779328,
+      "src/lib/internals/plain-branch-membership.ts": 623280,
+      "src/lib/experimental-publication/lifecycle.ts": 360896,
+      "src/lib/internals/observation-adapter.ts": 295344,
+      "src/lib/internals/cell-identity.ts": 229664,
+      "src/lib/internals/selected-entity-disposition.ts": 229600,
+      "src/lib/internals/member-membership.ts": 131168,
+      "src/lib/experimental-publication/projection.ts": 65632,
+      "src/lib/internals/entity-value-transition.ts": 65600,
+      "src/lib/internals/utilities/deep-equal.ts": 33600,
+      "src/lib/internals/position-registry.ts": 32800,
+      "src/lib/internals/owned-metadata.ts": 32784,
+      "unresolved-sample-node": 0
+    },
+    "topStacks": [
+      {
+        "nodeId": 154,
+        "sampleBytes": 6244064,
+        "sampleCount": 189,
+        "leaf": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 155,
+        "sampleBytes": 3061104,
+        "sampleCount": 93,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 156,
+        "sampleBytes": 2658848,
+        "sampleCount": 81,
+        "leaf": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 80,
+        "sampleBytes": 2379408,
+        "sampleCount": 72,
+        "leaf": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 164,
+        "sampleBytes": 2066544,
+        "sampleCount": 63,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 340,
+        "sampleBytes": 1969160,
+        "sampleCount": 60,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 162,
+        "sampleBytes": 1873360,
+        "sampleCount": 57,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 285,
+        "sampleBytes": 1804336,
+        "sampleCount": 55,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 336,
+        "sampleBytes": 1739056,
+        "sampleCount": 53,
+        "leaf": {
+          "raw": {
+            "functionName": "planRemove",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 1997,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 2862,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "planRemove",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 1997,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 2862,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 216,
+        "sampleBytes": 1640256,
+        "sampleCount": 50,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 305,
+        "sampleBytes": 1607584,
+        "sampleCount": 49,
+        "leaf": {
+          "raw": {
+            "functionName": "next",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "mapped": null
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "planHeterogeneousFrame",
+            "scriptId": "884",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+            "lineNumber": 768,
+            "columnNumber": 31
+          },
+          "mapped": {
+            "source": "tree-realization-adapter.ts",
+            "line": 1113,
+            "column": 9,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 165,
+        "sampleBytes": 1574624,
+        "sampleCount": 48,
+        "leaf": {
+          "raw": {
+            "functionName": "bindLocation",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2475,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3604,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "bindLocation",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2475,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3604,
+            "column": 25,
+            "name": null
+          }
+        }
+      }
+    ]
+  },
+  {
+    "unresolvedSampleCount": 0,
+    "unresolvedSampleBytes": 0,
+    "unresolvedFraction": 0,
+    "arm": "indexed",
+    "stage": "redo",
+    "sampleCount": 4380,
+    "estimatedSampleBytes": 153097016,
+    "selfSizeSumCrossCheck": 152992520,
+    "totalsEqual": false,
+    "profileBytes": 319019,
+    "leafClasses": {
+      "builtin-or-unmapped": 48778288,
+      "candidate-mapped": 103793928,
+      "node-runtime": 524800,
+      "unresolved-sample-node": 0
+    },
+    "nearestMappedCandidateCallerBytes": {
+      "src/lib/entity-signal.ts": 42495240,
+      "src/lib/internals/location-runtime.ts": 21877456,
+      "src/lib/internals/causal-runtime/tree-realization-adapter.ts": 16250304,
+      "src/lib/internals/utilities/deep-clone.ts": 9579600,
+      "src/lib/physical/entity-ordinary-topology.ts": 8634192,
+      "src/lib/experimental-publication/private.ts": 8265648,
+      "src/lib/physical/order-restores-for-placement.ts": 7258344,
+      "src/lib/internals/ordinary-entity-entries.ts": 5835664,
+      "src/lib/physical/entity-placement-stage.ts": 5551792,
+      "src/lib/physical/structural-store.ts": 3763320,
+      "src/enhancers/restoration/restoration.ts": 3587120,
+      "src/lib/physical/entity-mutation-frame.ts": 3518264,
+      "src/lib/path-notifier.ts": 3272376,
+      "src/lib/internals/entity-publication.ts": 3189648,
+      "src/lib/internals/intrinsic-mutation.ts": 2891696,
+      "src/lib/internals/causal-runtime/pending-rollback.ts": 1746400,
+      "src/lib/physical/ordinary-restoration-placement.ts": 1211800,
+      "src/lib/internals/selected-entity-disposition.ts": 918592,
+      "src/lib/internals/plain-branch-membership.ts": 820064,
+      "src/lib/internals/causal-runtime/target-transition.ts": 717856,
+      "src/lib/internals/causal-runtime/ordinary-realization.ts": 617656,
+      "src/lib/experimental-publication/projection.ts": 590624,
+      "src/lib/internals/entity-value-transition.ts": 363680,
+      "src/lib/internals/utilities/append-all.ts": 41312,
+      "src/lib/internals/mutation-capture-runtime.ts": 32800,
+      "src/lib/experimental-publication/lifecycle.ts": 32784,
+      "src/lib/internals/position-registry.ts": 32784,
+      "unresolved-sample-node": 0
+    },
+    "topStacks": [
+      {
+        "nodeId": 104,
+        "sampleBytes": 8094112,
+        "sampleCount": 245,
+        "leaf": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createEntityNode",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2434,
+            "columnNumber": 27
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3511,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 119,
+        "sampleBytes": 4018352,
+        "sampleCount": 122,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritableProjection",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 103,
+            "columnNumber": 33
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 169,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 271,
+        "sampleBytes": 3697568,
+        "sampleCount": 111,
+        "leaf": {
+          "raw": {
+            "functionName": "sort",
+            "scriptId": "0",
+            "url": "",
+            "lineNumber": -1,
+            "columnNumber": -1
+          },
+          "mapped": null
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "inspectSubjectResources",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2561,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3701,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 107,
+        "sampleBytes": 3676608,
+        "sampleCount": 112,
+        "leaf": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createDerived",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 429,
+            "columnNumber": 24
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 573,
+            "column": 24,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 30,
+        "sampleBytes": 3426928,
+        "sampleCount": 104,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 10,
+            "columnNumber": 21
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 21,
+            "column": 21,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 281,
+        "sampleBytes": 3084320,
+        "sampleCount": 94,
+        "leaf": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "prepareOrdinaryRealization",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 513,
+            "columnNumber": 37
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 815,
+            "column": 11,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 313,
+        "sampleBytes": 2741000,
+        "sampleCount": 81,
+        "leaf": {
+          "raw": {
+            "functionName": "orderRestoresForPlacement",
+            "scriptId": "837",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+            "lineNumber": 2,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "order-restores-for-placement.ts",
+            "line": 21,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "orderRestoresForPlacement",
+            "scriptId": "837",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+            "lineNumber": 2,
+            "columnNumber": 34
+          },
+          "mapped": {
+            "source": "order-restores-for-placement.ts",
+            "line": 21,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 108,
+        "sampleBytes": 2500272,
+        "sampleCount": 76,
+        "leaf": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "createWritable",
+            "scriptId": "798",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+            "lineNumber": 299,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "location-runtime.ts",
+            "line": 437,
+            "column": 25,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 120,
+        "sampleBytes": 2394336,
+        "sampleCount": 73,
+        "leaf": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "",
+            "scriptId": "866",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+            "lineNumber": 282,
+            "columnNumber": 60
+          },
+          "mapped": {
+            "source": "private.ts",
+            "line": 150,
+            "column": 33,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 28,
+        "sampleBytes": 2179168,
+        "sampleCount": 66,
+        "leaf": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "ordinaryEntityEntries",
+            "scriptId": "861",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+            "lineNumber": 6,
+            "columnNumber": 30
+          },
+          "mapped": {
+            "source": "ordinary-entity-entries.ts",
+            "line": 9,
+            "column": 16,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 105,
+        "sampleBytes": 1935688,
+        "sampleCount": 59,
+        "leaf": {
+          "raw": {
+            "functionName": "bindLocation",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2475,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3604,
+            "column": 25,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "bindLocation",
+            "scriptId": "835",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/entity-signal.ts",
+            "lineNumber": 2475,
+            "columnNumber": 25
+          },
+          "mapped": {
+            "source": "entity-signal.ts",
+            "line": 3604,
+            "column": 25,
+            "name": null
+          }
+        }
+      },
+      {
+        "nodeId": 231,
+        "sampleBytes": 1673104,
+        "sampleCount": 51,
+        "leaf": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        },
+        "nearestCaller": {
+          "raw": {
+            "functionName": "deepClone",
+            "scriptId": "845",
+            "url": "/private/tmp/st-c28-r3-sampled-allocation/indexed/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+            "lineNumber": 2,
+            "columnNumber": 18
+          },
+          "mapped": {
+            "source": "deep-clone.ts",
+            "line": 13,
+            "column": 16,
+            "name": null
+          }
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/dynamic-member-enrollment.spec.ts: 6 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/dynamic-member-enrollment.spec.ts(14,67): error TS18046: 'held' is of type 'unknown'.
+packages/kernel/src/lib/dynamic-member-enrollment.spec.ts(20,76): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/dynamic-member-enrollment.spec.ts(28,71): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/dynamic-member-enrollment.spec.ts(39,135): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/dynamic-member-enrollment.spec.ts(46,4): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/dynamic-member-enrollment.spec.ts(57,122): error TS18046: 't.$.rows.a' is of type 'unknown'.

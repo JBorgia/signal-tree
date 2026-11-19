@@ -1,0 +1,1 @@
+{"name":"held-continuation-probe","root":"tools/held-continuation-probe","targets":{"retention":{"executor":"nx:run-commands","cache":false,"options":{"command":"corepack pnpm exec vitest run --root packages/kernel --config retention-probe.config.ts","cwd":"."}}}}

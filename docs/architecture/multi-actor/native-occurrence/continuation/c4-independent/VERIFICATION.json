@@ -1,0 +1,43 @@
+{
+  "C2": {
+    "root": "/private/tmp/st-native-combined-c2",
+    "manifestSHA256": "c7dba7041936bdf80d01e8d69517ce1fd70fcd425325ba3cebf3086a8f8079a3",
+    "files": 2976,
+    "mismatches": []
+  },
+  "C3": {
+    "root": "/private/tmp/st-native-combined-c3",
+    "manifestSHA256": "ec4902e1c6326df60618c14e820975fb488e858b55cfc73ae4ea616f23c62192",
+    "files": 2982,
+    "mismatches": []
+  },
+  "C4": {
+    "root": "/private/tmp/st-native-combined-c4",
+    "manifestSHA256": "d5cb5d51990632b161b41dafafd65bc12151f9ea4112f854da1974bacf2c3350",
+    "files": 2985,
+    "mismatches": []
+  },
+  "packet": {
+    "root": "/private/tmp/st-packet-point-admission-successor",
+    "manifestSHA256": "542125745ddaad67aead344961bdfb408e43c6447938f6834413038a90ad413d",
+    "files": 2973,
+    "mismatches": []
+  },
+  "retirement": {
+    "root": "/private/tmp/st-fixed-window-retirement-successor",
+    "manifestSHA256": "05daee5c1db9478e3cdad0bbda8216bbc7f6fd10305622d3c3f2cf895a2bd022",
+    "files": 2975,
+    "mismatches": []
+  },
+  "cancellation": {
+    "root": "/private/tmp/st-fixed-window-retirement-cancellation-successor",
+    "manifestSHA256": "a22a4e603e3e28c2fbcc0d99d11e79f0b8f03eb0c762028896b8897b46fecc8e",
+    "files": 2977,
+    "mismatches": []
+  },
+  "reconstructedMatchesC4": {
+    "packages/kernel/src/lib/experimental-publication/entity.ts": true,
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": true,
+    "packages/kernel/src/lib/internals/entity-publication.ts": true
+  }
+}

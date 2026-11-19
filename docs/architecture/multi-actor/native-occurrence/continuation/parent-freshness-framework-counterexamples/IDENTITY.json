@@ -1,0 +1,31 @@
+{
+  "checks": {
+    "proof-original": {
+      "verified": 3047,
+      "mismatches": []
+    },
+    "proof-review": {
+      "verified": 3047,
+      "mismatches": []
+    },
+    "c8-original": {
+      "verified": 3031,
+      "mismatches": []
+    },
+    "c8-review": {
+      "verified": 3031,
+      "mismatches": []
+    }
+  },
+  "baseManifestSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+  "testPatchSha256": "690620f1a4d71a0f747492e0e666ea6c997a60ceac67a061270a78e7243d10ad",
+  "snapshotSha256": "fd91ba9e204fdec576215e5c60bc04b1723e4637a80a60c1b7ff58a7b1ec1e77",
+  "newTestFiles": {
+    "packages/react/src/parent-freshness-counterparts.spec.tsx": "93cf0c47e6fd501b59b05b46271d16543e138d90568a503c9020ebfa78b46a01",
+    "packages/solid/src/lib/parent-freshness-counterparts.spec.ts": "e9e10d77db5f943da1016c2620742d7900d10205d73f86328a4ed9025a9641e9",
+    "packages/vue/src/lib/parent-freshness-counterparts.spec.ts": "2cfd4233f1e221c72ba9ce9647c75e222ded58d277c3fdf7de241665c0697e8a"
+  },
+  "dependencySymlink": "/private/tmp/st-r4-review-resumed/candidate/node_modules",
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+  "rootLockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+}

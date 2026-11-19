@@ -1,0 +1,1 @@
+Independent review helper initially assumed successful Vitest logs contain '1 test'; compact success logs instead use 'Tests  1 passed (1)'. Assertion failed before VERIFICATION.json was written. This was a review-helper parsing error, not a candidate test failure. First helper preserved.

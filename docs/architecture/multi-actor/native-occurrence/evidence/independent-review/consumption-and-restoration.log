@@ -1,0 +1,60 @@
+
+> nx run kernel:test independent-restoration-review.spec.ts
+
+> node tools/run-core-vitest.mjs independent-restoration-review.spec.ts
+
+(node:90760) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90767) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-occurrence-independent-review/replica/packages/kernel
+
+(node:90774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-restoration-review.spec.ts (3 tests | 1 failed) 58ms
+   × consumed input remains after omission without explicitly declaring q on the consuming operation 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-restoration-review.spec.ts > consumed input remains after omission without explicitly declaring q on the consuming operation
+Error: Declaration invalid: contradiction; writes may remain
+ ❯ Module.runDeclaration src/lib/experimental-publication/lifecycle.ts:315:32
+    313|   try{result=work();}catch(error){thrown=true;primary=error;}
+    314|   if(result!==null&&(typeof result==='object'||typeof result==='functi…
+    315|   if(frameInvalid(frame))throw new SignalTreePublicationError(stage,'c…
+       |                                ^
+    316|   if(thrown)throw primary;
+    317|   return receipt;
+ ❯ Module.declare src/lib/experimental-publication/private.ts:410:142
+ ❯ Object.declare src/lib/link.ts:1156:16
+ ❯ src/lib/independent-restoration-review.spec.ts:35:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  12:53:40
+   Duration  1.20s (transform 618ms, setup 0ms, import 739ms, tests 58ms, environment 296ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-restoration-review.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

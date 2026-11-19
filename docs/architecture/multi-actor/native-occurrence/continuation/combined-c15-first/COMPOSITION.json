@@ -1,0 +1,7 @@
+{
+  "base": "C14",
+  "patchSha256": "fb2e0b8fa56396febe1f2e0434b9c798b0c3b8005d8e29b13c07e3cdd135e902",
+  "authorManifestSha256": "ae2d5bb7b2be7fe06cadc5bd09c1bba531ca9e305739ca2d06fad238cd5b4378",
+  "semanticMerge": "observeRevision initializes declared:false; notification observation conveys no declaration permission",
+  "status": "prepared-for-composition-replay-enrollment-independent-review-pending"
+}

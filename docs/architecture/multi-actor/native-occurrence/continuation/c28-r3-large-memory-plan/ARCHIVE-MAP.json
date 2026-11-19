@@ -1,0 +1,14 @@
+[
+  {
+    "source": "EVIDENCE.json",
+    "archive": "EVIDENCE.json",
+    "sourceSha256": "777258c46902f8f62307f47e95dabe4a0a3f7214e7bae5c106529f0d4d76cbc7",
+    "archiveSha256": "777258c46902f8f62307f47e95dabe4a0a3f7214e7bae5c106529f0d4d76cbc7"
+  },
+  {
+    "source": "PLAN.md",
+    "archive": "PLAN.md",
+    "sourceSha256": "8cd5943b6ef9b8826566aaa58f16d86828cf43092b35555cdb997935871cccab",
+    "archiveSha256": "8cd5943b6ef9b8826566aaa58f16d86828cf43092b35555cdb997935871cccab"
+  }
+]

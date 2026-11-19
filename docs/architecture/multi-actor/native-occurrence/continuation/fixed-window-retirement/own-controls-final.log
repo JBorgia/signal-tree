@@ -1,0 +1,35 @@
+
+> nx run kernel:test fixed-window-retirement.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs fixed-window-retirement.spec.ts --maxWorkers=1
+
+(node:83496) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-fixed-window-retirement-successor/candidate/packages/kernel
+
+(node:83831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  20:01:17
+   Duration  4.06s (transform 1.41s, setup 0ms, import 1.72s, tests 84ms, environment 1.91s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      5.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.0s

@@ -1,0 +1,19 @@
+{
+  "sources": {
+    "c27": {
+      "source": "/private/tmp/st-c27-public-composition/candidate",
+      "files": 3086,
+      "manifestSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd"
+    },
+    "c28": {
+      "source": "/private/tmp/st-c28-current-certificate/candidate",
+      "files": 3086,
+      "manifestSha256": "bc09d719916da43d7bf7ae5b4d5cf05eb34f3db85ae18f59143eba5e3a9e89a7"
+    }
+  },
+  "changedFromC27": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "scope": "all C27 manifest paths; author extra unmanifested fixtures excluded"
+}

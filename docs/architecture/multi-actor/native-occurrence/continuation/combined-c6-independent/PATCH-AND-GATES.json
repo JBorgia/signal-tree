@@ -1,0 +1,84 @@
+{
+  "patchExit": 0,
+  "reconstructedFiles": 19,
+  "mismatches": [],
+  "gates": {
+    "construction-angular": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 4.005894500005525
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    },
+    "recipient-cause-exact": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 1.7511373340385035
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    },
+    "retirement-enrollment": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 3.247797582997009
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    },
+    "source-types": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 2.711352040991187
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    },
+    "packet-accounting": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 11.05030804197304
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    },
+    "construction-kernel": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 8.603629000019282
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    },
+    "spec-types": {
+      "RESULT.json": {
+        "exit": 0,
+        "elapsedSeconds": 6.562228916969616
+      },
+      "SOURCE-AFTER.json": {
+        "unchanged": true,
+        "changed": []
+      },
+      "beforeMatchesFrozenManifest": true
+    }
+  }
+}

@@ -1,0 +1,37 @@
+
+> nx run kernel:test src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification-4g/reporter.mjs
+
+> node tools/run-core-vitest.mjs src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern="^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$" --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification-4g/reporter.mjs
+
+(node:59336) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+
+(node:59352) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts (2 tests | 1 skipped) 26739ms
+     ✓ jumps across a turn that cleared more rows than the argument limit  26737ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  11:24:51
+   Duration  28.53s (transform 913ms, setup 0ms, import 1.16s, tests 26.74s, environment 502ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      29.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     29.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    29.3s

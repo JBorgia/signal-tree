@@ -1,0 +1,14 @@
+{
+  "AUTHORITY-INDEPENDENT-FINAL.md": "3ce1ba7c84d16a006eac7a4c4b54bee2aaa1ee7dea76ba8ce9b452ffcd02fefa",
+  "authority-source-check.json": "94fe5e2e302b1fd65a37997176f7677d1f8ac927a84e7baf13b2780d98d8d533",
+  "authority-final-verification.json": "3646411dcbde0a008b131e20ac0d6fece1394ce907b6eb508316a85bd209dd81",
+  "authority-replay.mjs": "9811755c47187e1b1c7d4843b974f8aa5ca1e466d7b5117669c3be7050c6b7ae",
+  "authority-replay.log": "cea3cdf9162aa9a7398c95aadb597e49fa8b568371f143fbd14c031564c80c55",
+  "authority-extra-run.mjs": "17301d3df3190dfdb6948ba0ef9a7f3bfc2438137764aa3c080730679f01b190",
+  "authority-extra-checks.mjs": "f3587157a094b614d46d28798199444a0e8d804ad420ef489b8d2cc144a04b19",
+  "authority-extra.log": "ca3309198316d8f6e9facd38e9cedd87cbc8c95730d48baf27949142b3033748",
+  "authority-replay-ezJSFK/manifest.json": "5312e658ffee5dc64a503d64abaa739ad369d8d9b3eefea1ee01b30b12d4fa37",
+  "authority-replay-ezJSFK/browser-results.json": "c8a15a8a16c4dad4c42c8dbeabc028c9035c4eab5a6237897bc2bc71428fdb29",
+  "authority-extra-1f0OgT/manifest.json": "2f1e80b2a3d4fc7394bf57b55a1abd05c462be8c69f1b69f8b20c005ab9e555c",
+  "authority-extra-1f0OgT/browser-results.json": "7bbcd6e62201c1da744f8fae660dc50f2df86a415c258abbed152d84ff486fbc"
+}

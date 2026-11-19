@@ -1,0 +1,4 @@
+{"named":"r","calls":1,"same":true,"ownersUnchanged":true,"error":null,"initial":[],"afterFirst":[7],"final":[7],"afterDispose":[7]}
+{"named":"s","calls":1,"same":true,"ownersUnchanged":true,"error":{"message":"Declaration invalid: contradiction; writes may remain","code":"SIGNALTREE_PUBLICATION_DECLARATION_INVALID","stage":"after-callback","reason":"contradiction"},"initial":[],"afterFirst":[],"final":[7],"afterDispose":[7]}
+{"named":"both","calls":1,"same":true,"ownersUnchanged":true,"error":null,"initial":[],"afterFirst":[],"final":[7],"afterDispose":[7]}
+{"named":"saved-before-q","authorCalls":1,"calls":1,"same":true,"ownerUnchanged":true,"error":{"message":"Declaration invalid: contradiction; writes may remain","code":"SIGNALTREE_PUBLICATION_DECLARATION_INVALID","stage":"after-callback","reason":"contradiction"},"before":[],"after":[7]}

@@ -1,0 +1,6 @@
+Identical fixture JS: scalar-native-support.spec.ts
+Identical fixture JS: parent-proof-safety-falsifier.spec.ts
+Export names/signatures unchanged: experimental-publication/lifecycle.ts
+Export names/signatures unchanged: experimental-publication/private.ts
+Catch/finally byte identical
+Three guard predicates equivalent across 17 values including proxies; no traps invoked

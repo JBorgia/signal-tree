@@ -1,0 +1,34 @@
+[
+  {
+    "id": "kernel-batch-01",
+    "ordinaryPassed": 2115,
+    "expectedFailureSuccesses": 0,
+    "failed": 0,
+    "pending": 0,
+    "files": 100
+  },
+  {
+    "id": "kernel-batch-02",
+    "ordinaryPassed": 1147,
+    "expectedFailureSuccesses": 0,
+    "failed": 0,
+    "pending": 9,
+    "files": 100
+  },
+  {
+    "id": "kernel-batch-03",
+    "ordinaryPassed": 921,
+    "expectedFailureSuccesses": 0,
+    "failed": 1,
+    "pending": 0,
+    "files": 100
+  },
+  {
+    "id": "kernel-batch-04",
+    "ordinaryPassed": 822,
+    "expectedFailureSuccesses": 4,
+    "failed": 0,
+    "pending": 2,
+    "files": 100
+  }
+]

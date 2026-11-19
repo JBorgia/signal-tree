@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "guardReason": null,
+  "maxObservedOwnedRssBytes": 978518016,
+  "minObservedHostFreePercentage": 43.0,
+  "sourceMismatches": [],
+  "remainingOwned": [],
+  "completedAt": "2026-11-03T19:34:08.786624+00:00"
+}

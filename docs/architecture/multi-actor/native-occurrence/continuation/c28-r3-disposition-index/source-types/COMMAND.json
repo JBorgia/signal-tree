@@ -1,0 +1,22 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-disposition-index/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "exec",
+    "tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.typecheck-all.json"
+  ],
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-disposition-index/source-types/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-disposition-index/source-types/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-disposition-index/source-types/data",
+    "ST_RESTORATION_WORK": "/private/tmp/st-c28-r3-disposition-index/source-types/counts.jsonl"
+  }
+}

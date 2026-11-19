@@ -1,0 +1,6 @@
+{
+  "finding": "Buffered Nx output revealed React, not kernel, was the still-live Rollup child393.",
+  "evidence": "After SIGTERM log flushed nx run react:build, React sources/output, node393 warning and nonzero command status. Kernel output alone did not identify active package.",
+  "correction": "Do not describe this as a kernel shutdown failure. Next probe must establish cwd and stream output before target attribution.",
+  "action": "Original PROCESS-OBSERVATION.json, MANUAL-STOP.json and first.log remain unchanged."
+}

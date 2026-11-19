@@ -1,0 +1,679 @@
+{
+  "size": 2000,
+  "writes": 200,
+  "width": 2,
+  "original": 13800,
+  "total": 13800,
+  "perWrite": [
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69,
+    69
+  ],
+  "events": [
+    {
+      "operation": "Object.keys",
+      "stack": "    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2408:16)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at EntityValueStore.prepareValueTransition (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/physical/entity-value-store.ts:70:18)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2572:35)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Object.keys",
+      "stack": "    at equalsInner (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/utilities/deep-equal.ts:228:24)\n    at deepEqual (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/utilities/deep-equal.ts:17:10)\n    at EntityValueStore.prepareValueTransition (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/physical/entity-value-store.ts:90:10)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2572:35)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 400
+    },
+    {
+      "operation": "Object.keys",
+      "stack": "    at equalsInner (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/utilities/deep-equal.ts:229:24)\n    at deepEqual (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/utilities/deep-equal.ts:17:10)\n    at EntityValueStore.prepareValueTransition (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/physical/entity-value-store.ts:90:10)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2572:35)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 400
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at prepareOrdinaryTopology (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:1190:16)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2577:26)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at prepareOrdinaryTopology (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:1288:17)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2577:26)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at prepareOrdinaryTopology (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:1300:16)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2577:26)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at prepareOrdinaryTopology (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:1300:16)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2577:26)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at prepareOrdinaryTopology (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:1362:32)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2577:26)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2600:28)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at authoredFootprint (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2538:66)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2601:63)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2601:119)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:411)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.slice",
+      "stack": "    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:464\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:411)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:85:31)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:89:126\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:85:31)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:16)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:90:23\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:85:31)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.edit (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:64:123)\n    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:36)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:90:23\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:85:31)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:16)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:90:72\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:85:31)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.edit (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:64:123)\n    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:36)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:90:72\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:85:31)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:16)\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:92:57)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.edit (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:64:123)\n    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:36)\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:92:57)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at AdmissionMetadata.array (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:76:16)\n    at AdmissionMetadata.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:92:94)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:230:27)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:158:34)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:159:38)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:171:44)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:174:59)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:174:90)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:175:18)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:175:49)\n    at Module.prepareNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:189:17)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:105:53)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:140:20)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at pairPhysicalUnit (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:30:16)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:141:11)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:152:17)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "stack": "    at rowViews (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:149:108)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:159:19)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 400,
+      "visits": 400
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:161:19)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:162:29)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 400,
+      "visits": 400
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:167:17)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "stack": "    at rowFields (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:148:126)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:176:19)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 400,
+      "visits": 400
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:183:19)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:196:66)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 400,
+      "visits": 400
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:197:19)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:208:27)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:208:18)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:208:22)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:208:70)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:209:27)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:209:18)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:209:22)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:209:69)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.filter",
+      "stack": "    at combineTerminalRecords (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:20:25)\n    at Object.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:230:22)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:232:32)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)",
+      "calls": 200,
+      "visits": 600
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:234:37)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:248:62)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:248:62)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.filter",
+      "stack": "    at combineTerminalRecords (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:20:25)\n    at EntityPublicationSource.prepare (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:248:15)\n    at prepareEntityPublication (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2562:126)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2598:25)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 600
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:20)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.filter",
+      "stack": "    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:206:50)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2405:26)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:158:34)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:159:38)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:171:44)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:174:59)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:174:90)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:175:18)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.some",
+      "stack": "    at nativeProof (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:175:49)\n    at Module.finalizeNativeRequirement (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:208:54)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:231:31)\n    at Object.finalize (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:253:45)\n    at commitExistingSubjectValue (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2613:23)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at suppliedViews (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:113:76)\n    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:127:21)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:137:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:127:50)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:137:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:106:37)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:127:13)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:137:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:106:37)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "stack": "    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:127:13)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:137:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:106:37)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:127:80)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:137:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:106:37)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.filter",
+      "stack": "    at captureNativeInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:154:70)\n    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:127:80)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/private.ts:137:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.map",
+      "stack": "    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/intrinsic-mutation.ts:321:30)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:106:37)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3504:19\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3501:40)",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at publish (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:404:18)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:530:32)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:106:37)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3504:19\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3501:40)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "stack": "    at Object.runInvalidationGroup (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:422:32)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3502:41\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3501:40)\n    at updateSignals (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3502:5)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2412:7)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:386:20\n    at Object.runInvalidationGroup (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3502:41",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.push",
+      "stack": "    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:393:44\n    at Object.runInvalidationGroup (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3502:41",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at complete (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2625:17)\n    at updateSignals (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3507:9)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2412:7)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "stack": "    at EntityPublicationSource.complete (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:270:16)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2625:88\n    at complete (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2625:133)\n    at updateSignals (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:3507:9)\n    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2412:7)",
+      "calls": 200,
+      "visits": 200
+    },
+    {
+      "operation": "Array.every",
+      "stack": "    at nativeRequirementReady (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:122:123)\n    at Module.deliverNativeRequirementReady (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/lifecycle.ts:213:5)\n    at Object.complete (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/experimental-publication/entity.ts:234:36)\n    at EntityPublicationSource.complete (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/internals/entity-publication.ts:271:30)\n    at /private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2625:88",
+      "calls": 200,
+      "visits": 0
+    },
+    {
+      "operation": "Object.keys",
+      "stack": "    at updateOnePrivate (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:2426:20)\n    at Proxy.updateOne (/private/tmp/st-c21-point-bounded-alternatives/baseline/packages/kernel/src/lib/entity-signal.ts:4226:51)",
+      "calls": 200,
+      "visits": 200
+    }
+  ]
+}

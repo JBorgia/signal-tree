@@ -1,0 +1,62 @@
+[
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch equal whole actual-owner / confirm",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:31:70\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "classification": "preregistered historical receipt-oracle conflict; inspect actual error"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch equal whole actual-owner / rollback",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:31:70\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "classification": "preregistered historical receipt-oracle conflict; inspect actual error"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch disposed held receipt releases waiter without settling owner",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:61:103\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "classification": "preregistered historical receipt-oracle conflict; inspect actual error"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/whole-value-new-keys.spec.tsx",
+    "name": "publishes newly supplied ordinary keys through the React facade",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:483:18)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:490:13\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35\n    at Object.replace (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:488:26)\n    at node.n (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:461:17)"
+      }
+    ],
+    "classification": "unclassified first failure; no runtime/fixture causality inferred"
+  }
+]

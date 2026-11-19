@@ -1,0 +1,8 @@
+{
+  "calls": 1,
+  "firstValue": 7,
+  "secondValue": 7,
+  "secondError": "Error: Selected continuation cannot replay",
+  "rollbackError": "undefined",
+  "value": 0
+}

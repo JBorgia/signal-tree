@@ -1,0 +1,45 @@
+
+> nx run kernel:test entity-granular-reactivity.spec.ts --testNamePattern=entityMap — collection queries are lazily derived \(13\.5\.0\) a single-entity update does not rebuild the collection --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-granular-reactivity.spec.ts --testNamePattern="entityMap — collection queries are lazily derived \(13\.5\.0\) a single-entity update does not rebuild the collection" --reporter=verbose --maxWorkers=1
+
+(node:38766) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:38786) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap granular reactivity > publishes a field and collection projection as one coherent state
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap granular reactivity > removal releases the entity: held reference reads undefined, byId absent
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap granular reactivity > re-add after removal works through a fresh byId
+ ✓ src/lib/entity-granular-reactivity.spec.ts > entityMap — collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection 82ms
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap — collection queries are lazily derived (13.5.0) > repeated collection reads between writes are cached
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap — collection queries are lazily derived (13.5.0) > map() stays a snapshot, not a live view
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap — tombstoned subjects stay distinct from later key reuse > does not let a held node revive when the same key is reused by a new subject
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap — tombstoned subjects stay distinct from later key reuse > a held FIELD reference also stays absent across key reuse by a new subject
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap — tombstoned subjects stay distinct from later key reuse > resolves internal acquired handles by subject, not by reused key address
+ ↓ src/lib/entity-granular-reactivity.spec.ts > entityMap — tombstoned subjects stay distinct from later key reuse > keeps acquired handles isolated when setAll reuses a tombstoned key
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 9 skipped (10)
+   Start at  16:40:45
+   Duration  1.14s (transform 543ms, setup 0ms, import 662ms, tests 83ms, environment 239ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

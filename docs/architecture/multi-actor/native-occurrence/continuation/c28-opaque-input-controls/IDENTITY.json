@@ -1,0 +1,15 @@
+{
+  "c27": {
+    "source": "/private/tmp/st-c27-public-composition/candidate",
+    "manifestSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+    "changedFromC27": []
+  },
+  "c28": {
+    "source": "/private/tmp/st-c28-current-certificate/runtime-only-replay/candidate",
+    "manifestSha256": "00d6f0acb5d8c6cec6f5f9c8e8537194dd25cb6624516f2c211f47d11a441212",
+    "changedFromC27": [
+      "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "packages/kernel/src/lib/experimental-publication/private.ts"
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "cwd": "/private/tmp/st-r4-review-resumed/c8-candidate",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "c8-review-composition.spec.ts",
+    "--testNamePattern=membership readiness error",
+    "--maxWorkers=1"
+  ]
+}

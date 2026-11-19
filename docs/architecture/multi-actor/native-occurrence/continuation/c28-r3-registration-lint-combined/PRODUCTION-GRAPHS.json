@@ -1,0 +1,84 @@
+{
+  "consumer": {
+    "retainedOptionalInputs": {
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/index.js": 1398,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/lifecycle.js": 15841,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/recipient-occurrence.js": 3800,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/projection.js": 312,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/private.js": 24114,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": 9015,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/link.js": 8416,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/batching/batching.js": 2497,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/order-boundary-evidence.js": 3496,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/restoration.js": 49700,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/occupancy-composition.js": 925,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/transactions.js": 53016,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/devtools/devtools.js": 202
+    },
+    "entityFactory": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js"
+    ],
+    "link": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/link.js"
+    ]
+  },
+  "lifecycle-consumer": {
+    "retainedOptionalInputs": {
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/index.js": 1398,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/lifecycle.js": 15841,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/recipient-occurrence.js": 3800,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/projection.js": 312,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/private.js": 24114,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": 9015,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/link.js": 8416,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/batching/batching.js": 2497,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/order-boundary-evidence.js": 3496,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/restoration.js": 49700,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/occupancy-composition.js": 925,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/transactions.js": 53016,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/devtools/devtools.js": 202
+    },
+    "entityFactory": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js"
+    ],
+    "link": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/link.js"
+    ]
+  },
+  "receipt-consumer": {
+    "retainedOptionalInputs": {
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/index.js": 1398,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/lifecycle.js": 15841,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/recipient-occurrence.js": 3800,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/projection.js": 312,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/private.js": 24114,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": 9015,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/link.js": 8416,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/batching/batching.js": 2497,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/order-boundary-evidence.js": 3496,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/restoration.js": 49700,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/occupancy-composition.js": 925,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/transactions.js": 53016,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/devtools/devtools.js": 202
+    },
+    "entityFactory": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js"
+    ],
+    "link": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/link.js"
+    ]
+  },
+  "no-link": {
+    "retainedOptionalInputs": {
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/index.js": 1398,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/lifecycle.js": 11983,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/projection.js": 36,
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/private.js": 17837,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/restoration/order-boundary-evidence.js": 3496,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/occupancy-composition.js": 925,
+      "../consumer/node_modules/@signal-tree/kernel/dist/enhancers/transactions/transactions.js": 52742
+    },
+    "entityFactory": [],
+    "link": []
+  }
+}

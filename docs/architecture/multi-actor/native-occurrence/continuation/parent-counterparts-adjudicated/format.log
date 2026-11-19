@@ -1,0 +1,3 @@
+packages/vue/src/lib/parent-freshness-counterparts.spec.ts 244ms
+packages/solid/src/lib/parent-freshness-counterparts.spec.ts 27ms
+packages/react/src/parent-freshness-counterparts.spec.tsx 28ms

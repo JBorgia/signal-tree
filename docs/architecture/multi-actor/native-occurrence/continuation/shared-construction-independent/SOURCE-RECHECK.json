@@ -1,0 +1,13 @@
+{
+  "manifestSha256": "f63ade892aa381b827f1db54986fbb2ca787cb1bde497847104bd0a40bd9dffe",
+  "files": 2982,
+  "reviewCopyMismatches": [],
+  "authorMismatches": [],
+  "changedFromPrior": [
+    "packages/angular/src/lib/keyed-construction-cleanup.spec.ts",
+    "packages/kernel/src/lib/internals/construction-allocation.ts",
+    "packages/kernel/src/lib/internals/materialize-markers.ts",
+    "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts",
+    "packages/kernel/src/lib/signal-tree.ts"
+  ]
+}

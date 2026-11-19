@@ -1,0 +1,125 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -8,6 +8,26 @@
+ const sources=new Map<number,Source>();
+ const authentic=new WeakMap<object,OwnerCell>();
+ const pending=new Set<OwnerCell>();
++// Comparison-only chronology. Weak exact-cell keys never retain owner history.
++let confirmationSerial=0n;
++const firstConfirmation=new WeakMap<OwnerCell,bigint>();
++export type ComparisonAdmission=Readonly<{cutoff:bigint;protectedOwners:readonly OwnerCell[]}>;
++export function comparisonCutoff():bigint{return confirmationSerial;}
++export function comparisonAdmission(cutoff:bigint,invocation:NativeRequirement):ComparisonAdmission {
++ return Object.freeze({cutoff,protectedOwners:Object.freeze([...new Set([
++  ...invocation.inputs.flatMap(input=>input.owners),
++  ...invocation.frames.flatMap(frame=>[...frame.protectedOwners]),
++ ])])});
++}
++/** Disposable views only: never use this predicate for source or operation cleanup. */
++export function comparisonObligations(proof:Readonly<Proof>,admission:ComparisonAdmission):Proof {
++ const protectedOwners=new Set(admission.protectedOwners);
++ const eligible=new Set([...(proof.input??[]),...(proof.validation??[])].filter(cell=>{
++  const confirmed=firstConfirmation.get(cell);
++  return confirmed!==undefined&&confirmed<=admission.cutoff&&cell.outcome==='confirmed'&&!protectedOwners.has(cell);
++ }));
++ return currentObligations(proof,eligible);
++}
+ const queuedConnections=new Set<object>();
+ let wakeQueued=false;
+ export function registerOwnerSource(owner:number,token:object):void {if(!sources.has(owner))sources.set(owner,{token,cells:new Map()});}
+@@ -60,6 +80,7 @@
+  if(!['confirmed','rolled-back','abandoned'].includes(event.kind))return;
+  const outcome=event.kind as Exclude<Outcome,'pending'>;
+  if(cell.outcome!=='pending'&&cell.outcome!==outcome)throw Error('Terminal publication dependency outcome reversed');
++ if(cell.outcome==='pending'&&outcome==='confirmed')firstConfirmation.set(cell,++confirmationSerial);
+  cell.outcome=outcome;pending.delete(cell);
+  // Synchronous normal/recovery handle enrollment can still obtain this cell.
+  const retired=cell;queueMicrotask(()=>{if(source.cells.get(retired.id)===retired&&retired.outcome!=='pending')source.cells.delete(retired.id);});
+@@ -406,6 +427,12 @@
+ /** Only a matching declaration may use declared early admission. */
+ export function hasDeclaration(channel:object,revision:object):boolean {
+  return connections.get(channel)?.ops.get(revision)?.declared===true;
++}
++/** Operand completion, not owner settlement. No mutation or permission grant. */
++export function comparisonRevisionReady(channel:object,revision:object):boolean {
++ const op=connections.get(channel)?.ops.get(revision);
++ return !!op&&!op.frames.size&&!op.projectionPending&&projectionReady(op)&&
++  (!op.native||nativeRequirementReady(op.native));
+ }
+ export function noWrite(channel:object,revision:object):void {
+  const c=connections.get(channel),op=c?.ops.get(revision);if(!op)return;
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -21,7 +21,7 @@
+ type Fact=Readonly<{revision:number;clean:boolean;blockers:readonly Cell[];unknown:boolean}>;
+ type Slot=Readonly<{branch:object;key:string;child:object;address?:readonly string[]}>;
+ type Presence=Readonly<{present:boolean;fact:Fact}>;
+-type Unit={relevance?:lifecycle.CurrentRelevance;collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;invocation?:lifecycle.NativeRequirement;releaseInvocation?:()=>void;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
++type Unit={comparison?:lifecycle.ComparisonAdmission;relevance?:lifecycle.CurrentRelevance;collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;invocation?:lifecycle.NativeRequirement;releaseInvocation?:()=>void;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+@@ -50,6 +50,9 @@
+ type Binding={legacyScalars:LegacyScalar[];index:RecipientOccurrences;occurrences:Map<object,OccurrenceHandle>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;delivery:DeliveryState;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
++// Only the exact completed aggregate version qualifies. Later replacements do
++// not inherit this witness; no historical Fact graph or closure epoch is needed.
++const reducedComparisonProofs=new WeakSet<Proof>();
+ const ownProofs=new WeakMap<Fact,Proof>();
+ const factRequirements=new WeakMap<Fact,lifecycle.NativeRequirement>();
+ const factChannels=new WeakMap<Fact,object>();
+@@ -159,6 +162,7 @@
+     const selected=nativeValues.get(node)!,priorView=nativeViews.get(node),priorRequirement=priorView?.requirement;
+     return {record:{writes:[{map:nativeViews,key:node,value:{requirement:selected.requirement as lifecycle.NativeRequirement}}],adds:[]},completion:{requirement:selected.requirement},validate:()=>{if(nativeValues.get(node)!==selected||nativeViews.get(node)!==priorView||priorView?.requirement!==priorRequirement)throw new Error('Scalar physical view changed before installation');}};
+    }
++   const comparisonCutoff=lifecycle.comparisonCutoff();
+    const predecessor=nativeValues.get(node)!;
+    const existingView=nativeViews.get(node), physicalRequirement=existingView?.requirement;
+    const authored=mutation.changed?nativeAuthorship(node):{known:[],unknown:false};
+@@ -185,7 +189,7 @@
+    const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted&&!relevance?.size?prepared.requirement:lifecycle.combineScalarNativeRequirements(admitted?[prepared.requirement]:[retained.requirement as lifecycle.NativeRequirement,prepared.requirement],relevance);
+    const endpoint=requirement===retained.requirement?retained:Object.freeze({...retained,requirement});
+    const view=mutation.changed||mutation.physicalChanged||!existingView||existingView.requirement!==requirement?{requirement}:existingView;
+-   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view}],adds:[]})!,completion:{requirement,activation:prepared.requirement,relevance},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
++   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view}],adds:[]})!,completion:{requirement,activation:prepared.requirement,relevance,comparison:lifecycle.comparisonAdmission(comparisonCutoff,prepared.requirement)},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
+   },
+   complete:(completion)=>{const unit=completion as {activation?:lifecycle.NativeRequirement;requirement?:lifecycle.NativeRequirement};lifecycle.completeScalarNativeRequirement(unit.requirement,unit.activation??unit.requirement);},
+  };
+@@ -344,9 +348,15 @@
+    b.completedValueFact=unit.fact;b.valuePayload=unit.payload;
+   }
+   const support=projectionSupport(b);const effective=unit.selected?combineProofs([support.proof,lifecycle.nativeProof(unit.selected)]):support.proof;
+-  proofs.set(unit.fact,lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0));
++  const stored=lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0);
++  proofs.set(unit.fact,stored);
++  const reduced=b.index.unresolved()===0&&lifecycle.comparisonRevisionReady(channel,unit.fact)&&
++   (!unit.native||lifecycle.nativeRequirementReady(unit.native))&&
++   (!unit.selected||lifecycle.nativeRequirementReady(unit.selected));
++  if(reduced)reducedComparisonProofs.add(stored);
+   const prior=unit.previous&&proofs.get(unit.previous);
+-  const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior&&lifecycle.currentObligations(prior,unit.relevance),lifecycle.currentObligations(effective,unit.relevance));
++  const comparison=unit.comparison&&reduced&&prior&&reducedComparisonProofs.has(prior)?unit.comparison:undefined;
++  const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior&&(comparison?lifecycle.comparisonObligations(prior,comparison):lifecycle.currentObligations(prior,unit.relevance)),comparison?lifecycle.comparisonObligations(effective,comparison):lifecycle.currentObligations(effective,unit.relevance));
+   if(noop){
+    lifecycle.noWrite(channel,unit.fact);
+    const predecessor=effectivePredecessor(unit.previous);noopPredecessors.set(unit.fact,predecessor);
+@@ -360,7 +370,7 @@
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+    selectProjection(b,unit.fact,support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined),unit.changed);
+   }
+-  unit.relevance=undefined;unit.payload=undefined;b.pending.delete(unit);unit.resolve();
++  unit.comparison=undefined;unit.relevance=undefined;unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+  if(!b.pending.size)drainLegacyScalars(channel,b);
+  }finally{b.delivery.reducing=false;}
+@@ -389,7 +399,8 @@
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);scalarFacts.add(fact);mutation.publicationPredecessors?.set(channel,fact);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+  const relevance=(nativeUnit as {relevance?:lifecycle.CurrentRelevance}|undefined)?.relevance;
+- const unit:Unit={relevance,native,invocation:(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
++ const comparison=(nativeUnit as {comparison?:lifecycle.ComparisonAdmission}|undefined)?.comparison;
++ const unit:Unit={comparison,relevance,native,invocation:(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
+  const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,uncertainty,fact.blockers,native,b.aggregate,(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation??native,relevance);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};

@@ -1,0 +1,20 @@
+[
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "69a5735f61ec3a6ea8b2df560357d9c6e3cc577cf520f82ec5161161a8bd127b",
+    "archiveSha256": "69a5735f61ec3a6ea8b2df560357d9c6e3cc577cf520f82ec5161161a8bd127b"
+  },
+  {
+    "source": "OWNER-HISTORY.md",
+    "archive": "OWNER-HISTORY.md",
+    "sourceSha256": "1324b944aca5cf3beb1f42d415faa1f1cb00343d3dc19a1576969b04bcf53aa3",
+    "archiveSha256": "1324b944aca5cf3beb1f42d415faa1f1cb00343d3dc19a1576969b04bcf53aa3"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "f456ac9737f2286caa0ad26f43bc39c7f3fe45439f4536a578ba1dd32d7bc789",
+    "archiveSha256": "f456ac9737f2286caa0ad26f43bc39c7f3fe45439f4536a578ba1dd32d7bc789"
+  }
+]

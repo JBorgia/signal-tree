@@ -1,0 +1,10 @@
+{
+  "source": "/private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules",
+  "command": [
+    "cp",
+    "-cR",
+    "/private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules",
+    "/private/tmp/st-parent-freshness-resumed/test-promotion/candidate/node_modules"
+  ],
+  "note": "private clone; no dependency install or original writes"
+}

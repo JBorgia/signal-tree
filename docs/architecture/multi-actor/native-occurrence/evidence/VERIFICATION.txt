@@ -1,0 +1,1 @@
+Verified candidate 2918-file source manifest, full predecessor manifest, and three unchanged original fixture byte comparisons. No source changed during evidence finalization.

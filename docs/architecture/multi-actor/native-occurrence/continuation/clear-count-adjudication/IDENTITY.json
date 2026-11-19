@@ -1,0 +1,16 @@
+{
+  "sources": {
+    "c10": {
+      "verified": 3042,
+      "mismatches": []
+    },
+    "c8a": {
+      "verified": 3031,
+      "mismatches": []
+    }
+  },
+  "companion": {
+    "path": "packages/kernel/src/lib/clear-find-attribution-review.spec.ts",
+    "sha256": "f62dfb6256a8402cff1e6c62f8ecb42117ee52ebbd48483ea8baac31f6692111"
+  }
+}

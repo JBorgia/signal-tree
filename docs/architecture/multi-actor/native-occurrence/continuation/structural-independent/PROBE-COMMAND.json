@@ -1,0 +1,12 @@
+[
+  "corepack",
+  "pnpm",
+  "nx",
+  "test",
+  "kernel",
+  "--skip-nx-cache",
+  "independent-structural-probe.spec.ts",
+  "--reporter=json",
+  "--outputFile=/private/tmp/st-structural-admission-independent/probe-vitest.json",
+  "--maxWorkers=1"
+]

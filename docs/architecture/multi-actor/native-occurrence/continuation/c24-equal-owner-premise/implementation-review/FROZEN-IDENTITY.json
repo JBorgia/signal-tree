@@ -1,0 +1,12 @@
+{
+  "freezeSha256": "e300477a22517723faeb0ebd3f2c16ebee8d41a73f5c6c3c24f78287f5e883f7",
+  "manifestSha256": "cb54add521dafd9ec875b87d6c19f85de38e4b56d0c79c147a7c3c3e41306bcd",
+  "freezeArtifactMismatches": [],
+  "capturedRuntimeFiles": 181,
+  "captureVsFrozenManifestMismatches": [],
+  "captureVsCandidateMismatches": [],
+  "uninstrumentedCopies": {
+    "private": true,
+    "lifecycle": true
+  }
+}

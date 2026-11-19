@@ -1,0 +1,9 @@
+🔍 Verifying dev-only code folds when ngDevMode is defined false
+
+✅ signaltree-bare        20.26KB → 17.91KB gzip (−2.34KB)
+❌ signaltree-entities    46.62KB → 43.71KB gzip (−2.91KB)
+   ↳ diagnostic literals survived: ST2026 — these ship to production even with ngDevMode=false. Check that every guard is a bare `ngDevMode` comparison, not a function call.
+
+❌ Dev code is NOT fully foldable — consumers defining ngDevMode=false reclaim ~2.63KB gzip per tree.
+
+See docs/performance/dropping-dev-code.md for the guard shape and the per-bundler recipes this gate protects.

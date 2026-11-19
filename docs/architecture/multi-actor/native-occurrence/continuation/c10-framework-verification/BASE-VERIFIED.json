@@ -1,0 +1,16 @@
+{
+  "manifest": "/private/tmp/st-native-combined-c10-promoted/SNAPSHOT.json",
+  "manifestSha256": "de88e207c66e65a1a191d05ab4f2b5b2a4deeead71a06f239f278e28dee70dc4",
+  "files": 3042,
+  "mismatches": [],
+  "cwd": "/private/tmp/st-native-combined-c10-promoted/candidate",
+  "dependencyRealPath": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "rootLockMatches": true,
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+  "versions": {
+    "node": "v24.15.0",
+    "pnpm": "10.17.0"
+  },
+  "ST_PREPARED_REVIEW_OUTPUT": "unset",
+  "kernelAndBuilds": "not run"
+}

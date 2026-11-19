@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel independent-observation-wrapper-gc.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T18:12:59.750Z",
+    "endTime": "2026-11-02T18:13:04.566Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "9623949910040643026",
+      "startTime": "2026-11-02T18:12:59.817Z",
+      "endTime": "2026-11-02T18:13:04.564Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

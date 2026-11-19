@@ -1,0 +1,2050 @@
+{
+  "inputs": {
+    "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js": {
+      "bytes": 2229,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/production-substrate-stats.prod.js": {
+      "bytes": 98,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/cell-identity.js": {
+      "bytes": 301,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/leaf.js": {
+      "bytes": 521,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/observation-adapter.js": {
+      "bytes": 211,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js": {
+      "bytes": 2027,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js": {
+      "bytes": 10245,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "kind": "import-statement",
+          "original": "./cell-identity.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/leaf.js",
+          "kind": "import-statement",
+          "original": "../leaf.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "kind": "import-statement",
+          "original": "./observation-adapter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./intrinsic-mutation.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/constants.js": {
+      "bytes": 581,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/index.js": {
+      "bytes": 2177,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/constants.js",
+          "kind": "import-statement",
+          "original": "../lib/constants.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js": {
+      "bytes": 620,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js": {
+      "bytes": 979,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js": {
+      "bytes": 428,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js": {
+      "bytes": 935,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js": {
+      "bytes": 2097,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "./owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./location-runtime.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js": {
+      "bytes": 529,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js": {
+      "bytes": 7731,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "./owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "kind": "import-statement",
+          "original": "./path-observation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "kind": "import-statement",
+          "original": "./snapshot-authority.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "kind": "import-statement",
+          "original": "./tree-scalar-slot-port.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/write-context.js": {
+      "bytes": 251,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/owned-mutation.js": {
+      "bytes": 2969,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "kind": "import-statement",
+          "original": "./path-observation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "./owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./intrinsic-mutation.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js": {
+      "bytes": 1867,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js": {
+      "bytes": 310,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/materialize-markers.js": {
+      "bytes": 7602,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./intrinsic-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "kind": "import-statement",
+          "original": "./observation-adapter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "kind": "import-statement",
+          "original": "./cell-identity.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js",
+          "kind": "import-statement",
+          "original": "./runtime-tree-plan.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "kind": "import-statement",
+          "original": "./snapshot-authority.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "kind": "import-statement",
+          "original": "./path-observation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "./member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/observation-substrate.js": {
+      "bytes": 2835,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "kind": "import-statement",
+          "original": "./owned-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "./member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./intrinsic-mutation.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/root-source.js": {
+      "bytes": 495,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js": {
+      "bytes": 1743,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "kind": "import-statement",
+          "original": "./error-reporter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js": {
+      "bytes": 5353,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./intrinsic-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/production-substrate-stats.prod.js",
+          "kind": "import-statement",
+          "original": "./production-substrate-stats.prod.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js": {
+      "bytes": 3039,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js",
+          "kind": "import-statement",
+          "original": "./tree-scalar-slot-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "kind": "import-statement",
+          "original": "./observation-adapter.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/physical-commit-clock.js": {
+      "bytes": 727,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/tree-capabilities.js": {
+      "bytes": 2167,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js": {
+      "bytes": 1433,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/utils.js": {
+      "bytes": 5555,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "kind": "import-statement",
+          "original": "./internals/cell-identity.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "kind": "import-statement",
+          "original": "./internals/snapshot-authority.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "kind": "import-statement",
+          "original": "./internals/utilities/is-built-in-object.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "./internals/member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "kind": "import-statement",
+          "original": "./internals/materialize-markers.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./internals/node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/merge-derived.js": {
+      "bytes": 1607,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/cell-identity.js",
+          "kind": "import-statement",
+          "original": "./cell-identity.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/utils.js",
+          "kind": "import-statement",
+          "original": "../utils.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/enhancer-types.js": {
+      "bytes": 78,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js": {
+      "bytes": 1973,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/signal-tree.js": {
+      "bytes": 30696,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "kind": "import-statement",
+          "original": "./internals/error-reporter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/production-substrate-stats.prod.js",
+          "kind": "import-statement",
+          "original": "./internals/production-substrate-stats.prod.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/observation-adapter.js",
+          "kind": "import-statement",
+          "original": "./internals/observation-adapter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/constants.js",
+          "kind": "import-statement",
+          "original": "./constants.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/index.js",
+          "kind": "import-statement",
+          "original": "../enhancers/index.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "./internals/member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "kind": "import-statement",
+          "original": "./internals/owned-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./internals/owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "kind": "import-statement",
+          "original": "./internals/materialize-markers.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "kind": "import-statement",
+          "original": "./internals/path-observation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "kind": "import-statement",
+          "original": "./internals/observation-substrate.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "./internals/owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/root-source.js",
+          "kind": "import-statement",
+          "original": "./internals/root-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./internals/position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/mutation-capture-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "kind": "import-statement",
+          "original": "./internals/tree-scalar-slot-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/tree-scalar-leaf-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "kind": "import-statement",
+          "original": "./internals/physical-commit-clock.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-capabilities.js",
+          "kind": "import-statement",
+          "original": "./internals/tree-capabilities.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/merge-derived.js",
+          "kind": "import-statement",
+          "original": "./internals/merge-derived.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/leaf.js",
+          "kind": "import-statement",
+          "original": "./leaf.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/utils.js",
+          "kind": "import-statement",
+          "original": "./utils.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "kind": "import-statement",
+          "original": "./internals/snapshot-authority.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./internals/node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/enhancer-types.js",
+          "kind": "import-statement",
+          "original": "./enhancer-types.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "./internals/utilities/deep-equal.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js",
+          "kind": "import-statement",
+          "original": "./internals/utilities/is-built-in-object.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/readonly.js": {
+      "bytes": 69,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/types.js": {
+      "bytes": 345,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/restoration-eligibility.js": {
+      "bytes": 1220,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/undoable.js": {
+      "bytes": 171,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/restoration-eligibility.js",
+          "kind": "import-statement",
+          "original": "./internals/restoration-eligibility.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/external.js": {
+      "bytes": 819,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "./write-context.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js": {
+      "bytes": 20805,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/production-substrate-stats.prod.js",
+          "kind": "import-statement",
+          "original": "./production-substrate-stats.prod.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/utils.js",
+          "kind": "import-statement",
+          "original": "../utils.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "kind": "import-statement",
+          "original": "./path-observation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "./member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js",
+          "kind": "import-statement",
+          "original": "./snapshot-authority.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "kind": "import-statement",
+          "original": "./tree-scalar-slot-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "./utilities/deep-equal.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/write-observation-scope.js": {
+      "bytes": 1516,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/write-participation.js": {
+      "bytes": 270,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/path-notifier.js": {
+      "bytes": 12067,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "./write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/write-observation-scope.js",
+          "kind": "import-statement",
+          "original": "./internals/write-observation-scope.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/restoration-eligibility.js",
+          "kind": "import-statement",
+          "original": "./internals/restoration-eligibility.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-participation.js",
+          "kind": "import-statement",
+          "original": "./write-participation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js",
+          "kind": "import-statement",
+          "original": "./internals/path-observation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js",
+          "kind": "import-statement",
+          "original": "./internals/plain-branch-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "kind": "import-statement",
+          "original": "./internals/error-reporter.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/link-state-source.js": {
+      "bytes": 559,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/entity-projection-seed.js": {
+      "bytes": 805,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/source-mutation.js": {
+      "bytes": 1773,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/entity-egress-projection.js": {
+      "bytes": 2946,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/source-mutation.js",
+          "kind": "import-statement",
+          "original": "./source-mutation.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/commit-consequence.js": {
+      "bytes": 3490,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../write-context.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/link.js": {
+      "bytes": 11983,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js",
+          "kind": "import-statement",
+          "original": "./internals/plain-branch-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "./internals/utilities/deep-equal.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./internals/node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/external.js",
+          "kind": "import-statement",
+          "original": "./external.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./internals/owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "kind": "import-statement",
+          "original": "./path-notifier.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "kind": "import-statement",
+          "original": "./internals/error-reporter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./internals/position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/observation-substrate.js",
+          "kind": "import-statement",
+          "original": "./internals/observation-substrate.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/link-state-source.js",
+          "kind": "import-statement",
+          "original": "./internals/link-state-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-participation.js",
+          "kind": "import-statement",
+          "original": "./write-participation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "kind": "import-statement",
+          "original": "./internals/entity-projection-seed.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/mutation-capture-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-egress-projection.js",
+          "kind": "import-statement",
+          "original": "./internals/entity-egress-projection.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/source-mutation.js",
+          "kind": "import-statement",
+          "original": "./internals/source-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/root-source.js",
+          "kind": "import-statement",
+          "original": "./internals/root-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/commit-consequence.js",
+          "kind": "import-statement",
+          "original": "./internals/commit-consequence.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/visit-tree.js": {
+      "bytes": 645,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/batching/batching.js": {
+      "bytes": 6083,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../../lib/write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/restoration-eligibility.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/restoration-eligibility.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/visit-tree.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/visit-tree.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/enhancer-types.js",
+          "kind": "import-statement",
+          "original": "../../lib/enhancer-types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/restoration/order-boundary-evidence.js": {
+      "bytes": 3267,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/pending-rollback.js": {
+      "bytes": 9000,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/exposed-publication.js": {
+      "bytes": 452,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "kind": "import-statement",
+          "original": "../path-notifier.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js",
+          "kind": "import-statement",
+          "original": "./plain-branch-membership.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/transient-rows.js": {
+      "bytes": 1448,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/restoration-source.js": {
+      "bytes": 468,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js": {
+      "bytes": 825,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./position-registry.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/physical-rows.js": {
+      "bytes": 164,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/post-application-failure.js": {
+      "bytes": 718,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../location-runtime.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/subject-restoration-claims.js": {
+      "bytes": 2317,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/subject-reclamation-sink.js": {
+      "bytes": 1348,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/subject-restoration-claims.js",
+          "kind": "import-statement",
+          "original": "./subject-restoration-claims.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/intercept-leaf-signals.js": {
+      "bytes": 6036,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "./node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "kind": "import-statement",
+          "original": "./materialize-markers.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "./owned-metadata.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./intrinsic-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/visit-tree.js",
+          "kind": "import-statement",
+          "original": "./visit-tree.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/physical/prepare-structural-target.js": {
+      "bytes": 1969,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js": {
+      "bytes": 1907,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/physical/prepare-entity-target.js": {
+      "bytes": 4723,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/physical/prepare-structural-target.js",
+          "kind": "import-statement",
+          "original": "./prepare-structural-target.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "kind": "import-statement",
+          "original": "../internals/entity-membership-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "kind": "import-statement",
+          "original": "../internals/utilities/deep-clone.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "../internals/utilities/deep-equal.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/utilities/append-all.js": {
+      "bytes": 105,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/target-transition.js": {
+      "bytes": 21557,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/physical/prepare-entity-target.js",
+          "kind": "import-statement",
+          "original": "../../physical/prepare-entity-target.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/append-all.js",
+          "kind": "import-statement",
+          "original": "../utilities/append-all.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/scoped-value-addressing.js": {
+      "bytes": 222,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js": {
+      "bytes": 48308,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js",
+          "kind": "import-statement",
+          "original": "../plain-branch-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "kind": "import-statement",
+          "original": "../../path-notifier.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../../write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "kind": "import-statement",
+          "original": "../utilities/deep-clone.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "kind": "import-statement",
+          "original": "../physical-commit-clock.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "../position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "kind": "import-statement",
+          "original": "../tree-scalar-slot-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/visit-tree.js",
+          "kind": "import-statement",
+          "original": "../visit-tree.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "../owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/post-application-failure.js",
+          "kind": "import-statement",
+          "original": "./post-application-failure.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "kind": "import-statement",
+          "original": "../entity-membership-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/scoped-value-addressing.js",
+          "kind": "import-statement",
+          "original": "./scoped-value-addressing.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "../node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "../owned-metadata.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/transaction-lifecycle.js": {
+      "bytes": 1922,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/restoration/restoration.js": {
+      "bytes": 86536,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/restoration/order-boundary-evidence.js",
+          "kind": "import-statement",
+          "original": "./order-boundary-evidence.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/pending-rollback.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/pending-rollback.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/exposed-publication.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/exposed-publication.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/transient-rows.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/transient-rows.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/restoration-source.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/restoration-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/entity-membership-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/plain-branch-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/physical-rows.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/post-application-failure.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/post-application-failure.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/subject-reclamation-sink.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/subject-reclamation-sink.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/subject-restoration-claims.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/subject-restoration-claims.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/tree-scalar-slot-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/root-source.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/root-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/utils.js",
+          "kind": "import-statement",
+          "original": "../../lib/utils.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intercept-leaf-signals.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/intercept-leaf-signals.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/mutation-capture-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/target-transition.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/target-transition.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/tree-realization-adapter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/transaction-lifecycle.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/transaction-lifecycle.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/restoration-eligibility.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/restoration-eligibility.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/visit-tree.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/visit-tree.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-participation.js",
+          "kind": "import-statement",
+          "original": "../../lib/write-participation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "kind": "import-statement",
+          "original": "../../lib/path-notifier.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../../lib/write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/append-all.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/utilities/append-all.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/enhancer-types.js",
+          "kind": "import-statement",
+          "original": "../../lib/enhancer-types.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/utilities/deep-equal.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/node-shape.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/transaction-lifecycle-source.js": {
+      "bytes": 264,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/applied-turn-projection.js": {
+      "bytes": 5631,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/realization-context.js": {
+      "bytes": 2386,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/turn-store.js": {
+      "bytes": 7142,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js": {
+      "bytes": 76280,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/exposed-publication.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/exposed-publication.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/plain-branch-membership.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/plain-branch-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/physical-rows.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/post-application-failure.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/post-application-failure.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/subject-restoration-claims.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/subject-restoration-claims.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-participation.js",
+          "kind": "import-statement",
+          "original": "../../lib/write-participation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/types.js",
+          "kind": "import-statement",
+          "original": "../../lib/types.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/commit-consequence.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/commit-consequence.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/transaction-lifecycle-source.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/transaction-lifecycle-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/entity-membership-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/applied-turn-projection.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/applied-turn-projection.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/target-transition.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/target-transition.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/pending-rollback.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/pending-rollback.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/transaction-lifecycle.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/transaction-lifecycle.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/realization-context.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/realization-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/tree-realization-adapter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/causal-runtime/turn-store.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/causal-runtime/turn-store.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intercept-leaf-signals.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/intercept-leaf-signals.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/mutation-capture-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/error-reporter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "kind": "import-statement",
+          "original": "../../lib/path-notifier.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/utilities/deep-equal.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/node-shape.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../../lib/write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/visit-tree.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/visit-tree.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/tree-scalar-slot-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/physical-commit-clock.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/physical-commit-clock.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/enhancer-types.js",
+          "kind": "import-statement",
+          "original": "../../lib/enhancer-types.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/owned-metadata.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/devtools/devtools-impl.js": {
+      "bytes": 30363,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/root-source.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/root-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/utils.js",
+          "kind": "import-statement",
+          "original": "../../lib/utils.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intercept-leaf-signals.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/intercept-leaf-signals.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/path-notifier.js",
+          "kind": "import-statement",
+          "original": "../../lib/path-notifier.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "../../lib/write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/append-all.js",
+          "kind": "import-statement",
+          "original": "../../lib/internals/utilities/append-all.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/enhancer-types.js",
+          "kind": "import-statement",
+          "original": "../../lib/enhancer-types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/enhancers/devtools/devtools.js": {
+      "bytes": 538,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/devtools/devtools-impl.js",
+          "kind": "import-statement",
+          "original": "./devtools-impl.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/enhancer-types.js",
+          "kind": "import-statement",
+          "original": "../../lib/enhancer-types.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js": {
+      "bytes": 3796,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "../internals/intrinsic-mutation.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js": {
+      "bytes": 479,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/physical/entity-value-store.js": {
+      "bytes": 793,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/physical/structural-store.js": {
+      "bytes": 9407,
+      "imports": [],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/entity-signal.js": {
+      "bytes": 66378,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js",
+          "kind": "import-statement",
+          "original": "./internals/intrinsic-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/location-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js",
+          "kind": "import-statement",
+          "original": "./internals/utilities/deep-clone.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js",
+          "kind": "import-statement",
+          "original": "./internals/utilities/deep-equal.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js",
+          "kind": "import-statement",
+          "original": "./physical/entity-mutation-frame.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js",
+          "kind": "import-statement",
+          "original": "./physical/entity-handle-resolution.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/physical/entity-value-store.js",
+          "kind": "import-statement",
+          "original": "./physical/entity-value-store.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/physical/structural-store.js",
+          "kind": "import-statement",
+          "original": "./physical/structural-store.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owned-mutation.js",
+          "kind": "import-statement",
+          "original": "./internals/owned-mutation.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js",
+          "kind": "import-statement",
+          "original": "./internals/entity-membership-source.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/write-context.js",
+          "kind": "import-statement",
+          "original": "./write-context.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/entity-projection-seed.js",
+          "kind": "import-statement",
+          "original": "./internals/entity-projection-seed.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "./internals/position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js",
+          "kind": "import-statement",
+          "original": "./internals/owner-invalidation-port.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js",
+          "kind": "import-statement",
+          "original": "./internals/member-membership.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/physical-rows.js",
+          "kind": "import-statement",
+          "original": "./internals/physical-rows.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "kind": "import-statement",
+          "original": "./internals/mutation-capture-runtime.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/lib/markers/entity-map.js": {
+      "bytes": 3462,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js",
+          "kind": "import-statement",
+          "original": "../internals/position-registry.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js",
+          "kind": "import-statement",
+          "original": "../internals/mutation-capture-runtime.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/entity-signal.js",
+          "kind": "import-statement",
+          "original": "../entity-signal.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/materialize-markers.js",
+          "kind": "import-statement",
+          "original": "../internals/materialize-markers.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/utils.js",
+          "kind": "import-statement",
+          "original": "../utils.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "candidate/dist/packages/kernel/dist/index.js": {
+      "bytes": 712,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/signal-tree.js",
+          "kind": "import-statement",
+          "original": "./lib/signal-tree.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/leaf.js",
+          "kind": "import-statement",
+          "original": "./lib/leaf.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/readonly.js",
+          "kind": "import-statement",
+          "original": "./lib/readonly.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/types.js",
+          "kind": "import-statement",
+          "original": "./lib/types.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/undoable.js",
+          "kind": "import-statement",
+          "original": "./lib/undoable.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/external.js",
+          "kind": "import-statement",
+          "original": "./lib/external.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js",
+          "kind": "import-statement",
+          "original": "./lib/internals/error-reporter.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/link.js",
+          "kind": "import-statement",
+          "original": "./lib/link.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/batching/batching.js",
+          "kind": "import-statement",
+          "original": "./enhancers/batching/batching.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/restoration/restoration.js",
+          "kind": "import-statement",
+          "original": "./enhancers/restoration/restoration.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+          "kind": "import-statement",
+          "original": "./enhancers/transactions/transactions.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/enhancers/devtools/devtools.js",
+          "kind": "import-statement",
+          "original": "./enhancers/devtools/devtools.js"
+        },
+        {
+          "path": "candidate/dist/packages/kernel/dist/lib/markers/entity-map.js",
+          "kind": "import-statement",
+          "original": "./lib/markers/entity-map.js"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js": {
+      "bytes": 375,
+      "imports": [
+        {
+          "path": "candidate/dist/packages/kernel/dist/index.js",
+          "kind": "import-statement",
+          "original": "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/dist/packages/kernel/dist/index.js"
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "signaltree-entities.js": {
+      "imports": [],
+      "exports": [],
+      "entryPoint": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js",
+      "inputs": {
+        "candidate/dist/packages/kernel/dist/lib/internals/error-reporter.js": {
+          "bytesInOutput": 1208
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/cell-identity.js": {
+          "bytesInOutput": 193
+        },
+        "candidate/dist/packages/kernel/dist/lib/leaf.js": {
+          "bytesInOutput": 297
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/observation-adapter.js": {
+          "bytesInOutput": 90
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js": {
+          "bytesInOutput": 1011
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/location-runtime.js": {
+          "bytesInOutput": 4228
+        },
+        "candidate/dist/packages/kernel/dist/lib/constants.js": {
+          "bytesInOutput": 399
+        },
+        "candidate/dist/packages/kernel/dist/enhancers/index.js": {
+          "bytesInOutput": 1398
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/node-shape.js": {
+          "bytesInOutput": 285
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/owned-metadata.js": {
+          "bytesInOutput": 222
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js": {
+          "bytesInOutput": 97
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/path-observation-port.js": {
+          "bytesInOutput": 223
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/snapshot-authority.js": {
+          "bytesInOutput": 712
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js": {
+          "bytesInOutput": 171
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/member-membership.js": {
+          "bytesInOutput": 3457
+        },
+        "candidate/dist/packages/kernel/dist/lib/write-context.js": {
+          "bytesInOutput": 31
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/owned-mutation.js": {
+          "bytesInOutput": 1264
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/position-registry.js": {
+          "bytesInOutput": 978
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js": {
+          "bytesInOutput": 143
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/materialize-markers.js": {
+          "bytesInOutput": 3773
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/observation-substrate.js": {
+          "bytesInOutput": 190
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/root-source.js": {
+          "bytesInOutput": 48
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js": {
+          "bytesInOutput": 745
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js": {
+          "bytesInOutput": 2863
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js": {
+          "bytesInOutput": 1539
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/physical-commit-clock.js": {
+          "bytesInOutput": 213
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/tree-capabilities.js": {
+          "bytesInOutput": 934
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js": {
+          "bytesInOutput": 1075
+        },
+        "candidate/dist/packages/kernel/dist/lib/utils.js": {
+          "bytesInOutput": 1730
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/merge-derived.js": {
+          "bytesInOutput": 999
+        },
+        "candidate/dist/packages/kernel/dist/lib/enhancer-types.js": {
+          "bytesInOutput": 42
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js": {
+          "bytesInOutput": 1517
+        },
+        "candidate/dist/packages/kernel/dist/lib/signal-tree.js": {
+          "bytesInOutput": 13690
+        },
+        "candidate/dist/packages/kernel/dist/index.js": {
+          "bytesInOutput": 0
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/entity-projection-seed.js": {
+          "bytesInOutput": 235
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/entity-membership-source.js": {
+          "bytesInOutput": 126
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/physical-rows.js": {
+          "bytesInOutput": 23
+        },
+        "candidate/dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js": {
+          "bytesInOutput": 1182
+        },
+        "candidate/dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js": {
+          "bytesInOutput": 2578
+        },
+        "candidate/dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js": {
+          "bytesInOutput": 230
+        },
+        "candidate/dist/packages/kernel/dist/lib/physical/entity-value-store.js": {
+          "bytesInOutput": 480
+        },
+        "candidate/dist/packages/kernel/dist/lib/physical/structural-store.js": {
+          "bytesInOutput": 7431
+        },
+        "candidate/dist/packages/kernel/dist/lib/entity-signal.js": {
+          "bytesInOutput": 36439
+        },
+        "candidate/dist/packages/kernel/dist/lib/markers/entity-map.js": {
+          "bytesInOutput": 2105
+        },
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js": {
+          "bytesInOutput": 137
+        }
+      },
+      "bytes": 96732
+    }
+  }
+}

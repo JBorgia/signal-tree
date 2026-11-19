@@ -1,0 +1,14 @@
+{
+  "cwd": "/private/tmp/st-c12-independent-framework-verification/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "react",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env_file": "/private/tmp/st-c12-independent-framework-verification/ENVIRONMENT.json",
+  "ST_PREPARED_REVIEW_OUTPUT": "unset"
+}

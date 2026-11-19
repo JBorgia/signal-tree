@@ -1,0 +1,44 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/dist/packages/vue/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm pack
+8 verbose argv "pack" "--pack-destination" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_43_01_875Z-
+10 verbose logfile /private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_43_01_875Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 notice
+14 notice 📦  @signal-tree/vue@16.0.0-dev
+15 notice Tarball Contents
+16 notice 11.0kB LICENSE
+16 notice 534B NOTICE
+16 notice 3.5kB README.md
+16 notice 493B dist/index.js
+16 notice 1.0kB dist/lib/construction-input.js
+16 notice 2.7kB dist/lib/vue-observation.js
+16 notice 12.4kB llms.txt
+16 notice 897B package.json
+16 notice 1.6kB src/index.d.ts
+16 notice 346B src/lib/carrier.d.ts
+16 notice 497B src/lib/construction-input.d.ts
+16 notice 147B src/lib/vue-observation.d.ts
+17 notice Tarball Details
+18 notice name: @signal-tree/vue
+19 notice version: 16.0.0-dev
+20 notice filename: signal-tree-vue-16.0.0-dev.tgz
+21 notice package size: 13.0 kB
+22 notice unpacked size: 35.2 kB
+23 notice shasum: b84561a34ad67b05717d559a0ff89243570193ee
+24 notice integrity: sha512-S+aFSG3ZKHajD[...]2ymxxI+gc3Qcg==
+25 notice total files: 12
+26 notice
+27 verbose cwd /private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/dist/packages/vue
+28 verbose os Darwin 25.2.0
+29 verbose node v24.15.0
+30 verbose npm  v11.12.1
+31 verbose exit 0
+32 info ok

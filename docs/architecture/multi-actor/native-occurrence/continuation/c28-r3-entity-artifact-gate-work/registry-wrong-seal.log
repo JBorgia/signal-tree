@@ -1,0 +1,12 @@
+file:///private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-gates.mjs:1733
+    throw new Error(`Release artifacts changed ${label}`);
+          ^
+
+Error: Release artifacts changed before gates
+    at assertArtifacts (file:///private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-gates.mjs:1733:11)
+    at file:///private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-gates.mjs:1735:24
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.15.0

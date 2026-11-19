@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-r3-compatibility-inventory/full-reporter.mjs",
+    "startTime": "2026-11-03T05:02:55.327Z",
+    "endTime": "2026-11-03T05:02:57.711Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14635177565887507392",
+      "startTime": "2026-11-03T05:02:55.359Z",
+      "endTime": "2026-11-03T05:02:57.710Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "confirm-1000-selected-sample0",
+  "ordinal": 40,
+  "profile": "confirm",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample0",
+  "exit": 0,
+  "pid": 70371,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.7615756249288097,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1015808,
+  "minimumObservedHostFreePercentage": 43.0,
+  "attempts": 1
+}

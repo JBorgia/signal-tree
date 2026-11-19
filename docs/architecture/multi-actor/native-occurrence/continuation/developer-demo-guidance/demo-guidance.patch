@@ -1,0 +1,576 @@
+--- a/apps/demo/src/app/app.routes.ts
++++ b/apps/demo/src/app/app.routes.ts
+@@ -80,6 +80,18 @@
+       title: 'External truth & Link',
+       description:
+         'One-shot external ingress, persistent endpoint relationships through Link, and application-owned request policy.',
++    },
++  },
++  {
++    path: 'independent-publication',
++    loadComponent: () =>
++      import('./pages/independent-publication/independent-publication.component').then(
++        (c) => c.IndependentPublicationComponent
++      ),
++    data: {
++      title: 'Independent publication · v16 development preview (unreleased)',
++      description:
++        'Publish a literal note while a route proposal stays pending. Local state, admission receipts and an in-memory endpoint remain distinct.',
+     },
+   },
+   {
+--- a/apps/demo/src/app/components/navigation/navigation.component.spec.ts
++++ b/apps/demo/src/app/components/navigation/navigation.component.spec.ts
+@@ -32,6 +32,7 @@
+         '/entities',
+         '/restoration',
+         '/external-truth',
++        '/independent-publication',
+       ],
+       ['/frameworks', '/docs', '/docs', '/docs', '/docs', '/docs'],
+       ['/benchmarks', '/devtools', '/deep-typing', '/architecture-overview'],
+--- a/apps/demo/src/app/components/navigation/navigation.component.ts
++++ b/apps/demo/src/app/components/navigation/navigation.component.ts
+@@ -99,6 +99,11 @@
+           title: 'Server updates',
+           route: '/external-truth',
+         },
++        {
++          id: 'independent-publication',
++          title: 'Independent publication · v16 preview',
++          route: '/independent-publication',
++        },
+       ],
+     },
+     {
+--- /dev/null
++++ b/apps/demo/src/app/pages/independent-publication/independent-publication.component.html
+@@ -0,0 +1,145 @@
++<div class="publication-page layout-frame">
++  <header class="page-header">
++    <p class="page-eyebrow">v16 development preview · Unreleased</p>
++    <h1>Publish a note while a route is still under review.</h1>
++    <p class="page-lede">
++      A route proposal can stay pending while an independently authored note
++      reaches its own endpoint. This tutorial uses the v16 development API; it
++      is not stable v15 guidance.
++    </p>
++  </header>
++
++  <section aria-labelledby="try-heading">
++    <h2 id="try-heading">Try one local review</h2>
++    <ol class="instructions">
++      <li>
++        Propose west. The visible route changes, but the proposal stays pending.
++      </li>
++      <li>
++        Publish the literal note. Its endpoint can receive it before route
++        review ends.
++      </li>
++      <li>
++        Reject the route to restore its previous value (north on the first
++        proposal), or confirm it to keep west. The note remains.
++      </li>
++    </ol>
++    <div class="actions">
++      <button
++        type="button"
++        data-action="propose"
++        (click)="proposeWest()"
++        [disabled]="hasPending() || publishing()"
++      >
++        1. Propose west
++      </button>
++      <button
++        type="button"
++        data-action="publish"
++        (click)="publishIndependentNote()"
++        [disabled]="!hasPending() || publishing()"
++      >
++        2. Publish independent note
++      </button>
++      <button
++        type="button"
++        data-action="reject"
++        (click)="reject()"
++        [disabled]="!hasPending() || publishing()"
++      >
++        3. Reject route locally
++      </button>
++      <button
++        type="button"
++        data-action="confirm"
++        (click)="confirm()"
++        [disabled]="!hasPending() || publishing()"
++      >
++        3. Confirm route locally
++      </button>
++    </div>
++    <div class="state-grid" aria-live="polite" aria-atomic="true">
++      <article class="state-card">
++        <h3>Visible tree state</h3>
++        <dl>
++          <dt>Route</dt>
++          <dd data-testid="route">{{ tree.$.route() }}</dd>
++          <dt>Proposal</dt>
++          <dd data-testid="proposal">{{ decision() }}</dd>
++          <dt>Note</dt>
++          <dd>{{ tree.$.note() || 'No note yet' }}</dd>
++        </dl>
++      </article>
++      <article class="state-card">
++        <h3>Admission snapshot</h3>
++        <p>
++          <code data-testid="admission">{{
++            admission()?.state ?? 'No declaration yet'
++          }}</code>
++        </p>
++        <p>
++          Read from <code>receipt.read()</code> after this action. A receipt is
++          not a signal or a delivery acknowledgment.
++        </p>
++      </article>
++      <article class="state-card">
++        <h3>In-memory endpoint</h3>
++        <p data-testid="endpoint">
++          {{ deliveredNotes().at(-1) ?? 'No delivery yet' }}
++        </p>
++        <p>
++          Delivered notes: <strong>{{ deliveredNotes().length }}</strong>
++        </p>
++        <p>
++          This list changes only when the Link endpoint's <code>set</code> runs.
++        </p>
++      </article>
++    </div>
++    @if (publishing()) {
++    <p role="status">Waiting for the note Link to settle…</p>
++    } @if (error(); as message) {
++    <p role="alert">Note publication failed: {{ message }}</p>
++    }
++    <p class="aside">
++      Publish the same literal again while review is pending: the receipt can
++      report <code>no-write</code> without another endpoint delivery.
++    </p>
++  </section>
++
++  <section class="boundary" aria-labelledby="boundary-heading">
++    <h2 id="boundary-heading">Declare what the note actually consumes</h2>
++    <p>
++      <code>independent</code> is correct here because
++      <code>'dispatch-ready'</code> is a literal authored without reading the
++      proposal. A value saved earlier, hidden input, or cached computation can
++      still depend on pending work. Moving that read outside the callback does
++      not make it independent. Declare all contributing owners for dependent
++      work; use <code>unknown</code>
++      when you cannot establish a complete declaration.
++    </p>
++    <p>
++      The Link owns publication from the note leaf. Local confirmation and
++      rejection affect tree state; this in-memory endpoint has no server,
++      durable storage, or remote acknowledgment. Admission and
++      <code>settled()</code> do not prove backend durability or distributed
++      agreement.
++    </p>
++    <p>
++      Leaving this page disposes the Link and destroys the component-owned tree.
++    </p>
++  </section>
++
++  <section aria-labelledby="code-heading">
++    <h2 id="code-heading">Use the Angular facade</h2>
++    <p>
++      This small example uses public types and native Angular leaf writes. In a
++      component, keep the tree for its lifetime and release it in
++      <code>ngOnDestroy</code>.
++    </p>
++    <pre
++      class="code-example"
++      tabindex="0"
++      aria-label="Angular independent publication code example"
++    ><code>{{ example }}</code></pre>
++  </section>
++</div>
+--- /dev/null
++++ b/apps/demo/src/app/pages/independent-publication/independent-publication.component.scss
+@@ -0,0 +1,106 @@
++.page-header {
++  margin-bottom: var(--layout-section-gap);
++  padding-bottom: var(--layout-panel-inset);
++  border-bottom: 1px solid var(--color-neutral-200);
++}
++.page-eyebrow {
++  color: var(--color-primary-600);
++  font-weight: 700;
++}
++h1 {
++  color: var(--color-neutral-900);
++  font-size: clamp(1.8rem, 4vw, 2.4rem);
++  line-height: 1.2;
++}
++h2,
++h3 {
++  color: var(--color-neutral-900);
++}
++p,
++li {
++  color: var(--color-neutral-700);
++  line-height: 1.7;
++}
++.page-lede {
++  max-width: 760px;
++  font-size: 1.1rem;
++}
++section {
++  margin-bottom: var(--layout-section-gap);
++}
++.instructions {
++  padding-left: var(--space-6);
++}
++.actions {
++  display: flex;
++  flex-wrap: wrap;
++  gap: var(--space-3);
++  margin: var(--space-6) 0;
++}
++button {
++  padding: var(--space-3) var(--space-4);
++  border: 1px solid var(--color-primary-600);
++  border-radius: var(--radius-sm);
++  background: var(--color-primary-600);
++  color: white;
++  font: inherit;
++  cursor: pointer;
++  &:disabled {
++    background: var(--color-neutral-100);
++    color: var(--color-neutral-600);
++    border-color: var(--color-neutral-300);
++    cursor: default;
++  }
++}
++button:focus-visible,
++pre:focus-visible {
++  outline: 3px solid var(--color-primary-600);
++  outline-offset: 3px;
++}
++.state-grid {
++  display: grid;
++  grid-template-columns: repeat(3, minmax(0, 1fr));
++  gap: var(--space-4);
++}
++.state-card,
++.boundary {
++  padding: var(--space-6);
++  border: 1px solid var(--color-neutral-200);
++  border-radius: var(--radius-lg);
++}
++.state-card {
++  overflow-wrap: anywhere;
++  h3 {
++    margin-top: 0;
++  }
++}
++.boundary {
++  background: var(--color-primary-50);
++}
++dt {
++  color: var(--color-neutral-600);
++  margin-top: var(--space-3);
++}
++dd {
++  margin: var(--space-2) 0;
++  font-weight: 600;
++}
++code {
++  font-family: var(--font-mono);
++}
++.code-example {
++  padding: var(--space-6);
++  border-radius: var(--radius-lg);
++  background: var(--color-neutral-900);
++  color: var(--color-neutral-100);
++  overflow-x: auto;
++  line-height: 1.65;
++}
++.aside {
++  font-size: 0.95rem;
++}
++@media (max-width: 800px) {
++  .state-grid {
++    grid-template-columns: 1fr;
++  }
++}
+--- /dev/null
++++ b/apps/demo/src/app/pages/independent-publication/independent-publication.component.spec.ts
+@@ -0,0 +1,150 @@
++import { ComponentFixture, TestBed } from '@angular/core/testing';
++
++import { appRoutes } from '../../app.routes';
++import { IndependentPublicationComponent } from './independent-publication.component';
++
++describe('IndependentPublicationComponent (v16 preview)', () => {
++  let fixture: ComponentFixture<IndependentPublicationComponent>;
++
++  beforeEach(async () => {
++    await TestBed.configureTestingModule({
++      imports: [IndependentPublicationComponent],
++    }).compileComponents();
++    fixture = TestBed.createComponent(IndependentPublicationComponent);
++    fixture.detectChanges();
++  });
++
++  afterEach(() => fixture.destroy());
++
++  it.each(['confirm', 'reject'] as const)(
++    'delivers the literal before %s and preserves it after the local decision',
++    async (decision) => {
++      const page = fixture.componentInstance;
++      const host: HTMLElement = fixture.nativeElement;
++      host.querySelector<HTMLButtonElement>('[data-action="propose"]')!.click();
++      fixture.detectChanges();
++      expect(page.hasPending()).toBe(true);
++      expect(
++        host.querySelector('[data-testid="route"]')?.textContent?.trim()
++      ).toBe('west');
++
++      // If the note waits for route settlement this test times out: the proposal
++      // is deliberately not confirmed/rejected until delivery has been asserted.
++      await page.publishIndependentNote();
++      fixture.detectChanges();
++      expect(page.error()).toBeUndefined();
++      expect(page.hasPending()).toBe(true);
++      expect(page.decision()).toBe('Pending local review');
++      expect(page.deliveredNotes()).toEqual(['dispatch-ready']);
++      expect(page.admission()?.state).toBe('started');
++      expect(
++        host.querySelector('[data-testid="endpoint"]')?.textContent?.trim()
++      ).toBe('dispatch-ready');
++
++      await page.publishIndependentNote();
++      expect(page.error()).toBeUndefined();
++      expect(page.admission()?.state).toBe('no-write');
++      expect(page.deliveredNotes()).toEqual(['dispatch-ready']);
++      expect(page.hasPending()).toBe(true);
++
++      host
++        .querySelector<HTMLButtonElement>(`[data-action="${decision}"]`)!
++        .click();
++      fixture.detectChanges();
++      expect(page.hasPending()).toBe(false);
++      expect(page.tree.$.route()).toBe(
++        decision === 'confirm' ? 'west' : 'north'
++      );
++      expect(page.tree.$.note()).toBe('dispatch-ready');
++      expect(page.deliveredNotes()).toEqual(['dispatch-ready']);
++    }
++  );
++
++  it('handles a mocked settlement rejection in the UI without settling the proposal', async () => {
++    const page = fixture.componentInstance;
++    const host: HTMLElement = fixture.nativeElement;
++    const sentinel = new Error('UI settlement rejection sentinel');
++    // This injects a rejected result into the UI catch/finally path. It does not
++    // prove that a real Link endpoint failure rejects settled() or stops delivery.
++    const settlement = jest
++      .spyOn(page.noteConnection, 'settled')
++      .mockRejectedValueOnce(sentinel);
++    try {
++      page.proposeWest();
++      await page.publishIndependentNote();
++      fixture.detectChanges();
++      expect(settlement).toHaveBeenCalledTimes(1);
++      expect(page.error()).toBe(sentinel.message);
++      expect(host.querySelector('[role="alert"]')?.textContent?.trim()).toBe(
++        `Note publication failed: ${sentinel.message}`
++      );
++      expect(page.publishing()).toBe(false);
++      expect(page.hasPending()).toBe(true);
++      expect(page.tree.$.route()).toBe('west');
++      const reject = host.querySelector<HTMLButtonElement>(
++        '[data-action="reject"]'
++      )!;
++      expect(reject.disabled).toBe(false);
++      expect(
++        host.querySelector<HTMLButtonElement>('[data-action="confirm"]')!
++          .disabled
++      ).toBe(false);
++      reject.click();
++      fixture.detectChanges();
++      expect(page.hasPending()).toBe(false);
++      expect(page.decision()).toBe('Rejected locally');
++      expect(page.tree.$.route()).toBe('north');
++    } finally {
++      settlement.mockRestore();
++    }
++  });
++
++  it('disposes the Link before destroying the tree, including an in-flight action', async () => {
++    const page = fixture.componentInstance;
++    const disposal = jest.spyOn(page.noteConnection, 'dispose');
++    const destruction = jest.spyOn(page.tree, 'destroy');
++    page.proposeWest();
++    const publication = page.publishIndependentNote();
++    fixture.destroy();
++    const deliveredAtDestroy = [...page.deliveredNotes()];
++    const admissionAtDestroy = page.admission();
++    await publication;
++    expect(disposal).toHaveBeenCalledTimes(1);
++    expect(destruction).toHaveBeenCalledTimes(1);
++    expect(page.tree.destroyed()).toBe(true);
++    expect(disposal.mock.invocationCallOrder[0]).toBeLessThan(
++      destruction.mock.invocationCallOrder[0]
++    );
++    expect(page.deliveredNotes()).toEqual(deliveredAtDestroy);
++    expect(page.admission()).toBe(admissionAtDestroy);
++    expect(page.error()).toBeUndefined();
++    // Late UI invocations must neither publish nor create another transaction.
++    page.proposeWest();
++    await page.publishIndependentNote();
++    expect(page.deliveredNotes()).toEqual(deliveredAtDestroy);
++    page.ngOnDestroy();
++    expect(disposal).toHaveBeenCalledTimes(1);
++    expect(destruction).toHaveBeenCalledTimes(1);
++  });
++
++  it('labels the preview and separates receipt status from endpoint delivery', () => {
++    const text = (fixture.nativeElement as HTMLElement).textContent?.replace(
++      /\s+/g,
++      ' '
++    );
++    expect(text).toContain('v16 development preview · Unreleased');
++    expect(text).toContain('not stable v15 guidance');
++    expect(text).toContain('Admission snapshot');
++    expect(text).toContain('In-memory endpoint');
++    expect(text).toContain('cached computation');
++    expect(text).toContain('do not prove backend durability');
++    expect(fixture.componentInstance.example).toContain(
++      "from '@signal-tree/angular'"
++    );
++    const route = appRoutes.find(
++      (entry) => entry.path === 'independent-publication'
++    );
++    expect(route?.loadComponent).toBeDefined();
++    expect(route?.component).toBeUndefined();
++  });
++});
+--- /dev/null
++++ b/apps/demo/src/app/pages/independent-publication/independent-publication.component.ts
+@@ -0,0 +1,118 @@
++import {
++  ChangeDetectionStrategy,
++  Component,
++  computed,
++  signal,
++  type OnDestroy,
++} from '@angular/core';
++import {
++  link,
++  signalTree,
++  transactions,
++  type PendingTransaction,
++  type PublicationState,
++} from '@signal-tree/angular';
++
++@Component({
++  selector: 'app-independent-publication',
++  standalone: true,
++  templateUrl: './independent-publication.component.html',
++  styleUrl: './independent-publication.component.scss',
++  changeDetection: ChangeDetectionStrategy.OnPush,
++})
++export class IndependentPublicationComponent implements OnDestroy {
++  readonly tree = signalTree(
++    { route: 'north', note: '' },
++    { enhancers: [transactions()] }
++  );
++  readonly deliveredNotes = signal<readonly string[]>([]);
++  readonly noteConnection = link(this.tree.$.note, {
++    set: (value) => this.deliveredNotes.update((notes) => [...notes, value]),
++  });
++  private readonly proposal = signal<PendingTransaction | undefined>(undefined);
++  private destroyed = false;
++  readonly hasPending = computed(() => this.proposal() !== undefined);
++  readonly decision = signal('Not proposed');
++  readonly publishing = signal(false);
++  readonly admission = signal<PublicationState | undefined>(undefined);
++  readonly error = signal<string | undefined>(undefined);
++
++  proposeWest(): void {
++    if (this.destroyed || this.hasPending() || this.publishing()) return;
++    this.proposal.set(this.tree.transact(() => this.tree.$.route.set('west')));
++    this.decision.set('Pending local review');
++  }
++
++  confirm(): void {
++    if (this.destroyed || this.publishing() || !this.hasPending()) return;
++    this.proposal()?.confirm();
++    this.proposal.set(undefined);
++    this.decision.set('Confirmed locally');
++  }
++
++  reject(): void {
++    if (this.destroyed || this.publishing() || !this.hasPending()) return;
++    this.proposal()?.rollback();
++    this.proposal.set(undefined);
++    this.decision.set('Rejected locally');
++  }
++
++  async publishIndependentNote(): Promise<void> {
++    if (this.destroyed || this.publishing() || !this.hasPending()) return;
++    this.publishing.set(true);
++    this.error.set(undefined);
++    try {
++      const receipt = this.noteConnection.declare(
++        { kind: 'independent' },
++        () => {
++          // This literal consumes no route proposal, saved input or cached result.
++          this.tree.$.note.set('dispatch-ready');
++        }
++      );
++      // A receipt is readable status, not a signal. Explicitly sample it for UI.
++      this.admission.set(receipt.read());
++      await this.noteConnection.settled();
++      if (!this.destroyed) this.admission.set(receipt.read());
++    } catch (error) {
++      if (!this.destroyed) {
++        this.error.set(error instanceof Error ? error.message : String(error));
++      }
++    } finally {
++      if (!this.destroyed) this.publishing.set(false);
++    }
++  }
++
++  ngOnDestroy(): void {
++    if (this.destroyed) return;
++    this.destroyed = true;
++    this.noteConnection.dispose();
++    this.tree.destroy();
++  }
++
++  readonly example = `// v16 development preview (unreleased). Angular facade only.
++import { link, signalTree, transactions } from '@signal-tree/angular';
++
++export async function independentNote() {
++  const tree = signalTree(
++    { route: 'north', note: '' },
++    { enhancers: [transactions()] }
++  );
++  const delivered: string[] = [];
++  const notes = link(tree.$.note, {
++    set: value => { delivered.push(value); }, // In-memory endpoint only.
++  });
++  try {
++    const proposal = tree.transact(() => tree.$.route.set('west'));
++    const receipt = notes.declare({ kind: 'independent' }, () => {
++      tree.$.note.set('dispatch-ready'); // Authored literal: no proposal input.
++    });
++    await notes.settled(); // Resolves while proposal is still pending.
++    const admission = receipt.read(); // Status, not a delivery acknowledgment.
++    proposal.rollback(); // Or proposal.confirm() to retain west locally.
++    return { route: tree.$.route(), note: tree.$.note(), admission, delivered };
++  } finally {
++    notes.dispose();
++    tree.destroy(); // A component does this in ngOnDestroy instead.
++  }
++}`;
++}

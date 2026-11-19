@@ -1,0 +1,12 @@
+{
+  "author": {
+    "entries": 2967,
+    "mismatches": []
+  },
+  "review": {
+    "entries": 2967,
+    "mismatches": []
+  },
+  "reviewerSpecSha256": "32536876cb60b4369048d901abad13408d77976e9ab7f9bf05c1cfdf32b54e98",
+  "predecessorManifestSha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd"
+}

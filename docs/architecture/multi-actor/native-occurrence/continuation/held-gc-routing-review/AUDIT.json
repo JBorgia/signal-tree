@@ -1,0 +1,43 @@
+{
+  "baseHash": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "arms": {
+    "hold-proceed": {
+      "artifactSha256": "0be7da4846d52a8969c9f9fb6f86f9ec70d3d2c0b9a13cd6e39327dccc52d91d",
+      "allOriginalAssertionsRechecked": true,
+      "heldRounds": 12,
+      "releasedRounds": 12,
+      "node": "v24.15.0",
+      "nodeOptions": "--expose-gc --require=/private/tmp/st-c21-held-gc/hold-proceed/diagnostic-redirect.cjs",
+      "reporterNotInstalledHistoricalHarness": true
+    },
+    "drop-proceed": {
+      "artifactSha256": "e716f6c0d3dbc16dc28ca64520e1d262905b4de2bce35165e314ef86306903ee",
+      "allOriginalAssertionsRechecked": true,
+      "heldRounds": 12,
+      "releasedRounds": 12,
+      "node": "v24.15.0",
+      "nodeOptions": "--expose-gc --require=/private/tmp/st-c21-held-gc/drop-proceed/diagnostic-redirect.cjs",
+      "reporterNotInstalledHistoricalHarness": true
+    },
+    "hold-row": {
+      "artifactSha256": "25fb1e5078e44e3a3f7324a0f950492959775bad98f3f7c28df10b0f3c1f251f",
+      "allOriginalAssertionsRechecked": true,
+      "heldRounds": 12,
+      "releasedRounds": 12,
+      "node": "v24.15.0",
+      "nodeOptions": "--expose-gc --require=/private/tmp/st-c21-held-gc/hold-row/diagnostic-redirect.cjs",
+      "reporterNotInstalledHistoricalHarness": true
+    }
+  },
+  "source": {
+    "packages/kernel/src/lib/held-continuation-probe.spec.ts": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+    "packages/kernel/retention-probe.config.ts": "d9868ae1643dde8891ad25a1b18f930027fd32e0e68ae2dd921d6b4880da4d94",
+    "packages/kernel/vitest.config.ts": "d1e247e5f0f90050b96daa1b889a09301e94ac338597b425127395351e0d3fdd",
+    "packages/kernel/vitest.retention.config.ts": "30f6a25ac7bd1890913636b5428ad51721f15c354ee558b3dc91504a844e4336",
+    "tools/held-continuation-probe/project.json": "1e545fda3ed2a6e0c4588c193154805834a64b01e1a8b27ad032c277edea9582",
+    "tools/check-forwarding-retention.mjs": "e2aa24c5fef96465f11a9ec8809175cc9cd60f6006847f1a4c2d28c8e74659e6",
+    "tools/verify-gates.mjs": "fd51a412d12dd68d95754459f36de09278d4ddbec52253a241e0b834b3c62d18",
+    "tools/lib/heap-quiescence.mjs": "b9df8334d2ece2ba6f3e2eb4fb7aef7d45ff00fd8eb62c94ccbabc0937551186",
+    "packages/kernel/src/lib/internals/selected-write-operation.ts": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": false,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "outDir": "out",
+    "rootDir": ".",
+    "types": [],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "angularCompilerOptions": {
+    "strictTemplates": true,
+    "strictInjectionParameters": true,
+    "compilationMode": "full"
+  },
+  "files": [
+    "browser/app.ts",
+    "browser/main.ts"
+  ]
+}

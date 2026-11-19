@@ -1,0 +1,12 @@
+{
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+  "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+  "packages/kernel/src/lib/physical/entity-handle-resolution.ts": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005",
+  "packages/kernel/src/lib/physical/structural-store.ts": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353",
+  "packages/kernel/src/lib/physical/entity-handle-resolution.spec.ts": "24ca9e5ed2a1349815083cc7e193260684bb4c609d1107aac81d92027d5577b2",
+  "packages/kernel/src/lib/physical/structural-store.spec.ts": "d0c3c19503f915126548ffcfe5a1932e669ed8b5f76cba288b4a1c3d97b4e8a5",
+  "packages/kernel/src/lib/internals/physical-rows.ts": "b5ba4a48f620b2776edad5bdec2aa21c5c4044e683ebcf6673f29432c77dc48b",
+  "packages/kernel/src/lib/internals/utilities/deep-clone.ts": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635",
+  "packages/kernel/src/enhancers/restoration/restoration.ts": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1"
+}

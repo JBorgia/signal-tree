@@ -1,0 +1,21 @@
+[
+  {
+    "probe": "successor extracted proxy",
+    "ngDevMode": "absent",
+    "pass": true
+  },
+  {
+    "probe": "successor extracted proxy",
+    "ngDevMode": true,
+    "pass": true
+  },
+  {
+    "probe": "successor extracted proxy",
+    "ngDevMode": false,
+    "pass": true
+  },
+  {
+    "probe": "successor extracted constants, 3 flag states x 3 env states, exact strings and frozen object",
+    "pass": true
+  }
+]

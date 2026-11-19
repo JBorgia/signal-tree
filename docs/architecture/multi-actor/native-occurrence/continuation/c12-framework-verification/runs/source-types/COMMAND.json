@@ -1,0 +1,16 @@
+{
+  "cwd": "/private/tmp/st-c12-independent-framework-verification/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "exec",
+    "tsc",
+    "--noEmit",
+    "--pretty",
+    "false",
+    "-p",
+    "tsconfig.typecheck-all.json"
+  ],
+  "env_file": "/private/tmp/st-c12-independent-framework-verification/ENVIRONMENT.json",
+  "ST_PREPARED_REVIEW_OUTPUT": "unset"
+}

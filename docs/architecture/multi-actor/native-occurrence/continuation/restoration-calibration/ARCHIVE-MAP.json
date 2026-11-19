@@ -1,0 +1,200 @@
+[
+  {
+    "source": "EXPECTATIONS.md",
+    "archive": "EXPECTATIONS.md",
+    "sourceSha256": "257e9a6549564f4e7cf292b833d8866fe5900249b293e765c765470df86d5c98",
+    "archiveSha256": "257e9a6549564f4e7cf292b833d8866fe5900249b293e765c765470df86d5c98"
+  },
+  {
+    "source": "SUMMARY.json",
+    "archive": "SUMMARY.json",
+    "sourceSha256": "79b5721a24ddbced49906dce1af04ae72fc234f953b9dc88b49fa6c0e5ac69ed",
+    "archiveSha256": "79b5721a24ddbced49906dce1af04ae72fc234f953b9dc88b49fa6c0e5ac69ed"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "23a629f68e28db7f9f2925f0e685a75c65578cdc2d8568abd3be2a9bc4ec918c",
+    "archiveSha256": "23a629f68e28db7f9f2925f0e685a75c65578cdc2d8568abd3be2a9bc4ec918c"
+  },
+  {
+    "source": "ORIGINAL-FAILURE-STACKS.txt",
+    "archive": "ORIGINAL-FAILURE-STACKS.txt",
+    "sourceSha256": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a",
+    "archiveSha256": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "674120e146dca1a3b84e46be3abd6ed22f7165713a1213f2c749bb81436a2dfa",
+    "archiveSha256": "674120e146dca1a3b84e46be3abd6ed22f7165713a1213f2c749bb81436a2dfa"
+  },
+  {
+    "source": "FINAL-IDENTITY.json",
+    "archive": "FINAL-IDENTITY.json",
+    "sourceSha256": "ad8a7d5e927f8d4873b6ae1aa2ba3ee6eba51bc7898288910bd8b5307d5d4bd6",
+    "archiveSha256": "ad8a7d5e927f8d4873b6ae1aa2ba3ee6eba51bc7898288910bd8b5307d5d4bd6"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+    "archiveSha256": "562a3bb2415ec8b365bfd2e1ceb44be8df248bcb5cc99aaaa3f15dff287d19ed"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "41ef5af291b8cb669ca2e91b4725693b43c4f6c9ec647c927068def2747b4531",
+    "archiveSha256": "41ef5af291b8cb669ca2e91b4725693b43c4f6c9ec647c927068def2747b4531"
+  },
+  {
+    "source": "diagnostic-tests.patch",
+    "archive": "diagnostic-tests.patch",
+    "sourceSha256": "b85718dcd5c7e99abc62b05381acb9cadd8d30a5c9246a3e12dc3d5ee6d29830",
+    "archiveSha256": "b85718dcd5c7e99abc62b05381acb9cadd8d30a5c9246a3e12dc3d5ee6d29830"
+  },
+  {
+    "source": "freeze.py",
+    "archive": "freeze.py",
+    "sourceSha256": "a1692d78c93433679227c08ada3d7e1565fec912f7860fd947754ad057c43614",
+    "archiveSha256": "a1692d78c93433679227c08ada3d7e1565fec912f7860fd947754ad057c43614"
+  },
+  {
+    "source": "EXPECTATIONS.sha256",
+    "archive": "EXPECTATIONS.sha256",
+    "sourceSha256": "2c926b476804c29c8e08a7b167b6539d0c95cfe381bf8d14742203f8f0dc7512",
+    "archiveSha256": "2c926b476804c29c8e08a7b167b6539d0c95cfe381bf8d14742203f8f0dc7512"
+  },
+  {
+    "source": "runs/mutant-snapshot/RESULT.json",
+    "archive": "runs/mutant-snapshot/RESULT.json",
+    "sourceSha256": "b73b74139a23950758727746cd704f77afaab65848c04beaafebfcd62172381f",
+    "archiveSha256": "b73b74139a23950758727746cd704f77afaab65848c04beaafebfcd62172381f"
+  },
+  {
+    "source": "runs/mutant-snapshot/first.log",
+    "archive": "runs/mutant-snapshot/first.log",
+    "sourceSha256": "df154d84f1da2c8543b7cd67deff1d14989668974d4b45a156b85e5a4f179e7f",
+    "archiveSha256": "df154d84f1da2c8543b7cd67deff1d14989668974d4b45a156b85e5a4f179e7f"
+  },
+  {
+    "source": "runs/mutant-snapshot/mutant.patch",
+    "archive": "runs/mutant-snapshot/mutant.patch",
+    "sourceSha256": "c2ecef37045ecc8e33936f400847cda3620e2bb16faacef924f153c0bb244a13",
+    "archiveSha256": "c2ecef37045ecc8e33936f400847cda3620e2bb16faacef924f153c0bb244a13"
+  },
+  {
+    "source": "runs/mutant-snapshot/COMMAND.json",
+    "archive": "runs/mutant-snapshot/COMMAND.json",
+    "sourceSha256": "82c3147ed9cd1f11d726f686ca443f32f4f22a17ae050be18dc5d50c89a251bb",
+    "archiveSha256": "82c3147ed9cd1f11d726f686ca443f32f4f22a17ae050be18dc5d50c89a251bb"
+  },
+  {
+    "source": "runs/mutant-snapshot/RESTORED.json",
+    "archive": "runs/mutant-snapshot/RESTORED.json",
+    "sourceSha256": "a1bda8f5aafc60b119ea647caa2b65e98e9a7943f4e94c6acc3912ed39e1ff47",
+    "archiveSha256": "a1bda8f5aafc60b119ea647caa2b65e98e9a7943f4e94c6acc3912ed39e1ff47"
+  },
+  {
+    "source": "runs/mutant-snapshot/observations/paired-256.json",
+    "archive": "runs/mutant-snapshot/observations/paired-256.json.gz",
+    "sourceSha256": "54e8ecc3679dfa0d8995a19b1e10124a6f71bb4e5400025fa200173a8f1dd79e",
+    "archiveSha256": "41c1787edad9569059ae369fe362b9e2ab6a87dd934e059dc2e747bc252df717"
+  },
+  {
+    "source": "runs/mutant-snapshot/observations/large-sequence-32.json",
+    "archive": "runs/mutant-snapshot/observations/large-sequence-32.json.gz",
+    "sourceSha256": "396907fc3f9659d9d6e5df26af5e373c2eadb75cf541c5a11a714c4e65751b34",
+    "archiveSha256": "a7962f716d0f3476b268567065ffc25ea3f5b03989cb80b574b500c40a02dd92"
+  },
+  {
+    "source": "runs/mutant-snapshot/observations/large-sequence-256.json",
+    "archive": "runs/mutant-snapshot/observations/large-sequence-256.json.gz",
+    "sourceSha256": "fb1083504ea45db2f1e6c5b803ebca9eedd2d8e5721995c7ec71ee9c5b251b5a",
+    "archiveSha256": "833c1976d9b1cc9d831971c7cc82e7ca7cfeef43d3253c1f50fed7940e0a588d"
+  },
+  {
+    "source": "runs/mutant-snapshot/observations/paired-3.json",
+    "archive": "runs/mutant-snapshot/observations/paired-3.json.gz",
+    "sourceSha256": "b77a34c0eacba56b53e7c75a0cf9a37386fc68b659cea6b2ddde52882d5b0c39",
+    "archiveSha256": "e38bf9640d4a20bdc148073575a34c165c25c7400c87d3c9a6d25108125479b9"
+  },
+  {
+    "source": "runs/mutant-snapshot/observations/paired-32.json",
+    "archive": "runs/mutant-snapshot/observations/paired-32.json.gz",
+    "sourceSha256": "9d0be32bd332c4c8746541394ee09369c02949b88eae8a0a3f47afb14481f2e2",
+    "archiveSha256": "39e5ba7f6f81b44596d86f442b90ce91f7d4cc8e1075301b207eb0b6a5eab7a7"
+  },
+  {
+    "source": "runs/mutant-snapshot/observations/large-sequence-3.json",
+    "archive": "runs/mutant-snapshot/observations/large-sequence-3.json.gz",
+    "sourceSha256": "8e2407dff7f39ae65f533360669dd2f07060f0ebed1db1fe132bb5bfe0e3d31a",
+    "archiveSha256": "fa5a4654049bc6338b31a9417b3156867b55c337b4b7d32654f6873c8ac19cfe"
+  },
+  {
+    "source": "runs/mutant-validation/RESULT.json",
+    "archive": "runs/mutant-validation/RESULT.json",
+    "sourceSha256": "f0f0414cdffe4d396720b11a02c09c64c785721be457e963ef649148b1e01275",
+    "archiveSha256": "f0f0414cdffe4d396720b11a02c09c64c785721be457e963ef649148b1e01275"
+  },
+  {
+    "source": "runs/mutant-validation/first.log",
+    "archive": "runs/mutant-validation/first.log",
+    "sourceSha256": "69612bde9c8952adf43661e9b4fdab8ebb81298438055ee0874187f51fb77c4a",
+    "archiveSha256": "69612bde9c8952adf43661e9b4fdab8ebb81298438055ee0874187f51fb77c4a"
+  },
+  {
+    "source": "runs/mutant-validation/mutant.patch",
+    "archive": "runs/mutant-validation/mutant.patch",
+    "sourceSha256": "f146ba67002da28b6995b90ea1684b5992599fa39157867f33a533678346185d",
+    "archiveSha256": "f146ba67002da28b6995b90ea1684b5992599fa39157867f33a533678346185d"
+  },
+  {
+    "source": "runs/mutant-validation/COMMAND.json",
+    "archive": "runs/mutant-validation/COMMAND.json",
+    "sourceSha256": "d52bdc203631eef015eea97bd420035f5599274fff5f9cb1f2445f0a3255d172",
+    "archiveSha256": "d52bdc203631eef015eea97bd420035f5599274fff5f9cb1f2445f0a3255d172"
+  },
+  {
+    "source": "runs/mutant-validation/RESTORED.json",
+    "archive": "runs/mutant-validation/RESTORED.json",
+    "sourceSha256": "a1bda8f5aafc60b119ea647caa2b65e98e9a7943f4e94c6acc3912ed39e1ff47",
+    "archiveSha256": "a1bda8f5aafc60b119ea647caa2b65e98e9a7943f4e94c6acc3912ed39e1ff47"
+  },
+  {
+    "source": "runs/mutant-validation/observations/paired-256.json",
+    "archive": "runs/mutant-validation/observations/paired-256.json",
+    "sourceSha256": "06e0c22729ded67350365594311754dfd89ced58979f5a178890ca47703cdab9",
+    "archiveSha256": "06e0c22729ded67350365594311754dfd89ced58979f5a178890ca47703cdab9"
+  },
+  {
+    "source": "runs/mutant-validation/observations/large-sequence-32.json",
+    "archive": "runs/mutant-validation/observations/large-sequence-32.json",
+    "sourceSha256": "19fd1a3c1f75df78ae45be6873d28b8f7740772e2328c4f66a0c414187aa9c09",
+    "archiveSha256": "19fd1a3c1f75df78ae45be6873d28b8f7740772e2328c4f66a0c414187aa9c09"
+  },
+  {
+    "source": "runs/mutant-validation/observations/large-sequence-256.json",
+    "archive": "runs/mutant-validation/observations/large-sequence-256.json",
+    "sourceSha256": "b9d017c4512557533fea5b4ba0e190dc3e0dee06b8dc6fb561e9f20d7d1886f1",
+    "archiveSha256": "b9d017c4512557533fea5b4ba0e190dc3e0dee06b8dc6fb561e9f20d7d1886f1"
+  },
+  {
+    "source": "runs/mutant-validation/observations/paired-3.json",
+    "archive": "runs/mutant-validation/observations/paired-3.json",
+    "sourceSha256": "9b11172c5c02ba324fee691ec7681629be9e6fa36bc807fef90f3d26cf35751f",
+    "archiveSha256": "9b11172c5c02ba324fee691ec7681629be9e6fa36bc807fef90f3d26cf35751f"
+  },
+  {
+    "source": "runs/mutant-validation/observations/paired-32.json",
+    "archive": "runs/mutant-validation/observations/paired-32.json",
+    "sourceSha256": "fee08ff4547afe31e348650e8fbc1d71a91f842c4ef4a1a3c5cc111bb8ade1a1",
+    "archiveSha256": "fee08ff4547afe31e348650e8fbc1d71a91f842c4ef4a1a3c5cc111bb8ade1a1"
+  },
+  {
+    "source": "runs/mutant-validation/observations/large-sequence-3.json",
+    "archive": "runs/mutant-validation/observations/large-sequence-3.json",
+    "sourceSha256": "e1cc40cf6e5b02a0e0012826ea1e6cc14bb82799a52fa1d0dcd9f524a6adf38f",
+    "archiveSha256": "e1cc40cf6e5b02a0e0012826ea1e6cc14bb82799a52fa1d0dcd9f524a6adf38f"
+  }
+]

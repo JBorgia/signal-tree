@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel packages/kernel/src/lib/entity-large-batches.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:54:32.305Z",
+    "endTime": "2026-11-03T04:54:32.914Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "15761068455818786859",
+      "startTime": "2026-11-03T04:54:32.331Z",
+      "endTime": "2026-11-03T04:54:32.913Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

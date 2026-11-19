@@ -1,0 +1,42 @@
+
+> nx run vue:test entity-projection-publication.spec.ts settlement-publication.spec.ts --maxWorkers=1
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts entity-projection-publication.spec.ts settlement-publication.spec.ts --maxWorkers=1
+
+(node:61551) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:61567) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61591) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-r3-independent/candidate/packages/vue
+
+(node:61598) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  23 passed (23)
+   Start at  21:23:40
+   Duration  846ms (transform 456ms, setup 0ms, import 649ms, tests 60ms, environment 0ms)
+
+
+
+
+ NX   Successfully ran target test for project vue
+
+
+  Run duration:      3.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    3.6s

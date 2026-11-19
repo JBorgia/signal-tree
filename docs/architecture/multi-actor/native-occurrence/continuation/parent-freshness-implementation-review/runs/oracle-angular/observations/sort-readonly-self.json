@@ -1,0 +1,98 @@
+{
+  "facade": "angular",
+  "calls": 4,
+  "events": [
+    {
+      "name": "nested-self",
+      "kind": "throw",
+      "sameSentinel": false,
+      "error": {
+        "name": "Error",
+        "message": "Detected cycle in computations.",
+        "stack": "Error: Detected cycle in computations.\n    at Object.producerRecomputeValue (file:///private/tmp/st-parent-freshness-implementation-independent/oracle/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:294:15)\n    at producerUpdateValueVersion (file:///private/tmp/st-parent-freshness-implementation-independent/oracle/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:104:8)\n    at Object.computed [as observe] (file:///private/tmp/st-parent-freshness-implementation-independent/oracle/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:264:5)\n    at materializeSnapshotNode (/private/tmp/st-parent-freshness-implementation-independent/oracle/packages/kernel/src/lib/internals/snapshot-authority.ts:99:19)\n    at materializeNode (/private/tmp/st-parent-freshness-implementation-independent/oracle/packages/kernel/src/lib/utils.ts:220:10)\n    at Object.node (/private/tmp/st-parent-freshness-implementation-independent/oracle/packages/kernel/src/lib/signal-tree.ts:471:16)\n    at /private/tmp/st-parent-freshness-implementation-independent/oracle/packages/angular/src/lib/bounded-reentry-targeted.spec.ts:34:118\n    at Object.take (/private/tmp/st-parent-freshness-implementation-independent/oracle/packages/angular/src/lib/bounded-reentry-targeted.spec.ts:7:160)\n    at action (/private/tmp/st-parent-freshness-implementation-independent/oracle/packages/angular/src/lib/bounded-reentry-targeted.spec.ts:34:61)\n    at sortComparer (/private/tmp/st-parent-freshness-implementation-independent/oracle/packages/angular/src/lib/bounded-reentry-targeted.spec.ts:33:178)"
+      },
+      "before": 1,
+      "after": 1
+    },
+    {
+      "name": "first-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "before": 0,
+      "after": 1
+    },
+    {
+      "name": "immediate-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "before": 1,
+      "after": 1
+    },
+    {
+      "name": "collection-write",
+      "kind": "return",
+      "value": 3,
+      "before": 1,
+      "after": 1
+    },
+    {
+      "name": "post-write-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 3,
+              "n": 3
+            }
+          ]
+        }
+      },
+      "before": 1,
+      "after": 4
+    }
+  ]
+}

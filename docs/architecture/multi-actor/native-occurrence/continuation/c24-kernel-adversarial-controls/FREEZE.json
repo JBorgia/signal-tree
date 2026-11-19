@@ -1,0 +1,13 @@
+{
+  "baseManifestSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "scope": "test-only; outside candidate; UNEXECUTED",
+  "tests": 6,
+  "files": {
+    "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts": "8ebefaa05d0a47499c971b78295875a9d503db812db297689f71d69d45ead0fa"
+  },
+  "patchSha256": "02e3091c05a580214ac19c17807ba5f7e563d5c20031792c91a5af9abe6cb3f0",
+  "runtimeEdits": false,
+  "configEdits": false,
+  "runs": [],
+  "typechecks": []
+}

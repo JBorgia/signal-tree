@@ -1,0 +1,14 @@
+Forwarding retention artifacts: /private/tmp/st-c23-gc-composition-verification/candidate/artifacts/forwarding-retention/run-08foao
+hold-proceed-success: PASS
+hold-proceed-skip: PASS
+hold-proceed-caught: PASS
+drop-proceed-success: PASS
+drop-proceed-skip: PASS
+drop-proceed-caught: PASS
+hold-value-success: PASS
+hold-value-skip: PASS
+hold-value-caught: PASS
+held-hold-proceed: PASS
+held-drop-proceed: PASS
+held-hold-row: PASS
+Forwarding retention: 12/12 passed

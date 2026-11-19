@@ -1,0 +1,38 @@
+{
+  "cwd": "/private/tmp/st-r3-compatibility-inventory/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "solid",
+    "--skip-nx-cache",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=/private/tmp/st-r3-compatibility-inventory/full-reporter.mjs"
+  ],
+  "env": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-r3-compatibility-inventory/full-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-r3-compatibility-inventory/full-data",
+    "TMPDIR": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/tmp",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/observations",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/public",
+    "ST_C21_DIAGNOSTIC_OUTPUT": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/redirected",
+    "ST_TWO_HISTORY_OUTPUT": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/two-history.jsonl",
+    "ST_EQUAL_OWNER_TRACE": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/equal-owner.jsonl",
+    "ST_SUITE_EVENTS": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/events.jsonl",
+    "NODE_OPTIONS": "--require=/private/tmp/st-r3-compatibility-inventory/diagnostic-redirect.cjs"
+  },
+  "angularTargetRetainsOwnExposeGC": false,
+  "timeouts": {
+    "startupSeconds": 180,
+    "noProgressSeconds": 180,
+    "absoluteSeconds": 1800
+  },
+  "scope": "all ordinary discovered files; no filters/exclusions added"
+}

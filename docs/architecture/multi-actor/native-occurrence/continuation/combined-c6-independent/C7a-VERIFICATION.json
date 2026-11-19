@@ -1,0 +1,12 @@
+{
+  "manifestSha256": "d911ae7768e8e1a43eceb99ef5277988a6ff9e59c910337bb1e6b79db4d1b71d",
+  "mismatches": [],
+  "deltaFromC7": [
+    "packages/kernel/src/lib/singleton-row-allocation.spec.ts"
+  ],
+  "deltaFromC6": [
+    "packages/kernel/src/lib/singleton-row-reuse.spec.ts",
+    "packages/kernel/src/lib/singleton-row-allocation.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/entity.ts"
+  ]
+}

@@ -1,0 +1,226 @@
+
+> nx run kernel:test independent-prepared-unit.spec.ts independent-prepared-boundary.spec.ts batching.behavior.spec.ts batching-context-safety.spec.ts batching-semantic-scopes.spec.ts batching-adversarial.spec.ts external-baseline-coalescing.spec.ts batching-detachment.spec.ts batching-ownership.spec.ts main-invocation-scope.spec.ts native-invocation-handoff.spec.ts native-explicit-handoff.spec.ts selected-real-batching-review.spec.ts selected-ordinary-domain-removal.spec.ts
+
+> node tools/run-core-vitest.mjs independent-prepared-unit.spec.ts independent-prepared-boundary.spec.ts batching.behavior.spec.ts batching-context-safety.spec.ts batching-semantic-scopes.spec.ts batching-adversarial.spec.ts external-baseline-coalescing.spec.ts batching-detachment.spec.ts batching-ownership.spec.ts main-invocation-scope.spec.ts native-invocation-handoff.spec.ts native-explicit-handoff.spec.ts selected-real-batching-review.spec.ts selected-ordinary-domain-removal.spec.ts
+
+(node:22965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22972) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-forwarding-cleanup-successor/candidate/packages/kernel
+
+(node:22980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22983) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22986) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22985) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22982) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22987) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22990) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22992) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-prepared-boundary.spec.ts (6 tests | 6 failed) 63ms
+   × selected field plus surviving-row order restores the complete transaction 29ms
+   × producer ordinary images exclude untouched inspection sibling xy 13ms
+   × producer ordinary images exclude untouched inspection sibling yx 9ms
+   × certified absence row transport preserves actual replacement scope untouched 4ms
+   × certified absence row transport preserves actual replacement scope equal 2ms
+   × certified absence row transport preserves actual replacement scope changed 5ms
+(node:22997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-prepared-unit.spec.ts (17 tests | 17 failed) 151ms
+   × public second interceptor block is atomic; xy/retry 47ms
+   × public second interceptor block is atomic; xy/confirm 12ms
+   × public second interceptor block is atomic; yx/retry 6ms
+   × public second interceptor block is atomic; yx/confirm 10ms
+   × ordered transformed sibling support xy/0 8ms
+   × ordered transformed sibling support xy/99 2ms
+   × ordered transformed sibling support yx/0 8ms
+   × ordered transformed sibling support yx/99 4ms
+   × independent callback write survives invalidated preparation; selected fields and authority remain 5ms
+   × saved selected continuation is closed after success 8ms
+   × saved selected continuation is closed after throw 4ms
+   × saved selected continuation is closed after skip 3ms
+   × second selected proceed refuses before another preparation callback 7ms
+   × mixed scalar/entity public refusal occurs before any selected install 3ms
+   × mixed completed unit remains terminal after actual delivery throw 3ms
+   × inspection sibling retains ordinary baseline through composed rollback and equal-display adoption xy 11ms
+   × inspection sibling retains ordinary baseline through composed rollback and equal-display adoption yx 9ms
+(node:23000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▲ [WARNING] Ignoring this import because "src/lib/experimental-publication/entity.ts" was marked as having no side effects [ignored-bare-import]
+
+    src/lib/link.ts:1:7:
+      1 │ import './experimental-publication/entity';
+        ╵        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  "sideEffects" is false in the enclosing "package.json" file:
+
+    package.json:7:2:
+      7 │   "sideEffects": false,
+        ╵   ~~~~~~~~~~~~~
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 23 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > selected field plus surviving-row order restores the complete transaction
+Error: ENOENT: no such file or directory, open 'undefined/field-order.json'
+ ❯ src/lib/independent-prepared-boundary.spec.ts:13:3
+     11|   const pending=rows.all();let error:unknown;try{q.rollback();}catch(e…
+     12|   let confirmError:unknown;try{q.confirm();}catch(e){confirmError=e;}
+     13|   writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order…
+       |   ^
+     14|   expect(pending).toEqual([{id:'b',x:0},{id:'a',x:7}]);expect(error).t…
+     15|  }finally{t.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/23]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > producer ordinary images exclude untouched inspection sibling xy
+Error: ENOENT: no such file or directory, open 'undefined/packet-xy.json'
+ ❯ src/lib/independent-prepared-boundary.spec.ts:25:104
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/23]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > producer ordinary images exclude untouched inspection sibling yx
+Error: ENOENT: no such file or directory, open 'undefined/packet-yx.json'
+ ❯ src/lib/independent-prepared-boundary.spec.ts:25:104
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/23]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > certified absence row transport preserves actual replacement scope untouched
+Error: ENOENT: no such file or directory, open 'undefined/absence-untouched.json'
+ ❯ src/lib/independent-prepared-boundary.spec.ts:36:65
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/23]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > certified absence row transport preserves actual replacement scope equal
+Error: ENOENT: no such file or directory, open 'undefined/absence-equal.json'
+ ❯ src/lib/independent-prepared-boundary.spec.ts:36:65
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/23]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > certified absence row transport preserves actual replacement scope changed
+Error: ENOENT: no such file or directory, open 'undefined/absence-changed.json'
+ ❯ src/lib/independent-prepared-boundary.spec.ts:36:65
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > public second interceptor block is atomic; xy/retry
+ FAIL  src/lib/independent-prepared-unit.spec.ts > public second interceptor block is atomic; xy/confirm
+ FAIL  src/lib/independent-prepared-unit.spec.ts > public second interceptor block is atomic; yx/retry
+ FAIL  src/lib/independent-prepared-unit.spec.ts > public second interceptor block is atomic; yx/confirm
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:16:191
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > ordered transformed sibling support xy/0
+ FAIL  src/lib/independent-prepared-unit.spec.ts > ordered transformed sibling support xy/99
+ FAIL  src/lib/independent-prepared-unit.spec.ts > ordered transformed sibling support yx/0
+ FAIL  src/lib/independent-prepared-unit.spec.ts > ordered transformed sibling support yx/99
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:21:64
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > independent callback write survives invalidated preparation; selected fields and authority remain
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:26:235
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > saved selected continuation is closed after success
+ FAIL  src/lib/independent-prepared-unit.spec.ts > saved selected continuation is closed after throw
+ FAIL  src/lib/independent-prepared-unit.spec.ts > saved selected continuation is closed after skip
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:30:410
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > second selected proceed refuses before another preparation callback
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:35:76
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > mixed scalar/entity public refusal occurs before any selected install
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:39:208
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > mixed completed unit remains terminal after actual delivery throw
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:43:254
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/23]⎯
+
+ FAIL  src/lib/independent-prepared-unit.spec.ts > inspection sibling retains ordinary baseline through composed rollback and equal-display adoption xy
+ FAIL  src/lib/independent-prepared-unit.spec.ts > inspection sibling retains ordinary baseline through composed rollback and equal-display adoption yx
+Error: fresh output directory required
+ ❯ record src/lib/independent-prepared-unit.spec.ts:11:108
+
+ ❯ src/lib/independent-prepared-unit.spec.ts:66:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/23]⎯
+
+
+ Test Files  2 failed | 12 passed (14)
+      Tests  23 failed | 116 passed (139)
+   Start at  15:43:41
+   Duration  3.45s (transform 7.03s, setup 0ms, import 10.67s, tests 1.42s, environment 9.85s)
+
+Warning: command "node tools/run-core-vitest.mjs independent-prepared-unit.spec.ts independent-prepared-boundary.spec.ts batching.behavior.spec.ts batching-context-safety.spec.ts batching-semantic-scopes.spec.ts batching-adversarial.spec.ts external-baseline-coalescing.spec.ts batching-detachment.spec.ts batching-ownership.spec.ts main-invocation-scope.spec.ts native-invocation-handoff.spec.ts native-explicit-handoff.spec.ts selected-real-batching-review.spec.ts selected-ordinary-domain-removal.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.4s

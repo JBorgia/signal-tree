@@ -1,0 +1,125 @@
+{
+  "manifestSha256": "9ed147cfe0b48c0287c38a20a86a84a825b41741d1e5ea5daa2b917af3633d5d",
+  "packageProcesses": {
+    "kernel": {
+      "pid": 11333,
+      "ppid": 10802,
+      "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/packages/kernel",
+      "pgid": 11333,
+      "birth": "Mon Nov 2 14:21:25 2026",
+      "flagsAttested": {
+        "onSignal": true,
+        "signal": "SIGUSR2",
+        "excludeEnv": true,
+        "excludeNetwork": true,
+        "directory": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/reports"
+      },
+      "ancestryObserved": true
+    },
+    "react": {
+      "pid": 11868,
+      "ppid": 10802,
+      "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/packages/react",
+      "pgid": 11868,
+      "birth": "Mon Nov 2 14:22:19 2026",
+      "flagsAttested": {
+        "onSignal": true,
+        "signal": "SIGUSR2",
+        "excludeEnv": true,
+        "excludeNetwork": true,
+        "directory": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/reports"
+      },
+      "ancestryObserved": true
+    },
+    "angular": {
+      "pid": 11885,
+      "ppid": 10802,
+      "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/packages/angular",
+      "pgid": 11885,
+      "birth": "Mon Nov 2 14:22:23 2026",
+      "flagsAttested": {
+        "onSignal": true,
+        "signal": "SIGUSR2",
+        "excludeEnv": true,
+        "excludeNetwork": true,
+        "directory": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/reports"
+      },
+      "ancestryObserved": true
+    },
+    "vue": {
+      "pid": 11916,
+      "ppid": 10802,
+      "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/packages/vue",
+      "pgid": 11916,
+      "birth": "Mon Nov 2 14:22:28 2026",
+      "flagsAttested": {
+        "onSignal": true,
+        "signal": "SIGUSR2",
+        "excludeEnv": true,
+        "excludeNetwork": true,
+        "directory": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/reports"
+      },
+      "ancestryObserved": true
+    },
+    "solid": {
+      "pid": 11945,
+      "ppid": 10802,
+      "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/packages/solid",
+      "pgid": 11945,
+      "birth": "Mon Nov 2 14:22:31 2026",
+      "flagsAttested": {
+        "onSignal": true,
+        "signal": "SIGUSR2",
+        "excludeEnv": true,
+        "excludeNetwork": true,
+        "directory": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/reports"
+      },
+      "ancestryObserved": true
+    }
+  },
+  "artifacts": {
+    "kernel": {
+      "fileCount": 134,
+      "manifestSha256": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206"
+    },
+    "react": {
+      "fileCount": 10,
+      "manifestSha256": "8567a417ae5b061b81b0d51ff6d9a4611188e554d8b250c452b7b20cf261b90f"
+    },
+    "angular": {
+      "fileCount": 17,
+      "manifestSha256": "28b79d37d590ded8cb76f3879bcfb7d9d5bc7081b6a8831e772b01834b925ff3"
+    },
+    "vue": {
+      "fileCount": 13,
+      "manifestSha256": "972b0bfd85879c8f156903069b979a938521434dbad558b1d2adc44748450206"
+    },
+    "solid": {
+      "fileCount": 13,
+      "manifestSha256": "8633a01b224b0e50b8235af728a856717f846433c9ebad838ba6ff9747fc9e8c"
+    }
+  },
+  "finalObservedDescendants": [],
+  "normalResult": {
+    "exit": 0,
+    "noProgressTimeout": false,
+    "emittedPackages": [
+      "kernel",
+      "react",
+      "angular",
+      "vue",
+      "solid"
+    ],
+    "allFiveEmitted": true,
+    "allFiveHaveArtifacts": true,
+    "normalFullChainExit": true,
+    "sourceUnchanged": true,
+    "changedSourcePaths": [],
+    "reportRequests": 0,
+    "reports": [],
+    "remainingObservedDescendants": [],
+    "elapsedExecutionSeconds": 133.5535387910204
+  },
+  "oneInvocation": true,
+  "nodeModulesLink": "/Users/jonathanborgia/code/signaltree/node_modules"
+}

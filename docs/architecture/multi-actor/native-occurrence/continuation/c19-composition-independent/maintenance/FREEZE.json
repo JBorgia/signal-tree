@@ -1,0 +1,12 @@
+{
+  "inputManifestSHA256": "cdfdf039f8cac66c90de26ff47cec3850b5e33db00e4b5c335c51bc934facbee",
+  "manifestSHA256": "26d128655d1db2ff8472f3be4e83b45060b7d3126db1c9e2c60bf50c8d76e2d1",
+  "patchSHA256": "936879a4ea737be36185937a8d78278568eb3743ef065744297f3529486f4b57",
+  "changed": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/native-authored-footprint.spec.ts",
+    "packages/kernel/src/lib/value-work-handoff.spec.ts",
+    "packages/kernel/src/lib/whole-bounded-qualification.spec.ts"
+  ],
+  "frozenC18Unchanged": true
+}

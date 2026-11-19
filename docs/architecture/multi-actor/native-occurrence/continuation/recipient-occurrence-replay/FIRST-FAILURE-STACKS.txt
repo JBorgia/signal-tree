@@ -1,0 +1,113 @@
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission scalar: undeclared child waits then delivers after confirm
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission scalar: undeclared child waits then delivers after rollback
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission mixed: undeclared child waits then delivers after confirm
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission mixed: undeclared child waits then delivers after rollback
+AssertionError: expected [ undefined ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   undefined,
++ ]
+
+ ❯ src/lib/occurrence-successor.spec.ts:24:22
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   // A root declaration does not grant its undeclared child permission.
+     24|   expect(nestedSent).toEqual([]);
+       |                      ^
+     25|   q[outcome]();await flush();
+     26|   expect(sent).toEqual([{other:1}]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission empty: undeclared child waits then delivers after confirm
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission empty: undeclared child waits then delivers after rollback
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission collection: undeclared child waits then delivers after confirm
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission collection: undeclared child waits then delivers after rollback
+AssertionError: expected [ [] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [],
++ ]
+
+ ❯ src/lib/occurrence-successor.spec.ts:24:22
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   // A root declaration does not grant its undeclared child permission.
+     24|   expect(nestedSent).toEqual([]);
+       |                      ^
+     25|   q[outcome]();await flush();
+     26|   expect(sent).toEqual([{other:1}]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  src/lib/recipient-window-review.spec.ts > equal undeclared recipient proof does not discard held useful revision: confirm
+ FAIL  src/lib/recipient-window-review.spec.ts > equal undeclared recipient proof does not discard held useful revision: rollback
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/recipient-window-review.spec.ts:18:263
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  src/lib/recipient-window-review.spec.ts > membership omission retains recipient window through terminal confirm
+ FAIL  src/lib/recipient-window-review.spec.ts > membership omission retains recipient window through terminal rollback
+AssertionError: expected [ { x: 1 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++   },
++ ]
+
+ ❯ src/lib/recipient-window-review.spec.ts:38:116
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  12 failed | 13 passed (25)
+   Start at  12:40:08
+   Duration  3.50s (transform 775ms, setup 0ms, import 1.04s, tests 128ms, environment 1.90s)
+
+Warning: command "node tools/run-core-vitest.mjs occurrence-successor.spec.ts recipient-window-review.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.1s

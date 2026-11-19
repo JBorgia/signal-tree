@@ -1,0 +1,1148 @@
+--- /dev/null
++++ b/packages/angular/src/lib/construction-resource-cleanup.spec.ts
+@@ -0,0 +1,19 @@
++import {computed,isSignal} from '@angular/core';
++import {expect,it} from 'vitest';
++import {link,signalTree} from '../index';
++import {registerMembershipPublication} from '../../../kernel/src/lib/internals/intrinsic-mutation';
++import {getTreeScalarSlotRuntime} from '../../../kernel/src/lib/internals/tree-scalar-slot-port';
++type Row={n:{():number;set(value:number):void;update(fn:(value:number)=>number):void}};
++it('native Angular refused construction preserves reentrant native cell identity and releases only abandoned storage',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>});const l=link(t.$.rows,{set:()=>{}});const rt=getTreeScalarSlotRuntime(t.$)!;const start=rt.slotCount();let busy=false;let kept:Row|undefined;let escaped:Row|undefined;const fail=Error('native refused outer');
++ const off=registerMembershipPublication(edit=>{if(edit.key!=='a'||busy)return;busy=true;escaped=edit.child as Row;t.$.rows({kept:{n:7}});kept=t.$.rows.kept as Row;throw fail;},()=>{});
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(fail);off();expect(isSignal(kept!.n)).toBe(true);expect(t.$.rows.kept).toBe(kept);const value=computed(()=>kept!.n());expect(value()).toBe(7);kept!.n.set(8);expect(value()).toBe(8);kept!.n.update(n=>n+1);expect(value()).toBe(9);escaped!.n.set(99);expect(value()).toBe(9);expect(t.$.rows()).toEqual({kept:{n:9}});expect(rt.slotCount()).toBe(start+1);}
++ finally{off();l.dispose();t.destroy();}
++});
++
++it('native cell identity survives installed completion error and subsequent set/update',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>});const l=link(t.$.rows,{set:()=>{}});const rt=getTreeScalarSlotRuntime(t.$)!;const start=rt.slotCount();let prepared:Row|undefined;const fail=Error('native installed completion');
++ const off=registerMembershipPublication(edit=>{if(edit.key!=='a')return;prepared=edit.child as Row;return{record:{writes:[],adds:[]},completion:{}};},()=>{throw fail;});
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(fail);off();expect(isSignal(prepared!.n)).toBe(true);expect(t.$.rows.a).toBe(prepared);expect(rt.slotCount()).toBe(start+1);const current=computed(()=>prepared!.n());expect(current()).toBe(1);prepared!.n.set(2);expect(current()).toBe(2);prepared!.n.update(n=>n+1);expect(current()).toBe(3);expect(t.$.rows()).toEqual({a:{n:3}});}
++ finally{off();l.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/keyed-construction-cleanup.spec.ts
+@@ -0,0 +1,22 @@
++import {computed,isSignal} from '@angular/core';
++import {expect,it} from 'vitest';
++import {signalTree,link,transactions} from '../index';
++import {materializeMember,ordinaryBranch,registerMarkerProcessor} from '../../../kernel/src/lib/internals/materialize-markers';
++import {registerMembershipPublication} from '../../../kernel/src/lib/internals/intrinsic-mutation';
++import {getTreeScalarSlotRuntime} from '../../../kernel/src/lib/internals/tree-scalar-slot-port';
++const DYN=Symbol('native-keyed-cleanup');type Marker={[DYN]:true;seed:Record<string,unknown>};
++registerMarkerProcessor((v:unknown):v is Marker=>typeof v==='object'&&v!==null&&DYN in v,(m:Marker)=>ordinaryBranch(m.seed,{keyedLookup:true}));
++type Branch={():Record<string,unknown>;[key:string]:unknown};type Cell={():number;set(value:number):void;update(fn:(n:number)=>number):void};type Child={n:Cell;more:Cell};
++
++it('actual Angular keyed producer retains reentrant native identity and cancels refused recursive resources',()=>{
++ const t=signalTree({rows:{[DYN]:true,seed:{}} as Marker},{enhancers:[transactions()]});const rows=t.$.rows as unknown as Branch;const l=link(rows,{set:()=>{}});const rt=getTreeScalarSlotRuntime(t.$)!;const start=rt.slotCount();let busy=false;let kept:Child|undefined;let escaped:Child|undefined;const fail=Error('native keyed refusal');
++ const off=registerMembershipPublication(edit=>{if(edit.key==='a'&&!busy){busy=true;escaped=edit.child as Child;kept=materializeMember(rows,'kept',{n:7,more:8}) as Child;throw fail;}return undefined;},()=>{});
++ try{expect(()=>materializeMember(rows,'a',{n:1,more:2})).toThrow(fail);off();expect(rows.kept).toBe(kept);expect(isSignal(kept!.n)).toBe(true);const current=computed(()=>kept!.n());expect(current()).toBe(7);kept!.n.set(9);kept!.n.update(n=>n+1);expect(current()).toBe(10);escaped!.n.set(99);expect(current()).toBe(10);expect(rows()).toEqual({kept:{n:10,more:8}});expect(rt.slotCount()).toBe(start+2);}
++ finally{off();l.dispose();t.destroy();}
++});
++
++it('actual Angular keyed source pairs creation rollback and retained native identity',()=>{
++ const t=signalTree({rows:{[DYN]:true,seed:{}} as Marker},{enhancers:[transactions()]});const rows=t.$.rows as unknown as Branch;const l=link(rows,{set:()=>{}});const rt=getTreeScalarSlotRuntime(t.$)!;
++ try{let child:Child|undefined;const q=t.transact(()=>{child=materializeMember(rows,'a',{n:7,more:8}) as Child;});const count=rt.slotCount();expect(isSignal(child!.n)).toBe(true);q.rollback();expect(rows()).toEqual({});expect(materializeMember(rows,'a',{n:9,more:10})).toBe(child);expect(rt.slotCount()).toBe(count);const value=computed(()=>child!.n());expect(value()).toBe(9);child!.n.update(n=>n+1);expect(value()).toBe(10);}
++ finally{l.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/construction-resource-cleanup.spec.ts
+@@ -0,0 +1,68 @@
++import {getPositionRegistry} from './internals/position-registry';
++import {getOwnedPositionIds} from './internals/owned-metadata';
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++import {getTreeScalarSlotRuntime} from './internals/tree-scalar-slot-port';
++import {getMutationCaptureRuntime} from './internals/mutation-capture-runtime';
++import {getPathNotifier} from './path-notifier';
++type Row={n:{():number;(value:number):void}};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++
++for(const sameKey of [false,true])it(`refused construction preserves independently installed ${sameKey?'same-key':'other-key'} handle and releases only its own allocation`,async()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>});const sent:unknown[]=[];
++ const l=link(t.$.rows,{set:v=>{sent.push(v);}});const rt=getTreeScalarSlotRuntime(t.$)!;
++ const before=rt.slotCount();const fail=Error('refused outer');let nested:Row|undefined;let escaped:Row|undefined;let busy=false;
++ const off=registerMembershipPublication(edit=>{
++  if(edit.key!=='a'||busy)return;busy=true;escaped=edit.child as Row;
++  t.$.rows(sameKey?{a:{n:7}}:{kept:{n:7}});nested=t.$.rows[sameKey?'a':'kept'] as Row;
++  throw fail;
++ },()=>{});
++ try{
++  expect(()=>t.$.rows({a:{n:1}})).toThrow(fail);off();await flush();
++  const key=sameKey?'a':'kept';expect(t.$.rows()).toEqual({[key]:{n:7}});expect(t.$.rows[key]).toBe(nested);
++  nested!.n(8);await flush();expect(sent.at(-1)).toEqual({[key]:{n:8}});
++  const delivered=sent.length;escaped!.n(99);await flush();expect(sent.length).toBe(delivered);expect(t.$.rows()).toEqual({[key]:{n:8}});
++  expect(rt.slotCount()).toBe(before+1);
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('responsibility preparation refusal releases detached construction before membership preparation',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>},{enhancers:[transactions()]});const l=link(t.$.rows,{set:()=>{}});
++ const rt=getTreeScalarSlotRuntime(t.$)!;const capture=getMutationCaptureRuntime(t.$)!;const original=capture.prepareMemberResponsibility;const before=rt.slotCount();const fail=Error('responsibility preparation refused');
++ capture.prepareMemberResponsibility=(branch,key,child,presence)=>{if(key==='a')throw fail;return original?.(branch,key,child,presence);};
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(fail);expect(t.$.rows()).toEqual({});expect(rt.slotCount()).toBe(before);}
++ finally{capture.prepareMemberResponsibility=original;l.dispose();t.destroy();}
++});
++
++it('postinstallation completion throw preserves installed identity storage and terminal record',async()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++ const rt=getTreeScalarSlotRuntime(t.$)!;const before=rt.slotCount();const records=new Map<object,object>();const token={};const completion={};const fail=Error('completion after install');let child:Row|undefined;let completions=0;
++ const off=registerMembershipPublication(edit=>{if(edit.key!=='a')return;child=edit.child as Row;return{record:{writes:[{map:records,key:token,value:child}],adds:[]},completion};},()=>{completions++;throw fail;});
++ try{
++  expect(()=>t.$.rows({a:{n:1}})).toThrow(fail);off();expect(completions).toBe(1);expect(t.$.rows.a).toBe(child);expect(records.get(token)).toBe(child);expect(t.$.rows()).toEqual({a:{n:1}});expect(rt.slotCount()).toBe(before+1);
++  child!.n(2);await flush();expect(t.$.rows()).toEqual({a:{n:2}});expect(sent.at(-1)).toEqual({a:{n:2}});
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('detached child mutation invalidates its prepared payload without publishing or acquiring rollback responsibility',async()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>},{enhancers:[transactions()]});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});const rt=getTreeScalarSlotRuntime(t.$)!;const start=rt.slotCount();let escaped:Row|undefined;
++ const off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped=edit.child as Row;escaped.n(99);}return undefined;},()=>{});
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(/Detached member changed/);off();await flush();expect(sent).toEqual([]);expect(t.$.rows()).toEqual({});expect(rt.slotCount()).toBe(start);const q=t.transact(()=>t.$.rows({a:{n:7}}));const installed=t.$.rows.a as Row;escaped!.n(100);expect(installed.n()).toBe(7);q.rollback();await flush();expect(t.$.rows()).toEqual({});}
++ finally{off();l.dispose();t.destroy();}
++});
++
++it('same-key installation during preparation invalidates outer plan and preserves nested responsibility',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>},{enhancers:[transactions()]});const l=link(t.$.rows,{set:()=>{}});const rt=getTreeScalarSlotRuntime(t.$)!;const start=rt.slotCount();let busy=false;let nested:Row|undefined;
++ const off=registerMembershipPublication(edit=>{if(edit.key==='a'&&!busy){busy=true;t.$.rows({a:{n:7}});nested=t.$.rows.a as Row;}return undefined;},()=>{});
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(/changed/);off();expect(t.$.rows.a).toBe(nested);expect(t.$.rows()).toEqual({a:{n:7}});expect(rt.slotCount()).toBe(start+1);nested!.n(8);expect(t.$.rows()).toEqual({a:{n:8}});}
++ finally{off();l.dispose();t.destroy();}
++});
++
++it('cancellation removes exact position and leaf registrations while retained failed branch cannot route to the root',async()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>},{enhancers:[transactions()]});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});const runtime=getTreeScalarSlotRuntime(t.$)!;
++ const registry=getPositionRegistry(t.$)!;let failed:Row|undefined;let ids:readonly number[]=[];const fail=Error('resource refusal');
++ const off=registerMembershipPublication(edit=>{if(edit.key==='a'){failed=edit.child as Row;ids=getOwnedPositionIds(failed.n)??[];throw fail;}return undefined;},()=>{});
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(fail);off();expect(ids.length).toBeGreaterThan(0);for(const id of ids){expect(registry.addressFor(id)).toBeUndefined();expect(registry.parentOf(id)).toBeUndefined();expect(runtime.resolveScalarSlot(id)).toBeUndefined();expect(runtime.resolveScalarLeaf(id)).toBeUndefined();}expect(getTreeScalarSlotRuntime(failed)).toBeUndefined();expect(getPositionRegistry(failed)).toBeUndefined();failed!.n(9);await flush();expect(sent).toEqual([]);expect(t.$.rows()).toEqual({});}
++ finally{off();l.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/dynamic-member-enrollment.spec.ts
+@@ -0,0 +1,70 @@
++import {describe,it,expect} from 'vitest';
++import {signalTree,link,transactions} from '../index';
++import {withWriteContext} from './write-context';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++const tick=async()=>{for(let i=0;i<100;i++)await Promise.resolve();};
++type Row={n:number};
++type InstalledRow={n:(value?:number)=>number};
++const make=()=>signalTree({rows:{} as Record<string,Row>});
++describe('dynamic member enrollment',()=>{
++ it('enrolls nested and root recipients independently, then retains omit/readd updates',async()=>{
++  const t=make();const root:unknown[]=[];const nested:unknown[]=[];
++  const a=link(t.$,{set:v=>{root.push(v);}}),b=link(t.$.rows,{set:v=>{nested.push(v);}});
++  try{t.$.rows({a:{n:1}});await tick();expect(nested).toEqual([{a:{n:1}}]);expect(root).toEqual([{rows:{a:{n:1}}}]);
++   const held=t.$.rows.a as InstalledRow;t.$.rows({});await tick();expect(nested.at(-1)).toEqual({});
++   t.$.rows({a:{n:2}});await tick();expect(t.$.rows.a).toBe(held);held.n(3);await tick();expect(nested.at(-1)).toEqual({a:{n:3}});
++  }finally{a.dispose();b.dispose();t.destroy();}
++ });
++ it('inspection construction stays absent until ordinary whole-member adoption',async()=>{
++  const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++  try{withWriteContext({participation:'inspection'},()=>t.$.rows({a:{n:9},hidden:{n:99}}));await tick();expect(sent).toEqual([]);
++   t.$.rows({a:{n:2}});await tick();expect(sent.at(-1)).toEqual({a:{n:2}});(t.$.rows.a as InstalledRow).n(3);await tick();expect(sent.at(-1)).toEqual({a:{n:3}});
++  }finally{l.dispose();t.destroy();}
++ });
++ it('failed preparation leaves no child and retry enrolls once',async()=>{
++  const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});const failure=new Error('recipient abort');
++  let escaped:object|undefined;
++  let off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped=edit.child;throw failure;}return undefined;},()=>{});
++  try{expect(()=>t.$.rows({a:{n:1}})).toThrow(failure);expect(t.$.rows()).toEqual({});await tick();expect(sent).toEqual([]);off();
++   t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([{a:{n:2}}]);(t.$.rows.a as InstalledRow).n(3);await tick();expect(sent).toEqual([{a:{n:2}},{a:{n:3}}]);
++   (escaped as {n:(value:number)=>void}).n(999);await tick();expect(sent).toEqual([{a:{n:2}},{a:{n:3}}]);
++  }finally{off();l.dispose();t.destroy();}
++ });
++ it('foreign pending owner holds a newly installed member then rejection releases it',async()=>{
++  const foreign=signalTree({x:0},{enhancers:[transactions()]});const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++  try{const p=foreign.transact(()=>foreign.$.x(1));t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([]);p.rollback();await tick();expect(sent).toEqual([{a:{n:2}}]);await l.settled();
++  }finally{l.dispose();t.destroy();foreign.destroy();}
++ });
++ it('disposal while a new member waits cannot resurrect delivery',async()=>{
++  const foreign=signalTree({x:0},{enhancers:[transactions()]});const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++  try{const p=foreign.transact(()=>foreign.$.x(1));t.$.rows({a:{n:2}});l.dispose();p.rollback();await tick();expect(sent).toEqual([]);(t.$.rows.a as InstalledRow).n(3);await tick();expect(sent).toEqual([]);
++  }finally{l.dispose();t.destroy();foreign.destroy();}
++ });
++ it('reentrant preparation preserves the installed newer identity and rejects stale outer member',async()=>{
++  const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});let entered=false;
++  const off=registerMembershipPublication(edit=>{if(edit.key==='a'&&!entered){entered=true;t.$.rows({a:{n:7}});}return undefined;},()=>{});
++  try{expect(()=>t.$.rows({a:{n:1}})).toThrow();await tick();expect(t.$.rows()).toEqual({a:{n:7}});expect(sent.at(-1)).toEqual({a:{n:7}});
++   (t.$.rows.a as InstalledRow).n(8);await tick();expect(sent.at(-1)).toEqual({a:{n:8}});
++  }finally{off();l.dispose();t.destroy();}
++ });
++ it('disposal during preparation prevents recipient resurrection and leaves retry useful',async()=>{
++  const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++  const off=registerMembershipPublication(edit=>{if(edit.key==='a')l.dispose();return undefined;},()=>{});
++  try{expect(()=>t.$.rows({a:{n:1}})).toThrow();expect(t.$.rows()).toEqual({});off();t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([]);expect(t.$.rows()).toEqual({a:{n:2}});
++  }finally{off();l.dispose();t.destroy();}
++ });
++ it('installed membership completer can immediately author a tracked descendant write',async()=>{
++  const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++  const off=registerMembershipPublication(edit=>edit.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{(t.$.rows.a as InstalledRow).n(3);});
++  try{t.$.rows({a:{n:2}});await tick();expect(t.$.rows()).toEqual({a:{n:3}});expect(sent.at(-1)).toEqual({a:{n:3}});
++  }finally{off();l.dispose();t.destroy();}
++ });
++
++ it('an authored descendant adopts only its needed inspection-created ancestor path',async()=>{
++  const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++  try{withWriteContext({participation:'inspection'},()=>t.$.rows({a:{n:9},hidden:{n:99}}));await tick();expect(sent).toEqual([]);
++   (t.$.rows.a as InstalledRow).n(2);await tick();expect(sent.at(-1)).toEqual({a:{n:2}});
++  }finally{l.dispose();t.destroy();}
++ });
++
++});
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -8,7 +8,7 @@
+ import { getRetainedMembershipPath } from '../internals/member-membership';
+ import type { WriteMetadata } from '../mutation-types';
+ import { getActiveWriteContext } from '../write-context';
+-import { combineTerminalRecords, preparePublicationMutations, registerMembershipPublication, registerBranchPublicationInputs, registerNativePublicationFactory, registerPublicationSnapshots, type MembershipPublicationEdit, type IntrinsicMutation, type PreparedPublicationUnit } from '../internals/intrinsic-mutation';
++import { combineTerminalRecords, stagePublicationMutations, preparePublicationMutations, registerMembershipPublication, registerBranchPublicationInputs, registerNativePublicationFactory, registerPublicationSnapshots, type MembershipPublicationEdit, type IntrinsicMutation, type PreparedPublicationUnit } from '../internals/intrinsic-mutation';
+ import * as projection from './projection';
+ import * as lifecycle from './lifecycle';
+ export {stampSource,subscribeProjection,deliverEqual} from './projection';
+@@ -163,34 +163,76 @@
+  const source=b.source&&b.occurrences.get(b.source);
+  return {proof:b.index.proof(),present:!source||b.index.exposed(source)};
+ }
++/** Detached descendant plans; registrations become live only with source installation. */
++function prepareDescendantEnrollment(channel:object,b:Binding,edit:MembershipPublicationEdit,requirement:lifecycle.NativeRequirement,inspection:boolean) {
++ const occurrences=edit.preparedOccurrences;
++ if(!occurrences?.length||!b.aggregate)return undefined;
++ const fresh=occurrences.filter(value=>!b.occurrences.has(value.source));
++ if(!fresh.length)return undefined;
++ const fields=fresh.flatMap(value=>{
++  const node=value.source;if(!isWritableLocation(node)||getEntityPublicationBinding(node))return [];
++  const address=getNodeAddress(node),relative=address&&relativeSourceAddress(b.address??[],address);
++  if(!address||relative===undefined)throw Error('Prepared field has no recipient address');
++  const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:[],unknown:false});facts.add(fact);
++  const registration=stagePublicationMutations(node,(m,input,native)=>prepareScalar(channel,m,input,node,native),completeScalar,()=>captureValueInput(channel,node));
++  return [{node,address,relative,fact,registration}];
++ });
++ const install={set(){
++  for(const field of fields){b.fields.set(field.node,{address:field.address,relative:field.relative});
++   b.fieldFacts.set(field.node,field.fact);b.completedFields.set(field.node,field.fact);fieldAt(b.fieldTrie,field.relative,true)!.field=field.node;
++   field.registration.install();b.releases.push(field.registration.release);
++  }
++ }};
++ return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},validate:()=>{
++  if(bindings.get(channel)?.index!==b.index||bindings.get(channel)?.current!==b.current)throw Error('Dynamic recipient changed during preparation');
++ },activate:()=>{
++  if(bindings.get(channel)?.index!==b.index)return;
++  // Enrollment callbacks write internal proof tables only. No unit is complete yet.
++  for(const occurrence of fresh){const handle=b.index.enrollCaptured(occurrence);b.occurrences.set(occurrence.source,handle);}
++  for(const field of fields){installFact(b,field.node,'value',field.fact,requirement);if(!inspection)b.initialized.add(field.node);}
++  if(inspection){
++   const handle=b.occurrences.get(edit.child);if(handle)b.index.setPresence(handle,false,lifecycle.initialRequirement());
++   const slot=slotNode(b,[...edit.address,edit.key])?.slots.get(edit.child);
++   if(slot){const state={present:false,fact:b.baselineStructure};b.presence.set(slot,state);b.completedPresence.set(slot,state);}
++  }
++ }};
++}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+  const physicalView={requirement:unavailableInput()};
+  const viewDomain=negativeViews.get(domainKey)??new Map<object,NativeView>();
+  const viewWrites=[{map:memberViews,key:edit.child,value:physicalView},{map:negativeViews,key:domainKey,value:viewDomain},...(!edit.present?[{map:viewDomain,key:edit.child,value:physicalView}]:[])];
+- if(meta?.participation==='inspection')return {record:{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},completion:{parts:[]}};
++ const inspection=meta?.participation==='inspection';
+  const authored=nativeAuthorship(edit.child);const native=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,branchInputs.flatMap(scope=>scope.native));
+  const address=[...edit.address,edit.key],found:object[]=[];let cursor=tries.get(edit.registry);if(cursor)found.push(...cursor.channels);for(const key of address){cursor=cursor?.children.get(key);if(!cursor)break;found.push(...cursor.channels);}collect(trieFor(edit.registry,address,false),found);const channels=[...new Set(found)];
+- physicalView.requirement=native.requirement;
++ if(!inspection)physicalView.requirement=native.requirement;
+  const domain=nativeNegativeDomains.get(domainKey)??new Map<object,lifecycle.NativeRequirement>();
+- const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];const finalizeRecipients:(()=>void)[]=[];
++ const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];const finalizeRecipients:(()=>void)[]=[];const enrollments:NonNullable<ReturnType<typeof prepareDescendantEnrollment>>[]=[];
+  for(const channel of channels){const b=bindings.get(channel);if(!b?.source||!b.address)continue;const inside=relativeSourceAddress(b.address,address);if(inside!==undefined){if(!b.aggregate&&(inside.length!==0||edit.child!==b.source))continue;}else if(!reaches(edit.child,b.address.slice(address.length),b.source))continue;
+-  const indexed=slotNode(b,address);if(!indexed)continue;const slot=indexed.slots.get(edit.child)??slotFor(edit.branch,edit.key,edit.child);const previous=b.current;
++  const enrollment=prepareDescendantEnrollment(channel,b,edit,inspection?unavailableInput():native.requirement,inspection);
++  if(enrollment){enrollments.push(enrollment);records.push(enrollment.record);finalizeRecipients.push(enrollment.validate);}
++  if(inspection)continue;
++  const indexed=slotNode(b,address);if(!indexed&&!enrollment)continue;const slot=indexed?.slots.get(edit.child)??slotFor(edit.branch,edit.key,edit.child);const previous=b.current;
+   const attributed=meta?.transactionId;const known=typeof attributed==='number'?lifecycle.ownerCell(b.owner,attributed):undefined;
+   const valid=attributed===undefined||!!known&&meta?.transactionOwner===lifecycle.ownerToken(b.owner);
+   const uncertainty:lifecycle.RecipientUncertainty={invalidAttribution:!valid,unobservedOrigin:meta?.origin!==undefined};
+   const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin);
+   const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown});facts.add(fact);
+   let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});const state=Object.freeze({present:edit.present,fact});
+-  const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
++  const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(edit.ordinary?.before.present??b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
+   const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],uncertainty,fact.blockers,native.requirement);
+   if(record.finalize)finalizeRecipients.push(record.finalize);
+-  records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:indexed.slots,key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
+- }
+- const record=combineTerminalRecords(...records);return record?{record,completion:{parts},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
+-}
+-function completeMembership(completion:object):void{for(const {channel,unit}of(completion as {parts:{channel:object;unit:Unit}[]}).parts)completeScalar({channel,unit});}
++  records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:{set(){indexSlot(b,slot);}},key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
++ }
++ const record=combineTerminalRecords(...(inspection?[{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},...enrollments.map(value=>value.record)]:records));return record?{record,completion:{parts,enrollments},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
++}
++function completeMembership(completion:object):void{
++ const state=completion as {parts:{channel:object;unit:Unit}[];enrollments?:{activate():void}[]};
++ for(const enrollment of state.enrollments??[])enrollment.activate();
++ state.enrollments=undefined;
++ for(const {channel,unit}of state.parts)completeScalar({channel,unit});
++}
+ function ready(channel:object,b:Binding):void{
+  for(const unit of b.pending){
+   if(!unit.complete)break;
+@@ -352,9 +394,9 @@
+   }
+   wakeChannel(channel);
+  },edge=>nativeMembers.get(edge.child)??lifecycle.initialRequirement(),(edge,occurrence,requirement)=>{
+-  const slot=slotFor(edge.parent,edge.key,edge.child),fact=nativeFact(requirement);
++  const slot=slotNode(binding,edge.address)?.slots.get(edge.child)??slotFor(edge.parent,edge.key,edge.child),fact=nativeFact(requirement);
+   const state={present:edge.present,fact};binding.occurrences.set(edge.child,occurrence);
+-  binding.presence.set(slot,state);binding.completedPresence.set(slot,state);indexSlot(binding,slot);
++  if(!binding.presence.has(slot))binding.presence.set(slot,state);if(!binding.completedPresence.has(slot))binding.completedPresence.set(slot,state);indexSlot(binding,slot);
+   return proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);};
+  });
+  binding={index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
+--- /dev/null
++++ b/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
+@@ -0,0 +1,64 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {signalTree,link,transactions,entityMap} from '../index';
++import {withWriteContext} from './write-context';
++import {getPathNotifier} from './path-notifier';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++import {getTreeScalarSlotRuntime} from './internals/tree-scalar-slot-port';
++import {diagnostics} from './experimental-publication/private';
++const tick=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++const log=(v:unknown)=>appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/independent.jsonl',JSON.stringify(v)+'\n');
++type Declaration=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly object[]},work:()=>unknown):unknown};
++type Leaf={():number;(v:number):void};
++type Row={n:Leaf};
++
++it('deep inspection-created ordinary ancestry adopts only authored descendant path',async()=>{
++ const t=signalTree({rows:{} as Record<string,{deep:{x:number;y:number};other:number}>});const sent:unknown[]=[];const l=link(t.$,{set:v=>{sent.push(v);}});
++ try{withWriteContext({participation:'inspection'},()=>t.$.rows({a:{deep:{x:9,y:99},other:88},hidden:{deep:{x:77,y:66},other:55}}));await tick();expect(sent).toEqual([]);
++  (t.$.rows.a as {deep:{x:Leaf;y:Leaf};other:Leaf}).deep.x(2);await tick();expect(sent.at(-1)).toEqual({rows:{a:{deep:{x:2}}}});
++  (t.$.rows.a as {deep:{x:Leaf;y:Leaf};other:Leaf}).deep.x(3);await tick();expect(sent.at(-1)).toEqual({rows:{a:{deep:{x:3}}}});
++ }finally{l.dispose();t.destroy();}
++});
++
++it('partial installed nested member stays enrolled after later equality failure',async()=>{
++ const t=signalTree({trigger:[{x:0}]} as {trigger:{x:number}[];fresh?:{n:number}});const sent:unknown[]=[];const l=link(t.$,{set:v=>{sent.push(v);}});const failure=Error('independent later equality');
++ try{expect(()=>(t.$ as unknown as (value:{fresh:{n:number};trigger:{x:number}[]})=>void)({fresh:{n:1},trigger:[{get x():number{throw failure;}}]})).toThrow(failure);await tick();expect(sent).toEqual([{trigger:[{x:0}],fresh:{n:1}}]);
++  (t.$.fresh as unknown as Row).n(2);await tick();expect(sent.at(-1)).toEqual({trigger:[{x:0}],fresh:{n:2}});
++ }finally{l.dispose();t.destroy();}
++});
++
++it('nested installed writer survives rejected outer construction without abandoned registration',async()=>{
++ const t=signalTree({rows:{} as Record<string,unknown>,kept:{} as Record<string,number>});const sent:unknown[]=[];const l=link(t.$,{set:v=>{sent.push(v);}});const runtime=getTreeScalarSlotRuntime(t.$)!;const slots=runtime.slotCount();const failure=Error('independent getter abort');
++ try{const bad:unknown[]=[];Object.defineProperty(bad,'0',{get(){t.$.kept({saved:7});throw failure;}});
++  expect(()=>t.$.rows({lost:{n:1,bad}})).toThrow(failure);await tick();expect(t.$()).toEqual({rows:{},kept:{saved:7}});expect(sent.at(-1)).toEqual(t.$());expect(runtime.slotCount()).toBe(slots+1);
++  (t.$.kept.saved as Leaf)(8);await tick();expect(sent.at(-1)).toEqual({rows:{},kept:{saved:8}});
++ }finally{l.dispose();t.destroy();}
++});
++
++it('repeated omit/readd retains one observable writer and disposal ends delivery',async()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});
++ try{t.$.rows({a:{n:1}});await tick();const held=t.$.rows.a as Row;
++  for(let i=2;i<5;i++){t.$.rows({});await tick();expect(sent.at(-1)).toEqual({});t.$.rows({a:{n:i}});await tick();expect(t.$.rows.a).toBe(held);const before=sent.length;held.n(i+10);await tick();expect(sent.length).toBe(before+1);expect(sent.at(-1)).toEqual({a:{n:i+10}});}
++  const count=sent.length;l.dispose();held.n(100);await tick();expect(sent.length).toBe(count);
++ }finally{l.dispose();t.destroy();}
++});
++
++it('new member consuming pending source subtree cannot drop its actual owner on omission',async()=>{
++ const t=signalTree({rows:{a:{n:0}} as Record<string,{n:number}>});const owner=signalTree({z:0},{enhancers:[transactions()]});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}}) as Declaration;const q=owner.transact(()=>owner.$.z(7));
++ try{l.declare({kind:'dependent',owners:[q]},()=>(t.$.rows.a as Row).n(7));await tick();expect(sent).toEqual([]);
++  l.declare({kind:'dependent',owners:[q]},()=>t.$.rows(input=>({b:{n:input.a.n}})));await tick();expect(t.$.rows()).toEqual({b:{n:7}});expect(sent).toEqual([]);q.confirm();await tick();expect(sent).toEqual([{b:{n:7}}]);
++ }finally{l.dispose();t.destroy();owner.destroy();}
++});
++
++it('repeated preinstall refusal leaves no child observer and no scalar slot growth',async()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});const rt=getTreeScalarSlotRuntime(t.$)!;const slots=rt.slotCount();const before=diagnostics();const escaped:Row[]=[];const failure=Error('independent preinstall');
++ const off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped.push(edit.child as Row);throw failure;}return undefined;},()=>{});
++ try{for(let i=0;i<3;i++)expect(()=>t.$.rows({a:{n:i}})).toThrow(failure);off();expect(rt.slotCount()).toBe(slots);for(const row of escaped)row.n(99);await tick();expect(sent).toEqual([]);expect(t.$.rows()).toEqual({});expect(diagnostics().listeners).toBe(before.listeners);expect(diagnostics().latest).toBe(before.latest);
++  t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([{a:{n:2}}]);log({case:'failed-plan-live-counts',listeners:before.listeners,latest:before.latest,slots});
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('real retained collection obeys existing absent named-row refusal and supplied-row readd',async()=>{
++ const t=signalTree({branch:{rows:entityMap<{id:string;n:number},string>(),s:99},other:0});const rows=t.$.branch.rows;rows.addOne({id:'a',n:1});const held=rows.byIdOrFail('a');
++ try{(t.$ as unknown as (value:{other:number})=>void)({other:1});expect(rows.all()).toEqual([]);expect(()=>held.n(7)).toThrow(/not found/);expect(t.$()).toEqual({other:1});rows.addOne({id:'b',n:2});expect(rows.all()).toEqual([{id:'b',n:2}]);expect(t.$()).toEqual({branch:{rows:{all:[{id:'b',n:2}]}},other:1});}finally{t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
+@@ -0,0 +1,15 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {signalTree,link,transactions,entityMap} from '../index';
++import {getPathNotifier} from './path-notifier';
++type Declaration=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly object[]},work:()=>unknown):unknown};
++const tick=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++for(const kind of ['scalar','empty','collection','mixed'] as const)for(const outcome of ['confirm','rollback'] as const)it(`undeclared child ${kind} useful absence after ${outcome}`,async()=>{
++ const t=signalTree({branch:{rows:entityMap<{id:string;x:number},string>(),x:0},other:0},{enhancers:[transactions()]});const owner=signalTree({z:0},{enhancers:[transactions()]});if(kind!=='empty')t.$.branch.rows.addOne({id:'a',x:0});await tick();
++ const rootSent:unknown[]=[],childSent:unknown[]=[];const root=link(t.$ as unknown as (()=>{other:number;branch?:unknown}),{set:v=>{rootSent.push(v);}}) as Declaration;const child=link((kind==='scalar'?t.$.branch.x:kind==='mixed'?t.$.branch:t.$.branch.rows) as never,{set:(v:unknown)=>{childSent.push(v);}});const q=owner.transact(()=>owner.$.z(7));
++ try{root.declare({kind:'dependent',owners:[q]},()=>kind==='scalar'?t.$.branch.x(7):kind==='empty'?t.$.branch.rows.addOne({id:'a',x:7}):t.$.branch.rows.updateOne('a',{x:7}));await tick();expect(rootSent).toEqual([]);
++  root.declare({kind:'independent'},()=>(t.$ as unknown as (value:{other:number})=>void)({other:1}));await tick();expect(rootSent).toEqual([{other:1}]);const immediate=[...childSent];q[outcome]();await tick();
++  appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/terminal.jsonl',JSON.stringify({kind,outcome,immediate,terminal:childSent,root:rootSent})+'\n');
++  expect(childSent).toEqual([kind==='empty'||kind==='collection'?[]:undefined]);
++ }finally{root.dispose();child.dispose();t.destroy();owner.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/construction-allocation.ts
+@@ -0,0 +1,32 @@
++import type {TerminalRecordPlan} from './intrinsic-mutation';
++/** One member construction owns only its own provisional resources. */
++export class ConstructionAllocation {
++ private state: 'preparing'|'installed'|'canceled' = 'preparing';
++ private attaches: Array<()=>void> = [];
++ private cancels: Array<()=>void> = [];
++ private checks: Array<()=>void> = [];
++ get installed():boolean{return this.state==='installed';}
++ add(attach:()=>void, cancel:()=>void = ()=>{}, validate:()=>void = ()=>{}):void {
++  if(this.state!=='preparing')throw new Error('Closed member construction');
++  this.attaches.push(attach);this.cancels.push(cancel);this.checks.push(validate);
++ }
++ validate():void {for(const check of this.checks)check();}
++ install():void {
++  if(this.state!=='preparing')throw new Error('Closed member construction');
++  for(const attach of this.attaches)attach();
++  this.state='installed';this.clear();
++ }
++ cancel():void {
++  if(this.state!=='preparing')return;
++  this.state='canceled';
++  try{for(const cancel of this.cancels.reverse())cancel();}finally{this.clear();}
++ }
++ private clear():void{this.attaches=[];this.cancels=[];this.checks=[];}
++}
++
++/** Prepared by the source constructor; never reconstruct responsibility at install. */
++export interface PreparedMemberConstruction {
++ readonly child:object;
++ readonly responsibility?:TerminalRecordPlan;
++ readonly allocation:ConstructionAllocation;
++}
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -288,6 +288,15 @@
+   preparers.set(prepare, {complete,captureInput});
+   composePublication(source);
+   return () => { if (preparers.delete(prepare)) composePublication(source); };
++}
++
++/** No source registration is reachable until the producer installs this record. */
++export function stagePublicationMutations(node: object, prepare: PublicationPreparer,
++ complete: PublicationCompleter, captureInput?: PublicationInputCapture) {
++ if(!SOURCES.has(node))throw new Error('Prepared descendant lacks native publication source');
++ let release:(()=>void)|undefined;
++ return {install:()=>{release=preparePublicationMutations(node,prepare,complete,captureInput);},
++ release:()=>{release?.();release=undefined;}};
+ }
+ 
+ function composePublication(source: SourceRecord): void {
+@@ -325,6 +334,7 @@
+ 
+ /** Optional ordinary-membership admission; producers retain descriptor authority. */
+ export interface MembershipPublicationEdit {
++  readonly preparedOccurrences?: readonly import('./native-occurrence').NativeOccurrence[];
+   readonly registry: object;
+   readonly branch: object;
+   readonly address: readonly string[];
+--- a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ b/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -1,3 +1,5 @@
++import type {ConstructionAllocation,PreparedMemberConstruction} from './construction-allocation';
++import { inheritObservationForAddedMember } from './observation-substrate';
+ import { installTerminalRecord, combineTerminalRecords, membershipPublicationPreparer, completePreparedPublication } from './intrinsic-mutation';
+ import { reportContainedObserverError } from './error-reporter';
+ import type { TerminalRecordPlan } from './intrinsic-mutation';
+@@ -28,7 +30,9 @@
+   publishMembershipChange,
+ } from './snapshot-authority';
+ import { pathObservation } from './path-observation-port';
+-import { linkAddedMember } from './member-membership';
++import { ordinaryMemberSnapshot } from './plain-branch-membership';
++import { prepareNativeMemberOccurrences } from './native-occurrence';
++import { linkAddedMember, prepareFreshMemberPresence } from './member-membership';
+ // ⚠️ THE PORT, NOT THE ENGINE. Marker processors are handed the neutral
+ // observation port; the only thing any of them calls on it is `notify`. Typing
+ // this as `PathObservationPort` claimed the whole engine surface and is what let a
+@@ -780,25 +784,47 @@
+   ];
+   if (!bind) return undefined;
+ 
+-  const child = bind(key, value); // may throw — nothing observable yet
+-
+-  installPreparedMember(branch as object, key, child);
+-  publishMembershipChange(branch as object);
+-  return child;
+-}
+-
+-/** Install one prepared child on both physical halves without publishing. */
++  const prepared = bind(key, value); // source owns cancellation if construction throws
++  try {
++    installPreparedMember(branch as object,key,prepared.child,prepared.responsibility,prepared.allocation);
++    return prepared.child;
++  } finally {prepared.allocation.cancel();}
++}
++
++/** Install both physical halves and their records. Construction-owned children
++ * invalidate membership before callback-capable completion; other callers own
++ * their existing publication boundary. */
+ export function installPreparedMember(
+   branch: object,
+   key: string,
+   child: unknown,
+-  responsibility?: TerminalRecordPlan
++  responsibility?: TerminalRecordPlan,
++  allocation?: ConstructionAllocation
+ ): void {
++  const constructionTargets = allocation ? [branch,...((branch as Record<symbol,unknown>)[NODE_STORE_SYMBOL]
++    && (branch as Record<symbol,unknown>)[NODE_STORE_SYMBOL]!==branch
++    ? [(branch as Record<symbol,unknown>)[NODE_STORE_SYMBOL] as object] : [])]
++    .map(target=>({target,before:Object.getOwnPropertyDescriptor(target,key)})) : [];
+   const prepare = membershipPublicationPreparer;
+   const registry = prepare ? getPositionRegistry(branch) : undefined;
+   const address = registry ? getNodeAddress(branch) : undefined;
++  const fresh = isTraversableNode(child) ? prepareFreshMemberPresence(branch,key,child) : undefined;
++  const occurrence = prepare && registry && address && isTraversableNode(child)
++    ? prepareNativeMemberOccurrences(branch,key,child) : undefined;
++  // Read the detached canonical child's ordinary image before any install or delivery.
++  const ordinary = fresh ? {before:{present:false as const},after:fresh.present
++    ? {present:true as const,value:ordinaryMemberSnapshot(child)} : {present:false as const}} : undefined;
+   const unit = prepare && registry && address && isTraversableNode(child)
+-    ? prepare({registry,branch,address,key,child,present:true}) : undefined;
++    ? prepare({registry,branch,address,key,child,present:true,ordinary,preparedOccurrences:occurrence?.occurrences}) : undefined;
++  fresh?.validate();occurrence?.validate();allocation?.validate();
++  for(const {target,before} of constructionTargets){
++    const after=Object.getOwnPropertyDescriptor(target,key);
++    const same=before===undefined ? after===undefined : after!==undefined &&
++      before.value===after.value && before.get===after.get && before.set===after.set &&
++      before.configurable===after.configurable && before.enumerable===after.enumerable && before.writable===after.writable;
++    if(!same || (after ? !after.configurable : !Object.isExtensible(target)))
++      throw new Error('Prepared member target changed');
++  }
+   const records = combineTerminalRecords(responsibility,unit?.record);
+   let failed = false;
+   try {
+@@ -814,6 +840,7 @@
+       configurable: true,
+     });
+   };
++  allocation?.install();
+   define(branch as object);
+   const backingStore = (branch as Record<symbol, unknown>)[
+     NODE_STORE_SYMBOL
+@@ -824,14 +851,20 @@
+   if (records) {
+     installTerminalRecord(records);
+   }
++  fresh?.install();
+   // Under a branch that has been omitted before, so an omission above it is
+   // visible to the new member too (`isAbsentMember`).
+   linkAddedMember(branch as object, key, child);
++  // Claim only the child that actually installed; abandoned plans own no live observer.
++  inheritObservationForAddedMember(branch, child);
+ 
+   (branch as Record<symbol, Map<string, unknown> | undefined>)[KEY_INDEX]?.set(
+     key,
+     child
+   );
++  // Completion can throw after installation. Invalidate the installed shape
++  // first so an error cannot strand its cached snapshot at the old membership.
++  if(allocation)publishMembershipChange(branch);
+   } catch(error){failed=true;throw error;}
+   finally {
+     if(unit)try {completePreparedPublication(unit.completion);}
+@@ -887,7 +920,7 @@
+  * DERIVED from the owning branch, so there is no argument through which a caller
+  * could target topology elsewhere in the tree.
+  */
+-export type MemberMaterializer = (key: string, value: unknown) => unknown;
++export type MemberMaterializer = (key: string, value: unknown) => PreparedMemberConstruction;
+ 
+ /**
+  * @internal The canonical construction authority as seen by the marker
+--- a/packages/kernel/src/lib/internals/member-membership.ts
++++ b/packages/kernel/src/lib/internals/member-membership.ts
+@@ -204,11 +204,9 @@
+   );
+ }
+ function ownOrdinaryAbsence(node: unknown): boolean {
+-  const binding = memberBinding(node);
+-  return (
+-    binding !== undefined &&
+-    !readOrdinaryMemberPresence(binding.parent, binding.key)
+-  );
++  for(let binding=memberBinding(node);binding;binding=memberBinding(binding.parent))
++    if(!readOrdinaryMemberPresence(binding.parent,binding.key))return true;
++  return false;
+ }
+ 
+ /** Dev-mode cross-check of cached answers, one read in this many (8g). */
+@@ -508,8 +506,7 @@
+     );
+     if (
+       descriptor?.enumerable === false ||
+-      (path.length === 0 &&
+-        !readOrdinaryMemberPresence(binding.parent, binding.key))
++      !readOrdinaryMemberPresence(binding.parent, binding.key)
+     )
+       outer = path.length;
+     path.push(binding);
+@@ -1013,3 +1010,20 @@
+       }
+   }
+ }
++
++/** Prepare the ordinary exception for a newly materialized physical edge. */
++export function prepareFreshMemberPresence(branch: object,key: string,child: object) {
++ const parent=nodeOf(branch),previous=ordinaryPresenceSources.get(parent);
++ const descriptor=Object.getOwnPropertyDescriptor(parent,key);
++ const source=previous??new OrdinaryMemberPresenceSource();
++ const edit=source.prepare(key,child,false,true,getActiveWriteContext()?.participation==='inspection');
++ return {present:edit.after,validate:()=>{
++  if(ordinaryPresenceSources.get(parent)!==previous||Object.getOwnPropertyDescriptor(parent,key)?.value!==descriptor?.value)throw new Error('Fresh membership preparation reentered installation');
++  source.validate(edit);
++ },install:()=>{
++  const delta=source.install(edit);ordinaryPresenceSources.set(parent,source);
++  if(!edit.after){markHasDormant(parent);const peer=peerOf(parent);if(peer)markHasDormant(peer);linkMember(parent,key,child);linkDescendants(child);}
++  const runtime=getTreeScalarSlotRuntime(parent);
++  if(runtime&&delta){ordinaryDivergences.set(runtime,(ordinaryDivergences.get(runtime)??0)+delta);runtime.enableAbsence?.(ABSENCE);}
++ }};
++}
+--- a/packages/kernel/src/lib/internals/native-occurrence.ts
++++ b/packages/kernel/src/lib/internals/native-occurrence.ts
+@@ -48,3 +48,37 @@
+   issued.add(result);return result;
+ }
+ export function isNativeOccurrence(value: NativeOccurrence): boolean { return issued.has(value); }
++
++/** Source construction authority: authenticate a detached addition against its live parent. */
++export function prepareNativeMemberOccurrences(parent: object, key: string, child: object) {
++  const ancestry = captureNativeOccurrence(parent);
++  const address = getNodeAddress(parent);
++  if (!address || Object.getOwnPropertyDescriptor(occurrenceIdentity(parent), key))
++    throw new Error('Prepared native member is not a fresh edge');
++  const occurrences: NativeOccurrence[] = [];
++  const seen=new Set<object>();
++  const visit = (node: object, edges: readonly NativeOccurrenceEdge[]): void => {
++    const expected=edges.at(-1)?.address??[],actual=getNodeAddress(node);
++    if(getPositionRegistry(node)!==getPositionRegistry(parent)||!actual||actual.length!==expected.length||actual.some((part,i)=>part!==expected[i])||seen.has(node))
++      throw new Error('Prepared native member has invalid source identity');
++    seen.add(node);
++    const occurrence = Object.freeze({root: ancestry.root, source: node, edges: Object.freeze([...edges])});
++    issued.add(occurrence); occurrences.push(occurrence);
++    if (getEntityPublicationBinding(node)) return;
++    const storage = occurrenceIdentity(node);
++    for (const name of Object.getOwnPropertyNames(storage)) {
++      const descriptor = Object.getOwnPropertyDescriptor(storage, name);
++      if (!descriptor || !('value' in descriptor) || !isTraversableNode(descriptor.value) || !getNodeAddress(descriptor.value)) continue;
++      visit(descriptor.value, [...edges, Object.freeze({parent: node, key:name, child:descriptor.value,
++        address: Object.freeze([...address,key,...getNodeAddress(descriptor.value)!.slice(address.length+1)]), present:descriptor.enumerable===true})]);
++    }
++  };
++  visit(child,[...ancestry.edges,Object.freeze({parent,key,child,address:Object.freeze([...address,key]),present:true})]);
++  return {occurrences:Object.freeze(occurrences),validate:()=>{
++    const current=captureNativeOccurrence(parent);
++    if (current.root!==ancestry.root || current.edges.length!==ancestry.edges.length ||
++        current.edges.some((edge,i)=>edge.child!==ancestry.edges[i].child||edge.present!==ancestry.edges[i].present) ||
++        Object.getOwnPropertyDescriptor(occurrenceIdentity(parent),key))
++      throw new Error('Prepared native member ancestry changed');
++  }};
++}
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,4 @@
++import type {ConstructionAllocation} from './construction-allocation';
+ import type { PositionId } from '../types';
+ import { markTreeCell } from './cell-identity';
+ import {
+@@ -138,7 +139,7 @@
+   observation: ObservationAdapter,
+   slotIndex: SlotIndex,
+   liveness: { absence?: MemberAbsence }
+-): Location<T> {
++): {leaf:Location<T>;token:ObservationToken;attach(nextKernel:TreeScalarSlotRuntime,nextPublication:NativeScalarSlotPublication,nextSlot:SlotIndex,nextLiveness:{absence?:MemberAbsence}):void} {
+   const holder: { leaf?: Location<T> } = {};
+   const realized = observation.createWritableCell?.(() => {
+     // Absent when this leaf or a member above it is omitted (v16 8d). One
+@@ -351,7 +352,7 @@
+   registerWritableLocationBinding(binding);
+   native.set = binding.replace;
+   native.update = binding.derive;
+-  return leaf;
++  return {leaf,token:realized.token,attach(nextKernel,nextPublication,nextSlot,nextLiveness){kernel=nextKernel;publication=nextPublication;slotIndex=nextSlot;liveness=nextLiveness;}};
+ }
+ 
+ export function createNativeTreeScalarLeafRuntime(
+@@ -373,10 +374,24 @@
+     createLeaf<T>(
+       initialValue: T,
+       equal: (current: T, next: T) => boolean,
+-      positionId?: PositionId
++      positionId?: PositionId,
++      allocation?: ConstructionAllocation
+     ): Location<T> {
++      if(allocation){
++        const detached=createTreeScalarSlotRuntime();
++        const localPublication=new NativeScalarSlotPublication(observation);
++        const localSlot=detached.createSlot(initialValue,equal);
++        const prepared=createNativeScalarLeaf<T>(detached,localPublication,observation,localSlot,{});
++        allocation.add(()=>{
++          const slot=kernel.createSlot(initialValue,equal,positionId);
++          publication.bind(slot,prepared.token);
++          if(positionId!==undefined)leafByPositionId.set(positionId,prepared.leaf as Location<unknown>);
++          prepared.attach(kernel,publication,slot,liveness);
++        },()=>{},()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
++        return prepared.leaf;
++      }
+       const slotIndex = kernel.createSlot(initialValue, equal, positionId);
+-      const leaf = createNativeScalarLeaf<T>(
++      const {leaf} = createNativeScalarLeaf<T>(
+         kernel,
+         publication,
+         observation,
+--- a/packages/kernel/src/lib/internals/owned-mutation.ts
++++ b/packages/kernel/src/lib/internals/owned-mutation.ts
+@@ -38,6 +38,7 @@
+ };
+ 
+ type OwnedWriteHooks<TValue> = {
++  isActive?:()=>boolean;
+   afterSet?: (
+     value: TValue,
+     before: TValue,
+@@ -224,7 +225,7 @@
+   leaf: Location<TValue>,
+   options: OwnedMutationOptions,
+   hooks: OwnedWriteHooks<TValue> = {}
+-): void {
++): () => void {
+   const metadataStorage = options.metadataStorage ?? 'property';
+ 
+   defineOwnedPositionIds(leaf as object, options.positionIds, metadataStorage);
+@@ -242,6 +243,7 @@
+   const releaseIntrinsicObserver = observeIntrinsicMutations<TValue>(
+     leaf as object,
+     (mutation) => {
++      if(hooks.isActive && !hooks.isActive())return;
+       if (mutation.changed) {
+         emitOwnedMutation(
+           options,
+@@ -269,4 +271,5 @@
+   if (!releaseIntrinsicObserver) {
+     throw new Error('SignalTree location has no intrinsic mutation source');
+   }
+-}
++  return releaseIntrinsicObserver;
++}
+--- a/packages/kernel/src/lib/internals/position-registry.ts
++++ b/packages/kernel/src/lib/internals/position-registry.ts
+@@ -125,6 +125,8 @@
+     this.parents.set(positionId, parent);
+     return positionId;
+   }
++
++  releaseConstructionPosition(position:PositionId):void {this.parents.delete(position);this.addresses.delete(position);this.collectionPaths.delete(position);}
+ 
+   parentOf(position: PositionId): PositionId | undefined {
+     return this.parents.get(position);
+@@ -212,3 +214,9 @@
+     ? nodeAddresses.get(node as object)
+     : undefined;
+ }
++
++/** Exact provisional entries only; never rewinds namespace identity. */
++export function releaseConstructionPosition(registry:PositionRegistry,position:PositionId):void {
++  if(!(registry instanceof TreePositionRegistry))throw new Error('Unsupported construction registry');
++  registry.releaseConstructionPosition(position);
++}
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,4 @@
++import type {ConstructionAllocation} from './construction-allocation';
+ import type { PositionId } from '../types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+ import {
+@@ -128,6 +129,7 @@
+ ): {
+   readonly leaf: Location<T>;
+   readonly binding: WritableLocationBinding<T>;
++  attach(nextKernel:TreeScalarSlotKernel,nextPublication:ScalarSlotPublication,nextSlot:SlotIndex,nextLiveness:{absence?:MemberAbsence}):void;
+ } {
+   const holder: { leaf?: Location<T> } = {};
+ 
+@@ -170,7 +172,7 @@
+     liveness.absence?.needsAdmission?.(holder.leaf) === true;
+   const leaf = binding.location as Location<T>;
+   holder.leaf = leaf;
+-  return { leaf, binding };
++  return { leaf, binding, attach(nextKernel,nextPublication,nextSlot,nextLiveness){kernel=nextKernel;publication=nextPublication;slotIndex=nextSlot;liveness=nextLiveness;} };
+ }
+ 
+ export function createTreeScalarLeafRuntime(
+@@ -194,8 +196,23 @@
+     createLeaf<T>(
+       initialValue: T,
+       equal: (current: T, next: T) => boolean,
+-      positionId?: PositionId
++      positionId?: PositionId,
++      allocation?: ConstructionAllocation
+     ): Location<T> {
++      if(allocation){
++        const detached=createTreeScalarSlotKernel();
++        const localPublication=new ScalarSlotPublication(locations);
++        const localSlot=detached.createSlot(initialValue,equal);
++        const prepared=createScalarLeaf<T>(detached,localPublication,locations,localSlot,{});
++        localPublication.bind(localSlot,prepared.binding as WritableLocationBinding<unknown>);
++        allocation.add(()=>{
++          const slot=kernel.createSlot(initialValue,equal,positionId);
++          publication.bind(slot,prepared.binding as WritableLocationBinding<unknown>);
++          if(positionId!==undefined)leafByPositionId.set(positionId,prepared.leaf as Location<unknown>);
++          prepared.attach(kernel,publication,slot,liveness);
++        },()=>{},()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
++        return prepared.leaf;
++      }
+       const slotIndex = kernel.createSlot(initialValue, equal, positionId);
+       const { leaf, binding } = createScalarLeaf<T>(
+         kernel,
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+@@ -1,3 +1,4 @@
++import type {ConstructionAllocation} from './construction-allocation';
+ import type { PositionId } from '../types';
+ import type { Location } from './cell-runtime';
+ import { isTraversableNode } from './node-shape';
+@@ -60,7 +61,8 @@
+   createLeaf<T>(
+     initialValue: T,
+     equal: (current: T, next: T) => boolean,
+-    positionId?: PositionId
++    positionId?: PositionId,
++    allocation?: ConstructionAllocation
+   ): Location<T>;
+   beginFrame(): ScalarSlotMutationFrame;
+   runInvalidationGroup(run: () => void): void;
+--- /dev/null
++++ b/packages/kernel/src/lib/keyed-construction-cleanup.spec.ts
+@@ -0,0 +1,37 @@
++import {expect,it} from 'vitest';
++import {signalTree,link,transactions} from '../index';
++import {materializeMember,ordinaryBranch,registerMarkerProcessor} from './internals/materialize-markers';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++import {getTreeScalarSlotRuntime} from './internals/tree-scalar-slot-port';
++import {getMutationCaptureRuntime} from './internals/mutation-capture-runtime';
++import {getOwnedPositionIds} from './internals/owned-metadata';
++import {getPositionRegistry} from './internals/position-registry';
++const DYN=Symbol('keyed-cleanup-fixture');
++type Marker={[DYN]:true;seed:Record<string,unknown>};
++registerMarkerProcessor((v:unknown):v is Marker=>typeof v==='object'&&v!==null&&DYN in v,(m:Marker)=>ordinaryBranch(m.seed,{keyedLookup:true}));
++type Cell={():number;(v:number):void};type Child={():unknown;n:Cell;more:Cell};type Branch={():Record<string,unknown>;[key:string]:unknown};
++function setup(){const t=signalTree({rows:{[DYN]:true,seed:{}} as Marker},{enhancers:[transactions()]});const rows=t.$.rows as unknown as Branch;const sent:unknown[]=[];const l=link(rows,{set:v=>{sent.push(v);}});return{t,rows,l,sent,rt:getTreeScalarSlotRuntime(t.$)!};}
++const flush=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++
++for(const sameKey of [false,true])it(`keyed constructor refusal protects ${sameKey?'same':'other'}-key nested installed identity and releases recursive cells`,async()=>{
++ const {t,rows,l,sent,rt}=setup();const before=rt.slotCount();const fail=Error('keyed refused');let nested:Child|undefined;let escaped:Child|undefined;let busy=false;let ids:readonly number[]=[];const registry=getPositionRegistry(rows)!;
++ const off=registerMembershipPublication(edit=>{if(edit.key!=='a'||busy)return;busy=true;escaped=edit.child as Child;ids=getOwnedPositionIds(escaped.n)??[];nested=materializeMember(rows,sameKey?'a':'kept',{n:7,more:8}) as Child;throw fail;},()=>{});
++ try{expect(()=>materializeMember(rows,'a',{n:1,more:2})).toThrow(fail);off();const key=sameKey?'a':'kept';expect(rows[key]).toBe(nested);expect(rows()).toEqual({[key]:{n:7,more:8}});nested!.n(9);await flush();const count=sent.length;escaped!.n(99);(escaped as unknown as (v:unknown)=>void)({n:99,more:100,newChild:{x:12}});await flush();expect(sent.length).toBe(count);expect(rows()).toEqual({[key]:{n:9,more:8}});expect(rt.slotCount()).toBe(before+2);for(const id of ids){expect(registry.addressFor(id)).toBeUndefined();expect(rt.resolveScalarSlot(id)).toBeUndefined();expect(rt.resolveScalarLeaf(id)).toBeUndefined();}}
++ finally{off();l.dispose();t.destroy();}
++});
++
++it('keyed first appearance prepares rollback responsibility and rejects responsibility refusal without acquisition',()=>{
++ const {t,rows,l,rt}=setup();const capture=getMutationCaptureRuntime(t.$)!;const original=capture.prepareMemberResponsibility;const before=rt.slotCount();let calls=0;const fail=Error('keyed responsibility');capture.prepareMemberResponsibility=(branch,key,child,presence)=>{if(branch===rows&&key==='a'){calls++;throw fail;}return original?.(branch,key,child,presence);};
++ try{expect(()=>materializeMember(rows,'a',{n:1,more:2})).toThrow(fail);expect(calls).toBe(1);expect(rows()).toEqual({});expect(rt.slotCount()).toBe(before);}
++ finally{capture.prepareMemberResponsibility=original;l.dispose();t.destroy();}
++});
++
++it('keyed creation rollback and dormant reuse preserve source identity without fresh allocation',()=>{
++ const {t,rows,l,rt}=setup();try{let held:Child|undefined;const q=t.transact(()=>{held=materializeMember(rows,'a',{n:7,more:8}) as Child;});expect(rows()).toEqual({a:{n:7,more:8}});const count=rt.slotCount();q.rollback();expect(rows()).toEqual({});const reused=materializeMember(rows,'a',{n:9,more:10});expect(reused).toBe(held);expect(rt.slotCount()).toBe(count);expect(rows()).toEqual({a:{n:9,more:10}});}finally{l.dispose();t.destroy();}
++});
++
++it('keyed recursive construction failure after first leaf releases only its own provisional resources',()=>{
++ const {t,rows,l,rt}=setup();const before=rt.slotCount();const fail=Error('later recursive getter');
++ try{expect(()=>materializeMember(rows,'a',{n:1,deep:{get bad():number{throw fail;}}})).toThrow(fail);expect(rt.slotCount()).toBe(before);expect(rows()).toEqual({});const retry=materializeMember(rows,'a',{n:7,more:8}) as Child;expect(retry.n()).toBe(7);expect(rt.slotCount()).toBe(before+2);}
++ finally{l.dispose();t.destroy();}
++});
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -1,3 +1,5 @@
++import {releaseConstructionPosition} from './internals/position-registry';
++import {ConstructionAllocation,type PreparedMemberConstruction} from './internals/construction-allocation';
+ import { registerNativeOccurrenceRoot } from './internals/native-occurrence';
+ import { beginBranchPublicationInput, endBranchPublicationInput, hasPublicationPreparation } from './internals/intrinsic-mutation';
+ import {needsLocationAuthorityAdmission} from './internals/location-runtime';
+@@ -59,6 +61,7 @@
+   readdedDuringStructuralWrite,
+   republishMembers,
+   setMemberPresence,
++  readOrdinaryMemberPresence,
+   structuralWrites,
+ } from './internals/member-membership';
+ import { getOwnedPositionIds } from './internals/owned-mutation';
+@@ -76,7 +79,6 @@
+ import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
+ import {
+   installDormantObservation,
+-  inheritObservationForAddedMember,
+ } from './internals/observation-substrate';
+ import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
+ import { defineRootTree } from './internals/root-source';
+@@ -215,9 +217,11 @@
+   buildPlan: TreeBuildPlan,
+   captureRuntime: MutationCaptureRuntime,
+   registry: PositionRegistry | undefined,
+-  address: readonly string[]
++  address: readonly string[],
++  allocation?: ConstructionAllocation
+ ): void {
+   defineNodeAddress(leaf as object, address);
++  allocation?.add(()=>{},()=>{Reflect.deleteProperty(leaf,Symbol.for('SignalTree:PositionRegistry'));});
+   for (const position of positionIds ?? [])
+     registry?.registerPositionAddress(position, address);
+   // A LOCATION MUST BE ABLE TO NAME ITS OWNER. Attaching the registry to the
+@@ -231,7 +235,7 @@
+   }
+ 
+   if (buildPlan.has('mutation-capture')) {
+-    wrapOwnedWritableSignal(leaf, {
++    const release = wrapOwnedWritableSignal(leaf, {
+       path,
+       // `ownerPath: path` sat here until 15.0 (ME-B). The owner-address fact is
+       // still installed on the leaf — it is now derived from `path` inside
+@@ -240,7 +244,8 @@
+       ownerId: registry?.id,
+       metadataStorage: buildPlan.leafMetadataStorage,
+       captureRuntime,
+-    });
++    }, allocation ? {isActive:()=>allocation.installed} : {});
++    allocation?.add(()=>{},release);
+     return;
+   }
+ 
+@@ -892,7 +897,20 @@
+ 
+ // Whole-value writes may introduce ordinary members (owner decision 2026-10-17).
+ // Construction remains bound to the original tree; lookup alone creates nothing.
+-type PreparedOrdinaryMember = { child: object; responsibility?: TerminalRecordPlan };
++const constructionContexts = new WeakMap<MaterializationContext,MaterializationContext>();
++/** Each public acquisition uses a new owner, even when called from a preparer. */
++function constructionContext(materializationContext:MaterializationContext,owned:ConstructionAllocation):MaterializationContext {
++ const base=constructionContexts.get(materializationContext)??materializationContext;
++ const context:MaterializationContext={...base,allocatePositionId(parent){
++   const id=base.allocatePositionId(parent);
++   owned.add(()=>{},()=>releaseConstructionPosition(base.positionRegistry,id));
++   return id;
++ }};
++ constructionContexts.set(context,base);
++ return context;
++}
++
++type PreparedOrdinaryMember = PreparedMemberConstruction;
+ const ordinaryMemberBuilders = new WeakMap<
+   object,
+   (key: string, value: unknown) => PreparedOrdinaryMember
+@@ -1041,12 +1059,11 @@
+         buildAddition &&
+         !Object.prototype.hasOwnProperty.call(targetObj, key)
+       ) {
+-        const { child, responsibility } = buildAddition();
+-        inheritObservationForAddedMember(branch, child);
+-        installPreparedMember(branch, key, child, responsibility);
++        const { child, responsibility, allocation } = buildAddition();
++        try {installPreparedMember(branch, key, child, responsibility, allocation);}
++        finally {allocation.cancel();}
+         // Invalidate the installed membership before later application equality
+         // or updaters can read it. Native delivery remains owned by the group.
+-        publishMembershipChange(branch);
+         installed?.add(key);
+         out?.push(pathPrefix ? `${pathPrefix}.${key}` : key);
+         continue;
+@@ -1310,7 +1327,7 @@
+           // otherwise come back with its retained storage. Measured before v16 8d:
+           // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
+           // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
+-          !descriptor.enumerable &&
++          (!descriptor.enumerable || !readOrdinaryMemberPresence(targetObj,key)) &&
+           installed?.has(key) &&
+           setMemberPresence(targetObj, key, 'active')
+         ) {
+@@ -1427,7 +1444,8 @@
+   childPositionIds: number[] | undefined,
+   childPath: string,
+   address: readonly string[],
+-  preparedOrdinary = false
++  preparedOrdinary = false,
++  allocation?: ConstructionAllocation
+ ): unknown {
+   const nested = createSignalStore(
+     value,
+@@ -1439,7 +1457,8 @@
+     childPositionIds,
+     childPath,
+     address,
+-    preparedOrdinary
++    preparedOrdinary,
++    allocation
+   );
+   const accessor = makeNodeAccessor(
+     nested as TreeNode<object>,
+@@ -1459,6 +1478,12 @@
+     defineTreeScalarSlotRuntime(accessor as object, scalarSlotRuntime);
+     defineTreeScalarSlotRuntime(nested as object, scalarSlotRuntime);
+   }
++  allocation?.add(()=>{},()=>{
++    for(const node of [accessor,nested]){
++      Reflect.deleteProperty(node as object,Symbol.for('SignalTree:ScalarSlotRuntime'));
++      Reflect.deleteProperty(node as object,Symbol.for('SignalTree:PositionRegistry'));
++    }
++  });
+   return accessor;
+ }
+ 
+@@ -1477,7 +1502,8 @@
+    */
+   path = '',
+   address: readonly string[] = [],
+-  preparedOrdinary = false
++  preparedOrdinary = false,
++  allocation?: ConstructionAllocation
+ ): TreeNode<T> {
+   for (const position of positionIds ?? []) {
+     materializationContext.positionRegistry.registerPositionAddress(
+@@ -1496,7 +1522,8 @@
+       return scalarSlotRuntime.createLeaf(
+         value,
+         equal as (current: TValue, next: TValue) => boolean,
+-        leafPositionIds?.[0]
++        leafPositionIds?.[0],
++        allocation
+       );
+     }
+ 
+@@ -1517,7 +1544,8 @@
+       buildPlan,
+       captureRuntime,
+       materializationContext.positionRegistry,
+-      address
++      address,
++      allocation
+     );
+     return leaf as unknown as TreeNode<T>;
+   }
+@@ -1536,7 +1564,8 @@
+       buildPlan,
+       captureRuntime,
+       materializationContext.positionRegistry,
+-      address
++      address,
++      allocation
+     );
+     return leaf as unknown as TreeNode<T>;
+   }
+@@ -1555,7 +1584,8 @@
+       buildPlan,
+       captureRuntime,
+       materializationContext.positionRegistry,
+-      address
++      address,
++      allocation
+     );
+     return leaf as unknown as TreeNode<T>;
+   }
+@@ -1566,22 +1596,29 @@
+   ordinaryMemberBuilders.set(store, (key, value) => {
+     // Use the same child classification/finalization as initial construction,
+     // including primitive/undefined leaves and structured literal addresses.
++    const owned = new ConstructionAllocation();
++    const context=constructionContext(materializationContext,owned);
++    try {
+     const prepared = createSignalStore(
+       { [key]: value },
+       equalityFn,
+-      materializationContext,
++      context,
+       buildPlan,
+       captureRuntime,
+       scalarSlotRuntime,
+       positionIds,
+       path,
+       address,
+-      true
++      true,
++      owned
+     );
+     const child = (prepared as Record<string, object>)[key];
+     const branch = (store as Record<symbol, object>)[NODE_ACCESSOR_PEER] ?? store;
+-    return { child, responsibility: captureRuntime.prepareMemberResponsibility?.(branch, key, child) };
++    return { child, responsibility: captureRuntime.prepareMemberResponsibility?.(branch, key, child), allocation:owned };
++    } catch(error){owned.cancel();throw error;}
+   });
++
++  allocation?.add(()=>{},()=>ordinaryMemberBuilders.delete(store));
+ 
+   for (const [key, definedValue] of Object.entries(
+     obj as Record<string, unknown>
+@@ -1688,7 +1725,8 @@
+         buildPlan,
+         captureRuntime,
+         materializationContext.positionRegistry,
+-        childAddress
++        childAddress,
++        allocation
+       );
+       store[key] = leaf;
+       continue;
+@@ -1716,7 +1754,8 @@
+         buildPlan,
+         captureRuntime,
+         materializationContext.positionRegistry,
+-        childAddress
++        childAddress,
++        allocation
+       );
+       store[key] = leaf;
+       continue;
+@@ -1734,7 +1773,8 @@
+       getChildPositionIds(),
+       childPath,
+       childAddress,
+-      preparedOrdinary
++      preparedOrdinary,
++      allocation
+     );
+   }
+ 
+@@ -1873,21 +1913,20 @@
+       if (!ownerAddress)
+         throw new Error('Missing dynamic branch construction address.');
+       return (key: string, value: unknown) => {
+-        const childPositionIds = materializationContext.positionTopologyEnabled
+-          ? [materializationContext.allocatePositionId(ownerPositionId)]
+-          : undefined;
+-        const childPath = ownerPath ? `${ownerPath}.${key}` : key;
+-        return materializeOrdinaryBranch(
+-          value,
+-          equalityFn,
+-          materializationContext,
+-          buildPlan,
+-          captureRuntime,
+-          scalarSlotRuntime,
+-          childPositionIds,
+-          childPath,
+-          childAddressOf(ownerAddress, key)
+-        );
++        const allocation=new ConstructionAllocation();
++        const context=constructionContext(materializationContext,allocation);
++        try {
++          const childPositionIds=context.positionTopologyEnabled
++            ? [context.allocatePositionId(ownerPositionId)] : undefined;
++          const childPath=ownerPath?`${ownerPath}.${key}`:key;
++          const child=materializeOrdinaryBranch(
++            value,equalityFn,context,buildPlan,captureRuntime,scalarSlotRuntime,
++            childPositionIds,childPath,childAddressOf(ownerAddress,key),false,allocation
++          ) as object;
++          const responsibility=captureRuntime.prepareMemberResponsibility?.(ownerBranch,key,child);
++          return {child,responsibility,allocation};
++        } catch(error){allocation.cancel();throw error;}
++
+       };
+     },
+   };

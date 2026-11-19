@@ -1,0 +1,11 @@
+# Independent premise question before promotion
+
+Does this proposed test-only counterpart enforce the approved promises without waiving a frozen requirement? Review original and proposed assertions, exact runtime and authority independently; no preferred verdict requested.
+
+Base: exact frozen qualification candidate, manifest a95b716f10c7dc43efc0f60d13a31a947695affff153b376ba6232c6835a28e3; all 3066 entries verified when copied. Runtime untouched. Added candidate/packages/kernel/src/lib/whole-mixed-promises.spec.ts has two controls. ORIGINAL-MIXED-UNMET.spec.txt preserves original test verbatim; original file also remains unchanged in candidate. ORIGINAL-FIRST-FAILURE.log preserves its failure.
+
+The proposed counterpart keeps actual-owner endpoint identity, unowned endpoint refresh and clean proof, unchanged local inspection, pre-rollback hold, restored physical x0/y9, and foreign z9. After rollback it allows zero or one correct output, never stale x7. Fresh explicit independent whole reauthor must yield exactly one cumulative useful output before foreign settlement; settlement must not duplicate or alter truth. Separate control requires eventual ordinary delivery without fresh reauthor, allowing early delivery too. Please particularly scrutinize cumulative exactly-one after already-early delivery, declaration completeness and whether any retained frozen progress assertion is improperly relaxed.
+
+Raw predecessor trace (not a review verdict): /private/tmp/st-mixed-rollback-independent-policy/runs/bounded-trace/rollback-policy.json and its test source. It includes plain rollback, declaration-around-settlement, fresh-after; current proposed runtime unchanged. Around-settlement declaration is observed conservative/unknown, a current qualification limitation, not proof of intrinsically hidden inverse dependency. No new assertion requiring this hold is proposed.
+
+Authority: repository docs/architecture/multi-actor/native-occurrence/continuation/EQUAL-WHOLE-AUTHORITY.md and recipient-policy-review/authority/AUTHORITY.md; frozen candidate docs/audits/2026-10-17-incumbent-readiness/link-declared-contract/{README,SPEC}.md; RELEASE-CURRENT.md:628–632. User requests independent premise review from Plato before promotion. Write verdict in your own scratch and send location; no runtime/original oracle changes. No full suites needed.

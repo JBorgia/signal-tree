@@ -1,0 +1,83 @@
+[
+  [
+    "26324",
+    "8153",
+    "07:36",
+    "0:00.17",
+    "0.0",
+    "43104",
+    "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx test kernel --skip-nx-cache --reporter=json --outputFile=/private/tmp/st-native-broad-differential/predecessor/kernel/vitest.json --maxWorkers=2"
+  ],
+  [
+    "26326",
+    "26324",
+    "07:35",
+    "0:04.57",
+    "0.0",
+    "78128",
+    "node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel --skip-nx-cache --reporter=json --outputFile=/private/tmp/st-native-broad-differential/predecessor/kernel/vitest.json --maxWorkers=2"
+  ],
+  [
+    "26342",
+    "26326",
+    "07:33",
+    "0:00.27",
+    "0.0",
+    "12272",
+    "/private/tmp/v16-transition-qualification/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  ],
+  [
+    "26540",
+    "26326",
+    "07:32",
+    "0:00.03",
+    "0.0",
+    "35344",
+    "node tools/run-core-vitest.mjs --reporter=json --outputFile=/private/tmp/st-native-broad-differential/predecessor/kernel/vitest.json --maxWorkers=2"
+  ],
+  [
+    "26577",
+    "26540",
+    "07:32",
+    "0:00.20",
+    "0.0",
+    "43072",
+    "node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config vitest.config.ts --reporter=json --outputFile=/private/tmp/st-native-broad-differential/predecessor/kernel/vitest.json --maxWorkers=2"
+  ],
+  [
+    "26723",
+    "26577",
+    "07:31",
+    "0:10.05",
+    "0.0",
+    "55360",
+    "node /private/tmp/st-native-broad-differential/predecessor/candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts --reporter=json --outputFile=/private/tmp/st-native-broad-differential/predecessor/kernel/vitest.json --maxWorkers=2"
+  ],
+  [
+    "26848",
+    "26723",
+    "07:31",
+    "0:01.64",
+    "0.0",
+    "12560",
+    "/private/tmp/v16-transition-qualification/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  ],
+  [
+    "37464",
+    "26723",
+    "03:47",
+    "3:26.38",
+    "80.1",
+    "104384",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ],
+  [
+    "43529",
+    "26723",
+    "01:31",
+    "1:14.70",
+    "81.7",
+    "96224",
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  ]
+]

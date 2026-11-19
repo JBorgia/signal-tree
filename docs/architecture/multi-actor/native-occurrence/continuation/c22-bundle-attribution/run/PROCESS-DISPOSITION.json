@@ -1,0 +1,16 @@
+{
+  "launcher": 26908,
+  "nx": 26913,
+  "rollup": 26999,
+  "rollupParent": 26913,
+  "rollupGroup": 26999,
+  "inspection": "ps -axo pid=,ppid=,pgid=,lstart=,command=; node-ready.jsonl attestation",
+  "finalCheck": "ps -p 26908,26913,26999 -o pid=,ppid=,pgid=,lstart=,command=",
+  "finalCheckExit": 1,
+  "finalCheckRows": [],
+  "buildInvocations": 1,
+  "nxSuccessReceipt": true,
+  "waitpidExit": null,
+  "continuousDeadlineCoverage": false,
+  "adoptionFailure": "ProcessLookupError: [Errno 3] No such process at os.getpgid(child.pid); did not launch build"
+}

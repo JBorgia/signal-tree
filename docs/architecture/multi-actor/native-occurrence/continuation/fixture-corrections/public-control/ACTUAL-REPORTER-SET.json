@@ -1,0 +1,13 @@
+{
+  "started": [
+    "src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts"
+  ],
+  "ended": [
+    "src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts"
+  ],
+  "unexpected": [],
+  "missingStart": [],
+  "missingEnd": [],
+  "duplicateStarts": false,
+  "duplicateEnds": false
+}

@@ -1,0 +1,6 @@
+{
+  "ST_TWO_HISTORY_OUTPUT": "/private/tmp/st-c28-r3-main-replay/ST_TWO_HISTORY_OUTPUT.jsonl",
+  "ST_CACHED_INPUT_OUTPUT": "/private/tmp/st-c28-r3-main-replay/ST_CACHED_INPUT_OUTPUT.jsonl",
+  "ST_OPAQUE_INPUT_OUTPUT": "/private/tmp/st-c28-r3-main-replay/ST_OPAQUE_INPUT_OUTPUT.jsonl",
+  "ST_PUBLIC_SIBLING_OUTPUT": "/private/tmp/st-c28-r3-main-replay/ST_PUBLIC_SIBLING_OUTPUT.jsonl"
+}

@@ -1,0 +1,18 @@
+{
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts": {
+    "before": "cad4feca7d082b6d7f10dd6e6ab5a1172b19274d7602b21bbd0a0da6bf23ccaa",
+    "after": "7a3078f4ff9f9b041528b3917e07b6b1cf3e34ea7d7bbea2f123b8bae8b12369"
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts": {
+    "before": "b6c13c3e26f6ef27834f6e7e9c97ac395a7a5980a4de4259e8c70b2d1ab7fbce",
+    "after": "08e290c23ee194877e87cb9430fffab1aa7842e580e01f90de640ecca358b34e"
+  },
+  "packages/kernel/src/lib/structural-admission-sequence.spec.ts": {
+    "before": "e6154fc6e1159571839a93edc4dac3ed8f29cb81ad04fbecf312e220ec568a72",
+    "after": "c24f99577549e317fb0c079c6bf7c254661db1556fa0c2f7def3269f8157981b"
+  },
+  "packages/kernel/src/lib/occupancy-successor-realization.spec.ts": {
+    "before": "dbec4105d11acee4f5ac999cc0d077341cf14d71cdbfbeca294107e91319eae7",
+    "after": "dbec4105d11acee4f5ac999cc0d077341cf14d71cdbfbeca294107e91319eae7"
+  }
+}

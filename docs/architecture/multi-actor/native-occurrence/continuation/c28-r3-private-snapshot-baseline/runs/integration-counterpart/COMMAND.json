@@ -1,0 +1,23 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "private-snapshot-integration",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-private-snapshot-baseline/candidate",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/integration-counterpart/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/integration-counterpart/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/integration-counterpart/data",
+    "ST_SNAPSHOT_OUTPUT": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/integration-counterpart/observations.jsonl"
+  }
+}

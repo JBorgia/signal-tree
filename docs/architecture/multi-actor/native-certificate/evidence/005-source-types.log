@@ -1,0 +1,4 @@
+
+> @signaltree/workspace@16.0.0-dev typecheck:source /private/tmp/st-projection-certificate-successor
+> tsc --noEmit -p tsconfig.typecheck-all.json
+

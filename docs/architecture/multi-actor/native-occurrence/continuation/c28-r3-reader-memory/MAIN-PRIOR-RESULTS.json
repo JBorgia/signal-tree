@@ -1,0 +1,47 @@
+{
+  "main-angular-entities": {
+    "path": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-angular-entities",
+    "exit": "0",
+    "summaries": [
+      " Test Files  2 passed (2)",
+      "      Tests  4 passed (4)"
+    ]
+  },
+  "main-react-entities": {
+    "path": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-react-entities",
+    "exit": "0",
+    "summaries": [
+      " Test Files  1 passed (1)",
+      "      Tests  3 passed (3)"
+    ]
+  },
+  "main-vue-entities": {
+    "path": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-vue-entities",
+    "exit": "0",
+    "summaries": [
+      " Test Files  2 passed (2)",
+      "      Tests  4 passed (4)"
+    ]
+  },
+  "main-solid-entities": {
+    "path": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-solid-entities",
+    "exit": "0",
+    "summaries": [
+      " Test Files  2 passed (2)",
+      "      Tests  4 passed (4)"
+    ]
+  },
+  "main-existing-realization": {
+    "path": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-existing-realization",
+    "exit": "0",
+    "summaries": [
+      " Test Files  4 passed (4)",
+      "      Tests  93 passed (93)"
+    ]
+  },
+  "main-source-types": {
+    "path": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-source-types",
+    "exit": "0",
+    "summaries": []
+  }
+}

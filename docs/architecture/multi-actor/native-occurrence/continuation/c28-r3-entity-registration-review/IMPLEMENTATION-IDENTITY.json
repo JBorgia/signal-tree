@@ -1,0 +1,42 @@
+{
+  "manifest": "b0e09d16858ce67143ed08b3b2d159831ab96ddcb1d989a1d50d5ce880d04b2d",
+  "patch": "2daa5b09c2b98e817b270522ec798705fdba91b3e7289a02cd7fc43ce128f6b1",
+  "files": 3104,
+  "mismatches": [],
+  "delta": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/entity-registration-original.spec.ts",
+    "packages/kernel/src/lib/entity-registration-lifecycle.spec.ts"
+  ],
+  "consumer.metafile.json": {
+    "entityOutputs": {
+      "../consumer/consumer.production.mjs": {
+        "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": {
+          "bytesInOutput": 9015
+        }
+      }
+    }
+  },
+  "split.metafile.json": {
+    "entityOutputs": {
+      "../consumer/split/chunk-43EKSJS2.mjs": {
+        "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": {
+          "bytesInOutput": 9017
+        }
+      }
+    }
+  },
+  "lifecycle-consumer.metafile.json": {
+    "entityOutputs": {
+      "../consumer/lifecycle-consumer.production.mjs": {
+        "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js": {
+          "bytesInOutput": 9015
+        }
+      }
+    }
+  },
+  "no-link.metafile.json": {
+    "entityOutputs": {}
+  }
+}

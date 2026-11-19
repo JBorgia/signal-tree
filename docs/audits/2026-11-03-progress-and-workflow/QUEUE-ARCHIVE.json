@@ -1,0 +1,12 @@
+{
+  "TODO.md": {
+    "archive": "../../archive/2026-11-03-active-queues/TODO.md.before.txt",
+    "sha256": "1ba2da0841a52125a1b1f44f1601aa8774d664b667d699414367db71d8392c09",
+    "bytes": 276526
+  },
+  "RELEASE-CURRENT.md": {
+    "archive": "../../archive/2026-11-03-active-queues/RELEASE-CURRENT.md.before.txt",
+    "sha256": "4c3221a1ef7b974fae2719dddae4ccb3c3c9212e7dd582e87c9bdfc8d5e277c3",
+    "bytes": 30169
+  }
+}

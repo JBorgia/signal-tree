@@ -1,0 +1,7 @@
+
+Gate self-test — each gate must FAIL against its own mutation
+
+  · forwarding-retention-gc mutating packages/kernel/src/lib/forwarding-retention-probe.spec.ts ... caught it (exit 1) ✓
+
+──────────────────────────────────────────────────────────────────────────────
+1/1 gates PROVEN able to fail (0 indirectly, via a companion self-test gate). 0 unproven, 0 vacuous, 0 blind, 0 errored.

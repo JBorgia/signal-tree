@@ -1,0 +1,781 @@
+{
+  "root": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+  "sourceCommit": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+  "runtimeCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "priorMapSha256": "2e51f09fcc2d96f8a0a8221f11b85ace04927daaa85b3978df4385f2151f9a24",
+  "all193Verified": true,
+  "files": {
+    "dist/packages/angular/LICENSE": {
+      "sha256": "f5dcb3330332339856c5d061d659c2e6852aae553c6a5482d46818229b5db90d",
+      "executable": 0
+    },
+    "dist/packages/angular/NOTICE": {
+      "sha256": "89a5615d0d1f1ed80ae82acafd648f21e086f98ddf01496af2cbafead0eeedb6",
+      "executable": 0
+    },
+    "dist/packages/angular/README.md": {
+      "sha256": "f890327e0e1ec2b4711de01e0dbcc0440256abbf8c06eabfc871d9f501cefa94",
+      "executable": 0
+    },
+    "dist/packages/angular/dist/index.d.ts": {
+      "sha256": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+      "executable": 0
+    },
+    "dist/packages/angular/dist/index.js": {
+      "sha256": "c787c9c2e19d5aaf53e51c2923632abb05efb369e9ed9890e629cbaa88980676",
+      "executable": 0
+    },
+    "dist/packages/angular/dist/lib/construction-input.js": {
+      "sha256": "c7748a98e9cfe5d6500b8c9572be8f199aba68efd8555ea5de17800d0fa8d533",
+      "executable": 0
+    },
+    "dist/packages/angular/dist/lib/define-store.js": {
+      "sha256": "769dd2cf2561aa96df71a312e9c310d646c4792d863a5e6ed65bde3952d80730",
+      "executable": 0
+    },
+    "dist/packages/angular/dist/lib/observation-adapter.js": {
+      "sha256": "ac5072658140ff929aa0e822334afbd68d1cc4c556254035d51c5ae8127e2332",
+      "executable": 0
+    },
+    "dist/packages/angular/dist/lib/to-writable-signal.js": {
+      "sha256": "2cb663c8826e368e54f61d0b2a727144c77cd8f4ea679dc9eefaf4bbf0339332",
+      "executable": 0
+    },
+    "dist/packages/angular/llms.txt": {
+      "sha256": "df7d674c94b0a41b90e9874ae400f8e7c9aef1c4056054399f51ca4c8c498ebf",
+      "executable": 0
+    },
+    "dist/packages/angular/package.json": {
+      "sha256": "28b79d37d590ded8cb76f3879bcfb7d9d5bc7081b6a8831e772b01834b925ff3",
+      "executable": 0
+    },
+    "dist/packages/angular/src/index.d.ts": {
+      "sha256": "2daf5ab5a11970ee0ee2265124de7a91e507b60ee851eb3b0b43c35345144b38",
+      "executable": 0
+    },
+    "dist/packages/angular/src/lib/carrier.d.ts": {
+      "sha256": "2f288f2515523b91f92a8443986d4e5a91ece9c3852121bb7c7b9376ce3472a3",
+      "executable": 0
+    },
+    "dist/packages/angular/src/lib/construction-input.d.ts": {
+      "sha256": "c48903a8e799c49f3a67b79dc5355f4166fbb8f9e3cdb5cba588ba44da689804",
+      "executable": 0
+    },
+    "dist/packages/angular/src/lib/define-store.d.ts": {
+      "sha256": "c363131c635463bf9a4fe497c88db5c8a91bc2373a2f30b3bce880ed6879ef17",
+      "executable": 0
+    },
+    "dist/packages/angular/src/lib/observation-adapter.d.ts": {
+      "sha256": "4a1c38eacb6b3d10ee268268924966944682d904197299b9ff32ccbe2879ab9f",
+      "executable": 0
+    },
+    "dist/packages/angular/src/lib/to-writable-signal.d.ts": {
+      "sha256": "a0b9327dcbce2fbf5306f5e6b3290adb70ce8ce9a6e0e8876922efc9e03ec77d",
+      "executable": 0
+    },
+    "dist/packages/kernel/LICENSE": {
+      "sha256": "f5dcb3330332339856c5d061d659c2e6852aae553c6a5482d46818229b5db90d",
+      "executable": 0
+    },
+    "dist/packages/kernel/NOTICE": {
+      "sha256": "89a5615d0d1f1ed80ae82acafd648f21e086f98ddf01496af2cbafead0eeedb6",
+      "executable": 0
+    },
+    "dist/packages/kernel/README.md": {
+      "sha256": "bd17cf3ff2c17cba9a70318c8d1013f34d3595cb2252ebe1f3ff8c9f5e700f2b",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/_adapter-Cp5WVkcj.d.ts": {
+      "sha256": "9cd8c8d32fdee02184e04bb0a38274ad0ec6cdb42151effe97d935d6cbad4d1e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/_position-registry-D8dCXLAS.d.ts": {
+      "sha256": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/adapter.d.ts": {
+      "sha256": "6bf35e1e1860606f6c777788bea636ac44ed781e3b4b0e064102a53eb25e9683",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/adapter.js": {
+      "sha256": "7d92f397a047983c78ae21b1e0eb759332297fb515acf8078df6e90d1eada4d1",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/batching/batching.js": {
+      "sha256": "f266af789c5f4212b90bacb20657c4fc6a10da3200d7be6246b701946106ffce",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/devtools/devtools-impl.js": {
+      "sha256": "6db65cd985bc1116b11d9ebb3f99ac6117b743ad10f20f33da705e001ce4e64c",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/devtools/devtools.js": {
+      "sha256": "b3c05a3a89706751807e85bf96c184c0f26a82a399d980966301162572fbe678",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/index.js": {
+      "sha256": "2101af7fc02fd5d38b59084e760d5b51bff5128eb854e14081f4912873da1425",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/restoration/order-boundary-evidence.js": {
+      "sha256": "7d914140e91edcecea26ffb2be8b6b487777a8a939affaf217e9a37189069d44",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/restoration/restoration.js": {
+      "sha256": "95269eb7c63de657b9ca6e1e1deca6554b94305f0350b455f7cc19b5e7efe90e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/transactions/occupancy-composition.js": {
+      "sha256": "4021671e1f2ff5eeba117b279e17a605a9664dddfbd0e22446e5376496a76f50",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/enhancers/transactions/transactions.js": {
+      "sha256": "d7d62ae976cebabdf67c059631ac04a67557906e4d350fbceecac0fe39a27056",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/index.d.ts": {
+      "sha256": "d6718f35d6cd5179dcf54cae33b02f578a8a74954b7f6495fb821a69293a0418",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/index.js": {
+      "sha256": "77ecf6d8f685069a3620b8f54119dd33df27d417782c40ca79fb2145ae1f0559",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/internals.d.ts": {
+      "sha256": "75ea10e60200a72de95e7df66acc71f6139ad0a8236bb7818eb21ab027d24f4a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/internals.js": {
+      "sha256": "f0bd6c8036404f0e202eed089fa0d70224e430eb032b6dcc44560709b8d95415",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/constants.js": {
+      "sha256": "9e550635ca6aa3ec4e977b312ddc30af682ed5eb6f1d960df828b2528054fed3",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/enhancer-types.js": {
+      "sha256": "38a55eaafc23f76cda0cc9eb313aa3fda1ebfa01237f815f54e2cb1fafaf5bbe",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/entity-signal.js": {
+      "sha256": "47fc9291ab78010dc4b53c53826f4c289f2fc566ab87f0d6746264778d80aa57",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/experimental-publication/entity.js": {
+      "sha256": "ab4fc5eb02c90e943c9c9ee572e60eea7cdd418996ac9efb79f60e9f2ab0282a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js": {
+      "sha256": "faafaecec4c69dfe0235e83ebe9cc615d54f8ab4982940acff9bdef7b81201a0",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/experimental-publication/private.js": {
+      "sha256": "d46e207a50bc288cdb007905889d575e5fc62d4647607692a2dccca134e7c6ee",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/experimental-publication/projection.js": {
+      "sha256": "5821c9ff89122ef56f9ed9563f4aad4c7df3129de9fedb52899aa37b8cc6c8e0",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/experimental-publication/recipient-occurrence.js": {
+      "sha256": "4a288ccb7443d36d2185d60b8aa95cc4277ea6c1ad8951971062b4acc605103a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/external.js": {
+      "sha256": "a43be60d2a89d982209a55ce20246ecd7b65e869c908178683a0b12a95351081",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/canonical-snapshot.js": {
+      "sha256": "4ccacb2bc2e4c73b5daad34987c21628d8a8fe267c70f0faf16863234ce4b119",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/applied-turn-projection.js": {
+      "sha256": "c52212b5f2cabac82911f05e341eeb02e405b67e0d680aa4442df2bb9a97abd9",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/ordinary-realization.js": {
+      "sha256": "a735745e968627526ed958f596ab3f5a8918079d5d131c40a8ddf81018ca367d",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/pending-rollback.js": {
+      "sha256": "50863a86f1ca0cf81a29f633937089ca08c335c38bdeeacba94cbfa744dfa3e9",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/post-application-failure.js": {
+      "sha256": "9b85af135f97a976e5cc3e6ef33661db2873f987078c14599074e8a38a3df240",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/realization-context.js": {
+      "sha256": "6dbd74416fe572ebc63bc74bf81eddf86d570b9f53309dfdc77c6fc8f2a90208",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/scoped-value-addressing.js": {
+      "sha256": "0c8a4d03b88f7dc0cc845c22b731fc8f8de86c10e247334ea0b9dac00c5f91f8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/target-transition.js": {
+      "sha256": "a1af1a8014b4b951a0ff6bbbd9a56a3eacf26e2ffdcc7f6f2e90aaa40dc118f5",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/transaction-lifecycle.js": {
+      "sha256": "e6830837e4288560926c39edc188c66f994348eb8bda2e4482ee8b8c394f1cd1",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/transient-rows.js": {
+      "sha256": "d705adc9d4269f8ca577e796071f30c13ff2a5241af43bb9c2d4781a888fae87",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/tree-realization-adapter.js": {
+      "sha256": "81147696330715b2229aece93fd31a99f39011011a7d09b6d0daaf1187cd3708",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/causal-runtime/turn-store.js": {
+      "sha256": "9c0692505988d4276c5bfe0355a055b90a276ff4dc08f2fb0bad5cf74f2955df",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/cell-identity.js": {
+      "sha256": "2b1845cdfc9a5428490df81fedb26fa3acff824379c833384959942b9843b83b",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/commit-consequence.js": {
+      "sha256": "0cef50047fc80e20c5d93b98222d14a365d433ce0dfd1cf35642c22b321b3bad",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/confirmed-turn-view.js": {
+      "sha256": "f67861a6ea9a88888d8dbaf88a71561705063f24f73bfa0126667eaa2fc36067",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/construction-allocation.js": {
+      "sha256": "9ef45cf16700e2a0b6a6acd829e0927f7fd25575d87812057d929ace4bd3d946",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/construction-branch.js": {
+      "sha256": "fb6491c0318fae2b08f9274e3a648c1675ca71ccfdb2fdb2770402f0a89cd4c3",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-egress-projection.js": {
+      "sha256": "54227ae9f28098cf8a361c8b55d41f9fb24b47826a9475f5ccbe79462abc04a1",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-membership-inventory.js": {
+      "sha256": "b694227478a492f0f6c3e8ca8e71d6094fb7011b34b36ea6da63dcc7774d7b49",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-membership-source.js": {
+      "sha256": "f484bc5ab09ccbc02c984e12992195099dd5b9ab8ec48c9deae445c626190546",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-membership-view.js": {
+      "sha256": "efa8c0cc14ff6826d6702e2bbbfdfd2bd9c6e974d89c974772c9311d53f178d8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-preparation-reader.js": {
+      "sha256": "932b78bdb57aa8c357bdc6b715cc847d6f76fd9d5a0fd9fa28802899cc0275fc",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-projection-seed.js": {
+      "sha256": "6f91549be085973cac62227e01d2d9a1aed16552da11e45b3be7cc7d11f46234",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-publication.js": {
+      "sha256": "0d2467fdca5abb6cba9a11ca463d941cc0ea330944c26038c491158f2a6a23d8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/entity-value-transition.js": {
+      "sha256": "66c80a46f5a2839c72aef505c284eee26a4b2f319c3a86b002425c1fd4b39133",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/error-reporter.js": {
+      "sha256": "4e3df8672ad2fc6c94b0aec0bc95edca2fcfe5bb192afc36f5e18d8e9a866cff",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/exposed-publication.js": {
+      "sha256": "ec41990873df8ce007d38c385a22c13c02adf57a79fde81ed0252d5b75929a75",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/intercept-leaf-signals.js": {
+      "sha256": "b831beda28185623972e3b5de0581751ee76479d5397097c938f92ea81e25253",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/intrinsic-mutation.js": {
+      "sha256": "4b1f5ef7501a4e6d108ca67dc05917fb3e76b8bac33df2770b91f90f2fdd6373",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/link-state-source.js": {
+      "sha256": "e1703ca459b2b5d8a68e4e5d43edd0c7b2c52120b011920b686195a4efcd9a7e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/link-state-view.js": {
+      "sha256": "09decebd532286f9dd857cdda811e63538696ba5f04447b8106daa472a21a3b2",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/location-runtime.js": {
+      "sha256": "42ccbff42e43b8ae1e32747d2446d4b701d158abda2b57c2361dbdc2db2f949b",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/materialize-markers.js": {
+      "sha256": "55c32943ca582f95327db4f9e8f14b315d8f408bedaef8f85c91869afd35216a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/member-membership.js": {
+      "sha256": "b79d421680674816b00e19b08a8c212dee9c1fdae5b1e89cd00736a9570e5f60",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/merge-derived.js": {
+      "sha256": "125abd6c055f48c05797b8a9323e62f838e210bcd2aa1e744b7b1e60c7869643",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/mutation-capture-runtime.js": {
+      "sha256": "25661669ac4fb0a2cca48e8f946da7099aec79c2fa44d6f393a6c89ecf7ffe95",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/native-field-selection.js": {
+      "sha256": "e8fc38c7d664bdb2c20486482c42d218cc7d3fabfad9c701394df5b4318856b7",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/native-location-realization.js": {
+      "sha256": "8781641e30c49b9ba465754ad24b6c2807e547a2b1d8366254280ada46aa9dc5",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/native-occurrence.js": {
+      "sha256": "bd4ad75effd644313888ef79eafe3f84921692dc2aa99e3a1c8bee9bcc4d97e3",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/native-scalar-selection.js": {
+      "sha256": "38656d2be8648ae49928e42b187b1744c16a7ef3cdace12c8066e0c73d336c75",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/native-tree-scalar-leaf-runtime.js": {
+      "sha256": "9a957cd5492c20fcf87fd926902a633da956628bdff5f07944dd028967d94da6",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/node-shape.js": {
+      "sha256": "a59d861653779f6e7e6580b709badce8e7803be5f5cfb607828cb179a53d39a8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/observation-adapter.js": {
+      "sha256": "1907fca8d5bd4ba4c847ccc375de01b0921752185d8f491efffa8e12befcee7e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/observation-substrate.js": {
+      "sha256": "e0d816f966b68122b2b8aac25d2ebbc46167cab3ef991c0b6b26604107bd21f6",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/ordinary-entity-entries.js": {
+      "sha256": "5df1c2683c5b4f13002faae6a885d1ee69172d73eb7a4073aaadf477997a894b",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/owned-metadata.js": {
+      "sha256": "66dd3a5beb7db830728ec11a01064a6cf8db5c818ddbd8e0c63ac67411dab301",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/owned-mutation.js": {
+      "sha256": "40bc80042af7c68ffc1e5b710fbbe0bdeeed9d4c238460f6f632d9cba238a6f8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/owner-invalidation-port.js": {
+      "sha256": "ca1a7cb729f0f6a270e5de59a590aab755645c6a218abba9163be09a37132957",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/owner-invalidation.js": {
+      "sha256": "867aebe08f2dc3bcf70ae4ab1cd332d8ece089e9e6e2ed22d460ebda6b111e37",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/path-observation-port.js": {
+      "sha256": "d243c91aa1c394a94d1f0ec1e692ba5b641ed0b54acb4a06411a85621d988ec9",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/physical-commit-clock.js": {
+      "sha256": "e549fe6fc4b6f0bae4d956d4656cda037150f3571bbb991fa66e0d539bcb4755",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/physical-rows.js": {
+      "sha256": "af313f1b250cb2d02dd094e231e52969bceadfa95e0c437a5a0ef000740ed86d",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/plain-branch-membership.js": {
+      "sha256": "1e46bf1c573d976c8637fa2b7fe2cbdba71342a690c7fb63ed7ac2da960a6e65",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/position-registry.js": {
+      "sha256": "052b686674ccf0866b0bf4f37111eb038f7f7c115e5da9ed8f15e1952c047e16",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/predicate-churn-warning.js": {
+      "sha256": "403104a70d67efa686f82aec462f330df03e5f240f3224613bd0d463c0d7337a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/production-substrate-stats.prod.js": {
+      "sha256": "750a59ce80f35e04900b1dfc90b18d4caf3dc5b84d4ab93301c338971bc7648c",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/publication-preparation.js": {
+      "sha256": "5fb75d5b2075da0044417e8e5146e7dfc9bb52b1db42900e90527a06127db03e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/restoration-eligibility.js": {
+      "sha256": "a16e07468f9bb68d5ac56c5cd42476bbc10b310b02c0aa0b07e02f6b1fc6b739",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/restoration-reader.js": {
+      "sha256": "6a970c19cb257042282e5d1ce46d47e7053b3bb93fcb3868a5eea500abeb4204",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/restoration-source.js": {
+      "sha256": "5263d1feb5fc9456bd5522104a471dc7ba2fb1007cd19fa33ca183a4576f5df6",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/root-source.js": {
+      "sha256": "fd3f6454a5b4d80c2912604e68e95e7cff15d7ccd598130c1b6a191f1f533106",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/runtime-tree-plan.js": {
+      "sha256": "05d31fdf6efa5ef49f08ff271c87b74f541cf62098a028015045dc9a4cab703e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/scalar-admission-metadata.js": {
+      "sha256": "69b93055612a170ddc1628bb413177f692f2206266b4bd7c2cc9193d014b53b1",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/scalar-publication-coverage.js": {
+      "sha256": "8902f08cb466fc541fa8256c9f6cc1b89e18071075a636e618aa7021b888eae4",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/scalar-responsibility-attachment.js": {
+      "sha256": "006b1b22aaf665979e78a3dc018baa178b5211199bf5164e93fd0b24c9d219d0",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/selected-entity-disposition.js": {
+      "sha256": "1ab8014533eb432bc4e3d3a4f59d4523f1ae0c2ec9a890629da4b332e17560ad",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/selected-write-operation.js": {
+      "sha256": "1142b166b55e0ff046ef4e12b78cd19c3cb02430a77b2d192a063a08cc633487",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/snapshot-authority.js": {
+      "sha256": "7592bdbd308acec391b11d139195d19fa83f9037ca97d8eda5696ac4d24c12c8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/snapshot-installation.js": {
+      "sha256": "d0a8ee96c181d849cd45ea821f44e5fd0a0e9d0a94c4ae5ca3cd78d4bc42dc89",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/source-mutation.js": {
+      "sha256": "8942be662428ec984e1ac56f3317c5ed29fab6c1e41a1f58a0532b62c1ae1377",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/state-location-view.js": {
+      "sha256": "1d5639f0ac110ceb7bb6d3e9f12171f79fa1203e9bab2bfe68f04fc3db47b7b7",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/subject-reclamation-sink.js": {
+      "sha256": "2699a32e3cdcf80f201f503a1f6dbba6b56bcd12d04326ad958c23845ea43960",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/subject-restoration-claims.js": {
+      "sha256": "821f04b20d744b9469134fb0ee079cdfda567c25cd6113eecc8d2f4f026c6a3b",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/tooling-tree.js": {
+      "sha256": "7c5d2da645e0586f5aee8b9681dda818e32944375a4acd7fa05616718d2e5d33",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/transaction-lifecycle-source.js": {
+      "sha256": "c1267d31cdbc6053f8dc8b07a7b3c3cbb5b9ba91dfd1c773b8b825f73b4bc58e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/transaction-lifecycle-view.js": {
+      "sha256": "3d7e04e96dce625ab6148bfd827501e00df72333b35d5aff94f3afd4a10b959a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/tree-capabilities.js": {
+      "sha256": "05c762d6f35f3bc7918cd708a5f1c4ce4570a48c2c877b479c67606b22eb2dbf",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/tree-scalar-leaf-runtime.js": {
+      "sha256": "1ee4c3fbed751adac26ce46cdd0d97f498095b60430e1d0e94094a7b8e88f2be",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-port.js": {
+      "sha256": "1c16b191969ecb579f55c789f1480065853609251822bf44f982737c739bfd52",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/tree-scalar-slot-runtime.js": {
+      "sha256": "5987058cd43d33ae6a00d92ffffa0bc798750d7bf7749a377725d1f7398560ab",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/utilities/append-all.js": {
+      "sha256": "dc3bb31df5084ca8675c9fd73ffd807622fd09a0a16c322acb3a651f68cc6257",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/utilities/deep-clone.js": {
+      "sha256": "db45f96fa0d840c58321c217c953f8a08a4157df055fd28a9c8e75a79a081e5f",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/utilities/deep-equal.js": {
+      "sha256": "bf31d23598305cbf68909395a8eef505d73807e1af01078d0bb7aca888c2cc67",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/utilities/is-built-in-object.js": {
+      "sha256": "48b9269302bcc03d18147c399f105c968f7cb6285a182c4d43ccd62850cf8dee",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/visit-tree.js": {
+      "sha256": "4a0f98ac82f24a0f2ac20ef3942b0cbc7ba1404fd2f70012bbeb66556e8e5c0c",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/write-observation-scope.js": {
+      "sha256": "4dc4f650e78d56ae6172f5a769c62b0083a070c6b8df1d808fc9019d3d9a0d99",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/internals/write-observation.js": {
+      "sha256": "e4224471cfbac2b091d97ac8a2812830e879cd294d222f11923f543c0de0c6cc",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/leaf.js": {
+      "sha256": "d8b4384510c497d4073d43c4b8941f4e6ee8845e25f99984e949f8ecb225ec76",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/link.js": {
+      "sha256": "a1f1dfa163584e84f7b1cd3f55e4c4ab18a86dc5e2547e60fb1ce7cb6db6a025",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/markers/entity-map.js": {
+      "sha256": "791e611bb87e3ec05a98850579364f0171ee5ddf26da1464a5ee441b4991c97c",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/path-notifier.js": {
+      "sha256": "f3fa6c4a15c340059f46070d71d6333ba17644236842125fde968879b4ae9dbf",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/entity-handle-resolution.js": {
+      "sha256": "ce90278c24c0708532055390e4d4fc4609017471df2aefdabbdcaa85cefb2c37",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/entity-mutation-frame.js": {
+      "sha256": "a60f6d891c4806ad5674f70da3a5e339082f007b0b084bc98d2205d9f1fd1df7",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/entity-ordinary-topology.js": {
+      "sha256": "332a5a1707b6180a84af343b1504a1c4e219f85dc3c9f8f3aad6e0bed7d5a855",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/entity-placement-stage.js": {
+      "sha256": "1c7c6b1e11ff1127d03c081b01d80c4d4cd46d328abbe4a302a3717b46348dc0",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/entity-value-store.js": {
+      "sha256": "3626cfae31e8d7829b3d494bc03ec1edc955a192961d9d6dbbabdf8475b51e8f",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/order-restores-for-placement.js": {
+      "sha256": "26239b84c3c8b057e55d7a0748f909fb676cab4fd6cf6d07698e10a934811e3f",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/ordinary-key-evidence.js": {
+      "sha256": "94774122a140c9051153c83240449227cf8690e53c0a166b5eea48425df79d96",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/ordinary-restoration-placement.js": {
+      "sha256": "bd4ed04ec35e7de075cc6989e4fadb376c154a80229942731715155d3ee8bc9a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/prepare-entity-target.js": {
+      "sha256": "f9c27850208a772a619fdf3bc1088382616727e1d81e3be94edde447cb064f81",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/prepare-structural-target.js": {
+      "sha256": "2bd50c7f15a197b3746d74cde5d8d4d01dd10a7cb87c97f80d8cfb0c35f4fe7a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/prepared-placement-visibility.js": {
+      "sha256": "06f43b4e25a64d2526da327ce87fe4f1b1cc0abb7dff871686e49aa0a0eeee6e",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/physical/structural-store.js": {
+      "sha256": "73691ba75615b47ad9e87c537b660f36b979a4acfee91eb78d6d3882e86988db",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/readonly.js": {
+      "sha256": "99a42cd7d0ea2b78d8b348e68149d6a8e04227298e8372e8406342aafe01b364",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/signal-tree.js": {
+      "sha256": "d04274fc3935d254795fb56ffe4f02bff1abf3f676d118fe0e1ca80c4591dc17",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/types.js": {
+      "sha256": "b6d98bc9167425df63e74e67d140a89c6c5e985e241b77e54f19904fb4aeb4b8",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/undoable.js": {
+      "sha256": "1b6bd2bd39c95e3d595ed1e7a87117a731bf64736fa849d33d8c1167be32320a",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/utils.js": {
+      "sha256": "37e05c1e4c8bd2bbd29d55cbf4795feaf44b0d8f43519fb38f94335fa67c92c9",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/write-context.js": {
+      "sha256": "0e5accd045f855e65ea5dcfc72b34085cab7fa4623ed8a64f4fd4ecef650f975",
+      "executable": 0
+    },
+    "dist/packages/kernel/dist/lib/write-participation.js": {
+      "sha256": "01f57ab1e693a6f2c75ce1e106466c3e1553519387db5d6ec41920d1669dc6d9",
+      "executable": 0
+    },
+    "dist/packages/kernel/llms.txt": {
+      "sha256": "df7d674c94b0a41b90e9874ae400f8e7c9aef1c4056054399f51ca4c8c498ebf",
+      "executable": 0
+    },
+    "dist/packages/kernel/package.json": {
+      "sha256": "a738dcb86c2f21f3c1f99d6906b64452db8c7e695f9b9680888ad512aef8e206",
+      "executable": 0
+    },
+    "dist/packages/react/LICENSE": {
+      "sha256": "f5dcb3330332339856c5d061d659c2e6852aae553c6a5482d46818229b5db90d",
+      "executable": 0
+    },
+    "dist/packages/react/NOTICE": {
+      "sha256": "89a5615d0d1f1ed80ae82acafd648f21e086f98ddf01496af2cbafead0eeedb6",
+      "executable": 0
+    },
+    "dist/packages/react/README.md": {
+      "sha256": "d9b17a5a4e4a85ec72b57ef16604a3dac3636fcadbf04547b78e61990f13d9f1",
+      "executable": 0
+    },
+    "dist/packages/react/dist/index.d.ts": {
+      "sha256": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+      "executable": 0
+    },
+    "dist/packages/react/dist/index.js": {
+      "sha256": "bb8ffa1d700ae2e26d5c59cdbe02acb7c9b4d777339ece3949729b804a649171",
+      "executable": 0
+    },
+    "dist/packages/react/dist/use-signal-tree.js": {
+      "sha256": "6ecfd5684a1a792584d45ff41395fd977533eef1fb313bb341c420303b69a331",
+      "executable": 0
+    },
+    "dist/packages/react/llms.txt": {
+      "sha256": "df7d674c94b0a41b90e9874ae400f8e7c9aef1c4056054399f51ca4c8c498ebf",
+      "executable": 0
+    },
+    "dist/packages/react/package.json": {
+      "sha256": "8567a417ae5b061b81b0d51ff6d9a4611188e554d8b250c452b7b20cf261b90f",
+      "executable": 0
+    },
+    "dist/packages/react/src/index.d.ts": {
+      "sha256": "9ce57017a5bd4b15a7b23fcd72522e53054d1a07eb9bcf5b73cf715527f4a5d1",
+      "executable": 0
+    },
+    "dist/packages/react/src/use-signal-tree.d.ts": {
+      "sha256": "7aad01ae6cdc339cef4d8440eeef664867dd4c69f0350879593379bb1aa90ee8",
+      "executable": 0
+    },
+    "dist/packages/solid/LICENSE": {
+      "sha256": "f5dcb3330332339856c5d061d659c2e6852aae553c6a5482d46818229b5db90d",
+      "executable": 0
+    },
+    "dist/packages/solid/NOTICE": {
+      "sha256": "89a5615d0d1f1ed80ae82acafd648f21e086f98ddf01496af2cbafead0eeedb6",
+      "executable": 0
+    },
+    "dist/packages/solid/README.md": {
+      "sha256": "05e838fed6fe7a003d418a5cec81ca9409d0c35ff14dda33dee388ef3b91173a",
+      "executable": 0
+    },
+    "dist/packages/solid/dist/index.d.ts": {
+      "sha256": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+      "executable": 0
+    },
+    "dist/packages/solid/dist/index.js": {
+      "sha256": "73d4884f3313a96e9038e8571e6822c81ab22ee9ca8774a691f005ed7f864a24",
+      "executable": 0
+    },
+    "dist/packages/solid/dist/lib/construction-input.js": {
+      "sha256": "ff65786116f7bd380b8a043d3534accdc15e57046033e2126fc55512f205d8ba",
+      "executable": 0
+    },
+    "dist/packages/solid/dist/lib/solid-observation.js": {
+      "sha256": "2fa640ef27dfeea9a811596fbdec46276a1dd8efa072cec5f582e3a96a421f28",
+      "executable": 0
+    },
+    "dist/packages/solid/llms.txt": {
+      "sha256": "df7d674c94b0a41b90e9874ae400f8e7c9aef1c4056054399f51ca4c8c498ebf",
+      "executable": 0
+    },
+    "dist/packages/solid/package.json": {
+      "sha256": "8633a01b224b0e50b8235af728a856717f846433c9ebad838ba6ff9747fc9e8c",
+      "executable": 0
+    },
+    "dist/packages/solid/src/index.d.ts": {
+      "sha256": "96a28b7c9d9ab7e00433f54de3e5f213d95298668834a69372baf578b1d71aee",
+      "executable": 0
+    },
+    "dist/packages/solid/src/lib/carrier.d.ts": {
+      "sha256": "3b018bddaf82a8b6b9a2e55a921ff80c6e22c17a890c72c05f6e30344a8097e2",
+      "executable": 0
+    },
+    "dist/packages/solid/src/lib/construction-input.d.ts": {
+      "sha256": "84e4b8b6f9f5ed7170d9d16daa55bcabdce51756e87c2b64c320eb170095f1fc",
+      "executable": 0
+    },
+    "dist/packages/solid/src/lib/solid-observation.d.ts": {
+      "sha256": "c8d66235153b6b83d926d7c7f37a796d288e77ec611acaa73de7d3cc6a83634d",
+      "executable": 0
+    },
+    "dist/packages/vue/LICENSE": {
+      "sha256": "f5dcb3330332339856c5d061d659c2e6852aae553c6a5482d46818229b5db90d",
+      "executable": 0
+    },
+    "dist/packages/vue/NOTICE": {
+      "sha256": "89a5615d0d1f1ed80ae82acafd648f21e086f98ddf01496af2cbafead0eeedb6",
+      "executable": 0
+    },
+    "dist/packages/vue/README.md": {
+      "sha256": "9d886871f35d634e7bb1f331d4f55d7730698cccb60d2d446d778547d3fea8e5",
+      "executable": 0
+    },
+    "dist/packages/vue/dist/index.d.ts": {
+      "sha256": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+      "executable": 0
+    },
+    "dist/packages/vue/dist/index.js": {
+      "sha256": "853f78a32a354f28448245c3573f1c8bb36594bf019ad7a47b88ec4ef24f8860",
+      "executable": 0
+    },
+    "dist/packages/vue/dist/lib/construction-input.js": {
+      "sha256": "3489fb1b3ff53b5141ff9e952626455da4380759cb3b4e0a85370d3ace6af1cc",
+      "executable": 0
+    },
+    "dist/packages/vue/dist/lib/vue-observation.js": {
+      "sha256": "2e64872446f0b01b9af6b9628f3c785b924bdc5c8e0a65f77494cf3b686de125",
+      "executable": 0
+    },
+    "dist/packages/vue/llms.txt": {
+      "sha256": "df7d674c94b0a41b90e9874ae400f8e7c9aef1c4056054399f51ca4c8c498ebf",
+      "executable": 0
+    },
+    "dist/packages/vue/package.json": {
+      "sha256": "972b0bfd85879c8f156903069b979a938521434dbad558b1d2adc44748450206",
+      "executable": 0
+    },
+    "dist/packages/vue/src/index.d.ts": {
+      "sha256": "17ae4feda5d1dd047831b5063db4f19da6cd101c35ac30cc4c2eacd94a7c90aa",
+      "executable": 0
+    },
+    "dist/packages/vue/src/lib/carrier.d.ts": {
+      "sha256": "2a2fde3319ea3836caf069c8d5a7048f71c6acc778fe75ed3c1ac3df58b986d7",
+      "executable": 0
+    },
+    "dist/packages/vue/src/lib/construction-input.d.ts": {
+      "sha256": "6251df16aeba37e923d2374708386bc9a2fd32c2114ad133cdc8f3884e27a523",
+      "executable": 0
+    },
+    "dist/packages/vue/src/lib/vue-observation.d.ts": {
+      "sha256": "410c2ede972d45164ce942e4bf54d8fabb57d6522fd6fde6dc2bc5935af4b46e",
+      "executable": 0
+    }
+  }
+}

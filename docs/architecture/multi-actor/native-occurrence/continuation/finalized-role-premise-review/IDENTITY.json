@@ -1,0 +1,26 @@
+{
+  "manifest": "9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02",
+  "proposal": "1aaa797923457234281d160a07c67e382a01a59e36ddd8825147440e1c7cd934",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "501bc25e28a2eae0c33adc608cd85c773b95e80a12a57c3ecc4c8d378327daa9",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/entity.ts": {
+      "sha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": {
+      "sha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "sha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+      "matchesManifest": true
+    }
+  }
+}

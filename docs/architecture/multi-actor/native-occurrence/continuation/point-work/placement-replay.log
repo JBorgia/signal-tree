@@ -1,0 +1,89 @@
+
+> nx run kernel:test prepared-placement-index.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs prepared-placement-index.spec.ts --maxWorkers=1
+
+(node:20193) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-publication-retirement-successor/predecessor-check/packages/kernel
+
+(node:20211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/prepared-placement-index.spec.ts (7 tests | 6 failed) 59ms
+   × setAll resolves 32 staged keys with linear map work 8ms
+   × prependMany resolves 32 staged keys with linear map work 1ms
+   × setAll resolves 128 staged keys with linear map work 4ms
+   × prependMany resolves 128 staged keys with linear map work 3ms
+   × setAll resolves 512 staged keys with linear map work 17ms
+   × prependMany resolves 512 staged keys with linear map work 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/prepared-placement-index.spec.ts > setAll resolves 32 staged keys with linear map work
+ FAIL  src/lib/prepared-placement-index.spec.ts > prependMany resolves 32 staged keys with linear map work
+AssertionError: expected 96 to be less than or equal to 64
+ ❯ src/lib/prepared-placement-index.spec.ts:35:24
+     33|         tree.$.rows[operation](input);
+     34|         expect(tree.$.rows.ids()).toEqual(input.map((row) => row.id));
+     35|         expect(visits).toBeLessThanOrEqual(2 * size);
+       |                        ^
+     36|       } finally {
+     37|         spy.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/prepared-placement-index.spec.ts > setAll resolves 128 staged keys with linear map work
+ FAIL  src/lib/prepared-placement-index.spec.ts > prependMany resolves 128 staged keys with linear map work
+AssertionError: expected 384 to be less than or equal to 256
+ ❯ src/lib/prepared-placement-index.spec.ts:35:24
+     33|         tree.$.rows[operation](input);
+     34|         expect(tree.$.rows.ids()).toEqual(input.map((row) => row.id));
+     35|         expect(visits).toBeLessThanOrEqual(2 * size);
+       |                        ^
+     36|       } finally {
+     37|         spy.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/lib/prepared-placement-index.spec.ts > setAll resolves 512 staged keys with linear map work
+ FAIL  src/lib/prepared-placement-index.spec.ts > prependMany resolves 512 staged keys with linear map work
+AssertionError: expected 1536 to be less than or equal to 1024
+ ❯ src/lib/prepared-placement-index.spec.ts:35:24
+     33|         tree.$.rows[operation](input);
+     34|         expect(tree.$.rows.ids()).toEqual(input.map((row) => row.id));
+     35|         expect(visits).toBeLessThanOrEqual(2 * size);
+       |                        ^
+     36|       } finally {
+     37|         spy.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 1 passed (7)
+   Start at  17:10:48
+   Duration  765ms (transform 388ms, setup 0ms, import 462ms, tests 59ms, environment 170ms)
+
+Warning: command "node tools/run-core-vitest.mjs prepared-placement-index.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

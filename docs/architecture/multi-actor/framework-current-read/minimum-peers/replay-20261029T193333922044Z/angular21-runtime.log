@@ -1,0 +1,17 @@
+✔ fresh native dependency error propagates exact sentinel and recovers inside real rollback tap (8.517375ms)
+✔ new native consumer born during callback ABA reaches final selection (1.019167ms)
+retained-native-metadata true
+✔ realizes fresh tap reads and preserves later callback writes (10.004666ms)
+✔ keeps ordinary selected observation granular and native computations cached during the callback (1.244542ms)
+✔ preserves a callback selection followed by rekey (0.87725ms)
+✔ preserves a callback selection followed by clear (0.724417ms)
+✔ retains coherent native metadata on one callback-acquired reader (0.491667ms)
+✔ current-read real tap queries evaluate each recipe once across held ABA writes (0.92725ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 175.541208

@@ -1,0 +1,472 @@
+[
+  {
+    "terminal": "confirm",
+    "n": 0,
+    "phase": "closed",
+    "roots": {
+      "objects": 294,
+      "requirements": 7,
+      "components": 2
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": false,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "validation": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "possible": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      }
+    }
+  },
+  {
+    "terminal": "confirm",
+    "n": 1,
+    "phase": "closed",
+    "roots": {
+      "objects": 340,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 2,
+        "confirmed": 1,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 2,
+        "confirmed": 1,
+        "pending": 1
+      },
+      "validation": {
+        "total": 2,
+        "confirmed": 1,
+        "pending": 1
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      }
+    }
+  },
+  {
+    "terminal": "confirm",
+    "n": 2,
+    "phase": "closed",
+    "roots": {
+      "objects": 342,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 3,
+        "confirmed": 2,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 3,
+        "confirmed": 2,
+        "pending": 1
+      },
+      "validation": {
+        "total": 3,
+        "confirmed": 2,
+        "pending": 1
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      }
+    }
+  },
+  {
+    "terminal": "confirm",
+    "n": 4,
+    "phase": "closed",
+    "roots": {
+      "objects": 346,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 5,
+        "confirmed": 4,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 5,
+        "confirmed": 4,
+        "pending": 1
+      },
+      "validation": {
+        "total": 5,
+        "confirmed": 4,
+        "pending": 1
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      }
+    }
+  },
+  {
+    "terminal": "confirm",
+    "n": 4,
+    "phase": "p-terminal",
+    "roots": {
+      "objects": 327,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 5,
+        "confirmed": 5,
+        "pending": 0
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 1,
+        "pending": 0
+      },
+      "input": {
+        "total": 5,
+        "confirmed": 5,
+        "pending": 0
+      },
+      "validation": {
+        "total": 5,
+        "confirmed": 5,
+        "pending": 0
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 1,
+        "pending": 0
+      }
+    }
+  },
+  {
+    "terminal": "rollback",
+    "n": 0,
+    "phase": "closed",
+    "roots": {
+      "objects": 294,
+      "requirements": 7,
+      "components": 2
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": false,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "validation": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "possible": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      }
+    }
+  },
+  {
+    "terminal": "rollback",
+    "n": 1,
+    "phase": "closed",
+    "roots": {
+      "objects": 340,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 2,
+        "confirmed": 1,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 2,
+        "confirmed": 1,
+        "pending": 1
+      },
+      "validation": {
+        "total": 2,
+        "confirmed": 1,
+        "pending": 1
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      }
+    }
+  },
+  {
+    "terminal": "rollback",
+    "n": 2,
+    "phase": "closed",
+    "roots": {
+      "objects": 342,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 3,
+        "confirmed": 2,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 3,
+        "confirmed": 2,
+        "pending": 1
+      },
+      "validation": {
+        "total": 3,
+        "confirmed": 2,
+        "pending": 1
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      }
+    }
+  },
+  {
+    "terminal": "rollback",
+    "n": 4,
+    "phase": "closed",
+    "roots": {
+      "objects": 346,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": true,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": true
+    },
+    "roles": {
+      "owners": {
+        "total": 5,
+        "confirmed": 4,
+        "pending": 1
+      },
+      "destination": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      },
+      "input": {
+        "total": 5,
+        "confirmed": 4,
+        "pending": 1
+      },
+      "validation": {
+        "total": 5,
+        "confirmed": 4,
+        "pending": 1
+      },
+      "possible": {
+        "total": 1,
+        "confirmed": 0,
+        "pending": 1
+      }
+    }
+  },
+  {
+    "terminal": "rollback",
+    "n": 4,
+    "phase": "p-terminal",
+    "roots": {
+      "objects": 312,
+      "requirements": 9,
+      "components": 4
+    },
+    "source": {
+      "components": 0,
+      "getter": false
+    },
+    "flags": {
+      "unknown": false,
+      "invalid": false,
+      "terminalRejectedRoles": 0,
+      "historicalWindow": false
+    },
+    "roles": {
+      "owners": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "destination": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "input": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "validation": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      },
+      "possible": {
+        "total": 0,
+        "confirmed": 0,
+        "pending": 0
+      }
+    }
+  }
+]

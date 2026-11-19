@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test angular independent-parent-discriminators.spec.ts --testNamePattern=cold sort --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T16:36:18.550Z",
+    "endTime": "2026-11-02T16:36:20.203Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "angular:test",
+      "target": "test",
+      "projectName": "angular",
+      "hash": "13583485691215186184",
+      "startTime": "2026-11-02T16:36:18.576Z",
+      "endTime": "2026-11-02T16:36:20.202Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

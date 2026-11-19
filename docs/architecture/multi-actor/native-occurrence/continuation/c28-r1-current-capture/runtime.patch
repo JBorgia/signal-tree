@@ -1,0 +1,66 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -158,6 +158,9 @@
+ /** Admission-local confirmed history, never a settlement-time filter. */
+ export type CurrentRelevance=ReadonlySet<OwnerCell>;
+ export function currentRelevance(retained:NativeRequirement,invocation:NativeRequirement):CurrentRelevance {
++ // An unfinished predecessor can still acquire validation/activation evidence.
++ // Historical cleanup is restricted to closed predecessors at admission.
++ if(!nativeRequirementReady(retained))return new Set();
+  const protectedOwners=new Set(invocation.inputs.flatMap(input=>input.owners));
+  for(const frame of invocation.frames)for(const cell of frame.protectedOwners)protectedOwners.add(cell);
+  const parts=[nativeProof(retained),nativeProof(invocation)];
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -104,29 +104,36 @@
+ const negativeViews=new WeakMap<object,Map<object,NativeView>>();
+ const snapshotViews=new WeakMap<object,readonly NativeView[]>();
+ const unavailableInput=lifecycle.unavailableRequirement;
+-function suppliedViews(node:object,supplied?:unknown):NativeView[]{
++// Fresh updater containers use current source support. An opaque payload still
++// contributes its issued evidence in addition to its current leaf/location.
++// Snapshot registration keeps the historical supplied-object path (default).
++function suppliedViews(node:object,supplied?:unknown,currentSource=false):NativeView[]{
+  const entity=getEntityPublicationBinding(node);
+  if(entity)return [...entity.source.captureViews(entity.subject,entity.field)] as NativeView[];
+- if(supplied!==null&&typeof supplied==='object'){
++ if(!currentSource&&supplied!==null&&typeof supplied==='object'){
+   const certificate=snapshotViews.get(supplied);if(certificate)return [...certificate];
+  }
+  const own:NativeView[]=[];
+  for(const edge of getRetainedMembershipPath(node)){const view=memberViews.get(edge.child);if(view)own.push(view);if(!edge.present)return own;}
+- if(isWritableLocation(node)){const view=nativeViews.get(node);if(view)own.push(view);return own;}
++ if(isWritableLocation(node)){
++  const view=nativeViews.get(node);if(view)own.push(view);
++  if(currentSource&&supplied!==null&&typeof supplied==='object')own.push(...(snapshotViews.get(supplied)??[]));
++  return own;
++ }
+  const storage=nodeStoreOf(node)??node;
+  own.push(...(negativeViews.get(storage)?.values()??[]));
+  for(const key of Object.keys(storage)){
+   const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(!descriptor||!('value'in descriptor)||!isTraversableNode(descriptor.value))continue;
+   const value=supplied!==null&&typeof supplied==='object'?(supplied as Record<string,unknown>)[key]:undefined;
+-  own.push(...suppliedViews(descriptor.value,value));
++  own.push(...suppliedViews(descriptor.value,value,currentSource));
+  }
+  return own;
+ }
+ registerPublicationSnapshots((node,value)=>{snapshotViews.set(value,Object.freeze(suppliedViews(node,value)));});
+-function nativeInputs(node:object,supplied?:unknown):lifecycle.NativeInput[]{
++function nativeInputs(node:object,supplied?:unknown,currentSource=false):lifecycle.NativeInput[]{
+  const entity=getEntityPublicationBinding(node);
+  if(entity){const captured=entity.source.captureInput(entity.subject,entity.field) as {native?:readonly lifecycle.NativeInput[]}|undefined;return [...(captured?.native??[])];}
+- const views=suppliedViews(node,supplied);
++ const views=suppliedViews(node,supplied,currentSource);
+  // A singleton cannot duplicate support: retain capture timing and a fresh result,
+  // without allocating the intermediate requirement array, Set and deduped array.
+  if(views.length===1)return [lifecycle.captureNativeInput(views[0].requirement)];
+@@ -192,7 +199,7 @@
+    recipients.set(key,{facts:Object.freeze([...new Set(captured)]),recipientDomainUnknown:!covered});
+   }
+  }
+- const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied))};branchInputs.push(input);return input;
++ const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied,true))};branchInputs.push(input);return input;
+ }
+ function endBranchInput(token:object):void{if(branchInputs.at(-1)!==token)throw new Error('Branch publication input scope mismatch');branchInputs.pop();}
+ function requirementOf(proof:Proof):lifecycle.NativeRequirement {

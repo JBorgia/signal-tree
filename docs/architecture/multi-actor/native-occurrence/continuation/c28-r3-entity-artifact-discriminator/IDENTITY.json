@@ -1,0 +1,11 @@
+{
+  "sourceManifestSha256": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "sourceFilesVerified": 3102,
+  "allOriginalSourceUnchanged": true,
+  "allBuiltArtifactsUnchanged": true,
+  "allInstalledPackedFilesUnchanged": true,
+  "installedFileCount": 186,
+  "sharedCasesSha256": "6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71",
+  "productionBundleSha256": "2f0ba6576b59a4145cc1a7754d52cb044ef9c8d134cfda6488ec77deb9993f02",
+  "esbuildVersion": "0.25.12"
+}

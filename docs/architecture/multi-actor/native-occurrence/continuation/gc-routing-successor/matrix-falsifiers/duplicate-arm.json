@@ -1,0 +1,153 @@
+{
+  "name": "duplicate-arm",
+  "expectedExit": 1,
+  "actualExit": 1,
+  "pass": true,
+  "errors": [
+    "Unexpected or duplicate mode: held-drop-proceed",
+    "Missing mode: held-hold-row"
+  ],
+  "rows": [
+    {
+      "name": "hold-proceed-success",
+      "kind": "forwarding",
+      "arm": "hold-proceed",
+      "scenario": "success",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-proceed-success.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-proceed-success.log"
+    },
+    {
+      "name": "hold-proceed-skip",
+      "kind": "forwarding",
+      "arm": "hold-proceed",
+      "scenario": "skip",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-proceed-skip.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-proceed-skip.log"
+    },
+    {
+      "name": "hold-proceed-caught",
+      "kind": "forwarding",
+      "arm": "hold-proceed",
+      "scenario": "caught",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-proceed-caught.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-proceed-caught.log"
+    },
+    {
+      "name": "drop-proceed-success",
+      "kind": "forwarding",
+      "arm": "drop-proceed",
+      "scenario": "success",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/drop-proceed-success.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/drop-proceed-success.log"
+    },
+    {
+      "name": "drop-proceed-skip",
+      "kind": "forwarding",
+      "arm": "drop-proceed",
+      "scenario": "skip",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/drop-proceed-skip.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/drop-proceed-skip.log"
+    },
+    {
+      "name": "drop-proceed-caught",
+      "kind": "forwarding",
+      "arm": "drop-proceed",
+      "scenario": "caught",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/drop-proceed-caught.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/drop-proceed-caught.log"
+    },
+    {
+      "name": "hold-value-success",
+      "kind": "forwarding",
+      "arm": "hold-value",
+      "scenario": "success",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-value-success.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-value-success.log"
+    },
+    {
+      "name": "hold-value-skip",
+      "kind": "forwarding",
+      "arm": "hold-value",
+      "scenario": "skip",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-value-skip.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-value-skip.log"
+    },
+    {
+      "name": "hold-value-caught",
+      "kind": "forwarding",
+      "arm": "hold-value",
+      "scenario": "caught",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-value-caught.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/hold-value-caught.log"
+    },
+    {
+      "name": "held-hold-proceed",
+      "kind": "held",
+      "arm": "hold-proceed",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/held-hold-proceed.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/held-hold-proceed.log"
+    },
+    {
+      "name": "held-drop-proceed",
+      "kind": "held",
+      "arm": "drop-proceed",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/held-drop-proceed.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/held-drop-proceed.log"
+    },
+    {
+      "name": "held-drop-proceed",
+      "kind": "held",
+      "arm": "drop-proceed",
+      "processExit": 0,
+      "signal": null,
+      "exit": 0,
+      "errors": [],
+      "artifact": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/held-drop-proceed.json",
+      "log": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/held-drop-proceed.log"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "frozen": true,
+  "runtimeUnchanged": true,
+  "baselinePathsVerified": 3095,
+  "baselineManifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "manifestSha256": "25f95d6463d7a4ecd671a53b883f60f6560cd9ded965642b6aa0e839f98ff8fb",
+  "testPatchSha256": "60ac4ed6449833872a299ef250dc3e5bad8d0bed442194a53551fc5714eeb4cb",
+  "runs": {
+    "unchanged-and-minimal-first": {
+      "exit": 1,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "observation-first": {
+      "exit": 1,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "observation-import-corrected": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

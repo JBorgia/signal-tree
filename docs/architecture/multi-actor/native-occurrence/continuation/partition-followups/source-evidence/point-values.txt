@@ -1,0 +1,78 @@
+643:   function preparePointValues(
+644:     values: readonly {
+645:       subjectId: number;
+646:       key: string | number;
+647:       value: unknown;
+648:       edits: readonly EntityRealizationEdit[];
+649:       transition?: EntityValueTransition<E>;
+650:     }[],
+651:     selectedSteps?: readonly SelectedRowEdit[],
+652:     publicationPhase?: PublicationPreparation
+653:   ): { install(): void; invalidate(): void; publish(): void; complete():void } {
+654:     const prepared = values.map(({ subjectId, key, value, edits, transition }) => {
+655:       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+656:         throw new Error(
+657:           'Point realization subject is no longer active at its key'
+658:         );
+659:       }
+660:       const before = valueStore.backingForSubject(subjectId);
+661:       const after = deepClone(value) as E;
+662:       return {
+663:         subjectId,
+664:         edits,
+665:         key: key as K,
+666:         before,
+667:         after,
+668:         transition: transition ?? valueStore.prepareRealizationTransition(
+669:           subjectId,
+670:           after,
+671:           edits
+672:         ),
+673:         changed: !deepEqual(before, after),
+674:         epoch: subjectEpochs.get(subjectId),
+675:       };
+676:     });
+677:     const ordinarySteps=selectedSteps?.map(step=>({subject:step.subject,before:step.ordinaryBefore,after:step.ordinaryAfter,fields:step.fields,restoredFields:step.selections}));
+678:     const publication=prepareEntityPublication(
+679:       prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
+680:       ordinarySteps ?? prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,
+681:       selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinarySteps![ordinal]!]}))
+682:     );
+683:     const phase=publicationPhase ?? new PublicationPreparation();
+684:     phase.add(()=>publication.unit?.finalize?.(),()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
+685:     let completed=false;
+686:     const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+687:     return {
+688:       complete,
+689:       install(): void {
+690:         if(!publicationPhase)phase.validate();
+691:         for (const row of prepared)
+692:           valueStore.installValueTransition(row.transition);
+693:         if(publication.unit) installTerminalRecord(publication.unit.record);
+694:         advanceInstalledRead();
+695:       },
+696:       invalidate(): void {
+697:         let failed = false;
+698:         let firstError: unknown;
+699:         const stage = (fn: () => void) => {
+700:           try {
+701:             fn();
+702:           } catch (error) {
+703:             if (!failed) {
+704:               failed = true;
+705:               firstError = error;
+706:             }
+707:           }
+708:         };
+709:         for (const row of prepared) {
+710:           const epoch = row.epoch;
+711:           if (epoch) stage(() => advanceEpochHandle(epoch));
+712:         }
+713:         stage(() => updateSignals());
+714:         if(!publicationPhase)stage(complete);
+715:         if (failed) throw firstError;
+716:       },
+717:       publish(): void {
+718:         let failed=false;let first:unknown;
+719:         for (const row of prepared) {try {
+720:           pathNotifier.notify(

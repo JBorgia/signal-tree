@@ -1,0 +1,26 @@
+[
+  {
+    "source": "EVIDENCE.json",
+    "archive": "EVIDENCE.json",
+    "sourceSha256": "925118bed106068c82b9fcb5b60c0f4ca18b2ae37c8c54935bc75b6ce75868d4",
+    "archiveSha256": "925118bed106068c82b9fcb5b60c0f4ca18b2ae37c8c54935bc75b6ce75868d4"
+  },
+  {
+    "source": "OPTIONS.md",
+    "archive": "OPTIONS.md",
+    "sourceSha256": "596a8265f3f713f85e0b9a7b6b92c191bbeca7aa9f3a487a5c8bfb3658f4c017",
+    "archiveSha256": "596a8265f3f713f85e0b9a7b6b92c191bbeca7aa9f3a487a5c8bfb3658f4c017"
+  },
+  {
+    "source": "DESIGN.md",
+    "archive": "DESIGN.md",
+    "sourceSha256": "a0c9230784dcf1ab887f6732c485a69f2267adab193219b2e2bddbf195c2cac4",
+    "archiveSha256": "a0c9230784dcf1ab887f6732c485a69f2267adab193219b2e2bddbf195c2cac4"
+  },
+  {
+    "source": "READER-PATH-GATE.md",
+    "archive": "READER-PATH-GATE.md",
+    "sourceSha256": "a1541dafdec61050b701c4cca1a95d1b9b616fe990a8f65178d3c38dfb43d079",
+    "archiveSha256": "a1541dafdec61050b701c4cca1a95d1b9b616fe990a8f65178d3c38dfb43d079"
+  }
+]

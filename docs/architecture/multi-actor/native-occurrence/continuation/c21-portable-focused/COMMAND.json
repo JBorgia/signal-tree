@@ -1,0 +1,24 @@
+{
+  "cwd": "/private/tmp/st-c21-portable-reconstructed-r2",
+  "argv": [
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "--maxWorkers=1",
+    "src/lib/readonly.spec.ts",
+    "src/lib/fixed-window-retirement.spec.ts"
+  ],
+  "environmentOverrides": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c21-portable-focused/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c21-portable-focused/nx-data",
+    "ST_C21_DIAGNOSTIC_OUTPUT": "/private/tmp/st-c21-portable-focused/diagnostics",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-c21-portable-focused/observations",
+    "TMPDIR": "/private/tmp/st-c21-portable-focused/tmp",
+    "NODE_OPTIONS": "--require \"/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/native-occurrence/continuation/c21-portable-source/diagnostic-redirect.cjs\""
+  }
+}

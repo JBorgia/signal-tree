@@ -1,0 +1,5 @@
+bare (no enhancers)                0 frame(s) []
+batching()                         0 frame(s) []
+restoration()                      2 frame(s) ["total 12000->9600 origin=-","total 9600->10200 origin=external"]
+transactions()                     2 frame(s) ["total 12000->9600 origin=-","total 9600->10200 origin=external"]
+restoration()+transactions()       2 frame(s) ["total 12000->9600 origin=-","total 9600->10200 origin=external"]

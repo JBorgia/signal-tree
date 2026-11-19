@@ -1,0 +1,37 @@
+--- /private/tmp/st-c28-r3-composed-artifacts/candidate/tools/check-bundle-budget.mjs
++++ /private/tmp/st-c28-r3-composed-artifacts/graph-diagnostic.mjs
+@@ -27,15 +27,15 @@
+  * PROD bump needs a genuine justification; a DEV bump usually means a new
+  * diagnostic and can just say so.
+  */
+-import { build } from 'esbuild';
++import { build } from "/private/tmp/st-c28-r3-composed-artifacts/candidate/node_modules/esbuild/lib/main.js";
+ import { gzipSync } from 'node:zlib';
+ import { mkdtempSync, writeFileSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
+ 
+-const CORE = new URL('../dist/packages/kernel/dist/index.js', import.meta.url)
++const CORE = new URL('../dist/packages/kernel/dist/index.js', "file:///private/tmp/st-c28-r3-composed-artifacts/candidate/tools/check-bundle-budget.mjs")
+   .pathname;
+-const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
++const REPO_NODE_MODULES = new URL('../node_modules', "file:///private/tmp/st-c28-r3-composed-artifacts/candidate/tools/check-bundle-budget.mjs").pathname;
+ 
+ /**
+  * This gate measures BUILT OUTPUT (`dist/`), not source — and for a long time
+@@ -409,10 +409,15 @@
+     external: EXTERNAL,
+     nodePaths: [REPO_NODE_MODULES],
+     write: false,
++    metafile: true,
+     legalComments: 'none',
+     logLevel: 'silent',
+     define,
+   });
++  const label = entry.split('/').at(-1).replace('.js','') + (define.ngDevMode ? '-prod' : '-dev');
++  const bytes = Buffer.from(out.outputFiles[0].contents);
++  writeFileSync("/private/tmp/st-c28-r3-composed-artifacts/graph" + '/' + label + '.js', bytes);
++  writeFileSync("/private/tmp/st-c28-r3-composed-artifacts/graph" + '/' + label + '.json', JSON.stringify({gzipBytes:gzipSync(bytes,{level:9}).length,minifiedBytes:bytes.length,metafile:out.metafile},null,2));
+   return (
+     gzipSync(Buffer.from(out.outputFiles[0].contents), { level: 9 }).length /
+     1024

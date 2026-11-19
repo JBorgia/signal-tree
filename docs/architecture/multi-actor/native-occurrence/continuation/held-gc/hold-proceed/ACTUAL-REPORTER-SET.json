@@ -1,0 +1,13 @@
+{
+  "started": [],
+  "ended": [],
+  "unexpected": [],
+  "missingStart": [
+    "src/lib/held-continuation-probe.spec.ts"
+  ],
+  "missingEnd": [
+    "src/lib/held-continuation-probe.spec.ts"
+  ],
+  "duplicateStarts": false,
+  "duplicateEnds": false
+}

@@ -1,0 +1,21 @@
+@@ -2340,6 +2340,20 @@
+     const b=after && typeof after==='object'?after as Record<string,unknown>:{};
+     return Object.freeze([...new Set([...Object.keys(a),...Object.keys(b)])].filter(key=>Object.prototype.hasOwnProperty.call(a,key)!==Object.prototype.hasOwnProperty.call(b,key)||!Object.is(a[key],b[key])));
+   }
++  function prepareResponsibilityCapture(
++    changes: readonly CommittedEntityMutation[],
++    topologyUnit: import('./internals/mutation-capture-runtime').CompletedTopologyUnit,
++    structuralFrontier?: import('./internals/mutation-capture-runtime').StructuralFrontierInterval
++  ): import('./internals/mutation-capture-runtime').CommittedEntityCapture | undefined {
++    // Publication support is always prepared. Its optional responsibility
++    // consumer alone needs this owner-bearing capture; rich observers acquire
++    // their own capture through committedEntityObserver below.
++    if (!mutationCaptureRuntime?.prepareEntityResponsibility) return undefined;
++    const owner = getPositionIds()?.[0];
++    if (owner === undefined) return undefined;
++    return { owner, ownerPath: basePath, meta: ambientMeta(), changes, topologyUnit, structuralFrontier };
++  }
++
+   function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture) {
+     const id=Object.freeze({});
+     const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});

@@ -1,0 +1,30 @@
+{
+  "status": "frozen for independent implementation review; no self-acceptance",
+  "baseManifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "baseFiles": 3095,
+  "originalFixturesUnchanged": true,
+  "changedPaths": [
+    "packages/kernel/src/enhancers/restoration/restoration.ts",
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "packages/kernel/src/lib/internals/scalar-admission-metadata.ts",
+    "packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts"
+  ],
+  "sha256": {
+    "MANIFEST.json": "0ececc2f73a615ecebe88b0d44113cae7555ba1d19beefc4cc53c4acfa1c1061",
+    "RUNTIME-MANIFEST.json": "1af3cc0bf00b0c7fe4a9d44dd7960946840fd593c819bff9dec5206ccd7728e9",
+    "runtime.patch": "c520ba69f64b2a1593d12d1ec2be9800974ff8a7fde9fceb52ab5e94b9dacdbb",
+    "tests.patch": "0aaab1388053715afed6b719b1e97bc960821ea4f9fd9aa0fdbdee5d465e0318",
+    "MODES.json": "f8bc943c729b62707142dad7adb6d5f34b15d50eaf685344fbffffeeaada5baf",
+    "REPORT.md": "5161122aac1bfe98e2ed69ac7cfac510f250b5b329511d94dfafbd106001f12a",
+    "PRODUCERS.md": "5ccb7c91e4d59484d21a60dc4cfda89db0f36144c0a1a4be9dc4c63a63d2e788",
+    "EVIDENCE.json": "d1fc9fa289ee96a81dc19875206723a52a91fa39696a96973348caaf533b210a"
+  }
+}

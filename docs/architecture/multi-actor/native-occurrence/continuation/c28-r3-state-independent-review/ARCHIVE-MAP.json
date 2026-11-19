@@ -1,0 +1,80 @@
+[
+  {
+    "source": "INPUT-IDENTITY.json",
+    "archive": "INPUT-IDENTITY.json",
+    "sourceSha256": "1d1fdab1b2d1e5eb59a041972ae3e2d52ebd52e4b08beb37c3e1616095a64250",
+    "archiveSha256": "1d1fdab1b2d1e5eb59a041972ae3e2d52ebd52e4b08beb37c3e1616095a64250"
+  },
+  {
+    "source": "SOURCE-AUDIT.md",
+    "archive": "SOURCE-AUDIT.md",
+    "sourceSha256": "64315341cad677dddadeeed21a0bb3cc65c83351a2a3905c5ca2d97d14895f5f",
+    "archiveSha256": "64315341cad677dddadeeed21a0bb3cc65c83351a2a3905c5ca2d97d14895f5f"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "64b41c0d65beded55750a3bba98c12c65233edbfb11a7f63d082cc2e41513ad4",
+    "archiveSha256": "64b41c0d65beded55750a3bba98c12c65233edbfb11a7f63d082cc2e41513ad4"
+  },
+  {
+    "source": "FREEZE-VERIFICATION.json",
+    "archive": "FREEZE-VERIFICATION.json",
+    "sourceSha256": "4bd885654ed81f614f369e0bd0259dc9ff2d4e5f905cb00b56d8de8b069fc82c",
+    "archiveSha256": "4bd885654ed81f614f369e0bd0259dc9ff2d4e5f905cb00b56d8de8b069fc82c"
+  },
+  {
+    "source": "inputs/DIFFERENTIAL-REVIEW.md",
+    "archive": "inputs/DIFFERENTIAL-REVIEW.md",
+    "sourceSha256": "2cea80f2551d792db970f333a165fe8b069a3cd5cf00129ee67d85a5991d6901",
+    "archiveSha256": "2cea80f2551d792db970f333a165fe8b069a3cd5cf00129ee67d85a5991d6901"
+  },
+  {
+    "source": "inputs/CAUSAL-REVIEW.md",
+    "archive": "inputs/CAUSAL-REVIEW.md",
+    "sourceSha256": "738f22c9d76a9cfb94d3b34f77674fd4970ec1062fdeb8b9a799f8e9c96ce7d3",
+    "archiveSha256": "738f22c9d76a9cfb94d3b34f77674fd4970ec1062fdeb8b9a799f8e9c96ce7d3"
+  },
+  {
+    "source": "inputs/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "archive": "inputs/packages/kernel/src/enhancers/transactions/transactions.ts.gz",
+    "sourceSha256": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+    "archiveSha256": "714e7cbdf96504ee04496c423a0389919ffbaea510f9559ee70f360250169e53"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/external.ts",
+    "archive": "inputs/packages/kernel/src/lib/external.ts",
+    "sourceSha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704",
+    "archiveSha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/write-participation.ts",
+    "archive": "inputs/packages/kernel/src/lib/write-participation.ts",
+    "sourceSha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e",
+    "archiveSha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/write-context.ts",
+    "archive": "inputs/packages/kernel/src/lib/write-context.ts",
+    "sourceSha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+    "archiveSha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/experimental-publication/private.ts",
+    "archive": "inputs/packages/kernel/src/lib/experimental-publication/private.ts",
+    "sourceSha256": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+    "archiveSha256": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "archive": "inputs/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "sourceSha256": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+    "archiveSha256": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "archive": "inputs/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts.gz",
+    "sourceSha256": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+    "archiveSha256": "a7686013daaae9c1e211f9bacc18b58b27f0e7a18cc314ef50bb6e579dbe4d0f"
+  }
+]

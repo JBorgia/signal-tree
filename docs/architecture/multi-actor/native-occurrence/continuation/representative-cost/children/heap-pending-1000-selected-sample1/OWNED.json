@@ -1,0 +1,9 @@
+[
+  {
+    "pid": 71227,
+    "ppid": 69696,
+    "rssBytes": 770048,
+    "birth": "Tue Nov 3 11:40:05 2026",
+    "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --expose-gc /private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs /private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist heap-pending 1000"
+  }
+]

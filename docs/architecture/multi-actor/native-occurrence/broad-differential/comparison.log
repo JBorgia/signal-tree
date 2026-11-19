@@ -1,0 +1,193 @@
+{
+  "predecessor": {
+    "kernel": {
+      "success": false,
+      "numTotalTests": 6474,
+      "numPassedTests": 6357,
+      "numFailedTests": 95,
+      "numPendingTests": 12,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 1646,
+      "numFailedTestSuites": 66,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 6357,
+        "failed": 95,
+        "skipped": 12,
+        "pending": 10
+      }
+    },
+    "angular": {
+      "success": false,
+      "numTotalTests": 251,
+      "numPassedTests": 245,
+      "numFailedTests": 3,
+      "numPendingTests": 3,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 94,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 245,
+        "failed": 3,
+        "skipped": 3
+      }
+    },
+    "react": {
+      "success": false,
+      "numTotalTests": 85,
+      "numPassedTests": 82,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 32,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 82,
+        "failed": 3
+      }
+    },
+    "vue": {
+      "success": false,
+      "numTotalTests": 183,
+      "numPassedTests": 180,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 51,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 180,
+        "failed": 3
+      }
+    },
+    "solid": {
+      "success": false,
+      "numTotalTests": 115,
+      "numPassedTests": 112,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 36,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 112,
+        "failed": 3
+      }
+    }
+  },
+  "successor": {
+    "kernel": {
+      "success": false,
+      "numTotalTests": 6512,
+      "numPassedTests": 6392,
+      "numFailedTests": 98,
+      "numPendingTests": 12,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 1653,
+      "numFailedTestSuites": 68,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 6392,
+        "failed": 98,
+        "skipped": 12,
+        "pending": 10
+      }
+    },
+    "angular": {
+      "success": false,
+      "numTotalTests": 251,
+      "numPassedTests": 245,
+      "numFailedTests": 3,
+      "numPendingTests": 3,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 94,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 245,
+        "failed": 3,
+        "skipped": 3
+      }
+    },
+    "react": {
+      "success": false,
+      "numTotalTests": 85,
+      "numPassedTests": 82,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 32,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 82,
+        "failed": 3
+      }
+    },
+    "vue": {
+      "success": false,
+      "numTotalTests": 183,
+      "numPassedTests": 179,
+      "numFailedTests": 4,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 51,
+      "numFailedTestSuites": 5,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 179,
+        "failed": 4
+      }
+    },
+    "solid": {
+      "success": false,
+      "numTotalTests": 115,
+      "numPassedTests": 112,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numTotalTestSuites": 36,
+      "numFailedTestSuites": 3,
+      "execution": {
+        "exit": 1,
+        "jsonProduced": true
+      },
+      "rawAssertionStatuses": {
+        "passed": 112,
+        "failed": 3
+      }
+    }
+  }
+}
+delta count 44

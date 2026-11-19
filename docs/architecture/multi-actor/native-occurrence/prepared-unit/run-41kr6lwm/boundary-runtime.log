@@ -1,0 +1,74 @@
+
+> nx run kernel:test independent-prepared-boundary.spec.ts
+
+> node tools/run-core-vitest.mjs independent-prepared-boundary.spec.ts
+
+(node:52040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:52050) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-prepared-unit-review/run-41kr6lwm/candidate/packages/kernel
+
+(node:52061) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-prepared-boundary.spec.ts (1 test | 1 failed) 18ms
+   × selected field plus surviving-row order restores the complete transaction 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > selected field plus surviving-row order restores the complete transaction
+AssertionError: expected [ { id: 'b', x: +0 }, …(1) ] to deeply equal [ { id: 'a', x: +0 }, …(1) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "id": "a",
++     "id": "b",
+      "x": 0,
+    },
+    {
+-     "id": "b",
++     "id": "a",
+      "x": 0,
+    },
+  ]
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:14:100
+     12|   let confirmError:unknown;try{q.confirm();}catch(e){confirmError=e;}
+     13|   writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order…
+     14|   expect(pending).toEqual([{id:'b',x:0},{id:'a',x:7}]);expect(error).t…
+       |                                                                                                    ^
+     15|  }finally{t.destroy();}
+     16| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  15:22:13
+   Duration  830ms (transform 430ms, setup 0ms, import 510ms, tests 18ms, environment 210ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-prepared-boundary.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

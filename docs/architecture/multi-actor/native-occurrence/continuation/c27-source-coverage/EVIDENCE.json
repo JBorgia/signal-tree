@@ -1,0 +1,117 @@
+{
+  "C26-manifest": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/SNAPSHOT-C26.json",
+    "sha256": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f"
+  },
+  "C26/equal-owner-admission.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "sha256": "8028723fc87c052cea7ef2c256fd0fb87b3c9014cc73226b712e4477c61ac945",
+    "manifestVerified": true
+  },
+  "C26/equal-owner-selection-companion.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/equal-owner-selection-companion.spec.ts",
+    "sha256": "d9f8dd0775b5006d6294f1063b442dd3d856955c0b61752867eedc0e5ccd60fc",
+    "manifestVerified": true
+  },
+  "C26/terminal-owner-possible-refresh.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts",
+    "sha256": "ac0a34afd897db63761ea699cc9386d72a22e9837d3c55bb1cbb3443cc151171",
+    "manifestVerified": true
+  },
+  "C26/terminal-owner-actual-contributor.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts",
+    "sha256": "5daa8ac74fe590f173c1c7ddd52b24fef76f06aad2c9c7702403881b21982802",
+    "manifestVerified": true
+  },
+  "C26/saved-inspection-snapshot-isolation.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "sha256": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f",
+    "manifestVerified": true
+  },
+  "C26/equal-owner-current-input.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "sha256": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3",
+    "manifestVerified": true
+  },
+  "C26/entity-input-view-contract.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/entity-input-view-contract.spec.ts",
+    "sha256": "029d2177c3dc6e551e99fadbd59e913c7c0fd92f99ae7df316b974b166327f22",
+    "manifestVerified": true
+  },
+  "C26/entity-native-input-independent.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/entity-native-input-independent.spec.ts",
+    "sha256": "f9a7e74cda5b81b478a37b0e259ac2947215b4905541638d19ca1abe4a7247f4",
+    "manifestVerified": true
+  },
+  "C26/entity-inspection-egress.spec.ts": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/candidate/packages/kernel/src/lib/entity-inspection-egress.spec.ts",
+    "sha256": "2a4772e42ea9d5d88ae8b53df4e8a3d3b1b830a5e54628c75bd553cb977065a6",
+    "manifestVerified": true
+  },
+  "API-manifest": {
+    "path": "/private/tmp/st-c23-declare-public-successor/SNAPSHOT-CANDIDATE.json",
+    "sha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa"
+  },
+  "API/link-declaration-public.spec.ts": {
+    "path": "/private/tmp/st-c23-declare-public-successor/candidate/packages/kernel/src/lib/link-declaration-public.spec.ts",
+    "sha256": "dbd54bf992ac94dc19c7efff7837138b8e557830328f7f51454a4b742930960a",
+    "manifestVerified": true
+  },
+  "API/tree-error-public-contract.spec.ts": {
+    "path": "/private/tmp/st-c23-declare-public-successor/candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "sha256": "ba57c2d624c7d1dfa09c01f7eabf1dac0999b76fb15a32e5755631466916ec9d",
+    "manifestVerified": true
+  },
+  "C26-focused/first.log": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/runs/unchanged-focused/first.log",
+    "sha256": "0b03600f2d51b3258117305854fca555e7b903ca0902f4f0767594a70d93040f"
+  },
+  "C26-focused/COMMAND.json": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/runs/unchanged-focused/COMMAND.json",
+    "sha256": "cc6ba2c7e36b22bedd81d8120e60a09cec81168e6037a56cdd3923ed2a441c45"
+  },
+  "C26-focused/RESULT.json": {
+    "path": "/private/tmp/st-c26-scalar-finalized-role/runs/unchanged-focused/RESULT.json",
+    "sha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  "API-public/first.log": {
+    "path": "/private/tmp/st-c23-declare-public-successor/runs/kernel-public/first.log",
+    "sha256": "2a44f50733498f980f0999844b10a3e3b926a683c72d546698781f080bbae62e"
+  },
+  "API-public/COMMAND.json": {
+    "path": "/private/tmp/st-c23-declare-public-successor/runs/kernel-public/COMMAND.json",
+    "sha256": "ba428cd8bf25591bf7628d64b8b75895bd60a9235d3c758dc581b119d8129f61"
+  },
+  "API-public/RESULT.json": {
+    "path": "/private/tmp/st-c23-declare-public-successor/runs/kernel-public/RESULT.json",
+    "sha256": "511da3c575c56075846c0b3e428f92cd17bcde7b63cbb91fa6cb372bc6722287"
+  },
+  "C26-independent/first.log": {
+    "path": "/private/tmp/st-c26-lifecycle-controls/runs/C26/first.log",
+    "sha256": "4c21f04ec4cf61361fa4c6197f378e76bf63c4336b18b6e4516fb7575f4701b0"
+  },
+  "C26-independent/COMMAND.json": {
+    "path": "/private/tmp/st-c26-lifecycle-controls/runs/C26/COMMAND.json",
+    "sha256": "952fbaa321893b1b4375454ebe915398391fd3d0beca7eee9228be4166563248"
+  },
+  "C26-independent/RESULT.json": {
+    "path": "/private/tmp/st-c26-lifecycle-controls/runs/C26/RESULT.json",
+    "sha256": "25a4bd84eba6e1ce2ce856d7bb0fe4c371a0ff2764f055d75b937364c8827d29"
+  },
+  "C23-row/first.log": {
+    "path": "/private/tmp/st-c23-declaration-independent-adjudication/original-raw/kernel/first.log",
+    "sha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0"
+  },
+  "C23-row/COMMAND.json": {
+    "path": "/private/tmp/st-c23-declaration-independent-adjudication/original-raw/kernel/COMMAND.json",
+    "sha256": "f5533159c1711c3e666979f7328149d596ab0584e4f6a3b46131b8c429e220ef"
+  },
+  "C23-row/RESULT.json": {
+    "path": "/private/tmp/st-c23-declaration-independent-adjudication/original-raw/kernel/RESULT.json",
+    "sha256": "505801c6cb8ff7f3167c186ff1aac8c8c6eb4e2e540feab59a88463315f55431"
+  },
+  "C23-row-original": {
+    "path": "/private/tmp/st-c23-row-react-declaration-qualification/candidate/packages/kernel/src/lib/direct-row-declaration-qualification.spec.ts",
+    "sha256": "b8c6ec372e915a1b1fbec181dcffb072e6c02607274d499177045e834ba1c841"
+  }
+}

@@ -1,0 +1,1 @@
+Staged guidance only, not applied to production or a frozen tested candidate. Implements owner-approved acquisition-independent freshness and preserves native timing and whole-value omission rules. Requires final candidate/doc/demo qualification before release. Historical audit documents remain unchanged.

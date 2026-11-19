@@ -1,0 +1,62 @@
+[
+  {
+    "path": "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "line": 30,
+    "text": " writeFileSync(`/private/tmp/st-fixed-window-retirement-cancellation-successor/provenance-${cause}.json`,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}))}},(_key,value)=>value instanceof Set?[...value]:value,2)+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/recipient-window-review.spec.ts",
+    "line": 9,
+    "text": "const output='/private/tmp/st-joint-phase-successor-r4/runs/recipient-traces.jsonl';"
+  },
+  {
+    "path": "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+    "line": 15,
+    "text": " appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/getter.jsonl',JSON.stringify({partial,reads,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+    "line": 14,
+    "text": " appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/participant.jsonl',JSON.stringify({seen,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+    "line": 14,
+    "text": " appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/preparation-scalar.jsonl',JSON.stringify({seen,error,n:t.$.n(),left:t.$.left.ids(),right:t.$.right.ids()})+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/diagnostics/flush-0.spec.ts",
+    "line": 263,
+    "text": "    writeFileSync('/tmp/flush-0.txt', findings.join('\\n') + '\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/diagnostics/flush-probe.spec.ts",
+    "line": 75,
+    "text": "    writeFileSync('/tmp/flush-probe.txt', out.join('\\n') + '\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/diagnostics/leaf-observation-support-0.spec.ts",
+    "line": 130,
+    "text": "    writeFileSync('/tmp/leaf-support-0.txt', rows.join('\\n') + '\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts",
+    "line": 200,
+    "text": "    writeFileSync('/tmp/owner-evidence-0.txt', out.join('\\n\\n') + '\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/diagnostics/owner-scope-0.spec.ts",
+    "line": 177,
+    "text": "    writeFileSync('/tmp/owner-scope-leak.json', JSON.stringify(seen, null, 1));"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/diagnostics/owner-scope-0.spec.ts",
+    "line": 229,
+    "text": "      '/tmp/owner-scope-0.txt',"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+    "line": 36,
+    "text": "      appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/completion.jsonl',JSON.stringify({observed,stack:new Error().stack})+'\\n');"
+  }
+]

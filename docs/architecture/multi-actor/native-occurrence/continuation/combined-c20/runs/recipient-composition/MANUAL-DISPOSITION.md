@@ -1,0 +1,1 @@
+Interrupted while preparing source hashes to correct a diagnostic redirect that targeted another frozen evidence directory. No first.log had been created when inspected. No test result claimed. Successor uses a C20-owned trace sink.

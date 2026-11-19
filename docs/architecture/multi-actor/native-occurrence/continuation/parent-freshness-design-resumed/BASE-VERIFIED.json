@@ -1,0 +1,7 @@
+{
+  "base": "/private/tmp/st-native-combined-c7a/candidate",
+  "manifestSha256": "d911ae7768e8e1a43eceb99ef5277988a6ff9e59c910337bb1e6b79db4d1b71d",
+  "verifiedFiles": 2996,
+  "mismatches": [],
+  "method": "SHA-256 each manifest-listed file; no runtime execution; unlisted files not attested"
+}

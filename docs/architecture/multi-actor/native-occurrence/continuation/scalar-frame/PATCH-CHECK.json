@@ -1,0 +1,13 @@
+{
+  "initialCheck": {
+    "command": "git apply --check --directory=/private/tmp/st-scalar-frame-publication-successor/patch-check /private/tmp/st-scalar-frame-publication-successor/source.patch",
+    "exit": 128,
+    "error": "invalid path (absolute --directory rejected)"
+  },
+  "correctedCheck": {
+    "cwd": "/private/tmp/st-scalar-frame-publication-successor/patch-check",
+    "command": "git apply --check ../source.patch ../tests.patch",
+    "exit": 0
+  },
+  "archiveVerifiedFiles": 2970
+}

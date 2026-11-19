@@ -1,0 +1,13 @@
+{
+  "name": "st-peer-vue350",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@signal-tree/kernel": "file:../../st-current-read-capability-proof/proof-evidence/tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+    "@signal-tree/vue": "file:../../st-current-read-capability-proof/proof-evidence/tarballs/signal-tree-vue-16.0.0-dev.tgz",
+    "tslib": "2.8.1",
+    "typescript": "5.9.3",
+    "vue": "3.5.0"
+  }
+}

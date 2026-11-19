@@ -1,0 +1,7 @@
+{
+  "action": "SIGTERM exact verified Rollup child after prolonged post-emission nonexit",
+  "pid": 393,
+  "observation": "393   143   393 03:17   0.0 node /private/tmp/st-native-combined-c22/candidate/node_modules/.bin/../rollup/dist/bin/rollup -c rollup.config.cjs",
+  "time": "2026-11-02T14:06:21-0700",
+  "qualification": "manual interrupted build; emission is not success; cause unresolved"
+}

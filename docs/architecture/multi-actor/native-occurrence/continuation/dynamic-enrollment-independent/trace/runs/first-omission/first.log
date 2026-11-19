@@ -1,0 +1,223 @@
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildViteTargets (/private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:113:29)
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:63:44
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+(node:30901) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 10)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-dynamic-enrollment-independent/trace/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+> nx run kernel:test occurrence-successor.spec.ts --testNamePattern=first omission enrolls clean scalar ancestry --maxWorkers=1
+
+> node tools/run-core-vitest.mjs occurrence-successor.spec.ts --testNamePattern="first omission enrolls clean scalar ancestry" --maxWorkers=1
+
+(node:30959) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-enrollment-independent/trace/candidate/packages/kernel
+
+(node:30973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occurrence-successor.spec.ts (12 tests | 1 failed | 11 skipped) 21ms
+   × first omission enrolls clean scalar ancestry 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean scalar ancestry
+AssertionError: expected [] to deeply equal [ undefined ]
+
+- Expected
++ Received
+
+- [
+-   undefined,
+- ]
++ []
+
+ ❯ src/lib/occurrence-successor.spec.ts:23:22
+     21|   await flush();expect(sent).toEqual([]);
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:u…
+       |                      ^
+     24|  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy()…
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 11 skipped (12)
+   Start at  20:12:49
+   Duration  758ms (transform 423ms, setup 0ms, import 506ms, tests 21ms, environment 157ms)
+
+Warning: command "node tools/run-core-vitest.mjs occurrence-successor.spec.ts --testNamePattern="first omission enrolls clean scalar ancestry" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

@@ -1,0 +1,27 @@
+{
+  "cwd": "/private/tmp/st-c19-bounded-history-counts/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "large-batch-history-count-probe.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c19-bounded-history-counts/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c19-bounded-history-counts/nx-data",
+    "TMPDIR": "/private/tmp/st-c19-bounded-history-counts/runs/fresh128/tmp",
+    "ST_TRACE_SIZE": "128",
+    "ST_TRACE_REPEATS": "1",
+    "ST_TRACE_SITES": "{\n  \"setAll-initial\": [\n    \"lib/entity-signal.ts:1692:55)\",\n    \"lib/entity-signal.ts:337:34)\",\n    \"lib/entity-signal.ts:338:32)\",\n    \"lib/experimental-publication/lifecycle.ts:154:70)\",\n    \"lib/internals/entity-membership-inventory.ts:183:34)\",\n    \"lib/internals/entity-membership-inventory.ts:184:32)\",\n    \"lib/physical/entity-mutation-frame.ts:226:12)\",\n    \"lib/physical/prepared-placement-visibility.ts:21:40)\"\n  ],\n  \"setAll-disjoint-replace\": [\n    \"lib/entity-signal.ts:1692:55)\",\n    \"lib/entity-signal.ts:1692:55)\",\n    \"lib/entity-signal.ts:337:34)\",\n    \"lib/entity-signal.ts:338:32)\",\n    \"lib/experimental-publication/lifecycle.ts:154:70)\",\n    \"lib/internals/entity-membership-inventory.ts:183:34)\",\n    \"lib/internals/entity-membership-inventory.ts:184:32)\",\n    \"lib/physical/entity-mutation-frame.ts:226:12)\",\n    \"lib/physical/prepared-placement-visibility.ts:21:40)\"\n  ],\n  \"setAll-empty-clear\": [\n    \"lib/entity-signal.ts:1692:55)\",\n    \"lib/entity-signal.ts:1692:55)\",\n    \"lib/entity-signal.ts:337:34)\",\n    \"lib/entity-signal.ts:338:32)\",\n    \"lib/experimental-publication/lifecycle.ts:154:70)\",\n    \"lib/internals/entity-membership-inventory.ts:183:34)\",\n    \"lib/internals/entity-membership-inventory.ts:184:32)\",\n    \"lib/physical/entity-mutation-frame.ts:226:12)\"\n  ],\n  \"stop\": [],\n  \"destroy\": [],\n  \"microtask-drain-12\": []\n}\n"
+  },
+  "watchdogSeconds": 60,
+  "start_new_session": true
+}

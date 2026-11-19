@@ -1,0 +1,32 @@
+[
+  {
+    "source": "INPUT-IDENTITY.json",
+    "archive": "INPUT-IDENTITY.json",
+    "sourceSha256": "7804711322a595cc28b6bcb087c983eda2f5b8b55954a000b6add442b7ea552a",
+    "archiveSha256": "7804711322a595cc28b6bcb087c983eda2f5b8b55954a000b6add442b7ea552a"
+  },
+  {
+    "source": "POLICY-SOURCE-IDENTITY.json",
+    "archive": "POLICY-SOURCE-IDENTITY.json",
+    "sourceSha256": "f64c81a503c348e9b1cef5baaac069d69f79415047f21b8103c3d63487e35ac8",
+    "archiveSha256": "f64c81a503c348e9b1cef5baaac069d69f79415047f21b8103c3d63487e35ac8"
+  },
+  {
+    "source": "POLICY-AND-SELECTED-FACT.md",
+    "archive": "POLICY-AND-SELECTED-FACT.md",
+    "sourceSha256": "965cb03809d4ec4c75b483b03b27cb0237b616f9d2b1f0231f25f992a4d70495",
+    "archiveSha256": "965cb03809d4ec4c75b483b03b27cb0237b616f9d2b1f0231f25f992a4d70495"
+  },
+  {
+    "source": "OBSERVATIONS.json",
+    "archive": "OBSERVATIONS.json",
+    "sourceSha256": "8fe6ce78c2c46d81ebb125399b9638524ca22547587b2024e927466bbb038a89",
+    "archiveSha256": "8fe6ce78c2c46d81ebb125399b9638524ca22547587b2024e927466bbb038a89"
+  },
+  {
+    "source": "CAUSAL-INVENTORY.md",
+    "archive": "CAUSAL-INVENTORY.md",
+    "sourceSha256": "5b75dca0e2035f2a19712e235271c97ce10c7121e675537ccdc20c693cec4556",
+    "archiveSha256": "5b75dca0e2035f2a19712e235271c97ce10c7121e675537ccdc20c693cec4556"
+  }
+]

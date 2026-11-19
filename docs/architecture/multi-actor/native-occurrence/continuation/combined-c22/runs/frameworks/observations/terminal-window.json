@@ -1,0 +1,22 @@
+{
+  "delivered": 1,
+  "during": {
+    "n": 2
+  },
+  "mirror": 1,
+  "cached": {
+    "n": 1
+  },
+  "direct": {
+    "n": 2
+  },
+  "root": {
+    "box": {
+      "n": 2
+    },
+    "sibling": {
+      "n": 8
+    }
+  },
+  "runs": 1
+}

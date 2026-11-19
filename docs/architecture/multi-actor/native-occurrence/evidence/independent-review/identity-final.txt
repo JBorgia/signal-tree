@@ -1,0 +1,6 @@
+/private/tmp/st-occurrence-successor: 2918 original files unchanged
+/private/tmp/st-occurrence-independent-review/replica: 2918 original files unchanged
+publication-terminal-consumer-independent.spec.ts: changed; terminal fixture native-tree setup adapter, assertions retained
+core-independent-review.spec.ts: byte-identical
+native-certificate-successor.spec.ts: byte-identical
+collection-contributor-core.spec.ts: byte-identical

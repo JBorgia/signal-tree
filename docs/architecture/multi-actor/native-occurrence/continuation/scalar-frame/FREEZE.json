@@ -1,0 +1,17 @@
+{
+  "status": "frozen for independent review; not accepted or activated",
+  "source": "/private/tmp/st-scalar-frame-publication-successor/candidate",
+  "predecessor": "/private/tmp/st-native-combined-successor/candidate",
+  "files": 2970,
+  "changedFiles": 24,
+  "runtimeFiles": 18,
+  "testFiles": 6,
+  "sha256": {
+    "PREDECESSOR-SNAPSHOT-A.json": "b226c1d39c85e49265446b2bf83d3e5bdb64c2dae1ade93a466baceac1641e0a",
+    "SOURCE-SHA256.json": "e9b1555e1c2f49f1dfd5b26aa56cae20b22afa9d8d386c32f32091d46a8590a6",
+    "CHANGED-SHA256.json": "71834bddba480b777e17fe75ebd5459d7fffaef8b2bda65b168386cdbec8cb63",
+    "source.patch": "c8e2819a9f36333533ccd3631f4411282882c87ce35ef33232c002d93c5790a7",
+    "tests.patch": "b6824c397f9b70275c0e3db879e59bf9f28c0b7c29a3e1ae25812a19da3a1fa4",
+    "candidate-source.tar.gz": "6cd015eada89c04520df59ff21ec9c7af5f0a8cc8802d4ecf5288f9284bfa955"
+  }
+}

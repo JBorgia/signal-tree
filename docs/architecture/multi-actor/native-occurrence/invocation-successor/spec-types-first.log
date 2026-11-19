@@ -1,0 +1,10 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/native-invocation-handoff.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/native-invocation-handoff.spec.ts(29,17): error TS2550: Property 'hasOwn' does not exist on type 'ObjectConstructor'. Do you need to change your target library? Try changing the 'lib' compiler option to 'es2022' or later.

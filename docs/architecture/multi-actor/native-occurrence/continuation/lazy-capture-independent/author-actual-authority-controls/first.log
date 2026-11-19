@@ -1,0 +1,41 @@
+
+> nx run kernel:test committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts --maxWorkers=1
+
+(node:79811) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-lazy-capture-owner/candidate/packages/kernel
+
+(node:79825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79829) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  31 passed (31)
+   Start at  19:24:41
+   Duration  1.83s (transform 444ms, setup 0ms, import 662ms, tests 190ms, environment 686ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.3s

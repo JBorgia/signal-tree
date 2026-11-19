@@ -1,0 +1,62 @@
+[
+  {
+    "source": "audit.json",
+    "archive": "audit.json",
+    "sourceSha256": "e44f5cb8bc761bea2bf99bac4d1a1b8b964fa83e68885e83ede059966e389485",
+    "archiveSha256": "e44f5cb8bc761bea2bf99bac4d1a1b8b964fa83e68885e83ede059966e389485"
+  },
+  {
+    "source": "audit.py",
+    "archive": "audit.py",
+    "sourceSha256": "702c83ec6654bbfea9d6e4c629a669d034f611671ad628945d5fa87dafeb45c7",
+    "archiveSha256": "702c83ec6654bbfea9d6e4c629a669d034f611671ad628945d5fa87dafeb45c7"
+  },
+  {
+    "source": "progress-reporter.mjs",
+    "archive": "progress-reporter.mjs",
+    "sourceSha256": "c9b26fc7821b8349c8505980eec6345ffabb6d6b0cd29997c297b86aa31526f6",
+    "archiveSha256": "c9b26fc7821b8349c8505980eec6345ffabb6d6b0cd29997c297b86aa31526f6"
+  },
+  {
+    "source": "diagnostic-redirect.cjs",
+    "archive": "diagnostic-redirect.cjs",
+    "sourceSha256": "7e515673241a16779638a06587b648b1ad9dede01e74954db29646293dfab164",
+    "archiveSha256": "7e515673241a16779638a06587b648b1ad9dede01e74954db29646293dfab164"
+  },
+  {
+    "source": "PROCESS-observed.json",
+    "archive": "PROCESS-observed.json",
+    "sourceSha256": "526e4aa01c5b2a13f056efc7d52ad9146de38851e7d3ab71ee6655492a6c989f",
+    "archiveSha256": "526e4aa01c5b2a13f056efc7d52ad9146de38851e7d3ab71ee6655492a6c989f"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "38608e121533558f701c9c4debe11c46887c09abe2183b290a018ca886753f23",
+    "archiveSha256": "38608e121533558f701c9c4debe11c46887c09abe2183b290a018ca886753f23"
+  },
+  {
+    "source": "COMPOSITION.json",
+    "archive": "COMPOSITION.json",
+    "sourceSha256": "f5d87a83499b47363d92b6134bf6a3853f2195e4b52b984855930a0306f3fa1d",
+    "archiveSha256": "f5d87a83499b47363d92b6134bf6a3853f2195e4b52b984855930a0306f3fa1d"
+  },
+  {
+    "source": "run-full-watchdog.py",
+    "archive": "run-full-watchdog.py",
+    "sourceSha256": "0ce9d651af18a9f18baf2137953da7c0f8d9d2c8936eef85e91244dc823bbda0",
+    "archiveSha256": "0ce9d651af18a9f18baf2137953da7c0f8d9d2c8936eef85e91244dc823bbda0"
+  },
+  {
+    "source": "tests.patch",
+    "archive": "tests.patch",
+    "sourceSha256": "d95ade53b32fdd724e223f1c16c3ebadcae9173039da4316f9d62e3d9b3221fc",
+    "archiveSha256": "d95ade53b32fdd724e223f1c16c3ebadcae9173039da4316f9d62e3d9b3221fc"
+  },
+  {
+    "source": "SNAPSHOT-C21.json",
+    "archive": "SNAPSHOT-C21.json.gz",
+    "sourceSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+    "archiveSha256": "562a3bb2415ec8b365bfd2e1ceb44be8df248bcb5cc99aaaa3f15dff287d19ed"
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "predecessorUnchanged": true,
+  "predecessorFiles": 2967,
+  "candidateFiles": 2970,
+  "changed": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts",
+    "packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+    "packages/kernel/src/lib/physical/ordinary-restoration-placement.ts"
+  ],
+  "originalFixturesUnchanged": true
+}

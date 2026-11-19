@@ -1,0 +1,161 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+ import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+@@ -965,7 +966,8 @@
+     changes: readonly CommittedEntityMutation[],
+     physical = structuralStore.preparePlacement(),
+     authoredOrder?: readonly number[],
+-    authoredDomain?: readonly number[]
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
+   ) {
+     const placement = ordinaryTopology.preparePlacement(
+       structuralStore.preparePlacement()
+@@ -1078,7 +1080,8 @@
+           ): number | undefined => {
+             visibility ??= createPreparedPlacementVisibility(
+               physical,
+-              (id) => placement.read(id).present
++              (id) => placement.read(id).present,
++              physicalEntries
+             );
+             return visibility.resolve(
+               subject,
+@@ -1332,6 +1335,9 @@
+       }
+     }
+     const physicalPlacement = frame.preparePlacement();
++    // Capture after the frame has finished all placement edits. Both consumers
++    // use this exact stage; the earlier staged-key lookup may be stale here.
++    const physicalEntries = physicalPlacement.capturePatch();
+     for (let index = 0; index < changes.length; index++) {
+       const change = changes[index];
+       if (change.structuralRecord?.kind !== 'add') continue;
+@@ -1350,7 +1356,8 @@
+       changes,
+       physicalPlacement,
+       frame.ordinaryOrder,
+-      frame.orderEndpoints?.before
++      frame.orderEndpoints?.before,
++      physicalEntries
+     );
+     const valueResultsByStep = frame.mutations.map((mutation) => {
+       if (mutation.kind !== 'replace-value') return undefined;
+@@ -1381,7 +1388,7 @@
+           }
+         : undefined;
+     const physicalInterval =
+-      ordinaryTopology.prepareInterval(physicalPlacement);
++      ordinaryTopology.prepareInterval(physicalPlacement, physicalEntries);
+     const physicalBeforeToken = structuralStore.activeOrderFrontier();
+     const topologyUnit = Object.freeze({
+       id: Object.freeze({}),
+--- a/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
++++ b/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
+@@ -1,5 +1,8 @@
+ import type { TopologyViewInterval } from '../internals/mutation-capture-runtime';
+-import { EntityPlacementStage } from './entity-placement-stage';
++import {
++  EntityPlacementStage,
++  type PreparedPlacementEntries,
++} from './entity-placement-stage';
+ import type { StructuralEffect } from '../mutation-types';
+ 
+ export type OrdinaryEntityPresence<K extends string | number, E> =
+@@ -71,8 +74,11 @@
+       { interval }
+     );
+   }
+-  prepareInterval(stage: EntityPlacementStage<K>): TopologyViewInterval {
+-    const pairs = [...stage.patch].flatMap(([subject, after]) => {
++  prepareInterval(
++    stage: EntityPlacementStage<K>,
++    entries?: PreparedPlacementEntries<K>
++  ): TopologyViewInterval {
++    const pairs = (entries ?? [...stage.patch]).flatMap(([subject, after]) => {
+       const before = stage.base(subject);
+       const equal =
+         before.present === after.present &&
+@@ -87,7 +93,10 @@
+             Object.freeze({
+               subject,
+               before: Object.freeze({ ...before }),
+-              after: Object.freeze({ ...after }),
++              after:
++                entries && Object.isFrozen(after)
++                  ? after
++                  : Object.freeze({ ...after }),
+             }),
+           ];
+     });
+--- a/packages/kernel/src/lib/physical/entity-placement-stage.ts
++++ b/packages/kernel/src/lib/physical/entity-placement-stage.ts
+@@ -2,6 +2,11 @@
+ export type EntityPlacement<K> =
+   | { present: false }
+   | { present: true; key: K; beforeSubject?: number; afterSubject?: number };
++export type PreparedPlacementEntries<K> = readonly (readonly [
++  number,
++  Readonly<EntityPlacement<K>>
++])[];
++
+ export class EntityPlacementStage<K> {
+   readonly patch = new Map<number, EntityPlacement<K>>();
+   constructor(
+@@ -9,6 +14,16 @@
+     public head: number | undefined,
+     public tail: number | undefined
+   ) {}
++  /** One immutable enumeration of a completed preparation, not a stored index. */
++  capturePatch(): PreparedPlacementEntries<K> {
++    const entries: Array<readonly [number, Readonly<EntityPlacement<K>>]> = [];
++    // Map iteration creates this tuple; it is not the Map's stored row.
++    for (const entry of this.patch) {
++      entry[1] = Object.freeze({ ...entry[1] });
++      entries.push(Object.freeze(entry));
++    }
++    return Object.freeze(entries);
++  }
+   read(subject: number): EntityPlacement<K> {
+     return this.patch.get(subject) ?? this.base(subject);
+   }
+--- a/packages/kernel/src/lib/physical/prepared-placement-visibility.ts
++++ b/packages/kernel/src/lib/physical/prepared-placement-visibility.ts
+@@ -1,10 +1,14 @@
+-import type { EntityPlacementStage } from './entity-placement-stage';
++import type {
++  EntityPlacementStage,
++  PreparedPlacementEntries,
++} from './entity-placement-stage';
+ type Direction = 'before' | 'after';
+ type Run = { ids: number[]; size: number; counts: number[] };
+ /** Transient query index over one fixed physical preparation, never state authority. */
+ export function createPreparedPlacementVisibility<K>(
+   physical: EntityPlacementStage<K>,
+-  isVisible: (subject: number) => boolean
++  isVisible: (subject: number) => boolean,
++  entries?: PreparedPlacementEntries<K>
+ ) {
+   const overrides = new Map<number, boolean>();
+   const positions = new Map<number, { run: Run; at: number }>();
+@@ -14,11 +18,13 @@
+     if (built) return;
+     built = true;
+     const present = new Map(
+-      [...physical.patch].filter(
++      (entries ?? [...physical.patch]).filter(
+         (
+           entry
+-        ): entry is [number, Extract<(typeof entry)[1], { present: true }>] =>
+-          entry[1].present
++        ): entry is readonly [
++          number,
++          Extract<(typeof entry)[1], { present: true }>
++        ] => entry[1].present
+       )
+     );
+     const visited = new Set<number>();

@@ -1,0 +1,62 @@
+[
+  {
+    "source": "ATTRIBUTION-SOURCE-COMPARISON.json",
+    "archive": "ATTRIBUTION-SOURCE-COMPARISON.json",
+    "sourceSha256": "b62ff236144b94b8f73d70abce0ec02796c2b09f1e261bb4c6aa2c1587557c9b",
+    "archiveSha256": "b62ff236144b94b8f73d70abce0ec02796c2b09f1e261bb4c6aa2c1587557c9b"
+  },
+  {
+    "source": "C12-POINT-FIRST.log",
+    "archive": "C12-POINT-FIRST.log",
+    "sourceSha256": "818e18be4e7b8aeb66d1b891bef98b4bdf6e6aea06ed826a57a9d6944e8e7815",
+    "archiveSha256": "818e18be4e7b8aeb66d1b891bef98b4bdf6e6aea06ed826a57a9d6944e8e7815"
+  },
+  {
+    "source": "DORMANT-FEASIBILITY.md",
+    "archive": "DORMANT-FEASIBILITY.md",
+    "sourceSha256": "c1c015b77b2e6c2261c45181bec23b6f5ecc1781779b956b630443ce0f925b74",
+    "archiveSha256": "c1c015b77b2e6c2261c45181bec23b6f5ecc1781779b956b630443ce0f925b74"
+  },
+  {
+    "source": "PRIOR-ATTRIBUTION.json",
+    "archive": "PRIOR-ATTRIBUTION.json",
+    "sourceSha256": "595362950a42591b65a478d886c6131937de9305e6ebc404db3bed6fa1332b8b",
+    "archiveSha256": "595362950a42591b65a478d886c6131937de9305e6ebc404db3bed6fa1332b8b"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "547f57592c0281c797d998b9f9f56fa2311b3ba69cf667b743086df2ead38718",
+    "archiveSha256": "547f57592c0281c797d998b9f9f56fa2311b3ba69cf667b743086df2ead38718"
+  },
+  {
+    "source": "PLAN.md",
+    "archive": "PLAN.md",
+    "sourceSha256": "b77281d510201817506c91e0bb54bdbcdccb8d6d0f6f03c2cab80c2e4ecb1523",
+    "archiveSha256": "b77281d510201817506c91e0bb54bdbcdccb8d6d0f6f03c2cab80c2e4ecb1523"
+  },
+  {
+    "source": "PRIOR-POINT-REVIEW.md",
+    "archive": "PRIOR-POINT-REVIEW.md",
+    "sourceSha256": "46b14d6a604af95f0a6c65ecac571c65c431d59fa3e7970f8f6b23410e3034b6",
+    "archiveSha256": "46b14d6a604af95f0a6c65ecac571c65c431d59fa3e7970f8f6b23410e3034b6"
+  },
+  {
+    "source": "SOURCE-IDENTITIES.json",
+    "archive": "SOURCE-IDENTITIES.json",
+    "sourceSha256": "7bb27c377e5f18a3b8d05b1328489aa85cd943ad41e85879c8d3cd1b4b904559",
+    "archiveSha256": "7bb27c377e5f18a3b8d05b1328489aa85cd943ad41e85879c8d3cd1b4b904559"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "b77281d510201817506c91e0bb54bdbcdccb8d6d0f6f03c2cab80c2e4ecb1523",
+    "archiveSha256": "b77281d510201817506c91e0bb54bdbcdccb8d6d0f6f03c2cab80c2e4ecb1523"
+  },
+  {
+    "source": "INPUT-SNAPSHOT.json",
+    "archive": "INPUT-SNAPSHOT.json.gz",
+    "sourceSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+    "archiveSha256": "a82f4764727aa7b40c594a13cef71981ba733cbfdfa41a67b9826dee1ee7c639"
+  }
+]

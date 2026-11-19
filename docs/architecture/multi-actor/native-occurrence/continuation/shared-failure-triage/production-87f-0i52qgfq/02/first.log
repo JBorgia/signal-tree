@@ -1,0 +1,55 @@
+
+> nx run kernel:test opaque-leaf-restoration.spec.ts --testNamePattern=opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs opaque-leaf-restoration.spec.ts --testNamePattern="opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling" --reporter=verbose --maxWorkers=1
+
+(node:37902) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37909) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:37978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=false
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=true
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=false
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=false
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=true
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=true
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes an atomic replacement with restoration alone
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > keeps ordinary branch children independently restorable
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > restores the entire terminal value across shape changes from null
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > restores the entire terminal value across shape changes from { min: +0, max: 10 }
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rolls back an atomic object leaf without a restoration enhancer
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses to overwrite external truth, including a safe sibling
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > keeps pending overlap refusal atomic and retries after settlement
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses structural drift before reversing an atomic leaf sibling 12ms
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > retains external undefined as terminal truth and refuses the whole undo
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > refuses redo after external undefined without changing the history position
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: transactions
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: transactions-first
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: restoration-first
+ ↓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > does not treat a retained slot as permission to restore an externally omitted terminal
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 19 skipped (20)
+   Start at  16:40:30
+   Duration  1.25s (transform 637ms, setup 0ms, import 765ms, tests 13ms, environment 350ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.0s

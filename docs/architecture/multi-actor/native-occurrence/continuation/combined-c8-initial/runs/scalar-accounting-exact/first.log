@@ -1,0 +1,35 @@
+
+> nx run kernel:test scalar-install-accounting.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-install-accounting.spec.ts --maxWorkers=1
+
+(node:41607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41614) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c8/candidate/packages/kernel
+
+(node:41622) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  08:49:40
+   Duration  250ms (transform 37ms, setup 0ms, import 47ms, tests 3ms, environment 131ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      662ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     653ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    653ms

@@ -1,0 +1,19 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-c28-r3-entity-artifact-gate-work/successor/dist/packages/solid/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm pack
+8 verbose argv "pack" "--ignore-scripts" "--json" "--pack-destination" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0ubW4B/clean-tarballs"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c28-r3-entity-artifact-gate-work/tool-empty-cache/_logs/2026-11-03T14_59_00_890Z-
+10 verbose logfile /private/tmp/st-c28-r3-entity-artifact-gate-work/tool-empty-cache/_logs/2026-11-03T14_59_00_890Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 verbose cwd /private/tmp/st-c28-r3-entity-artifact-gate-work/successor/dist/packages/solid
+14 verbose os Darwin 25.2.0
+15 verbose node v24.15.0
+16 verbose npm  v11.12.1
+17 verbose exit 0
+18 info ok

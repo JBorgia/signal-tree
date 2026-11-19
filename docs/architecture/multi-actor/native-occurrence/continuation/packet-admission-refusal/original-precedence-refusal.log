@@ -1,0 +1,63 @@
+
+> nx run kernel:test packet-index-adversarial.spec.ts --testNamePattern=remove followed by restored same subject --maxWorkers=1
+
+> node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts --testNamePattern="remove followed by restored same subject" --maxWorkers=1
+
+(node:2181) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2188) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-admission-refusal-successor/candidate/packages/kernel
+
+(node:2195) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-index-adversarial.spec.ts (24 tests | 1 failed | 23 skipped) 3ms
+   × remove followed by restored same subject preserves final endpoint and per-edit restoredFields precedence 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > remove followed by restored same subject preserves final endpoint and per-edit restoredFields precedence
+Error: Frozen entity publication edit contains mutable admission metadata
+ ❯ AdmissionMetadata.edit src/lib/internals/entity-publication.ts:67:15
+     65|       if (edit.fields && !Object.isFrozen(edit.fields) ||
+     66|           edit.structural && !Object.isFrozen(edit.structural))
+     67|         throw new Error('Frozen entity publication edit contains mutab…
+       |               ^
+     68|     }
+     69|     Object.freeze(edit);
+ ❯ AdmissionMetadata.array src/lib/internals/entity-publication.ts:74:36
+ ❯ src/lib/internals/entity-publication.ts:88:23
+ ❯ AdmissionMetadata.prepare src/lib/internals/entity-publication.ts:83:31
+ ❯ EntityPublicationSource.prepare src/lib/internals/entity-publication.ts:218:27
+ ❯ install src/lib/packet-index-adversarial.spec.ts:10:64
+ ❯ src/lib/packet-index-adversarial.spec.ts:30:6
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 23 skipped (24)
+   Start at  20:06:24
+   Duration  812ms (transform 483ms, setup 0ms, import 585ms, tests 3ms, environment 145ms)
+
+Warning: command "node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts --testNamePattern="remove followed by restored same subject" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

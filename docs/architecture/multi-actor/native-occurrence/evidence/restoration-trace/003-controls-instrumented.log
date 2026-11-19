@@ -1,0 +1,83 @@
+
+> nx run kernel:test restoration-diagnostic.spec.ts
+
+> node tools/run-core-vitest.mjs restoration-diagnostic.spec.ts
+
+(node:94180) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94187) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-occurrence-restoration-trace/candidate/packages/kernel
+
+(node:94194) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/restoration-diagnostic.spec.ts > explicit-equal-hidden
+RESTORATION_TRACE {"seq":58,"event":"entityPacket","data":{"physical":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}],"ordinary":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}],"steps":[{"ordinal":0,"ordinary":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}],"physical":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}]}]}}
+
+stdout | src/lib/restoration-diagnostic.spec.ts > explicit-equal-hidden
+RESTORATION_TRACE {"seq":59,"event":"entityPacket","data":{"physical":[{"subject":1,"before":{"id":"a","x":0},"after":{"id":"a","x":7},"fields":["x"]}],"ordinary":[{"subject":1,"before":{"id":"a","x":0},"after":{"id":"a","x":7},"path":"branch.rows.a","fields":["x"]}]}}
+RESTORATION_TRACE {"seq":60,"event":"entityRecipientPrepared","data":{"affected":true,"changed":true,"next":[{"id":"a","x":7}],"supportEdits":[{"key":"1:f:x","before":{"id":17,"proof":{"unknown":false,"invalid":false,"owners":[]}},"after":{"id":18}}],"native":{"id":18}}}
+RESTORATION_TRACE {"seq":61,"event":"completeCollection","data":{"revision":28}}
+RESTORATION_TRACE {"seq":62,"event":"reduceUnit","data":{"revision":28,"kind":"collection","payload":[{"id":"a","x":7}],"native":{"id":18,"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":19,"outcome":"pending"}],"destination":[],"input":[]}},"proof":{"unknown":true,"invalid":false,"owners":[],"destination":[]}}}
+RESTORATION_TRACE {"seq":63,"event":"collectionSupportEdit","data":{"revision":28,"key":"1:f:x","after":{"id":18,"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":19,"outcome":"pending"}],"destination":[],"input":[]}}}}
+RESTORATION_TRACE {"seq":64,"event":"reducedSelection","data":{"revision":28,"payload":{"branch":{"rows":{"all":[{"id":"a","x":7}]}},"other":0},"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":19,"outcome":"pending"}],"destination":[],"input":[]},"unresolved":0}}
+
+stdout | src/lib/restoration-diagnostic.spec.ts > explicit-equal-hidden
+RESTORATION_TRACE {"seq":65,"event":"recursiveHydrate","data":{"path":"other","supplied":1,"hydrated":false}}
+RESTORATION_TRACE {"seq":66,"event":"prepareMembership","data":{"address":[],"key":"branch","present":false,"ordinary":{"before":{"present":true,"value":{"rows":{"all":[{"id":"a","x":7}]}}},"after":{"present":false}}}}
+RESTORATION_TRACE {"seq":67,"event":"completeMembership","data":{"units":[30]}}
+RESTORATION_TRACE {"seq":68,"event":"reduceUnit","data":{"revision":29,"kind":"field","payload":1,"native":{"id":20,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":69,"event":"reducedSelection","data":{"revision":29,"payload":{"branch":{"rows":{"all":[{"id":"a","x":7}]}},"other":1},"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":19,"outcome":"pending"}],"destination":[],"input":[]},"unresolved":0}}
+RESTORATION_TRACE {"seq":70,"event":"reduceUnit","data":{"revision":30,"kind":"membership","member":{"key":"branch","present":false,"ordinary":{"before":{"present":true,"value":{"rows":{"all":[{"id":"a","x":7}]}}},"after":{"present":false}}},"native":{"id":21,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":71,"event":"reducedSelection","data":{"revision":30,"payload":{"branch":{"rows":{"all":[{"id":"a","x":7}]}},"other":1},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]},"unresolved":0}}
+
+ ❯ src/lib/restoration-diagnostic.spec.ts (5 tests | 1 failed) 37ms
+   × explicit-equal-hidden 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/restoration-diagnostic.spec.ts > explicit-equal-hidden
+Error: Entity with id a not found
+ ❯ Proxy.updateOne src/lib/entity-signal.ts:3702:15
+    3700|       const entity = presentEntity(id);
+    3701|       if (!entity) {
+    3702|         throw new Error(`Entity with id ${String(id)} not found`);
+       |               ^
+    3703|       }
+    3704|
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/lib/restoration-diagnostic.spec.ts:18:43
+ ❯ Module.runDeclaration src/lib/experimental-publication/lifecycle.ts:313:14
+ ❯ Module.declare src/lib/experimental-publication/private.ts:414:142
+ ❯ Object.declare src/lib/link.ts:1158:16
+ ❯ src/lib/restoration-diagnostic.spec.ts:17:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  12:55:03
+   Duration  759ms (transform 412ms, setup 0ms, import 493ms, tests 37ms, environment 155ms)
+
+Warning: command "node tools/run-core-vitest.mjs restoration-diagnostic.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

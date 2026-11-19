@@ -1,0 +1,46 @@
+[
+  {
+    "width": 2,
+    "rows": 2000,
+    "writes": 200,
+    "baselineMaps": 5200,
+    "successorMaps": 5000,
+    "savedMaps": 200,
+    "baselineCopiedEntries": 2000,
+    "successorCopiedEntries": 1600,
+    "savedCopiedEntries": 400
+  },
+  {
+    "width": 2,
+    "rows": 20000,
+    "writes": 200,
+    "baselineMaps": 5200,
+    "successorMaps": 5000,
+    "savedMaps": 200,
+    "baselineCopiedEntries": 2000,
+    "successorCopiedEntries": 1600,
+    "savedCopiedEntries": 400
+  },
+  {
+    "width": 32,
+    "rows": 2000,
+    "writes": 200,
+    "baselineMaps": 5200,
+    "successorMaps": 5000,
+    "savedMaps": 200,
+    "baselineCopiedEntries": 32000,
+    "successorCopiedEntries": 25600,
+    "savedCopiedEntries": 6400
+  },
+  {
+    "width": 32,
+    "rows": 20000,
+    "writes": 200,
+    "baselineMaps": 5200,
+    "successorMaps": 5000,
+    "savedMaps": 200,
+    "baselineCopiedEntries": 32000,
+    "successorCopiedEntries": 25600,
+    "savedCopiedEntries": 6400
+  }
+]

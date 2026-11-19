@@ -1,0 +1,266 @@
+[
+  {
+    "project": "angular",
+    "file": "packages/angular/src/lib/declared-publication-composition.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "angular",
+    "file": "packages/angular/src/lib/link-native-address.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+    "count": 3,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/transactions/native-structural-composition-gates.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "count": 4,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+    "count": 4,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/audit-entity-projection.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/authored-removal-contract.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/authored-removal-independent.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-egress-footprint.spec.ts",
+    "count": 5,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-obligation-matrix.spec.ts",
+    "count": 7,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-own-property-audit.spec.ts",
+    "count": 12,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts",
+    "count": 3,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "count": 5,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-commit-ordering.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-native-address.spec.ts",
+    "count": 10,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-reactive-settlement.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-structured-address-audit.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/native-certificate-successor.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/path-notifier-membership.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "count": 6,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "count": 6,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "react",
+    "file": "packages/react/src/lib/declared-publication-composition.spec.tsx",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "react",
+    "file": "packages/react/src/lib/link-native-address.spec.tsx",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "solid",
+    "file": "packages/solid/src/lib/declared-publication-composition.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "solid",
+    "file": "packages/solid/src/lib/link-native-address.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "vue",
+    "file": "packages/vue/src/lib/declared-publication-composition.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause"
+  },
+  {
+    "project": "vue",
+    "file": "packages/vue/src/lib/link-native-address.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause"
+  }
+]

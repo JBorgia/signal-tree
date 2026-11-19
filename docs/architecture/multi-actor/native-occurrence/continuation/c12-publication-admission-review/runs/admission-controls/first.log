@@ -1,0 +1,37 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts native-authored-footprint.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-authored-footprint.spec.ts --maxWorkers=1
+
+(node:58645) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-publication-admission-design-review/candidate/packages/kernel
+
+(node:58661) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58665) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  5 passed (5)
+   Start at  10:58:35
+   Duration  2.46s (transform 1.01s, setup 0ms, import 1.33s, tests 76ms, environment 724ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.2s

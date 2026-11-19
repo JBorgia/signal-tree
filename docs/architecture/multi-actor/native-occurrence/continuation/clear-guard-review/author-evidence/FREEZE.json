@@ -1,0 +1,31 @@
+{
+  "baseManifestSha256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "candidateManifestSha256": "67be7d9620ff5ce4e426e2b489dd69e1dd6e26f030611d77d3e6036d09275d71",
+  "patchSha256": "d95ade53b32fdd724e223f1c16c3ebadcae9173039da4316f9d62e3d9b3221fc",
+  "runtimeUnchanged": true,
+  "changedFiles": [
+    "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts"
+  ],
+  "results": {
+    "candidate-first": {
+      "exit": 0
+    },
+    "candidate-final": {
+      "exit": 0
+    },
+    "current-mutant-first": {
+      "exit": 1
+    },
+    "legacy-mutant-first": {
+      "exit": 1
+    },
+    "spec-types": {
+      "exit": 0
+    },
+    "test-lint": {
+      "exit": 0
+    }
+  },
+  "independentReview": "pending",
+  "promotion": false
+}

@@ -1,0 +1,130 @@
+{
+  "modules": 41,
+  "pathEntityBackToLink": null,
+  "topLevelCalls": [
+    {
+      "file": "experimental-publication/entity.ts",
+      "call": "registerEntityPublicationFactory"
+    },
+    {
+      "file": "internals/intrinsic-mutation.ts",
+      "call": "Object.freeze"
+    },
+    {
+      "file": "internals/entity-publication.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "internals/entity-publication.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "experimental-publication/lifecycle.ts",
+      "call": "BigInt"
+    },
+    {
+      "file": "internals/node-shape.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/node-shape.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "experimental-publication/private.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "experimental-publication/private.ts",
+      "call": "registerPublicationSnapshots"
+    },
+    {
+      "file": "experimental-publication/private.ts",
+      "call": "registerNativePublicationFactory"
+    },
+    {
+      "file": "experimental-publication/private.ts",
+      "call": "requirementOf"
+    },
+    {
+      "file": "experimental-publication/private.ts",
+      "call": "registerMembershipPublication"
+    },
+    {
+      "file": "experimental-publication/private.ts",
+      "call": "registerBranchPublicationInputs"
+    },
+    {
+      "file": "internals/scalar-publication-coverage.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "internals/scalar-publication-coverage.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "internals/position-registry.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/location-runtime.ts",
+      "call": "createLocationRuntime"
+    },
+    {
+      "file": "internals/cell-identity.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "leaf.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/member-membership.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/member-membership.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/member-membership.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/member-membership.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/plain-branch-membership.ts",
+      "call": "Symbol"
+    },
+    {
+      "file": "utils.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/materialize-markers.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/materialize-markers.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/materialize-markers.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/materialize-markers.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/tree-scalar-slot-port.ts",
+      "call": "Symbol.for"
+    },
+    {
+      "file": "internals/mutation-capture-runtime.ts",
+      "call": "Symbol.for"
+    }
+  ]
+}

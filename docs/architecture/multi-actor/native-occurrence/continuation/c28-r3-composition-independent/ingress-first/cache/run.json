@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/lib/internals/dynamic-realization-composition-independent.spec.ts src/lib/internals/realization-admission-metadata.spec.ts src/lib/scalar-responsibility-lifecycle.spec.ts src/lib/dynamic-admission-minimal.spec.ts src/lib/initializer-attachment-independent.spec.ts src/lib/initializer-owned-cleanup.spec.ts src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts src/enhancers/transactions/transaction-safety.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:11:34.205Z",
+    "endTime": "2026-11-03T05:11:45.096Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "3915068764518614244",
+      "startTime": "2026-11-03T05:11:34.254Z",
+      "endTime": "2026-11-03T05:11:45.093Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -56,14 +56,15 @@
+   private edit(edit: EntityPublicationEdit): void {
+     if (this.edits.has(edit)) return;
+     // Native producers supply mutable shells. Copy shared metadata before locking
+-    // that same edit identity. Already frozen private shells transfer ownership
+-    // of their metadata too; no public API accepts publication packets.
++    // that same edit identity. A frozen shell cannot transfer ownership of
++    // borrowed mutable metadata: require stability without mutating those aliases.
+     if (!Object.isFrozen(edit)) {
+       if (edit.fields && !Object.isFrozen(edit.fields)) Object.defineProperty(edit,'fields',{value:Object.freeze([...edit.fields]),enumerable:true});
+       if (edit.structural) Object.defineProperty(edit,'structural',{value:Object.freeze({...edit.structural}),enumerable:true});
+     } else {
+-      if (edit.fields) Object.freeze(edit.fields);
+-      if (edit.structural) Object.freeze(edit.structural);
++      if (edit.fields && !Object.isFrozen(edit.fields) ||
++          edit.structural && !Object.isFrozen(edit.structural))
++        throw new Error('Frozen entity publication edit contains mutable admission metadata');
+     }
+     Object.freeze(edit);
+     this.edits.add(edit);

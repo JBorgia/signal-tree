@@ -1,0 +1,29 @@
+{
+  "manifestSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "composedFilesVerified": 3086,
+  "C26Unchanged": true,
+  "public081e2114Unchanged": true,
+  "priorPackedProofSourceAndArtifactsMatch": true,
+  "runs": {
+    "focused-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "source-types": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "public-types": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "spec-types": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

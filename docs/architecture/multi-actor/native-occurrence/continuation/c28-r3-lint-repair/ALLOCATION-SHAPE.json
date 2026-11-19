@@ -1,0 +1,28 @@
+[
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "baseline": {
+      "functions": 49,
+      "objects": 23,
+      "arrays": 1
+    },
+    "candidate": {
+      "functions": 49,
+      "objects": 23,
+      "arrays": 1
+    }
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "baseline": {
+      "functions": 37,
+      "objects": 10,
+      "arrays": 3
+    },
+    "candidate": {
+      "functions": 37,
+      "objects": 10,
+      "arrays": 3
+    }
+  }
+]

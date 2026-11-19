@@ -1,0 +1,68 @@
+
+> nx run kernel:test branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts --maxWorkers=1
+
+(node:26092) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:26135) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/branch-omission-correctness.spec.ts (35 tests | 1 failed) 80ms
+     × same-turn removal and reintroduction ends absent at Link 5ms
+(node:26136) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
++   "age": 8,
+    "name": "Ada",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:255:33
+    253|         await nextTask();
+    254|         await relation.settled();
+    255|         expect(received.at(-1)).toStrictEqual(
+       |                                 ^
+    256|           end === 'present' ? { name: 'Ada', age: undefined } : { name…
+    257|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 43 passed (44)
+   Start at  17:14:00
+   Duration  1.14s (transform 437ms, setup 0ms, import 587ms, tests 111ms, environment 298ms)
+
+Warning: command "node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.5s

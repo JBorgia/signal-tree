@@ -1,0 +1,8 @@
+{
+  "REGISTRY.json": "7f49e18cc9d66ee2c9a75e789f1c6bbe57b705a9c39136111afbb58a3bb94807",
+  "build-inventory.py": "f55a4cefc1ef662fb876d5e24e8e22e31251e4ecf706622ab2dc12343b29f06d",
+  "SOURCE-IDENTITY.json": "c6f9f942556ed2d102034abd5e1802af886504241501591e51fad934f9df65c6",
+  "GATE-MAP.md": "017bf30fe0a5ae759e7be2b6874c3cb61512205782730a2279d24ae5fd42a953",
+  "README.md": "5104a861c8289e3711d45a9e9aafce2eade57dfb9e0cb501bed0424df1e2830a",
+  "extract-registry.cjs": "e6a9142a059de7a5ea411dc2f7a9a8cfe60faa3dc58a542b028c6221d2b160f1"
+}

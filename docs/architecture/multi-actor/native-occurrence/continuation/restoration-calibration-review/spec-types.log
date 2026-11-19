@@ -1,0 +1,16 @@
+check-spec-types: 2 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/restoration-calibrated-large-sequence.spec.ts: 2 error(s), baseline allows 0
+  packages/kernel/src/lib/restoration-calibrated-paired.spec.ts: 4 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/restoration-calibrated-large-sequence.spec.ts(25,8): error TS2367: This comparison appears to be unintentional because the types '"large-sequence"' and '"paired"' have no overlap.
+packages/kernel/src/lib/restoration-calibrated-large-sequence.spec.ts(27,8): error TS2367: This comparison appears to be unintentional because the types '"large-sequence"' and '"paired"' have no overlap.
+packages/kernel/src/lib/restoration-calibrated-paired.spec.ts(15,7): error TS2367: This comparison appears to be unintentional because the types '"paired"' and '"large-sequence"' have no overlap.
+packages/kernel/src/lib/restoration-calibrated-paired.spec.ts(26,49): error TS2367: This comparison appears to be unintentional because the types '"paired"' and '"large-sequence"' have no overlap.
+packages/kernel/src/lib/restoration-calibrated-paired.spec.ts(26,81): error TS2367: This comparison appears to be unintentional because the types '"paired"' and '"large-sequence"' have no overlap.
+packages/kernel/src/lib/restoration-calibrated-paired.spec.ts(41,59): error TS2367: This comparison appears to be unintentional because the types '"paired"' and '"large-sequence"' have no overlap.

@@ -1,0 +1,40 @@
+
+> nx run kernel:test link-commit-boundary-carrier.spec.ts --testNamePattern=the durable commit boundary, carried by public Link a FOREIGN tree's open transaction neither absorbs nor delays this tree's write --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs link-commit-boundary-carrier.spec.ts --testNamePattern="the durable commit boundary, carried by public Link a FOREIGN tree's open transaction neither absorbs nor delays this tree's write" --reporter=verbose --maxWorkers=1
+
+(node:38632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38640) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:38650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > CONTROL — a bare write with no transaction becomes durable
+ ↓ src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > an unconfirmed transaction is not durable; confirm publishes final values only
+ ↓ src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > a THROWN transaction makes zero speculative writes
+ ↓ src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > out-of-order confirm cannot resurrect a value a later transaction superseded
+ ✓ src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > a FOREIGN tree's open transaction neither absorbs nor delays this tree's write 12ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 4 skipped (5)
+   Start at  16:40:38
+   Duration  885ms (transform 450ms, setup 0ms, import 540ms, tests 12ms, environment 207ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

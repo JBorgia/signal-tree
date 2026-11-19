@@ -1,0 +1,2 @@
+Main: independent reviewer has verified the current SOURCE-SHA256 and copied source/raw evidence. No final author report was present at first inspection. Please provide final report/freeze status before review closes. Runtime entity hash a253c0b4793919a15cf5d7849576fc086ed32f60fdec654ec28486e72e2e6091. Continuing raw replay without an author verdict.
+Resolved: author RESULTS/REVIEW-REQUEST/FREEZE appeared during independent replay. All FREEZE SHA entries independently match; source identity unchanged. No response needed.

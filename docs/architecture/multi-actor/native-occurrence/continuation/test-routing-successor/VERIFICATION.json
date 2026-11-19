@@ -1,0 +1,14 @@
+{
+  "candidateFiles": 3049,
+  "candidateManifestSha256": "def6910829632965f5b05409864721f568834af11962274573a662c9b1c7ce19",
+  "frozenC11Files": 3045,
+  "frozenPresenceFiles": 3050,
+  "frozenPresenceManifestSha256": "47e05e6216bab9fd186dfbb66b656f4e33dc1f9d98a81a1ad096ee61b12181f9",
+  "mismatches": [],
+  "rootLockMatches": true,
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+  "nodeModules": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "runtimeChanges": 0,
+  "budgetChanges": 0,
+  "assertionChanges": 0
+}

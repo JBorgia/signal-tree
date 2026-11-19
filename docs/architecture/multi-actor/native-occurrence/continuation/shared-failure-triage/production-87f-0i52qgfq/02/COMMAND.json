@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "opaque-leaf-restoration.spec.ts",
+    "--testNamePattern=opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling",
+    "--reporter=verbose",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate",
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "fullName": "opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling",
+    "duplicateOrdinal": 1
+  },
+  "fixtureSha256": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf",
+  "environment": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "ST_OBSERVATIONS": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/02/observations/native.jsonl",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/02/observations/prepared",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/02/observations/public"
+  },
+  "filterNote": "Equivalent full-name regex; literal whitespace and hyphens need no escape. No fixture or timeout changes."
+}

@@ -1,0 +1,66 @@
+
+> nx run kernel:test publication-retirement-acceptance.spec.ts --testNamePattern=foreign pending exclusion --maxWorkers=1
+
+> node tools/run-core-vitest.mjs publication-retirement-acceptance.spec.ts --testNamePattern="foreign pending exclusion" --maxWorkers=1
+
+(node:60807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-fixed-window-retirement-cancellation-successor/candidate/packages/kernel
+
+(node:60834) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-retirement-acceptance.spec.ts (9 tests | 1 failed | 8 skipped) 35ms
+   × acceptance: foreign pending exclusion gates a later useful declared publication 33ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-retirement-acceptance.spec.ts > acceptance: foreign pending exclusion gates a later useful declared publication
+AssertionError: foreign omission must not be published as independent: expected [ [ { id: 'b', n: 2 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "b",
++       "n": 2,
++     },
++   ],
++ ]
+
+ ❯ src/lib/publication-retirement-acceptance.spec.ts:49:324
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 skipped (9)
+   Start at  20:22:16
+   Duration  2.46s (transform 1.23s, setup 0ms, import 1.48s, tests 35ms, environment 679ms)
+
+Warning: command "node tools/run-core-vitest.mjs publication-retirement-acceptance.spec.ts --testNamePattern="foreign pending exclusion" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.0s

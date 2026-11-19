@@ -1,0 +1,9 @@
+# Bounded singleton experiment
+
+Exact C5 baseline b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620. No runtime change until baseline controls/allocation and original point gate execute. Only proposed change: entity.ts ordinaryRow uses row directly when ordinaryEdits length is exactly1; physical copy and every multi-edit case unchanged. No representation, loop syntax, ownership or threshold changes.
+
+New controls: held per-edit evidence before/after install, later writes, physical inspection, retirement/restoration with exact restored endpoint precedence; absent vs present undefined; distinct/repeated same-subject multi-edit snapshots; finalizer reentry; recipient preparation refusal; real owner confirm/rollback. Existing packet, deferred, mutation, native equal-value ownership and lifetime controls replay afterward.
+
+Actual allocation diagnostic intercepts Map constructor in test only, wraps its input iterator to count copied entries, restores globally in finally, and independently calibrates two constructors/two entries. No runtime instrumentation. Populate2k/20k rows of2/32 fields, then200 identical point updates. Verify all200 rows plus untouched sentinel outside measured region. Preregistered matched reduction:200 Maps and200*width copied entries in each population. Other constructor work must remain unchanged. No CPU/heap/timing assertion; wrapper overhead not a performance result. Original counter test remains byte-identical, including less-than2,000 threshold. Expected red15,800 baseline, conditional15,400 successor for its two-field workload, not an acceptance target.
+
+Commands/environment and source identities archived. Original first failures retained, including fixture/setup failures if any. Standalone experiment requires independent review before integration.

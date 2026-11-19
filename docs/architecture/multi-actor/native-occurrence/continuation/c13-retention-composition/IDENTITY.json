@@ -1,0 +1,9 @@
+{
+  "input": "/private/tmp/st-native-combined-c13/SNAPSHOT-C13.json",
+  "sha256": "0efc2a195ab9cc2a49ba72da60c9c3b95b67f181861fb0b059f54340f66e3fcb",
+  "files": 3057,
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "dependencyRoot": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules",
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+}

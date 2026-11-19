@@ -1,0 +1,6 @@
+{
+  "manifestSha256": "968c8bdeb6a2496bc273a252923214abb4383b971608ed54300d39e201739dbc",
+  "fromInitialPatchSha256": "e8b1e79f999c29aff20987c590e74159cb5c35abfb2f07fc6869e7e1405ecd66",
+  "fromBPatchSha256": "7341bf88da35302ca5e5d167d451f870aab0415662332f7c5eb37c3b9dbe4d51",
+  "status": "frozen for independent review, not activation"
+}

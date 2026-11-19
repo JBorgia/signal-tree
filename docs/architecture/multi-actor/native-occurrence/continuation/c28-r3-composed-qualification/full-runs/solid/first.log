@@ -1,0 +1,116 @@
+
+> nx run solid:test --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+(node:91167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:91196) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c28-r3-composed-qualification/candidate/packages/solid
+
+(node:91243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/native-publication-error-boundary.spec.ts (5 tests) 33ms
+(node:91251) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/absent-collection.spec.ts > absent collection — Solid (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)
+computations created outside a `createRoot` or `render` will never be disposed
+
+stderr | src/lib/absent-collection.spec.ts > absent collection — Solid (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)
+computations created outside a `createRoot` or `render` will never be disposed
+
+ ✓ src/lib/absent-collection.spec.ts (14 tests) 79ms
+(node:91255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/selected-callback-facade.spec.ts (4 tests) 32ms
+(node:91258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/absent-path-write.spec.ts (13 tests) 47ms
+(node:91259) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/equal-owner-facade-controls.spec.ts (8 tests) 36ms
+(node:91267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/solid-observation.spec.ts (7 tests) 30ms
+(node:91270) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/parent-freshness-counterparts.spec.ts (3 tests) 23ms
+(node:91271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/transaction-realization.spec.ts (26 tests) 290ms
+(node:91279) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/plain-member-absence-observation.spec.ts (15 tests) 19ms
+(node:91281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/declared-publication-composition.spec.ts (3 tests) 28ms
+(node:91283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-value-new-keys.spec.ts (3 tests) 47ms
+(node:91287) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/saved-inspection-snapshot-isolation.spec.ts > saved inspection snapshot cannot borrow fresh ordinary support: direct
+SignalTree: write at "input" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+
+ ✓ src/lib/saved-inspection-snapshot-isolation.spec.ts (2 tests) 33ms
+(node:91291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/audit-observation.spec.ts (9 tests) 13ms
+(node:91294) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/designated-collection-omission.spec.ts (6 tests) 36ms
+(node:91295) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration.spec.ts (6 tests) 29ms
+(node:91296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-native-obligation-composition.spec.ts (3 tests) 27ms
+(node:91298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-rich-publication.spec.ts (1 test) 29ms
+(node:91301) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/scalar-frame-publication.spec.ts (2 tests) 36ms
+(node:91304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/audit-native-tooling.spec.ts (2 tests) 14ms
+(node:91307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/joint-native-frontier.spec.ts > first synchronous Solid observer and detached completion see the installed mixed unit
+computations created outside a `createRoot` or `render` will never be disposed
+
+ ✓ src/lib/joint-native-frontier.spec.ts (1 test) 33ms
+(node:91310) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-native-address.spec.ts (2 tests) 17ms
+(node:91314) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/batching-dynamic-field.spec.ts (1 test) 9ms
+
+ Test Files  22 passed (22)
+      Tests  136 passed (136)
+   Start at  22:13:23
+   Duration  6.75s (transform 891ms, setup 0ms, import 3.45s, tests 942ms, environment 1ms)
+
+
+
+
+ NX   Successfully ran target test for project solid
+
+
+  Run duration:      11.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     11.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        solid:test    11.9s

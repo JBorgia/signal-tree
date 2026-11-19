@@ -1,0 +1,11 @@
+{
+  "source": "/private/tmp/st-c27-public-composition/candidate",
+  "manifestSHA256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "verifiedFiles": 3086,
+  "overlays": {
+    "packages/kernel/src/lib/direct-row-declaration-qualification.spec.ts": "b8c6ec372e915a1b1fbec181dcffb072e6c02607274d499177045e834ba1c841",
+    "packages/kernel/src/lib/entity-declaration-useful-lifecycle.spec.ts": "b0d0a4b4c07a8d281724d6acf6aa72e4de530cef8d1a10a8ad2e6c2ad991e4c7"
+  },
+  "originalROW23": "/private/tmp/st-c23-row-react-declaration-qualification/candidate/packages/kernel/src/lib/direct-row-declaration-qualification.spec.ts",
+  "dependencies": "symlink root node_modules"
+}

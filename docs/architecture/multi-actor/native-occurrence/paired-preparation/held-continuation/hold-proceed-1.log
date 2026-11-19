@@ -1,0 +1,9 @@
+
+ RUN  v4.1.9 /private/tmp/st-held-continuation-review/candidate/packages/kernel
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:35:48
+   Duration  5.52s (transform 1.87s, setup 0ms, import 2.35s, tests 795ms, environment 2.01s)
+

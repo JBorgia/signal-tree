@@ -1,0 +1,18 @@
+
+  ../consumer/consumer.production.mjs  424.8kb
+
+⚡ Done in 67ms
+
+  ../consumer/lifecycle-consumer.production.mjs  424.5kb
+
+⚡ Done in 41ms
+
+  ../consumer/no-link.production.mjs  324.8kb
+
+⚡ Done in 39ms
+
+  ../consumer/split/chunk-43EKSJS2.mjs  365.2kb
+  ../consumer/split/early.mjs             222b 
+  ../consumer/split/late.mjs               60b 
+
+⚡ Done in 48ms

@@ -1,0 +1,27 @@
+[
+  {
+    "file": "packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "sha256": "d431664a34accaf94c46d76d0329e462fb0464cda4fa2c1ff0bb8d1afd190510",
+    "unchangedFromC25": true
+  },
+  {
+    "file": "packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "sha256": "7c7525c6fb3fa73d38a6afe7c5f8da49981bf4da49a417272005d8b4120867d1",
+    "unchangedFromC25": true
+  },
+  {
+    "file": "packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "sha256": "1107c9e81c960dc7507690bfde9599aad87e8c40d811fc6eab0d8a5a914ca6f9",
+    "unchangedFromC25": true
+  },
+  {
+    "file": "packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "sha256": "2cb46070ecfed68beaa74cbc59850db078bd8dcc1dfd105dc018191fd34c0c1e",
+    "unchangedFromC25": true
+  },
+  {
+    "file": "packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "sha256": "f0cf9ad14f4ddaeb4acc566fbe8b7cd47edf1615cbf363e8eec5a54f3a322ebe",
+    "unchangedFromC25": true
+  }
+]

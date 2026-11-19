@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:57:07.213Z",
+    "endTime": "2026-11-03T04:57:45.014Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "2381839497482106422",
+      "startTime": "2026-11-03T04:57:07.240Z",
+      "endTime": "2026-11-03T04:57:45.011Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

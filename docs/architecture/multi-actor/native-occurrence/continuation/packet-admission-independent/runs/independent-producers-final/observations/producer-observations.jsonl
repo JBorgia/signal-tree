@@ -1,0 +1,3 @@
+{"case":"producer ownership","edits":26,"structural":15,"firstSeenFrozen":0}
+{"case":"held actual proof","edits":2,"ownerOutcome":"rolled-back"}
+{"case":"private frozen shell ownership side effect","descriptorFrozen":true}

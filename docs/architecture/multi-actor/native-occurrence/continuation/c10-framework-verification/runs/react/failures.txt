@@ -1,0 +1,79 @@
+Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/absent-collection.spec.tsx > absent collection — React (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again
+ FAIL  src/absent-collection.spec.tsx > absent collection — React (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again
+AssertionError: expected '{"a":{"rows":{"all":[]}},"count":0}|[…' to be '{"a":{"rows":{"all":[{"id":"z","n":9}…' // Object.is equality
+
+Expected: "{"a":{"rows":{"all":[{"id":"z","n":9}]}},"count":0}|[{"id":"z","n":9}]|1"
+Received: "{"a":{"rows":{"all":[]}},"count":0}|[{"id":"z","n":9}]|1"
+
+ ❯ src/absent-collection.spec.tsx:106:22
+    104|       await step(() => owner.$({ count: 0 }));
+    105|       await step(() => undoable(() => owner.$.a.rows.addOne(Z)));
+    106|       expect(text()).toBe(READDED);
+       |                      ^
+    107|       await step(() => owner.undo());
+    108|       expect(text()).toBe(ABSENT);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/absent-collection.spec.tsx > absent collection — React (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)
+ FAIL  src/absent-collection.spec.tsx > absent collection — React (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)
+AssertionError: expected '{"users":{"all":[]},"orders":{"all":[…' to be '{"users":{"all":[{"id":"z","n":9}]},"…' // Object.is equality
+
+Expected: "{"users":{"all":[{"id":"z","n":9}]},"orders":{"all":[]}}|[{"id":"z","n":9}]"
+Received: "{"users":{"all":[]},"orders":{"all":[]}}|[{"id":"z","n":9}]"
+
+ ❯ src/absent-collection.spec.tsx:152:23
+    150|       expect(users()).toBe('{"orders":{"all":[]}}|[]');
+    151|       await step(() => undoable(() => owner.$.users.addOne(Z)));
+    152|       expect(users()).toBe(
+       |                       ^
+    153|         '{"users":{"all":[{"id":"z","n":9}]},"orders":{"all":[]}}|[{"i…
+    154|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/absent-collection.spec.tsx > absent collection — React (transactions first) > rollback of a re-adding write makes it absent again
+ FAIL  src/absent-collection.spec.tsx > absent collection — React (restoration first) > rollback of a re-adding write makes it absent again
+AssertionError: expected '{"a":{"rows":{"all":[]}},"count":0}|[…' to be '{"a":{"rows":{"all":[{"id":"z","n":9}…' // Object.is equality
+
+Expected: "{"a":{"rows":{"all":[{"id":"z","n":9}]}},"count":0}|[{"id":"z","n":9}]|1"
+Received: "{"a":{"rows":{"all":[]}},"count":0}|[{"id":"z","n":9}]|1"
+
+ ❯ src/absent-collection.spec.tsx:262:22
+    260|         pending = owner.transact(() => owner.$.a.rows.addOne(Z));
+    261|       });
+    262|       expect(text()).toBe(READDED);
+       |                      ^
+    263|       await step(() => pending?.rollback());
+    264|       expect(text()).toBe(ABSENT);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+ Test Files  1 failed | 15 passed (16)
+      Tests  6 failed | 85 passed (91)
+   Start at  10:01:35
+   Duration  211.91s (transform 5.64s, setup 0ms, import 59.44s, tests 1.76s, environment 133.18s)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/react/tsconfig.spec.json && npx vitest run --config packages/react/vitest.config.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project react failed
+
+Failed tasks:
+
+- react:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4m 16s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4m 16s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        react:test    4m 16s

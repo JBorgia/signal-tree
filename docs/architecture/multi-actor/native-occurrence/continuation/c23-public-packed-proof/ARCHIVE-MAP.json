@@ -1,0 +1,380 @@
+[
+  {
+    "source": "build.py",
+    "archive": "build.py",
+    "sourceSha256": "c636941672d9f6b97c4b1169b93a442ae87fd3f69e6c83c9245f547b14fb94f6",
+    "archiveSha256": "c636941672d9f6b97c4b1169b93a442ae87fd3f69e6c83c9245f547b14fb94f6"
+  },
+  {
+    "source": "types-node16-result.json",
+    "archive": "types-node16-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "TARBALL-HASHES.json",
+    "archive": "TARBALL-HASHES.json",
+    "sourceSha256": "00feca0b3c35f416ae00b3f656cba64d1d7e41b22f272ae592c0c6e6d9b3e2a4",
+    "archiveSha256": "00feca0b3c35f416ae00b3f656cba64d1d7e41b22f272ae592c0c6e6d9b3e2a4"
+  },
+  {
+    "source": "pack-react-command.json",
+    "archive": "pack-react-command.json",
+    "sourceSha256": "41f9154c44c5513e2aa56c5f980da14b6c764db9b964bda6b43e22ea546efc7f",
+    "archiveSha256": "41f9154c44c5513e2aa56c5f980da14b6c764db9b964bda6b43e22ea546efc7f"
+  },
+  {
+    "source": "pack-angular-first.log",
+    "archive": "pack-angular-first.log",
+    "sourceSha256": "586b2100dbb286e87aa3542f6b988ca698b3fc6734fbe1eae4125e350cf0643a",
+    "archiveSha256": "586b2100dbb286e87aa3542f6b988ca698b3fc6734fbe1eae4125e350cf0643a"
+  },
+  {
+    "source": "BUILD-PROCESS.json",
+    "archive": "BUILD-PROCESS.json",
+    "sourceSha256": "1723ad6ca5d2435ee3081ede3c90314175a28a8df1fc81b0da923b289ba2f124",
+    "archiveSha256": "1723ad6ca5d2435ee3081ede3c90314175a28a8df1fc81b0da923b289ba2f124"
+  },
+  {
+    "source": "ARTIFACT-HASHES.json",
+    "archive": "ARTIFACT-HASHES.json",
+    "sourceSha256": "78c111f10f30ffd6add15de448d1a7f0682cbffe9c9d7e8acb6f4afe5366bea0",
+    "archiveSha256": "78c111f10f30ffd6add15de448d1a7f0682cbffe9c9d7e8acb6f4afe5366bea0"
+  },
+  {
+    "source": "types-bundler-result.json",
+    "archive": "types-bundler-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "pack-kernel-process.json",
+    "archive": "pack-kernel-process.json",
+    "sourceSha256": "daf53716ae56f7350ad5e759d2e24a489da092a3c9a2064cfb056507a8e40ae0",
+    "archiveSha256": "daf53716ae56f7350ad5e759d2e24a489da092a3c9a2064cfb056507a8e40ae0"
+  },
+  {
+    "source": "packed.py",
+    "archive": "packed.py",
+    "sourceSha256": "00d31340b7253e31e7a361bf494572c608f766d5bd16d0186fdb87c6b2ac0ae3",
+    "archiveSha256": "00d31340b7253e31e7a361bf494572c608f766d5bd16d0186fdb87c6b2ac0ae3"
+  },
+  {
+    "source": "pack-react-result.json",
+    "archive": "pack-react-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "runtime-first.log",
+    "archive": "runtime-first.log",
+    "sourceSha256": "a6b6ff81d88fab7d53da4410d5ee0f7c9bde66be560b91366d9c8f828a245295",
+    "archiveSha256": "a6b6ff81d88fab7d53da4410d5ee0f7c9bde66be560b91366d9c8f828a245295"
+  },
+  {
+    "source": "pack-solid-command.json",
+    "archive": "pack-solid-command.json",
+    "sourceSha256": "088b6d9775889471a313445f208186eb67e7aadefd76011fde875e383d770a34",
+    "archiveSha256": "088b6d9775889471a313445f208186eb67e7aadefd76011fde875e383d770a34"
+  },
+  {
+    "source": "pack-vue-result.json",
+    "archive": "pack-vue-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "pack-vue-command.json",
+    "archive": "pack-vue-command.json",
+    "sourceSha256": "61d83fbc03e0c4829f38dad41c221ada88a386f7e42ece7a717d13064fac1692",
+    "archiveSha256": "61d83fbc03e0c4829f38dad41c221ada88a386f7e42ece7a717d13064fac1692"
+  },
+  {
+    "source": "SOURCE-BEFORE.json",
+    "archive": "SOURCE-BEFORE.json.gz",
+    "sourceSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+    "archiveSha256": "55826d9a36a5e98205d07ffb1bf17ed0b133a02a6cca2917988925f9e7552cd5"
+  },
+  {
+    "source": "BUILD-COMMAND.json",
+    "archive": "BUILD-COMMAND.json",
+    "sourceSha256": "e15cc2b2a06c8011926e9a2c83aa06dc8fffc97698b31d9d56a261754337b897",
+    "archiveSha256": "e15cc2b2a06c8011926e9a2c83aa06dc8fffc97698b31d9d56a261754337b897"
+  },
+  {
+    "source": "pack-kernel-command.json",
+    "archive": "pack-kernel-command.json",
+    "sourceSha256": "6c2392369456a6c7e2b4bd52aae39c17084aabd189970857e6dcde566d910f98",
+    "archiveSha256": "6c2392369456a6c7e2b4bd52aae39c17084aabd189970857e6dcde566d910f98"
+  },
+  {
+    "source": "types-bundler-first.log",
+    "archive": "types-bundler-first.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "SOURCE-AFTER-BUILD.json",
+    "archive": "SOURCE-AFTER-BUILD.json.gz",
+    "sourceSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+    "archiveSha256": "55826d9a36a5e98205d07ffb1bf17ed0b133a02a6cca2917988925f9e7552cd5"
+  },
+  {
+    "source": "pack-react-process.json",
+    "archive": "pack-react-process.json",
+    "sourceSha256": "ae72e05653537ee8db4da126834f130a94057d29e02baaf1a1c350c0a74751ea",
+    "archiveSha256": "ae72e05653537ee8db4da126834f130a94057d29e02baaf1a1c350c0a74751ea"
+  },
+  {
+    "source": "pack-solid-result.json",
+    "archive": "pack-solid-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "pack-solid-process.json",
+    "archive": "pack-solid-process.json",
+    "sourceSha256": "7db803efd259b468b8f89b5f74fc49f4a93f194ca03e3fec87f6a5a49757bb47",
+    "archiveSha256": "7db803efd259b468b8f89b5f74fc49f4a93f194ca03e3fec87f6a5a49757bb47"
+  },
+  {
+    "source": "PACKED-RESULT.json",
+    "archive": "PACKED-RESULT.json",
+    "sourceSha256": "4c0630c3b123316513a58efacd3e5600f0020fef16b55476e1c3fcca5182c05a",
+    "archiveSha256": "4c0630c3b123316513a58efacd3e5600f0020fef16b55476e1c3fcca5182c05a"
+  },
+  {
+    "source": "pack-vue-process.json",
+    "archive": "pack-vue-process.json",
+    "sourceSha256": "3c56dc5d39ba6909a8619b3f842fbaf1cdb96565f4efec66aabf4ccfdd229fb0",
+    "archiveSha256": "3c56dc5d39ba6909a8619b3f842fbaf1cdb96565f4efec66aabf4ccfdd229fb0"
+  },
+  {
+    "source": "runtime-result.json",
+    "archive": "runtime-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "pack-kernel-first.log",
+    "archive": "pack-kernel-first.log",
+    "sourceSha256": "01f21f79f0dbf1a48a9f3d6d24d851889d955326b9556a30a346d407515905a6",
+    "archiveSha256": "01f21f79f0dbf1a48a9f3d6d24d851889d955326b9556a30a346d407515905a6"
+  },
+  {
+    "source": "pack-solid-first.log",
+    "archive": "pack-solid-first.log",
+    "sourceSha256": "7fa054aaaea96a7873291c3ed7202562afe02393cd8eb4043c78017983c62bc0",
+    "archiveSha256": "7fa054aaaea96a7873291c3ed7202562afe02393cd8eb4043c78017983c62bc0"
+  },
+  {
+    "source": "pack-angular-result.json",
+    "archive": "pack-angular-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "build-first.log",
+    "archive": "build-first.log",
+    "sourceSha256": "51eb96ff528fad07496d446860931143d590b565ef74b9c23ea60804c05f25c7",
+    "archiveSha256": "51eb96ff528fad07496d446860931143d590b565ef74b9c23ea60804c05f25c7"
+  },
+  {
+    "source": "install-command.json",
+    "archive": "install-command.json",
+    "sourceSha256": "db66d622d68a381889c1f8753fa1c26e5bb4848f3fb3c6105d9bde0b53d1681e",
+    "archiveSha256": "db66d622d68a381889c1f8753fa1c26e5bb4848f3fb3c6105d9bde0b53d1681e"
+  },
+  {
+    "source": "types-node16-command.json",
+    "archive": "types-node16-command.json",
+    "sourceSha256": "735f84c65469aacdc2d8919342c4f386e69eb6b419f0c1a93d591f171bed7653",
+    "archiveSha256": "735f84c65469aacdc2d8919342c4f386e69eb6b419f0c1a93d591f171bed7653"
+  },
+  {
+    "source": "pack-kernel-result.json",
+    "archive": "pack-kernel-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "runtime-command.json",
+    "archive": "runtime-command.json",
+    "sourceSha256": "86bc81961580d39e7c1da0b915021116e4d210957538bf040df4893ce96ee66b",
+    "archiveSha256": "86bc81961580d39e7c1da0b915021116e4d210957538bf040df4893ce96ee66b"
+  },
+  {
+    "source": "types-bundler-process.json",
+    "archive": "types-bundler-process.json",
+    "sourceSha256": "a7465f507b4ce1f6e8f5efc8c836b2074d251f1a4a201d6856e57da63b88d1a6",
+    "archiveSha256": "a7465f507b4ce1f6e8f5efc8c836b2074d251f1a4a201d6856e57da63b88d1a6"
+  },
+  {
+    "source": "pack-angular-command.json",
+    "archive": "pack-angular-command.json",
+    "sourceSha256": "710ff3dc967b32da06a94fd487426ec6b6b8082e30679006fc8155feb53c1a1e",
+    "archiveSha256": "710ff3dc967b32da06a94fd487426ec6b6b8082e30679006fc8155feb53c1a1e"
+  },
+  {
+    "source": "types-node16-first.log",
+    "archive": "types-node16-first.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "install-first.log",
+    "archive": "install-first.log",
+    "sourceSha256": "906a6725542c73a548943d4470fb916e2158bd4af4cb2f654a411df31c9c84fd",
+    "archiveSha256": "906a6725542c73a548943d4470fb916e2158bd4af4cb2f654a411df31c9c84fd"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "2c12f97346c846b28d1fb8a448939173cdbaabc40cdd43df66c745a2961532e4",
+    "archiveSha256": "2c12f97346c846b28d1fb8a448939173cdbaabc40cdd43df66c745a2961532e4"
+  },
+  {
+    "source": "types-node16-process.json",
+    "archive": "types-node16-process.json",
+    "sourceSha256": "56c3146bc046968afe34653cc63f0b291a8d1380251272bdd91d224f606c0064",
+    "archiveSha256": "56c3146bc046968afe34653cc63f0b291a8d1380251272bdd91d224f606c0064"
+  },
+  {
+    "source": "INSTALLED-ARTIFACT-AGREEMENT.json",
+    "archive": "INSTALLED-ARTIFACT-AGREEMENT.json",
+    "sourceSha256": "820c3349554be8575681ea8e1b5134e75d524b25fdb9c4d3519be755ff1f1c62",
+    "archiveSha256": "820c3349554be8575681ea8e1b5134e75d524b25fdb9c4d3519be755ff1f1c62"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "792290a8f2b52c91892ba2f1f481bfdd0dd572aa9e8c11c856b40fee4abf4514",
+    "archiveSha256": "792290a8f2b52c91892ba2f1f481bfdd0dd572aa9e8c11c856b40fee4abf4514"
+  },
+  {
+    "source": "PEER-VERSIONS.json",
+    "archive": "PEER-VERSIONS.json",
+    "sourceSha256": "7a57da763bde9151d2acd6d167ad6b83c4f5c3984a8a7f72d399503bca18d2fa",
+    "archiveSha256": "7a57da763bde9151d2acd6d167ad6b83c4f5c3984a8a7f72d399503bca18d2fa"
+  },
+  {
+    "source": "install-process.json",
+    "archive": "install-process.json",
+    "sourceSha256": "4f193ebb73f37785ebe8e638da9322640cf2fb103527d11e35cf6466125aa648",
+    "archiveSha256": "4f193ebb73f37785ebe8e638da9322640cf2fb103527d11e35cf6466125aa648"
+  },
+  {
+    "source": "pack-vue-first.log",
+    "archive": "pack-vue-first.log",
+    "sourceSha256": "3592ff6cfa9b05fc931534720473589ae2ce62d02147296e3474fa57c3182750",
+    "archiveSha256": "3592ff6cfa9b05fc931534720473589ae2ce62d02147296e3474fa57c3182750"
+  },
+  {
+    "source": "install-result.json",
+    "archive": "install-result.json",
+    "sourceSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf",
+    "archiveSha256": "05d834a8298dadfe4405556a3f17740b7448113980aa4acd03180b0e76dc6abf"
+  },
+  {
+    "source": "SOURCE-FINAL.json",
+    "archive": "SOURCE-FINAL.json.gz",
+    "sourceSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+    "archiveSha256": "55826d9a36a5e98205d07ffb1bf17ed0b133a02a6cca2917988925f9e7552cd5"
+  },
+  {
+    "source": "types-bundler-command.json",
+    "archive": "types-bundler-command.json",
+    "sourceSha256": "691b14e080b5edee84f51697aa7e803f4efaf8a5923cafa6a5d4944d591d2f46",
+    "archiveSha256": "691b14e080b5edee84f51697aa7e803f4efaf8a5923cafa6a5d4944d591d2f46"
+  },
+  {
+    "source": "runtime-process.json",
+    "archive": "runtime-process.json",
+    "sourceSha256": "69899b424107131a8d12cb556c72b212ef8afd85e2d05f0b9e09bbeef411f1de",
+    "archiveSha256": "69899b424107131a8d12cb556c72b212ef8afd85e2d05f0b9e09bbeef411f1de"
+  },
+  {
+    "source": "pack-angular-process.json",
+    "archive": "pack-angular-process.json",
+    "sourceSha256": "63546dcc488661b774d297aa10cce2d0d350f6e2e51635c9a42355426f75685b",
+    "archiveSha256": "63546dcc488661b774d297aa10cce2d0d350f6e2e51635c9a42355426f75685b"
+  },
+  {
+    "source": "BUILD-RESULT.json",
+    "archive": "BUILD-RESULT.json",
+    "sourceSha256": "4dd4f11b14adfb495eb2297409c72b76439b14d978cf6a6f858442c5b7a2e581",
+    "archiveSha256": "4dd4f11b14adfb495eb2297409c72b76439b14d978cf6a6f858442c5b7a2e581"
+  },
+  {
+    "source": "pack-react-first.log",
+    "archive": "pack-react-first.log",
+    "sourceSha256": "0bc4aa54764ec7a5c9b8a308ba854af7d7f4b302bbb5e806a7d565584ac7ae3c",
+    "archiveSha256": "0bc4aa54764ec7a5c9b8a308ba854af7d7f4b302bbb5e806a7d565584ac7ae3c"
+  },
+  {
+    "source": "tarballs/signal-tree-vue-16.0.0-dev.tgz",
+    "archive": "tarballs/signal-tree-vue-16.0.0-dev.tgz",
+    "sourceSha256": "de6c42db9ca19ed6caa0ddaac5dfb17d39320eabf45f49a06a6ed36b7138bbfd",
+    "archiveSha256": "de6c42db9ca19ed6caa0ddaac5dfb17d39320eabf45f49a06a6ed36b7138bbfd"
+  },
+  {
+    "source": "tarballs/signal-tree-angular-16.0.0-dev.tgz",
+    "archive": "tarballs/signal-tree-angular-16.0.0-dev.tgz",
+    "sourceSha256": "d35baf399f8a5e384092cc0367523e6cc0570f96e7527f2c56e27049b42090f5",
+    "archiveSha256": "d35baf399f8a5e384092cc0367523e6cc0570f96e7527f2c56e27049b42090f5"
+  },
+  {
+    "source": "tarballs/signal-tree-solid-16.0.0-dev.tgz",
+    "archive": "tarballs/signal-tree-solid-16.0.0-dev.tgz",
+    "sourceSha256": "5330a5c4431f96fc8b3bd1a19f02cf426b642b064847c605f780223315e0103d",
+    "archiveSha256": "5330a5c4431f96fc8b3bd1a19f02cf426b642b064847c605f780223315e0103d"
+  },
+  {
+    "source": "tarballs/signal-tree-react-16.0.0-dev.tgz",
+    "archive": "tarballs/signal-tree-react-16.0.0-dev.tgz",
+    "sourceSha256": "84c08bc35a8bac47710ca584494bfcd9b3c47c8197b280e3ff72bc8828b92d03",
+    "archiveSha256": "84c08bc35a8bac47710ca584494bfcd9b3c47c8197b280e3ff72bc8828b92d03"
+  },
+  {
+    "source": "tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+    "archive": "tarballs/signal-tree-kernel-16.0.0-dev.tgz.gz",
+    "sourceSha256": "bdcb12cc3ac765d803402951ccc994aa02b23eb808f1544d75b9a29fa4c25fc8",
+    "archiveSha256": "67347df0f00b4a222aa2c75a326bd4118f8b80b3086286741ce6a6df60a8b128"
+  },
+  {
+    "source": "consumer/tsconfig.node16.json",
+    "archive": "consumer/tsconfig.node16.json",
+    "sourceSha256": "60d1cd03195bc6645a6cafa50afbce8d9725005cdb53f3a593aa9e2cb624c7b6",
+    "archiveSha256": "60d1cd03195bc6645a6cafa50afbce8d9725005cdb53f3a593aa9e2cb624c7b6"
+  },
+  {
+    "source": "consumer/package-lock.json",
+    "archive": "consumer/package-lock.json",
+    "sourceSha256": "9a29209f11555a0dffe51c89eb5cc13e186063dbe63fdf01c356d8a0aa8eb837",
+    "archiveSha256": "9a29209f11555a0dffe51c89eb5cc13e186063dbe63fdf01c356d8a0aa8eb837"
+  },
+  {
+    "source": "consumer/package.json",
+    "archive": "consumer/package.json",
+    "sourceSha256": "1cb3606378a059212126f50de0fe7600ab59503fed7a2e5c828f3ad0d0ad0be0",
+    "archiveSha256": "1cb3606378a059212126f50de0fe7600ab59503fed7a2e5c828f3ad0d0ad0be0"
+  },
+  {
+    "source": "consumer/runtime.mjs",
+    "archive": "consumer/runtime.mjs",
+    "sourceSha256": "e22130d6a79be55d65cf01c8cbd3fc2d8db82d11050f4357b419053a7617c04c",
+    "archiveSha256": "e22130d6a79be55d65cf01c8cbd3fc2d8db82d11050f4357b419053a7617c04c"
+  },
+  {
+    "source": "consumer/tsconfig.bundler.json",
+    "archive": "consumer/tsconfig.bundler.json",
+    "sourceSha256": "b44b64979fa830100f23c698846ecf3d2aedeae97c7891900c1c3a94c001fb62",
+    "archiveSha256": "b44b64979fa830100f23c698846ecf3d2aedeae97c7891900c1c3a94c001fb62"
+  },
+  {
+    "source": "consumer/src/public-declare.ts",
+    "archive": "consumer/src/public-declare.ts",
+    "sourceSha256": "639a3a5ed8d713703d88d10149667f08195f6c4b5fe6c085f0de1af4c2f8cee7",
+    "archiveSha256": "639a3a5ed8d713703d88d10149667f08195f6c4b5fe6c085f0de1af4c2f8cee7"
+  }
+]

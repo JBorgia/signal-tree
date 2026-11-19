@@ -1,0 +1,24 @@
+[
+  {
+    "case": "terminal",
+    "otherPending": false,
+    "sameEndpoint": true,
+    "beforeDestination": [
+      "confirmed"
+    ],
+    "afterDestination": [
+      "confirmed"
+    ]
+  },
+  {
+    "case": "terminal",
+    "otherPending": true,
+    "sameEndpoint": true,
+    "beforeDestination": [
+      "confirmed"
+    ],
+    "afterDestination": [
+      "confirmed"
+    ]
+  }
+]

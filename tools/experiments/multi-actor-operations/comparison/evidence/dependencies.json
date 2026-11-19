@@ -1,0 +1,68 @@
+{
+  "name": "multi-actor-reference-comparison",
+  "dependencies": {
+    "@tanstack/db": {
+      "version": "1.0.0-rc.1",
+      "resolved": "https://registry.npmjs.org/@tanstack/db/-/db-1.0.0-rc.1.tgz",
+      "overridden": false,
+      "dependencies": {
+        "@standard-schema/spec": {
+          "version": "1.1.0",
+          "resolved": "https://registry.npmjs.org/@standard-schema/spec/-/spec-1.1.0.tgz",
+          "overridden": false
+        },
+        "@tanstack/db-ivm": {
+          "version": "1.0.0-rc.1",
+          "resolved": "https://registry.npmjs.org/@tanstack/db-ivm/-/db-ivm-1.0.0-rc.1.tgz",
+          "overridden": false,
+          "dependencies": {
+            "fractional-indexing": {
+              "version": "3.4.0",
+              "resolved": "https://registry.npmjs.org/fractional-indexing/-/fractional-indexing-3.4.0.tgz",
+              "overridden": false
+            },
+            "typescript": {
+              "version": "7.0.2"
+            }
+          }
+        },
+        "@tanstack/pacer-lite": {
+          "version": "0.2.2",
+          "resolved": "https://registry.npmjs.org/@tanstack/pacer-lite/-/pacer-lite-0.2.2.tgz",
+          "overridden": false
+        },
+        "typescript": {
+          "version": "7.0.2",
+          "resolved": "https://registry.npmjs.org/typescript/-/typescript-7.0.2.tgz",
+          "overridden": false,
+          "dependencies": {
+            "@typescript/typescript-aix-ppc64": {},
+            "@typescript/typescript-darwin-arm64": {
+              "version": "7.0.2",
+              "resolved": "https://registry.npmjs.org/@typescript/typescript-darwin-arm64/-/typescript-darwin-arm64-7.0.2.tgz",
+              "overridden": false
+            },
+            "@typescript/typescript-darwin-x64": {},
+            "@typescript/typescript-freebsd-arm64": {},
+            "@typescript/typescript-freebsd-x64": {},
+            "@typescript/typescript-linux-arm": {},
+            "@typescript/typescript-linux-arm64": {},
+            "@typescript/typescript-linux-loong64": {},
+            "@typescript/typescript-linux-mips64el": {},
+            "@typescript/typescript-linux-ppc64": {},
+            "@typescript/typescript-linux-riscv64": {},
+            "@typescript/typescript-linux-s390x": {},
+            "@typescript/typescript-linux-x64": {},
+            "@typescript/typescript-netbsd-arm64": {},
+            "@typescript/typescript-netbsd-x64": {},
+            "@typescript/typescript-openbsd-arm64": {},
+            "@typescript/typescript-openbsd-x64": {},
+            "@typescript/typescript-sunos-x64": {},
+            "@typescript/typescript-win32-arm64": {},
+            "@typescript/typescript-win32-x64": {}
+          }
+        }
+      }
+    }
+  }
+}

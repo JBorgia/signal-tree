@@ -1,0 +1,35 @@
+
+> nx run kernel:test recipient-cause-classification.spec.ts --testNamePattern=external-origin|unknown-declaration --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-cause-classification.spec.ts --testNamePattern="external-origin|unknown-declaration" --maxWorkers=1
+
+(node:96813) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96835) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c21-recipient-positive-counterparts/candidate/packages/kernel
+
+(node:96867) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed | 2 skipped (6)
+   Start at  13:58:11
+   Duration  3.36s (transform 1.90s, setup 0ms, import 2.32s, tests 61ms, environment 765ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.7s

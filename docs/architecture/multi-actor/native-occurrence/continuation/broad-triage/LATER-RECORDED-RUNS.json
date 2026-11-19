@@ -1,0 +1,95 @@
+[
+  {
+    "path": "/private/tmp/st-native-combined-successor/runs/key-and-sdk",
+    "cwd": "/private/tmp/st-native-combined-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "entity-missing-id-guard.spec.ts",
+      "entity-key-evidence-public.spec.ts",
+      "ordinary-key-evidence.spec.ts",
+      "structural-store.spec.ts",
+      "current-read-capability.spec.ts",
+      "selected-callback-facade.spec.ts",
+      "link-native-address.spec.ts",
+      "--maxWorkers=2"
+    ],
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 15.24983633303782
+    },
+    "totals": [
+      "Test Files  7 passed (7)",
+      "Tests  66 passed (66)"
+    ],
+    "commandSha256": "2ce72527aac85596400547e7a367434d9c4268efbf92efd9647f25036cc79a3f",
+    "logSha256": "6735074ae317c4f84d012c562629806d10c21d382b0b09f13ab78974356d7e42"
+  },
+  {
+    "path": "/private/tmp/st-native-combined-successor/runs/retirement-and-collection",
+    "cwd": "/private/tmp/st-native-combined-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "publication-retirement-acceptance.spec.ts",
+      "entity-publication-work-lifetime.spec.ts",
+      "publication-retirement-boundaries.spec.ts",
+      "entity-lifetime-ledger-null.spec.ts",
+      "entity-selection-lifetime.spec.ts",
+      "subject-reclamation-coordinator.spec.ts",
+      "reclamation-eligibility.spec.ts",
+      "entity-signal.spec.ts",
+      "entity-mutation-frame.spec.ts",
+      "collection-natural-egress.spec.ts",
+      "link-absent-locations.spec.ts",
+      "--maxWorkers=2"
+    ],
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 3.813770708977245
+    },
+    "totals": [
+      "Test Files  11 passed (11)",
+      "Tests  158 passed (158)"
+    ],
+    "commandSha256": "8aebeb7073843e07341caa57053a0de9e6e51722038edd3eeb0d9497416fec23",
+    "logSha256": "91e71798cd617a07993bec77a14ebf3175033e7a936f2b11af8bbaede147e11a"
+  },
+  {
+    "path": "/private/tmp/st-native-combined-successor/runs/collection-combined",
+    "cwd": "/private/tmp/st-native-combined-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "collection-natural-egress.spec.ts",
+      "link-absent-locations.spec.ts",
+      "row-source-independent.spec.ts",
+      "link-nested-collection.spec.ts",
+      "link-native-address.spec.ts",
+      "publication-membership-provenance.spec.ts",
+      "--maxWorkers=2"
+    ],
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 3.2376890409504995
+    },
+    "totals": [
+      "Test Files  6 passed (6)",
+      "Tests  63 passed (63)"
+    ],
+    "commandSha256": "7db79b069cf1548820c9e75af4331e94ae1603afb9940b1699c9f96eea638e25",
+    "logSha256": "43e9b2d5f61417ab77b538996309fdd18944e01b85889dd58003eebeca7d15db"
+  }
+]

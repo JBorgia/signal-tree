@@ -1,0 +1,116 @@
+[
+  {
+    "id": "@angular/platform-browser@22.0.7",
+    "name": "@angular/platform-browser",
+    "version": "22.0.7",
+    "size": 78705,
+    "unpackedSize": 314990,
+    "shasum": "30024afdfeb9ef46ac6a67a90f0748fda53eb598",
+    "integrity": "sha512-iCuREIWRnDCsd7mI5vn5ovXjcSwseWR4qfd+zo6QUrY2O9zkUNV79YuCqVjSzvWyvU2rtR5iRBvpB5JQgBELeg==",
+    "filename": "angular-platform-browser-22.0.7.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1105,
+        "mode": 493
+      },
+      {
+        "path": "README.md",
+        "size": 290,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_browser-chunk.mjs",
+        "size": 12710,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_browser-chunk.mjs.map",
+        "size": 38064,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_dom_renderer-chunk.mjs",
+        "size": 24229,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_dom_renderer-chunk.mjs.map",
+        "size": 64799,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/animations-async.mjs",
+        "size": 7532,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/animations-async.mjs.map",
+        "size": 23295,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/animations.mjs",
+        "size": 5543,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/animations.mjs.map",
+        "size": 12109,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/platform-browser.mjs",
+        "size": 15734,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/platform-browser.mjs.map",
+        "size": 52948,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/testing.mjs",
+        "size": 3384,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/testing.mjs.map",
+        "size": 6111,
+        "mode": 493
+      },
+      {
+        "path": "package.json",
+        "size": 1866,
+        "mode": 493
+      },
+      {
+        "path": "types/_browser-chunk.d.ts",
+        "size": 5349,
+        "mode": 493
+      },
+      {
+        "path": "types/animations-async.d.ts",
+        "size": 3612,
+        "mode": 493
+      },
+      {
+        "path": "types/animations.d.ts",
+        "size": 4689,
+        "mode": 493
+      },
+      {
+        "path": "types/platform-browser.d.ts",
+        "size": 30806,
+        "mode": 493
+      },
+      {
+        "path": "types/testing.d.ts",
+        "size": 815,
+        "mode": 493
+      }
+    ],
+    "entryCount": 20,
+    "bundled": []
+  }
+]

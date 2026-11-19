@@ -1,0 +1,39 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts native-invocation-handoff.spec.ts independent-invocation-scope.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-invocation-handoff.spec.ts independent-invocation-scope.spec.ts
+
+(node:30447) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30454) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-invocation-successor/independent-review/replica/packages/kernel
+
+(node:30462) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30463) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30461) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+   Start at  14:04:30
+   Duration  975ms (transform 1.43s, setup 0ms, import 1.76s, tests 64ms, environment 795ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

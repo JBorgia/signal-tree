@@ -1,0 +1,27 @@
+{
+  "status": "final freeze verified",
+  "baseManifest": "42280bba7bc92b75ae3f252742de5b7f78e4cce0b61c1d935212d7e438f2baf1",
+  "source": {
+    "tools/verify-entity-registration-artifacts.mjs": "a73bd9e58aeccee5cb5969432326b9de0e1b4025fc8f897b99ec61787732c828",
+    "tools/verify-gates.mjs": "c5ce068a0c54d8b3353a6451bffcb5346d885639f68f58ce746dc8a35fb02ef9",
+    "tools/experiments/entity-registration/README.md": "a1555012626ea1fc361b258654103bd6754caaf3a4492e769896cbbbfbb5a7bd"
+  },
+  "distRegularFiles": 192,
+  "distMatchesDiagnostic": true,
+  "reviewedAtUTC": "2026-11-03T15:20:09.666217+00:00",
+  "finalManifest": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+  "sourceFiles": 3124,
+  "npmQualification": {
+    "11.12.1": "full F1 focused mutation/setup-negative/recovery",
+    "11.21.1": "single normal sealed gate smoke only"
+  },
+  "finalReceiptHashes": {
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/MANIFEST.json": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/IDENTITY.json": "15a48b30e13d25a88d8d97b223a6c15f66b3a89eb280b9b2daa7448857b60fc0",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/STATUS.md": "f80724a1acb22ce84d29a1c9208ddbd63b86897b4f3f3bd2103daccc33251440",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/NPM-QUALIFICATION.json": "6c12efe04feb10e17fe545dcf930d2e058572ec9e8adceb64d5c46292e48ee09",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/npm-11.21.1-smoke-command.json": "a5f395c1ac94140bec13a07c6230ebf70b0c67ec484493cc97bf0fb2a7401061",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/npm-11.21.1-smoke-result.json": "116483df4927973489706a11696f02a48be8edb2cdce21dda4f99ac066e99a8a",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-f1/npm-11.21.1-smoke.log": "9d0d9ca7c10ec43cacd04a7b04a99525a8e76131c19165fdf0581eeb307d8854"
+  }
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "original": "enrollment invariance branch: none",
+    "live": "adjudicated enrollment invariance branch: none",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance branch: before-pending",
+    "live": "adjudicated enrollment invariance branch: before-pending",
+    "classification": "adjudicated useful surviving output; six stale hold assertions superseded"
+  },
+  {
+    "original": "enrollment invariance branch: during-pending",
+    "live": "adjudicated enrollment invariance branch: during-pending",
+    "classification": "adjudicated useful surviving output; six stale hold assertions superseded"
+  },
+  {
+    "original": "enrollment invariance branch: dispose-before",
+    "live": "adjudicated enrollment invariance branch: dispose-before",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance branch: dispose-in-updater",
+    "live": "adjudicated enrollment invariance branch: dispose-in-updater",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance branch: enroll-in-updater",
+    "live": "adjudicated enrollment invariance branch: enroll-in-updater",
+    "classification": "adjudicated useful surviving output; six stale hold assertions superseded"
+  },
+  {
+    "original": "enrollment invariance branch: dispose-in-validation",
+    "live": "adjudicated enrollment invariance branch: dispose-in-validation",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance branch: dispose-after-declaration",
+    "live": "adjudicated enrollment invariance branch: dispose-after-declaration",
+    "classification": "coverage gap: <=1 permits a send after disposal; needs cutoff assertion"
+  },
+  {
+    "original": "enrollment invariance root: none",
+    "live": "adjudicated enrollment invariance root: none",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance root: before-pending",
+    "live": "adjudicated enrollment invariance root: before-pending",
+    "classification": "adjudicated useful surviving output; six stale hold assertions superseded"
+  },
+  {
+    "original": "enrollment invariance root: during-pending",
+    "live": "adjudicated enrollment invariance root: during-pending",
+    "classification": "adjudicated useful surviving output; six stale hold assertions superseded"
+  },
+  {
+    "original": "enrollment invariance root: dispose-before",
+    "live": "adjudicated enrollment invariance root: dispose-before",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance root: dispose-in-updater",
+    "live": "adjudicated enrollment invariance root: dispose-in-updater",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance root: enroll-in-updater",
+    "live": "adjudicated enrollment invariance root: enroll-in-updater",
+    "classification": "adjudicated useful surviving output; six stale hold assertions superseded"
+  },
+  {
+    "original": "enrollment invariance root: dispose-in-validation",
+    "live": "adjudicated enrollment invariance root: dispose-in-validation",
+    "classification": "covered unchanged"
+  },
+  {
+    "original": "enrollment invariance root: dispose-after-declaration",
+    "live": "adjudicated enrollment invariance root: dispose-after-declaration",
+    "classification": "coverage gap: <=1 permits a send after disposal; needs cutoff assertion"
+  }
+]

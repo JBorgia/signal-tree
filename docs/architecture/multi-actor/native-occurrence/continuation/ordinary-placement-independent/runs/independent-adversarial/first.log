@@ -1,0 +1,35 @@
+
+> nx run kernel:test placement-independent-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs placement-independent-review.spec.ts --maxWorkers=1
+
+(node:99180) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:99187) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-ordinary-placement-independent-review/candidate/packages/kernel
+
+(node:99194) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  19:36:10
+   Duration  338ms (transform 41ms, setup 0ms, import 51ms, tests 61ms, environment 159ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      684ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     674ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    674ms

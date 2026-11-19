@@ -1,0 +1,89 @@
+
+> nx run kernel:test independent-prepared-boundary.spec.ts
+
+> node tools/run-core-vitest.mjs independent-prepared-boundary.spec.ts
+
+(node:67293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:67300) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-prepared-unit-review/run-17t1svy_/candidate/packages/kernel
+
+(node:67307) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-prepared-boundary.spec.ts (6 tests | 3 failed) 29ms
+   × producer ordinary images exclude untouched inspection sibling xy 6ms
+   × producer ordinary images exclude untouched inspection sibling yx 2ms
+   × certified absence row transport preserves actual replacement scope untouched 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > producer ordinary images exclude untouched inspection sibling xy
+AssertionError: expected [ { id: {}, owner: 2, …(9) }, …(1) ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:26:18
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > producer ordinary images exclude untouched inspection sibling yx
+AssertionError: expected [ { id: {}, owner: 3, …(9) }, …(1) ] to have a length of 1 but got 2
+
+- Expected
++ Received
+
+- 1
++ 2
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:26:18
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/independent-prepared-boundary.spec.ts > certified absence row transport preserves actual replacement scope untouched
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/independent-prepared-boundary.spec.ts:37:142
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 3 passed (6)
+   Start at  15:24:35
+   Duration  768ms (transform 437ms, setup 0ms, import 521ms, tests 29ms, environment 139ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-prepared-boundary.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

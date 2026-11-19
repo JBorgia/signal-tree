@@ -1,0 +1,1677 @@
+{
+  "llms.txt": {
+    "sha256": "343d77c8ada389165e099eff0c9db972edd67e7a03435d34efded0ea998d7dc6",
+    "bytes": 12351,
+    "baseSha256": "3e8213b1456088b387399b4526cc1d4edc4bfb87708761fc7d8fb0bcb4591285"
+  },
+  "packages/angular/src/lib/construction-resource-cleanup.spec.ts": {
+    "sha256": "bcfacd2efc8e54f883d72dd3fa1fb48024a85a18cf0a51756be95ebe9315b9b6",
+    "bytes": 2356,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/current-read-capability.spec.ts": {
+    "sha256": "c845adc924555e7b91ab859ba762bc1125d4263482eeacb9442ab2e1f4e65e59",
+    "bytes": 6900,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/current-read-capability.typing.spec.ts": {
+    "sha256": "e599891c002412515aa30aee15826339643961d9695555c56e8ccd90da58fce7",
+    "bytes": 316,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/declared-publication-composition.spec.ts": {
+    "sha256": "2256465d7f3f7cb5316126c302acef63f42d08be1ebc60fce87626faf44fee46",
+    "bytes": 4435,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/effective-presence-install-reentry.spec.ts": {
+    "sha256": "556f6a87f72f3ab6074d382589caa711a2384cb61b5cf29b9f4b31d80ffafb2c",
+    "bytes": 2372,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/effective-presence-successor.spec.ts": {
+    "sha256": "1229828bc24e6ac6736962a80c12cd3e284994b92cb2d8d1c9e0ee738dd8de28",
+    "bytes": 6145,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/entity-native-obligation-composition.spec.ts": {
+    "sha256": "f6ef68f812b940e929cd78d64fced2f97ca88d6a37fbdad8b328d24bdcd459fb",
+    "bytes": 2370,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/joint-native-frontier.spec.ts": {
+    "sha256": "a578260be0a0a14b8e3c39f54902f157b4ee6bffa468015bd28829b5d1f095bb",
+    "bytes": 1946,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/joint-rich-publication.spec.ts": {
+    "sha256": "7ba34efc2875e22b10fdd6d2945dad822a09eac5b0cc49a6f0e707648877cf98",
+    "bytes": 2012,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/keyed-construction-cleanup.spec.ts": {
+    "sha256": "756ed0da7a0217f1d22dfbb7239a2a7465124f9d6643ba0595b56de83a077aa7",
+    "bytes": 2750,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/link-native-address.spec.ts": {
+    "sha256": "83e52007d59b64954bf73aa6dee472ad44c4750493b97f003208ba322f38adfb",
+    "bytes": 1503,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/observation-adapter.ts": {
+    "sha256": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+    "bytes": 3917,
+    "baseSha256": "ad6882d888832b290965e3f508f078a53a59699c215a61d0454be59e2408dd73"
+  },
+  "packages/angular/src/lib/parent-freshness-entity.spec.ts": {
+    "sha256": "6237c55ebbcf910b70bb43c266d4ffbfdf410241093b615ddaa5195a1fec36d4",
+    "bytes": 1701,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/parent-freshness-focused.spec.ts": {
+    "sha256": "af32a888645ffde5cfeb47758109bbb22fe20dd10cef17e6d01dd5529e4b3794",
+    "bytes": 7685,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/parent-snapshot-currentness.spec.ts": {
+    "sha256": "db3835be6a83b6f2191eb2c5c68bf3895b749b7f1a582e8a3b85d6364cdd93ec",
+    "bytes": 4962,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/scalar-frame-publication.spec.ts": {
+    "sha256": "ba2248b29c58917b874efe4878784253d61fb07c844b808c8394aac98ddf860f",
+    "bytes": 1906,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/selected-active-id-preparation.spec.ts": {
+    "sha256": "acbab376daa21a6cfe32808ecf74434ade711757132edc767c623c4b5b038cf1",
+    "bytes": 2412,
+    "baseSha256": null
+  },
+  "packages/angular/src/lib/selected-callback-facade.spec.ts": {
+    "sha256": "f5483e0cf15e6b073c137ef50f5b51cb140c57b56b83803d1c793377e369b98e",
+    "bytes": 8658,
+    "baseSha256": null
+  },
+  "packages/kernel/README.md": {
+    "sha256": "e799be9cbe70c22029733289adb769b54a1c672b181797eaf6a2673d16cd28c4",
+    "bytes": 25007,
+    "baseSha256": "9529c877ff56f0c928b34682822acf8f2bea06c9ca9981873b0420a49db5a01b"
+  },
+  "packages/kernel/forwarding-retention.config.ts": {
+    "sha256": "0c877cd8feeb60b8feba31e0246b2892fe2554b01c113a57eddac53bf506850b",
+    "bytes": 237,
+    "baseSha256": null
+  },
+  "packages/kernel/project.json": {
+    "sha256": "6a72ec115860f8f2dea793e2fb36a350fcbec6a2b98c9f56e289bcce11037687",
+    "bytes": 1410,
+    "baseSha256": "f414f578e7f16a5dc7ecb54aeb456ade3ecdd49a9c63fb2340cf9ec85679c336"
+  },
+  "packages/kernel/retention-probe.config.ts": {
+    "sha256": "d9868ae1643dde8891ad25a1b18f930027fd32e0e68ae2dd921d6b4880da4d94",
+    "bytes": 234,
+    "baseSha256": null
+  },
+  "packages/kernel/src/adapter.ts": {
+    "sha256": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+    "bytes": 6085,
+    "baseSha256": "e99cc57221d867942fcb276fb48136ebd5b5620663436d7a2ed756c75a7d6fa9"
+  },
+  "packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts": {
+    "sha256": "7506b64dd89479c0fd5d540ac44d3f5d8814c54a09fd60dcf8235b6cc4b89fb4",
+    "bytes": 4124,
+    "baseSha256": "bc4eda56fde9cbb6bb2a34280fe34ae44c9c158b38fbdad2abdfd6644ecde6ba"
+  },
+  "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts": {
+    "sha256": "b58219f560ceedfefd792c87e8056593b14edeed63fd49d26b42d5247db6bfea",
+    "bytes": 22733,
+    "baseSha256": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c"
+  },
+  "packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts": {
+    "sha256": "100d9028bb73442b9d6280dfda9d6c2cb4d07f3ba6d3151b3b2098b72697f004",
+    "bytes": 9788,
+    "baseSha256": "f86b63862d73df0a64e0b11ddb4ae11380c350710e739e265109dc334594537a"
+  },
+  "packages/kernel/src/enhancers/restoration/paired-order-composer.spec.ts": {
+    "sha256": "f25e90b34a5b65e66ffd9b858f434a242522a804a8082d12ab238bf548c75264",
+    "bytes": 3762,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/restoration/paired-ordinary-boundary.spec.ts": {
+    "sha256": "485a7363d1a0dfce7a5697504ec23e9a7d39175e260136ba3222a8bd23cd0c0f",
+    "bytes": 2862,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/restoration/restoration.ts": {
+    "sha256": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+    "bytes": 205553,
+    "baseSha256": "c8eff760937ac975de308013ca891afe2ebedb3249a20ed5e735dffe9f8eef7a"
+  },
+  "packages/kernel/src/enhancers/transactions/native-admission-segments.spec.ts": {
+    "sha256": "bf11ff4b26137f4f87f7dc7c23d0d00e5a46c4c7807cabae43852bd07b9d0675",
+    "bytes": 3903,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts": {
+    "sha256": "6248370ec0de3fe089a4c4729b02761e162af4d2fd1b7c3ee62f493e4309a0a1",
+    "bytes": 3291,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts": {
+    "sha256": "79d1d8b016199e6d2fc1fc33fda410f8c3de6bc4141176825bf223d7b2d92400",
+    "bytes": 2280,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/native-order-interference.spec.ts": {
+    "sha256": "8f8aff94d88ab39a15ab55b432c6df70268f12e51a29fb108c9cece5ac6ee15d",
+    "bytes": 8755,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/native-segment-compilation.spec.ts": {
+    "sha256": "0c5b8ee2d66a53b723b828271415382a25733ac8737f463dd03ac973b1457eb9",
+    "bytes": 6203,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/native-source-notification-pairing.spec.ts": {
+    "sha256": "6b6b26c31ebf9351938638b7f80d3a59d46e694d1739d7e67235a6d523e7e0c9",
+    "bytes": 3587,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/native-structural-composition-gates.spec.ts": {
+    "sha256": "4c00825e75267762487bc920ec053a64d873e60daff0b5ea8b4249a0d42ac38e",
+    "bytes": 5135,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/occupancy-composition.spec.ts": {
+    "sha256": "45e8c96c07a9367e59f569ff4337674947fc91ea0891f8cc975e058b99d3a0c8",
+    "bytes": 2687,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/occupancy-composition.ts": {
+    "sha256": "921c83c65cf73836dbb4411686e18163f7f178052abcccedeaf71333bf4762ce",
+    "bytes": 2610,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/occupancy-inspection-chronology.spec.ts": {
+    "sha256": "2ed764bdfb0fad488b3976c7a7d9fab80fbb2e6869cd6182ae48c7cea7b9ac92",
+    "bytes": 3073,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/paired-order-witness.spec.ts": {
+    "sha256": "bb9cdbc7d6a59d96cfaad1106a0d0c91b1beef7a79dacc8498c9d810cb7b818f",
+    "bytes": 4657,
+    "baseSha256": null
+  },
+  "packages/kernel/src/enhancers/transactions/transactions.ts": {
+    "sha256": "7c4b9d481e481db43fba92f1e32789c36300bcbda2a3cf0316f437c41f291fff",
+    "bytes": 206116,
+    "baseSha256": "487b4e2a693395b37572991484a66a3cd36f5748098e5d4ab21b2673c85bd536"
+  },
+  "packages/kernel/src/lib/a1-independent-review.spec.ts": {
+    "sha256": "c0bbb057120459e096e5fe43703878a3f91f53d145615fcf580091ed99f042d2",
+    "bytes": 3035,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/a1-installed-publication.spec.ts": {
+    "sha256": "65da8178f977561bb234071fe90cea7c1a40b772c05f49f15a3dafc7c63221d7",
+    "bytes": 16344,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/admission-refusal.spec.ts": {
+    "sha256": "61f29397dbf8fcd0285dc0f4d32e6e2f8009a073bddfcb4c9ad5cb939e0b87ed",
+    "bytes": 4998,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/aggregate-independent-input.spec.ts": {
+    "sha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "bytes": 2224,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/aggregate-installed-publication.spec.ts": {
+    "sha256": "11ed1ee5de87db332a9e12501ee4bd2427546863ca4f262ee3bd4549e25db179",
+    "bytes": 10426,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/aggregate-native-input-default-control.spec.ts": {
+    "sha256": "6a2d6071a14d203e0e33103e8af77750143ab5e4bdbec63c3fd3348f5d8486e0",
+    "bytes": 871,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts": {
+    "sha256": "dd3a96166f3f0987ec191b26201c7b98ae93e7d44025c4ef50935c5b2d0a6341",
+    "bytes": 1442,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/aggregate-owner-construction.spec.ts": {
+    "sha256": "ccae7fe908e2115971cf66c2e47bba63888184d5a6c044ee7ecbe61cf9915e05",
+    "bytes": 2823,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/authored-removal-contract.spec.ts": {
+    "sha256": "d1610e1535d32e2d94cabc652070fb0e2501a0a2e564a4255991a3c1eb733286",
+    "bytes": 3216,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/authored-removal-independent.spec.ts": {
+    "sha256": "4b936b1bdd9894118d87b53a16b9d82d94edf7677aaaca0b18d5a475fc0e174c",
+    "bytes": 12138,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/authored-removal-obligations.spec.ts": {
+    "sha256": "8782bc80b6df36321e7d85d65017b1a943deed4291188b6b573ff97fd595bf79",
+    "bytes": 4053,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/branch-omission-correctness.spec.ts": {
+    "sha256": "2e24443db2c8ebf7a434864453b2b9ac7ee757db790c8888be357148cc278fdf",
+    "bytes": 22377,
+    "baseSha256": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99"
+  },
+  "packages/kernel/src/lib/collection-contributor-core.spec.ts": {
+    "sha256": "b6520ced389a5d28c22c1503f2420e77c854d0102012efd71cd1dc68fe238edf",
+    "bytes": 9087,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/collection-natural-egress.spec.ts": {
+    "sha256": "d735fd7b83f1c4ca21ce8e420442c751982415ae637a9c7708ca1b65b3691359",
+    "bytes": 4534,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/complete-structural-sequence.spec.ts": {
+    "sha256": "45b9b8114a5f19a322ce0b03d595c4d62cf0cd7a53dcd9f74069129d0b93be1f",
+    "bytes": 5108,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/construction-resource-cleanup.spec.ts": {
+    "sha256": "496166c0f764d338e13fa17d653143381b15044908498fa3e3731f15c0d7c501",
+    "bytes": 6627,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/core-independent-review.spec.ts": {
+    "sha256": "d12118e4058f597958b06084b79b98fe68c5f6b6ff9e779217433b1f329b03a3",
+    "bytes": 3103,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/current-read-capability.spec.ts": {
+    "sha256": "e951238bb917bdb60b2965e27f8bbbd9a935d0125176aa2491c1ad7256810574",
+    "bytes": 5040,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/declaration-finally-precedence.spec.ts": {
+    "sha256": "0f1f563cdf04df7d6f92af7a83474835e7deb503ee017852332f35be3fe2e3ca",
+    "bytes": 4845,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/derive-footprint.spec.ts": {
+    "sha256": "b0debc44848f8ba6b8d097fa8ff1eabc94f183cc7983c34be524c815cb5e167d",
+    "bytes": 7478,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/dynamic-member-enrollment.spec.ts": {
+    "sha256": "d6b38b99a81a07b3810acf0948969ad8f95f0592bbc9aed249c646d29d9499eb",
+    "bytes": 5577,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/effective-presence-install-reentry.spec.ts": {
+    "sha256": "2122c48bf9475fbef05f275dd7d72a532016bcd0b7b07c2db7e9d2747f4d41f6",
+    "bytes": 2350,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/effective-presence-reentry.spec.ts": {
+    "sha256": "c5dad24344c9fa62501315b5005431f678fd8fe2432a62594979f95c8a3a30ce",
+    "bytes": 1916,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/effective-presence-successor.spec.ts": {
+    "sha256": "9449dd9b157217bdf145080df5d405d0fb2b53b542254d04470552ab02230051",
+    "bytes": 6257,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-egress-footprint.spec.ts": {
+    "sha256": "3769add882e22a3798070fa29f97543da03e47cbcf879af67b71ec68a8a572a8",
+    "bytes": 7270,
+    "baseSha256": "19536a3160a4458b7b3cd85d97fb04c092c63bc64c22d675346788d5dbf84a2a"
+  },
+  "packages/kernel/src/lib/entity-input-view-contract.spec.ts": {
+    "sha256": "029d2177c3dc6e551e99fadbd59e913c7c0fd92f99ae7df316b974b166327f22",
+    "bytes": 2263,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-key-evidence-public.spec.ts": {
+    "sha256": "b819b7635f3bb43b6ed11e0cb16da8be8a70c79a878337ecd2a633fa50103aa8",
+    "bytes": 2577,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts": {
+    "sha256": "208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a",
+    "bytes": 10218,
+    "baseSha256": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56"
+  },
+  "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts": {
+    "sha256": "7fd43cdf9d714cc6d1b66a5b87b8041c782b2356cba9710abc3569b8d6399946",
+    "bytes": 15365,
+    "baseSha256": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4"
+  },
+  "packages/kernel/src/lib/entity-native-input-independent.spec.ts": {
+    "sha256": "f9a7e74cda5b81b478a37b0e259ac2947215b4905541638d19ca1abe4a7247f4",
+    "bytes": 6565,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts": {
+    "sha256": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "bytes": 2450,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-obligation-matrix.spec.ts": {
+    "sha256": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55",
+    "bytes": 6581,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-occupancy-steps.spec.ts": {
+    "sha256": "8b3fc351d9d917365d82f10ecc9d9deff3fbd019341ebc7adfd37758aa9ad05c",
+    "bytes": 1705,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts": {
+    "sha256": "7ca2ca3c60b332b3cf01752618e409d9a8c0b0fc2d52f97865514dd7c26b6a94",
+    "bytes": 4472,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-realization-handoff.spec.ts": {
+    "sha256": "0ccc560c03845c037d7e17c0f0bc3918a9d3c5bd23b7b93ed70a2b9adbec03db",
+    "bytes": 4713,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-composition-slice.spec.ts": {
+    "sha256": "e9ce723bf105674b1e085a2a1f353929eab266532518ef08d70972b6b499db4c",
+    "bytes": 2953,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-point-recurrence.spec.ts": {
+    "sha256": "40083ad176d073c4b3994ed36d5c7024f15fbea169713f8ead91152dc4db18b7",
+    "bytes": 1230,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-rekey-vacancy-recurrence.spec.ts": {
+    "sha256": "197b0a8eb1f0803e1ad50084f704729f940d65387f4e8a1e3885ce019d424169",
+    "bytes": 978,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-structural-inverses.spec.ts": {
+    "sha256": "3d4227b0b520a8fe3b0216f8573d2ce74da58adeedac79626560672d0617f2c2",
+    "bytes": 2065,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-structure-faults.spec.ts": {
+    "sha256": "07d3d70071de287b4e2761cdfd9d04c9b3e046195b61f8cd19ff816d088554f1",
+    "bytes": 2408,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-structure-interceptors.spec.ts": {
+    "sha256": "7feab4e185d15436fb3705d584b04e0b216cc3fda36356cd57d021c81fb9be72",
+    "bytes": 2461,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-structure-slice.spec.ts": {
+    "sha256": "1daf40398ae26564eb96787d7d3dbbae3f2ec9197bc08ddff98e6f9c77c447c3",
+    "bytes": 4217,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-topology.spec.ts": {
+    "sha256": "4a2343aa89568224f58632e6c7feeb39e02be9ab5c9082bafad8f7a41f909dfc",
+    "bytes": 2896,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-semantic-transition.spec.ts": {
+    "sha256": "24c0a85d87365a81ec181dd2e97aa0a2175141855b665c6817d8c520e2350837",
+    "bytes": 6950,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/entity-signal.ts": {
+    "sha256": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "bytes": 225256,
+    "baseSha256": "4459d2ad9dfdf690388ce38f8421234ae8bb3a10266b65125287388cc674aebc"
+  },
+  "packages/kernel/src/lib/entity-tap-reads.spec.ts": {
+    "sha256": "904691011f10ea4edd911dcb7dd0c1434b3b75000e4d5e7a4cd313d8ed721cbb",
+    "bytes": 8512,
+    "baseSha256": "92a7d6cf3878d6787f8c703ee76e7f3fbbc478a5924aa58a1b6f7db28b45ad5e"
+  },
+  "packages/kernel/src/lib/experimental-publication/entity.ts": {
+    "sha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+    "bytes": 21771,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "sha256": "a621673bb7a4df5aca0113e59b1ec40c8b5a1d5cd2dfef7299e59642a7f57ad2",
+    "bytes": 31112,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "sha256": "e022f8ce37bb23c659c27b342023b361ba11e4a8dcb16a783ab44f51ad3e9c28",
+    "bytes": 52268,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/experimental-publication/projection.ts": {
+    "sha256": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3",
+    "bytes": 1583,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/experimental-publication/proof-retirement.ts": {
+    "sha256": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4",
+    "bytes": 1792,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": {
+    "sha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+    "bytes": 7337,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/fixed-window-independent.spec.ts": {
+    "sha256": "fc27d5b4672c4f786d3fea0485034e1a6197f7204edf1cf0441ecdbdfa102edd",
+    "bytes": 8211,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/fixed-window-retirement.spec.ts": {
+    "sha256": "3774e6c2fae9cbee474455cd3e4d901a0dff19a9d65d95597a22480432c977f4",
+    "bytes": 9785,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/forwarding-retention-probe.spec.ts": {
+    "sha256": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "bytes": 4893,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/held-continuation-probe.spec.ts": {
+    "sha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+    "bytes": 3325,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts": {
+    "sha256": "9a210b20dde15faa909a752af33095dc68672d55808f7ab4dd8033403ce83325",
+    "bytes": 6252,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-explicit-continuation.spec.ts": {
+    "sha256": "ee26f04577f70aee9b6bd3f8d83b9d583c6763f2bfde354ba3fb1632eb5215e7",
+    "bytes": 2771,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts": {
+    "sha256": "bedf67e635d8147e13c6752a1271ec7e47f82b26a1dbb149c45ea9bf98f87a60",
+    "bytes": 1964,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-prepared-boundary.spec.ts": {
+    "sha256": "a4763269937c6d6085745cdef58775e6ee23e3d2ac6b112875bd14f11e1e0941",
+    "bytes": 4011,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-prepared-unit.spec.ts": {
+    "sha256": "c990f5125ed89f00f806c7c7cb1698b00059f8992551cac0965c2f2b6694a436",
+    "bytes": 10819,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-public-handoff.spec.ts": {
+    "sha256": "8e2fba4ba0695061305c76d304b4e6deaa6ed55792ed80279da5326a3011c93e",
+    "bytes": 2225,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-refusal-branches.spec.ts": {
+    "sha256": "dcd47b88da49a78738f70f55dcf1b76b3c7d9ed61a9100292149cc1e7186dc58",
+    "bytes": 2430,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/independent-scalar-publication.spec.ts": {
+    "sha256": "ba492604bc1a4db0346186a9b12d4ac93cad5679bf1c429b07af31391036a073",
+    "bytes": 4191,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/indexed-source-owner-cross-baseline.spec.ts": {
+    "sha256": "eebf016427e0eb619bc47dd21dc0a1fbedbf49b94e93110027e2990fefeb330e",
+    "bytes": 1908,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/indexed-source-owner-payload.spec.ts": {
+    "sha256": "728f7273706b97ce532bd3934f0c0943f4bfd073e3cd017fab9b0e7dd4700f19",
+    "bytes": 1198,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/indexed-source-owner-prefix.spec.ts": {
+    "sha256": "68a0ae8e4ecc051eb8d359fec78c83b42b1e3779150cdbea9c758adf98cf4953",
+    "bytes": 2975,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/indexed-source-owner-prepend.spec.ts": {
+    "sha256": "e3d38f9b491afd8bb518010018f72d718bcc072f10649fe70e3375f33cc30694",
+    "bytes": 1064,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/indexed-source-owner-s4.spec.ts": {
+    "sha256": "da656635bf29becb2f37f48b7a51fd7aa4b251d3a080a1fd9d3332fb3c75c3be",
+    "bytes": 1778,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/indexed-source-owner-subset.spec.ts": {
+    "sha256": "ec49f239aee6c5d7d119131b52125738b579e1184eb9b04dc1ea8612e7537f94",
+    "bytes": 3793,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/a1-publication-installation.spec.ts": {
+    "sha256": "795609b3ad3ce5a38dcfb829ec3bfc091903e1c0120693244593eb10e8055d02",
+    "bytes": 4614,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts": {
+    "sha256": "2a6a89b3aff4226bdc2a4070db8db648bd222390a296582e35691b9e9f0ce5f9",
+    "bytes": 1975,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts": {
+    "sha256": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544",
+    "bytes": 1490,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts": {
+    "sha256": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02",
+    "bytes": 2464,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts": {
+    "sha256": "7a3078f4ff9f9b041528b3917e07b6b1cf3e34ea7d7bbea2f123b8bae8b12369",
+    "bytes": 6182,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts": {
+    "sha256": "af6b26df9c06e0c62bc19e97bc0dd1ecded0fef6666547016b0b610380e2feb1",
+    "bytes": 1743,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts": {
+    "sha256": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c",
+    "bytes": 2610,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": {
+    "sha256": "cbeb44226cb42a1e8b35afa6111fee96de5f0c907f4d55e84b68e9875ce728a9",
+    "bytes": 17799,
+    "baseSha256": "6b70aaeec9d3c6355f144d26e671460af30484e933e47a829bf6e30f7f707e83"
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts": {
+    "sha256": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252",
+    "bytes": 1488,
+    "baseSha256": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f"
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts": {
+    "sha256": "7bbf24a92eecec1885ea1067326e551b0e8521d35c8d9e76c76a54cc1aec4b3f",
+    "bytes": 2322,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": {
+    "sha256": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d",
+    "bytes": 39934,
+    "baseSha256": "f9dbf57611f70c3e41ca8b5d0163bf62cea2d0bfbd0ffbbf419d6f993f7e0e8a"
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": {
+    "sha256": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1",
+    "bytes": 130932,
+    "baseSha256": "fa27b488a96c0c1c46b01b9dbfb9c8c41f4bc5e798d446a3290ce3baef75a9a9"
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": {
+    "sha256": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+    "bytes": 116986,
+    "baseSha256": "c3fec9f52a71aba93314cb1715003b27084548cf4f9914b4deb548299e2faea0"
+  },
+  "packages/kernel/src/lib/internals/construction-allocation.ts": {
+    "sha256": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c",
+    "bytes": 1396,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/entity-egress-projection.ts": {
+    "sha256": "b5e5e6009112701abe83f93582c78c1d5b362f08163b059f34894f236b319e13",
+    "bytes": 18216,
+    "baseSha256": "f071541ff79537b0fde69d4d85554b37c1a586942964a26cdcdd816bb111a115"
+  },
+  "packages/kernel/src/lib/internals/entity-membership-inventory.ts": {
+    "sha256": "82c306630ab0b1be88111a21bda76ed769c275240030e9f8e90bf1d9862bcf3e",
+    "bytes": 11406,
+    "baseSha256": "f04d2e639d67a923f88e69091d61f629ecaaf17be4d6aceb3d3cfcbc95afdd89"
+  },
+  "packages/kernel/src/lib/internals/entity-membership-source.ts": {
+    "sha256": "0c1df9a0ec396539566f82a671b2a643631e148a4e0a5cddd21fcd4b77080aa2",
+    "bytes": 3862,
+    "baseSha256": "099b2d5ad23ae5f7a75f691577bf45221aa18c1276d09ca1dacf2324b3eb6dc1"
+  },
+  "packages/kernel/src/lib/internals/entity-publication.ts": {
+    "sha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "bytes": 18976,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/entity-value-transition.ts": {
+    "sha256": "3592cb9441dff5538b69f8cadddffdb95940b164bd2cb94d8841d69527cdbd84",
+    "bytes": 4148,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts": {
+    "sha256": "08e290c23ee194877e87cb9430fffab1aa7842e580e01f90de640ecca358b34e",
+    "bytes": 7358,
+    "baseSha256": "b6c13c3e26f6ef27834f6e7e9c97ac395a7a5980a4de4259e8c70b2d1ab7fbce"
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": {
+    "sha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "bytes": 14959,
+    "baseSha256": "164c87dc9405b74f52a1d3eb08dd899745492fb141bfdcf9010f88b22383584c"
+  },
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+    "sha256": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+    "bytes": 19930,
+    "baseSha256": "b813247b331d44cd6cb0566b572118ab1bac4fb774deb7ad7b35dd95837103fd"
+  },
+  "packages/kernel/src/lib/internals/location-runtime.ts": {
+    "sha256": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5",
+    "bytes": 26184,
+    "baseSha256": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6"
+  },
+  "packages/kernel/src/lib/internals/materialize-markers.ts": {
+    "sha256": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381",
+    "bytes": 44700,
+    "baseSha256": "67c7bf8e90248c56427abc2690f746f7d7f437631f3bcc2986ac49976e9e1235"
+  },
+  "packages/kernel/src/lib/internals/member-membership.ts": {
+    "sha256": "b15765f0b0dbb5a8f5f37aecd9eef87ef450e95df919e8ee1cfc5da004c68ff7",
+    "bytes": 44044,
+    "baseSha256": "e748154443c4769a66572cf7eff6f4224ba7e1619f2d542fe301ebaf64283906"
+  },
+  "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": {
+    "sha256": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f",
+    "bytes": 8981,
+    "baseSha256": "3f2621c3d489d6cb04356bb6cac3b68b46f9587ea82a380316f56098e9a1c88b"
+  },
+  "packages/kernel/src/lib/internals/native-field-selection.ts": {
+    "sha256": "29d02197f19a11912ff6967ac770e17c28f56c7e7776e8df06deeafee07413a6",
+    "bytes": 1623,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/native-location-realization.ts": {
+    "sha256": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680",
+    "bytes": 11904,
+    "baseSha256": "7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c"
+  },
+  "packages/kernel/src/lib/internals/native-occurrence.ts": {
+    "sha256": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+    "bytes": 5077,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+    "sha256": "2845404e89069c33f5131e2b2aa6404ebdbb88ade92173371bbc98f590862d55",
+    "bytes": 15693,
+    "baseSha256": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876"
+  },
+  "packages/kernel/src/lib/internals/observation-adapter.ts": {
+    "sha256": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574",
+    "bytes": 3410,
+    "baseSha256": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016"
+  },
+  "packages/kernel/src/lib/internals/observation-substrate.ts": {
+    "sha256": "75bdd60bc568aff5460af61616a6896fb0e16c9c0ed6ee0f0150e88d4f150dab",
+    "bytes": 7623,
+    "baseSha256": "2db4780106eb7faa09c33fd04e2f56a96476b2e178d998471039cac8c3349026"
+  },
+  "packages/kernel/src/lib/internals/ordinary-entity-entries.ts": {
+    "sha256": "ca270fc464492372cbd43b1c0c753d6e9a55a04ba69f8972dc13f18f9d49b5c3",
+    "bytes": 958,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/owned-mutation.ts": {
+    "sha256": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3",
+    "bytes": 8957,
+    "baseSha256": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24"
+  },
+  "packages/kernel/src/lib/internals/plain-branch-membership.ts": {
+    "sha256": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+    "bytes": 45061,
+    "baseSha256": "4116ebdd4e7d300bf47e6f14260c914e6698116f6fbae3a30279fd7aceec12d7"
+  },
+  "packages/kernel/src/lib/internals/position-registry.ts": {
+    "sha256": "205a6893bee3c03ae3d100848a2faa3e9f42fc8f42f4aaefc344ee9bbd5059eb",
+    "bytes": 7841,
+    "baseSha256": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6"
+  },
+  "packages/kernel/src/lib/internals/prepared-entity-structure.ts": {
+    "sha256": "eb3e9e920fbb16c2171f64057fb44a96049118b9ff555224a01c32ab116b4d3a",
+    "bytes": 576,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/publication-preparation.ts": {
+    "sha256": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587",
+    "bytes": 851,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts": {
+    "sha256": "63b4841431311818a65ceb6b7607ed43be348b48804a3ad11b435c0587509d14",
+    "bytes": 5146,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/scalar-publication-coverage.ts": {
+    "sha256": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83",
+    "bytes": 3504,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/selected-entity-disposition.ts": {
+    "sha256": "5c475f94b1300471a861c317e1ba2f97bd02eb36fc53daa6ad274d024352f82f",
+    "bytes": 962,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/selected-write-operation.ts": {
+    "sha256": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111",
+    "bytes": 3222,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+    "sha256": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354",
+    "bytes": 4952,
+    "baseSha256": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954"
+  },
+  "packages/kernel/src/lib/internals/snapshot-installation.ts": {
+    "sha256": "02ffc94a1b4150bb108a5ed4bd01e3bfd36bbef86af2c1bf96552d7e41f67a7b",
+    "bytes": 1534,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/internals/source-mutation.ts": {
+    "sha256": "bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518",
+    "bytes": 7448,
+    "baseSha256": "cc24db10b21def186cca62d23a27224e09edb7ffe8991bdd8e8ebb094b8b5a87"
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+    "sha256": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+    "bytes": 9653,
+    "baseSha256": "d03cd01b1b0037756027daad3c10961596626ae41bf2eebe7dd00d5b9e3e2030"
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": {
+    "sha256": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270",
+    "bytes": 3574,
+    "baseSha256": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9"
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": {
+    "sha256": "2954b77e477ed7177b2580ce2d7ea55caa07d88e374adb5191f6ed5676c1a01c",
+    "bytes": 16995,
+    "baseSha256": "3d609a913f82055ea18bdc03e10af7a07f3de38c09e5ea229ec8a4cd44b623df"
+  },
+  "packages/kernel/src/lib/joint-atomic-preparation.spec.ts": {
+    "sha256": "9c0209d91190bf43a616f16c4d2483738d4a5777202cec4878436b2e0d5dc8a5",
+    "bytes": 2566,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-install-boundary-independent.spec.ts": {
+    "sha256": "ce4445720787ff57d8ce888c86b3a6d34886251873f10d83d1b77ce5137c27ea",
+    "bytes": 1463,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-install-validation.spec.ts": {
+    "sha256": "1d8ecfe930b0b87e032f63b6a5baf581abdb2e5d9aa90af52adc0cce8bc06219",
+    "bytes": 4030,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-membership-completion.spec.ts": {
+    "sha256": "bad404ea590508fb3116ff4d6f019e2257768d7b2d3f90fa764b434ace3ea337",
+    "bytes": 3842,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-membership-phase.spec.ts": {
+    "sha256": "45862080b2487f5f978699f1e3b2a52b9eb51b4f7c57cbb2be952943f0cb0719",
+    "bytes": 5392,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-membership-seal-independent.spec.ts": {
+    "sha256": "24f7d010e8b31f6bd66a58660d5a893d463b1e427eb72b8c72a4a532ec70ea43",
+    "bytes": 2870,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-mixed-seal.spec.ts": {
+    "sha256": "08feaecaa24b19286f8681962d3f02f412a147da9d094b19c1bc353ea4abe50a",
+    "bytes": 2183,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/joint-readiness.spec.ts": {
+    "sha256": "a23e192e2146c99cda5b7048185709df4954e527aa46f0d471c11bd9e3c6a86e",
+    "bytes": 7583,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts": {
+    "sha256": "12ed2c3209d879088aca8731722f29ca9ab503cdeed6621f6cf8375f37f3fd52",
+    "bytes": 4440,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/known-input-contract-review.spec.ts": {
+    "sha256": "6e8f443a169b10e992a008bab11c899ce1bb588b2c2b22654ad9327544f0bcd8",
+    "bytes": 1368,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts": {
+    "sha256": "2078b018d3cdeec8bd32e47e0b02bf341bce0864902e59428d712f833e84eae7",
+    "bytes": 5619,
+    "baseSha256": "c96291c63c49b0ac5cc3c312af6c68d31581573b145595b7307ed239d4748751"
+  },
+  "packages/kernel/src/lib/link-commit-ordering.spec.ts": {
+    "sha256": "49c26727b88e2cd994afec1c7768d664b3db5f438da8c69c4d136baedb34cf9c",
+    "bytes": 8609,
+    "baseSha256": "e6f6742c93fcfcf802e8708e7d1dfb42ff890ee0271deee7f939e8ff6829d0da"
+  },
+  "packages/kernel/src/lib/link-native-address.spec.ts": {
+    "sha256": "a4bd9896281f2a38b556443dc8286266e4419bb6710c06c265f01407b6ce5865",
+    "bytes": 6753,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/link.ts": {
+    "sha256": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65",
+    "bytes": 51124,
+    "baseSha256": "d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901"
+  },
+  "packages/kernel/src/lib/main-invocation-scope.spec.ts": {
+    "sha256": "e4508b11eb68a7cfbdd294c34c24b411b9810ba2a6c15e0d81682d39a6285b3e",
+    "bytes": 3751,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/markers/entity-map.ts": {
+    "sha256": "de4db2c626f8175e0f0e7f69560e68441cc217c50b69c90aec02b7bae8216f88",
+    "bytes": 20007,
+    "baseSha256": "dcd89d2b8f2afc3931dcce3ddf935578d9c98dc1762f1b4a49041e1b275d182e"
+  },
+  "packages/kernel/src/lib/membership-input-contract.spec.ts": {
+    "sha256": "6dcfb29d6ea327ac59a4913e1ad25d3fe40824fc8fe53ca20b34bc0681b04997",
+    "bytes": 9658,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/membership-prepared-order.spec.ts": {
+    "sha256": "a3c6690ae62a1c85f235de5fb89c4305628cd5a680262e85ec8f164d027bd4c2",
+    "bytes": 6175,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-admission-handoff.spec.ts": {
+    "sha256": "f397f87621117e031693fa14909a15a3415392b098d0034f94096fb8dd756000",
+    "bytes": 2590,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-anchor-diagnostic.spec.ts": {
+    "sha256": "261fd61f3d42b7bd48f5a1896025c09c5251cb4312e40b766f9df60ae877d213",
+    "bytes": 1180,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-authored-footprint.spec.ts": {
+    "sha256": "6cc7e0932dea9a089fb4fbaa8c1ed8bcb3c5d732dda08b9e9ef11e245744d136",
+    "bytes": 1520,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-certificate-successor.spec.ts": {
+    "sha256": "e591491ccbb6772a678a00ce00e1bf186e822a3511eb27fa90579cbcbdfe037d",
+    "bytes": 4361,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-explicit-handoff.spec.ts": {
+    "sha256": "5b41d87bbe882541be36bbb985d480d3c761ef07b20a06bfcf1944a5d2a6450b",
+    "bytes": 3470,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-invocation-handoff.spec.ts": {
+    "sha256": "51571e4044e65887d257b492e1908e13055886cb96be559b738462cdb9acc128",
+    "bytes": 4222,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/native-window-preparation-audit.spec.ts": {
+    "sha256": "e24b6714a2a08407064c3dbb4166ba1bfd3c227d8b52baae7ee00ac1c1f2f042",
+    "bytes": 4747,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/occupancy-successor-composition.spec.ts": {
+    "sha256": "ed77bbc8bf2552a8fc3f5b1a885605d104445f3b6b3d9305b17f0d0d1e888952",
+    "bytes": 3120,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/occupancy-successor-point-work.spec.ts": {
+    "sha256": "feb8effb41bf0086739a62146ba3d9f7f54b20a079a8821ef291dace406e3a74",
+    "bytes": 1025,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/occupancy-successor-realization.spec.ts": {
+    "sha256": "23d7d3337be7cfe601d7ab7db61fb150ff3b8b25df490d13caa7deb236919307",
+    "bytes": 5755,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/occurrence-successor.spec.ts": {
+    "sha256": "4938fe5f5c3e6f987cafb2f67982ae3f0745038678557f6b81765000a185548a",
+    "bytes": 7930,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/oracle-alignment-independent.spec.ts": {
+    "sha256": "fce9b17f9a732c6c33caa293d9d6ccdb9316970878853f5e1f0b2187f1dc0c61",
+    "bytes": 5375,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-member-presence.spec.ts": {
+    "sha256": "32274abd25e03a1a55e44425e5eac31cde28b5a2b0fe55e3720f8f918e9e2e64",
+    "bytes": 8826,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-member-publication-facts.spec.ts": {
+    "sha256": "541633e80cba180fae6020593c95b5f88c5ca4de65fde488853ee6e16bfe2c70",
+    "bytes": 2911,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-order-indexed-work.spec.ts": {
+    "sha256": "39d5766ebb54b00acb1dcc828e73141239392779dbf4efac294f15dcb6800e21",
+    "bytes": 6611,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-order-owner-preparation.spec.ts": {
+    "sha256": "c00160a5660ca543a81b2fea3a8c1d98dba070cd37bbe7573b4696f17bbbbbb1",
+    "bytes": 2812,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-order-source-boundaries.spec.ts": {
+    "sha256": "6fb7bef72f755f56ea1bcac2384974205e4b34cda899b1408661fd3be8bbbef5",
+    "bytes": 5775,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-presence-discriminator.spec.ts": {
+    "sha256": "65da8178f977561bb234071fe90cea7c1a40b772c05f49f15a3dafc7c63221d7",
+    "bytes": 16344,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-presence-independent.spec.ts": {
+    "sha256": "b41e1bbd94cd524d2b4a8c65f1efa205ca1f430a99ac126375d70b205cdd4618",
+    "bytes": 3607,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts": {
+    "sha256": "2457836415fea5590d8f949aeb49c9543f088945810a4abcd315a21bdfa8d664",
+    "bytes": 9486,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/owner-transition-cancellation.spec.ts": {
+    "sha256": "456bf91b9627d8dfe48b28ec7c4dd5b3debc312405084fcdfb0c1b47d318bfaa",
+    "bytes": 2104,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/packet-admission-r1.spec.ts": {
+    "sha256": "e7fa7f3954cfb6b415370db0fce1f745a35b9eea2de01d98661d3f2085db03ec",
+    "bytes": 5595,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/packet-index-adversarial.spec.ts": {
+    "sha256": "7ac49f1fa9a5d6461f226af11a4421aec4dbdedd1013e5ba218ab9bae5fe7b85",
+    "bytes": 16429,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/packet-index-review.spec.ts": {
+    "sha256": "81c7c8f0baf38432be96b5cc320eb92df3ca1de3ae0d777e305dd50e16915c53",
+    "bytes": 4837,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts": {
+    "sha256": "0aa146a7cc90e0a89fe8b74f49eb052860af917ba98838e8e5ae78a2bef40611",
+    "bytes": 6522,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts": {
+    "sha256": "93679a448adf9a5b0cd06f4c3298021c22a96fbcf34255fed6c5b23ad7333e66",
+    "bytes": 2365,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/packet-physical-pair-work.spec.ts": {
+    "sha256": "02efb70a00a0377d06b517e10d95a5c8c40d60eb8d741a1a6ff5dabc8a14c110",
+    "bytes": 3042,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/parent-freshness-entity.spec.ts": {
+    "sha256": "7e224cb7c28f9b2f6878a30a1c9c33d60a726717573892e4c513cac0f8a85bc3",
+    "bytes": 1626,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/parent-freshness-focused.spec.ts": {
+    "sha256": "c31ab537a83917af1211f5ae863d4847f393032f480c50296fddc20ab9d6ba72",
+    "bytes": 7405,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts": {
+    "sha256": "e32cd6e32c5305f275ead8151bc295d85ff8c966184b98af6141c2371a34e9b4",
+    "bytes": 1353,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts": {
+    "sha256": "93273e3668f2e1ef1d78fbc4c93a415e16949e0f273f5eb0f033cb809d6200d4",
+    "bytes": 4565,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/path-notifier.ts": {
+    "sha256": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde",
+    "bytes": 32522,
+    "baseSha256": "016d3ad005ce360c8e3ae83520a064cff99fd2e4dbbabb077fb2ba075c0e8799"
+  },
+  "packages/kernel/src/lib/pending-placement-work.spec.ts": {
+    "sha256": "0e9eee4036ee8cda41789833d4bb7f54b1ec3091ddd1d93733a75d9a377af4b5",
+    "bytes": 1566,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts": {
+    "sha256": "3ab59e1db0c9735d49832f0f9f15e986f0b9587772c922e30ba547af73668bf0",
+    "bytes": 6467,
+    "baseSha256": "5080edcbbe753c8153c748121a4faf24559808512f689a494f766561c6662233"
+  },
+  "packages/kernel/src/lib/physical/entity-mutation-frame.ts": {
+    "sha256": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f",
+    "bytes": 16437,
+    "baseSha256": "d18cda629dca7ada76b2a7f9b5d621bd2b5f04acd3b229487d50230b59d4c4d6"
+  },
+  "packages/kernel/src/lib/physical/entity-ordinary-topology.ts": {
+    "sha256": "d66cfb6b8476877c44c64532a3d62328ac8b184d1fd3ea4053f00a849d09144b",
+    "bytes": 5003,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/entity-placement-stage.ts": {
+    "sha256": "350e86c0a987bd86629d359a56488e49b062a6e3ad47869db7367f377f200e48",
+    "bytes": 4624,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/entity-value-store.ts": {
+    "sha256": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+    "bytes": 6694,
+    "baseSha256": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f"
+  },
+  "packages/kernel/src/lib/physical/order-restores-for-placement.ts": {
+    "sha256": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c",
+    "bytes": 3843,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/ordinary-key-evidence.spec.ts": {
+    "sha256": "39c5bfda65069f6826514feeb19041811414dd2862caaaf5b0c777252344e871",
+    "bytes": 1682,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/ordinary-key-evidence.ts": {
+    "sha256": "55506941297e26fa1cc40728edb40509c4d6823fd1af9ac07fb33faa56b2a3f2",
+    "bytes": 751,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/ordinary-restoration-placement.ts": {
+    "sha256": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0",
+    "bytes": 2265,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/prepare-entity-target.ts": {
+    "sha256": "d0d52d5f0a54f902e72826358896cbead8a282a9bbba2490bff8b1efee1407db",
+    "bytes": 12954,
+    "baseSha256": "5eb02667ae8e30e5b7d450bc2f4b376c83ed592d3b941d49f49be698061c1cce"
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts": {
+    "sha256": "1f55fe87b9f33ea24edf0ca01e2e9a5574bf7f69a43a17e4ee1364c49fcbd1ed",
+    "bytes": 1176,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts": {
+    "sha256": "126ae6f1bfca4ae95fac14bdec9dee6800eee73e89f41d835dc69bef7bf41cbd",
+    "bytes": 1901,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-visibility.spec.ts": {
+    "sha256": "0d688b2500f11da5f9d215c00cfbbc41c324eedc0dd78dc97f36fa40f5e70034",
+    "bytes": 3457,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-visibility.ts": {
+    "sha256": "9fad616ecfedf8152958e76df0388dc4e3bf703d30974c8a818fb821e0112c28",
+    "bytes": 4710,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/physical/structural-store.ts": {
+    "sha256": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353",
+    "bytes": 20472,
+    "baseSha256": "36d7005b9c44bc98776c1b05e4b381a2fcc4e9777caf552ca23514412204243a"
+  },
+  "packages/kernel/src/lib/placement-snapshot-reuse.spec.ts": {
+    "sha256": "26a63cfaa4a0357d7881238debda71245991068cc85957c24135ec4e61286162",
+    "bytes": 2707,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/point-admission-followup.spec.ts": {
+    "sha256": "5f0c91a0db8fdbc9a191817083d35928f67747ae719b421a8ff385e672adee36",
+    "bytes": 2706,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/point-result-allocation.spec.ts": {
+    "sha256": "281196216b92dc418f5236624ce7d631d56c8393f5b950793492b17100930b0b",
+    "bytes": 2273,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/point-result-demand.spec.ts": {
+    "sha256": "58a97dba8907644e10d9bf289747ad31b705f75391cd932bf2f4eb34917e9baf",
+    "bytes": 2705,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/possible-owner-window-contract.spec.ts": {
+    "sha256": "c8a0443f9ba33971ef0459a65d3106b9d19f5dcbc076770592240d9a91d67a72",
+    "bytes": 15273,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/prepared-anchor-work.spec.ts": {
+    "sha256": "a98bdaa1aa6be47895cb85deb3e8f336c725c799b20c9ee89d70d69a23d18594",
+    "bytes": 1278,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/prepared-placement-index.spec.ts": {
+    "sha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "bytes": 2397,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts": {
+    "sha256": "229fdf26cbc654ad7e7367d45e71f7fc656925b16a588065a7ba2578c68793bc",
+    "bytes": 5269,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": {
+    "sha256": "c1c2e3a2a141425045b2dcd4b5b9865d4a345c48ebb48c84affa978d9d4d7af8",
+    "bytes": 47018,
+    "baseSha256": "35fe5fa6f208dba498e9925bf247b312286993fb3a7cc56ee558c59bbb16ba1b"
+  },
+  "packages/kernel/src/lib/public-selected-unit.spec.ts": {
+    "sha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "bytes": 2511,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-confirmed-input-independent.spec.ts": {
+    "sha256": "fe1adff9705324c5189709486e90198ec243ba4729bc4ac13b80150f66c58274",
+    "bytes": 1484,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts": {
+    "sha256": "43d91b8f25b3d0b347e545ac2d1d744d8c8e8145979df7e1f612355d45233e5b",
+    "bytes": 3421,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-evidence-scope-controls.spec.ts": {
+    "sha256": "b1f5676c6ad1044a7a260d9867726c777d09561d9b54421d05a62c46f0648a7b",
+    "bytes": 4338,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts": {
+    "sha256": "f052ecf6a8afaf3007e538c3e70833260ee860c27f65789024373489fee2e6a7",
+    "bytes": 2296,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-independent-omission-input.spec.ts": {
+    "sha256": "608ab9a49ed6a91f6485538aa3a7d576e45656d93b26e628eac3cfbe82ccd6e7",
+    "bytes": 2184,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-membership-provenance.spec.ts": {
+    "sha256": "c0680a00eb824748ec00ba66b817fd64164c2a9747dcf447d93b17ae5a541d9a",
+    "bytes": 1957,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-native-provenance.spec.ts": {
+    "sha256": "bf9b0d917f8431b7244f0012de0e5e6ab9daa4e143f5cb010c6a99f4b476f370",
+    "bytes": 3083,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-obligation-combination.spec.ts": {
+    "sha256": "250079867ec3c585e054c96adb26eb35bfb34c2ca80dc457669d4585953b07b0",
+    "bytes": 8046,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-proof-retirement.spec.ts": {
+    "sha256": "42802bc7648ee70fc638a5459b476964dd782ace61e89605e4d3a86410f8f90c",
+    "bytes": 4946,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-retirement-acceptance.spec.ts": {
+    "sha256": "f742232adb3217898f09b762276f9fc38a05bd4c790f0bcb0a62f71bd2c76768",
+    "bytes": 8218,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-retirement-boundaries.spec.ts": {
+    "sha256": "1861f61495e87da82c3f18a5a1fa9c3f222450dc91b7d90a78c53803076c5aff",
+    "bytes": 6193,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-role-overlap-audit.spec.ts": {
+    "sha256": "eae5c11466234782135259651fc610042b6334fbbbaf3287fe9167027bad6d5b",
+    "bytes": 2720,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-terminal-consumer-independent.spec.ts": {
+    "sha256": "6ab8aa5e55836f384fbf7a4a83635bc70a9f9dc2b96a0fb0cde195dce8f9b720",
+    "bytes": 3364,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-terminal-horizon-independent.spec.ts": {
+    "sha256": "9736816d0e980a3be2b5d7901381b19bc7ed6e77a27e903478789570dd81e4cf",
+    "bytes": 3218,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-terminal-obligation.spec.ts": {
+    "sha256": "0725a41669d33ea0358fc7559f63436cb9c235abdd8ed8ca5131bc888276f91e",
+    "bytes": 10937,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-uncertainty-provenance.spec.ts": {
+    "sha256": "6906a1db3ba371275ab7f8e86b75267453ef5404e701b89889736be8142aec83",
+    "bytes": 4043,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/publication-validation-window-audit.spec.ts": {
+    "sha256": "5013a5ff93263f4767279f2c484a09301c183aba4c735915db5bf80df2474953",
+    "bytes": 1855,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/recipient-cause-classification.spec.ts": {
+    "sha256": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+    "bytes": 3185,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/recipient-positive-counterparts.spec.ts": {
+    "sha256": "af371d339dd11a4a60a53a1ad1eff583f899cece5d9465d4c6f9f46def3c7e29",
+    "bytes": 7364,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/recipient-source-permission.spec.ts": {
+    "sha256": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a",
+    "bytes": 5123,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/recipient-window-independent.spec.ts": {
+    "sha256": "886c2626b1a5f0892a4610577d798039795133b1103ddfe3a5af2c065c741dae",
+    "bytes": 6019,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/recipient-window-review.spec.ts": {
+    "sha256": "f933ed3a4e9b401b08925966648c9a6316444b402d4b78ff5f45c8ae52e3b86d",
+    "bytes": 4929,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/restoration-paired-composition.spec.ts": {
+    "sha256": "08ff4eb0ad419be6eb8761b28f644bd40481010a922b121105a3e2e27c8f8b4f",
+    "bytes": 3600,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/restoration-paired-work.spec.ts": {
+    "sha256": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c",
+    "bytes": 1671,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/retained-source-public-controls.spec.ts": {
+    "sha256": "b4e4f60b5d395413bbe4127286c6e1743f73ec6b5ac137df51bca107a79ad8e9",
+    "bytes": 5860,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts": {
+    "sha256": "413be33da213685a25912806dc0568b6ee82373c5401d237171d358d98459ac4",
+    "bytes": 1377,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts": {
+    "sha256": "d8ba5216cb9a539ef0a8cdbf91a7e955291d5a281fe25502563a0f78fc5be82b",
+    "bytes": 1457,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts": {
+    "sha256": "b26e56e62cf9795df7947082563bf6c6192e68c4a736089386d4632385ee867e",
+    "bytes": 1470,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/rich-unit-source-group.spec.ts": {
+    "sha256": "49479c2d55c1a238a9cf05134a9c9fbd013e178339793693c78106edec50352b",
+    "bytes": 2210,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/row-source-independent.spec.ts": {
+    "sha256": "2fb4d898962a899945bb5d24031368899f9b059a3ff84cc143802b57dacdf50c",
+    "bytes": 4876,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/scalar-frame-finalize.spec.ts": {
+    "sha256": "116f971081e536b77f7656bfb631291a57bb62eb66451f23156310cbdad3ee53",
+    "bytes": 2247,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/scalar-frame-publication.spec.ts": {
+    "sha256": "e8554d47371ca1891279bf17387418018b17993be9b843f5b7a50eb9516e1075",
+    "bytes": 19954,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/scalar-native-support.spec.ts": {
+    "sha256": "74acda5f67e00ec0ad070b5ef1562b5f2e18bcc5eb18accb0d4124e99d52bfb1",
+    "bytes": 9093,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/selected-callback-facade.spec.ts": {
+    "sha256": "ff50c90f285549bcd0d965a51d8be726d1476dd5e13ddae863b7be749654f96a",
+    "bytes": 4343,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/selected-forwarding-cleanup.spec.ts": {
+    "sha256": "cfc52460494465983c9609ad18f4f389180d430baa559ed3bb33e6dc6ef7650e",
+    "bytes": 3534,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts": {
+    "sha256": "e3f0f1b52168be48708ff4de04214c487b4effc14010938d73fb419743b688c3",
+    "bytes": 1376,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/selected-real-batching-review.spec.ts": {
+    "sha256": "137bd24a9716c5217dbfa4a0fa07c13f0e402ec5c44e8bdaf4e806ac2b311020",
+    "bytes": 2523,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/selected-unit-support.spec.ts": {
+    "sha256": "7cc4610a626af03ff102c7f3c30828a1173a7cfbaf63d0860b74c49e9e6afe7c",
+    "bytes": 2611,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/separate-boundary-contract.spec.ts": {
+    "sha256": "ff125e32a692c0a88acaa02eac7256162147a7096fcc030edde86a04f28c6708",
+    "bytes": 8346,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/signal-tree.ts": {
+    "sha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "bytes": 101337,
+    "baseSha256": "28c6016585c4f3f260df9ce4adef53a53f6573a7304961af6afdfad54d6814e4"
+  },
+  "packages/kernel/src/lib/singleton-row-allocation.spec.ts": {
+    "sha256": "5fed02175193cf217ecb6c78666a4ca0ab7fd12773f045ebc61985a764ee9d93",
+    "bytes": 1846,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/singleton-row-reuse.spec.ts": {
+    "sha256": "4aa24ac4d6bd7d7b5e6d460cb011a0fd3fd24a8cbdd6038509025f92e904b784",
+    "bytes": 7305,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/structural-admission-controls.spec.ts": {
+    "sha256": "af5e0868f35662a861d35dcf53c2c9b3dbecce6da085a189947eccf57fe737cd",
+    "bytes": 5097,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/structural-admission-sequence.spec.ts": {
+    "sha256": "c24f99577549e317fb0c079c6bf7c254661db1556fa0c2f7def3269f8157981b",
+    "bytes": 5222,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/structural-completeness.spec.ts": {
+    "sha256": "287421da208040f0e140069b8d2a5ab7db77b1d397638dcd6070781ae01dc89a",
+    "bytes": 5009,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/utils.ts": {
+    "sha256": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232",
+    "bytes": 31031,
+    "baseSha256": "3a631f9381e564a964474e7e86c0eeac5809c5da8b4658c6f105927828d89e53"
+  },
+  "packages/kernel/src/lib/value-work-handoff.spec.ts": {
+    "sha256": "315ac154b8841da2603ec484b6bdb4db8b78c7a17710e909bdf5b208a92a8a42",
+    "bytes": 7861,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/whole-bounded-qualification.spec.ts": {
+    "sha256": "b54e343ef51923d62d8db9c02d86a3f3b97dfa4aba1bdace9f0be7d0c3fa523a",
+    "bytes": 7109,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/whole-getter-controls.spec.ts": {
+    "sha256": "c13477f73723c6c34aae2f0efa1000a143155ef9f39c3fbe6cc1f2a627705932",
+    "bytes": 2419,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/whole-mixed-promises.spec.ts": {
+    "sha256": "bbbc1db97df42d362bbef97a15afcc3562e4a19fe4fb3a4a0d83004cf1613bec",
+    "bytes": 2696,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/whole-unowned-publication-authorized.spec.ts": {
+    "sha256": "7025a024c85722832cc863df8b718265ad2de55bed610255e72bdfbc8469d2e9",
+    "bytes": 1896,
+    "baseSha256": null
+  },
+  "packages/kernel/src/lib/whole-value-new-keys.spec.ts": {
+    "sha256": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+    "bytes": 17762,
+    "baseSha256": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606"
+  },
+  "packages/kernel/vitest.config.ts": {
+    "sha256": "d1e247e5f0f90050b96daa1b889a09301e94ac338597b425127395351e0d3fdd",
+    "bytes": 2923,
+    "baseSha256": "76f5676437b9d8e8236e7b3a48e47c42b326458dcf1f712407a97ceac447b566"
+  },
+  "packages/kernel/vitest.retention.config.ts": {
+    "sha256": "30f6a25ac7bd1890913636b5428ad51721f15c354ee558b3dc91504a844e4336",
+    "bytes": 966,
+    "baseSha256": "90b6c446f93bc3acd15511f214a15a6c39b7159798cf523433882ddfbe2c1d37"
+  },
+  "packages/react/src/joint-native-frontier.spec.tsx": {
+    "sha256": "faebf3946f71e139ca48f52326791fb92a22cfeb77095418fc792ebdb39c8fc2",
+    "bytes": 1293,
+    "baseSha256": null
+  },
+  "packages/react/src/joint-rich-publication.spec.ts": {
+    "sha256": "5f9d760dc7d21d3a3c3fe9b022f740191c85287841362893dbca69b4383e6fb4",
+    "bytes": 1996,
+    "baseSha256": null
+  },
+  "packages/react/src/lib/declared-publication-composition.spec.tsx": {
+    "sha256": "1618f81ddb5077e5b04325963c1b6c8f3e8ba044064b237170395a2e02af1bab",
+    "bytes": 4395,
+    "baseSha256": null
+  },
+  "packages/react/src/lib/entity-native-obligation-composition.spec.tsx": {
+    "sha256": "627b3c3d674e8290fcbf1c74662c97b5d795e6af63e875aefc158a9b8eb4e60e",
+    "bytes": 2362,
+    "baseSha256": null
+  },
+  "packages/react/src/lib/link-native-address.spec.tsx": {
+    "sha256": "d5f10a522ec126e4846a74652f31140d03c09d55b3ed886fc600d1516371c97f",
+    "bytes": 1497,
+    "baseSha256": null
+  },
+  "packages/react/src/parent-freshness-counterparts.spec.tsx": {
+    "sha256": "2431b05bc5dfb20caf5dc9fc070e372961fc52d3bb6231172fd1aa26c8e87596",
+    "bytes": 5371,
+    "baseSha256": null
+  },
+  "packages/react/src/scalar-frame-publication.spec.tsx": {
+    "sha256": "38747eba9ba50aaebf1c85ef3160d7ddf48b3bc7d39e99e73188210543b15d72",
+    "bytes": 1894,
+    "baseSha256": null
+  },
+  "packages/react/src/selected-callback-facade.spec.tsx": {
+    "sha256": "52731cfa9bf6d3f165c3e32d5642fd1bf3e7289420e06a6082a330517ca1c4f3",
+    "bytes": 4342,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/declared-publication-composition.spec.ts": {
+    "sha256": "2256465d7f3f7cb5316126c302acef63f42d08be1ebc60fce87626faf44fee46",
+    "bytes": 4435,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/entity-native-obligation-composition.spec.ts": {
+    "sha256": "f6ef68f812b940e929cd78d64fced2f97ca88d6a37fbdad8b328d24bdcd459fb",
+    "bytes": 2370,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/joint-native-frontier.spec.ts": {
+    "sha256": "9721b8b628b296a1738a51a74d08498cf48814a71367de32d505c4e720740de5",
+    "bytes": 1725,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/joint-rich-publication.spec.ts": {
+    "sha256": "7ba34efc2875e22b10fdd6d2945dad822a09eac5b0cc49a6f0e707648877cf98",
+    "bytes": 2012,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/link-native-address.spec.ts": {
+    "sha256": "c0fc48dbb27f371866f870515949e42b2ebf200e85ac6577945167d690427913",
+    "bytes": 1501,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/parent-freshness-counterparts.spec.ts": {
+    "sha256": "9be14e49e2849f084e61384034d5919695b2c8c5478204bcc4dd44cee454f126",
+    "bytes": 5266,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/scalar-frame-publication.spec.ts": {
+    "sha256": "ffe4021bb3da2f680d384dec8690caba0b6e46cb38f5870c91c7fd915ca4787a",
+    "bytes": 1902,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/selected-callback-facade.spec.ts": {
+    "sha256": "6375753efbdf8007f15c275a0d4e25d60e6fa9ca7bf0d74e63c74fa6bb3965fb",
+    "bytes": 6610,
+    "baseSha256": null
+  },
+  "packages/solid/src/lib/solid-observation.ts": {
+    "sha256": "1007de2283f5af3c0c2ee2e535ccfe7bb926a0a4be73a9aab8ce097a2c69ec13",
+    "bytes": 5306,
+    "baseSha256": "637c48e331243a37625ae7f6b99cfd993a6d278bf4236e5cc962eb8603c0211b"
+  },
+  "packages/vue/src/lib/current-read-capability.spec.ts": {
+    "sha256": "aa1d788f243b27969b80197a2ba3fa7763121ae255717e73c3f98834e0787f42",
+    "bytes": 6725,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/current-read-capability.typing.spec.ts": {
+    "sha256": "75ddabe9915566b92e2d42288bd782959824ffd429387ae6820a1d98e8adc5eb",
+    "bytes": 335,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/declared-publication-composition.spec.ts": {
+    "sha256": "372939242e3aa63333d2ee42c59444ea6e72340643ff5ead3d44549dbfc42232",
+    "bytes": 4485,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/entity-native-obligation-composition.spec.ts": {
+    "sha256": "a04d067f3f91ba84b6d23d69d88f03428309123947e89eb36d475654569bccce",
+    "bytes": 2372,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/entity-projection-publication.spec.ts": {
+    "sha256": "2f378851f39074ce65708a2e220542a9380bbfef4383756bc79cbee3fd378f03",
+    "bytes": 11799,
+    "baseSha256": "cdb0d3691b697774b8af117406e560b063111137fad9c2f198147a17a138e810"
+  },
+  "packages/vue/src/lib/joint-direct-independent.spec.ts": {
+    "sha256": "fe28e7af85a23fc4f60f569084b738d54f9064aa45c9ae0be7347a125d44729e",
+    "bytes": 1910,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/joint-direct-probe.spec.ts": {
+    "sha256": "21011e784a08a6fdf03e02da3826d6aa6413b320c8fa12b746f9604a8b0a7d9d",
+    "bytes": 2688,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/joint-native-frontier.spec.ts": {
+    "sha256": "7f404a29d68ecd3288262e19dc8ac8d09486dc833196d5744a181f928daaad25",
+    "bytes": 1662,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/joint-rich-publication.spec.ts": {
+    "sha256": "af139ec5c9a5eeb92e14e65573e197c71e641e4f9ace380062aa8e8078862259",
+    "bytes": 2035,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/joint-rollback-frontier.spec.ts": {
+    "sha256": "f060d14eaad43872dabf68ed359d849c12ce9af5a521a98c4e0c27e4f462d20c",
+    "bytes": 1291,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/link-native-address.spec.ts": {
+    "sha256": "67df0698bb41869e0b61c42b6374cf6fb8318a7e73546933b9a25b7e3e31802a",
+    "bytes": 1510,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/parent-freshness-counterparts.spec.ts": {
+    "sha256": "8cdac84212260f1dea2964c75b96927b70476248dd62a858a5ab7e762767f073",
+    "bytes": 5127,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/scalar-frame-publication.spec.ts": {
+    "sha256": "29f477126e403b7bb14aa450daacc014c6a0413684a1fb1eabbcee6f13fe4105",
+    "bytes": 1901,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/selected-active-id-preparation.spec.ts": {
+    "sha256": "05d118ddbd5fbc4f27aed441b8cfa3eefc96f076247f8cb53c41574698a5794f",
+    "bytes": 2157,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/selected-callback-facade.spec.ts": {
+    "sha256": "92e198d5db1772e5ec6fad15130f643cb2ce21485e748c58641c6e5c9dc2cd78",
+    "bytes": 8829,
+    "baseSha256": null
+  },
+  "packages/vue/src/lib/settlement-publication.spec.ts": {
+    "sha256": "23139a888410c08a62ad9493497c1582fb8f8e9def6e484c397791d10a6f6837",
+    "bytes": 11205,
+    "baseSha256": "cb69e5829ae69bea669e631646ce57c47ec6c922011d475a6af1ce6491cbc49d"
+  },
+  "packages/vue/src/lib/vue-observation.ts": {
+    "sha256": "cd1d1276fe946a7166f68addb3ca08a1375980ce82c816a47092fc8719fc2bce",
+    "bytes": 5568,
+    "baseSha256": "c4678206e2bd3be2c5d4353e411c4f4c8615b31023bbea210d530ce2e50a3bc4"
+  },
+  "tools/check-forwarding-retention.mjs": {
+    "sha256": "e2aa24c5fef96465f11a9ec8809175cc9cd60f6006847f1a4c2d28c8e74659e6",
+    "bytes": 3816,
+    "baseSha256": null
+  },
+  "tools/experiments/native-publication-diagnostics/README.md": {
+    "sha256": "9aa4ec1c0eee8e36dd4618e587e5b4af97b90defc95f4ee5d6489e257933363a",
+    "bytes": 2447,
+    "baseSha256": null
+  },
+  "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts": {
+    "sha256": "d33106aa93fc9795bdee00020333685002fffba1fc29bf3283fdd9e305e2799b",
+    "bytes": 4800,
+    "baseSha256": null
+  },
+  "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts": {
+    "sha256": "3189b76033d12630ba386373f25aab8004ffda077431fb3e4ec7a2462f32c256",
+    "bytes": 4864,
+    "baseSha256": null
+  },
+  "tools/experiments/native-publication-diagnostics/replay.config.ts": {
+    "sha256": "e76680ddb5a441d1c85d5f011d3fde3074a1d6409a57c4cc5aa6ce49c35877b8",
+    "bytes": 644,
+    "baseSha256": null
+  },
+  "tools/experiments/native-publication-diagnostics/run.mjs": {
+    "sha256": "d69c6e8858f255edc873dfabb54486e6655ee4386c1f9403851d665500e7ee6a",
+    "bytes": 3700,
+    "baseSha256": null
+  },
+  "tools/held-continuation-probe/project.json": {
+    "sha256": "1e545fda3ed2a6e0c4588c193154805834a64b01e1a8b27ad032c277edea9582",
+    "bytes": 588,
+    "baseSha256": null
+  },
+  "tools/lib/heap-quiescence.d.mts": {
+    "sha256": "b608c54ce64618302603e58d22505161e9149767799d545ad447506f9979aa9c",
+    "bytes": 105,
+    "baseSha256": null
+  },
+  "tools/verify-gates.mjs": {
+    "sha256": "fd51a412d12dd68d95754459f36de09278d4ddbec52253a241e0b834b3c62d18",
+    "bytes": 87656,
+    "baseSha256": "21ac1c5f2e2e1b347af819f685d0b9ce7c58bc330092312c9819a2d6b8980843"
+  },
+  "tsconfig.typecheck-specs.json": {
+    "sha256": "eef22a7719802a318a3fb0e1db3b329ead8b53f5a8fed6f538b79d164c8ab003",
+    "bytes": 760,
+    "baseSha256": "24925071ff6eb7819abfce8de23213f59fa2e5da5b6fd361951208378f040bff"
+  },
+  "vitest.config.ts": {
+    "sha256": "4e909a5a9e82a5dad175042086bf1d9438c0a22baea711684a250aa0a12fa7f5",
+    "bytes": 445,
+    "baseSha256": "b414af05494ac95a58b300635f3fb6fe5edc794fcd4f0c5094f592b0148089b3"
+  }
+}

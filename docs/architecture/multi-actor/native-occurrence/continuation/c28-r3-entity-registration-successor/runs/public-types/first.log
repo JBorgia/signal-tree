@@ -1,0 +1,4 @@
+
+> @signaltree/workspace@16.0.0-dev typecheck:typing /private/tmp/st-c28-r3-entity-registration-successor/candidate
+> tsc --noEmit -p packages/kernel/tsconfig.typecheck.json
+

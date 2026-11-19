@@ -1,0 +1,1 @@
+packages/kernel/src/lib/internals/scalar-publication-coverage.ts(25,30): error TS2353: Object literal may only specify known properties, and '[CONTRIBUTIONS]' does not exist in type 'WriteMetadata'.

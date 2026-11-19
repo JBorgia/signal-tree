@@ -1,0 +1,19 @@
+{
+  "calls": 2,
+  "seen": [
+    "y",
+    "x"
+  ],
+  "after": {
+    "x": 7,
+    "y": 0,
+    "z": 4
+  },
+  "final": {
+    "x": 7,
+    "y": 0,
+    "z": 4
+  },
+  "error": "Error: Cannot update entity: second required inverse refused",
+  "followError": "Error: Cannot confirm a rolled back transaction"
+}

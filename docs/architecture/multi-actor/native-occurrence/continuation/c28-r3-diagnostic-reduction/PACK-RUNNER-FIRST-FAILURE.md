@@ -1,0 +1,1 @@
+First publisher-runner invocation stopped before executing because the new MANIFEST.json had not yet been written. No artifact or runtime mutation occurred. Main froze source, then reran. The temporary graph-backed lint launcher was preserved as lint-executed.cjs and removed from candidate; it was diagnostic orchestration only.

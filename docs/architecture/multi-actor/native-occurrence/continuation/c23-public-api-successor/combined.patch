@@ -1,0 +1,228 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/publication-declaration.ts
+@@ -0,0 +1,31 @@
++import type { PendingTransaction } from '../enhancers/transactions/transactions.types';
++import type { SignalTreeRollbackError } from './types';
++
++type DeclarationOwner = PendingTransaction | NonNullable<SignalTreeRollbackError['recovery']>['transaction'];
++
++/** Complete contributor declaration for one synchronous Link operation.
++ * Handles identify dependencies; they do not transfer write ownership.
++ * Runtime authenticates handles. Types cannot prove hidden-input completeness.
++ */
++export type PublicationDeclaration =
++  | Readonly<{ kind: 'independent' }>
++  | Readonly<{ kind: 'dependent'; owners: readonly DeclarationOwner[] }>
++  | Readonly<{ kind: 'unknown' }>;
++
++/** Admission status, not transport acknowledgment or a publication capability. */
++export type PublicationState =
++  | Readonly<{ state: 'validating' }>
++  | Readonly<{ state: 'no-write' }>
++  | Readonly<{ state: 'held'; reason: 'pending-dependency' }>
++  | Readonly<{ state: 'eligible'; basis: 'declared' }>
++  | Readonly<{ state: 'conservative'; reason: 'invalid-declaration' | 'unknown' | 'rejected-dependency' }>
++  | Readonly<{ state: 'started'; basis: 'declared' | 'surviving' }>
++  | Readonly<{ state: 'superseded' }>
++  | Readonly<{ state: 'disposed' }>;
++
++/** Frozen handle; read returns the current detached immutable status snapshot.
++ * This is not a signal, subscription, cancellation handle or delivery promise.
++ */
++export interface PublicationReceipt {
++  readonly read: () => PublicationState;
++}
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,3 +1,4 @@
++import type { PublicationDeclaration, PublicationReceipt } from './publication-declaration';
+ import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
+ import './experimental-publication/entity';
+ import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+@@ -135,13 +136,22 @@
+ }
+ 
+ /**
+- * The handle. Deliberately three members.
++ * The handle: declaration admission and relationship lifecycle.
+  *
+  * No `subscribe()`, no `then()`, no retry/backoff/status, no `afterGet`/
+  * `afterSet`/`afterChange` — none of those were earned by a demonstrated
+  * third-party authoring need, and "might be useful" is UNPROVEN, not PUBLIC.
+  */
+ export interface Link {
++  /** Declare contributors for synchronous writes to this connection's source.
++   * The callback result is discarded. Writes may remain if validation throws.
++   * PromiseLike returns are rejected by inference; erased types and other
++   * thenables still require runtime validation. No declaration crosses await.
++   */
++  declare<R>(
++    declaration: PublicationDeclaration,
++    work: (() => R) & (Extract<R, PromiseLike<unknown>> extends never ? unknown : never)
++  ): PublicationReceipt;
+   /** Pull Y into X once. Rejects if the endpoint supplies no `get()`. */
+   retrieve(): Promise<void>;
+   /**
+--- a/packages/kernel/src/index.ts
++++ b/packages/kernel/src/index.ts
+@@ -170,6 +170,8 @@
+ // and no third-party authoring need has earned the symbol. It stays exported
+ // from `link.ts` for declaration emit only.
+ export type { Link, LinkEndpoint } from './lib/link';
++export type { PublicationDeclaration, PublicationReceipt, PublicationState } from './lib/publication-declaration';
++export { SignalTreePublicationError } from './lib/experimental-publication/lifecycle';
+ 
+ // `getPathNotifier` is not root app API. `composeEnhancers` left the root barrel
+ // in v12 too and was deleted outright in 15.0 — pass the enhancers declaratively:
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -1,3 +1,4 @@
++import type { PublicationState } from '../publication-declaration';
+ import { isTraversableNode } from '../internals/node-shape';
+ import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ // Private native experiment; no package export. Publication authority only.
+@@ -74,7 +75,7 @@
+  if(owner!==undefined){const cell=ownerCell(owner,id);if(cell)authentic.set(handle,cell);}
+  return handle;
+ }
+-type State = Readonly<{state:string;reason?:string;basis?:string}>;
++type State = PublicationState;
+ type View = {value:State};
+ type Connection={report:(error:unknown)=>void;wake:()=>void;supported:boolean;ops:Map<object,Operation>;disposed:boolean};
+ type Horizon={frames:Set<Frame>;requirements:Set<NativeRequirement>;open:number};
+@@ -226,7 +227,7 @@
+ let reporting=false;
+ export class SignalTreePublicationError extends Error{
+  readonly code='SIGNALTREE_PUBLICATION_DECLARATION_INVALID';
+- constructor(readonly stage:'before-callback'|'after-callback',readonly reason:string,options?:{cause?:unknown}){super(`Declaration invalid: ${reason}; writes may remain`);if(options && 'cause' in options)Object.defineProperty(this,'cause',{value:options.cause,writable:true,configurable:true});}
++ constructor(readonly stage:'before-callback'|'after-callback',readonly reason:'malformed'|'unavailable-owner'|'contradiction'|'async-callback'|'validation-threw'|'disposed'|'unsupported-source',options?:{cause?:unknown}){super(`Declaration invalid: ${reason}; writes may remain`);if(options && 'cause' in options)Object.defineProperty(this,'cause',{value:options.cause,writable:true,configurable:true});}
+ }
+ export function registerConnection(channel:object,options:{report:(error:unknown)=>void;wake:()=>void;supported:boolean}):void{
+  if(connections.has(channel))throw Error('Publication connection already registered');
+--- a/packages/kernel/src/lib/tree-error-public-contract.spec.ts
++++ b/packages/kernel/src/lib/tree-error-public-contract.spec.ts
+@@ -230,12 +230,14 @@
+     cap.stop();
+   });
+ 
+-  it('the Link handle is still exactly three members', async () => {
+-    const tree = makeTree();
+-    await flush();
+-    const l = link(tree.$.settings.theme, { set: failing });
+-
+-    expect(Object.keys(l).sort()).toEqual(['dispose', 'retrieve', 'settled']);
++  it('the approved Link handle has exactly four callable members', async () => {
++    const tree = makeTree();
++    await flush();
++    const l = link(tree.$.settings.theme, { set: failing });
++
++    expect(Object.keys(l).sort()).toEqual(['declare', 'dispose', 'retrieve', 'settled']);
++    for (const member of ['declare', 'dispose', 'retrieve', 'settled'] as const)
++      expect(typeof l[member]).toBe('function');
+     l.dispose();
+   });
+ });
+--- a/packages/kernel/src/lib/aggregate-installed-publication.spec.ts
++++ b/packages/kernel/src/lib/aggregate-installed-publication.spec.ts
+@@ -129,7 +129,8 @@
+   try{
+    const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x+1,y:input.pair.y}})));
+    // Historical hold oracle corrected by 75c645eb's explicit recipient-only exception.
+-   expect(receipt.read().basis).not.toBe('declared');
++   const admission = receipt.read();
++   expect('basis' in admission ? admission.basis : undefined).not.toBe('declared');
+    await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).toEqual([{x:1,y:0}]);
+    expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});
+    expect(owner.$.z()).toBe(7);p.rollback();await flush();expect(sent).toEqual([{x:1,y:0}]);await c.settled();
+--- /dev/null
++++ b/packages/kernel/src/lib/link-declaration-public.spec.ts
+@@ -0,0 +1,35 @@
++import { expect, it } from 'vitest';
++import { entityMap, leaf, link, signalTree, transactions, SignalTreePublicationError, type Link, type PublicationReceipt } from '../index';
++const flush = async () => { for (let i=0;i<120;i++) await Promise.resolve(); };
++type Case = { destroy():void; connect(set:(v:unknown)=>void):Link; write():void; expected:unknown };
++const cases:readonly (readonly [string,()=>Case])[] = [
++ ['leaf',()=>{const t=signalTree({x:0});return {destroy:()=>t.destroy(),connect:set=>link(t.$.x,{set}),write:()=>{t.$.x(1);},expected:1};}],
++ ['atomic object leaf',()=>{const t=signalTree({x:leaf({n:0})});return {destroy:()=>t.destroy(),connect:set=>link(t.$.x,{set}),write:()=>{t.$.x({n:1});},expected:{n:1}};}],
++ ['branch',()=>{const t=signalTree({box:{x:0}});return {destroy:()=>t.destroy(),connect:set=>link(t.$.box,{set}),write:()=>{t.$.box.x(1);},expected:{x:1}};}],
++ ['root',()=>{const t=signalTree({x:0});return {destroy:()=>t.destroy(),connect:set=>link(t.$,{set}),write:()=>{t.$.x(1);},expected:{x:1}};}],
++ ...(['entity field','direct row','collection'] as const).map(kind=>[kind,()=>{
++   const t=signalTree({rows:entityMap<{id:string;n:number},string>()});t.$.rows.addOne({id:'a',n:0});const row=t.$.rows.byIdOrFail('a');
++   return {destroy:()=>t.destroy(),connect:(set:(v:unknown)=>void)=>kind==='entity field'?link(row.n,{set}):kind==='direct row'?link(row,{set}):link(t.$.rows,{set}),write:()=>{row.n(1);},expected:kind==='entity field'?1:kind==='direct row'?{id:'a',n:1}:[{id:'a',n:1}]};
++ }] as const),
++];
++it.each(cases)('public declare admits existing %s without changing foreign ownership',async(_name,make)=>{
++ const fixture=make(),owner=signalTree({n:0},{enhancers:[transactions()]});await flush();
++ const sent:unknown[]=[];const c=fixture.connect(v=>{sent.push(v);});const q=owner.transact(()=>owner.$.n(7));const inspection=q.inspect();
++ try{
++  const receipt:PublicationReceipt=c.declare({kind:'independent'},fixture.write);await flush();await c.settled();
++  expect(sent).toEqual([fixture.expected]);expect(receipt.read()).toEqual({state:'started',basis:'declared'});
++  expect(q.inspect()).toEqual(inspection);expect(owner.$.n()).toBe(7);
++  expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(receipt.read())).toBe(true);
++  const empty=c.declare({kind:'independent'},()=>{});expect(empty.read()).toEqual({state:'no-write'});
++  q.rollback();await flush();await c.settled();expect(owner.$.n()).toBe(0);expect(sent).toEqual([fixture.expected]);
++ }finally{c.dispose();fixture.destroy();owner.destroy();}
++});
++it('public declaration error is the actual instance; disposed work never runs',()=>{
++ const t=signalTree({x:0});const c=link(t.$.x,{set:()=>{}});c.dispose();let calls=0;
++ try{let error:unknown;try{c.declare({kind:'independent'},()=>{calls++;t.$.x(1);});}catch(e){error=e;}
++ expect(error).toBeInstanceOf(SignalTreePublicationError);expect(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'before-callback',reason:'disposed'});expect(calls).toBe(0);expect(t.$.x()).toBe(0);
++ }finally{t.destroy();}
++});
++it('public typing does not grant an unowned callable runtime admission',()=>{
++ expect(()=>link(()=>1,{set:()=>{}})).toThrow(/owned SignalTree location/);
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/link-declaration.typing.spec.ts
+@@ -0,0 +1,51 @@
++/** Public source typing controls; compiled, not executed. Installed-package qualification is separate. */
++import { signalTree, entityMap, leaf, type PendingTransaction } from '@signal-tree/kernel';
++import { link, SignalTreePublicationError, type PublicationReceipt, type PublicationState } from '@signal-tree/kernel';
++declare const owner: PendingTransaction;
++function examples() {
++  const t = signalTree({x:0,pair:{x:0},atomic:leaf({x:0}),rows:entityMap<{id:string;x:number},string>()});
++  const c = link(t.$.x,{set:value=>{const n:number=value;void n;}});
++  c.declare({kind:'independent'},()=>t.$.x(1));
++  c.declare({kind:'dependent',owners:[owner]},()=>t.$.x(2));
++  c.declare({kind:'unknown'},()=>3); // returned value is discarded, not a second payload
++  // @ts-expect-error ordinary Promise return is rejected
++  c.declare({kind:'independent'},async()=>t.$.x(3));
++  // @ts-expect-error a union that can return a Promise is also rejected
++  c.declare({kind:'unknown'},():number|Promise<number>=>Math.random()?1:Promise.resolve(1));
++  // @ts-expect-error missing owners
++  c.declare({kind:'dependent'},()=>{});
++  const receipt:PublicationReceipt=c.declare({kind:'independent'},()=>{});
++  // @ts-expect-error receipt method is read-only
++  receipt.read=()=>({state:'no-write'});
++  // @ts-expect-error detached status snapshot is read-only
++  receipt.read().state='disposed';
++  link(t.$.atomic,{set:value=>{const n:number=value.x;void n;}});
++  link(t.$.pair,{set:value=>{const n:number=value.x;void n;}});
++  link(t.$.rows,{set:value=>{const rows:readonly {id:string;x:number}[]=value;void rows;}});
++  link(t.$.rows.byIdOrFail('a'),{set:value=>{const n:number=value.x;void n;}});
++  const plain=signalTree({x:0,pair:{x:0}});
++  link(plain.$,{set:value=>{const n:number=value.pair.x;void n;}});
++  // @ts-expect-error marker-bearing root admission remains excluded
++  link(t.$,{set:()=>{}});
++  // Existing structural ownership limit: type admission is not proof of a live tree registry.
++  link(()=>1,{set:()=>{}}); // runtime link must reject; no new acceptance is proposed
++  const erased:()=>void=async()=>{};
++  c.declare({kind:'unknown'},erased); // TS void erasure: runtime thenable guard remains mandatory
++  c.declare<unknown>({kind:'unknown'},async()=>{}); // explicit erasure cannot be statically policed
++  const partialThenable=()=>({then:()=>{}});
++  c.declare({kind:'unknown'},partialThenable); // not PromiseLike<T>, but runtime rejects callable then
++  // @ts-expect-error branch containing EntityMap remains rejected
++  link(signalTree({box:{rows:entityMap<{id:string},string>()}}).$.box,{set:()=>{}});
++  // @ts-expect-error source rejection also applies to subscribe-only endpoints
++  link(t.$,{subscribe:()=>()=>{}});
++  const error = new SignalTreePublicationError('after-callback','async-callback',{cause:owner});
++  const code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID'=error.code;void code;
++  // @ts-expect-error unknown declaration error reason is not public contract
++  new SignalTreePublicationError('before-callback','invented');
++  // @ts-expect-error historical proposal state is not emitted
++  const notEmitted:PublicationState={state:'eligible',basis:'surviving'};void notEmitted;
++  // @ts-expect-error unavailable owner is an error, not a receipt state
++  const notStatus:PublicationState={state:'conservative',reason:'unavailable-owner'};void notStatus;
++  return [t,plain];
++}
++void examples;

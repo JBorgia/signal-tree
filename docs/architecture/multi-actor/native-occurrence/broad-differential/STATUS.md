@@ -1,0 +1,3 @@
+Setup completed: both verified source copies and fixture inventory are present.
+Successor kernel acquired the fixed-output serialization lock first and is executing Vitest; its first.log contains new worker output and has grown between observations. Predecessor kernel has written COMMAND.json and waits on that lock before backing up fixed /tmp outputs or creating its log. This is intentional serialization, not a missing subprocess launch for successor.
+The runner prints driver.log entries only after subprocess completion. Framework commands are queued behind these first two executor jobs. No rerun, source edit or harness failure identified at this stage.

@@ -1,0 +1,41 @@
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/entity-signal.ts:419:  const version = locations.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/entity-signal.ts:2255:    const cell = locations.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/entity-signal.ts:2287:    const created = locations.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/enhancers/devtools/devtools-impl.ts:275:  ).createCell<ModularPerformanceMetrics>({
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts:57:      const cell = NEUTRAL_LOCATION_RUNTIME.createCell(payload);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/unwrap-symbol-keys.spec.ts:10:  markTreeCell(NEUTRAL_LOCATION_RUNTIME.createCell(value));
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/markers/marker-contract.spec.ts:7:const signal = createReactiveTestRealization().locations.createCell;
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/link-2-x-constraint.typing.spec.ts:53:const signal = testRealization.locations.createCell;
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/signal-tree.ts:1530:    return materializationContext.locationRuntime.createCell(value, equal);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/signal-tree.ts:2049:  const destroyedSig = materializationContext.locationRuntime.createCell(false);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/snapshot-builder.spec.ts:10:const signal = createReactiveTestRealization().locations.createCell;
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/link-1-relationship.spec.ts:20:const signal = testRealization.locations.createCell;
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts:130: * by `createCell` and live only inside a private `Map` in `createEntitySignal`.
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/enhancers/restoration/restoration.ts:747:    this.indexSignal = locations.createCell(-1);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/enhancers/restoration/restoration.ts:748:    this.historyVersion = locations.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/enhancers/restoration/restoration.ts:749:    this.frontierVersion = locations.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts:10:const signal = createReactiveTestRealization().locations.createCell;
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime-retention.spec.ts:35:    const source = runtime.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/native-location-realization.ts:153:  const createCell = <T>(
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/native-location-realization.ts:333:    createCell,
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.ts:317:  createCell<T>(
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.ts:555:  const createCell = <T>(
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.ts:687:   * This started as a wrapper around `createCell`, and that was wrong for a
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.ts:734:    createCell,
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/custom-markers.spec.ts:14:const signal = testRealization.locations.createCell;
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/native-projection-observability.spec.ts:15: * cut `createCell` locations took in `SUBJECT-STATE-MINIMAL-0`.
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/snapshot-authority.ts:40:    revision = locations.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:11:    const source = NEUTRAL_LOCATION_RUNTIME.createCell(2);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:31:    const location = NEUTRAL_LOCATION_RUNTIME.createCell('a');
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:49:    const chooseLeft = NEUTRAL_LOCATION_RUNTIME.createCell(true);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:50:    const left = NEUTRAL_LOCATION_RUNTIME.createCell(1);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:51:    const right = NEUTRAL_LOCATION_RUNTIME.createCell(10);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:73:    const rows = NEUTRAL_LOCATION_RUNTIME.createCell([
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:101:    const source = runtime.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:122:    const source = runtime.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:142:    const first = firstRuntime.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:143:    const second = secondRuntime.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:184:    const location = runtime.createCell(0);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts:194:    const location = NEUTRAL_LOCATION_RUNTIME.createCell(1);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/cell-identity.spec.ts:8:    expect(isTreeCell(NEUTRAL_LOCATION_RUNTIME.createCell(1))).toBe(true);
+/private/tmp/st-c21-undispatched-kernel/candidate/packages/kernel/src/lib/internals/cell-identity.spec.ts:49:    const cell = markTreeCell(rt.createCell(7));

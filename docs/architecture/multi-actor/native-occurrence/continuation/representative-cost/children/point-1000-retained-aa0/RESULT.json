@@ -1,0 +1,21 @@
+{
+  "id": "point-1000-retained-aa0",
+  "ordinal": 13,
+  "profile": "point",
+  "size": 1000,
+  "arm": "retained",
+  "label": "aa0",
+  "exit": 0,
+  "pid": 69927,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.6943722920259461,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1064960,
+  "minimumObservedHostFreePercentage": 49.0,
+  "attempts": 1
+}

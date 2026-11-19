@@ -1,0 +1,9 @@
+{
+  "tmpdirPreflight": "rejected before consumer creation",
+  "registryOfflineNegative": "0/2 proven, 2 errored; baseline-ci setup failure",
+  "registryNormal": "2/2 passed; clean baseline, behavioral mutation, clean recovery",
+  "registryBlindnessPositive": "2/2 proven, identified witness exit42",
+  "toolRestoredHash": "a73bd9e58aeccee5cb5969432326b9de0e1b4025fc8f897b99ec61787732c828",
+  "node": "v24.15.0",
+  "npm": "11.12.1"
+}

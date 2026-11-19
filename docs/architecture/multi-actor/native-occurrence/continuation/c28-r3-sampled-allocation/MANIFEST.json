@@ -1,0 +1,8 @@
+{
+  "FIRST-ENVIRONMENT-FAILURES.txt": "8dc14f2c5bd97ad575a91613897d83ae01ffeaa410faa11fa589227d82cd3a97",
+  "REPORT.md": "57f756e4253dc3555b4a2381b28603a90b8f5fa6314756640a99dbb3e8bbeebb",
+  "VERSIONS.json": "aaa3824a57034e5048826bf90e736f4fa103fe57b29e5f658a243e0ffe50fb74",
+  "pinned-js_protocol.pdl": "9541b1454d1c352ef852dc0b6321569438271731068c803f980afb65def58982",
+  "pinned-sampling-heap-profiler.cc": "3178f7f8a478a0382a23c150c9363de67df6faae5c0d8f04504fc6dff9ecf96b",
+  "pinned-v8-heap-profiler-agent-impl.cc": "4c84ced886f91fd3762a67dca76f897ec477126c7dff9c21a0391b8d9d6ab3dc"
+}

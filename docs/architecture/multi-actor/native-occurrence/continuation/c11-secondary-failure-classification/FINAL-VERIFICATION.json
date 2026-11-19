@@ -1,0 +1,22 @@
+{
+  "candidate": {
+    "scratch": {
+      "checked": 3045,
+      "mismatches": []
+    },
+    "frozen": {
+      "checked": 3045,
+      "mismatches": []
+    }
+  },
+  "oracle": {
+    "scratch": {
+      "checked": 3031,
+      "mismatches": []
+    },
+    "frozen": {
+      "checked": 3031,
+      "mismatches": []
+    }
+  }
+}

@@ -1,0 +1,250 @@
+
+ NX   Running target test for 5 projects:
+
+- kernel
+- angular
+- vue
+- solid
+- react
+
+With additional flags:
+  selected-callback-facade
+  --maxWorkers=2
+
+
+
+> nx run kernel:test selected-callback-facade --maxWorkers=2
+
+> node tools/run-core-vitest.mjs selected-callback-facade --maxWorkers=2
+
+(node:77393) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/kernel
+
+(node:77407) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:48:08
+   Duration  1.17s (transform 587ms, setup 0ms, import 708ms, tests 18ms, environment 349ms)
+
+
+> nx run react:test selected-callback-facade --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/react/tsconfig.spec.json && npx vitest run --config packages/react/vitest.config.ts selected-callback-facade --maxWorkers=2
+
+(node:77888) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:78403) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78426) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:262:8[90m)[39m
+    at parseExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24[90m)[39m
+[90m    ... 3 lines matching cause stack trace ...[39m
+    at async Promise.all (index 2)
+    at async resolveConfig [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3[90m)[39m
+    at async _createServer [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66[90m)[39m
+    at async createViteServer [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:8835:17[90m)[39m
+    at async createVitest [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:14221:18[90m)[39m {
+  code: [32m'EXTENDS_RESOLVE'[39m,
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+  [90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)[39m
+  [90m    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)[39m
+  [90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)[39m
+  [90m    at require.resolve (node:internal/modules/helpers:171:31)[39m
+      at resolveExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:250:14[90m)[39m
+      at parseExtends [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24[90m)[39m
+      at Module.parse [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:54:23[90m)[39m
+      at async Promise.all (index 9)
+      at async configResolved [90m(file:///private/tmp/st-selected-projection-repair/[39mnode_modules/[4m.pnpm[24m/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/[4mvite-tsconfig-paths[24m/dist/index.js:117:9[90m)[39m
+      at async Promise.all (index 2) {
+    code: [32m'MODULE_NOT_FOUND'[39m,
+    requireStack: [
+      [32m'/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+    ]
+  },
+  tsconfigFile: [32m'/private/tmp/st-selected-projection-repair/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+}
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/react
+
+(node:78433) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  12:48:12
+   Duration  1.05s (transform 446ms, setup 0ms, import 546ms, tests 15ms, environment 411ms)
+
+
+> nx run angular:test selected-callback-facade --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:78436) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78459) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/angular
+
+(node:78473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+retained-native-metadata false
+
+ ❯ src/lib/selected-callback-facade.spec.ts (5 tests | 1 failed) 24ms
+   × retains coherent native metadata on one callback-acquired reader 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+AssertionError: expected { …(2) } to be { …(2) } // Object.is equality
+
+If it should pass with deep equality, replace "toBe" with "toStrictEqual"
+
+Expected: { …(2) }
+Received: serializes to the same string
+
+
+Compared values have no visual difference.
+
+ ❯ Object.onAdd src/lib/selected-callback-facade.spec.ts:239:21
+    237|       const after = held[SIGNAL];
+    238|       console.log('retained-native-metadata', Object.is(before, after)…
+    239|       expect(after).toBe(before);
+       |                     ^
+    240|     },
+    241|   });
+ ❯ emitTap ../kernel/src/lib/entity-signal.ts:2061:24
+ ❯ addOneWithStructuralEffect ../kernel/src/lib/entity-signal.ts:1912:5
+ ❯ addOne ../kernel/src/lib/entity-signal.ts:2769:14
+ ❯ Proxy.api.<computed> ../kernel/src/lib/entity-signal.ts:3968:16
+ ❯ src/lib/selected-callback-facade.spec.ts:243:17
+ ❯ new ZoneAwarePromise ../../node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  12:48:13
+   Duration  1.30s (transform 670ms, setup 170ms, import 799ms, tests 24ms, environment 221ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade --maxWorkers=2" exited with non-zero status code
+> nx run vue:test selected-callback-facade --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts selected-callback-facade --maxWorkers=2
+
+(node:78930) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:78986) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:79013) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/vue
+
+(node:79020) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+retained-native-metadata false
+
+ ❯ src/lib/selected-callback-facade.spec.ts (5 tests | 1 failed) 23ms
+   × retains coherent native metadata on one callback-acquired reader 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+AssertionError: expected ComputedRefImpl{ …(13) } to be ComputedRefImpl{ …(13) } // Object.is equality
+
+If it should pass with deep equality, replace "toBe" with "toStrictEqual"
+
+Expected: ComputedRefImpl{ …(13) }
+Received: serializes to the same string
+
+
+Compared values have no visual difference.
+
+ ❯ Object.onAdd src/lib/selected-callback-facade.spec.ts:241:21
+    239|       const after = held.effect;
+    240|       console.log('retained-native-metadata', Object.is(before, after)…
+    241|       expect(after).toBe(before);
+       |                     ^
+    242|     },
+    243|   });
+ ❯ emitTap ../kernel/src/lib/entity-signal.ts:2061:24
+ ❯ addOneWithStructuralEffect ../kernel/src/lib/entity-signal.ts:1912:5
+ ❯ addOne ../kernel/src/lib/entity-signal.ts:2769:14
+ ❯ Proxy.api.<computed> ../kernel/src/lib/entity-signal.ts:3968:16
+ ❯ src/lib/selected-callback-facade.spec.ts:245:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  12:48:17
+   Duration  690ms (transform 465ms, setup 0ms, import 593ms, tests 23ms, environment 0ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts selected-callback-facade --maxWorkers=2" exited with non-zero status code
+> nx run solid:test selected-callback-facade --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts selected-callback-facade --maxWorkers=2
+
+(node:79272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:80049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80071) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/solid
+
+(node:80078) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  12:48:20
+   Duration  556ms (transform 390ms, setup 0ms, import 468ms, tests 15ms, environment 0ms)
+
+
+
+
+ NX   Running target test for 5 projects failed
+
+Failed tasks:
+
+- angular:test
+- vue:test
+
+  Run duration:      13.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.0s (1 task)
+  Recoverable time:  9.7s (71% of the run)
+
+  Recommendations:
+    - Increase parallelism to recover up to 9.7s → https://nx.dev/docs/concepts/ci-concepts/parallelization-distribution?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=parallelization.
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.

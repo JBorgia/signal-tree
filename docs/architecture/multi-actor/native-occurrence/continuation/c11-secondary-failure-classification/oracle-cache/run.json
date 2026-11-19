@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel independent-metadata-fields-v2.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T17:29:52.357Z",
+    "endTime": "2026-11-02T17:29:55.053Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14931903445160691495",
+      "startTime": "2026-11-02T17:29:52.421Z",
+      "endTime": "2026-11-02T17:29:55.053Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

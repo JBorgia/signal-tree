@@ -1,0 +1,10 @@
+{
+  "REVIEW.md": "3d88c65a23700b8a5d1891c4b000324795ea5f9e83bd478932a63b0cd13dbd08",
+  "IDENTITY.json": "3c49e3612e6bb331bede1abd639b673199a4a75ae5edbcdfc76a8b20723c2be4",
+  "candidate/packages/kernel/src/lib/whole-rollback-policy-trace.spec.ts": "70f7f34abdd33bb9b7c77e7f3e0067b4f0c065a35f3e4e4ead1ea7891d41a2b0",
+  "runs/bounded-trace/COMMAND.json": "9f9b43afca80809d2f6fe5bf805e4b52d8942920bc50d614346856e1bf08adab",
+  "runs/bounded-trace/RESULT.json": "c029ccc9f6132d5390aa77e256ec366afe5acbdbc351698a1f651484e1468f56",
+  "runs/bounded-trace/SOURCE-BEFORE.json": "99439cdf43403cdfa147942a85d6284d9e21262dcbc9b4f7a4df6ee36f10ee8f",
+  "runs/bounded-trace/first.log": "9ef8f8b17f23f7820c4c98fa310d4c4ad6b3b0c862b60aab6e53146cf6bf96eb",
+  "runs/bounded-trace/rollback-policy.json": "4938b49e38a512972682773303a90d5a35f92fb5cf76a9e6a8954bf400f6a5a1"
+}

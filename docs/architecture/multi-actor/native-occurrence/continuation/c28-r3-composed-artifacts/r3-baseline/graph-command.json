@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "/private/tmp/st-c28-r3-composed-artifacts/r3-baseline/graph-diagnostic.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-composed-artifacts/r3-baseline/candidate",
+  "noProgressSeconds": 180
+}

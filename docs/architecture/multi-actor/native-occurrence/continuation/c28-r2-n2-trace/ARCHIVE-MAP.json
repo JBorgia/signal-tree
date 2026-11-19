@@ -1,0 +1,92 @@
+[
+  {
+    "source": "EVIDENCE.json",
+    "archive": "EVIDENCE.json",
+    "sourceSha256": "0b274bb42c23c9f4bd1d22f945426ba9c28f78321f29643a1a2cb9a024648950",
+    "archiveSha256": "0b274bb42c23c9f4bd1d22f945426ba9c28f78321f29643a1a2cb9a024648950"
+  },
+  {
+    "source": "run-focused.py",
+    "archive": "run-focused.py",
+    "sourceSha256": "27485bdd38c9fe9f4d6c3c107d18e2a1de81fa540f6fb1d318b15fadc6a7a935",
+    "archiveSha256": "27485bdd38c9fe9f4d6c3c107d18e2a1de81fa540f6fb1d318b15fadc6a7a935"
+  },
+  {
+    "source": "COMPARATOR-SUMMARY.json",
+    "archive": "COMPARATOR-SUMMARY.json",
+    "sourceSha256": "1dde7a2471a298bac56cc0bc65702c0cd1fcae2d8d1263f64ee58e2cb61936a5",
+    "archiveSha256": "1dde7a2471a298bac56cc0bc65702c0cd1fcae2d8d1263f64ee58e2cb61936a5"
+  },
+  {
+    "source": "BASE-DIAGNOSTIC-MANIFEST.json",
+    "archive": "BASE-DIAGNOSTIC-MANIFEST.json.gz",
+    "sourceSha256": "740817923a09015adf05e334c13e6646f303c0a8eb1d89c156867b307251c317",
+    "archiveSha256": "4a148e0379fcae637d455f8dedfa3f69a068ed92c6253e1b9d61a42cfe9b3604"
+  },
+  {
+    "source": "ALTERNATIVES.md",
+    "archive": "ALTERNATIVES.md",
+    "sourceSha256": "96c3d69c922ef535b65a26f41dbbb13984d62565f09f8950c7e3769846ab8b9a",
+    "archiveSha256": "96c3d69c922ef535b65a26f41dbbb13984d62565f09f8950c7e3769846ab8b9a"
+  },
+  {
+    "source": "N2-FIRST.jsonl",
+    "archive": "N2-FIRST.jsonl.gz",
+    "sourceSha256": "e3ac0ced33a5e71f3c22e910d1c7da16516855895aa006e6d3c47797e3a4d14f",
+    "archiveSha256": "8cf7705beff7ea638b0c64bedd3acd76f316726ec60e4b5fbe37cc42c6198b89"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "bad45355502cbd4f5f515392864f6fe6fe6cb5c46047547654df68209828c5c7",
+    "archiveSha256": "bad45355502cbd4f5f515392864f6fe6fe6cb5c46047547654df68209828c5c7"
+  },
+  {
+    "source": "MANIFEST.json",
+    "archive": "MANIFEST.json.gz",
+    "sourceSha256": "8b61b751508892864d360552c8a70f83308157fabe9325ff57995a3143c7c6d1",
+    "archiveSha256": "e9a163989fd04e7896fc7c66036d1e512d3bd4e6700dea9ea92e764a8c9ad427"
+  },
+  {
+    "source": "trace-overlay.patch",
+    "archive": "trace-overlay.patch",
+    "sourceSha256": "052694481df6aa58f2fb27d1ea3bcf54f18037e365e689cd3a1a530f0eacc7d6",
+    "archiveSha256": "052694481df6aa58f2fb27d1ea3bcf54f18037e365e689cd3a1a530f0eacc7d6"
+  },
+  {
+    "source": "TRACE-REVIEW.md",
+    "archive": "TRACE-REVIEW.md",
+    "sourceSha256": "b6054e3f8aa24a629a9e710c6db3f186240d8c70912ce2a26cf4be60b445b5f9",
+    "archiveSha256": "b6054e3f8aa24a629a9e710c6db3f186240d8c70912ce2a26cf4be60b445b5f9"
+  },
+  {
+    "source": "runs/observational-first/RESULT.json",
+    "archive": "runs/observational-first/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "runs/observational-first/first.log",
+    "archive": "runs/observational-first/first.log",
+    "sourceSha256": "0d8c3a10f1dc09ec937acd11949c0e8b726d2a179cc700baaba4961e68963792",
+    "archiveSha256": "0d8c3a10f1dc09ec937acd11949c0e8b726d2a179cc700baaba4961e68963792"
+  },
+  {
+    "source": "runs/observational-first/SOURCE.json",
+    "archive": "runs/observational-first/SOURCE.json.gz",
+    "sourceSha256": "aa33542ff12b01c353d296311a8ca525a2b867f967891b5c9fe917943862dd45",
+    "archiveSha256": "951f0424f4aa674dccece16c37c693378defda20c9bdf525468b361717af279e"
+  },
+  {
+    "source": "runs/observational-first/COMMAND.json",
+    "archive": "runs/observational-first/COMMAND.json",
+    "sourceSha256": "82851308d976d97817b7ae934f6ca67b6aeed8d14c783d4d269555b1597bd1f0",
+    "archiveSha256": "82851308d976d97817b7ae934f6ca67b6aeed8d14c783d4d269555b1597bd1f0"
+  },
+  {
+    "source": "runs/observational-first/PROCESS.json",
+    "archive": "runs/observational-first/PROCESS.json",
+    "sourceSha256": "3198ff9a78cb79c313f700ea9a1a3c32f52764be8eb83bf4fd6ebbbd457bd03b",
+    "archiveSha256": "3198ff9a78cb79c313f700ea9a1a3c32f52764be8eb83bf4fd6ebbbd457bd03b"
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "run-direct.py": "a5a94a30527877a4da0c8f6b5142f7ea8dcd75ba3b420f60508b64d5e8685812",
+  "opaque-observations.jsonl": "129231c93ff4afe17150f86aef3ff0912f56188ecc8d92176ba3336d178d7764",
+  "run-focused.py": "d1e5a4196a8490cc88f1be1dc6723aa510bcdaebed2059974d8dd86043b5fc7f",
+  "BASE-MANIFEST.json": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b",
+  "SNAPSHOT.json": "0637bc033b63538497ccf5de26021f6fe7154a16d63c0589a3a6bcfbe816a70c",
+  "MANIFEST.json": "8845040f287d4062ff368d558e713edd5b30ad684b51d67d10ed93a9189c3f22",
+  "REVIEW.md": "2661bdeb693262d2d01970b32d374a8bf9e7528011b438976ec16a4fd5343468",
+  "ORIGINAL-SPEC-TYPES-FIRST.log": "d163a410533019eacfe4a7f6348601df69d29a1b8db56d256a9d658b38dc9d16",
+  "cached-observations.jsonl": "252049eaf9ee933d3ace57c485c7314d0aa2df8f91113e19cb0d85d4b70c6ce7",
+  "tests.patch": "4e1831819b392175a2e82fa8b635cc1e23f7c342ea9a89c109d01e76aaabb519",
+  "runs/spec-types-first/RESULT.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+  "runs/spec-types-first/first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+  "runs/spec-types-first/SOURCE.json": "1ee5b0bc15f5dbcf09f5ef5d34eeddf5b00180b88d108af0b248638c9da36bff",
+  "runs/spec-types-first/COMMAND.json": "b0d8e1ca226e33af9d5aa5b63252dfb85314de7b05fb947048c848f80647bc15",
+  "runs/spec-types-first/PROCESS.json": "ace391aaad62d90d0b9edb44683bc8cfa3e843e4c7a1d3c9536ecfcebe878f19",
+  "runs/affected-first/RESULT.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+  "runs/affected-first/first.log": "c8dfa0cd965a4d1ccac70ec496e62158a49b54cff75f83a5791d41030689dbfd",
+  "runs/affected-first/SOURCE.json": "1ee5b0bc15f5dbcf09f5ef5d34eeddf5b00180b88d108af0b248638c9da36bff",
+  "runs/affected-first/COMMAND.json": "cee090174fdb5618654edd798223ff15907ad28d5d82850b76084f8058639cf9",
+  "runs/affected-first/PROCESS.json": "0b352c36869647b1df1cfcd6ab760820df12f1b79cefe7af78b23b4cfea45c21"
+}

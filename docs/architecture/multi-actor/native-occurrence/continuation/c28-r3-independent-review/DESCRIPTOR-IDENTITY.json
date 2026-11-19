@@ -1,0 +1,14 @@
+{
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "sha256": "0d355d0ba0d64ba9d4d38042279b6f511fde66bad5cd494e12fa9545862e89af",
+    "matchesFinalDiagnostic": true
+  },
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "sha256": "763f46168dd2446d4e21f87ef883a4e5320bc0b5f7280e0ac6658f050cb451a5",
+    "matchesFinalDiagnostic": true
+  },
+  "release-check/candidate/packages/kernel/src/lib/comparator-disposal-r3.spec.ts": "fe426d7d36d9afebddec3acf7edc45dee24589a04d2bc0790d896546e660df95",
+  "release-check/runs/descriptor-first/first.log": "eb49321fb6757a2d03c111c0fa7d047e18098dbd086e9bef8285252cd03eeafd",
+  "release-check/runs/descriptor-first/RESULT.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+  "release-check/MANIFEST.json": "13cf3416257f9beb473fcf6cd86d0c81da5cc54a1ffee247755f97f999a7ae16"
+}

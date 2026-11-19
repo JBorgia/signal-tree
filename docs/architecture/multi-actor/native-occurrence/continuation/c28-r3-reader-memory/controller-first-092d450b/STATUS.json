@@ -1,0 +1,12 @@
+{
+  "phase": "waiting-for-Main-clearance",
+  "commandInvocationsStarted": 1,
+  "testEvents": 0,
+  "memorySamples": 0,
+  "classification": "administrative pre-test startup cancellation; not assertion/resource/memory failure",
+  "supervisorExit": 143,
+  "NxExit": "not observed; owned processes administratively terminated",
+  "remainingOwnedBeforeFinalCleanup": [],
+  "retryStarted": false,
+  "firstOutcomePreserved": true
+}

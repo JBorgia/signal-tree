@@ -1,0 +1,464 @@
+diff --git a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts
+index cd77e3b7..4111841d 100644
+--- a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts
++++ b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts
+@@ -138,6 +138,7 @@ describe('compound operations publish one unit', () => {
+         { id: 'b', n: 2 },
+       ]);
+       const reader = entityMembershipReader(tree)!;
++      const before = reader.snapshot().collections[0].members;
+       const events: EntityMembershipEvent[] = [];
+       const seen: string[][] = [];
+       reader.subscribe((event) => {
+@@ -150,10 +151,13 @@ describe('compound operations publish one unit', () => {
+       });
+       tree.$.rows.prependOne({ id: 'z', n: 0 });
+       expect(events).toHaveLength(1);
+-      expect(events[0].changes.map((change) => change.kind)).toEqual([
+-        'add',
+-        'reorder',
+-      ]);
++      expect(events[0].changes).toEqual([{
++        kind: 'add',
++        lifetimeId: reader.snapshot().collections[0].members[0].lifetimeId,
++        key: 'z',
++        beforeLifetimeId: undefined,
++        afterLifetimeId: before[0].lifetimeId,
++      }]);
+       expect(seen).toEqual([['z', 'a', 'b']]);
+     } finally {
+       tree.destroy();
+diff --git a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/entity-signal.ts b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/entity-signal.ts
+index ad9baa62..fc7ce425 100644
+--- a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/entity-signal.ts
++++ b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/entity-signal.ts
+@@ -1590,7 +1590,7 @@ export function createEntitySignal<
+         // to detached completion, so sibling facts precede listener reentry.
+         if (membershipTap) {
+           releaseMembership = holdEntityMembershipDelivery(api);
+-          membershipTap(MEMBERSHIP_FACTS, frame.mutations);
++          membershipTap(MEMBERSHIP_FACTS, frame.mutations, frame.orderEndpoints);
+         }
+         return resultOf(result);
+       },
+diff --git a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-inventory.ts b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-inventory.ts
+index 04e5239e..e7ec2b86 100644
+--- a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-inventory.ts
++++ b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-inventory.ts
+@@ -5,6 +5,7 @@ import {
+   MEMBERSHIP_OPEN,
+   MEMBERSHIP_OPEN_ORDER,
+   type EntityMembershipInstruction,
++  type EntityMembershipOrderEndpoints,
+   type EntityMembershipStore,
+ } from './entity-membership-source';
+ 
+@@ -242,10 +243,12 @@ function diffOrders(
+   return changes;
+ }
+ 
+-/** Point deltas of one committed mutation frame; never scans the collection. */
++/** Point facts stay sparse. Explicit order endpoints are already prepared;
++ * only their supplied arrays are compared, never a new live-store snapshot. */
+ function frameChanges(
+   store: EntityMembershipStore,
+-  instructions: readonly EntityMembershipInstruction[]
++  instructions: readonly EntityMembershipInstruction[],
++  order?: EntityMembershipOrderEndpoints
+ ): EntityMembershipChange[] {
+   const changes: EntityMembershipChange[] = [];
+   for (const instruction of instructions) {
+@@ -275,6 +278,9 @@ function frameChanges(
+       changes.push({ kind: 'remove', lifetimeId, key });
+     }
+   }
++  if (order && survivingOrderChanged(order.before, order.after)) {
++    changes.push({ kind: 'reorder', before: order.before, after: order.after });
++  }
+   return changes;
+ }
+ 
+@@ -299,16 +305,16 @@ export function activateEntityMembership(
+   });
+   const units: { unit: EntityMembershipUnit; before?: MembershipOrder }[] = [];
+   // The tap runs only from later structural operations, never during attach.
+-  const store: EntityMembershipStore = source((phase, instructions) => {
++  const store: EntityMembershipStore = source((phase, instructions, order) => {
+     const truth = store;
+     if (phase === MEMBERSHIP_FACTS) {
+       // Inside a diffed bulk unit the close diff already covers this frame.
+       if (
+         inventory.observed() &&
+-        instructions &&
++        (instructions || order) &&
+         !units.some((open) => open.before)
+       )
+-        inventory.begin().commit(frameChanges(truth, instructions));
++        inventory.begin().commit(frameChanges(truth, instructions ?? [], order));
+     } else if (phase === MEMBERSHIP_OPEN || phase === MEMBERSHIP_OPEN_ORDER) {
+       units.push({
+         unit: inventory.begin(),
+diff --git a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-source.ts b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-source.ts
+index 48cd92b9..649057c1 100644
+--- a/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-source.ts
++++ b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/internals/entity-membership-source.ts
+@@ -38,9 +38,16 @@ export type EntityMembershipInstruction = {
+   readonly toKey?: string | number;
+ };
+ 
++/** Prepared physical placement; ordinary publication authority is separate. */
++export type EntityMembershipOrderEndpoints = {
++  readonly before: readonly number[];
++  readonly after: readonly number[];
++};
++
+ export type EntityMembershipTap = (
+   phase: number,
+-  instructions?: readonly EntityMembershipInstruction[]
++  instructions?: readonly EntityMembershipInstruction[],
++  order?: EntityMembershipOrderEndpoints
+ ) => void;
+ 
+ /** What an observer may read from the collection's structural truth. */
+diff --git a/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/membership-prepared-order.spec.ts b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/membership-prepared-order.spec.ts
+new file mode 100644
+index 00000000..2f2c0049
+--- /dev/null
++++ b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/membership-prepared-order.spec.ts
+@@ -0,0 +1,170 @@
++import { expect, it, vi } from 'vitest';
++import { signalTree, entityMap } from '../index';
++import {
++  entityMembershipReader,
++  type EntityMembershipEvent,
++} from './internals/entity-membership-view';
++import {
++  getEntityPublicationBinding,
++  type EntityPublicationPacket,
++} from './internals/entity-publication';
++import { withWriteContext } from './write-context';
++import { EntityPlacementStage } from './physical/entity-placement-stage';
++import { StructuralStore } from './physical/structural-store';
++const seed = [
++  { id: 'a', n: 1 },
++  { id: 'b', n: 2 },
++  { id: 'c', n: 3 },
++];
++it('bulk diff owns mixed setAll reorder exactly once', () => {
++  const t = signalTree({
++    rows: entityMap<{ id: string; n: number }, string>(),
++  });
++  try {
++    t.$.rows.setAll(seed);
++    const reader = entityMembershipReader(t)!;
++    const before = reader.snapshot().collections[0].members;
++    const events: EntityMembershipEvent[] = [];
++    reader.subscribe((e) => events.push(e));
++    t.$.rows.setAll([seed[2], { id: 'z', n: 9 }, seed[0], seed[1]]);
++    const after = reader.snapshot().collections[0].members;
++    expect(events).toHaveLength(1);
++    expect(events[0].changes.map((c) => c.kind)).toEqual(['add', 'reorder']);
++    const order = events[0].changes.find((c) => c.kind === 'reorder')!;
++    expect(order.before).toEqual(before.map((m) => m.lifetimeId));
++    expect(order.after).toEqual(after.map((m) => m.lifetimeId));
++    expect(after.map((m) => m.key)).toEqual(['c', 'z', 'a', 'b']);
++  } finally {
++    t.destroy();
++  }
++});
++it('listener reentry cannot rewrite earlier prepared order endpoints', () => {
++  const t = signalTree({
++    rows: entityMap<{ id: string; n: number }, string>(),
++  });
++  try {
++    t.$.rows.setAll(seed);
++    const reader = entityMembershipReader(t)!;
++    const before = reader.snapshot().collections[0].members;
++    const events: EntityMembershipEvent[] = [];
++    reader.subscribe((e) => {
++      events.push(e);
++      if (events.length === 1)
++        t.$.rows.prependMany([{ id: 'b', n: 20 }], { mode: 'overwrite' });
++    });
++    t.$.rows.prependMany([{ id: 'c', n: 30 }], { mode: 'overwrite' });
++    expect(events.map((e) => e.sequence)).toEqual([1, 2]);
++    const order = events[0].changes.find((c) => c.kind === 'reorder')!;
++    expect(order.before).toEqual(before.map((m) => m.lifetimeId));
++    expect(order.after).toEqual(
++      [before[2], before[0], before[1]].map((m) => m.lifetimeId)
++    );
++    expect(t.$.rows.ids()).toEqual(['b', 'c', 'a']);
++    t.$.rows.addOne({ id: 'z', n: 4 });
++    expect(events).toHaveLength(3);
++  } finally {
++    t.destroy();
++  }
++});
++it('inspection membership reports physical order without ordinary order adoption', () => {
++  const t = signalTree({
++    rows: entityMap<{ id: string; n: number }, string>(),
++  });
++  let off = () => {};
++  try {
++    t.$.rows.setAll(seed);
++    const reader = entityMembershipReader(t)!;
++    const before = reader.snapshot().collections[0].members;
++    const source = getEntityPublicationBinding(
++      t.$.rows.byIdOrFail('a')
++    )!.source;
++    const ordinary = before.map((m) =>
++      source.evidence()!.placement(m.lifetimeId, 'ordinary')
++    );
++    const packets: EntityPublicationPacket[] = [];
++    off = source.subscribe({
++      prepare(p) {
++        packets.push(p);
++        return undefined;
++      },
++      complete() {},
++    });
++    const events: EntityMembershipEvent[] = [];
++    reader.subscribe((e) => events.push(e));
++    withWriteContext({ participation: 'inspection' }, () =>
++      t.$.rows.prependMany([{ id: 'c', n: 99 }], { mode: 'overwrite' })
++    );
++    expect(t.$.rows.ids()).toEqual(['c', 'a', 'b']);
++    expect(events).toHaveLength(1);
++    expect(events[0].changes.some((c) => c.kind === 'reorder')).toBe(true);
++    expect(packets.length).toBeGreaterThan(0);
++    expect(
++      packets.every(
++        (p) => p.ordinary.length === 0 && p.ordinaryOrder === undefined
++      )
++    ).toBe(true);
++    for (const [i, m] of before.entries())
++      expect(source.evidence()!.placement(m.lifetimeId, 'ordinary')).toBe(
++        ordinary[i]
++      );
++  } finally {
++    off();
++    t.destroy();
++  }
++});
++for (const size of [32, 1024])
++  for (const existing of [false, true])
++    it(`membership order handoff adds no source snapshots N=${size} existing=${existing}`, () => {
++      const runs: number[][] = [];
++      for (const observed of [false, true]) {
++        const t = signalTree({
++          rows: entityMap<{ id: string; n: number }, string>(),
++        });
++        t.$.rows.setAll(
++          Array.from({ length: size }, (_, n) => ({ id: String(n), n }))
++        );
++        const events: EntityMembershipEvent[] = [];
++        if (observed)
++          entityMembershipReader(t)!.subscribe((e) => events.push(e));
++        let placement = 0,
++          store = 0;
++        const p = EntityPlacementStage.prototype.snapshot,
++          s = StructuralStore.prototype.snapshotActiveOrder;
++        const a = vi
++          .spyOn(EntityPlacementStage.prototype, 'snapshot')
++          .mockImplementation(function (this: EntityPlacementStage<string>) {
++            const result = p.call(this);
++            placement += result.length;
++            return result;
++          });
++        const b = vi
++          .spyOn(StructuralStore.prototype, 'snapshotActiveOrder')
++          .mockImplementation(function (
++            this: StructuralStore<string>,
++            keys,
++            ids
++          ) {
++            store++;
++            return s.call(this, keys, ids);
++          });
++        try {
++          t.$.rows.prependMany(
++            [{ id: existing ? String(size - 1) : 'new', n: 42 }],
++            { mode: 'overwrite' }
++          );
++          runs.push([placement, store]);
++          expect(t.$.rows.ids()[0]).toBe(existing ? String(size - 1) : 'new');
++          expect(
++            t.$.rows.byIdOrFail(existing ? String(size - 1) : 'new').n()
++          ).toBe(42);
++          expect(events).toHaveLength(observed ? 1 : 0);
++        } finally {
++          a.mockRestore();
++          b.mockRestore();
++          t.destroy();
++        }
++      }
++      expect(runs[1]).toEqual(runs[0]);
++      if (!existing) expect(runs[0]).toEqual([0, 0]);
++      else expect(runs[0][0]).toBeGreaterThan(0);
++    });
+diff --git a/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts
+new file mode 100644
+index 00000000..73c77091
+--- /dev/null
++++ b/private/tmp/st-membership-order-c8a/candidate/packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts
+@@ -0,0 +1,160 @@
++import { expect, it } from 'vitest';
++import { appendFileSync } from 'node:fs';
++import { entityMap, signalTree } from '../index';
++import {
++  entityMembershipReader,
++  type EntityMembershipEvent,
++} from './internals/entity-membership-view';
++type Member = { lifetimeId: number; key: string | number };
++function apply(list: Member[], event: EntityMembershipEvent): void {
++  const initial = list.map((m) => m.lifetimeId);
++  const adds: Extract<
++    EntityMembershipEvent['changes'][number],
++    { kind: 'add' }
++  >[] = [];
++  const at = (id: number) => list.findIndex((m) => m.lifetimeId === id);
++  const flush = () => {
++    while (adds.length) {
++      let progress = false;
++      for (let i = 0; i < adds.length; i++) {
++        const a = adds[i];
++        const before =
++          a.beforeLifetimeId === undefined ? -1 : at(a.beforeLifetimeId);
++        if (a.beforeLifetimeId !== undefined && before < 0) continue;
++        expect(at(a.lifetimeId)).toBe(-1);
++        list.splice(before + 1, 0, { lifetimeId: a.lifetimeId, key: a.key });
++        adds.splice(i--, 1);
++        progress = true;
++      }
++      expect(progress).toBe(true);
++    }
++  };
++  for (const change of event.changes) {
++    if (change.kind === 'add') {
++      adds.push(change);
++      continue;
++    }
++    flush();
++    if (change.kind === 'remove') {
++      const i = at(change.lifetimeId);
++      expect(i).toBeGreaterThanOrEqual(0);
++      list.splice(i, 1);
++    } else if (change.kind === 'rekey') {
++      const i = at(change.lifetimeId);
++      expect(i).toBeGreaterThanOrEqual(0);
++      list[i] = { lifetimeId: change.lifetimeId, key: change.afterKey };
++    } else {
++      expect(change.before).toEqual(initial);
++      expect(new Set(change.after).size).toBe(list.length);
++      expect([...change.after].sort()).toEqual(
++        list.map((m) => m.lifetimeId).sort()
++      );
++      const ordered = change.after.map((id) => {
++        const member = list[at(id)];
++        expect(member).toBeDefined();
++        return member;
++      });
++      list.splice(0, list.length, ...ordered);
++    }
++  }
++  flush();
++}
++for (const mode of [
++  'fresh-one',
++  'fresh-many',
++  'existing-many',
++  'mixed-many',
++  'existing-front-noop',
++  'existing-one-refuses',
++] as const)
++  it(`consumer membership replica and one event unit: ${mode}`, () => {
++    const t = signalTree({
++      rows: entityMap<{ id: string; n: number }, string>(),
++    });
++    try {
++      t.$.rows.setAll([
++        { id: 'a', n: 1 },
++        { id: 'b', n: 2 },
++        { id: 'c', n: 3 },
++      ]);
++      const held = t.$.rows.byIdOrFail('c');
++      const reader = entityMembershipReader(t)!;
++      const initial = reader
++        .snapshot()
++        .collections[0].members.map((m) => ({ ...m }));
++      const replica = initial.map((m) => ({ ...m }));
++      const events: EntityMembershipEvent[] = [];
++      const observed: Member[][] = [];
++      reader.subscribe((e) => {
++        events.push(e);
++        observed.push(
++          reader.snapshot().collections[0].members.map((m) => ({ ...m }))
++        );
++      });
++      let expected: string[];
++      let units = 1;
++      if (mode === 'fresh-one') {
++        t.$.rows.prependOne({ id: 'z', n: 9 });
++        expected = ['z', 'a', 'b', 'c'];
++      } else if (mode === 'fresh-many') {
++        t.$.rows.prependMany([
++          { id: 'x', n: 8 },
++          { id: 'y', n: 9 },
++        ]);
++        expected = ['x', 'y', 'a', 'b', 'c'];
++      } else if (mode === 'existing-many') {
++        t.$.rows.prependMany([{ id: 'c', n: 30 }], { mode: 'overwrite' });
++        expected = ['c', 'a', 'b'];
++        expect(held.n()).toBe(30);
++      } else if (mode === 'mixed-many') {
++        t.$.rows.prependMany(
++          [
++            { id: 'c', n: 30 },
++            { id: 'z', n: 9 },
++          ],
++          { mode: 'overwrite' }
++        );
++        expected = ['c', 'z', 'a', 'b'];
++        expect(held.n()).toBe(30);
++      } else if (mode === 'existing-front-noop') {
++        t.$.rows.prependMany([{ id: 'a', n: 10 }], { mode: 'overwrite' });
++        expected = ['a', 'b', 'c'];
++        units = 0;
++        expect(t.$.rows.byIdOrFail('a').n()).toBe(10);
++      } else {
++        expect(() => t.$.rows.prependOne({ id: 'c', n: 30 })).toThrow(
++          'already exists'
++        );
++        expected = ['a', 'b', 'c'];
++        units = 0;
++        expect(held.n()).toBe(3);
++      }
++      const after = reader.snapshot().collections[0].members;
++      for (const event of events) apply(replica, event);
++      const output = process.env.ST_MEMBERSHIP_REPLAY_OUTPUT;
++      if (output)
++        appendFileSync(
++          output,
++          JSON.stringify({
++            mode,
++            initial,
++            events,
++            observed,
++            replica,
++            after,
++            physical: t.$.rows.ids(),
++          }) + '\n'
++        );
++      expect(t.$.rows.ids()).toEqual(expected);
++      expect(after.map((m) => m.key)).toEqual(expected);
++      expect(after.find((m) => m.key === 'c')!.lifetimeId).toBe(
++        initial.find((m) => m.key === 'c')!.lifetimeId
++      );
++      expect(replica).toEqual(after);
++      expect(events).toHaveLength(units);
++      expect(events.map((e) => e.sequence)).toEqual(units ? [1] : []);
++      for (const snapshot of observed) expect(snapshot).toEqual(after);
++    } finally {
++      t.destroy();
++    }
++  });

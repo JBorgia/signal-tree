@@ -1,0 +1,6 @@
+{
+  "timestamp": "2026-11-02T10:14:09.029925-07:00",
+  "reason": "Confirmed parent-currentness regression now isolated; broad run already incomplete after external worker watchdog. Stop remaining broad execution and focus bounded correction. No unreported case is passed; no full-suite totals claimed.",
+  "pid": 828,
+  "command": "node /private/tmp/st-native-combined-c10-promoted/candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts --maxWorkers=1\n"
+}

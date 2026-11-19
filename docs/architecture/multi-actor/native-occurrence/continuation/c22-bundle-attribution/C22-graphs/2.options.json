@@ -1,0 +1,23 @@
+{
+  "entryPoints": [
+    "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-bare.js"
+  ],
+  "bundle": true,
+  "minify": true,
+  "format": "esm",
+  "platform": "browser",
+  "treeShaking": true,
+  "external": [
+    "@angular/*",
+    "rxjs",
+    "rxjs/*",
+    "tslib"
+  ],
+  "nodePaths": [
+    "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/node_modules"
+  ],
+  "write": false,
+  "legalComments": "none",
+  "logLevel": "silent",
+  "define": {}
+}

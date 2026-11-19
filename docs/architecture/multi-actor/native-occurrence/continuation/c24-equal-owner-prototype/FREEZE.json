@@ -1,0 +1,28 @@
+{
+  "status": "FROZEN NON-COMPOSABLE PROTOTYPE; no runtime changes after focused invocation split",
+  "baseManifestSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "files": {
+    "SNAPSHOT-FROZEN.json": "cb54add521dafd9ec875b87d6c19f85de38e4b56d0c79c147a7c3c3e41306bcd",
+    "runtime-frozen.patch": "3cd1e93852c8550bc6a5cbdba45e28e5aa4aaee6a75233cfd3b01fa244ec03ef",
+    "controls-frozen.patch": "8ec5106b9b5b0e7f8d859746453353814bd5886d41c67264f5fa434564aa70b8",
+    "research-frozen.patch": "fd094780fb6319ed6370efd9c03f02891135fd22f14166891302bb5907d7beb1",
+    "RETENTION-OBSERVATIONS.jsonl": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d"
+  },
+  "changedFiles": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "packages/kernel/src/lib/equal-owner-selection-companion.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/native-scalar-selection.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "packages/react/src/branch-declaration-qualification.spec.tsx"
+  ],
+  "Main13Unchanged": true,
+  "React6Unchanged": true
+}

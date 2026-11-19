@@ -1,0 +1,12 @@
+{
+  "baseFiles": 3053,
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "added": [
+    "packages/kernel/src/lib/scalar-native-support.spec.ts",
+    "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts"
+  ],
+  "predecessorBaseUnchanged": true
+}

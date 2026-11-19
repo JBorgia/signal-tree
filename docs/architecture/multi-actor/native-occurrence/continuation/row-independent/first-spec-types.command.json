@@ -1,0 +1,8 @@
+{
+  "cwd": "/private/tmp/st-row-source-independent/candidate",
+  "command": [
+    "node",
+    "tools/check-spec-types.mjs"
+  ],
+  "exit": 0
+}

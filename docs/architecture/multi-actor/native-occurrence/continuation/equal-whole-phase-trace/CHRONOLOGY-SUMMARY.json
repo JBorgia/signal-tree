@@ -1,0 +1,74 @@
+[
+  {
+    "route": "setAll",
+    "pending": false,
+    "installedByRead": 6,
+    "throwRead": 7,
+    "throwSite": "PathNotifier.changedSubjectFieldKeys",
+    "sameSentinelAtCatch": true,
+    "invalidAndReadyAtCatch": true,
+    "sendBeforeCatch": false,
+    "afterFlushSends": 1,
+    "afterConfirmSends": null
+  },
+  {
+    "route": "setAll",
+    "pending": true,
+    "installedByRead": 6,
+    "throwRead": 7,
+    "throwSite": "PathNotifier.changedSubjectFieldKeys",
+    "sameSentinelAtCatch": true,
+    "invalidAndReadyAtCatch": true,
+    "sendBeforeCatch": false,
+    "afterFlushSends": 0,
+    "afterConfirmSends": 1
+  },
+  {
+    "route": "replaceOne",
+    "pending": false,
+    "installedByRead": 6,
+    "throwRead": 7,
+    "throwSite": "PathNotifier.changedSubjectFieldKeys",
+    "sameSentinelAtCatch": true,
+    "invalidAndReadyAtCatch": true,
+    "sendBeforeCatch": false,
+    "afterFlushSends": 1,
+    "afterConfirmSends": null
+  },
+  {
+    "route": "replaceOne",
+    "pending": true,
+    "installedByRead": 6,
+    "throwRead": 7,
+    "throwSite": "PathNotifier.changedSubjectFieldKeys",
+    "sameSentinelAtCatch": true,
+    "invalidAndReadyAtCatch": true,
+    "sendBeforeCatch": false,
+    "afterFlushSends": 0,
+    "afterConfirmSends": 1
+  },
+  {
+    "route": "row",
+    "pending": false,
+    "installedByRead": 6,
+    "throwRead": 7,
+    "throwSite": "PathNotifier.changedSubjectFieldKeys",
+    "sameSentinelAtCatch": true,
+    "invalidAndReadyAtCatch": true,
+    "sendBeforeCatch": false,
+    "afterFlushSends": 1,
+    "afterConfirmSends": null
+  },
+  {
+    "route": "row",
+    "pending": true,
+    "installedByRead": 6,
+    "throwRead": 7,
+    "throwSite": "PathNotifier.changedSubjectFieldKeys",
+    "sameSentinelAtCatch": true,
+    "invalidAndReadyAtCatch": true,
+    "sendBeforeCatch": false,
+    "afterFlushSends": 0,
+    "afterConfirmSends": 1
+  }
+]

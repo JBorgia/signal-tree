@@ -1,0 +1,65 @@
+
+> nx run kernel:test whole-late-getter.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs whole-late-getter.spec.ts --maxWorkers=1
+
+(node:83819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-equal-whole-c16-successor/candidate/packages/kernel
+
+(node:83871) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/whole-late-getter.spec.ts (3 tests | 3 failed) 57ms
+   × whole setAll does not newly reach a seventh-read exception 44ms
+   × whole replaceOne does not newly reach a seventh-read exception 6ms
+   × whole row does not newly reach a seventh-read exception 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/whole-late-getter.spec.ts > whole setAll does not newly reach a seventh-read exception
+ FAIL  src/lib/whole-late-getter.spec.ts > whole replaceOne does not newly reach a seventh-read exception
+ FAIL  src/lib/whole-late-getter.spec.ts > whole row does not newly reach a seventh-read exception
+AssertionError: expected Error: new seventh getter read to be undefined
+
+- Expected:
+undefined
+
++ Received:
+Error {
+  "message": "new seventh getter read",
+}
+
+ ❯ src/lib/whole-late-getter.spec.ts:14:462
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  11:45:58
+   Duration  2.41s (transform 1.24s, setup 0ms, import 1.49s, tests 57ms, environment 628ms)
+
+Warning: command "node tools/run-core-vitest.mjs whole-late-getter.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.0s

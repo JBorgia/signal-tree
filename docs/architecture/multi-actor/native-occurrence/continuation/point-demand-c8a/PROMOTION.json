@@ -1,0 +1,10 @@
+{
+  "semantic_source_lines": [
+    "1-10",
+    "16-24"
+  ],
+  "supported_tests": 3,
+  "allocation_tests": 5,
+  "allocation_change": "diagnostic output conditional only",
+  "research": "original full spec, patches and failing logs retained unchanged outside candidate"
+}

@@ -1,0 +1,18 @@
+{
+  "from": "/private/tmp/st-large-qualification/run.py",
+  "fromSha256": "78ae216f317ef02a9ea1089755a2739ee3a34b08244df0337a31cfd8effbfc54",
+  "newSha256": "2304660fc82835dfaf7ed7ee1a8413593e0a5e25fc8021ec4a4eb0d48a6ad98d",
+  "changes": [
+    "4GiB aggregate RSS,25% host metric floor",
+    "same exact-candidate graph directory reused; explicit graph precheck remains",
+    "three remaining original cases only",
+    "per-PID RSS/birth/command and telemetry command latencies captured"
+  ],
+  "unchanged": [
+    "source assertions/timeouts",
+    "360s/180s bounds",
+    "birth-matched cleanup",
+    "source/dependency checks outside live loop",
+    "first-failure stop; no retries"
+  ]
+}

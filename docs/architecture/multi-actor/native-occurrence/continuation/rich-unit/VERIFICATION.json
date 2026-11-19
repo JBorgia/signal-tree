@@ -1,0 +1,8 @@
+{
+  "candidateManifestMismatches": [],
+  "predecessorManifestMismatches": [],
+  "specErrors": 202,
+  "comparisonSpecErrors": 202,
+  "specDiagnosticsEqualAfterRootNormalization": true,
+  "specComparison": "/private/tmp/st-structural-completeness-successor/runs/spec-types/first.log"
+}

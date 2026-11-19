@@ -1,0 +1,9 @@
+{
+  "frozenFilesVerified": 2918,
+  "frozenDifferences": [],
+  "scratchSourceDifferences": [
+    "packages/kernel/src/lib/core-independent-review.spec.ts"
+  ],
+  "specTypeBaselineUnchanged": true,
+  "patchSha256": "fb56dff86a8a1c6945f973d2fc1ebe174b7f7e95187b439f267ab0215ae94053"
+}

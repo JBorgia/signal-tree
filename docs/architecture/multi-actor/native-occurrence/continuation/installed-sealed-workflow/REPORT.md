@@ -1,0 +1,11 @@
+# I7 installed workflow — passed
+
+Candidate `/private/tmp/st-v16-integration-candidate`, source manifest `8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670`, used the existing canonical five-package build bound in `/private/tmp/st-v16-integration-evidence/SOURCE-BUILD-BINDING.json`. Artifact seal remains `sha256-4e10ab551ba731818b9ab68941f7da013cd79c33920518c6eff2d8b501c8d012`. No rebuild, source, oracle, budget or root-document edit occurred.
+
+Kernel installed workflow exited0 with no failed checks: local tarball packing/installation, strict bundler and node16 types, typed operation runtime, and installed plus bundled probe/workflow/settlement executions. Angular continuation then exited0 with no failed checks: packed installed kernel/Angular, full AOT compilation and component runtime. These are command outcomes, not inflated test-case totals. Main's separate helper-check result is13/13, not14; it is not a substitute for these actual consumer executions.
+
+Exact consumer evidence directory: `/private/tmp/st-installed-review-1R4fzy`. `manifest.json` and `angular-manifest.json` preserve per-command exits and logs. Root harness3file SHA256s, captured before kernel launch and verified unchanged, are bound to each command in `HARNESS-BINDING.json` and `ANGULAR-HARNESS-BINDING.json`. Old pinned replay mode was not executed or changed.
+
+Final preservation:3,127 selected source files, zero mismatches;193 artifact files with unchanged complete build seal. Both helpers also verified source/seal before and after, including finally paths. All command receipts complete, no surviving owned processes. Limits: offline installed dependencies were locally packed by the existing workflow; root tooling dependencies were reused, not claimed lockfile-equivalent to a clean installation. No full-release sign-off follows.
+
+Separate failures remain preserved: fresh bundle budgets exceeded unchanged ceilings; old2GiB functional protocol stopped on aggregate RSS during the original130k replacement invocation. I7 passes do not waive either result. No old probe expectation failed or was weakened. Sole heavy slot retained for Main's newly authorized finite4GiB protocol; no further cap escalation authorized.

@@ -1,0 +1,22 @@
+{
+  "REPORT.md": "1c98f14babc6ace8507145bf7261760311e1ffaf9330f51c11838103114686a1",
+  "HARNESS-BINDING.json": "e589ea4c9ab2027e5519ef021b0bb58cb83c2f69a594f401eb44e8e991dc9e8a",
+  "ANGULAR-HARNESS-BINDING.json": "2a77e30542ec7c6a6e6d413720b7175ca258faa4fc9efecfa259059e532c9d51",
+  "manifest.json": "c289597e2290f82d6b75a9ac66eba0451b36d80ca3374330f5fdbee85a921c45",
+  "angular-manifest.json": "9d911b6188763811005a11019dc6acbd7ceebf6f02ba9af5b7d0ffc7b475c09c",
+  "FINAL-PRESERVATION.json": "1555a29878d757e5a7561fbb0a7189b47ee08fceb130d6f79d37e48d7a21bd6f",
+  "FINAL-PROCESS-CENSUS.json": "0a4c4ee3c073d4a6da34b69c6bc29f0163f6e8a1c083b37e8dbccc13af60c0ec",
+  "ARTIFACT-MANIFEST.json": "2c13ff3e3e42c8ff1e68a9a584de494bd2a2df7a5619afa239568d88efcab363",
+  "runs/kernel-installed/RESULT.json": "1d50a5d5ffc9f373b68ee368508b02b0be650dae887ab5e0a9db9972edc9853f",
+  "runs/kernel-installed/first.log": "90a937938d2777ec17dda7ec9aa11c0e8792a3dcb0683ccd7eed596a8aa722fc",
+  "runs/kernel-installed/COMMAND.json": "32a92957304d47070a86d591fda868466f0f295d7df9ff0853d3815151f99bdf",
+  "runs/kernel-installed/OWNED.json": "84ec478f5ccff54e11fa4ce3df9ab0c8820a7ee6f238a29a0bfedd01782f292d",
+  "runs/kernel-installed/EXIT": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "runs/kernel-installed/PROCESS.json": "402f63da0b452e569dd1c6c163390fff4740cad6b622d390c53ae838f3b3a4e8",
+  "runs/angular-installed/RESULT.json": "83ca99745224f415b728536aaccaddd1ac6528f699a2054557c8a91dffabe0b8",
+  "runs/angular-installed/first.log": "5a599e398b74e7bdf6eec2c912c0ed31f04e833d7d59aee4df3676d56dd8d745",
+  "runs/angular-installed/COMMAND.json": "1ed282b21a578ccf75a4a7e5e0b3ea3cff79af955f15b0bc0b1a18946ccca04d",
+  "runs/angular-installed/OWNED.json": "78dc8ed3f873019e33750413049de6a55e7aeefaf524b28aae13813c9e3fe1f6",
+  "runs/angular-installed/EXIT": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "runs/angular-installed/PROCESS.json": "c9920996dd77ace4df9e574d51b0ffd32802d3a8d866948b43baaa9b7222c24e"
+}

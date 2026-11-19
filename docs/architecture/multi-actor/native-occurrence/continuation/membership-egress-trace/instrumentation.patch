@@ -1,0 +1,42 @@
+--- candidate/packages/kernel/src/lib/experimental-publication/private.ts
++++ instrumented/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -133,6 +133,7 @@
+  };
+ });
+ function beginBranchInput(node:object,supplied?:unknown):object|undefined{
++ console.log('TRACE branch-input',JSON.stringify({address:getNodeAddress(node),supplied,participation:getActiveWriteContext()?.participation}));
+  const registry=getPositionRegistry(node),address=getNodeAddress(node);const recipients=new Map<object,InputEvidence>();
+  if(registry&&address){const keys:object[]=[];let trie=tries.get(registry);if(trie){keys.push(...trie.channels);for(const part of address){trie=trie.children.get(part);if(!trie)break;keys.push(...trie.channels);}collect(trie,keys);}
+   for(const key of new Set(keys)){const b=bindings.get(key);if(!b?.address)continue;const within=relativeSourceAddress(b.address,address);const encloses=relativeSourceAddress(address,b.address);if(within===undefined&&encloses===undefined)continue;const captured:Fact[]=[];let covered=false;
+@@ -165,6 +166,7 @@
+ }
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
++ console.log('TRACE membership',JSON.stringify({address:[...edit.address,edit.key],present:edit.present,participation:meta?.participation,ordinary:edit.ordinary}));
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+  const physicalView={requirement:unavailableInput()};
+  const viewDomain=negativeViews.get(domainKey)??new Map<object,NativeView>();
+@@ -196,6 +198,7 @@
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+   const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(proof),...(unit.native?[unit.native]:[])]);
+   const authoredProof=lifecycle.nativeProof(authoredRequirement);ownProofs.set(unit.fact,authoredProof);
++  console.log('TRACE ready-before',JSON.stringify({address:b.address,payload:b.valuePayload,unitPayload:unit.payload,field:unit.relative,presence:unit.presence&&{address:unit.presence.slot.address,state:unit.presence.state.present,ordinary:unit.presence.ordinary},collection:!!unit.collection}));
+   if(unit.collection){
+    const collection=b.collections.get(unit.collection.key);
+    if(collection){for(const edit of unit.collection.edits){
+@@ -246,6 +249,7 @@
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+    b.projected=Object.freeze({fact:unit.fact,changed:unit.changed,payload:support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined)});
+   }
++  console.log('TRACE ready-after',JSON.stringify({address:b.address,payload:b.valuePayload,projected:b.projected?.payload,present:support.present,aggregate:b.aggregate}));
+   unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+ }
+@@ -253,6 +257,7 @@
+ function captureValueInput(channel:object,field?:object):object|undefined{const b=bindings.get(channel);if(!b)return;const info=field&&b.fields.get(field);const states=info?presenceForField(b,info.address):[...b.presence.values()];const absent=states.filter(state=>!state.present);return {facts:Object.freeze(absent.length?absent.map(state=>state.fact):[b.baselineStructure,field?b.fieldFacts.get(field)!:b.valueFact,...states.map(state=>state.fact)])};}
+ function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?:object,field?:object,nativeUnit?:object):PreparedPublicationUnit|undefined{
+  const b=bindings.get(channel);if(!b)return;
++ console.log('TRACE scalar',JSON.stringify({address:b.address,field:field&&b.fields.get(field)?.relative,intent:mutation.intent,before:mutation.before,after:mutation.after,participation:getActiveWriteContext()?.participation,branchInputs:branchInputs.length}));
+  const meta=getActiveWriteContext();if(meta?.participation==='inspection')return;
+  const clean=!!ingress&&!consumedIngress.has(ingress)&&ingress.channel===channel;
+  const attributed=meta?.transactionId;

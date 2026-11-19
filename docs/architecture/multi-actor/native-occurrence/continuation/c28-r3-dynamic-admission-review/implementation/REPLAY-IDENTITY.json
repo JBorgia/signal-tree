@@ -1,0 +1,15 @@
+{
+  "unchangedFiles": 3098,
+  "sha256": {
+    "FINAL.md": "7274c9b5ec43616fbcc97cbce18d9a17f3f092e9c974c0bb73df0e5498853958",
+    "REVIEW.md": "6dc3d2d8463859f1214a90640b4b65525df67be20a31b2b6f3f74712b1b1addb",
+    "FRAMEWORK-VERIFIED.json": "8fcd73a34cfa7e018819f480980fbfc35edfe65973c2802d6f659a5376207c84",
+    "FINAL-IDENTITY.json": "7992d18ac1fd13ad1884478e8b39e280ae284c5b6f6b350f37121c5532c869a4",
+    "REPLAY-BASE-MANIFEST.json": "905af11731583b81a9690e2fdaf8a2e0cc71fad4d375f0f5ec1d7a944a012816",
+    "candidate/packages/kernel/src/lib/initializer-attachment-independent.spec.ts": "423bd5b8e8b574959656dc9696092623fc273dae28e881fd12018b309537bbfa",
+    "focused-first/first.log": "9265b12753211ca525acefeeafff9742823e2e55157dce370e9ec86b106dee8a",
+    "focused-first/COMMAND.json": "a1572e026376b4971800e43d7891b7ca5cbb725d0d7872c12319eaa296e81096",
+    "focused-first/RESULT.json": "0c71095f705a27d6e7ca556a1e43bcc857100932d8b37f30e97c8c9120dc512f",
+    "run.py": "31c201cdb7029d947c01878bad95dfa821f5dccbeac73f0bca3306cb2ecb0359"
+  }
+}

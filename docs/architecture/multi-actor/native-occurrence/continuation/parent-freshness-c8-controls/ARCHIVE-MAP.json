@@ -1,0 +1,116 @@
+[
+  {
+    "source": "run-gate.py",
+    "archive": "run-gate.py",
+    "sourceSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  {
+    "source": "RESULTS.md",
+    "archive": "RESULTS.md",
+    "sourceSha256": "ab5d896ebf1e72f8ba8dff32cc085ffd9b689fdf3d40ffefc58e7149ec8b4f59",
+    "archiveSha256": "ab5d896ebf1e72f8ba8dff32cc085ffd9b689fdf3d40ffefc58e7149ec8b4f59"
+  },
+  {
+    "source": "BASE-SOURCE.json",
+    "archive": "BASE-SOURCE.json.gz",
+    "sourceSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+    "archiveSha256": "c87d417784e6b90fc333d83e600515da170f14bda1676e78e396b6d784d20af9"
+  },
+  {
+    "source": "tests.patch",
+    "archive": "tests.patch",
+    "sourceSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463",
+    "archiveSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463"
+  },
+  {
+    "source": "runs/angular-typed-contract/RESULT.json",
+    "archive": "runs/angular-typed-contract/RESULT.json",
+    "sourceSha256": "298e0fd2605e8bf823d6179de2812d9b1f8d8d1c3d1520fd6a0dce6f7c123eac",
+    "archiveSha256": "298e0fd2605e8bf823d6179de2812d9b1f8d8d1c3d1520fd6a0dce6f7c123eac"
+  },
+  {
+    "source": "runs/angular-typed-contract/first.log",
+    "archive": "runs/angular-typed-contract/first.log",
+    "sourceSha256": "dd69c3c53f7b3bd0d3dc5b06a7f8371cc9e0e58912b8edde204c9fa8ea035770",
+    "archiveSha256": "dd69c3c53f7b3bd0d3dc5b06a7f8371cc9e0e58912b8edde204c9fa8ea035770"
+  },
+  {
+    "source": "runs/angular-typed-contract/SOURCE-BEFORE.json",
+    "archive": "runs/angular-typed-contract/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "b60ce5bd3aec98f84a0864c7c4fc0e21826410f5ef9a3dce88ab09cf26e6bd02",
+    "archiveSha256": "6a817e2a1252babde7832fe34015795e956efa11e23b1095b58f8a27878c8971"
+  },
+  {
+    "source": "runs/angular-typed-contract/SOURCE-AFTER.json",
+    "archive": "runs/angular-typed-contract/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/angular-typed-contract/COMMAND.json",
+    "archive": "runs/angular-typed-contract/COMMAND.json",
+    "sourceSha256": "fab52dfcafd522f58f0adc4ac52c6b58c156ffbb52ad5f84794d822505b48ce4",
+    "archiveSha256": "fab52dfcafd522f58f0adc4ac52c6b58c156ffbb52ad5f84794d822505b48ce4"
+  },
+  {
+    "source": "runs/angular-typed-contract/observations/angular-ordinary.json",
+    "archive": "runs/angular-typed-contract/observations/angular-ordinary.json",
+    "sourceSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6",
+    "archiveSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6"
+  },
+  {
+    "source": "runs/angular-typed-contract/observations/angular-native-timing.json",
+    "archive": "runs/angular-typed-contract/observations/angular-native-timing.json",
+    "sourceSha256": "b9cddec0cd6714f604d1c9eabea018612492ff1659d1909a8cadd56813c96cf9",
+    "archiveSha256": "b9cddec0cd6714f604d1c9eabea018612492ff1659d1909a8cadd56813c96cf9"
+  },
+  {
+    "source": "runs/angular-typed-contract/observations/angular-keyed.json",
+    "archive": "runs/angular-typed-contract/observations/angular-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/kernel-typed-contract/RESULT.json",
+    "archive": "runs/kernel-typed-contract/RESULT.json",
+    "sourceSha256": "23ca85138b47d59e3fbf419aecadd454a54e9a7d95d70bae38d94dd5adff2eda",
+    "archiveSha256": "23ca85138b47d59e3fbf419aecadd454a54e9a7d95d70bae38d94dd5adff2eda"
+  },
+  {
+    "source": "runs/kernel-typed-contract/first.log",
+    "archive": "runs/kernel-typed-contract/first.log",
+    "sourceSha256": "9db2c95bc5e5a0419f6eaf51c094581f7e64af035064941c8d2bc3c7b079aa86",
+    "archiveSha256": "9db2c95bc5e5a0419f6eaf51c094581f7e64af035064941c8d2bc3c7b079aa86"
+  },
+  {
+    "source": "runs/kernel-typed-contract/SOURCE-BEFORE.json",
+    "archive": "runs/kernel-typed-contract/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "b60ce5bd3aec98f84a0864c7c4fc0e21826410f5ef9a3dce88ab09cf26e6bd02",
+    "archiveSha256": "6a817e2a1252babde7832fe34015795e956efa11e23b1095b58f8a27878c8971"
+  },
+  {
+    "source": "runs/kernel-typed-contract/SOURCE-AFTER.json",
+    "archive": "runs/kernel-typed-contract/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/kernel-typed-contract/COMMAND.json",
+    "archive": "runs/kernel-typed-contract/COMMAND.json",
+    "sourceSha256": "4c0db7cfca24595a1894b76047ceceac7df5e1db21eb757116d880cdfefec642",
+    "archiveSha256": "4c0db7cfca24595a1894b76047ceceac7df5e1db21eb757116d880cdfefec642"
+  },
+  {
+    "source": "runs/kernel-typed-contract/observations/kernel-ordinary.json",
+    "archive": "runs/kernel-typed-contract/observations/kernel-ordinary.json",
+    "sourceSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6",
+    "archiveSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6"
+  },
+  {
+    "source": "runs/kernel-typed-contract/observations/kernel-keyed.json",
+    "archive": "runs/kernel-typed-contract/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  }
+]

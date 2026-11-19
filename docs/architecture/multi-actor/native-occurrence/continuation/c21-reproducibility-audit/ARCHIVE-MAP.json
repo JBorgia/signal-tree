@@ -1,0 +1,80 @@
+[
+  {
+    "source": "PLAN-SUMMARY.json",
+    "archive": "PLAN-SUMMARY.json",
+    "sourceSha256": "015c4df5737b9a988d2e8ed4b2e770a6f1429066d0dd9fbbd6e5f484fee4aec8",
+    "archiveSha256": "015c4df5737b9a988d2e8ed4b2e770a6f1429066d0dd9fbbd6e5f484fee4aec8"
+  },
+  {
+    "source": "plan.py",
+    "archive": "plan.py",
+    "sourceSha256": "6fc94055a68d822082f4c12b8cd8e158419e17c80a9066374132d673c3f251fe",
+    "archiveSha256": "6fc94055a68d822082f4c12b8cd8e158419e17c80a9066374132d673c3f251fe"
+  },
+  {
+    "source": "audit.py",
+    "archive": "audit.py",
+    "sourceSha256": "eebe19ef1e7527fd626a15008bf20e9a557898343cb1bf0b6000fbc61abfbddc",
+    "archiveSha256": "eebe19ef1e7527fd626a15008bf20e9a557898343cb1bf0b6000fbc61abfbddc"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "72fcc93620c24fedef6d1ccedef8daae52ce8d5c31af7f0f18bb64202572d8ea",
+    "archiveSha256": "72fcc93620c24fedef6d1ccedef8daae52ce8d5c31af7f0f18bb64202572d8ea"
+  },
+  {
+    "source": "PORTABLE-OVERLAY-REQUIRED.json",
+    "archive": "PORTABLE-OVERLAY-REQUIRED.json",
+    "sourceSha256": "5b183a78c57e9ce2a59ca82b08ca492d6e71a01d4e206ff33abe1cad81b5e03d",
+    "archiveSha256": "5b183a78c57e9ce2a59ca82b08ca492d6e71a01d4e206ff33abe1cad81b5e03d"
+  },
+  {
+    "source": "AUDIT-IDENTITY.json",
+    "archive": "AUDIT-IDENTITY.json",
+    "sourceSha256": "c539f3c56db55f4581c7f16a7acf2f32e61f58300b6ce854ef715c51273f08fa",
+    "archiveSha256": "c539f3c56db55f4581c7f16a7acf2f32e61f58300b6ce854ef715c51273f08fa"
+  },
+  {
+    "source": "SCOPED-MANIFEST.json",
+    "archive": "SCOPED-MANIFEST.json.gz",
+    "sourceSha256": "534e9956c01d8c3eabacd9179e181137e56e6e39fbf64c56358a331da15766c0",
+    "archiveSha256": "1640ee72297df459b8a6001d944925892a627f139766e6482b24283d6fc85f0f"
+  },
+  {
+    "source": "OMITTED-BUNDLE-EVIDENCE.json",
+    "archive": "OMITTED-BUNDLE-EVIDENCE.json",
+    "sourceSha256": "1da5ed66d144a1339fdabd962b92ef1a10014d0e44abb8154d3258923029f314",
+    "archiveSha256": "1da5ed66d144a1339fdabd962b92ef1a10014d0e44abb8154d3258923029f314"
+  },
+  {
+    "source": "COST-MODULE-GRAPH-NOTE.md",
+    "archive": "COST-MODULE-GRAPH-NOTE.md",
+    "sourceSha256": "ed6b4875e796c748383ee7bb7b66a918609275a6b2bf7d34d8abeb0e91658de9",
+    "archiveSha256": "ed6b4875e796c748383ee7bb7b66a918609275a6b2bf7d34d8abeb0e91658de9"
+  },
+  {
+    "source": "SCOPED-UNRESOLVED.json",
+    "archive": "SCOPED-UNRESOLVED.json",
+    "sourceSha256": "bd1dc3a6aa15b83ccc0ea19ee58f024e5766da485cb0cc62105e789623f86323",
+    "archiveSha256": "bd1dc3a6aa15b83ccc0ea19ee58f024e5766da485cb0cc62105e789623f86323"
+  },
+  {
+    "source": "SCOPED-MODES.json",
+    "archive": "SCOPED-MODES.json.gz",
+    "sourceSha256": "c0566457dcd50ad470d21f81f40fb90a9199f46ed468d69833c336b648ae80cc",
+    "archiveSha256": "39ae64c74a43f4089369a78b5c94ef8cae86c5206d5ecb705c30fa1b0c5bd7e5"
+  },
+  {
+    "source": "git-extra.py",
+    "archive": "git-extra.py",
+    "sourceSha256": "11b8ec9ec71bc4c23a2905eec7ce96d5461768f8f0d9759d38da963c547200f5",
+    "archiveSha256": "11b8ec9ec71bc4c23a2905eec7ce96d5461768f8f0d9759d38da963c547200f5"
+  },
+  {
+    "source": "closure.py",
+    "archive": "closure.py",
+    "sourceSha256": "1be948be0284a3e189592cf413c73afbdb76b34ac2ef410f64255222264c8718",
+    "archiveSha256": "1be948be0284a3e189592cf413c73afbdb76b34ac2ef410f64255222264c8718"
+  }
+]

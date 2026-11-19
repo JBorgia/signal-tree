@@ -1,0 +1,36 @@
+✔ primary failure survives every cleanup and reporting failure (0.727833ms)
+✔ cleanup failure after successful assertions remains a failed test (0.080417ms)
+✔ review is immutable, detached, unforgeable locally, and invalidated by revision (2.580458ms)
+✔ backend rejects reviewed operation after a relevant human edit, including ABA (1.028167ms)
+✔ two agents and human independently edit the same entity; rejection preserves later work (1.315958ms)
+✔ explicit read dependencies reject a proposal when an external input changes (0.996291ms)
+✔ lost acknowledgment is uncertain; retry keeps command identity and applies once (0.6875ms)
+✔ explicit unknown UI actor remains unknown through asynchronous delivery (0.412833ms)
+✔ definitive persistence failure does not install state or report success (0.174ms)
+✔ server permission revocation overrides local approval (0.096042ms)
+✔ unrelated acknowledgment cannot mark success; backend rejects key reuse (0.145958ms)
+✔ unsupported proposal data is rejected before recording or revising (0.372375ms)
+✔ external snapshots and reviews cannot mutate operation or accepted state (0.158ms)
+✔ forget and dispose refuse unresolved work and release terminal records (1.277625ms)
+✔ fragmented tool output creates a proposal; finished run does not grant approval (1.845041ms)
+✔ transport metadata and state events cannot approve or mutate canonical data (0.161667ms)
+✔ invalid and oversize arguments leave no operation (0.079166ms)
+✔ duplicate calls, unrelated finishes and incomplete runs are refused (0.07525ms)
+✔ host actor context is declared; tool-provided actor and permission are rejected (0.063709ms)
+✔ tool completion preserves versions of the observation supplied before reasoning (1.337709ms)
+✔ review: forged approval fields and tool result never grant consent (0.902958ms)
+✔ review: byte boundary, tool count, tool identity and terminal run checks (1.541042ms)
+✔ review: disposing stream from proposal callback prevents later operation creation (0.30575ms)
+✔ review: recursive tool end is refused before invoking builder twice (0.129375ms)
+✔ adapter reentry cannot duplicate an in-flight attempt (1.845292ms)
+✔ synchronous transport throw cannot be interpreted as definitive rejection (0.784875ms)
+✔ an approved operation cannot be changed through a retained draft reference (0.188ms)
+✔ permission rejection and lost acknowledgment remain distinct terminal outcomes (0.135833ms)
+ℹ tests 28
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56.862333

@@ -1,0 +1,11 @@
+{
+  "reason": "aggregate-owned-rss-over2GiB",
+  "lastStructuredEvent": {
+    "at": 1793729695311,
+    "monotonicNs": "956581530830666",
+    "reporterPid": 51863,
+    "kind": "module-start",
+    "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-large-batches.spec.ts"
+  },
+  "elapsedSeconds": 34.86454529198818
+}

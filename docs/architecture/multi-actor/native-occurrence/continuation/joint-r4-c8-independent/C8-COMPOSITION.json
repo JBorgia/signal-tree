@@ -1,0 +1,483 @@
+{
+  "inputs": [
+    "/private/tmp/st-native-combined-c/SNAPSHOT-C0.json",
+    "/private/tmp/st-native-combined-c7a/SNAPSHOT-C7a.json",
+    "/private/tmp/st-joint-phase-successor-r4/SOURCE-SHA256.json"
+  ],
+  "changes": [
+    {
+      "path": "packages/angular/src/lib/joint-native-frontier.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "a578260be0a0a14b8e3c39f54902f157b4ee6bffa468015bd28829b5d1f095bb",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/angular/src/lib/joint-rich-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "7ba34efc2875e22b10fdd6d2945dad822a09eac5b0cc49a6f0e707648877cf98",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/angular/src/lib/scalar-frame-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "ba2248b29c58917b874efe4878784253d61fb07c844b808c8394aac98ddf860f",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+      "base": "b5264ba28f8a5c06078a966edd679910238634e619255a906a9e194e9eca29fb",
+      "left": "b5264ba28f8a5c06078a966edd679910238634e619255a906a9e194e9eca29fb",
+      "right": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "base": "3486885c59b44c2ce3fc059d86253f634d133e436f07385ab1cc788084bf86ae",
+      "left": "3486885c59b44c2ce3fc059d86253f634d133e436f07385ab1cc788084bf86ae",
+      "right": "7c4b9d481e481db43fba92f1e32789c36300bcbda2a3cf0316f437c41f291fff",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/complete-structural-sequence.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "45b9b8114a5f19a322ce0b03d595c4d62cf0cd7a53dcd9f74069129d0b93be1f",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/entity-signal.ts",
+      "base": "7489aab0e44f0dcec48522a30081207ee5d26bd579c9dfd695fb8673681610d7",
+      "left": "3f359f415d8f4342c955eef9991792eff487c15901e999cfafb8b212330d9a9a",
+      "right": "115b1a6531cfe64ba5b5a3454b21955d20e298014c7f1b00b7220d123413ab27",
+      "method": "three-way",
+      "exit": 1
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "base": "7e39ba1ae0609cd3a569b1228187b4ff3fe55c1e76ef4313d7ce2d9ed4b89a73",
+      "left": "8e34c1015462e9a07a6d55736e58dd66c753ee986714d55ba960d7fc0f009776",
+      "right": "2f7ce707351d0be583a96a9026252edd8a46bfc661894959db4ebdb5fb62c214",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "base": "e1908fff513014d1edbfa804c9e0bc778a6d57850e18789365be3f8994490e14",
+      "left": "f77278071476061670291308b0f4b4ff0b033c06aa9db0d5967e3d5661272b58",
+      "right": "d06c7be0f3a5ebfc6cb59e1d5f5ebda8fc5d44dd9038b8daf8e1e3bf8f3f8bee",
+      "method": "three-way",
+      "exit": 1
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/private.ts",
+      "base": "eddf7a756dfa0b38a87a40f756341fdb63da4909f59af4aa2775425fe7623644",
+      "left": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b",
+      "right": "a2719b620781cde8d0defde8441851a3add4c8d87109b6b84281c43529be28eb",
+      "method": "three-way",
+      "exit": 1
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/projection.ts",
+      "base": "5191a41593cbefef098c7c7da6f43a380232889e57b0d8efb971611407aeddf4",
+      "left": "5191a41593cbefef098c7c7da6f43a380232889e57b0d8efb971611407aeddf4",
+      "right": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/independent-scalar-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "ba492604bc1a4db0346186a9b12d4ac93cad5679bf1c429b07af31391036a073",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+      "base": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f",
+      "left": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f",
+      "right": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "7bbf24a92eecec1885ea1067326e551b0e8521d35c8d9e76c76a54cc1aec4b3f",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+      "base": "4822c6b9cbc635ea258d2c1a6218ecb9ca557b2d1096726d06a71a00c36956b7",
+      "left": "4822c6b9cbc635ea258d2c1a6218ecb9ca557b2d1096726d06a71a00c36956b7",
+      "right": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts",
+      "base": "fa27b488a96c0c1c46b01b9dbfb9c8c41f4bc5e798d446a3290ce3baef75a9a9",
+      "left": "fa27b488a96c0c1c46b01b9dbfb9c8c41f4bc5e798d446a3290ce3baef75a9a9",
+      "right": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+      "base": "de3fc72f214550ad6e6b6f069d349f0ce67f6a8f1b26375215a5c85c23bd9895",
+      "left": "de3fc72f214550ad6e6b6f069d349f0ce67f6a8f1b26375215a5c85c23bd9895",
+      "right": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/entity-publication.ts",
+      "base": "266488a37342b315e46a42b92768099df84bd45aa96d8bf496375b82d2aea1fc",
+      "left": "ba30f82b4f3fae5dd5469f1e1edde307ca54511ab9e4ce99ab193c09e25b91d2",
+      "right": "896ab9f40637f52c57f8a53bbcbfd3d9cd6f90f368cbe37333d2ff00f0fc162a",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+      "base": "164c87dc9405b74f52a1d3eb08dd899745492fb141bfdcf9010f88b22383584c",
+      "left": "164c87dc9405b74f52a1d3eb08dd899745492fb141bfdcf9010f88b22383584c",
+      "right": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+      "base": "3cc8cb86f8bff03abbe088729aab5ac1191cd5a075d3b332b3dc34c4a0df81ee",
+      "left": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b",
+      "right": "e9a056e4e148b17d4a7d7b1b6ca82a69bb6cdd2e7786d82127b6c6fbbb1de958",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/location-runtime.ts",
+      "base": "c97c14f089a7df085ac41325d445f0c545df502ff21d6f2983d658bcced6b392",
+      "left": "c97c14f089a7df085ac41325d445f0c545df502ff21d6f2983d658bcced6b392",
+      "right": "cad5bf20f795c98c3df6dd9bb01260815e1a170beef54dc435ffab05546c6cbd",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+      "base": "1c37ded9438b959ac6e69f4c13b7ef26351204fb84be34c78096f5820d12ceb8",
+      "left": "1c37ded9438b959ac6e69f4c13b7ef26351204fb84be34c78096f5820d12ceb8",
+      "right": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+      "base": "eaa9850c22851a0d8887e9f69060e8724f2b7c6f12d577d847439ee3cfc4ada4",
+      "left": "76e8d645a8652ab9528cde87547c45623ca73ff146451cc39f2773c14a01bf5e",
+      "right": "603f975dd808e61e0ec830cbb811aa71fbbd79cdef945e911337f59930848b6d",
+      "method": "three-way",
+      "exit": 1
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/observation-substrate.ts",
+      "base": "2db4780106eb7faa09c33fd04e2f56a96476b2e178d998471039cac8c3349026",
+      "left": "2db4780106eb7faa09c33fd04e2f56a96476b2e178d998471039cac8c3349026",
+      "right": "75bdd60bc568aff5460af61616a6896fb0e16c9c0ed6ee0f0150e88d4f150dab",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/owned-mutation.ts",
+      "base": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+      "left": "fee66b9718415de7466a9e8427f9d37d731715584037b668750a9d72205541ef",
+      "right": "1d6ac5f7f6de7b5627d4920915e9e798aa66298eabbee599602d0213d2123c94",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+      "base": "6ce91d97dca19d448a7893856c7eca04e3eebafb6fc9e0cb76916ee1a32202cf",
+      "left": "6ce91d97dca19d448a7893856c7eca04e3eebafb6fc9e0cb76916ee1a32202cf",
+      "right": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/prepared-entity-structure.ts",
+      "base": null,
+      "left": null,
+      "right": "eb3e9e920fbb16c2171f64057fb44a96049118b9ff555224a01c32ab116b4d3a",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/publication-preparation.ts",
+      "base": null,
+      "left": null,
+      "right": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/scalar-publication-coverage.ts",
+      "base": null,
+      "left": null,
+      "right": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/selected-write-operation.ts",
+      "base": "e069b0e51f18c12d3fa2bc7cf2c5e4e5c7af427e758c4202c6ec3a928768513f",
+      "left": "e069b0e51f18c12d3fa2bc7cf2c5e4e5c7af427e758c4202c6ec3a928768513f",
+      "right": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+      "base": "e900f7ab3d50eb89f5776ade9c653885301bbad298c4853a90d6d06d511983f5",
+      "left": "af7ec0a4ea50235c7cf93831bc154b64cb4b6cf5f82b5ad335916f06ba56012c",
+      "right": "f5fe3c0cbde6fbc154da9a0dd42f5f20b7ad5c3f175afa7210918bb798b21852",
+      "method": "three-way",
+      "exit": 1
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+      "base": "ebff3a34de705f308cb7822d842bdd0afcb3fbb516cd6dd9e89b8f1933d09469",
+      "left": "f26908891177e9c6cbab9231976f954ea96ce50ae2875c8bb7ada43487c11a9a",
+      "right": "7ec7c8006e5df03c93695c3ecf637abd2779c761414c83788bc18159310ebc7f",
+      "method": "three-way",
+      "exit": 1
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+      "base": "766a3f606b3f2ff59492c45a0748f69b07739262e213cbd9baa91eb10b3b9165",
+      "left": "c24ae49cd4a82df718ad6b6e934af2d2015e9ba194560733a8f30f85515579d6",
+      "right": "e4aa30ac16bf620f28bb3d2ee4de3aa781f201d1ace86996bf830b3967fd6471",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-atomic-preparation.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "9c0209d91190bf43a616f16c4d2483738d4a5777202cec4878436b2e0d5dc8a5",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-install-boundary-independent.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "ce4445720787ff57d8ce888c86b3a6d34886251873f10d83d1b77ce5137c27ea",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-install-validation.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "1d8ecfe930b0b87e032f63b6a5baf581abdb2e5d9aa90af52adc0cce8bc06219",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-membership-completion.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "bad404ea590508fb3116ff4d6f019e2257768d7b2d3f90fa764b434ace3ea337",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-membership-phase.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "45862080b2487f5f978699f1e3b2a52b9eb51b4f7c57cbb2be952943f0cb0719",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-membership-seal-independent.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "24f7d010e8b31f6bd66a58660d5a893d463b1e427eb72b8c72a4a532ec70ea43",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-mixed-seal.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "08feaecaa24b19286f8681962d3f02f412a147da9d094b19c1bc353ea4abe50a",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/joint-readiness.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "a23e192e2146c99cda5b7048185709df4954e527aa46f0d471c11bd9e3c6a86e",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/link.ts",
+      "base": "1e9b0a856eb980edaf0f07afe2d0189b3cdcf2d3e636e33c2faa07cf6c340dc4",
+      "left": "1e9b0a856eb980edaf0f07afe2d0189b3cdcf2d3e636e33c2faa07cf6c340dc4",
+      "right": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/path-notifier.ts",
+      "base": "445c22fcd15b413631c7ca8852773698a2029e6f332c52fd88e4298caf1c043c",
+      "left": "445c22fcd15b413631c7ca8852773698a2029e6f332c52fd88e4298caf1c043c",
+      "right": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+      "base": "f3629844fd2705bdb290f9f6b2f17031f493a0eaf9a01826448165d1c8036244",
+      "left": "f3629844fd2705bdb290f9f6b2f17031f493a0eaf9a01826448165d1c8036244",
+      "right": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/recipient-window-review.spec.ts",
+      "base": "e4c5e4b25030b37c4365169441202d7ffb5c5d662af1daddc3ecc53dc71d0136",
+      "left": "e4c5e4b25030b37c4365169441202d7ffb5c5d662af1daddc3ecc53dc71d0136",
+      "right": "a6196ef6b47bf7a167e17e60e2d1ad19feb132afafd6575999e85f4356ed7361",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "413be33da213685a25912806dc0568b6ee82373c5401d237171d358d98459ac4",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "d8ba5216cb9a539ef0a8cdbf91a7e955291d5a281fe25502563a0f78fc5be82b",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "b26e56e62cf9795df7947082563bf6c6192e68c4a736089386d4632385ee867e",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/rich-unit-source-group.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "49479c2d55c1a238a9cf05134a9c9fbd013e178339793693c78106edec50352b",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/scalar-frame-finalize.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "116f971081e536b77f7656bfb631291a57bb62eb66451f23156310cbdad3ee53",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/scalar-frame-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "e8554d47371ca1891279bf17387418018b17993be9b843f5b7a50eb9516e1075",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/react/src/joint-native-frontier.spec.tsx",
+      "base": null,
+      "left": null,
+      "right": "faebf3946f71e139ca48f52326791fb92a22cfeb77095418fc792ebdb39c8fc2",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/react/src/joint-rich-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "5f9d760dc7d21d3a3c3fe9b022f740191c85287841362893dbca69b4383e6fb4",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/react/src/scalar-frame-publication.spec.tsx",
+      "base": null,
+      "left": null,
+      "right": "38747eba9ba50aaebf1c85ef3160d7ddf48b3bc7d39e99e73188210543b15d72",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/solid/src/lib/joint-native-frontier.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "9721b8b628b296a1738a51a74d08498cf48814a71367de32d505c4e720740de5",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/solid/src/lib/joint-rich-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "7ba34efc2875e22b10fdd6d2945dad822a09eac5b0cc49a6f0e707648877cf98",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/solid/src/lib/scalar-frame-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "ffe4021bb3da2f680d384dec8690caba0b6e46cb38f5870c91c7fd915ca4787a",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/entity-projection-publication.spec.ts",
+      "base": "cdb0d3691b697774b8af117406e560b063111137fad9c2f198147a17a138e810",
+      "left": "cdb0d3691b697774b8af117406e560b063111137fad9c2f198147a17a138e810",
+      "right": "2f378851f39074ce65708a2e220542a9380bbfef4383756bc79cbee3fd378f03",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/joint-direct-independent.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "fe28e7af85a23fc4f60f569084b738d54f9064aa45c9ae0be7347a125d44729e",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/joint-direct-probe.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "21011e784a08a6fdf03e02da3826d6aa6413b320c8fa12b746f9604a8b0a7d9d",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/joint-native-frontier.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "7f404a29d68ecd3288262e19dc8ac8d09486dc833196d5744a181f928daaad25",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/joint-rich-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "af139ec5c9a5eeb92e14e65573e197c71e641e4f9ace380062aa8e8078862259",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/joint-rollback-frontier.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "f060d14eaad43872dabf68ed359d849c12ce9af5a521a98c4e0c27e4f462d20c",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/scalar-frame-publication.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "29f477126e403b7bb14aa450daacc014c6a0413684a1fb1eabbcee6f13fe4105",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/vue/src/lib/settlement-publication.spec.ts",
+      "base": "cb69e5829ae69bea669e631646ce57c47ec6c922011d475a6af1ce6491cbc49d",
+      "left": "cb69e5829ae69bea669e631646ce57c47ec6c922011d475a6af1ce6491cbc49d",
+      "right": "23139a888410c08a62ad9493497c1582fb8f8e9def6e484c397791d10a6f6837",
+      "method": "incoming"
+    }
+  ],
+  "conflicts": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts"
+  ]
+}

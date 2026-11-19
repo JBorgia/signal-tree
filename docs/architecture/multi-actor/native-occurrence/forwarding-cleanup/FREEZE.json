@@ -1,0 +1,28 @@
+{
+  "status": "bounded implementation complete; independent implementation/execution review pending; no activation",
+  "frozenAtUTC": "2026-10-29T21:47:50.523435+00:00",
+  "sourceManifestSha256": "d3b6da2906ae9cef72e5623b35eb6de3dee73d64b12f5c9bd408352aa627e73b",
+  "sourceFiles": 2941,
+  "predecessorManifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+  "sourcePatchSha256": "64272c6ddaafc5199404aaf394a52e6da03696babb08cba3d2af38c99b12991a",
+  "successorPatchSha256": "dc0dd8c081ee9cc5f9f1e6f2cdfcf5788abfc760ee7003c94d73f14049535856",
+  "unchangedPredecessorTests": true,
+  "gates": {
+    "forwarding-first": 0,
+    "unchanged139-output-fixed": 0,
+    "freeze-source-types": 0,
+    "freeze-spec-types": 0,
+    "matched-drop-proceed": 0,
+    "matched-hold-proceed": 0,
+    "matched-hold-row": 0,
+    "typed-extended-success-drop-proceed": 0,
+    "typed-extended-success-hold-proceed": 0,
+    "typed-extended-skip-drop-proceed": 0,
+    "typed-extended-skip-hold-proceed": 0,
+    "typed-extended-caught-drop-proceed": 0,
+    "typed-extended-caught-hold-proceed": 0,
+    "typed-explicit-value": 0
+  },
+  "patchCheck": "git -C /private/tmp/st-prepared-paired-successor/candidate apply --check /private/tmp/st-selected-forwarding-cleanup-successor/successor.patch (exit0)",
+  "reviewedProposalSha256": "b5b809e6dc0aaac18879f205711a98f380bd9266e1d4716df5001168009c06c1"
+}

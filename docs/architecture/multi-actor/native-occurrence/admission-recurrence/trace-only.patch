@@ -1,0 +1,13 @@
+--- candidate/packages/kernel/src/lib/internals/native-field-selection.ts
++++ trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts
+@@ -13,8 +13,9 @@
+ const ENDPOINTS=Symbol('native-field-endpoints');
+ export interface NativeFieldPair {readonly before:NativeFieldEndpoint;readonly after:NativeFieldEndpoint}
+ type Paired = {[ENDPOINTS]?:NativeFieldPair};
+-export function fieldEndpoints(effect:object):NativeFieldPair|undefined{return (effect as Paired)[ENDPOINTS];}
++export function fieldEndpoints(effect:object):NativeFieldPair|undefined{const pair=(effect as Paired)[ENDPOINTS];console.error('ENDPOINT-READ',JSON.stringify({effect,present:!!pair,stack:new Error().stack?.split('\n').slice(1,4)}));return pair;}
+ export function bindFieldEndpoints<T extends object>(effect:T,pair:NativeFieldPair|undefined):T {
++  console.error('ENDPOINT-BIND',JSON.stringify({effect,present:!!pair,before:pair?.before.value,after:pair?.after.value,stack:new Error().stack?.split('\n').slice(1,4)}));
+   if(pair)(effect as Paired)[ENDPOINTS]=pair;
+   else delete (effect as Paired)[ENDPOINTS];
+   return effect;

@@ -1,0 +1,64 @@
+
+> nx run kernel:test occurrence-successor.spec.ts
+
+> node tools/run-core-vitest.mjs occurrence-successor.spec.ts
+
+(node:59023) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59030) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-occurrence-successor/packages/kernel
+
+(node:59037) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occurrence-successor.spec.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts [ src/lib/occurrence-successor.spec.ts ]
+Error: Failed to resolve import "./experimental-publication/recipient-occurrence" from "src/lib/occurrence-successor.spec.ts". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /private/tmp/st-occurrence-successor/packages/kernel/src/lib/occurrence-successor.spec.ts:6:37
+  4  |  import * as life from "./experimental-publication/lifecycle";
+  5  |  import { installTerminalRecord } from "./internals/intrinsic-mutation";
+  6  |  import { RecipientOccurrences } from "./experimental-publication/recipient-occurrence";
+     |                                        ^
+  7  |  const flush = async () => {
+  8  |    getPathNotifier().flushSync();
+ ❯ TransformPluginContext._formatLog ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42658:41
+ ❯ TransformPluginContext.error ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42655:16
+ ❯ normalizeUrl ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40634:23
+ ❯ ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40753:37
+ ❯ TransformPluginContext.transform ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:40680:7
+ ❯ EnvironmentPluginContainer.transform ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:42453:18
+ ❯ loadAndTransform ../../../v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:35845:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  12:42:58
+   Duration  310ms (transform 0ms, setup 0ms, import 0ms, tests 0ms, environment 190ms)
+
+Warning: command "node tools/run-core-vitest.mjs occurrence-successor.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      802ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     776ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    776ms

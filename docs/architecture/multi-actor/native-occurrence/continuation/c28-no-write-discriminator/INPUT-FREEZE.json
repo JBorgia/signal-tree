@@ -1,0 +1,8 @@
+{
+  "base": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "overlay": "packages/kernel/src/lib/two-history-public.spec.ts",
+  "testSha256": "b11cd947609f6c4eb868449c22497d183f59edd37fda9519c822107c4f7224e5",
+  "inputManifestSha256": "0f4d2e5415a716bb5e9f63b11cef94c3238ed64adf89a470821d0cdd403daf2e",
+  "instrumentation": "none; public APIs and observations only",
+  "oracle": "Assert matched state/genuine history input and unchanged p inspection; observe all receipt/output/settlement/error results without assigning expected states"
+}

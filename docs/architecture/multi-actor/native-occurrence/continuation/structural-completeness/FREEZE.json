@@ -1,0 +1,8 @@
+{
+  "candidate": "/private/tmp/st-structural-completeness-successor/candidate",
+  "sourceManifestSha256": "14be1df54242880b5a10aa8b0822da6fa999d4586ac51047eee1c1dcac2cefe2",
+  "runtimePatchSha256": "6d89cb7159fd0aea9fe4a3ca44e717cfb689aa1a299756ccc343dba7468e0996",
+  "testsPatchSha256": "3aeab67c8a1611662ea1b5bccee4160bc888b42861d1d75b19e50115d75001fc",
+  "predecessorManifestSha256": "c5bc23c33106f0ba39223c9ac27665732dad087bf65f1342159c9c5093b77221",
+  "status": "frozen for independent review; no activation"
+}

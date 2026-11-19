@@ -1,0 +1,23 @@
+{
+  "rawUnknown": true,
+  "ownWindowOnly": false,
+  "captureWindow": true,
+  "proof": {
+    "destination": [],
+    "input": [],
+    "validation": [],
+    "owners": [],
+    "possible": [
+      {
+        "owner": 12,
+        "id": 1,
+        "outcome": "confirmed"
+      }
+    ],
+    "terminalRejectedRoles": 0,
+    "unavailableInput": false,
+    "historicalWindow": true,
+    "unknown": true,
+    "invalid": false
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "cwd": "/private/tmp/st-v16-integration-candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "exec",
+    "eslint",
+    "packages/kernel/src/lib/approved-current-obligation.spec.ts",
+    "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+    "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+    "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+    "packages/kernel/src/lib/optional-diagnostic.spec.ts",
+    "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "packages/kernel/src/lib/recipient-window-review.spec.ts",
+    "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+    "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+    "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+    "tools/testing/optional-diagnostic.ts",
+    "tools/check-doc-links.mjs",
+    "tools/experiments/multi-actor-operations/installed/run.mjs",
+    "tools/experiments/multi-actor-operations/installed/angular.mjs",
+    "tools/experiments/multi-actor-operations/installed/sealed-input.mjs",
+    "tools/experiments/multi-actor-operations/installed/reference.component.ts",
+    "tools/experiments/multi-actor-operations/installed/angular-runtime.mjs"
+  ],
+  "env": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/sbin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-v16-test-doc-composition/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-large-qualification/graph-original",
+    "TMPDIR": "/private/tmp/st-v16-test-doc-composition/runs/affected-lint/tmp",
+    "npm_config_cache": "/private/tmp/st-v16-test-doc-composition/npm-cache"
+  },
+  "absoluteTimeoutSeconds": 600,
+  "startedAt": "2026-11-03T18:59:26.506216+00:00"
+}

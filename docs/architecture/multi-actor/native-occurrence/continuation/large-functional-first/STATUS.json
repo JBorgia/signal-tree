@@ -1,0 +1,111 @@
+{
+  "updatedAt": "2026-11-03T18:16:20.011348+00:00",
+  "identity": {
+    "candidate": "/private/tmp/st-v16-integration-candidate",
+    "candidateManifest": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+    "screen": "/private/tmp/st-large-qualification/screen-candidate",
+    "screenManifest": "69d5bcd26e5cf8cc1c3884dba159436ee23b386eeace2c8046a667550905d459",
+    "delta": [
+      "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts"
+    ],
+    "originalsUntouched": true
+  },
+  "results": {
+    "graph-original": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "graph-setup-pass",
+      "workerPids": [],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 487325696,
+      "minimumObservedHostFreePercentage": 31.0
+    },
+    "graph-screen": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "graph-setup-pass",
+      "workerPids": [],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 371851264,
+      "minimumObservedHostFreePercentage": 32.0
+    },
+    "original-membership": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        51344
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 1338163200,
+      "minimumObservedHostFreePercentage": 32.0
+    },
+    "original-replacement-undo-redo": {
+      "exit": -15,
+      "qualified": false,
+      "classification": "aggregate-owned-rss-over2GiB",
+      "workerPids": [
+        51877
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 2201042944,
+      "minimumObservedHostFreePercentage": 38.0
+    },
+    "screen-membership": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        47622
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 799784960,
+      "minimumObservedHostFreePercentage": 34.0
+    },
+    "screen-replacement-undo-redo": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        48078
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 582582272,
+      "minimumObservedHostFreePercentage": 32.0
+    },
+    "screen-restoration-jumps": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        48467
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 802652160,
+      "minimumObservedHostFreePercentage": 38.0
+    },
+    "screen-restoration-truncation": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        48893
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 549617664,
+      "minimumObservedHostFreePercentage": 38.0
+    }
+  },
+  "stopped": true,
+  "heavySlot": "retained exclusively",
+  "scope": "finite selected-case functional qualification; not A/B memory measurement"
+}

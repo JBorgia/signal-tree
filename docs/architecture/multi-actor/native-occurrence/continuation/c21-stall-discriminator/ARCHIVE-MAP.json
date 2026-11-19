@@ -1,0 +1,44 @@
+[
+  {
+    "source": "large-batch-worker.sample.txt",
+    "archive": "large-batch-worker.sample.txt",
+    "sourceSha256": "c62142ac8d282c18002c1fe49836e56d42e9293edaf6766255b6bd4ff881199b",
+    "archiveSha256": "c62142ac8d282c18002c1fe49836e56d42e9293edaf6766255b6bd4ff881199b"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "43fa7d8712dd30ecf32f87429e338a4985d9b7d586ebc4a1f648b497142e8f3d",
+    "archiveSha256": "43fa7d8712dd30ecf32f87429e338a4985d9b7d586ebc4a1f648b497142e8f3d"
+  },
+  {
+    "source": "LOG-EVIDENCE.json",
+    "archive": "LOG-EVIDENCE.json",
+    "sourceSha256": "cf41a2d3bbfbf23cd843569ed2b39989aa0ecb6a3824f42f6005b741ea90b41a",
+    "archiveSha256": "cf41a2d3bbfbf23cd843569ed2b39989aa0ecb6a3824f42f6005b741ea90b41a"
+  },
+  {
+    "source": "defaults.9aQKnqFk.js",
+    "archive": "defaults.9aQKnqFk.js",
+    "sourceSha256": "e500ba917d0d320a037b4ad92ae691462b50a939e21b1f98d0073c45d55466ab",
+    "archiveSha256": "e500ba917d0d320a037b4ad92ae691462b50a939e21b1f98d0073c45d55466ab"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "21626f9295a21131a27b62b95746cf77ce83b41538d43f7e32fbc18071ae4a42",
+    "archiveSha256": "21626f9295a21131a27b62b95746cf77ce83b41538d43f7e32fbc18071ae4a42"
+  },
+  {
+    "source": "cli-api.24X8XwN1.js",
+    "archive": "cli-api.24X8XwN1.js.gz",
+    "sourceSha256": "02f2ab29d67228334503688a0168fa08ddb42949aa447fbcd7541d06919a4f7d",
+    "archiveSha256": "e8eaa5c5a5308ee7c5126a48b1fa29e7095347ece134db275f1a9dd93c54f1e3"
+  },
+  {
+    "source": "coverage.DM_a_rWm.js",
+    "archive": "coverage.DM_a_rWm.js",
+    "sourceSha256": "e509f3cc1bd81ae6426265253fa926cbde02be5cebfe35b1df422017bffdca31",
+    "archiveSha256": "e509f3cc1bd81ae6426265253fa926cbde02be5cebfe35b1df422017bffdca31"
+  }
+]

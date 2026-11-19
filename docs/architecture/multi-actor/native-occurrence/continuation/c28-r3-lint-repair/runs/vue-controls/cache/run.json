@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test vue scalar-frame-publication whole-value-new-keys entity-native-obligation-composition --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:31:24.359Z",
+    "endTime": "2026-11-03T05:31:30.342Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "vue:test",
+      "target": "test",
+      "projectName": "vue",
+      "hash": "1862383582930999000",
+      "startTime": "2026-11-03T05:31:24.383Z",
+      "endTime": "2026-11-03T05:31:30.341Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

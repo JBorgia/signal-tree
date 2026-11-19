@@ -1,0 +1,9 @@
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c13-retention-composition/candidate/packages/kernel
+
+
+ Test Files  3 passed (3)
+      Tests  10 passed (10)
+   Start at  11:00:37
+   Duration  2.94s (transform 1.80s, setup 0ms, import 2.32s, tests 2.66s, environment 1.35s)
+

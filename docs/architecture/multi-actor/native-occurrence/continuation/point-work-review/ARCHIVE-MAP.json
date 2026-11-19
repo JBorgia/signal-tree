@@ -1,0 +1,14 @@
+[
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "585d83d13a7ca6fce9bcb5333a45c7beb51daebbac733b992350fa33222680ae",
+    "archiveSha256": "585d83d13a7ca6fce9bcb5333a45c7beb51daebbac733b992350fa33222680ae"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "b1c8515849c7719f97926eda7a86a436b7bd05874cc7161931e621ac44e392a7",
+    "archiveSha256": "b1c8515849c7719f97926eda7a86a436b7bd05874cc7161931e621ac44e392a7"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "snapshot": "C0",
+    "manifest": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+    "test_hash": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4",
+    "source_hash": "7489aab0e44f0dcec48522a30081207ee5d26bd579c9dfd695fb8673681610d7",
+    "stageFinalFront": true,
+    "test_has_add_reorder": true
+  },
+  {
+    "snapshot": "C7a",
+    "manifest": "d911ae7768e8e1a43eceb99ef5277988a6ff9e59c910337bb1e6b79db4d1b71d",
+    "test_hash": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4",
+    "source_hash": "3f359f415d8f4342c955eef9991792eff487c15901e999cfafb8b212330d9a9a",
+    "stageFinalFront": true,
+    "test_has_add_reorder": true
+  }
+]

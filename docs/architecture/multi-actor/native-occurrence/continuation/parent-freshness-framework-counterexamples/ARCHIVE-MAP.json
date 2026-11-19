@@ -1,0 +1,428 @@
+[
+  {
+    "source": "vue-second-command.json",
+    "archive": "vue-second-command.json",
+    "sourceSha256": "d7df0e9210769ab9a20499d05db8e151e783582f462ffcc139fed1c2ea32c7fe",
+    "archiveSha256": "d7df0e9210769ab9a20499d05db8e151e783582f462ffcc139fed1c2ea32c7fe"
+  },
+  {
+    "source": "source-types-exit.json",
+    "archive": "source-types-exit.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "react-final.log",
+    "archive": "react-final.log",
+    "sourceSha256": "1f9c1b8b65c8cb47c1e8796e59fab91e9905adb71a9c3ba7fc1a1b13b3e69128",
+    "archiveSha256": "1f9c1b8b65c8cb47c1e8796e59fab91e9905adb71a9c3ba7fc1a1b13b3e69128"
+  },
+  {
+    "source": "c8-vue-final-exit.json",
+    "archive": "c8-vue-final-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "144465d3aca0e425b1ebe8f951e63ce8ba2f2eaff8b6a870b084b9df6508b90b",
+    "archiveSha256": "144465d3aca0e425b1ebe8f951e63ce8ba2f2eaff8b6a870b084b9df6508b90b"
+  },
+  {
+    "source": "solid-final-command.json",
+    "archive": "solid-final-command.json",
+    "sourceSha256": "0c38bdb3e540373db4cfd53efe2fa8a4a5ec4d92efed7db4f3b6379f83f485df",
+    "archiveSha256": "0c38bdb3e540373db4cfd53efe2fa8a4a5ec4d92efed7db4f3b6379f83f485df"
+  },
+  {
+    "source": "c8-solid-final.log",
+    "archive": "c8-solid-final.log",
+    "sourceSha256": "b6e464cb4bfca37b2d9d0f026ea0096cfa728e5b98a70fa83c3e6e1e442242ef",
+    "archiveSha256": "b6e464cb4bfca37b2d9d0f026ea0096cfa728e5b98a70fa83c3e6e1e442242ef"
+  },
+  {
+    "source": "source-types-command.json",
+    "archive": "source-types-command.json",
+    "sourceSha256": "790d439084ce966794468d198aeeea5a63b4df56e382a181342928a4f90265cc",
+    "archiveSha256": "790d439084ce966794468d198aeeea5a63b4df56e382a181342928a4f90265cc"
+  },
+  {
+    "source": "c8-react-final-exit.json",
+    "archive": "c8-react-final-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "SETUP.json",
+    "archive": "SETUP.json",
+    "sourceSha256": "4f5645e36005b3217e0092752a286c451b1bb46d8a610713aa28c9f5c62ae744",
+    "archiveSha256": "4f5645e36005b3217e0092752a286c451b1bb46d8a610713aa28c9f5c62ae744"
+  },
+  {
+    "source": "react-final-command.json",
+    "archive": "react-final-command.json",
+    "sourceSha256": "e2bdc1d4f28b02abb132ff1163b80e0354f44828930205cdaa3e13dee1af5c0a",
+    "archiveSha256": "e2bdc1d4f28b02abb132ff1163b80e0354f44828930205cdaa3e13dee1af5c0a"
+  },
+  {
+    "source": "format.log",
+    "archive": "format.log",
+    "sourceSha256": "16c820ede89736559cba2f54725cc87ec37f13fe0959001c1b9a8966925aedb0",
+    "archiveSha256": "16c820ede89736559cba2f54725cc87ec37f13fe0959001c1b9a8966925aedb0"
+  },
+  {
+    "source": "BASE-FREEZE.json",
+    "archive": "BASE-FREEZE.json",
+    "sourceSha256": "386b801eacaeb0468612b479acbaa9c19e1e0409f116a487a9c8751d0361d345",
+    "archiveSha256": "386b801eacaeb0468612b479acbaa9c19e1e0409f116a487a9c8751d0361d345"
+  },
+  {
+    "source": "node-version.log",
+    "archive": "node-version.log",
+    "sourceSha256": "c642a0de246dcdc6c51318fe449646fc5067b981a8d09e9ccdb8141a5756339a",
+    "archiveSha256": "c642a0de246dcdc6c51318fe449646fc5067b981a8d09e9ccdb8141a5756339a"
+  },
+  {
+    "source": "BASE-tests.patch",
+    "archive": "BASE-tests.patch",
+    "sourceSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463",
+    "archiveSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463"
+  },
+  {
+    "source": "c8-solid-first-exit.json",
+    "archive": "c8-solid-first-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "BASE-SNAPSHOT-PROOF.json",
+    "archive": "BASE-SNAPSHOT-PROOF.json.gz",
+    "sourceSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+    "archiveSha256": "bd5dd6bbf9395f270f044b0bb98bc356e759ea675cbc1ccaa86422c94adf15cb"
+  },
+  {
+    "source": "generate.py",
+    "archive": "generate.py",
+    "sourceSha256": "ad91ad4daa7b8abcd638b080b6b30b1247235c4b4ffeef970e94a53872762773",
+    "archiveSha256": "ad91ad4daa7b8abcd638b080b6b30b1247235c4b4ffeef970e94a53872762773"
+  },
+  {
+    "source": "solid-final-exit.json",
+    "archive": "solid-final-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "pnpm-version-command.json",
+    "archive": "pnpm-version-command.json",
+    "sourceSha256": "fba26f02b1b43f2c252c46b6db4df34f77c4677ee3531ccb7c2ab3d5323a2d78",
+    "archiveSha256": "fba26f02b1b43f2c252c46b6db4df34f77c4677ee3531ccb7c2ab3d5323a2d78"
+  },
+  {
+    "source": "spec-types-command.json",
+    "archive": "spec-types-command.json",
+    "sourceSha256": "08df82e802b85fa6a33a3639c0b1ca288899b3772d4109993188bddb707fc94d",
+    "archiveSha256": "08df82e802b85fa6a33a3639c0b1ca288899b3772d4109993188bddb707fc94d"
+  },
+  {
+    "source": "c8-solid-final-command.json",
+    "archive": "c8-solid-final-command.json",
+    "sourceSha256": "a9b372dc5a1b4c6a2a6fe93f0259d98a497206bb2b71866dafc2c17c595a5c2f",
+    "archiveSha256": "a9b372dc5a1b4c6a2a6fe93f0259d98a497206bb2b71866dafc2c17c595a5c2f"
+  },
+  {
+    "source": "vue-third.log",
+    "archive": "vue-third.log",
+    "sourceSha256": "cb06b1f7b5cd142bbbf90bcdede12a415f02c837af45c1d5dd6571076ec6630a",
+    "archiveSha256": "cb06b1f7b5cd142bbbf90bcdede12a415f02c837af45c1d5dd6571076ec6630a"
+  },
+  {
+    "source": "pnpm-version-exit.json",
+    "archive": "pnpm-version-exit.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "node-version-command.json",
+    "archive": "node-version-command.json",
+    "sourceSha256": "363fc9fe1ded3960970345dcc8798a7d1a54f42f389ffaa13ed926adb36483fd",
+    "archiveSha256": "363fc9fe1ded3960970345dcc8798a7d1a54f42f389ffaa13ed926adb36483fd"
+  },
+  {
+    "source": "vue-first.log",
+    "archive": "vue-first.log",
+    "sourceSha256": "b1d535a90b2139ac0ae8a404647246d78d07390081b35dacedf89bf4c274c390",
+    "archiveSha256": "b1d535a90b2139ac0ae8a404647246d78d07390081b35dacedf89bf4c274c390"
+  },
+  {
+    "source": "react-first-exit.json",
+    "archive": "react-first-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "spec-types.log",
+    "archive": "spec-types.log",
+    "sourceSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  {
+    "source": "c8-react-first.log",
+    "archive": "c8-react-first.log",
+    "sourceSha256": "ebb131d487ee0b4fa2045107f8b7cf9ed8c5408770a8bc1ab3b4d8dbce2842aa",
+    "archiveSha256": "ebb131d487ee0b4fa2045107f8b7cf9ed8c5408770a8bc1ab3b4d8dbce2842aa"
+  },
+  {
+    "source": "c8-react-final-command.json",
+    "archive": "c8-react-final-command.json",
+    "sourceSha256": "c9003b1057aaa396b39aa2cb7c31e402ecfc8b90dcb9c4875dd4e37bfdac7c9d",
+    "archiveSha256": "c9003b1057aaa396b39aa2cb7c31e402ecfc8b90dcb9c4875dd4e37bfdac7c9d"
+  },
+  {
+    "source": "BASE-BASE-SOURCE.json",
+    "archive": "BASE-BASE-SOURCE.json.gz",
+    "sourceSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+    "archiveSha256": "c87d417784e6b90fc333d83e600515da170f14bda1676e78e396b6d784d20af9"
+  },
+  {
+    "source": "vue-final-exit.json",
+    "archive": "vue-final-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "solid-first.log",
+    "archive": "solid-first.log",
+    "sourceSha256": "b0190bcf8f516d424f3b93189b08d6d7dcda5cebbf2068aa6012fb7a0d743fb3",
+    "archiveSha256": "b0190bcf8f516d424f3b93189b08d6d7dcda5cebbf2068aa6012fb7a0d743fb3"
+  },
+  {
+    "source": "c8-vue-first-command.json",
+    "archive": "c8-vue-first-command.json",
+    "sourceSha256": "00fcdc871de08d75cb9d2d2fe7cd2e6f950209e7a2bdfb4cff49855c196e3a39",
+    "archiveSha256": "00fcdc871de08d75cb9d2d2fe7cd2e6f950209e7a2bdfb4cff49855c196e3a39"
+  },
+  {
+    "source": "c8-vue-final.log",
+    "archive": "c8-vue-final.log",
+    "sourceSha256": "d009addcbc7eafa1368d99b45d74ef3c51a8480076befddb8ba188c3f36880e6",
+    "archiveSha256": "d009addcbc7eafa1368d99b45d74ef3c51a8480076befddb8ba188c3f36880e6"
+  },
+  {
+    "source": "SNAPSHOT-COUNTERPARTS.json",
+    "archive": "SNAPSHOT-COUNTERPARTS.json.gz",
+    "sourceSha256": "fd91ba9e204fdec576215e5c60bc04b1723e4637a80a60c1b7ff58a7b1ec1e77",
+    "archiveSha256": "488e06331c26263bf63cee0311e25a436c5b1734d7834978c7e7f5c6a0f41ab3"
+  },
+  {
+    "source": "vue-third-exit.json",
+    "archive": "vue-third-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "vue-second.log",
+    "archive": "vue-second.log",
+    "sourceSha256": "21d8fa8713bfe53f91e89756ee4f3b560581afbb7640a6d5dd8a337b11ec7476",
+    "archiveSha256": "21d8fa8713bfe53f91e89756ee4f3b560581afbb7640a6d5dd8a337b11ec7476"
+  },
+  {
+    "source": "vue-final-command.json",
+    "archive": "vue-final-command.json",
+    "sourceSha256": "d7df0e9210769ab9a20499d05db8e151e783582f462ffcc139fed1c2ea32c7fe",
+    "archiveSha256": "d7df0e9210769ab9a20499d05db8e151e783582f462ffcc139fed1c2ea32c7fe"
+  },
+  {
+    "source": "c8-vue-first.log",
+    "archive": "c8-vue-first.log",
+    "sourceSha256": "210929c8f2f170f8a26e9a3ed6f6a542a7158bb55ea98d98fa80a6019dd4c01a",
+    "archiveSha256": "210929c8f2f170f8a26e9a3ed6f6a542a7158bb55ea98d98fa80a6019dd4c01a"
+  },
+  {
+    "source": "c8-solid-first-command.json",
+    "archive": "c8-solid-first-command.json",
+    "sourceSha256": "a9b372dc5a1b4c6a2a6fe93f0259d98a497206bb2b71866dafc2c17c595a5c2f",
+    "archiveSha256": "a9b372dc5a1b4c6a2a6fe93f0259d98a497206bb2b71866dafc2c17c595a5c2f"
+  },
+  {
+    "source": "node-version-exit.json",
+    "archive": "node-version-exit.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "BASE-RUNTIME.patch",
+    "archive": "BASE-RUNTIME.patch",
+    "sourceSha256": "19e8c5dbd6208da35754e97244c389ade7f199548d6c81610ce309669cc78c6d",
+    "archiveSha256": "19e8c5dbd6208da35754e97244c389ade7f199548d6c81610ce309669cc78c6d"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "f07bb5c778e39e793f43017a0c55c4ca978f43860b41227a42edc0055bc225eb",
+    "archiveSha256": "f07bb5c778e39e793f43017a0c55c4ca978f43860b41227a42edc0055bc225eb"
+  },
+  {
+    "source": "solid-first-exit.json",
+    "archive": "solid-first-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "vue-second-exit.json",
+    "archive": "vue-second-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "c8-react-final.log",
+    "archive": "c8-react-final.log",
+    "sourceSha256": "1870d8a8729b97d484fe27f1efe090da8f8bfcc1fa5f49f298c97acbca1379f6",
+    "archiveSha256": "1870d8a8729b97d484fe27f1efe090da8f8bfcc1fa5f49f298c97acbca1379f6"
+  },
+  {
+    "source": "solid-final.log",
+    "archive": "solid-final.log",
+    "sourceSha256": "b80a15b6d423cff2eb9a2263a74151c1c9f2ae0eac9fc4ceead8cde1dbc1e67e",
+    "archiveSha256": "b80a15b6d423cff2eb9a2263a74151c1c9f2ae0eac9fc4ceead8cde1dbc1e67e"
+  },
+  {
+    "source": "c8-react-first-command.json",
+    "archive": "c8-react-first-command.json",
+    "sourceSha256": "c9003b1057aaa396b39aa2cb7c31e402ecfc8b90dcb9c4875dd4e37bfdac7c9d",
+    "archiveSha256": "c9003b1057aaa396b39aa2cb7c31e402ecfc8b90dcb9c4875dd4e37bfdac7c9d"
+  },
+  {
+    "source": "spec-types-exit.json",
+    "archive": "spec-types-exit.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "C8-SETUP.json",
+    "archive": "C8-SETUP.json",
+    "sourceSha256": "617d75cbaf7d3633ca65e18cba046728867696a3b7fa11e97167f555f6fd5695",
+    "archiveSha256": "617d75cbaf7d3633ca65e18cba046728867696a3b7fa11e97167f555f6fd5695"
+  },
+  {
+    "source": "vue-final.log",
+    "archive": "vue-final.log",
+    "sourceSha256": "9859723bcc36596f4bbe4be7deb509b9e317bae0dd8c930def3c0e8dc843b750",
+    "archiveSha256": "9859723bcc36596f4bbe4be7deb509b9e317bae0dd8c930def3c0e8dc843b750"
+  },
+  {
+    "source": "react-final-exit.json",
+    "archive": "react-final-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "vue-first-command.json",
+    "archive": "vue-first-command.json",
+    "sourceSha256": "92b206b6a3805dbec0e7e1436fbe682d3a3db6c5fba99ee898d9a6b9f1fa7c64",
+    "archiveSha256": "92b206b6a3805dbec0e7e1436fbe682d3a3db6c5fba99ee898d9a6b9f1fa7c64"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "520d3cf8e4182b1e634ab3c1d6ab6aca8f3e0ea4c1caa14699b3b75a105d7d59",
+    "archiveSha256": "520d3cf8e4182b1e634ab3c1d6ab6aca8f3e0ea4c1caa14699b3b75a105d7d59"
+  },
+  {
+    "source": "c8-vue-final-command.json",
+    "archive": "c8-vue-final-command.json",
+    "sourceSha256": "00fcdc871de08d75cb9d2d2fe7cd2e6f950209e7a2bdfb4cff49855c196e3a39",
+    "archiveSha256": "00fcdc871de08d75cb9d2d2fe7cd2e6f950209e7a2bdfb4cff49855c196e3a39"
+  },
+  {
+    "source": "pnpm-version.log",
+    "archive": "pnpm-version.log",
+    "sourceSha256": "f900da1311a910c04e5c793491190353e8aa6b8c73c89db3228677e1e107a5fb",
+    "archiveSha256": "f900da1311a910c04e5c793491190353e8aa6b8c73c89db3228677e1e107a5fb"
+  },
+  {
+    "source": "vue-first-exit.json",
+    "archive": "vue-first-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "c8-vue-first-exit.json",
+    "archive": "c8-vue-first-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "c8-react-first-exit.json",
+    "archive": "c8-react-first-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "717b64b2f3304366e595731c888e441c416ec7c1c87855097b01056d7ed5aaaa",
+    "archiveSha256": "717b64b2f3304366e595731c888e441c416ec7c1c87855097b01056d7ed5aaaa"
+  },
+  {
+    "source": "source-types.log",
+    "archive": "source-types.log",
+    "sourceSha256": "521a705200aec8b305fe4740e053f7ea7d6e6d3930783954c1f85e410da5e4fe",
+    "archiveSha256": "521a705200aec8b305fe4740e053f7ea7d6e6d3930783954c1f85e410da5e4fe"
+  },
+  {
+    "source": "solid-first-command.json",
+    "archive": "solid-first-command.json",
+    "sourceSha256": "0c38bdb3e540373db4cfd53efe2fa8a4a5ec4d92efed7db4f3b6379f83f485df",
+    "archiveSha256": "0c38bdb3e540373db4cfd53efe2fa8a4a5ec4d92efed7db4f3b6379f83f485df"
+  },
+  {
+    "source": "react-first.log",
+    "archive": "react-first.log",
+    "sourceSha256": "84610e75a66e747545d8fdc14519b1b23804bfec2d825dcadee9a7d44ccf15d7",
+    "archiveSha256": "84610e75a66e747545d8fdc14519b1b23804bfec2d825dcadee9a7d44ccf15d7"
+  },
+  {
+    "source": "format-command.json",
+    "archive": "format-command.json",
+    "sourceSha256": "61af959ce0b59c2651688ccd008e20c174000f26aaa18726409136aa5f2f38a9",
+    "archiveSha256": "61af959ce0b59c2651688ccd008e20c174000f26aaa18726409136aa5f2f38a9"
+  },
+  {
+    "source": "c8-solid-first.log",
+    "archive": "c8-solid-first.log",
+    "sourceSha256": "b61faa98407837139d7b80dd86ecc98d4449a36c07739463cebd0c4bde355972",
+    "archiveSha256": "b61faa98407837139d7b80dd86ecc98d4449a36c07739463cebd0c4bde355972"
+  },
+  {
+    "source": "c8-solid-final-exit.json",
+    "archive": "c8-solid-final-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "format-exit.json",
+    "archive": "format-exit.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "TESTS.patch",
+    "archive": "TESTS.patch",
+    "sourceSha256": "690620f1a4d71a0f747492e0e666ea6c997a60ceac67a061270a78e7243d10ad",
+    "archiveSha256": "690620f1a4d71a0f747492e0e666ea6c997a60ceac67a061270a78e7243d10ad"
+  },
+  {
+    "source": "vue-third-command.json",
+    "archive": "vue-third-command.json",
+    "sourceSha256": "d7df0e9210769ab9a20499d05db8e151e783582f462ffcc139fed1c2ea32c7fe",
+    "archiveSha256": "d7df0e9210769ab9a20499d05db8e151e783582f462ffcc139fed1c2ea32c7fe"
+  },
+  {
+    "source": "react-first-command.json",
+    "archive": "react-first-command.json",
+    "sourceSha256": "e2bdc1d4f28b02abb132ff1163b80e0354f44828930205cdaa3e13dee1af5c0a",
+    "archiveSha256": "e2bdc1d4f28b02abb132ff1163b80e0354f44828930205cdaa3e13dee1af5c0a"
+  }
+]

@@ -1,0 +1,35 @@
+
+> nx run kernel:test absent-collection.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs absent-collection.spec.ts --maxWorkers=1
+
+(node:31827) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31837) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-retained-source-successor/candidate/packages/kernel
+
+(node:31845) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  92 passed (92)
+   Start at  16:38:51
+   Duration  1.51s (transform 717ms, setup 0ms, import 870ms, tests 184ms, environment 331ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

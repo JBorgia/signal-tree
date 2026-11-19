@@ -1,0 +1,18 @@
+{
+  "entered": true,
+  "after": {
+    "x": 0,
+    "y": 0,
+    "z": 4
+  },
+  "sameX": false,
+  "sameY": false,
+  "sameZ": true,
+  "error": "undefined",
+  "retryError": "undefined",
+  "final": {
+    "x": 0,
+    "y": 0,
+    "z": 4
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "exit": 0,
+  "watchdog": null,
+  "caseStartsObserved": 6,
+  "unclosedCases": [],
+  "ownedGroupStillPresent": false,
+  "sourceUnchanged": true,
+  "threePassed": true
+}

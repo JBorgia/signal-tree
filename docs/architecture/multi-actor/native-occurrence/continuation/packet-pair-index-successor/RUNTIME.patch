@@ -1,0 +1,71 @@
+diff --git a/packages/kernel/src/lib/experimental-publication/entity.ts b/packages/kernel/src/lib/experimental-publication/entity.ts
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -13,6 +13,48 @@
+ const unavailable = lifecycle.unavailableRequirement;
+ const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
+ const fieldValue = (row:unknown,key:string):unknown=>own(row,key)?(row as Record<string,unknown>)[key]:undefined;
++
++/** Pair only within one admitted unit. Metadata is source-owned and stable;
++ * payloads are never read here. Keep the first physical occurrence (Array.find),
++ * independently of the last-ordinary proposal lookup below. */
++function pairPhysicalUnit(
++  paired: Map<EntityPublicationEdit, EntityPublicationEdit>,
++  ordinary: readonly EntityPublicationEdit[],
++  physical: readonly EntityPublicationEdit[] | undefined,
++  authoredRemoval?: EntityPublicationEdit
++): void {
++  if (!physical?.length || (!ordinary.length && !authoredRemoval)) return;
++  // Point units need no extra map, array, or lookup closure.
++  if (physical.length === 1) {
++    const first = physical[0];
++    for (const edit of ordinary)
++      if (first.subject === edit.subject) paired.set(edit, first);
++    if (authoredRemoval && first.subject === authoredRemoval.subject)
++      paired.set(authoredRemoval, first);
++    return;
++  }
++  const singleton = ordinary.length === 1 && !authoredRemoval
++    ? ordinary[0] : ordinary.length === 0 ? authoredRemoval : undefined;
++  if (singleton) {
++    const first = physical.find(edit => edit.subject === singleton.subject);
++    if (first) paired.set(singleton, first);
++    return;
++  }
++  const firstBySubject = new Map<number, EntityPublicationEdit>();
++  for (const edit of physical) {
++    // Map uses SameValueZero; the old strict equality never matched NaN.
++    if (edit.subject === edit.subject && !firstBySubject.has(edit.subject))
++      firstBySubject.set(edit.subject, edit);
++  }
++  for (const edit of ordinary) {
++    const first = firstBySubject.get(edit.subject);
++    if (first) paired.set(edit, first);
++  }
++  if (authoredRemoval) {
++    const first = firstBySubject.get(authoredRemoval.subject);
++    if (first) paired.set(authoredRemoval, first);
++  }
++}
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+ registerEntityPublicationFactory(() => {
+@@ -94,12 +136,13 @@
+       const nextMappings=new Map<number,Requirement>(),nextMappingViews=new Map<number,View>();
+       const physicalMembers=new Map<number,View>(),physicalPlacements=new Map<number,View>();
+       const paired=new Map<EntityPublicationEdit,EntityPublicationEdit>();
+-      for(const step of packet.steps??[]) for(const edit of [...step.ordinary,...(step.authoredRemoval?[step.authoredRemoval]:[])]) {
+-        const physical=step.physical?.find(value=>value.subject===edit.subject);
+-        if(physical)paired.set(edit,physical);
++      if (packet.steps) {
++        for (const step of packet.steps)
++          pairPhysicalUnit(paired, step.ordinary, step.physical, step.authoredRemoval);
++      } else {
++        // No steps is one unit; an explicit empty steps list has no fallback.
++        pairPhysicalUnit(paired, packet.ordinary, packet.physical);
+       }
+-      // Packets with no explicit steps are one point unit, never a flattened multi-step unit.
+-      if(!packet.steps)for(const edit of packet.ordinary){const physical=packet.physical.find(value=>value.subject===edit.subject);if(physical)paired.set(edit,physical);}
+       const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+       const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+       const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};

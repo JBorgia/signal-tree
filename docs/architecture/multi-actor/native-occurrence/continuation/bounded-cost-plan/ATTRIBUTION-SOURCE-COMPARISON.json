@@ -1,0 +1,47 @@
+{
+  "lib/experimental-publication/entity.ts": {
+    "attributedSourceSha256": "f07cab1698b8d6f859e9f836072971b656eabe8508e69085e3d0a67139b09189",
+    "C12Sha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+    "sameBytes": false
+  },
+  "lib/internals/entity-publication.ts": {
+    "attributedSourceSha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "C12Sha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "sameBytes": true
+  },
+  "lib/entity-signal.ts": {
+    "attributedSourceSha256": "02e4771405be77a19941b2c338fee058089b632d82234f812181da8202cd87ee",
+    "C12Sha256": "d88a717430732d76e7a3c6cfcba3211a707ae9adee1b7731f4b5fd9ed176cd22",
+    "sameBytes": false
+  },
+  "lib/internals/intrinsic-mutation.ts": {
+    "attributedSourceSha256": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+    "C12Sha256": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+    "sameBytes": true
+  },
+  "lib/experimental-publication/private.ts": {
+    "attributedSourceSha256": "b5b6ba96c5c96c10e2c0bb8561b21b16ec75a377d8d60c015f149bece321539d",
+    "C12Sha256": "b5b6ba96c5c96c10e2c0bb8561b21b16ec75a377d8d60c015f149bece321539d",
+    "sameBytes": true
+  },
+  "lib/internals/utilities/deep-equal.ts": {
+    "attributedSourceSha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+    "C12Sha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+    "sameBytes": true
+  },
+  "lib/internals/location-runtime.ts": {
+    "attributedSourceSha256": "cad5bf20f795c98c3df6dd9bb01260815e1a170beef54dc435ffab05546c6cbd",
+    "C12Sha256": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5",
+    "sameBytes": false
+  },
+  "lib/physical/entity-value-store.ts": {
+    "attributedSourceSha256": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+    "C12Sha256": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+    "sameBytes": true
+  },
+  "lib/experimental-publication/lifecycle.ts": {
+    "attributedSourceSha256": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+    "C12Sha256": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+    "sameBytes": true
+  }
+}

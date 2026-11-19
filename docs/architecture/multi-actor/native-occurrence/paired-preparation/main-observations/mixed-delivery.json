@@ -1,0 +1,18 @@
+{
+  "deliveries": [
+    {
+      "plain": 0,
+      "x": 0
+    }
+  ],
+  "after": {
+    "plain": 0,
+    "x": 0,
+    "y": 0,
+    "z": 4
+  },
+  "sameSupport": true,
+  "error": "Error: post-install delivery failure",
+  "exactError": true,
+  "confirmError": "Error: Cannot confirm a rolled back transaction"
+}

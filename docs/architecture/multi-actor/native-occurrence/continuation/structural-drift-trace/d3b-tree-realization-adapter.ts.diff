@@ -1,0 +1,20 @@
+--- c47b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ d3b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,4 +1,4 @@
+-import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent} from '../selected-write-operation';
++import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent,type SelectedOutcome} from '../selected-write-operation';
+ import { replaceSelectedLocation } from '../location-runtime';
+ import {fieldEndpoints} from '../native-field-selection';
+ import {getEntityPublicationBinding} from '../entity-publication';
+@@ -1857,8 +1857,9 @@
+     if (binding.field !== undefined) replaceSelectedLocation(target as import('../cell-runtime').Location<unknown>, value, selection);
+     else {
+       if (!binding.replaceSelected) throw new Error('Selected row replacement has no private continuation');
+-      const invocation=openSelected(value,selection);
+-      try{const request=consumeSelected(invocation);binding.replaceSelected(request.value,request.selection);}finally{closeSelected(invocation);}
++      const outcome:SelectedOutcome={failed:false};
++      const invocation=openSelected(value,selection,outcome);
++      try{const request=consumeSelected(invocation);binding.replaceSelected(request.value,request.selection);}finally{closeSelected(invocation);outcome.error=undefined;}
+     }
+   };
+ 

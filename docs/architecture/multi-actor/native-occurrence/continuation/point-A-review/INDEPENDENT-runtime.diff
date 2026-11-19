@@ -1,0 +1,15 @@
+--- baseline/packages/kernel/src/lib/experimental-publication/private.ts
++++ A/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -124,7 +124,11 @@
+ function nativeInputs(node:object,supplied?:unknown):lifecycle.NativeInput[]{
+  const entity=getEntityPublicationBinding(node);
+  if(entity){const captured=entity.source.captureInput(entity.subject,entity.field) as {native?:readonly lifecycle.NativeInput[]}|undefined;return [...(captured?.native??[])];}
+- return [...new Set(suppliedViews(node,supplied).map(view=>view.requirement))].map(lifecycle.captureNativeInput);
++ const views=suppliedViews(node,supplied);
++ // A singleton cannot duplicate support: retain capture timing and a fresh result,
++ // without allocating the intermediate requirement array, Set and deduped array.
++ if(views.length===1)return [lifecycle.captureNativeInput(views[0].requirement)];
++ return [...new Set(views.map(view=>view.requirement))].map(lifecycle.captureNativeInput);
+ }
+ function nativeAuthorship(node:object):{known:Cell[];unknown:boolean}{
+  const meta=getActiveWriteContext();const owner=getPositionRegistry(node)?.id;const id=meta?.transactionId;

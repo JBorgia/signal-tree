@@ -1,0 +1,16 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/independent-review-codex",
+  "argv": [
+    "/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex",
+    "exec",
+    "--ignore-user-config",
+    "--ephemeral",
+    "--sandbox",
+    "read-only",
+    "--skip-git-repo-check",
+    "--cd",
+    "/private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/independent-review-codex",
+    "-"
+  ],
+  "stdin": "PROMPT.txt"
+}

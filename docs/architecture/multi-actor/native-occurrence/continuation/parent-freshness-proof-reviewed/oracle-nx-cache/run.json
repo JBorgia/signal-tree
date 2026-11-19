@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test angular --skip-nx-cache bounded-reentry-targeted.spec.ts --testNamePattern=warmed marker --maxWorkers=1",
+    "startTime": "2026-11-02T16:14:36.911Z",
+    "endTime": "2026-11-02T16:14:38.626Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "angular:test",
+      "target": "test",
+      "projectName": "angular",
+      "hash": "11454040216005552831",
+      "startTime": "2026-11-02T16:14:36.934Z",
+      "endTime": "2026-11-02T16:14:38.625Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

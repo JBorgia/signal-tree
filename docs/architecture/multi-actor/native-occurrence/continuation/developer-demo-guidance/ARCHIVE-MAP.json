@@ -1,0 +1,110 @@
+[
+  {
+    "source": "INDEPENDENT-REVIEW.md",
+    "archive": "INDEPENDENT-REVIEW.md",
+    "sourceSha256": "551bc8cee4adb54b6ebddfd6582b66e9f236aca4f28c6aec9b36fdc87c56afb4",
+    "archiveSha256": "551bc8cee4adb54b6ebddfd6582b66e9f236aca4f28c6aec9b36fdc87c56afb4"
+  },
+  {
+    "source": "HASHES.json",
+    "archive": "HASHES.json",
+    "sourceSha256": "e5a1fb138dcd9697fdc3d985119c6be3e90611f27a5ff2cfd7ecfac314aaac78",
+    "archiveSha256": "e5a1fb138dcd9697fdc3d985119c6be3e90611f27a5ff2cfd7ecfac314aaac78"
+  },
+  {
+    "source": "README.md",
+    "archive": "README.md",
+    "sourceSha256": "6a1d7fe70b4ec32f99220acc6150465d5b838011e92e81d20d4b151390d0315c",
+    "archiveSha256": "6a1d7fe70b4ec32f99220acc6150465d5b838011e92e81d20d4b151390d0315c"
+  },
+  {
+    "source": "check.cjs",
+    "archive": "check.cjs",
+    "sourceSha256": "a3d0866e45cf75a5aeec276d7708d6d0a73e23109966e101b4bd88faa90523ea",
+    "archiveSha256": "a3d0866e45cf75a5aeec276d7708d6d0a73e23109966e101b4bd88faa90523ea"
+  },
+  {
+    "source": "PLAYWRIGHT-RECIPE.md",
+    "archive": "PLAYWRIGHT-RECIPE.md",
+    "sourceSha256": "b68ea2afec0c2c4494829ee6240ea79ff272474e231782d5c0a412452030f510",
+    "archiveSha256": "b68ea2afec0c2c4494829ee6240ea79ff272474e231782d5c0a412452030f510"
+  },
+  {
+    "source": "CHECKS.txt",
+    "archive": "CHECKS.txt",
+    "sourceSha256": "b84e146f60ab88ee53b09064962ae3323308a716f7edbf1f315a21eba5b9b143",
+    "archiveSha256": "b84e146f60ab88ee53b09064962ae3323308a716f7edbf1f315a21eba5b9b143"
+  },
+  {
+    "source": "prepare.py",
+    "archive": "prepare.py",
+    "sourceSha256": "960fb33ff4b65adf7b088a09f8623fb5503eded8b244f3baf7fd8e474ab806cf",
+    "archiveSha256": "960fb33ff4b65adf7b088a09f8623fb5503eded8b244f3baf7fd8e474ab806cf"
+  },
+  {
+    "source": "demo-guidance.patch",
+    "archive": "demo-guidance.patch",
+    "sourceSha256": "cc95bcf5d870d713d39ed4f027915460464be05a576c0c945f1af9cb1078e9e0",
+    "archiveSha256": "cc95bcf5d870d713d39ed4f027915460464be05a576c0c945f1af9cb1078e9e0"
+  },
+  {
+    "source": "before/apps/demo/src/app/app.routes.ts",
+    "archive": "before/apps/demo/src/app/app.routes.ts",
+    "sourceSha256": "eeff0324530af6a076301550984b45f7fb07a483dba2f2ca8f5a9749f6d5e539",
+    "archiveSha256": "eeff0324530af6a076301550984b45f7fb07a483dba2f2ca8f5a9749f6d5e539"
+  },
+  {
+    "source": "before/apps/demo/src/app/components/navigation/navigation.component.ts",
+    "archive": "before/apps/demo/src/app/components/navigation/navigation.component.ts",
+    "sourceSha256": "49a3394bd8791c019026b1bd7263a3a54de16d6ae10ea970e46e2cbe6ca2f223",
+    "archiveSha256": "49a3394bd8791c019026b1bd7263a3a54de16d6ae10ea970e46e2cbe6ca2f223"
+  },
+  {
+    "source": "before/apps/demo/src/app/components/navigation/navigation.component.spec.ts",
+    "archive": "before/apps/demo/src/app/components/navigation/navigation.component.spec.ts",
+    "sourceSha256": "c39c4973d80efb884c944960e95461132eb75a7c5b6941f2fe80f9115c4474a7",
+    "archiveSha256": "c39c4973d80efb884c944960e95461132eb75a7c5b6941f2fe80f9115c4474a7"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/app.routes.ts",
+    "archive": "overlay/apps/demo/src/app/app.routes.ts",
+    "sourceSha256": "ca2ae45d2a354f5f80bbbeb5ed9adfebfbe68c67bfab57f2bb89e56bf5e9c976",
+    "archiveSha256": "ca2ae45d2a354f5f80bbbeb5ed9adfebfbe68c67bfab57f2bb89e56bf5e9c976"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/components/navigation/navigation.component.ts",
+    "archive": "overlay/apps/demo/src/app/components/navigation/navigation.component.ts",
+    "sourceSha256": "5a03e81d7b11c9ea536140a908308a004faa6a9179d34cce5de91a8a1fb23d2d",
+    "archiveSha256": "5a03e81d7b11c9ea536140a908308a004faa6a9179d34cce5de91a8a1fb23d2d"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/components/navigation/navigation.component.spec.ts",
+    "archive": "overlay/apps/demo/src/app/components/navigation/navigation.component.spec.ts",
+    "sourceSha256": "9580eacb8befe177e7fa718c912860313713737c2b34e06e6f74a36ae0ca4c29",
+    "archiveSha256": "9580eacb8befe177e7fa718c912860313713737c2b34e06e6f74a36ae0ca4c29"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.html",
+    "archive": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.html",
+    "sourceSha256": "93683a81b9992ab32098d3d03dd8c7be884cbe949c5ab6e9691d5dbdd4570cab",
+    "archiveSha256": "93683a81b9992ab32098d3d03dd8c7be884cbe949c5ab6e9691d5dbdd4570cab"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.spec.ts",
+    "archive": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.spec.ts",
+    "sourceSha256": "ea940b9cc907ecc64de1e9523d12e5fa3c34f569e4ca145b421f81cf3a48213f",
+    "archiveSha256": "ea940b9cc907ecc64de1e9523d12e5fa3c34f569e4ca145b421f81cf3a48213f"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.ts",
+    "archive": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.ts",
+    "sourceSha256": "401f224ff53650173ba5238edbfe5edc62dc8e233e4f84d9f4b73256b6481eac",
+    "archiveSha256": "401f224ff53650173ba5238edbfe5edc62dc8e233e4f84d9f4b73256b6481eac"
+  },
+  {
+    "source": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.scss",
+    "archive": "overlay/apps/demo/src/app/pages/independent-publication/independent-publication.component.scss",
+    "sourceSha256": "80dc2f29749308f29a2fa1c89efc82696118b3eac07db99afb5b9acac9236662",
+    "archiveSha256": "80dc2f29749308f29a2fa1c89efc82696118b3eac07db99afb5b9acac9236662"
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "number": 1,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+      "fullName": "entity link ownership controls bare field ignores another row, collection, and tree",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 8 skipped (9)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 8.555447101593018
+  },
+  {
+    "number": 2,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+      "fullName": "opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 19 skipped (20)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 3.5724899768829346
+  },
+  {
+    "number": 3,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+      "fullName": "whole-value plain-object omission correctness an omission does not carry an unchanged inspection-only sibling to Link",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 34 skipped (35)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 2.8136448860168457
+  },
+  {
+    "number": 4,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+      "fullName": "Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 20 skipped (21)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 2.4648358821868896
+  },
+  {
+    "number": 5,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+      "fullName": "the durable commit boundary, carried by public Link a FOREIGN tree's open transaction neither absorbs nor delays this tree's write",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 4 skipped (5)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 2.5475449562072754
+  },
+  {
+    "number": 6,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+      "fullName": "entityMap missing-id guard (dev mode) warns when entities have no id and no selectId",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 2 skipped (3)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 2.2058539390563965
+  },
+  {
+    "number": 7,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+      "fullName": "audit entity boundaries row and field links retain ownership, enhanced=false",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 8 skipped (9)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 2.2445619106292725
+  },
+  {
+    "number": 8,
+    "exit": 0,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+      "fullName": "entityMap \u2014 collection queries are lazily derived (13.5.0) a single-entity update does not rebuild the collection",
+      "duplicateOrdinal": 1
+    },
+    "summary": [
+      "Test Files  1 passed (1)",
+      "Tests  1 passed | 9 skipped (10)"
+    ],
+    "elapsedSecondsForRunTrackingOnly": 2.5555858612060547
+  }
+]

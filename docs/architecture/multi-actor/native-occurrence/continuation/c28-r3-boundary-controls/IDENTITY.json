@@ -1,0 +1,6 @@
+{
+  "manifestSHA256": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "overlays": {
+    "packages/kernel/src/lib/comparator-boundary-controls.spec.ts": "21507dcce7a734e685fd38749ada24a19e1194f6fca4de20e0a45c6f1400ecf9"
+  }
+}

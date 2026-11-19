@@ -1,0 +1,11 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts: 2 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts(88,25): error TS2345: Argument of type 'Location<0>' is not assignable to parameter of type 'Location<0 | 9>'.
+packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts(104,25): error TS2345: Argument of type 'Location<0>' is not assignable to parameter of type 'Location<0 | 10>'.

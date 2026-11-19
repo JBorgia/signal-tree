@@ -1,0 +1,35 @@
+
+> nx run kernel:test clear-find-attribution.spec.ts --testNamePattern=N=(256|1024)  --maxWorkers=1
+
+> node tools/run-core-vitest.mjs clear-find-attribution.spec.ts --testNamePattern="N=(256|1024) " --maxWorkers=1
+
+(node:39198) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39205) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel
+
+(node:39212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  6 passed | 6 skipped (12)
+   Start at  12:48:54
+   Duration  2.34s (transform 896ms, setup 0ms, import 1.07s, tests 632ms, environment 466ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.0s

@@ -1,0 +1,20 @@
+[
+  {
+    "source": "AUDIT.json",
+    "archive": "AUDIT.json",
+    "sourceSha256": "1fbf2ad71363b9030b563df0dbe2acdd2f352d3153136f1c28d1d5b6a27b2cf0",
+    "archiveSha256": "1fbf2ad71363b9030b563df0dbe2acdd2f352d3153136f1c28d1d5b6a27b2cf0"
+  },
+  {
+    "source": "NEXT-DISCRIMINATOR.md",
+    "archive": "NEXT-DISCRIMINATOR.md",
+    "sourceSha256": "323f8a6b49239f322e505692239b5659cb12234bc1d302f5907f35f7a2afb9a9",
+    "archiveSha256": "323f8a6b49239f322e505692239b5659cb12234bc1d302f5907f35f7a2afb9a9"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "19f7a5fafeb6167df26300b0e1c7777a46d2f7cb97664f41ed188d58b7e116d6",
+    "archiveSha256": "19f7a5fafeb6167df26300b0e1c7777a46d2f7cb97664f41ed188d58b7e116d6"
+  }
+]

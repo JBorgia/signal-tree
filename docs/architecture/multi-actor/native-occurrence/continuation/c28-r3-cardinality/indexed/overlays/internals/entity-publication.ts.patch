@@ -1,0 +1,21 @@
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -1,3 +1,4 @@
++import { tally as ct, size as cs, check as cc } from '../cardinality-diagnostic'; // CARDINALITY-ONLY
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import type { WriteMetadata } from '../mutation-types';
+ import { combineTerminalRecords, installTerminalRecord, type PreparedPublicationUnit } from './intrinsic-mutation';
+@@ -224,11 +225,13 @@
+     group.state.packets.push(packet);return group.publication;
+   }
+   prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
++    cs("packet.ordinary",packet.ordinary.length); cs("packet.physical",packet.physical.length); ct(packet.steps===undefined?"packet.stepsAbsent":"packet.stepsPresent"); cs("packet.steps",packet.steps?.length??0);
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
+     const retirementRevision = this.retirementRevision;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
+     packet=this.admission.prepare(packet);
+     const native = this.nativeParticipant();
++    ct(native?"packet.nativePresent":"packet.nativeAbsent");
+     const nativeUnit = native?.prepare(packet);
+     const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();
+     if (native && nativeUnit) parts.push({ participant: native, unit: nativeUnit });

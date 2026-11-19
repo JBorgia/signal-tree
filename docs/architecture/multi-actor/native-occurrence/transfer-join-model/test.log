@@ -1,0 +1,22 @@
+✔ same segment keeps first baseline and latest after selection; inverse restores q as D (0.61175ms)
+✔ distinct segments cannot capture-compose; compensation keeps both field effects (0.434291ms)
+✔ equal no-effect retains selection; declaration cannot discard destination obligation (0.077666ms)
+✔ omitted superseded effect produces no inverse selection (0.069125ms)
+✔ continuous selected occupancy transfers first endpoint across segments (0.086541ms)
+✔ discontinuous structural endpoints remain separate; no omitted bridge invented (0.048875ms)
+✔ remove/add cancellation retains synthetic field baseline and latest authored selection (0.101833ms)
+✔ ordinary add lowers to physical rekey without substituting ordinary support (0.089833ms)
+✔ history references survive supersession/held output and release exactly (0.086583ms)
+✔ join staged order, mixed fields, and exclusion support; never adopt extra source row (0.181875ms)
+✔ same-value changed support is selected only with staged permission; peer stays peer (0.072125ms)
+✔ hidden/restored old lifetime may retain peer; same key new lifetime cannot alias it (0.06725ms)
+✔ held exact completion rejects changed source frontier; immutable captured map still renders (0.0845ms)
+✔ rebind equal native field values do not invent synthetic ownership from different support (0.04125ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38.429333

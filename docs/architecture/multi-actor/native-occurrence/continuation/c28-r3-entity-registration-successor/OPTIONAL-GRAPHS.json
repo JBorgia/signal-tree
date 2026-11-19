@@ -1,0 +1,140 @@
+{
+  "consumer": [
+    {
+      "module": "dist/enhancers/batching/batching.js",
+      "bytesInOutput": 2497
+    },
+    {
+      "module": "dist/enhancers/devtools/devtools.js",
+      "bytesInOutput": 202
+    },
+    {
+      "module": "dist/enhancers/index.js",
+      "bytesInOutput": 1398
+    },
+    {
+      "module": "dist/enhancers/restoration/order-boundary-evidence.js",
+      "bytesInOutput": 3496
+    },
+    {
+      "module": "dist/enhancers/restoration/restoration.js",
+      "bytesInOutput": 49590
+    },
+    {
+      "module": "dist/enhancers/transactions/occupancy-composition.js",
+      "bytesInOutput": 925
+    },
+    {
+      "module": "dist/enhancers/transactions/transactions.js",
+      "bytesInOutput": 53031
+    },
+    {
+      "module": "dist/lib/experimental-publication/entity.js",
+      "bytesInOutput": 9015
+    },
+    {
+      "module": "dist/lib/experimental-publication/lifecycle.js",
+      "bytesInOutput": 15841
+    },
+    {
+      "module": "dist/lib/experimental-publication/private.js",
+      "bytesInOutput": 24114
+    },
+    {
+      "module": "dist/lib/experimental-publication/projection.js",
+      "bytesInOutput": 312
+    },
+    {
+      "module": "dist/lib/experimental-publication/recipient-occurrence.js",
+      "bytesInOutput": 3800
+    },
+    {
+      "module": "dist/lib/link.js",
+      "bytesInOutput": 8416
+    }
+  ],
+  "lifecycle-consumer": [
+    {
+      "module": "dist/enhancers/batching/batching.js",
+      "bytesInOutput": 2497
+    },
+    {
+      "module": "dist/enhancers/devtools/devtools.js",
+      "bytesInOutput": 202
+    },
+    {
+      "module": "dist/enhancers/index.js",
+      "bytesInOutput": 1398
+    },
+    {
+      "module": "dist/enhancers/restoration/order-boundary-evidence.js",
+      "bytesInOutput": 3496
+    },
+    {
+      "module": "dist/enhancers/restoration/restoration.js",
+      "bytesInOutput": 49590
+    },
+    {
+      "module": "dist/enhancers/transactions/occupancy-composition.js",
+      "bytesInOutput": 925
+    },
+    {
+      "module": "dist/enhancers/transactions/transactions.js",
+      "bytesInOutput": 53031
+    },
+    {
+      "module": "dist/lib/experimental-publication/entity.js",
+      "bytesInOutput": 9015
+    },
+    {
+      "module": "dist/lib/experimental-publication/lifecycle.js",
+      "bytesInOutput": 15841
+    },
+    {
+      "module": "dist/lib/experimental-publication/private.js",
+      "bytesInOutput": 24114
+    },
+    {
+      "module": "dist/lib/experimental-publication/projection.js",
+      "bytesInOutput": 312
+    },
+    {
+      "module": "dist/lib/experimental-publication/recipient-occurrence.js",
+      "bytesInOutput": 3800
+    },
+    {
+      "module": "dist/lib/link.js",
+      "bytesInOutput": 8416
+    }
+  ],
+  "no-link": [
+    {
+      "module": "dist/enhancers/index.js",
+      "bytesInOutput": 1398
+    },
+    {
+      "module": "dist/enhancers/restoration/order-boundary-evidence.js",
+      "bytesInOutput": 3496
+    },
+    {
+      "module": "dist/enhancers/transactions/occupancy-composition.js",
+      "bytesInOutput": 925
+    },
+    {
+      "module": "dist/enhancers/transactions/transactions.js",
+      "bytesInOutput": 52746
+    },
+    {
+      "module": "dist/lib/experimental-publication/lifecycle.js",
+      "bytesInOutput": 11983
+    },
+    {
+      "module": "dist/lib/experimental-publication/private.js",
+      "bytesInOutput": 17837
+    },
+    {
+      "module": "dist/lib/experimental-publication/projection.js",
+      "bytesInOutput": 36
+    }
+  ]
+}

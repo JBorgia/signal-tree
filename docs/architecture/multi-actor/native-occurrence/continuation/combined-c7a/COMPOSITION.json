@@ -1,0 +1,6 @@
+{
+  "base": "C7 frozen; C6 + reviewed singleton reuse",
+  "change": "Only optional measurement-output side effect; all calibration and useful-work assertions unchanged",
+  "firstFailure": "/private/tmp/st-native-combined-c7/runs/singleton-composition/first.log",
+  "runtimeUnchanged": true
+}

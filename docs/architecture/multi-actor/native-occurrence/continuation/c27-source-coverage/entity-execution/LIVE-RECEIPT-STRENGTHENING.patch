@@ -1,0 +1,10 @@
+--- a/packages/kernel/src/lib/entity-declaration-useful-lifecycle.spec.ts
++++ b/packages/kernel/src/lib/entity-declaration-useful-lifecycle.spec.ts
+@@ -36,6 +36,7 @@
+     expect(row()).toEqual({ id: 'a', n: 0 });
+     expect(sent).toEqual([{ id: 'a', n: 0 }]);
+     const terminal = receipt.read();
++    expect(terminal.state).not.toBe('disposed');
+     record('ROW-RECEIPT-OBSERVATION', { initial, afterRollback: terminal, sent });
+     expect(Object.isFrozen(terminal)).toBe(true);
+     // Only the existing terminal/sticky state-machine category is checked here.

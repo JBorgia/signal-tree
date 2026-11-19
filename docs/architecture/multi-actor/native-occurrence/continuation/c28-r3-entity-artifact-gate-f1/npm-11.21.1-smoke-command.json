@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=entity-registration-artifacts",
+    "--artifact-integrity=sha256-f349d92ace4237eedf6822b515ceda8273acf3a3f0fbdaa6bb7df9d4fc496e1f"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+  "npm": "11.21.1",
+  "cache": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/npm-11.21.1-smoke-cache",
+  "scope": "one normal sealed artifact gate; no build or mutation rerun"
+}

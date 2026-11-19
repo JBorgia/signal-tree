@@ -1,0 +1,14 @@
+[
+  {
+    "path": "/private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/TESTS.patch",
+    "sha256": "48454f134c909a79748b91ca49a1b88f99cc83c8458e71a96ee1f88af00efb33"
+  },
+  {
+    "path": "/private/tmp/st-c11-reviewed-oracle-patch/TESTS.patch",
+    "sha256": "9a673e22d417ec38b0a3bfa256ab0aa3806cdad7c96a25bcda7ab5b3958e6711"
+  },
+  {
+    "path": "/private/tmp/st-current-reader-guidance-patch/GUIDANCE.patch",
+    "sha256": "4384cfc6dd5ac7890d4e5718f1b4b92e0c232a41948bb0ffa7fc2031871823bd"
+  }
+]

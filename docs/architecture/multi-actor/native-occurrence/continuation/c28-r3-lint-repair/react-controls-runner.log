@@ -1,0 +1,64 @@
+{"exit": 0, "timeout": false, "sourceUnchanged": true}
+-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c28-r3-lint-repair/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24)
+[90m    ... 3 lines matching cause stack trace ...[39m
+    at async Promise.all (index 2)
+    at async resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at async _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at async createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at async createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: [32m'EXTENDS_RESOLVE'[39m,
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c28-r3-lint-repair/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+  [90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)[39m
+  [90m    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)[39m
+  [90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)[39m
+  [90m    at require.resolve (node:internal/modules/helpers:171:31)[39m
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at async configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/[4mvite-tsconfig-paths[24m/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: [32m'MODULE_NOT_FOUND'[39m,
+    requireStack: [
+      [32m'/private/tmp/st-c28-r3-lint-repair/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+    ]
+  },
+  tsconfigFile: [32m'/private/tmp/st-c28-r3-lint-repair/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+}
+
+ RUN  v4.1.9 /private/tmp/st-c28-r3-lint-repair/candidate/packages/react
+
+(node:11646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11651) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11653) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  15 passed (15)
+   Start at  22:31:14
+   Duration  3.23s (transform 671ms, setup 0ms, import 1.26s, tests 146ms, environment 1.46s)
+
+
+
+
+ NX   Successfully ran target test for project react
+
+
+  Run duration:      7.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        react:test    7.2s
+

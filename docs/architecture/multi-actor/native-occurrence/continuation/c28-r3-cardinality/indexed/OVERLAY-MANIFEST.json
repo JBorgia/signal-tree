@@ -1,0 +1,8 @@
+{
+  "packages/kernel/src/lib/physical/entity-value-store.ts": "fb3a3880e6709736db3a7c57358f496c6e68bf3d2dacfd233b9c254dc313103d",
+  "packages/kernel/src/lib/internals/entity-publication.ts": "d1b1b249bf94bdaba08165ad5e915aed9b2ffd9db0ebbb3192335a2d40a66cf1",
+  "packages/kernel/src/lib/experimental-publication/entity.ts": "280098953096153992541efb067feb60a2c9878ad109a40118f077eacfffbdef",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "4215f96ee4823fb3f08c193b8e54a2f53d3a02bd4f88766306801126287fe8ce",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "00589a9bc26ed9cc306848728748efa0b6e37f7ac27429d61a2d289a337d7e7d",
+  "packages/kernel/src/lib/cardinality-diagnostic.ts": "271d6805bc9b868f391cc83d393dd1a88ebb54bc47ede0a9b2dbf41db8cd59a8"
+}

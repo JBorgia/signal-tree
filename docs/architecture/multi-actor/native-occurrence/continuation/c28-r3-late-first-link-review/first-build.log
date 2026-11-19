@@ -1,0 +1,7 @@
+
+  ...ate/tmp/st-c28-r3-late-first-link-review/split/chunk-4ZNWTTLN.js  804.2kb
+  ...../private/tmp/st-c28-r3-late-first-link-review/split/initial.js    1.6kb
+  ...vate/tmp/st-c28-r3-late-first-link-review/split/lazy-YTJPSRU4.js    139b 
+
+⚡ Done in 305ms
+{"classification":"unreached-registration-in-initial-closure","initial":["split/initial.js","split/chunk-4ZNWTTLN.js"],"registrations":["split/chunk-4ZNWTTLN.js"],"authorities":["split/chunk-4ZNWTTLN.js"],"initialRegistration":["split/chunk-4ZNWTTLN.js"],"outputs":["split/initial.js","split/lazy-YTJPSRU4.js","split/chunk-4ZNWTTLN.js"]}

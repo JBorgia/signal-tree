@@ -1,0 +1,77 @@
+
+> nx run kernel:test recipient-cause-classification.spec.ts recipient-window-review.spec.ts known-input-contract-review.spec.ts recipient-window-independent.spec.ts publication-enrollment-invariance.spec.ts aggregate-independent-input.spec.ts aggregate-installed-publication.spec.ts a1-installed-publication.spec.ts publication-validation-window-audit.spec.ts publication-terminal-horizon-independent.spec.ts publication-terminal-consumer-independent.spec.ts publication-terminal-obligation.spec.ts declaration-extensibility-e5-fork.spec.ts a1-independent-review.spec.ts intrinsic-mutation-pay-for-use.spec.ts a1-publication-installation.spec.ts publication-membership-provenance.spec.ts publication-native-provenance.spec.ts publication-evidence-scope-controls.spec.ts publication-proof-retirement.spec.ts collection-contributor-core.spec.ts aggregate-native-input-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-cause-classification.spec.ts recipient-window-review.spec.ts known-input-contract-review.spec.ts recipient-window-independent.spec.ts publication-enrollment-invariance.spec.ts aggregate-independent-input.spec.ts aggregate-installed-publication.spec.ts a1-installed-publication.spec.ts publication-validation-window-audit.spec.ts publication-terminal-horizon-independent.spec.ts publication-terminal-consumer-independent.spec.ts publication-terminal-obligation.spec.ts declaration-extensibility-e5-fork.spec.ts a1-independent-review.spec.ts intrinsic-mutation-pay-for-use.spec.ts a1-publication-installation.spec.ts publication-membership-provenance.spec.ts publication-native-provenance.spec.ts publication-evidence-scope-controls.spec.ts publication-proof-retirement.spec.ts collection-contributor-core.spec.ts aggregate-native-input-independent.spec.ts --maxWorkers=1
+
+(node:32982) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32989) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c/candidate/packages/kernel
+
+(node:32997) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33034) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33035) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33316) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33518) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33520) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33523) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33524) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33526) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33527) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33528) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:33541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  22 passed (22)
+      Tests  172 passed (172)
+   Start at  19:44:16
+   Duration  7.27s (transform 609ms, setup 0ms, import 1.99s, tests 469ms, environment 3.22s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      7.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    7.7s

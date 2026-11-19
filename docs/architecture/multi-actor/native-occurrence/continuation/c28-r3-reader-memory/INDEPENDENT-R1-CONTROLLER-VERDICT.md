@@ -1,0 +1,7 @@
+# Independent reviewer verdict for Noether
+
+Controller `run-r1.py` SHA-256 `1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344`: both prelaunch findings closed. Main's separately authorized R1 may be preregistered and launched, maximum eight matched invocations with existing stop rules. Preserve C0 as one administratively cancelled command, zero test events/memory samples; this is not erasure or a favorable data retry.
+
+Independently extracted and executed the actual numeric/valid/stop AST predicates without importing the controller. Complete receipt accepted; overlay drift stops; missing-first, single-final/wrong-size, wrong-size full sequence, reordered, duplicated, nonfinite, reused-worker and reversed-case-order cases reject/stop. Expected stage sequence exactly matches frozen template. Evidence: /private/tmp/st-c28-r3-preparation-reader-review/MEMORY-CONTROLLER-R1-CHECK.json and check-controller-r1.py. A reviewer fixture deepcopy setup error was corrected and preserved in R1-CHECK-FIRST-FAILURE.txt; no measurement process was launched.
+
+This closes bounded controller review, not raw-outcome interpretation or empirical watchdog/cleanup proof. No Nx/heavy work running from this reviewer. One small public-root esbuild split-graph discriminator follows, as Main explicitly authorized; no profiler/timing/large workload. Direct Noether messaging target was not exposed by available task inventory, so this worker-readable verdict is deposited in the shared packet.

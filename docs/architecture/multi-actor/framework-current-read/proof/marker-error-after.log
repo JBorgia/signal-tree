@@ -1,0 +1,4 @@
+{"framework":"angular","control":"fresh-error-identity-and-recovery","result":"PASS","sourceCalls":3}
+{"framework":"vue","control":"fresh-error-identity-and-recovery","result":"PASS","sourceCalls":3}
+{"framework":"vue","variant":"native","control":"dependency-poll-error","sameError":true,"sourceRuns":1,"innerRuns":2}
+{"framework":"vue","variant":"candidate","control":"dependency-poll-error","sameError":true,"sourceRuns":1,"innerRuns":2}

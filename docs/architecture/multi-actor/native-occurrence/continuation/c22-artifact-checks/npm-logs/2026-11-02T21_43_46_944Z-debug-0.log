@@ -1,0 +1,369 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/consumer/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm install /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-kernel-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-angular-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-react-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-vue-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-solid-16.0.0-dev.tgz @angular/core@^22.0.0 rxjs@^7.0.0 react@^19.0.0 react-dom@^19.0.0 @types/react@^19.0.0 @types/react-dom@^19.0.0 vue@^3.5.0 typescript@^5.6.0
+8 verbose argv "install" "--no-audit" "--no-fund" "--loglevel" "silent" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-kernel-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-angular-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-react-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-vue-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-solid-16.0.0-dev.tgz" "@angular/core@^22.0.0" "rxjs@^7.0.0" "react@^19.0.0" "react-dom@^19.0.0" "@types/react@^19.0.0" "@types/react-dom@^19.0.0" "vue@^3.5.0" "typescript@^5.6.0"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_43_46_944Z-
+10 verbose logfile /private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_43_46_944Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly logfile done cleaning log files
+14 silly idealTree buildDeps
+15 silly fetch manifest @angular/core@^22.0.0
+16 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore cache-miss
+17 http fetch GET 200 https://registry.npmjs.org/@angular%2fcore 1261ms (cache miss)
+18 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore set size:undefined disposed:false
+19 silly fetch manifest @angular/compiler@22.2.4
+20 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler cache-miss
+21 http fetch GET 200 https://registry.npmjs.org/@angular%2fcompiler 573ms (cache miss)
+22 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler set size:undefined disposed:false
+23 silly fetch manifest rxjs@^7.0.0
+24 silly packumentCache full:https://registry.npmjs.org/rxjs cache-miss
+25 http fetch GET 200 https://registry.npmjs.org/rxjs 248ms (cache miss)
+26 silly packumentCache full:https://registry.npmjs.org/rxjs set size:undefined disposed:false
+27 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+28 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+29 http fetch GET 200 https://registry.npmjs.org/zone.js 222ms (cache miss)
+30 silly packumentCache full:https://registry.npmjs.org/zone.js set size:undefined disposed:false
+31 silly fetch manifest react@^19.0.0
+32 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+33 http fetch GET 200 https://registry.npmjs.org/react 1000ms (cache miss)
+34 silly packumentCache full:https://registry.npmjs.org/react set size:undefined disposed:false
+35 silly fetch manifest react-dom@^19.0.0
+36 silly packumentCache full:https://registry.npmjs.org/react-dom cache-miss
+37 http fetch GET 200 https://registry.npmjs.org/react-dom 773ms (cache miss)
+38 silly packumentCache full:https://registry.npmjs.org/react-dom set size:undefined disposed:false
+39 silly fetch manifest @types/react@^19.0.0
+40 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+41 http fetch GET 200 https://registry.npmjs.org/@types%2freact 484ms (cache miss)
+42 silly packumentCache full:https://registry.npmjs.org/@types%2freact set size:undefined disposed:false
+43 silly fetch manifest @types/react-dom@^19.0.0
+44 silly packumentCache full:https://registry.npmjs.org/@types%2freact-dom cache-miss
+45 http fetch GET 200 https://registry.npmjs.org/@types%2freact-dom 282ms (cache miss)
+46 silly packumentCache full:https://registry.npmjs.org/@types%2freact-dom set size:undefined disposed:false
+47 silly fetch manifest vue@^3.5.0
+48 silly packumentCache full:https://registry.npmjs.org/vue cache-miss
+49 http fetch GET 200 https://registry.npmjs.org/vue 365ms (cache miss)
+50 silly packumentCache full:https://registry.npmjs.org/vue set size:undefined disposed:false
+51 silly fetch manifest typescript@^5.6.0
+52 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+53 http fetch GET 200 https://registry.npmjs.org/typescript 447ms (cache miss)
+54 silly packumentCache full:https://registry.npmjs.org/typescript set size:undefined disposed:false
+55 silly fetch manifest @signal-tree/react@file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-react-16.0.0-dev.tgz
+56 silly fetch manifest tslib@^2.0.0
+57 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+58 http fetch GET 200 https://registry.npmjs.org/tslib 262ms (cache miss)
+59 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+60 silly fetch manifest @signal-tree/vue@file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-vue-16.0.0-dev.tgz
+61 silly fetch manifest @signal-tree/solid@file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-solid-16.0.0-dev.tgz
+62 silly fetch manifest solid-js@^1.9.0
+63 silly packumentCache full:https://registry.npmjs.org/solid-js cache-miss
+64 http fetch GET 200 https://registry.npmjs.org/solid-js 295ms (cache miss)
+65 silly packumentCache full:https://registry.npmjs.org/solid-js set size:undefined disposed:false
+66 silly fetch manifest @signal-tree/angular@file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-angular-16.0.0-dev.tgz
+67 silly fetch manifest @signal-tree/kernel@file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-kernel-16.0.0-dev.tgz
+68 silly placeDep ROOT @angular/core@22.2.4 OK for: consumer@1.0.0 want: ^22.0.0
+69 silly placeDep ROOT rxjs@7.8.2 OK for: @angular/core@22.2.4 want: ^6.5.3 || ^7.4.0
+70 silly placeDep ROOT @signal-tree/angular@16.0.0-dev OK for: consumer@1.0.0 want: file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-angular-16.0.0-dev.tgz
+71 silly placeDep ROOT tslib@2.9.1 OK for: @signal-tree/angular@16.0.0-dev want: ^2.0.0
+72 silly placeDep ROOT @signal-tree/kernel@16.0.0-dev OK for: consumer@1.0.0 want: file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-kernel-16.0.0-dev.tgz
+73 silly placeDep ROOT @signal-tree/react@16.0.0-dev OK for: consumer@1.0.0 want: file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-react-16.0.0-dev.tgz
+74 silly placeDep ROOT react@19.3.1 OK for: @signal-tree/react@16.0.0-dev want: ^18.0.0 || ^19.0.0
+75 silly placeDep ROOT @signal-tree/solid@16.0.0-dev OK for: consumer@1.0.0 want: file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-solid-16.0.0-dev.tgz
+76 silly placeDep ROOT solid-js@1.9.18 OK for: @signal-tree/solid@16.0.0-dev want: ^1.9.0
+77 silly placeDep ROOT @signal-tree/vue@16.0.0-dev OK for: consumer@1.0.0 want: file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-vue-16.0.0-dev.tgz
+78 silly placeDep ROOT vue@3.5.44 OK for: @signal-tree/vue@16.0.0-dev want: ^3.5.0
+79 silly placeDep ROOT @types/react@19.3.0 OK for: consumer@1.0.0 want: ^19.0.0
+80 silly placeDep ROOT @types/react-dom@19.3.0 OK for: consumer@1.0.0 want: ^19.0.0
+81 silly placeDep ROOT react@19.3.1 REPLACE for: consumer@1.0.0 want: ^19.0.0
+82 silly placeDep ROOT react-dom@19.3.1 OK for: consumer@1.0.0 want: ^19.0.0
+83 silly placeDep ROOT rxjs@7.8.2 REPLACE for: consumer@1.0.0 want: ^7.0.0
+84 silly placeDep ROOT typescript@5.9.3 OK for: consumer@1.0.0 want: ^5.6.0
+85 silly placeDep ROOT vue@3.5.44 REPLACE for: consumer@1.0.0 want: ^3.5.0
+86 silly fetch manifest tslib@^2.3.0
+87 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+88 silly fetch manifest tslib@^2.1.0
+89 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+90 silly fetch manifest @signal-tree/kernel@16.0.0-dev
+91 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel cache-miss
+92 silly fetch manifest csstype@^3.1.0
+93 silly packumentCache full:https://registry.npmjs.org/csstype cache-miss
+94 silly fetch manifest seroval@~1.6.11
+95 silly packumentCache full:https://registry.npmjs.org/seroval cache-miss
+96 silly fetch manifest seroval-plugins@~1.6.8
+97 silly packumentCache full:https://registry.npmjs.org/seroval-plugins cache-miss
+98 silly fetch manifest @vue/shared@3.5.44
+99 silly packumentCache full:https://registry.npmjs.org/@vue%2fshared cache-miss
+100 silly fetch manifest @vue/runtime-dom@3.5.44
+101 silly packumentCache full:https://registry.npmjs.org/@vue%2fruntime-dom cache-miss
+102 silly fetch manifest @vue/compiler-dom@3.5.44
+103 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-dom cache-miss
+104 http cache https://registry.npmjs.org/tslib 184ms (cache hit)
+105 silly packumentCache full:https://registry.npmjs.org/tslib set size:111280 disposed:false
+106 silly fetch manifest @vue/compiler-sfc@3.5.44
+107 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-sfc cache-miss
+108 http cache https://registry.npmjs.org/tslib 201ms (cache hit)
+109 silly packumentCache full:https://registry.npmjs.org/tslib set size:111280 disposed:false
+110 silly packumentCache full:https://registry.npmjs.org/tslib dispose
+111 silly fetch manifest @vue/server-renderer@3.5.44
+112 silly packumentCache full:https://registry.npmjs.org/@vue%2fserver-renderer cache-miss
+113 http fetch GET 200 https://registry.npmjs.org/seroval-plugins 543ms (cache miss)
+114 silly packumentCache full:https://registry.npmjs.org/seroval-plugins set size:undefined disposed:false
+115 silly fetch manifest csstype@^3.2.2
+116 silly packumentCache full:https://registry.npmjs.org/csstype cache-miss
+117 http fetch GET 200 https://registry.npmjs.org/csstype 626ms (cache miss)
+118 silly packumentCache full:https://registry.npmjs.org/csstype set size:undefined disposed:false
+119 silly fetch manifest scheduler@^0.28.0
+120 silly packumentCache full:https://registry.npmjs.org/scheduler cache-miss
+121 http fetch GET 200 https://registry.npmjs.org/seroval 681ms (cache miss)
+122 silly packumentCache full:https://registry.npmjs.org/seroval set size:undefined disposed:false
+123 silly fetch manifest @vue/shared@3.5.44
+124 silly packumentCache full:https://registry.npmjs.org/@vue%2fshared cache-miss
+125 http fetch GET 200 https://registry.npmjs.org/@signal-tree%2fkernel 900ms (cache miss)
+126 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel set size:undefined disposed:false
+127 silly fetch manifest @vue/runtime-dom@3.5.44
+128 silly packumentCache full:https://registry.npmjs.org/@vue%2fruntime-dom cache-miss
+129 http fetch GET 200 https://registry.npmjs.org/@vue%2fserver-renderer 974ms (cache miss)
+130 silly packumentCache full:https://registry.npmjs.org/@vue%2fserver-renderer set size:undefined disposed:false
+131 silly fetch manifest @vue/compiler-dom@3.5.44
+132 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-dom cache-miss
+133 http fetch GET 200 https://registry.npmjs.org/@vue%2fshared 1196ms (cache miss)
+134 silly packumentCache full:https://registry.npmjs.org/@vue%2fshared set size:undefined disposed:false
+135 silly fetch manifest @vue/compiler-sfc@3.5.44
+136 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-sfc cache-miss
+137 http fetch GET 200 https://registry.npmjs.org/@vue%2fruntime-dom 1204ms (cache miss)
+138 silly packumentCache full:https://registry.npmjs.org/@vue%2fruntime-dom set size:undefined disposed:false
+139 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-dom 1224ms (cache miss)
+140 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-dom set size:undefined disposed:false
+141 http fetch GET 200 https://registry.npmjs.org/csstype 738ms (cache miss)
+142 silly packumentCache full:https://registry.npmjs.org/csstype set size:undefined disposed:false
+143 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-sfc 1137ms (cache miss)
+144 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-sfc set size:undefined disposed:false
+145 http fetch GET 200 https://registry.npmjs.org/@vue%2fshared 683ms (cache miss)
+146 silly packumentCache full:https://registry.npmjs.org/@vue%2fshared set size:undefined disposed:false
+147 http fetch GET 200 https://registry.npmjs.org/@vue%2fruntime-dom 534ms (cache miss)
+148 silly packumentCache full:https://registry.npmjs.org/@vue%2fruntime-dom set size:undefined disposed:false
+149 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-dom 290ms (cache miss)
+150 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-dom set size:undefined disposed:false
+151 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-sfc 455ms (cache miss)
+152 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-sfc set size:undefined disposed:false
+153 http fetch GET 200 https://registry.npmjs.org/scheduler 1191ms (cache miss)
+154 silly packumentCache full:https://registry.npmjs.org/scheduler set size:undefined disposed:false
+155 silly placeDep ROOT csstype@3.2.3 OK for: @types/react@19.3.0 want: ^3.2.2
+156 silly placeDep ROOT scheduler@0.28.0 OK for: react-dom@19.3.1 want: ^0.28.0
+157 silly placeDep ROOT seroval@1.6.12 OK for: solid-js@1.9.18 want: ~1.6.11
+158 silly placeDep ROOT seroval-plugins@1.6.12 OK for: solid-js@1.9.18 want: ~1.6.8
+159 silly placeDep ROOT @vue/compiler-dom@3.5.44 OK for: vue@3.5.44 want: 3.5.44
+160 silly placeDep ROOT @vue/compiler-sfc@3.5.44 OK for: vue@3.5.44 want: 3.5.44
+161 silly placeDep ROOT @vue/runtime-dom@3.5.44 OK for: vue@3.5.44 want: 3.5.44
+162 silly placeDep ROOT @vue/server-renderer@3.5.44 OK for: vue@3.5.44 want: 3.5.44
+163 silly placeDep ROOT @vue/shared@3.5.44 OK for: vue@3.5.44 want: 3.5.44
+164 silly fetch manifest @vue/compiler-core@3.5.44
+165 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-core cache-miss
+166 silly fetch manifest postcss@^8.5.29
+167 silly packumentCache full:https://registry.npmjs.org/postcss cache-miss
+168 silly fetch manifest magic-string@^0.30.21
+169 silly packumentCache full:https://registry.npmjs.org/magic-string cache-miss
+170 silly fetch manifest @babel/parser@^7.29.9
+171 silly packumentCache full:https://registry.npmjs.org/@babel%2fparser cache-miss
+172 silly fetch manifest estree-walker@^2.0.2
+173 silly packumentCache full:https://registry.npmjs.org/estree-walker cache-miss
+174 silly fetch manifest source-map-js@^1.2.2
+175 silly packumentCache full:https://registry.npmjs.org/source-map-js cache-miss
+176 silly fetch manifest @vue/compiler-ssr@3.5.44
+177 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-ssr cache-miss
+178 silly fetch manifest @vue/compiler-core@3.5.44
+179 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-core cache-miss
+180 silly fetch manifest @vue/reactivity@3.5.44
+181 silly packumentCache full:https://registry.npmjs.org/@vue%2freactivity cache-miss
+182 http fetch GET 200 https://registry.npmjs.org/source-map-js 641ms (cache miss)
+183 silly packumentCache full:https://registry.npmjs.org/source-map-js set size:undefined disposed:false
+184 silly fetch manifest @vue/runtime-core@3.5.44
+185 silly packumentCache full:https://registry.npmjs.org/@vue%2fruntime-core cache-miss
+186 http fetch GET 200 https://registry.npmjs.org/estree-walker 752ms (cache miss)
+187 silly packumentCache full:https://registry.npmjs.org/estree-walker set size:undefined disposed:false
+188 silly fetch manifest @vue/compiler-ssr@3.5.44
+189 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-ssr cache-miss
+190 http fetch GET 200 https://registry.npmjs.org/magic-string 799ms (cache miss)
+191 silly packumentCache full:https://registry.npmjs.org/magic-string set size:undefined disposed:false
+192 http fetch GET 200 https://registry.npmjs.org/postcss 853ms (cache miss)
+193 silly packumentCache full:https://registry.npmjs.org/postcss set size:undefined disposed:false
+194 http fetch GET 200 https://registry.npmjs.org/@babel%2fparser 1349ms (cache miss)
+195 silly packumentCache full:https://registry.npmjs.org/@babel%2fparser set size:undefined disposed:false
+196 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-core 1363ms (cache miss)
+197 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-core set size:undefined disposed:false
+198 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-ssr 1407ms (cache miss)
+199 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-ssr set size:undefined disposed:false
+200 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-core 1441ms (cache miss)
+201 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-core set size:undefined disposed:false
+202 http fetch GET 200 https://registry.npmjs.org/@vue%2freactivity 1446ms (cache miss)
+203 silly packumentCache full:https://registry.npmjs.org/@vue%2freactivity set size:undefined disposed:false
+204 http fetch GET 200 https://registry.npmjs.org/@vue%2fcompiler-ssr 856ms (cache miss)
+205 silly packumentCache full:https://registry.npmjs.org/@vue%2fcompiler-ssr set size:undefined disposed:false
+206 http fetch GET 200 https://registry.npmjs.org/@vue%2fruntime-core 1246ms (cache miss)
+207 silly packumentCache full:https://registry.npmjs.org/@vue%2fruntime-core set size:undefined disposed:false
+208 silly placeDep ROOT @vue/compiler-core@3.5.44 OK for: @vue/compiler-dom@3.5.44 want: 3.5.44
+209 silly fetch manifest entities@^7.0.1
+210 silly packumentCache full:https://registry.npmjs.org/entities cache-miss
+211 http fetch GET 200 https://registry.npmjs.org/entities 341ms (cache miss)
+212 silly packumentCache full:https://registry.npmjs.org/entities set size:undefined disposed:false
+213 silly placeDep ROOT @babel/parser@7.29.12 OK for: @vue/compiler-core@3.5.44 want: ^7.29.9
+214 silly placeDep ROOT entities@7.0.1 OK for: @vue/compiler-core@3.5.44 want: ^7.0.1
+215 silly placeDep ROOT estree-walker@2.0.2 OK for: @vue/compiler-core@3.5.44 want: ^2.0.2
+216 silly placeDep ROOT source-map-js@1.2.2 OK for: @vue/compiler-core@3.5.44 want: ^1.2.2
+217 silly fetch manifest @babel/types@^7.29.11
+218 silly packumentCache full:https://registry.npmjs.org/@babel%2ftypes cache-miss
+219 http fetch GET 200 https://registry.npmjs.org/@babel%2ftypes 189ms (cache miss)
+220 silly packumentCache full:https://registry.npmjs.org/@babel%2ftypes set size:undefined disposed:false
+221 silly placeDep ROOT @babel/types@7.29.11 OK for: @babel/parser@7.29.12 want: ^7.29.11
+222 silly fetch manifest @babel/helper-string-parser@^7.29.11
+223 silly packumentCache full:https://registry.npmjs.org/@babel%2fhelper-string-parser cache-miss
+224 silly fetch manifest @babel/helper-validator-identifier@^7.29.7
+225 silly packumentCache full:https://registry.npmjs.org/@babel%2fhelper-validator-identifier cache-miss
+226 http fetch GET 200 https://registry.npmjs.org/@babel%2fhelper-string-parser 237ms (cache miss)
+227 silly packumentCache full:https://registry.npmjs.org/@babel%2fhelper-string-parser set size:undefined disposed:false
+228 http fetch GET 200 https://registry.npmjs.org/@babel%2fhelper-validator-identifier 263ms (cache miss)
+229 silly packumentCache full:https://registry.npmjs.org/@babel%2fhelper-validator-identifier set size:undefined disposed:false
+230 silly placeDep ROOT @babel/helper-string-parser@7.29.11 OK for: @babel/types@7.29.11 want: ^7.29.11
+231 silly placeDep ROOT @babel/helper-validator-identifier@7.29.7 OK for: @babel/types@7.29.11 want: ^7.29.7
+232 silly placeDep ROOT @vue/compiler-ssr@3.5.44 OK for: @vue/compiler-sfc@3.5.44 want: 3.5.44
+233 silly placeDep ROOT magic-string@0.30.21 OK for: @vue/compiler-sfc@3.5.44 want: ^0.30.21
+234 silly placeDep ROOT postcss@8.5.32 OK for: @vue/compiler-sfc@3.5.44 want: ^8.5.29
+235 silly fetch manifest @jridgewell/sourcemap-codec@^1.5.5
+236 silly packumentCache full:https://registry.npmjs.org/@jridgewell%2fsourcemap-codec cache-miss
+237 silly fetch manifest nanoid@^3.3.20
+238 silly packumentCache full:https://registry.npmjs.org/nanoid cache-miss
+239 silly fetch manifest picocolors@^1.1.1
+240 silly packumentCache full:https://registry.npmjs.org/picocolors cache-miss
+241 http fetch GET 200 https://registry.npmjs.org/nanoid 419ms (cache miss)
+242 silly packumentCache full:https://registry.npmjs.org/nanoid set size:undefined disposed:false
+243 http fetch GET 200 https://registry.npmjs.org/@jridgewell%2fsourcemap-codec 440ms (cache miss)
+244 silly packumentCache full:https://registry.npmjs.org/@jridgewell%2fsourcemap-codec set size:undefined disposed:false
+245 http fetch GET 200 https://registry.npmjs.org/picocolors 438ms (cache miss)
+246 silly packumentCache full:https://registry.npmjs.org/picocolors set size:undefined disposed:false
+247 silly placeDep ROOT @vue/reactivity@3.5.44 OK for: @vue/runtime-dom@3.5.44 want: 3.5.44
+248 silly placeDep ROOT @vue/runtime-core@3.5.44 OK for: @vue/runtime-dom@3.5.44 want: 3.5.44
+249 silly placeDep ROOT @jridgewell/sourcemap-codec@1.6.0 OK for: magic-string@0.30.21 want: ^1.5.5
+250 silly placeDep ROOT nanoid@3.3.20 OK for: postcss@8.5.32 want: ^3.3.20
+251 silly placeDep ROOT picocolors@1.1.1 OK for: postcss@8.5.32 want: ^1.1.1
+252 silly reify moves {}
+253 http cache picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz 0ms (cache hit)
+254 http cache nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz 0ms (cache hit)
+255 http cache @jridgewell/sourcemap-codec@https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz 0ms (cache hit)
+256 http cache @vue/runtime-core@https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.44.tgz 0ms (cache hit)
+257 http cache @vue/reactivity@https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.5.44.tgz 0ms (cache hit)
+258 http cache postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz 0ms (cache hit)
+259 http cache magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz 0ms (cache hit)
+260 http cache @vue/compiler-ssr@https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.5.44.tgz 0ms (cache hit)
+261 http cache @babel/helper-validator-identifier@https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz 0ms (cache hit)
+262 http cache @babel/helper-string-parser@https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.11.tgz 0ms (cache hit)
+263 http cache @babel/types@https://registry.npmjs.org/@babel/types/-/types-7.29.11.tgz 0ms (cache hit)
+264 http cache source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz 0ms (cache hit)
+265 http cache estree-walker@https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz 0ms (cache hit)
+266 http cache entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz 0ms (cache hit)
+267 http cache @babel/parser@https://registry.npmjs.org/@babel/parser/-/parser-7.29.12.tgz 0ms (cache hit)
+268 http cache @vue/compiler-core@https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.5.44.tgz 0ms (cache hit)
+269 http cache @vue/server-renderer@https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.5.44.tgz 0ms (cache hit)
+270 http cache @vue/shared@https://registry.npmjs.org/@vue/shared/-/shared-3.5.44.tgz 0ms (cache hit)
+271 http cache @vue/runtime-dom@https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.5.44.tgz 0ms (cache hit)
+272 http cache @vue/compiler-sfc@https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.5.44.tgz 0ms (cache hit)
+273 http cache @vue/compiler-dom@https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.5.44.tgz 0ms (cache hit)
+274 http cache seroval-plugins@https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.6.12.tgz 0ms (cache hit)
+275 http cache seroval@https://registry.npmjs.org/seroval/-/seroval-1.6.12.tgz 0ms (cache hit)
+276 http cache scheduler@https://registry.npmjs.org/scheduler/-/scheduler-0.28.0.tgz 0ms (cache hit)
+277 http cache csstype@https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz 0ms (cache hit)
+278 http cache vue@https://registry.npmjs.org/vue/-/vue-3.5.44.tgz 0ms (cache hit)
+279 http cache typescript@https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz 0ms (cache hit)
+280 http cache rxjs@https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz 0ms (cache hit)
+281 http cache react-dom@https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz 0ms (cache hit)
+282 http cache react@https://registry.npmjs.org/react/-/react-19.3.1.tgz 0ms (cache hit)
+283 http cache @types/react-dom@https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz 0ms (cache hit)
+284 http cache @types/react@https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz 0ms (cache hit)
+285 http cache @signal-tree/vue@file:/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-vue-16.0.0-dev.tgz 0ms (cache hit)
+286 http cache solid-js@https://registry.npmjs.org/solid-js/-/solid-js-1.9.18.tgz 0ms (cache hit)
+287 http cache @signal-tree/solid@file:/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-solid-16.0.0-dev.tgz 0ms (cache hit)
+288 http cache @signal-tree/react@file:/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-react-16.0.0-dev.tgz 0ms (cache hit)
+289 http cache @signal-tree/kernel@file:/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-kernel-16.0.0-dev.tgz 0ms (cache hit)
+290 silly tarball no local data for picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz. Extracting by manifest.
+291 silly tarball no local data for nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz. Extracting by manifest.
+292 silly tarball no local data for @jridgewell/sourcemap-codec@https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz. Extracting by manifest.
+293 silly tarball no local data for @vue/runtime-core@https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.44.tgz. Extracting by manifest.
+294 silly tarball no local data for @vue/reactivity@https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.5.44.tgz. Extracting by manifest.
+295 silly tarball no local data for postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz. Extracting by manifest.
+296 silly tarball no local data for magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz. Extracting by manifest.
+297 silly tarball no local data for @vue/compiler-ssr@https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.5.44.tgz. Extracting by manifest.
+298 silly tarball no local data for @babel/helper-validator-identifier@https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz. Extracting by manifest.
+299 silly tarball no local data for @babel/helper-string-parser@https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.11.tgz. Extracting by manifest.
+300 silly tarball no local data for @babel/types@https://registry.npmjs.org/@babel/types/-/types-7.29.11.tgz. Extracting by manifest.
+301 silly tarball no local data for source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz. Extracting by manifest.
+302 silly tarball no local data for estree-walker@https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz. Extracting by manifest.
+303 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz. Extracting by manifest.
+304 silly tarball no local data for @babel/parser@https://registry.npmjs.org/@babel/parser/-/parser-7.29.12.tgz. Extracting by manifest.
+305 silly tarball no local data for @vue/compiler-core@https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.5.44.tgz. Extracting by manifest.
+306 silly tarball no local data for @vue/server-renderer@https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.5.44.tgz. Extracting by manifest.
+307 silly tarball no local data for @vue/shared@https://registry.npmjs.org/@vue/shared/-/shared-3.5.44.tgz. Extracting by manifest.
+308 silly tarball no local data for @vue/runtime-dom@https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.5.44.tgz. Extracting by manifest.
+309 silly tarball no local data for @vue/compiler-sfc@https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.5.44.tgz. Extracting by manifest.
+310 silly tarball no local data for @vue/compiler-dom@https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.5.44.tgz. Extracting by manifest.
+311 silly tarball no local data for seroval-plugins@https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.6.12.tgz. Extracting by manifest.
+312 silly tarball no local data for seroval@https://registry.npmjs.org/seroval/-/seroval-1.6.12.tgz. Extracting by manifest.
+313 silly tarball no local data for scheduler@https://registry.npmjs.org/scheduler/-/scheduler-0.28.0.tgz. Extracting by manifest.
+314 silly tarball no local data for csstype@https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz. Extracting by manifest.
+315 silly tarball no local data for vue@https://registry.npmjs.org/vue/-/vue-3.5.44.tgz. Extracting by manifest.
+316 silly tarball no local data for typescript@https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz. Extracting by manifest.
+317 silly tarball no local data for rxjs@https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz. Extracting by manifest.
+318 silly tarball no local data for react-dom@https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz. Extracting by manifest.
+319 silly tarball no local data for react@https://registry.npmjs.org/react/-/react-19.3.1.tgz. Extracting by manifest.
+320 silly tarball no local data for @types/react-dom@https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz. Extracting by manifest.
+321 silly tarball no local data for @types/react@https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz. Extracting by manifest.
+322 silly tarball no local data for solid-js@https://registry.npmjs.org/solid-js/-/solid-js-1.9.18.tgz. Extracting by manifest.
+323 http cache tslib@https://registry.npmjs.org/tslib/-/tslib-2.9.1.tgz 0ms (cache hit)
+324 http cache @signal-tree/angular@file:/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/signal-tree-angular-16.0.0-dev.tgz 0ms (cache hit)
+325 http cache @angular/core@https://registry.npmjs.org/@angular/core/-/core-22.2.4.tgz 0ms (cache hit)
+326 silly tarball no local data for tslib@https://registry.npmjs.org/tslib/-/tslib-2.9.1.tgz. Extracting by manifest.
+327 silly tarball no local data for @angular/core@https://registry.npmjs.org/@angular/core/-/core-22.2.4.tgz. Extracting by manifest.
+328 http fetch GET 200 https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz 2646ms (cache miss)
+329 http fetch GET 200 https://registry.npmjs.org/scheduler/-/scheduler-0.28.0.tgz 2721ms (cache miss)
+330 http fetch GET 200 https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz 3146ms (cache miss)
+331 http fetch GET 200 https://registry.npmjs.org/@types/react-dom/-/react-dom-19.3.0.tgz 3590ms (cache miss)
+332 http fetch GET 200 https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz 3784ms (cache miss)
+333 http fetch GET 200 https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.5.44.tgz 3805ms (cache miss)
+334 http fetch GET 200 https://registry.npmjs.org/@vue/shared/-/shared-3.5.44.tgz 3940ms (cache miss)
+335 http fetch GET 200 https://registry.npmjs.org/tslib/-/tslib-2.9.1.tgz 4300ms (cache miss)
+336 http fetch GET 200 https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.11.tgz 4556ms (cache miss)
+337 http fetch GET 200 https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.5.44.tgz 5586ms (cache miss)
+338 http fetch GET 200 https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz 5743ms (cache miss)
+339 http fetch GET 200 https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.5.44.tgz 5742ms (cache miss)
+340 http fetch GET 200 https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.5.44.tgz 5771ms (cache miss)
+341 http fetch GET 200 https://registry.npmjs.org/@types/react/-/react-19.3.0.tgz 5793ms (cache miss)
+342 http fetch GET 200 https://registry.npmjs.org/seroval/-/seroval-1.6.12.tgz 6038ms (cache miss)
+343 http fetch GET 200 https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz 6113ms (cache miss)
+344 http fetch GET 200 https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.44.tgz 6264ms (cache miss)
+345 http fetch GET 200 https://registry.npmjs.org/react/-/react-19.3.1.tgz 6298ms (cache miss)
+346 http fetch GET 200 https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.5.44.tgz 6542ms (cache miss)
+347 http fetch GET 200 https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz 6697ms (cache miss)
+348 http fetch GET 200 https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz 6929ms (cache miss)
+349 http fetch GET 200 https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz 7100ms (cache miss)
+350 http fetch GET 200 https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.6.12.tgz 7391ms (cache miss)
+351 http fetch GET 200 https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.5.44.tgz 7642ms (cache miss)
+352 http fetch GET 200 https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz 8728ms (cache miss)
+353 http fetch GET 200 https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.5.44.tgz 8805ms (cache miss)
+354 http fetch GET 200 https://registry.npmjs.org/@babel/parser/-/parser-7.29.12.tgz 8930ms (cache miss)
+355 http fetch GET 200 https://registry.npmjs.org/vue/-/vue-3.5.44.tgz 9505ms (cache miss)
+356 http fetch GET 200 https://registry.npmjs.org/solid-js/-/solid-js-1.9.18.tgz 10691ms (cache miss)
+357 http fetch GET 200 https://registry.npmjs.org/react-dom/-/react-dom-19.3.1.tgz 13416ms (cache miss)
+358 http fetch GET 200 https://registry.npmjs.org/entities/-/entities-7.0.1.tgz 14033ms (cache miss)
+359 http fetch GET 200 https://registry.npmjs.org/@angular/core/-/core-22.2.4.tgz 19220ms (cache miss)
+360 http fetch GET 200 https://registry.npmjs.org/@babel/types/-/types-7.29.11.tgz 19963ms (cache miss)
+361 http fetch GET 200 https://registry.npmjs.org/typescript/-/typescript-5.9.3.tgz 23528ms (cache miss)
+362 http fetch GET 200 https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz 40466ms (cache miss)
+363 verbose cwd /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/consumer
+364 verbose os Darwin 25.2.0
+365 verbose node v24.15.0
+366 verbose npm  v11.12.1
+367 verbose exit 0
+368 info ok

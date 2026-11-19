@@ -1,0 +1,47 @@
+{
+  "BASE-SOURCE-SHA256.json": {
+    "sha256": "c374723071aa1aea781d1b2caf3c13c92d522a4c226831e2fb923a20e5c72147",
+    "archive": "BASE-SOURCE-SHA256.json.gz",
+    "archiveSha256": "b411e6cbb7e0fd78df3216137108e756df1c4aa149669ab51936b8a923d6dac0"
+  },
+  "CENSUS-15-17.json": {
+    "sha256": "2adc4e83205d97303214efb4e65bb54a113ec4f47e473a2a2e5433e9f8bc4d74",
+    "archive": "CENSUS-15-17.json",
+    "archiveSha256": "2adc4e83205d97303214efb4e65bb54a113ec4f47e473a2a2e5433e9f8bc4d74"
+  },
+  "REVIEW.md": {
+    "sha256": "4c40dc270fc258763f8eab50f823d92732de6580b4f35dc2d684bee204ea4abc",
+    "archive": "REVIEW.md",
+    "archiveSha256": "4c40dc270fc258763f8eab50f823d92732de6580b4f35dc2d684bee204ea4abc"
+  },
+  "VERIFICATION.json": {
+    "sha256": "baa5d1b37b581b6ab98a2609c6d8c20d94e06da37b4356933f65a7bbadaa0262",
+    "archive": "VERIFICATION.json",
+    "archiveSha256": "baa5d1b37b581b6ab98a2609c6d8c20d94e06da37b4356933f65a7bbadaa0262"
+  },
+  "trace-confirm.json": {
+    "sha256": "5c0ebc3dbfb3f36f6ce259bce73c82b152750471352200be4619abaa309d36a5",
+    "archive": "trace-confirm.json",
+    "archiveSha256": "5c0ebc3dbfb3f36f6ce259bce73c82b152750471352200be4619abaa309d36a5"
+  },
+  "trace-destroy.json": {
+    "sha256": "cc387d1e5b50be12c0812bb2f46ae36208950cc719206568819876ef40d8e30e",
+    "archive": "trace-destroy.json",
+    "archiveSha256": "cc387d1e5b50be12c0812bb2f46ae36208950cc719206568819876ef40d8e30e"
+  },
+  "trace-first.log": {
+    "sha256": "4cedc5f2e91ca53ef69921757f3b3dc1ed6c10d59e1a80d0214c77f1e96f644b",
+    "archive": "trace-first.log",
+    "archiveSha256": "4cedc5f2e91ca53ef69921757f3b3dc1ed6c10d59e1a80d0214c77f1e96f644b"
+  },
+  "trace-rollback.json": {
+    "sha256": "b515a12a1be69cb3066cff930499347c5fe7c8a81faeb68fc39269587fab74a1",
+    "archive": "trace-rollback.json",
+    "archiveSha256": "b515a12a1be69cb3066cff930499347c5fe7c8a81faeb68fc39269587fab74a1"
+  },
+  "unchanged-first.log": {
+    "sha256": "88026f1cfd2dac95ef01c4693a89289561bffcaa96caf6300ba86dc9ac21429a",
+    "archive": "unchanged-first.log",
+    "archiveSha256": "88026f1cfd2dac95ef01c4693a89289561bffcaa96caf6300ba86dc9ac21429a"
+  }
+}

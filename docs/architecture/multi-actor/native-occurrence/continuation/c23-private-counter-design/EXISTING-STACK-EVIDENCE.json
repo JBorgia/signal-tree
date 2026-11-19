@@ -1,0 +1,52 @@
+{
+  "2000": {
+    "input": "/private/tmp/st-c21-point-bounded-alternatives/runs/A-point/observations/rows-2000.json",
+    "sha256": "16b27df8ccec67954d377b5f1a2f0a29b8d078f37b6d45ccba399a730f5a9bfd",
+    "total": 13000,
+    "events": [
+      {
+        "operation": "Array.push",
+        "stack": "    at suppliedViews (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:113:76)\n    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:127:14)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:141:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:509:50)",
+        "calls": 200,
+        "visits": 200
+      },
+      {
+        "operation": "Array.filter",
+        "stack": "    at Module.captureNativeInput (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/lifecycle.ts:154:70)\n    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:130:40)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:141:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:509:50)",
+        "calls": 200,
+        "visits": 0
+      },
+      {
+        "operation": "Array.map",
+        "stack": "    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/intrinsic-mutation.ts:321:30)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:106:37)\n    at /private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/entity-signal.ts:3504:19\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/entity-signal.ts:3501:40)",
+        "calls": 200,
+        "visits": 0
+      }
+    ]
+  },
+  "20000": {
+    "input": "/private/tmp/st-c21-point-bounded-alternatives/runs/A-point/observations/rows-20000.json",
+    "sha256": "b9f1623c921152c1a829fa9a5de14d401a402326aa704f691e3fe9a0e6c65efc",
+    "total": 13000,
+    "events": [
+      {
+        "operation": "Array.push",
+        "stack": "    at suppliedViews (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:113:76)\n    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:127:14)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:141:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:509:50)",
+        "calls": 200,
+        "visits": 200
+      },
+      {
+        "operation": "Array.filter",
+        "stack": "    at Module.captureNativeInput (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/lifecycle.ts:154:70)\n    at nativeInputs (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:130:40)\n    at Object.captureInput (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/experimental-publication/private.ts:141:43)\n    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:509:50)",
+        "calls": 200,
+        "visits": 0
+      },
+      {
+        "operation": "Array.map",
+        "stack": "    at Object.source.publicationInputCapture (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/intrinsic-mutation.ts:321:30)\n    at Object.derive (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:509:50)\n    at deriveLocation (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/internals/location-runtime.ts:106:37)\n    at /private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/entity-signal.ts:3504:19\n    at deliver (/private/tmp/st-c21-point-bounded-alternatives/A/packages/kernel/src/lib/entity-signal.ts:3501:40)",
+        "calls": 200,
+        "visits": 0
+      }
+    ]
+  }
+}

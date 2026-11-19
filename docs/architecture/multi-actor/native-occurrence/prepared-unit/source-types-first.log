@@ -1,0 +1,2 @@
+packages/kernel/src/lib/entity-signal.ts(3957,10): error TS2304: Cannot find name 'inverseClaim'.
+packages/kernel/src/lib/entity-signal.ts(3957,104): error TS2304: Cannot find name 'inverseClaim'.

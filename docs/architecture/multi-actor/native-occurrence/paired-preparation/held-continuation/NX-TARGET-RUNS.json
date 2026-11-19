@@ -1,0 +1,26 @@
+[
+  {
+    "arm": "drop-proceed",
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:retention",
+      "--skip-nx-cache"
+    ]
+  },
+  {
+    "arm": "hold-proceed",
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:retention",
+      "--skip-nx-cache"
+    ]
+  }
+]

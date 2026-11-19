@@ -1,0 +1,12 @@
+{
+  "base": "/private/tmp/st-native-combined-c/SNAPSHOT-C0.json",
+  "predecessor": "/private/tmp/st-joint-phase-successor-r1",
+  "identity": {
+    "SOURCE-SHA256.json": "289e25b0aeb5ab0d936c81b7ba77bf6994929c1a081418f6c0f6996e8c198a99",
+    "source.patch": "da637adfa2b53f932fafa7aeeceb40173b7861b09a2552e9152b033d37e94f99",
+    "tests.patch": "41c939f3952d2ddd8dcc8c22789e3dcf36b84f09758d36d1589a259128edec16",
+    "CHANGED-SHA256.json": "7e4881fdebcbd5996b035156863b9df52f10f91d1a5798e7bf15be723a6f8960",
+    "predecessor-to-r2.patch": "8869cc7fc367381be395ba67c9ca26a2d07af97b6ee8123fbe661c21ee85a794"
+  },
+  "acceptance": "not accepted; independent review required; frozen replay recorded separately"
+}

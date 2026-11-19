@@ -1,0 +1,175 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -13,37 +13,6 @@
+ const unavailable = lifecycle.unavailableRequirement;
+ const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
+ const fieldValue = (row:unknown,key:string):unknown=>own(row,key)?(row as Record<string,unknown>)[key]:undefined;
+-
+-/** Check only source-owned admission structure, never caller payloads or proof cells.
+- * Private callbacks may read the packet; changing its membership/subject/kind
+- * invalidates preparation rather than letting a lookup outlive its authority.
+- */
+-function captureAdmissionStructure(packet:EntityPublicationPacket):()=>void {
+-  const steps=packet.steps,stepOrder=steps?.slice();
+-  const arrays:{read:()=>readonly EntityPublicationEdit[]|undefined; original:readonly EntityPublicationEdit[]|undefined; entries:readonly EntityPublicationEdit[]}[]=[];
+-  const edits=new Map<EntityPublicationEdit,{subject:number;structural:EntityPublicationEdit['structural'];kind:string|undefined}>();
+-  const remember=(edit:EntityPublicationEdit)=>{if(!edits.has(edit))edits.set(edit,{subject:edit.subject,structural:edit.structural,kind:edit.structural?.kind});};
+-  const array=(read:()=>readonly EntityPublicationEdit[]|undefined)=>{
+-    const original=read(),entries=original?.slice()??[];
+-    arrays.push({read,original,entries});for(const edit of entries)remember(edit);
+-  };
+-  array(()=>packet.ordinary);array(()=>packet.physical);
+-  const removals=stepOrder?.map(step=>{
+-    array(()=>step.ordinary);array(()=>step.physical);
+-    const removal=step.authoredRemoval;if(removal)remember(removal);
+-    return removal;
+-  });
+-  return ()=>{
+-    const changed=()=>{throw new Error('Entity publication admission structure changed during preparation');};
+-    if(packet.steps!==steps||steps?.length!==stepOrder?.length)changed();
+-    for(let i=0;i<(stepOrder?.length??0);i++)if(steps![i]!==stepOrder![i]||stepOrder![i].authoredRemoval!==removals![i])changed();
+-    for(const {read,original,entries}of arrays){
+-      const current=read();if(current!==original||current?.length!==(original===undefined?undefined:entries.length))changed();
+-      for(let i=0;i<entries.length;i++)if(current![i]!==entries[i])changed();
+-    }
+-    for(const [edit,fact]of edits)if(edit.subject!==fact.subject||edit.structural!==fact.structural||edit.structural?.kind!==fact.kind)changed();
+-  };
+-}
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+ registerEntityPublicationFactory(() => {
+@@ -97,17 +66,16 @@
+       // Keep duplicates/tombstones in that sequence; only proposal lookup uses
+       // the last subject occurrence, exactly as the former reverse/find did.
+       // The index belongs to this preparation, never a source or observer cache.
+-      const validateAdmission=captureAdmissionStructure(packet);
+-      // With steps, the helper already owns its new sequence. Without steps,
+-      // copy the source array so delayed support cannot observe later mutation.
+-      const ordinaryEdits=packet.steps?entityPublicationOrdinary(packet):packet.ordinary.slice();
+-      const lastOrdinaryBySubject=new Map<number,EntityPublicationEdit>();
+-      for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
+-      const ordinarySubjects=[...lastOrdinaryBySubject.keys()];
++      // Admission owns stable metadata; reuse point membership directly.
++      // The stepped helper builds exactly one ordered sequence.
++      const ordinaryEdits=entityPublicationOrdinary(packet);
++      const singleton=ordinaryEdits.length===1?ordinaryEdits[0]:undefined;
++      const lastOrdinaryBySubject=singleton?undefined:new Map<number,EntityPublicationEdit>();
++      if(lastOrdinaryBySubject)for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
+       const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
+       const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
+-        const edit=lastOrdinaryBySubject.get(subject);
++        const edit=singleton?.subject===subject?singleton:lastOrdinaryBySubject?.get(subject);
+         if(!edit)throw new Error('Missing admitted field publication');
+         return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
+       };
+@@ -115,7 +83,6 @@
+         let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new Map());row.set(key,value);
+       }};
+       const responsibility=packet.prepareResponsibility?.(selections);
+-      validateAdmission();
+       const chosen=(edit:EntityPublicationEdit,key:string):NativeFieldEndpoint=>edit.restoredFields?.get(key)??selectedFields.get(edit.subject)?.get(key)??proposal(edit.subject,key);
+       const writes:TerminalRecordPlan['writes'][number][]=[];
+       const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+@@ -203,7 +170,7 @@
+       selected.forEdit=edit=>selectedAt.get(edit)??selected;
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+-        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...ordinarySubjects])]:[subject];
++        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject!.keys())])]:[subject];
+         if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+         for(const id of selected){
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+@@ -215,11 +182,8 @@
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+         return lifecycle.combineNativeRequirements(sources);
+       };
+-      validateAdmission();
+       return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
+-        validateAdmission();
+         if(prepared)lifecycle.finalizeNativeRequirement(requirement);
+-        validateAdmission();
+       }};
+     },
+     complete(){},
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -45,6 +45,55 @@
+   readonly physicalOrder?: readonly number[];
+   readonly ordinaryOrder?: readonly number[];
+ }
++/** Private ownership boundary: metadata is source-owned, row payloads and proof
++ * objects are not. Weak marks avoid reprocessing queued point fragments; they
++ * contain no values, certificates or revision authority and do not retain keys.
++ */
++class AdmissionMetadata {
++  private readonly edits = new WeakSet<EntityPublicationEdit>();
++  private readonly arrays = new WeakSet<readonly EntityPublicationEdit[]>();
++  private readonly packets = new WeakSet<EntityPublicationPacket>();
++  private edit(edit: EntityPublicationEdit): void {
++    if (this.edits.has(edit)) return;
++    // Native producers supply mutable shells. Copy shared metadata before locking
++    // that same edit identity. Already frozen private shells transfer ownership
++    // of their metadata too; no public API accepts publication packets.
++    if (!Object.isFrozen(edit)) {
++      if (edit.fields && !Object.isFrozen(edit.fields)) Object.defineProperty(edit,'fields',{value:Object.freeze([...edit.fields]),enumerable:true});
++      if (edit.structural) Object.defineProperty(edit,'structural',{value:Object.freeze({...edit.structural}),enumerable:true});
++    } else {
++      if (edit.fields) Object.freeze(edit.fields);
++      if (edit.structural) Object.freeze(edit.structural);
++    }
++    Object.freeze(edit);
++    this.edits.add(edit);
++  }
++  private array(edits: readonly EntityPublicationEdit[]): readonly EntityPublicationEdit[] {
++    if (this.arrays.has(edits)) return edits;
++    for (const edit of edits) this.edit(edit);
++    // These arrays are private source-issued membership, never user row payloads.
++    // Transfer their ownership once instead of duplicating every admitted list.
++    const result=Object.freeze(edits);
++    this.arrays.add(result);
++    return result;
++  }
++  prepare(packet:EntityPublicationPacket):EntityPublicationPacket {
++    if(this.packets.has(packet))return packet;
++    const steps=packet.steps?.map(step=>{
++      if(step.authoredRemoval)this.edit(step.authoredRemoval);
++      const footprint=step.authoredFootprint;
++      return Object.freeze({...step,
++        authoredFootprint:footprint?Object.freeze(footprint.kind==='fields'?{...footprint,fields:Object.freeze([...footprint.fields])}:{...footprint}):undefined,
++        ordinary:this.array(step.ordinary),physical:step.physical?this.array(step.physical):undefined});
++    });
++    const result=Object.freeze({...packet,ordinary:this.array(packet.ordinary),physical:this.array(packet.physical),
++      steps:steps?Object.freeze(steps):undefined,
++      ordinaryOrder:packet.ordinaryOrder?Object.freeze([...packet.ordinaryOrder]):undefined,
++      physicalOrder:packet.physicalOrder?Object.freeze([...packet.physicalOrder]):undefined});
++    this.packets.add(result);
++    return result;
++  }
++}
+ /** Opaque source-issued support; the reducer transports, never interprets, it. */
+ export interface EntityPublicationEvidence {
+   exclusions?():readonly (readonly [number,object])[];
+@@ -79,6 +128,7 @@
+ }
+ /** Native ownership lives with the collection even when there are no recipients. */
+ export class EntityPublicationSource {
++  private readonly admission = new AdmissionMetadata();
+   private native: EntityPublicationParticipant | undefined;
+   private readonly recipients = new Set<EntityPublicationParticipant>();
+   private recipientRevision = 0;
+@@ -158,12 +208,13 @@
+       group={state,publication:{record:{writes:[{map:gate,key:undefined,value:undefined}],adds:[]},completion,finalize:()=>{if(!state.finalized){state.finalized=true;state.unit?.finalize?.();}}}};
+       pointPreparation.set(this,group);
+     }
+-    group.state.packets.push(packet);return group.publication;
++    group.state.packets.push(this.admission.prepare(packet));return group.publication;
+   }
+   prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
+     const retirementRevision = this.retirementRevision;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
++    packet=this.admission.prepare(packet);
+     const native = this.nativeParticipant();
+     const nativeUnit = native?.prepare(packet);
+     const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();

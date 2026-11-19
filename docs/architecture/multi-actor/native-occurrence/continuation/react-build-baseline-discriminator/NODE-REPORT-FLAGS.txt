@@ -1,0 +1,5 @@
+  --report-directory, --report-dir=...
+  --report-exclude-env        Exclude environment variables when
+  --report-exclude-network    exclude network interface diagnostics.
+  --report-on-signal          generate diagnostic report upon
+  --report-signal=...         causes diagnostic report to be produced

@@ -1,0 +1,28 @@
+{
+  "exit": 0,
+  "watchdog": null,
+  "ownedGroupStillPresent": false,
+  "lastStage": {
+    "stage": "drain:after",
+    "pid": 58691,
+    "execArgv": [
+      "--experimental-import-meta-resolve",
+      "--require",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+      "--conditions",
+      "node",
+      "--conditions",
+      "development"
+    ],
+    "timeMs": 1793650185057,
+    "memory": {
+      "rss": 1113964544,
+      "heapTotal": 1900625920,
+      "heapUsed": 1794980976,
+      "external": 3957098,
+      "arrayBuffers": 64816
+    }
+  },
+  "phaseCount": 15,
+  "sourceUnchanged": true
+}

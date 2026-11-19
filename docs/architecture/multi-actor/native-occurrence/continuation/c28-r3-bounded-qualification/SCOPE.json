@@ -1,0 +1,31 @@
+{
+  "uniqueRuntimeFiles": 22,
+  "uniqueRuntimeCases": 147,
+  "selectedPaths": [
+    "packages/kernel/src/lib/link-declaration-public.spec.ts",
+    "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "packages/kernel/src/lib/equal-owner-selection-companion.spec.ts",
+    "packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts",
+    "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts",
+    "packages/kernel/src/lib/recipient-source-permission.spec.ts",
+    "packages/kernel/src/lib/recipient-window-independent.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts"
+  ],
+  "authorGateIncludedInCount": false,
+  "publicSiblingReplayed": false,
+  "repeatedUseDiagnosticReplayed": false
+}

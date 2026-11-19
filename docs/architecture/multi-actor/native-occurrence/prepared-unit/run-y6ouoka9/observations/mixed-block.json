@@ -1,0 +1,18 @@
+{
+  "calls": 0,
+  "after": {
+    "plain": 0,
+    "x": 0,
+    "y": 0,
+    "z": 4
+  },
+  "sameSupport": false,
+  "error": "undefined",
+  "retryError": "undefined",
+  "final": {
+    "plain": 0,
+    "x": 0,
+    "y": 0,
+    "z": 4
+  }
+}

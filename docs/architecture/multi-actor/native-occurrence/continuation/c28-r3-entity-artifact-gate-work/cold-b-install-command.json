@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "npm",
+    "install",
+    "--save-exact",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund",
+    "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-angular-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-react-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-solid-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-vue-16.0.0-dev.tgz"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b",
+  "env": {
+    "npm_config_cache": "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b-cache",
+    "npm_config_fetch_retries": "0",
+    "npm_config_fetch_timeout": "20000"
+  }
+}

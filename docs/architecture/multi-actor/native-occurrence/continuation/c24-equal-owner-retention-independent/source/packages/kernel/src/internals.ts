@@ -1,0 +1,275 @@
+/**
+ * `@signal-tree/kernel/internals` — supported seams for tooling, NOT everyday
+ * application API.
+ *
+ *     TOOLING NEEDS A SUPPORTED SEAM. APPLICATION CODE DOES NOT NEED
+ *     TRANSACTION HISTORY.
+ *
+ * ⚠️ The intended dependency is `studio-adapter -> kernel`, never
+ * `application business code -> confirmed turn history`. This subpath exists so
+ * Studio has a stable contract without `causal-runtime` or the transactions
+ * enhancer's storage types becoming public surface.
+ */
+export {
+  withWriteObservationScope,
+  type DeclaredWriteScopes,
+} from './lib/internals/write-observation-scope';
+import type { CarrierKind } from './lib/types';
+import type { ToolingTree } from './lib/internals/tooling-tree';
+import { getActiveWriteContext } from './lib/write-context';
+import { peekInternalTransactionRuntime } from './enhancers/transactions/transactions';
+import { getPositionRegistry } from './lib/internals/position-registry';
+import { getTreeCapabilities } from './lib/internals/tree-capabilities';
+export {
+  observeWrites,
+  type ObservedWriteFrame,
+} from './lib/internals/write-observation';
+import type { TreeId } from './lib/internals/position-registry';
+import {
+  StudioTreeDestroyedError,
+  type ConfirmedTurnEffectView,
+  type ConfirmedTurnReader,
+  type ConfirmedTurnSnapshot,
+  type ConfirmedTurnView,
+} from './lib/internals/confirmed-turn-view';
+
+export { StudioTreeDestroyedError } from './lib/internals/confirmed-turn-view';
+
+/**
+ * The transaction active in the current synchronous ambient scope, if any.
+ * This identifies callback scope, not a write target or a committed outcome.
+ * It is absent after the callback returns or throws, including across await.
+ * The owner is an opaque identity token: compare by reference, never serialize.
+ * Reading this projection installs no observation or transaction machinery.
+ */
+export function activeTransactionContext():
+  | { readonly owner: object; readonly id: number }
+  | undefined {
+  const context = getActiveWriteContext();
+  const owner = context?.transactionOwner;
+  const id = context?.transactionId;
+  if (
+    typeof owner !== 'object' ||
+    owner === null ||
+    typeof id !== 'number' ||
+    !Number.isSafeInteger(id) ||
+    id < 0
+  )
+    return undefined;
+  return { owner, id };
+}
+
+/**
+ * The capabilities this tree was CONSTRUCTED with, or `undefined` if the
+ * subject is not a tree. An empty array is meaningful — a bare tree — and must
+ * not be conflated with `undefined`.
+ *
+ * ⚠️ Generic kernel truth, deliberately. A consumer translates capabilities
+ * into its own capability model; no consumer-shaped predicate belongs here.
+ */
+export function treeCapabilities<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ToolingTree<T, C, TAccum>) {
+  return getTreeCapabilities(tree);
+}
+export type {
+  ConfirmedTurnEffectKind,
+  ConfirmedTurnEffectView,
+  ConfirmedTurnReader,
+  ConfirmedTurnRetention,
+  ConfirmedTurnSnapshot,
+  ConfirmedTurnView,
+} from './lib/internals/confirmed-turn-view';
+
+/**
+ * Project retained records into the stable view model.
+ *
+ *     THE PROJECTION LIVES HERE SO IT TREE-SHAKES.
+ *
+ * ⚠️ This was a method on `TransactionAuthority` until it was measured. Class
+ * methods are retained whenever the class is instantiated, and the transactions
+ * enhancer always instantiates that one — so every consumer paid +489 B
+ * minified / +161 B gzip for a projection most of them never call. Here it is
+ * reachable only from a build that imports `@signal-tree/kernel/internals`.
+ */
+function projectConfirmedTurns(
+  records: readonly {
+    id: number;
+    __positionIds?: number[];
+    __effects?: readonly {
+      position: number;
+      path: string;
+      ownerPath: string;
+      kind: 'set' | 'add' | 'remove' | 'rekey';
+      before?: unknown;
+      after?: unknown;
+      subject?: unknown;
+      subjectFieldSegments?: readonly string[];
+      plainBranchMembership?: {
+        readonly before: boolean;
+        readonly after: boolean;
+      };
+    }[];
+  }[],
+  retention: { truncated: boolean; firstAvailableTurnId?: number }
+): ConfirmedTurnSnapshot {
+  const turns: ConfirmedTurnView[] = [];
+  for (const record of records) {
+    const effects: ConfirmedTurnEffectView[] = [];
+    for (const effect of record.__effects ?? []) {
+      effects.push({
+        position: effect.position,
+        path: effect.path,
+        ownerPath: effect.ownerPath,
+        kind: effect.kind,
+        before: 'before' in effect ? effect.before : undefined,
+        after: 'after' in effect ? effect.after : undefined,
+        subjectId: 'subject' in effect ? effect.subject : undefined,
+        // The producer-known row-relative address, never a parsed path.
+        ...(effect.subjectFieldSegments
+          ? { fieldSegments: [...effect.subjectFieldSegments] }
+          : {}),
+        ...(effect.plainBranchMembership
+          ? { plainBranchMembership: { ...effect.plainBranchMembership } }
+          : {}),
+      });
+    }
+    turns.push({
+      id: record.id,
+      positions: [...(record.__positionIds ?? [])],
+      effects,
+    });
+  }
+
+  // EXPLICIT, not derived. The previous version inferred truncation from
+  // `firstAvailableTurnId > 1` and predicted it would "start reporting true on
+  // its own" once eviction existed. Porting L15 here proved it would not: when
+  // the WHOLE window is evicted, `turns` is empty, `firstAvailableTurnId` is
+  // undefined, and the comparison yields FALSE — asserting a complete history
+  // precisely when none was kept. Id gaps are also left by pending and
+  // rejected turns, so they were never truncation evidence to begin with.
+  return { turns, retention };
+}
+
+/**
+ * This tree's runtime identity, or `undefined` if it has none.
+ *
+ * ⚠️ SEPARATE FROM `confirmedTurnReader` ON PURPOSE. A tree built without
+ * `transactions()` has no reader, but it is still a distinct tree that a tool
+ * may legitimately attach to and key on. Folding identity into the reader would
+ * mean a capability-less tree had no identity at all, and two of them would be
+ * indistinguishable.
+ *
+ * Equality and `Map`-key use only — never serialize it. A consumer needing
+ * persistence maps this to its own session identity.
+ */
+export function treeRuntimeId<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ToolingTree<T, C, TAccum>): TreeId | undefined {
+  return getPositionRegistry(tree.$)?.id;
+}
+
+/**
+ * A read-only window onto one tree's retained committed turns, or `undefined`
+ * if this tree has no transaction runtime.
+ *
+ *     OBSERVATION PEEKS. IT DOES NOT INSTALL.
+ *
+ * ⚠️ `undefined` is a MEANINGFUL ANSWER — the tree was built without
+ * `transactions()`, or has not run one. It is deliberately not "create a
+ * runtime so there is something to read": allocating a `TransactionAuthority`
+ * because someone LOOKED would violate the rule that an unused observation seam
+ * retains nothing, and would make the act of inspecting change what is
+ * inspected.
+ *
+ * Returns a live view: it reads what the enhancer already retains and keeps no
+ * history of its own. Repeated calls are cheap and always current.
+ */
+export function confirmedTurnReader<
+  T,
+  C extends CarrierKind = CarrierKind,
+  TAccum = unknown
+>(tree: ToolingTree<T, C, TAccum>): ConfirmedTurnReader | undefined {
+  // The peek reads only the runtime's symbol on the tree, never its carriers.
+  const runtime = peekInternalTransactionRuntime(tree);
+  if (!runtime) {
+    return undefined;
+  }
+
+  const destroyed = (tree as unknown as { destroyed?: () => boolean })
+    .destroyed;
+
+  return {
+    treeId: treeRuntimeId(tree),
+    readConfirmedTurns: () => {
+      // Checked per call, not at construction: a reader is legitimately held
+      // across a tree's lifetime, and the interesting moment is the read.
+      if (destroyed?.() === true) {
+        throw new StudioTreeDestroyedError();
+      }
+      return projectConfirmedTurns(
+        runtime.getConfirmedTurnRecords() as never,
+        runtime.getConfirmedRetention()
+      );
+    },
+  };
+}
+
+/*
+ * READ-ONLY RUNTIME OBSERVATION READERS (v15 → v16 integration, slice 6).
+ *
+ * Each reader observes an existing owner; none is an authority. A reader
+ * retains no event history and never installs the capability it reads: a tree
+ * without `transactions()`, `restoration()` or entity collections answers
+ * `undefined`. Admission is `ToolingTree<T, C, TAccum>`: the accumulated
+ * surface and carrier of the constructed tree, never `TreeNode<T>` rebuilt
+ * from unwrapped state.
+ */
+export {
+  stateLocationReader,
+  type StateLocationReader,
+  type StateLocationSegment,
+  type StateLocationTarget,
+} from './lib/internals/state-location-view';
+
+export {
+  linkStateReader,
+  type LinkStateReader,
+  type LinkStateView,
+  type LinkStateEvent,
+  type LinkStateSnapshot,
+} from './lib/internals/link-state-view';
+
+export {
+  transactionLifecycleReader,
+  type PendingTransactionView,
+  type TransactionLifecycleReader,
+  type TransactionLifecycleSnapshot,
+  type TransactionLifecycleObservation,
+  type TransactionRefusalReason,
+} from './lib/internals/transaction-lifecycle-view';
+
+export {
+  restorationReader,
+  type RestorationReader,
+  type RestorationReaderSnapshot,
+  type RestorationReaderEvent,
+  type RestorationEntryView,
+  type RestorationEntryId,
+  type RestorationOperationId,
+} from './lib/internals/restoration-reader';
+
+export {
+  entityMembershipReader,
+  type EntityMembershipReader,
+  type EntityMembershipSnapshot,
+  type EntityMembershipEvent,
+  type EntityMembershipCollection,
+  type EntityMembershipLocation,
+  type EntityMembership,
+  type EntityMembershipChange,
+} from './lib/internals/entity-membership-view';

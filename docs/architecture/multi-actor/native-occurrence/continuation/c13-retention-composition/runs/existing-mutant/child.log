@@ -1,0 +1,33 @@
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c13-retention-composition/candidate/packages/kernel
+
+ ❯ src/lib/link-lifetime.spec.ts (5 tests | 1 failed) 1060ms
+     × disposed: payload is collectible 330ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/link-lifetime.spec.ts > Link lifetime: payload GC > disposed: payload is collectible
+AssertionError: expected 1970-01-01T00:00:01.234Z to be undefined
+
+- Expected:
+undefined
+
++ Received:
+1970-01-01T00:00:01.234Z
+
+ ❯ src/lib/link-lifetime.spec.ts:98:40
+     96|         await pressure();
+     97|         if (mode === 'live') expect(reference.deref()).toBeDefined();
+     98|         else expect(reference.deref()).toBeUndefined();
+       |                                        ^
+     99|       } finally {
+    100|         cleanup();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 9 passed (10)
+   Start at  11:01:06
+   Duration  2.49s (transform 1.54s, setup 0ms, import 2.04s, tests 2.47s, environment 729ms)
+

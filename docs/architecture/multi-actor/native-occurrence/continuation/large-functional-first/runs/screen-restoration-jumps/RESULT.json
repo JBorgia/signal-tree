@@ -1,0 +1,36 @@
+{
+  "id": "screen-restoration-jumps",
+  "arm": "screen",
+  "exit": 0,
+  "qualified": true,
+  "classification": "selected-case-pass",
+  "reason": null,
+  "cases": [
+    {
+      "file": "/private/tmp/st-large-qualification/screen-candidate/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "name": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit",
+      "state": "passed",
+      "expectedFailure": false,
+      "mode": "run"
+    },
+    {
+      "file": "/private/tmp/st-large-qualification/screen-candidate/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "name": "v16 restoration of turns larger than the argument limit > releases the claims of a truncated turn that cleared more rows than the argument limit",
+      "state": "skipped",
+      "expectedFailure": false,
+      "mode": "skip"
+    }
+  ],
+  "workerPids": [
+    48467
+  ],
+  "remainingOwned": [],
+  "sourceMismatches": [],
+  "dependencyDrift": false,
+  "telemetrySamples": 19,
+  "maxObservedOwnedRssBytes": 802652160,
+  "minimumObservedHostFreePercentage": 38.0,
+  "elapsedSeconds": 25.679710583994165,
+  "attempts": 1,
+  "completedAt": "2026-11-03T18:09:31.884668+00:00"
+}

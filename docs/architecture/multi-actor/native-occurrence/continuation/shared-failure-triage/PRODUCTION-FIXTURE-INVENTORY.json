@@ -1,0 +1,442 @@
+[
+  {
+    "project": "angular",
+    "file": "packages/angular/src/lib/declared-publication-composition.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "2256465d7f3f7cb5316126c302acef63f42d08be1ebc60fce87626faf44fee46",
+    "identicalToProduction": false
+  },
+  {
+    "project": "angular",
+    "file": "packages/angular/src/lib/link-native-address.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "83e52007d59b64954bf73aa6dee472ad44c4750493b97f003208ba322f38adfb",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+    "count": 3,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c",
+    "successorSha256": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "223de1a18e26295983f10f860cee2a40f7e719cafecbacf644c3a03e7bf4315d",
+    "successorSha256": "223de1a18e26295983f10f860cee2a40f7e719cafecbacf644c3a03e7bf4315d",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "3a63515b7db07d9e08b1715e3f2bd705ca3920d39109bcc23bac5314410cdcf2",
+    "successorSha256": "3a63515b7db07d9e08b1715e3f2bd705ca3920d39109bcc23bac5314410cdcf2",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "6248370ec0de3fe089a4c4729b02761e162af4d2fd1b7c3ee62f493e4309a0a1",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/enhancers/transactions/native-structural-composition-gates.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "4c00825e75267762487bc920ec053a64d873e60daff0b5ea8b4249a0d42ac38e",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "count": 4,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "821b525ff50cb1ce124fc0230cd336f718eec2376a9c3ccd20d10866c6e3aabf",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "0ec2b037b3af6a1271f747487c0f9c14261a879fd98c76147dd3a17b5a4c883d",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+    "count": 4,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "e37c51072b237dce1bffe96df143ae9b1be33d3415acf9e343e3e044ba2390af",
+    "successorSha256": "e37c51072b237dce1bffe96df143ae9b1be33d3415acf9e343e3e044ba2390af",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/audit-entity-projection.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "d863102c86150b99004dd4171d77081bb20a397c9369b4793ad576bd0ffff653",
+    "successorSha256": "d863102c86150b99004dd4171d77081bb20a397c9369b4793ad576bd0ffff653",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/authored-removal-contract.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "d1610e1535d32e2d94cabc652070fb0e2501a0a2e564a4255991a3c1eb733286",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/authored-removal-independent.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "4b936b1bdd9894118d87b53a16b9d82d94edf7677aaaca0b18d5a475fc0e174c",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99",
+    "successorSha256": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-egress-footprint.spec.ts",
+    "count": 5,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "19536a3160a4458b7b3cd85d97fb04c092c63bc64c22d675346788d5dbf84a2a",
+    "successorSha256": "19536a3160a4458b7b3cd85d97fb04c092c63bc64c22d675346788d5dbf84a2a",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "successorSha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4",
+    "successorSha256": "afb9fbb606d3cc025f1d4f3fd497266cca49002554fa94eceaa966b4463753e4",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "c1268e6dcb11f5b98251d56a749854972ea2c28c5b114b9294151bcb32252827",
+    "successorSha256": "c1268e6dcb11f5b98251d56a749854972ea2c28c5b114b9294151bcb32252827",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-obligation-matrix.spec.ts",
+    "count": 7,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-own-property-audit.spec.ts",
+    "count": 12,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "df5f931934ba452134c064a4ec5c0b325ab65354664669e932f076bb031df0c8",
+    "successorSha256": "df5f931934ba452134c064a4ec5c0b325ab65354664669e932f076bb031df0c8",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts",
+    "count": 3,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "7ca2ca3c60b332b3cf01752618e409d9a8c0b0fc2d52f97865514dd7c26b6a94",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "2a6a89b3aff4226bdc2a4070db8db648bd222390a296582e35691b9e9f0ce5f9",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "count": 5,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "successorSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "c96291c63c49b0ac5cc3c312af6c68d31581573b145595b7307ed239d4748751",
+    "successorSha256": "c96291c63c49b0ac5cc3c312af6c68d31581573b145595b7307ed239d4748751",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-commit-ordering.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "e6f6742c93fcfcf802e8708e7d1dfb42ff890ee0271deee7f939e8ff6829d0da",
+    "successorSha256": "e6f6742c93fcfcf802e8708e7d1dfb42ff890ee0271deee7f939e8ff6829d0da",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-native-address.spec.ts",
+    "count": 10,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "a4bd9896281f2a38b556443dc8286266e4419bb6710c06c265f01407b6ce5865",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-reactive-settlement.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "80c4366e29f6ef0a25053ad6086f6cea93193c96ac98ee4847b2b38dd9daee89",
+    "successorSha256": "80c4366e29f6ef0a25053ad6086f6cea93193c96ac98ee4847b2b38dd9daee89",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-structured-address-audit.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "9af87c75c5437130f15adecb90655fc5850c3b58ea695abbf9fb736ed3709aa6",
+    "successorSha256": "9af87c75c5437130f15adecb90655fc5850c3b58ea695abbf9fb736ed3709aa6",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/native-certificate-successor.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "7c53fee09ca49890f9b45c994307fe72dc177ff30ecf6cfe2ac13784d3d9136b",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf",
+    "successorSha256": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/path-notifier-membership.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "d819ff7a943c0a8ead488c43f8948f01768f6885983f0e2b4a2d37540ba289b8",
+    "successorSha256": "d819ff7a943c0a8ead488c43f8948f01768f6885983f0e2b4a2d37540ba289b8",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/prepared-placement-index.spec.ts",
+    "count": 6,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "1329b0b8c285bd2cccfd82ccf3f2cbf11def75435640d457429aeecfcee9b681",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "35fe5fa6f208dba498e9925bf247b312286993fb3a7cc56ee558c59bbb16ba1b",
+    "successorSha256": "f4245476f7cc67ecc2016690d1c2a01383c44af9985c566fa3d60e4f9657acc4",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/publication-enrollment-invariance.spec.ts",
+    "count": 6,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "e9bc2895302fd4bccd4e1180232d5accd9616e525d0ebdbadc8b8a2b4aad8316",
+    "identicalToProduction": false
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+    "successorSha256": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+    "identicalToProduction": true
+  },
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": true,
+    "productionSha256": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606",
+    "successorSha256": "86cb44e83eb1641b2cb3eb5dd7c12bc524089ccaaf41ada5367fd7cec2bce606",
+    "identicalToProduction": true
+  },
+  {
+    "project": "react",
+    "file": "packages/react/src/lib/declared-publication-composition.spec.tsx",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "1618f81ddb5077e5b04325963c1b6c8f3e8ba044064b237170395a2e02af1bab",
+    "identicalToProduction": false
+  },
+  {
+    "project": "react",
+    "file": "packages/react/src/lib/link-native-address.spec.tsx",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "d5f10a522ec126e4846a74652f31140d03c09d55b3ed886fc600d1516371c97f",
+    "identicalToProduction": false
+  },
+  {
+    "project": "solid",
+    "file": "packages/solid/src/lib/declared-publication-composition.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "2256465d7f3f7cb5316126c302acef63f42d08be1ebc60fce87626faf44fee46",
+    "identicalToProduction": false
+  },
+  {
+    "project": "solid",
+    "file": "packages/solid/src/lib/link-native-address.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "c0fc48dbb27f371866f870515949e42b2ebf200e85ac6577945167d690427913",
+    "identicalToProduction": false
+  },
+  {
+    "project": "vue",
+    "file": "packages/vue/src/lib/declared-publication-composition.spec.ts",
+    "count": 1,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "372939242e3aa63333d2ee42c59444ea6e72340643ff5ead3d44549dbfc42232",
+    "identicalToProduction": false
+  },
+  {
+    "project": "vue",
+    "file": "packages/vue/src/lib/link-native-address.spec.ts",
+    "count": 2,
+    "classification": "same failed identity, not proof of identical cause",
+    "productionExists": false,
+    "productionSha256": null,
+    "successorSha256": "67df0698bb41869e0b61c42b6374cf6fb8318a7e73546933b9a25b7e3e31802a",
+    "identicalToProduction": false
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "arm": "reader",
+  "size": 128,
+  "replicate": 1,
+  "exit": 0,
+  "watchdog": null,
+  "counts": {
+    "passed": 2,
+    "skipped": 9
+  },
+  "workerPids": [
+    42727
+  ],
+  "heapSizeLimits": [
+    4496293888
+  ],
+  "maxSampledHeapUsed": 62336416,
+  "firstSampleHeapUsed": 38942720,
+  "sampledPositiveGrowth": 23393696,
+  "steepGrowthStop": false,
+  "validTwoCasesAndFreshWorker": true,
+  "remainingOwned": [],
+  "runtimeMismatches": [],
+  "testUnchanged": true,
+  "attempts": 1
+}

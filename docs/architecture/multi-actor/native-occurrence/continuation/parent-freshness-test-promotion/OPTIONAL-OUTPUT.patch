@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/parent-freshness-focused.spec.ts
++++ b/packages/kernel/src/lib/parent-freshness-focused.spec.ts
+@@ -10,7 +10,7 @@
+ import {materializeNode} from './utils';
+ 
+ function write(leaf:unknown,value:number){if(typeof leaf!=='function')throw Error('missing leaf');(leaf as (v:number)=>void)(value);}
+-function save(name:string,data:unknown){writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,name+'.json'),JSON.stringify(data,null,2));}
++function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}
+ it('prepared slot completion discriminates current snapshot from undelivered native mirror and derived',()=>{
+  const t=signalTree({box:{n:1},sibling:{n:8}},{enhancers:[transactions()]});const rt=getTreeScalarSlotRuntime(t.$)!;const lr=getLocationRuntime(t.$)!;
+  let runs=0;const observed=lr.createDerived(()=>{runs++;return t.$.box();});const before=observed();const sibling=t.$.sibling();let delivered=0;let during:unknown;let mirror:unknown;let cached:unknown;let direct:unknown;let root:unknown;
+--- a/packages/angular/src/lib/parent-freshness-focused.spec.ts
++++ b/packages/angular/src/lib/parent-freshness-focused.spec.ts
+@@ -10,7 +10,7 @@
+ import {materializeNode} from '../../../kernel/src/lib/utils';
+ import {computed} from '@angular/core';
+ function write(leaf:unknown,value:number){if(typeof leaf!=='function'||!('set'in leaf)||typeof leaf.set!=='function')throw Error('missing native leaf');(leaf as unknown as {set(v:number):void}).set(value);}
+-function save(name:string,data:unknown){writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,name+'.json'),JSON.stringify(data,null,2));}
++function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}
+ it('prepared slot completion discriminates current snapshot from undelivered native mirror and derived',()=>{
+  const t=signalTree({box:{n:1},sibling:{n:8}},{enhancers:[transactions()]});const rt=getTreeScalarSlotRuntime(t.$)!;const lr=getLocationRuntime(t.$)!;
+  let runs=0;const observed=computed(()=>{runs++;return t.$.box();});const before=observed();const sibling=t.$.sibling();let delivered=0;let during:unknown;let mirror:unknown;let cached:unknown;let direct:unknown;let root:unknown;

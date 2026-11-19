@@ -1,0 +1,74 @@
+[
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/receipt-consumer.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/lifecycle.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/build-consumers.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/cases.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/no-link.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/consumer.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/lifecycle-consumer.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--check",
+      "/private/tmp/st-c28-r3-registration-lint-combined/candidate/tools/experiments/entity-registration/facade-imports.mjs"
+    ],
+    "exit": 0,
+    "output": ""
+  }
+]

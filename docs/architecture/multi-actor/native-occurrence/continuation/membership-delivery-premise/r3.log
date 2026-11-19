@@ -1,0 +1,661 @@
+
+> nx run kernel:test plain-branch-membership.spec.ts membership-reversal-delivery.spec.ts membership-declarative-delivery-v16-controls.spec.ts membership-history-projection.spec.ts pending-membership-admission.spec.ts whole-value-membership.spec.ts membership-queued-evidence.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs plain-branch-membership.spec.ts membership-reversal-delivery.spec.ts membership-declarative-delivery-v16-controls.spec.ts membership-history-projection.spec.ts pending-membership-admission.spec.ts whole-value-membership.spec.ts membership-queued-evidence.spec.ts --maxWorkers=1
+
+(node:58254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58262) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-successor-r3/candidate/packages/kernel
+
+(node:58273) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58279) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts (216 tests | 76 failed) 386ms
+     × left add + right clear 6ms
+     × left add + right setAll 5ms
+     × left remove + right clear 2ms
+     × left remove + right setAll 2ms
+     × left removeMid + right clear 2ms
+     × left removeMid + right setAll 4ms
+     × left rekey + right clear 2ms
+     × left rekey + right setAll 2ms
+     × left clear + right add 4ms
+     × left clear + right remove 2ms
+     × left clear + right removeMid 2ms
+     × left clear + right rekey 2ms
+     × left clear + right clear 2ms
+     × left clear + right setAll 2ms
+     × left clear + right readd 2ms
+     × left clear + right prepend 2ms
+     × left clear + right field 2ms
+     × left clear + right removeTwo 2ms
+     × left setAll + right add 2ms
+     × left setAll + right remove 2ms
+     × left setAll + right removeMid 3ms
+     × left setAll + right rekey 2ms
+     × left setAll + right clear 2ms
+     × left setAll + right setAll 2ms
+     × left setAll + right readd 2ms
+     × left setAll + right prepend 2ms
+     × left setAll + right field 2ms
+     × left setAll + right removeTwo 2ms
+     × left readd + right clear 3ms
+     × left readd + right setAll 2ms
+     × left prepend + right clear 2ms
+     × left prepend + right setAll 2ms
+     × left field + right clear 2ms
+     × left field + right setAll 2ms
+     × left removeTwo + right clear 1ms
+     × left removeTwo + right setAll 2ms
+     × left add + right clear 2ms
+     × left add + right setAll 2ms
+     × left remove + right clear 1ms
+     × left remove + right setAll 1ms
+     × left removeMid + right clear 2ms
+     × left removeMid + right setAll 2ms
+     × left rekey + right clear 2ms
+     × left rekey + right setAll 2ms
+     × left clear + right add 4ms
+     × left clear + right remove 2ms
+     × left clear + right removeMid 2ms
+     × left clear + right rekey 2ms
+     × left clear + right clear 2ms
+     × left clear + right setAll 2ms
+     × left clear + right readd 1ms
+     × left clear + right prepend 2ms
+     × left clear + right field 1ms
+     × left clear + right removeTwo 2ms
+     × left setAll + right add 1ms
+     × left setAll + right remove 2ms
+     × left setAll + right removeMid 2ms
+     × left setAll + right rekey 2ms
+     × left setAll + right clear 2ms
+     × left setAll + right setAll 2ms
+     × left setAll + right readd 2ms
+     × left setAll + right prepend 1ms
+     × left setAll + right field 2ms
+     × left setAll + right removeTwo 2ms
+     × left readd + right clear 2ms
+     × left readd + right setAll 2ms
+     × left prepend + right clear 1ms
+     × left prepend + right setAll 2ms
+     × left field + right clear 1ms
+     × left field + right setAll 2ms
+     × left removeTwo + right clear 1ms
+     × left removeTwo + right setAll 2ms
+     × a listener remove of the other collection queues after the reversal (rollback) 1ms
+     × a listener rekey of the other collection queues after the reversal (rollback) 1ms
+     × a listener remove of the other collection queues after the reversal (rollback) 1ms
+     × a listener rekey of the other collection queues after the reversal (rollback) 1ms
+(node:58280) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58282) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 76 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left add + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left remove + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left removeMid + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left rekey + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left prepend + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left add + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left remove + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left removeMid + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left rekey + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left prepend + right clear
+AssertionError: expected [ Array(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq3 remove 1 does not match",
++   "seq3 remove 2 does not match",
++   "seq12 remove 1 does not match",
++   "seq12 remove 2 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left add + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left remove + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left removeMid + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left rekey + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left prepend + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left add + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left remove + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left removeMid + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left rekey + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left prepend + right setAll
+AssertionError: expected [ Array(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq3 remove 2 does not match",
++   "seq3 duplicate add 3",
++   "seq12 remove 2 does not match",
++   "seq12 duplicate add 4",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right add
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right remove
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right removeMid
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right rekey
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right prepend
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right add
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right remove
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right removeMid
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right rekey
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right prepend
+AssertionError: expected [ Array(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq11 remove 1 does not match",
++   "seq11 remove 2 does not match",
++   "seq11 remove 3 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right clear
+AssertionError: expected [ …(10) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq4 remove 1 does not match",
++   "seq4 remove 2 does not match",
++   "seq12 remove 1 does not match",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++   "seq14 remove 1 does not match",
++   "seq14 remove 2 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right setAll
+AssertionError: expected [ …(10) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq4 remove 2 does not match",
++   "seq4 duplicate add 3",
++   "seq12 remove 1 does not match",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++   "seq14 remove 2 does not match",
++   "seq14 duplicate add 4",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right readd
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right removeTwo
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right readd
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right removeTwo
+AssertionError: expected [ Array(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq12 remove 1 does not match",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right field
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right field
+AssertionError: expected [ Array(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq7 remove 1 does not match",
++   "seq7 remove 2 does not match",
++   "seq7 remove 3 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right add
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right remove
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right removeMid
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right rekey
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right prepend
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right add
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right remove
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right removeMid
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right rekey
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right prepend
+AssertionError: expected [ Array(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq2 duplicate add 4",
++   "seq11 remove 2 does not match",
++   "seq11 remove 3 does not match",
++   "seq11 duplicate add 5",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right clear
+AssertionError: expected [ …(10) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq2 duplicate add 4",
++   "seq4 remove 1 does not match",
++   "seq4 remove 2 does not match",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++   "seq12 duplicate add 5",
++   "seq14 remove 1 does not match",
++   "seq14 remove 2 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right setAll
+AssertionError: expected [ …(10) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq2 duplicate add 4",
++   "seq4 remove 2 does not match",
++   "seq4 duplicate add 3",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++   "seq12 duplicate add 5",
++   "seq14 remove 2 does not match",
++   "seq14 duplicate add 4",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right readd
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right removeTwo
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right readd
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right removeTwo
+AssertionError: expected [ Array(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq2 duplicate add 4",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++   "seq12 duplicate add 5",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left setAll + right field
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left setAll + right field
+AssertionError: expected [ Array(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq2 duplicate add 4",
++   "seq7 remove 2 does not match",
++   "seq7 remove 3 does not match",
++   "seq7 duplicate add 5",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left readd + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left removeTwo + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left readd + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left removeTwo + right clear
+AssertionError: expected [ Array(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq4 remove 1 does not match",
++   "seq4 remove 2 does not match",
++   "seq14 remove 1 does not match",
++   "seq14 remove 2 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left readd + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left removeTwo + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left readd + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left removeTwo + right setAll
+AssertionError: expected [ Array(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq4 remove 2 does not match",
++   "seq4 duplicate add 3",
++   "seq14 remove 2 does not match",
++   "seq14 duplicate add 4",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left field + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left field + right clear
+AssertionError: expected [ Array(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq7 remove 1 does not match",
++   "seq7 remove 2 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left field + right setAll
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left field + right setAll
+AssertionError: expected [ Array(4) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 2 does not match",
++   "seq2 duplicate add 3",
++   "seq7 remove 2 does not match",
++   "seq7 duplicate add 4",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > reentrant and failing delivery (transactions, restoration) > a listener remove of the other collection queues after the reversal (rollback)
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > reentrant and failing delivery (restoration, transactions) > a listener remove of the other collection queues after the reversal (rollback)
+AssertionError: expected { issues: [ …(2) ], …(1) } to deeply equal { issues: [], writeError: undefined }
+
+- Expected
++ Received
+
+  {
+-   "issues": [],
++   "issues": [
++     "seq4 remove 2 does not match",
++     "seq5 rekey 2 does not match",
++   ],
+    "writeError": undefined,
+  }
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:285:60
+    283|             await flush();
+    284|             replica.compare(reader.snapshot(), 'after');
+    285|             expect({ issues: replica.issues, writeError }).toEqual({
+       |                                                            ^
+    286|               issues: [],
+    287|               writeError: undefined,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/76]⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > reentrant and failing delivery (transactions, restoration) > a listener rekey of the other collection queues after the reversal (rollback)
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > reentrant and failing delivery (restoration, transactions) > a listener rekey of the other collection queues after the reversal (rollback)
+AssertionError: expected { issues: [ …(3) ], …(1) } to deeply equal { issues: [], writeError: undefined }
+
+- Expected
++ Received
+
+  {
+-   "issues": [],
++   "issues": [
++     "seq4 rekey 2 does not match",
++     "seq5 rekey 2 does not match",
++     "after: replica differs from snapshot at left",
++   ],
+    "writeError": undefined,
+  }
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:285:60
+    283|             await flush();
+    284|             replica.compare(reader.snapshot(), 'after');
+    285|             expect({ issues: replica.issues, writeError }).toEqual({
+       |                                                            ^
+    286|               issues: [],
+    287|               writeError: undefined,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/76]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  76 failed | 197 passed (273)
+   Start at  21:20:04
+   Duration  2.86s (transform 455ms, setup 0ms, import 854ms, tests 510ms, environment 994ms)
+
+Warning: command "node tools/run-core-vitest.mjs plain-branch-membership.spec.ts membership-reversal-delivery.spec.ts membership-declarative-delivery-v16-controls.spec.ts membership-history-projection.spec.ts pending-membership-admission.spec.ts whole-value-membership.spec.ts membership-queued-evidence.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.2s

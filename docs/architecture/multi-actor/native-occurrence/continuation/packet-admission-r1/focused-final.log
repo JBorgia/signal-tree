@@ -1,0 +1,192 @@
+
+> nx run kernel:test packet-admission-r1.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts structural-admission-controls.spec.ts structural-admission-sequence.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs packet-admission-r1.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts structural-admission-controls.spec.ts structural-admission-sequence.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts --maxWorkers=1
+
+(node:37363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37510) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-index-admission-r1/candidate/packages/kernel
+
+(node:37533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/structural-admission-sequence.spec.ts (8 tests | 3 failed) 21ms
+   × ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening 3ms
+   × ordinary remove is admitted before physical omission and still completes ordinary authority 1ms
+   × semantic occupancy preserves numeric and string keys 1ms
+(node:37535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-index-adversarial.spec.ts (24 tests | 5 failed) 11ms
+   × private admission mutation refuses before installation: append 3ms
+   × private admission mutation refuses before installation: subject 0ms
+   × private admission mutation refuses before installation: kind 0ms
+   × later private recipient mutation refuses at finalize, before prepared responsibility installs 0ms
+   × held support uses captured admitted subjects after source retirement and later private array mutation 0ms
+(node:37536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-index-review.spec.ts (4 tests | 2 failed) 6ms
+   × recipient finalizer admission mutation must refuse before installation 4ms
+   × recipient finalizer mutation diagnostic proves accepted stale native endpoint 1ms
+(node:37542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > private admission mutation refuses before installation: append
+AssertionError: expected [Function] to throw error including 'admission structure changed' but got 'Cannot add property 1, object is not …'
+
+Expected: "admission structure changed"
+Received: "Cannot add property 1, object is not extensible"
+
+ ❯ src/lib/packet-index-adversarial.spec.ts:91:31
+     89|   return undefined;
+     90|  }};
+     91|  try{expect(()=>s.prepare(p)).toThrow('admission structure changed');e…
+       |                               ^
+     92| });
+     93|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > private admission mutation refuses before installation: subject
+ FAIL  src/lib/packet-index-adversarial.spec.ts > private admission mutation refuses before installation: kind
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/lib/packet-index-adversarial.spec.ts:91:31
+     89|   return undefined;
+     90|  }};
+     91|  try{expect(()=>s.prepare(p)).toThrow('admission structure changed');e…
+       |                               ^
+     92| });
+     93|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > later private recipient mutation refuses at finalize, before prepared responsibility installs
+TypeError: Cannot add property 1, object is not extensible
+ ❯ Object.prepare src/lib/packet-index-adversarial.spec.ts:96:41
+
+ ❯ EntityPublicationSource.prepare src/lib/internals/entity-publication.ts:223:32
+ ❯ src/lib/packet-index-adversarial.spec.ts:97:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > held support uses captured admitted subjects after source retirement and later private array mutation
+TypeError: Cannot assign to read only property 'length' of object '[object Array]'
+ ❯ src/lib/packet-index-adversarial.spec.ts:115:94
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  src/lib/packet-index-review.spec.ts > recipient finalizer admission mutation must refuse before installation
+AssertionError: expected [Function] to throw error including 'admission structure changed' but got 'Cannot add property 1, object is not …'
+
+Expected: "admission structure changed"
+Received: "Cannot add property 1, object is not extensible"
+
+ ❯ src/lib/packet-index-review.spec.ts:10:142
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  src/lib/packet-index-review.spec.ts > recipient finalizer mutation diagnostic proves accepted stale native endpoint
+TypeError: Cannot add property 1, object is not extensible
+ ❯ Object.finalize src/lib/packet-index-review.spec.ts:14:106
+
+ ❯ Object.finalize src/lib/internals/entity-publication.ts:239:45
+ ❯ src/lib/packet-index-review.spec.ts:15:184
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:28:163
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:34:290
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:40:140
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+
+ Test Files  3 failed | 6 passed (9)
+      Tests  10 failed | 61 passed (71)
+   Start at  19:45:19
+   Duration  3.09s (transform 494ms, setup 0ms, import 1.07s, tests 214ms, environment 1.15s)
+
+Warning: command "node tools/run-core-vitest.mjs packet-admission-r1.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts structural-admission-controls.spec.ts structural-admission-sequence.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

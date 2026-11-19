@@ -1,0 +1,65 @@
+{
+  "scope": "Packed public surface and shared class identity only, not runtime safety qualification",
+  "results": [
+    {
+      "name": "Kernel",
+      "sharedClass": true,
+      "actualError": true,
+      "receipt": "no-write",
+      "keys": [
+        "declare",
+        "dispose",
+        "retrieve",
+        "settled"
+      ]
+    },
+    {
+      "name": "Angular",
+      "sharedClass": true,
+      "actualError": true,
+      "receipt": "no-write",
+      "keys": [
+        "declare",
+        "dispose",
+        "retrieve",
+        "settled"
+      ]
+    },
+    {
+      "name": "React",
+      "sharedClass": true,
+      "actualError": true,
+      "receipt": "no-write",
+      "keys": [
+        "declare",
+        "dispose",
+        "retrieve",
+        "settled"
+      ]
+    },
+    {
+      "name": "Vue",
+      "sharedClass": true,
+      "actualError": true,
+      "receipt": "no-write",
+      "keys": [
+        "declare",
+        "dispose",
+        "retrieve",
+        "settled"
+      ]
+    },
+    {
+      "name": "Solid",
+      "sharedClass": true,
+      "actualError": true,
+      "receipt": "no-write",
+      "keys": [
+        "declare",
+        "dispose",
+        "retrieve",
+        "settled"
+      ]
+    }
+  ]
+}

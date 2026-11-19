@@ -1,0 +1,289 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,5 @@
++import { registerScalarResponsibility } from '../../lib/internals/scalar-responsibility-attachment';
++import type { ScalarResponsibilityPreparer } from '../../lib/internals/mutation-capture-runtime';
+ import {registerScalarSelection} from '../../lib/internals/native-scalar-selection';
+ import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+@@ -1472,6 +1474,7 @@
+   let unsubscribePairedBoundaries: (() => void) | undefined;
+   let unsubscribeCollectionOrders: (() => void) | null = null;
+   let restoreLeafInterceptors: (() => void) | null = null;
++  let scalarAttachmentFailed=false;
+   const pendingCapture = createCaptureBucket();
+   const pendingTransactions = new Map<number, CaptureBucket>();
+   // External writes can arrive while the callback is still collecting, before
+@@ -4185,50 +4188,7 @@
+         });
+       }
+ 
+-      restoreLeafInterceptors = interceptLeafSignals(
+-        tree.$ as Record<string, unknown>,
+-        (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
+-          const effectiveMeta = meta ?? getActiveWriteContext();
+-          if (isRestoring) return;
+-          if (effectiveMeta?.origin === 'restoration') {
+-            return;
+-          }
+-          // DEVTOOLS-JUMP-0.1. Notified so the write still reaches observers
+-          // and the tree updates, but captured nowhere.
+-          if (
+-            isInspectionWrite(effectiveMeta) ||
+-            getWriteParticipation(effectiveMeta) === 'realized'
+-          ) {
+-            notifier.notify(
+-              path,
+-              next,
+-              prev,
+-              ownerPath,
+-              subjectIds,
+-              positionIds,
+-              effectiveMeta
+-            );
+-            return;
+-          }
+-          if (
+-            typeof effectiveMeta?.transactionId === 'number' &&
+-            effectiveMeta.transactionOwner !== transactionOwnerToken
+-          ) {
+-            return;
+-          }
+-          notifier.notify(
+-            path,
+-            next,
+-            prev,
+-            ownerPath,
+-            subjectIds,
+-            positionIds,
+-            effectiveMeta,
+-            treeOwnerId
+-          );
+-        },
+-        {
+-          terminalRecord: (
++      const prepareScalarResponsibility:ScalarResponsibilityPreparer = (
+             path,
+             next,
+             prev,
+@@ -4318,7 +4278,54 @@
+                 { set: bucket.ownerPaths, value: ownerPath ?? path },
+               ],
+             };
+-          },
++          };
++      let releaseScalarResponsibility:(()=>void)|undefined;
++      try {
++        if(sourceCaptureRuntime)releaseScalarResponsibility=registerScalarResponsibility(sourceCaptureRuntime,prepareScalarResponsibility);
++      restoreLeafInterceptors = interceptLeafSignals(
++        tree.$ as Record<string, unknown>,
++        (path, next, prev, meta, ownerPath, subjectIds, positionIds) => {
++          const effectiveMeta = meta ?? getActiveWriteContext();
++          if (isRestoring) return;
++          if (effectiveMeta?.origin === 'restoration') {
++            return;
++          }
++          // DEVTOOLS-JUMP-0.1. Notified so the write still reaches observers
++          // and the tree updates, but captured nowhere.
++          if (
++            isInspectionWrite(effectiveMeta) ||
++            getWriteParticipation(effectiveMeta) === 'realized'
++          ) {
++            notifier.notify(
++              path,
++              next,
++              prev,
++              ownerPath,
++              subjectIds,
++              positionIds,
++              effectiveMeta
++            );
++            return;
++          }
++          if (
++            typeof effectiveMeta?.transactionId === 'number' &&
++            effectiveMeta.transactionOwner !== transactionOwnerToken
++          ) {
++            return;
++          }
++          notifier.notify(
++            path,
++            next,
++            prev,
++            ownerPath,
++            subjectIds,
++            positionIds,
++            effectiveMeta,
++            treeOwnerId
++          );
++        },
++        {
++          scalarResponsibility: sourceCaptureRuntime,
+           beforePublication: (
+             path,
+             next,
+@@ -4370,6 +4377,9 @@
+         }
+       );
+ 
++        if(releaseScalarResponsibility)tree.registerCleanup(releaseScalarResponsibility);
++      }catch(error){scalarAttachmentFailed=true;releaseScalarResponsibility?.();throw error;}
++
+       if (typeof notifier.onFlush === 'function') {
+         unsubscribeFlush = notifier.onFlush(() => {
+           if (isRestoring || !selfDirty) {
+@@ -4380,7 +4390,8 @@
+         });
+       }
+     }
+-  } catch {
++  } catch(error) {
++    if(scalarAttachmentFailed)throw error;
+     // fall through without capture support
+   }
+ 
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+@@ -1,3 +1,5 @@
++import { attachScalarResponsibility } from './scalar-responsibility-attachment';
++import type { MutationCaptureRuntime } from './mutation-capture-runtime';
+ import { withScalarPublicationCoverage } from './scalar-publication-coverage';
+ import type { WriteMetadata } from '../mutation-types';
+ import { isTraversableNode } from './node-shape';
+@@ -56,7 +58,7 @@
+     subjectIds?: number[],
+     positionIds?: number[]
+   ) => void,
+-  options: { maxDepth?: number; beforePublication?: typeof onWrite; terminalRecord?: (...args: Parameters<typeof onWrite>) => TerminalRecordPlan | undefined } = {}
++  options: { scalarResponsibility?: MutationCaptureRuntime; maxDepth?: number; beforePublication?: typeof onWrite; terminalRecord?: (...args: Parameters<typeof onWrite>) => TerminalRecordPlan | undefined } = {}
+ ): () => void {
+   const restorers: Array<() => void> = [];
+   const maxDepth = options.maxDepth ?? 32;
+@@ -143,6 +145,8 @@
+     ownerPathOverride?: string,
+     normal = true
+   ): void => {
++    const attached:Array<()=>void>=[];
++    try {
+     const release = normal ? observeIntrinsicMutations(node, (mutation) => {
+       if (!mutation.changed) return;
+       onWrite(
+@@ -155,13 +159,16 @@
+         getPositionIds(node)
+       );
+     }) : undefined;
++    if(release)attached.push(release);
++    const scalarRelease=attachScalarResponsibility(node,options.scalarResponsibility,path,undefined,ownerPathOverride);
++    if(scalarRelease)attached.push(scalarRelease);
+     const terminalRecord = options.terminalRecord;
+     if(terminalRecord){
+       const terminalRelease=prepareTerminalMutations(node,(mutation)=>{
+         if(!mutation.changed)return;
+         return terminalRecord.call(options,path,mutation.after,mutation.before,withMutationIntent(getActiveWriteContext(),mutation.intent),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
+       });
+-      if(terminalRelease)restorers.push(terminalRelease);
++      if(terminalRelease)attached.push(terminalRelease);
+     }
+     const beforePublication = options.beforePublication;
+     if (beforePublication) {
+@@ -177,9 +184,12 @@
+         getPositionIds(node)
+       );
+     }, true);
+-      if (captureRelease) restorers.push(captureRelease);
+-    }
+-    if (release) restorers.push(release);
++      if (captureRelease) attached.push(captureRelease);
++    }
++
++      restorers.push(...attached);
++    } catch(error){for(const release of attached.reverse())release();throw error;}
++
+   };
+ 
+   const wrapOwnedFieldAccessors = (
+@@ -391,7 +401,12 @@
+       },
+       { maxDepth }
+     );
+-  } catch {
++  } catch(error) {
++    if(options.scalarResponsibility){
++      for(const restore of restorers.reverse())restore();
++      restorers.length=0;
++      throw error;
++    }
+     // Ignore traversal errors; partial interception is still useful.
+   }
+ 
+--- a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
++++ b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+@@ -102,7 +102,14 @@
+   'SignalTree:MutationCaptureRuntime'
+ );
+ 
++/** Existing scalar authority producer; ordinary source attachment owns routing only. */
++export type ScalarResponsibilityPreparer = (
++ path:string,next:unknown,prev:unknown,meta?:WriteMetadata,ownerPath?:string,
++ subjectIds?:number[],positionIds?:number[]
++) => TerminalRecordPlan | undefined;
++
+ export interface MutationCaptureRuntime {
++  prepareScalarResponsibility?: ScalarResponsibilityPreparer;
+   /** Prepared ordinary membership responsibility; installed without delivery. */
+   prepareMemberResponsibility?: (
+     branch: object,
+--- a/packages/kernel/src/lib/internals/owned-mutation.ts
++++ b/packages/kernel/src/lib/internals/owned-mutation.ts
+@@ -1,3 +1,4 @@
++import { attachScalarResponsibility } from './scalar-responsibility-attachment';
+ import { withScalarPublicationCoverage } from './scalar-publication-coverage';
+ import type { Location } from './cell-runtime';
+ 
+@@ -274,5 +275,9 @@
+   if (!releaseIntrinsicObserver) {
+     throw new Error('SignalTree location has no intrinsic mutation source');
+   }
+-  return releaseIntrinsicObserver;
+-}
++  let releaseTerminal:(()=>void)|undefined;
++  try { releaseTerminal=attachScalarResponsibility(leaf as object,options.captureRuntime,options.path,hooks.isActive); }
++  catch(error){releaseIntrinsicObserver();throw error;}
++  let active=true;
++  return ()=>{if(!active)return;active=false;try{releaseTerminal?.();}finally{releaseIntrinsicObserver();}};
++}
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts
+@@ -0,0 +1,32 @@
++import { prepareTerminalMutations } from './intrinsic-mutation';
++import type { MutationCaptureRuntime, ScalarResponsibilityPreparer } from './mutation-capture-runtime';
++import { getOwnedOwnerPath, getOwnedPositionIds, getOwnedSubjectIds } from './owned-metadata';
++import { getActiveWriteContext } from '../write-context';
++
++/** An absent provider must not reserve the source's single terminal slot. */
++export function attachScalarResponsibility(
++ node:object,runtime:MutationCaptureRuntime|undefined,path:string,
++ isActive?:()=>boolean,ownerPathOverride?:string
++): (()=>void)|undefined {
++ if(!runtime?.prepareScalarResponsibility)return;
++ const release=prepareTerminalMutations(node,mutation=>{
++  if(!mutation.changed||(isActive&&!isActive()))return;
++  const prepare=runtime.prepareScalarResponsibility;
++  if(!prepare)return;
++  return prepare(path,mutation.after,mutation.before,
++   {...(getActiveWriteContext()??{}),mutationIntent:mutation.intent},
++   ownerPathOverride??getOwnedOwnerPath(node)??path,getOwnedSubjectIds(node),getOwnedPositionIds(node));
++ });
++ if(!release)throw new Error('Scalar responsibility source is not registered');
++ let active=true;
++ return ()=>{if(!active)return;active=false;release();};
++}
++
++export function registerScalarResponsibility(
++ runtime:MutationCaptureRuntime,prepare:ScalarResponsibilityPreparer
++):()=>void {
++ if(runtime.prepareScalarResponsibility)throw new Error('Scalar responsibility provider already owned');
++ runtime.prepareScalarResponsibility=prepare;
++ let active=true;
++ return ()=>{if(!active)return;active=false;if(runtime.prepareScalarResponsibility===prepare)delete runtime.prepareScalarResponsibility;};
++}

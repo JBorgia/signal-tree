@@ -1,0 +1,3 @@
+# Independent review requested before composition
+
+Question: Does moving these four void publisher primary throws after their unchanged completion finally preserve exact error precedence and reentry behavior? Inspect original/candidate and identical40-case matrix, including thrown undefined and reporter override, not just lint success. Verify single-init const cannot be read by early initialization cleanup. Comments must leave emitted JavaScript/assertions unchanged. No preferred verdict; Main retains architectural/composition authority. No runtime edits requested from reviewer. FREEZE.json pins candidate and patch identities; first failures are retained. Existing8reviewer overlay remains separately promoted.

@@ -1,0 +1,14 @@
+{
+  "changed_files": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+    "packages/kernel/src/lib/joint-membership-completion.spec.ts",
+    "packages/kernel/src/lib/recipient-window-review.spec.ts",
+    "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+    "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+    "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts"
+  ],
+  "r3_entity_sha256": "d077e163d85c9fdc1b250ffbc9c01b6b2c12c2d76e106b36cadcfb2e5b37412a",
+  "r4_entity_sha256": "115b1a6531cfe64ba5b5a3454b21955d20e298014c7f1b00b7220d123413ab27",
+  "reverse_patch_matches_R3_manifest": true
+}

@@ -1,0 +1,219 @@
+[
+  {
+    "path": "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "from": "/private/tmp/st-c28-r3-suite-correction/candidate/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "baseSha256": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0",
+    "sha256": "1e0940740e1a535b7d343a0105a800337eb78331e0fc1cbb08df9defd0009e4d",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "from": "/private/tmp/st-c28-r3-suite-correction/candidate/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "baseSha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f",
+    "sha256": "f740a20625dd71bbb92d7dc00f9d6d84067dceab428747f154d455e5bb851b20",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "from": "/private/tmp/st-c28-r3-suite-correction/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "baseSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "sha256": "5078516b64ac2c705073727749b64e5d6884eb5f597bcb4ae9cce9875724c2f3",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+    "from": "/private/tmp/st-c28-r3-refusal-fixtures/candidate/packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+    "baseSha256": "6e7e13999ac6161cec1065804521b5608ad2eb82d2d615c4943450ab63e75c35",
+    "sha256": "e1b2631108d1c89e0c12000286709eda21dd486ab1ae1fcce641d7f7f9625b13",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts",
+    "from": "/private/tmp/st-c28-r3-refusal-fixtures/candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts",
+    "baseSha256": "9beb551de9a15e2585420c9b62f3aa5d36a62ca2e63071a535e9e36a171905c1",
+    "sha256": "74220c38abc41437ea29b78073832fa8c3b64c7a5affab7d40e7c03271d150b7",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "from": "/private/tmp/st-c28-r3-refusal-fixtures/candidate/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "baseSha256": "3caf653470ce0136ecd912c60410eda76476c134dad711e6dab2ae63df0af5af",
+    "sha256": "5e9ba0c6b3990a50322270073c26d9ba7c2e557935f6048343c2dde086a816a5",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "from": "/private/tmp/st-c28-r3-refusal-fixtures/candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "baseSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "sha256": "53b154fd9e2fc71909313f61de2e3b8415db243cc096af0c2c5ebd096efacac4",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/lib/link-commit-ordering.spec.ts",
+    "from": "/private/tmp/st-c28-r3-link-refusal-fixture/candidate/packages/kernel/src/lib/link-commit-ordering.spec.ts",
+    "baseSha256": "49c26727b88e2cd994afec1c7768d664b3db5f438da8c69c4d136baedb34cf9c",
+    "sha256": "12c775d7a708e8c1ef95d78bd913bcf50310bf8922e8d8115a9cf14ecadcf3ed",
+    "kind": "reviewed-test-correction"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "from": "/private/tmp/st-c28-r3-disposition-index/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "baseSha256": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+    "sha256": "0e9e8347f26bec9a360b0db5080fb52b0949b3f30da011db93efe018a8d57fce",
+    "kind": "reviewed-bounded-disposition-index",
+    "limits": "130k entity gate OOM; no cost or release acceptance"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "baseSha256": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+    "sha256": "49ca84a55e187d10843555be4b1810ad7d30d7d1cb58eb88849303dcd84e9e31",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/dynamic-admission-minimal.spec.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/dynamic-admission-minimal.spec.ts",
+    "baseSha256": null,
+    "sha256": "b432eacb8da7227ccd1122a697aff10c6a0bc4aa5fd7f7e1edbbb7d596c362aa",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "baseSha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "sha256": "109ac6e5141ff07a7f36b87864d982d21eb4f4c56e79fe842211edd2775b29e4",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "baseSha256": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f",
+    "sha256": "1611c4c120bcfd288c2f6b33928594bf38c7c15f7768decb2822a81969834273",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/internals/owned-mutation.ts",
+    "baseSha256": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3",
+    "sha256": "b35d57b057771648447bffa99bf3f55ff2d9a8a1488a1735be63d8f048169323",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+    "baseSha256": null,
+    "sha256": "f288d131f5aa12ef62c79b5d5237fb284761daef02402422295984be99251fb7",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "baseSha256": null,
+    "sha256": "95291431b0c4412ed2b5b09ed4e0dc67389426cd8cb54498900595372985add0",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/initializer-attachment-independent.spec.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/initializer-attachment-independent.spec.ts",
+    "baseSha256": null,
+    "sha256": "423bd5b8e8b574959656dc9696092623fc273dae28e881fd12018b309537bbfa",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/lib/initializer-owned-cleanup.spec.ts",
+    "from": "/private/tmp/st-c28-r3-initialization-cleanup-successor/candidate/packages/kernel/src/lib/initializer-owned-cleanup.spec.ts",
+    "baseSha256": null,
+    "sha256": "68b576f316ffb9ced8a20866debbd3c6460156f63b073fdb795286aabc8ae274",
+    "kind": "reviewed-dynamic-admission-and-owned-cleanup"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/enhancers/restoration/restoration.ts",
+    "beforeSha256": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+    "sha256": "f07244d39d8f48995eedde33c9dc3ca919df4bd9c9e41de9ae655dcb5e6f8fed",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "beforeSha256": "49ca84a55e187d10843555be4b1810ad7d30d7d1cb58eb88849303dcd84e9e31",
+    "sha256": "76137a3920673ddab063bde956674bedde9ee5dfab29a2196c935070188bade5",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "beforeSha256": "0e9e8347f26bec9a360b0db5080fb52b0949b3f30da011db93efe018a8d57fce",
+    "sha256": "8f327df272f277c376c36de9dec55718d333fc7ca4574e67f6340ba855b0e2f6",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "beforeSha256": "109ac6e5141ff07a7f36b87864d982d21eb4f4c56e79fe842211edd2775b29e4",
+    "sha256": "9fcd2ec62e4907b75abe86c89ae8e4008688e704f69179bf869fcff2a3f9761e",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "beforeSha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+    "sha256": "27a88b798bb1c47dbbd5d931f09fbe6238cc831195d244309bda4df23607a692",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "beforeSha256": "83e9d1a6fc724b32912f7ca18a3b6514e8a952906e35c67704ab5610ca88a335",
+    "sha256": "cd77fa41a9fb862ad2a18bc53ae679d4d43c04446dc0a3a318a432ba1362e346",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "beforeSha256": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+    "sha256": "7c3bc031d97585d97d082c5d65a6b6be8027a5ce8785073c9cbb26cae1b851f0",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "beforeSha256": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+    "sha256": "18d41061d6076e59e4c626c8400bd8d85a0de6a8473d452b5adf7d823fcebb60",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "beforeSha256": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270",
+    "sha256": "20b6b9a61f387fb87a35aabcc12c25e1c41bc11bbf31e9b7d8ff41850f41092f",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "beforeSha256": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+    "sha256": "3295b2aba72d7b103e1a99c6d45f490632f0c1a3ab1e146551950b39eb980915",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/scalar-admission-metadata.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/scalar-admission-metadata.ts",
+    "beforeSha256": null,
+    "sha256": "02230ed3d3d8f3a94f2e032378323d215a0d31648af8047d1fb2f232555f57c3",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts",
+    "from": "/private/tmp/st-c28-r3-composition/metadata-merge/packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts",
+    "beforeSha256": null,
+    "sha256": "da83b2fd43f32a175a01ddc080a99702592b8925eb4268f3316cfd9fef744741",
+    "kind": "reviewed-realization-metadata-three-way-composition"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+    "beforeSha256": "f288d131f5aa12ef62c79b5d5237fb284761daef02402422295984be99251fb7",
+    "sha256": "edb0cb422cf8de33bf534772d3323a6365dfb4d037266ee8da67efbb49fafcab",
+    "kind": "composition-required-exact-mutation-metadata-forwarding"
+  }
+]

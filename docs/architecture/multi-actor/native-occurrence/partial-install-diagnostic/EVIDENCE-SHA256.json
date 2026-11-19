@@ -1,0 +1,22 @@
+{
+  "verifiedPredecessorFiles": 2926,
+  "runtimeUnchanged": true,
+  "files": {
+    "observations-v2-mixed.json": "86f83ee4db6dcc14d061bf099bc1034954d35c7368d44d7214ae92072f93489d",
+    "observation-runtime.log": "daea59ae9fa04e79414b433fc0796a3d2e29c3deecc8f0796411468126df9a04",
+    "first-runtime.log": "00efe8fb157ab1b3fc727258365fe378cfd566c7a76a02319a55b14ab05a9b96",
+    "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "observations-v2-final-observer-throws.json": "8bba623a8f6e4870daed9c09ac52f7f786931a6aeb453480728ff59bc8d7bb6d",
+    "observation-first-fixture.spec.ts": "afc8ec6cc81c6960c5438b76f0efbb62a1de7c86356de1c7e81a22d101b75299",
+    "first-fixture.spec.ts": "2fee820d1787916b94c3c1791767e6f4513e03a6bc58240b6504ee636e7abab1",
+    "RESULTS.md": "276c809250afe9c764707f1f0140b9f0c9b3a01f2f577e7877123f9093966ea6",
+    "observations-mixed.json": "86f83ee4db6dcc14d061bf099bc1034954d35c7368d44d7214ae92072f93489d",
+    "observation-v2-runtime.log": "5537bf4d38fab3a6d035e1c65b4117cce316e02a957e1e49a69f856a6756f4c1",
+    "FROZEN-SOURCE-SHA256.json": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+    "observations-final-observer-throws.json": "c8db3baf4e427f3b9833abd997aa95868824858343b9b249c62b6113f278a10e",
+    "observations-second-refuses.json": "cef3fdf925603232c42dd84ada7a1df7c0ae101dc43231ee94dc83aee4a0c8be",
+    "observations-v2-final-interceptor-throws.json": "092fb0d832f13e74ee7609309b13be8469f1933e36759df718abf7f43dcc4655",
+    "observations-v2-second-refuses.json": "a4bd2c28a2b6b8d6b83a13cc084bbea1e278cc6ec40e74c1a64ae84bda32cd0e",
+    "candidate/packages/kernel/src/lib/native-partial-install-diagnostic.spec.ts": "3f1a10953088ae4e065c73a7daf60e65f4c6550228915ffa4836f1398f778c9b"
+  }
+}

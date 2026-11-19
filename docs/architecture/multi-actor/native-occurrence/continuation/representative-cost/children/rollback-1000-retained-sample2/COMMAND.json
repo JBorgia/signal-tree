@@ -1,0 +1,18 @@
+{
+  "ordinal": 55,
+  "id": "rollback-1000-retained-sample2",
+  "profile": "rollback",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample2",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--expose-gc",
+    "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+    "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+    "rollback",
+    "1000"
+  ],
+  "cwd": "/private/tmp/st-v16-representative-cost/harness",
+  "childTimeoutSeconds": 180
+}

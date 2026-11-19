@@ -1,0 +1,104 @@
+[
+  {
+    "source": "check-controller-r1.py",
+    "archive": "check-controller-r1.py",
+    "sourceSha256": "fcc1ac0311bd46ba41b43fb85fe500666f19bf4a726691445304670d5f988bc8",
+    "archiveSha256": "fcc1ac0311bd46ba41b43fb85fe500666f19bf4a726691445304670d5f988bc8"
+  },
+  {
+    "source": "verify-memory-sources.py",
+    "archive": "verify-memory-sources.py",
+    "sourceSha256": "8f33f6e543b5808b7669589093b86044fa34fe45e82ab84a90f86da9435548d7",
+    "archiveSha256": "8f33f6e543b5808b7669589093b86044fa34fe45e82ab84a90f86da9435548d7"
+  },
+  {
+    "source": "IDENTITY-CHECK.json",
+    "archive": "IDENTITY-CHECK.json",
+    "sourceSha256": "7b186d6d598f508f48535b623e439af4e0a0a24dde075355169188e7593ed47f",
+    "archiveSha256": "7b186d6d598f508f48535b623e439af4e0a0a24dde075355169188e7593ed47f"
+  },
+  {
+    "source": "MEMORY-R1-SOURCE-CHECK.json",
+    "archive": "MEMORY-R1-SOURCE-CHECK.json",
+    "sourceSha256": "9b1424b4d62e0188b828bb509a521c2434ecae1bc757a23473601a657a6ac740",
+    "archiveSha256": "9b1424b4d62e0188b828bb509a521c2434ecae1bc757a23473601a657a6ac740"
+  },
+  {
+    "source": "MEMORY-CONTROLLER-REVIEW.md",
+    "archive": "MEMORY-CONTROLLER-REVIEW.md",
+    "sourceSha256": "a1a4dcdddec161a69b6f535cd54ddbfc63d31be8a57ceddfbe5a0277a55d08e2",
+    "archiveSha256": "a1a4dcdddec161a69b6f535cd54ddbfc63d31be8a57ceddfbe5a0277a55d08e2"
+  },
+  {
+    "source": "MEMORY-R1-MATCHED-PHASES.json",
+    "archive": "MEMORY-R1-MATCHED-PHASES.json",
+    "sourceSha256": "835b20861be3c7dd560230f75b03402740ee45dd23e5832544e4e3c07bee2197",
+    "archiveSha256": "835b20861be3c7dd560230f75b03402740ee45dd23e5832544e4e3c07bee2197"
+  },
+  {
+    "source": "MEMORY-CONTROLLER-R1-CHECK.json",
+    "archive": "MEMORY-CONTROLLER-R1-CHECK.json",
+    "sourceSha256": "f0f48dde528598efc4135dea15de3753d34ab8a80d2473adce5c04e72bfd7671",
+    "archiveSha256": "f0f48dde528598efc4135dea15de3753d34ab8a80d2473adce5c04e72bfd7671"
+  },
+  {
+    "source": "COMPOSITION-CHECK.json",
+    "archive": "COMPOSITION-CHECK.json",
+    "sourceSha256": "f4c662407132436618aad10675f26a61f36a615a2a91ca12dc9c0cf26dbd6b2c",
+    "archiveSha256": "f4c662407132436618aad10675f26a61f36a615a2a91ca12dc9c0cf26dbd6b2c"
+  },
+  {
+    "source": "MEMORY-CONTROLLER-FALSIFIERS.json",
+    "archive": "MEMORY-CONTROLLER-FALSIFIERS.json",
+    "sourceSha256": "860737a6ba4e4ff59abd572fad47982fa0f04f6ac9e5f80dc285c5488bd59226",
+    "archiveSha256": "860737a6ba4e4ff59abd572fad47982fa0f04f6ac9e5f80dc285c5488bd59226"
+  },
+  {
+    "source": "MEMORY-PREMISE-PRELIMINARY.md",
+    "archive": "MEMORY-PREMISE-PRELIMINARY.md",
+    "sourceSha256": "31a952afae9c1b59f6584a2a958918d679711e42d1dd251f5c955bca52442ad7",
+    "archiveSha256": "31a952afae9c1b59f6584a2a958918d679711e42d1dd251f5c955bca52442ad7"
+  },
+  {
+    "source": "MEMORY-R1-INDEPENDENT-CALCULATION.json",
+    "archive": "MEMORY-R1-INDEPENDENT-CALCULATION.json",
+    "sourceSha256": "193357618f00830a182dbdccb56529beb6e41e7dda4bfd28b2d170fac62cca53",
+    "archiveSha256": "193357618f00830a182dbdccb56529beb6e41e7dda4bfd28b2d170fac62cca53"
+  },
+  {
+    "source": "R1-CHECK-FIRST-FAILURE.txt",
+    "archive": "R1-CHECK-FIRST-FAILURE.txt",
+    "sourceSha256": "32d4a5f738cb7f474a3e167c180de60a8cb4e72fd4e9a17fbce770ceb9a89f52",
+    "archiveSha256": "32d4a5f738cb7f474a3e167c180de60a8cb4e72fd4e9a17fbce770ceb9a89f52"
+  },
+  {
+    "source": "analyze-memory-r1.py",
+    "archive": "analyze-memory-r1.py",
+    "sourceSha256": "6b02b5e0df51609eee5f663c587bb5df3f88a8fac52d115d40d9ab7f28b0deab",
+    "archiveSha256": "6b02b5e0df51609eee5f663c587bb5df3f88a8fac52d115d40d9ab7f28b0deab"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "8a07d8739d8a1c2618f65222643e431b2d0ddd76a3db1f541b0b810b5fc0b1f1",
+    "archiveSha256": "8a07d8739d8a1c2618f65222643e431b2d0ddd76a3db1f541b0b810b5fc0b1f1"
+  },
+  {
+    "source": "MEMORY-INTERPRETATION.md",
+    "archive": "MEMORY-INTERPRETATION.md",
+    "sourceSha256": "0482d5945f2536e545a547a0778354a06660e5b0f273eb7914bd961d068c178a",
+    "archiveSha256": "0482d5945f2536e545a547a0778354a06660e5b0f273eb7914bd961d068c178a"
+  },
+  {
+    "source": "COMPOSITION-REVIEW.md",
+    "archive": "COMPOSITION-REVIEW.md",
+    "sourceSha256": "061deaf727cdc32bebcdef5c52ffd7985173b6a315472dba3ac7f16ef9eccf81",
+    "archiveSha256": "061deaf727cdc32bebcdef5c52ffd7985173b6a315472dba3ac7f16ef9eccf81"
+  },
+  {
+    "source": "MEMORY-STATIC-CHECK.json",
+    "archive": "MEMORY-STATIC-CHECK.json",
+    "sourceSha256": "e1b9564a84d9cb47476ae4e662dfd3528d02a3744cf4bf8926cfbf3281233950",
+    "archiveSha256": "e1b9564a84d9cb47476ae4e662dfd3528d02a3744cf4bf8926cfbf3281233950"
+  }
+]

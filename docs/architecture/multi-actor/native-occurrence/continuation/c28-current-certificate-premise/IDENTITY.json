@@ -1,0 +1,25 @@
+{
+  "manifestSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "f21f99f975a5ad9577c618ddb2593edf200faa4b00de1c0a8c2e484479405873",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": {
+      "sha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/proof-retirement.ts": {
+      "sha256": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/entity.ts": {
+      "sha256": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+      "matchesManifest": true
+    }
+  }
+}

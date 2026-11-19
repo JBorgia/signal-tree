@@ -1,0 +1,79 @@
+
+> nx run kernel:test point-result-demand.spec.ts point-result-allocation.spec.ts ordinary-order-owner-preparation.spec.ts ordinary-order-source-boundaries.spec.ts ordinary-restoration-placement.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs point-result-demand.spec.ts point-result-allocation.spec.ts ordinary-order-owner-preparation.spec.ts ordinary-order-source-boundaries.spec.ts ordinary-restoration-placement.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts --maxWorkers=1
+
+(node:57168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-point-result-demand-successor/candidate/packages/kernel
+
+(node:57182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/point-result-demand.spec.ts (6 tests | 1 failed) 22ms
+   × point owner plan reentry preserves prior or nested installed value 3ms
+(node:57183) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57185) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57187) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57217) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57219) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57220) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57297) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/point-result-demand.spec.ts > point owner plan reentry preserves prior or nested installed value
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/lib/point-result-demand.spec.ts:14:41
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 10 passed (11)
+      Tests  1 failed | 73 passed (74)
+   Start at  21:18:57
+   Duration  5.16s (transform 517ms, setup 0ms, import 1.31s, tests 1.19s, environment 1.83s)
+
+Warning: command "node tools/run-core-vitest.mjs point-result-demand.spec.ts point-result-allocation.spec.ts ordinary-order-owner-preparation.spec.ts ordinary-order-source-boundaries.spec.ts ordinary-restoration-placement.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.5s

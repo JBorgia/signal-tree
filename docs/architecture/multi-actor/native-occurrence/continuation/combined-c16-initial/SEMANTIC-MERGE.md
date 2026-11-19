@@ -1,0 +1,1 @@
+Retain decision(channel) parameter name because C15 now actually uses it for revision-local declaration permission. Lint arm renamed the previously unused parameter; carrying that rename would break the new caller-independent implementation. No other manual merge.

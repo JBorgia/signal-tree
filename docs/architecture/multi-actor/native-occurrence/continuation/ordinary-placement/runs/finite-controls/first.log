@@ -1,0 +1,35 @@
+
+> nx run kernel:test ordinary-restoration-placement.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs ordinary-restoration-placement.spec.ts --maxWorkers=1
+
+(node:78049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-ordinary-placement-successor/candidate/packages/kernel
+
+(node:78069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  11 passed (11)
+   Start at  17:27:38
+   Duration  792ms (transform 448ms, setup 0ms, import 542ms, tests 13ms, environment 160ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

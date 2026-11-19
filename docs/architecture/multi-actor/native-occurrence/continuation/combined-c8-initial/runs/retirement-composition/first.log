@@ -1,0 +1,58 @@
+
+> nx run kernel:test fixed-window-retirement.spec.ts publication-retirement-boundaries.spec.ts scalar-accounting.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs fixed-window-retirement.spec.ts publication-retirement-boundaries.spec.ts scalar-accounting.spec.ts --maxWorkers=1
+
+(node:40770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c8/candidate/packages/kernel
+
+(node:40785) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40791) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-retirement-boundaries.spec.ts (10 tests | 1 failed) 27ms
+   × callback-capable finalization reentry invalidates the outer prepared source unit 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-retirement-boundaries.spec.ts > callback-capable finalization reentry invalidates the outer prepared source unit
+AssertionError: expected [Function] to throw error including 'changed during finalization' but got 'Entity publication source changed bef…'
+
+Expected: "changed during finalization"
+Received: "Entity publication source changed before installation"
+
+ ❯ src/lib/publication-retirement-boundaries.spec.ts:57:111
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 23 passed (24)
+   Start at  08:49:03
+   Duration  1.33s (transform 567ms, setup 0ms, import 748ms, tests 68ms, environment 373ms)
+
+Warning: command "node tools/run-core-vitest.mjs fixed-window-retirement.spec.ts publication-retirement-boundaries.spec.ts scalar-accounting.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

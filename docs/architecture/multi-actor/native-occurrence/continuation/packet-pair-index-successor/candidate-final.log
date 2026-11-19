@@ -1,0 +1,39 @@
+
+> nx run kernel:test --testFile=packet-physical-pair --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=packet-physical-pair --maxWorkers=1
+
+(node:30842) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c11-packet-pair-index-review/candidate/packages/kernel
+
+(node:30856) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30879) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30911) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  3 passed (3)
+      Tests  11 passed (11)
+   Start at  10:30:41
+   Duration  4.33s (transform 1.21s, setup 0ms, import 1.77s, tests 486ms, environment 1.54s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      5.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.0s

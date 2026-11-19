@@ -1,0 +1,15 @@
+{
+  "cwd": "/private/tmp/st-structural-admission-independent/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "independent-public-handoff.spec.ts",
+    "--reporter=json",
+    "--outputFile=/private/tmp/st-structural-admission-independent/public-handoff-vitest.json",
+    "--maxWorkers=1"
+  ]
+}

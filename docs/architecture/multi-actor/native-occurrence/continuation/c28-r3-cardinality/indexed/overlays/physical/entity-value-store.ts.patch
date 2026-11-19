@@ -1,0 +1,15 @@
+--- a/packages/kernel/src/lib/physical/entity-value-store.ts
++++ b/packages/kernel/src/lib/physical/entity-value-store.ts
+@@ -1,3 +1,4 @@
++import { tally as ct, size as cs, check as cc } from '../cardinality-diagnostic'; // CARDINALITY-ONLY
+ import { getActiveWriteContext } from '../write-context';
+ import { deepEqual } from '../internals/utilities/deep-equal';
+ import { deepClone } from '../internals/utilities/deep-clone';
+@@ -164,6 +165,7 @@
+   prepareTargetValues(
+     subjects: readonly { readonly subjectId: number; readonly value: E }[]
+   ): Map<number, E> {
++    cs("target.retained",this.retainedEntities.size); cs("target.subjects",subjects.length);
+     const target = new Map(this.retainedEntities);
+     for (const subject of subjects) {
+       target.set(subject.subjectId, subject.value);

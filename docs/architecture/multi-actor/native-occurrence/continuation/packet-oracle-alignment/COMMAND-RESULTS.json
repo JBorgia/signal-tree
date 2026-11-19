@@ -1,0 +1,69 @@
+[
+  {
+    "name": "aligned-first",
+    "cwd": "/private/tmp/st-packet-oracle-alignment-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "packet-index-adversarial.spec.ts",
+      "packet-index-review.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "focused",
+    "cwd": "/private/tmp/st-packet-oracle-alignment-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "independent-refusal-branches.spec.ts",
+      "point-admission-followup.spec.ts",
+      "admission-refusal.spec.ts",
+      "packet-admission-r1.spec.ts",
+      "packet-index-adversarial.spec.ts",
+      "packet-index-review.spec.ts",
+      "native-admission-handoff.spec.ts",
+      "native-invocation-handoff.spec.ts",
+      "structural-admission-controls.spec.ts",
+      "structural-admission-sequence.spec.ts",
+      "entity-publication-work-lifetime.spec.ts",
+      "publication-retirement-acceptance.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "exit": 1
+  },
+  {
+    "name": "point",
+    "cwd": "/private/tmp/st-packet-oracle-alignment-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "entity-granular-reactivity.spec.ts",
+      "--testNamePattern=a single-entity update does not rebuild",
+      "--maxWorkers=1"
+    ],
+    "exit": 1
+  },
+  {
+    "name": "spec-types",
+    "cwd": "/private/tmp/st-packet-oracle-alignment-successor/candidate",
+    "argv": [
+      "node",
+      "tools/check-spec-types.mjs"
+    ],
+    "exit": 0
+  }
+]

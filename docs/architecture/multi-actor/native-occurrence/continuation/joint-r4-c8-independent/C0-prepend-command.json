@@ -1,0 +1,15 @@
+{
+  "cwd": "/private/tmp/st-r4-review-resumed/c0-prepend-control",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "entity-membership-view-v16-controls.spec.ts",
+    "--testNamePattern=prependOne reports the row at the front once",
+    "--maxWorkers=1"
+  ],
+  "verified_files": 2974
+}

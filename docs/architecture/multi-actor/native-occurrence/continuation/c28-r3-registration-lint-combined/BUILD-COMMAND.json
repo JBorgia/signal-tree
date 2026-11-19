@@ -1,0 +1,20 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "run-many",
+    "-t",
+    "build",
+    "--projects=kernel,angular,react,vue,solid",
+    "--parallel=1",
+    "--skip-nx-cache",
+    "--output-style=stream",
+    "--nxBail"
+  ],
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "noOutputWatchdogSeconds": 180,
+  "manifestSha256": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84"
+}

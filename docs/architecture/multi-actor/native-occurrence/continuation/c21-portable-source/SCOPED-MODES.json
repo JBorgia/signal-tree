@@ -1,0 +1,6954 @@
+{
+  ".cursorrules": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".editorconfig": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".githooks/pre-commit": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/bundle-size-check.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/bundle-size-monitor.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/check-bundle-size.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/ci-metrics.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/perf-suite.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/publish.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/release.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/retention-characterization.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/test-packages.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".github/workflows/validate.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".gitignore": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".npmrc": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".nvmrc": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".nxignore": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".prettierignore": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".prettierrc": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".verdaccio/config.yml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".vscode/extensions.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".vscode/settings.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  ".vscode/tasks.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "CNAME": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "LICENSE": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "NOTICE": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "api/benchmark.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "api/realistic-benchmark.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "api/realistic-benchmark/[id].ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo-e2e/eslint.config.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo-e2e/playwright.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo-e2e/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo-e2e/src/example.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo-e2e/src/smoke.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo-e2e/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/core-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/demo-e2e/src/tests/diagnose.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/eslint.config.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/jest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/404.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/CNAME": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/accessor-grammar.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/accessor-grammar.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/accessor-grammar.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/accessor-grammar.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/causal-authority.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/causal-authority.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/causal-authority.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/causal-authority.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/coherent-operation.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/coherent-operation.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/coherent-operation.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/coherent-operation.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/entity-identity.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/entity-identity.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/entity-identity.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/entity-identity.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/explanation-projection.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/explanation-projection.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/explanation-projection.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/explanation-projection.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/link.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/link.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/link.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/link.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/package-ownership.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/package-ownership.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/package-ownership.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/package-ownership.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/semantic-spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/system-boundary.docs.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/system-boundary.mobile.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/system-boundary.slide.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/architecture/system-boundary.web.svg": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/benchmarks/angular-native-aa.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/benchmarks/angular-native-memory.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/benchmarks/angular-native-vs-historical.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/benchmarks/angular-native-vs-universal.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/benchmarks/callable-locations-aa.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/benchmarks/callable-locations.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/favicon.ico": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/signaltree-mark-192.png": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/signaltree-mark-512.png": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/signaltree-mark-64.png": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/signaltree-mark.png": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/signaltree-sample-stats.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/public/signaltree.png": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/advanced-performance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/agent-review-reference.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/app.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/app.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/app.routes.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/app.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/app.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/app.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/benchmarks/granular-reactivity-fanout.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/benchmarks/signaltree-performance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/boilerplate-metrics.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/benchmark-results-table/benchmark-results-table.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/benchmark-results-table/benchmark-results-table.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/benchmark-results-table/benchmark-results-table.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/extreme-depth/deep-typing-catalog.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/extreme-depth/deep-typing-proofs.generated.typecheck.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/extreme-depth/extreme-depth.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/extreme-depth/extreme-depth.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/extreme-depth/extreme-depth.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/extreme-depth/extreme-depth.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/home/home.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/home/home.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/home/home.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/home/home.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/navigation/navigation.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/navigation/navigation.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/navigation/navigation.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/components/navigation/navigation.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/core/config/examples.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/core/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/core/models/example-meta.model.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/core/models/filter-state.model.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/core/models/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/core/services/examples-registry.service.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/async/async-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/async/async-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/async/async-demo.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/async/async-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/async/search-pipeline.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/async/search-pipeline.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/derived-tiers/derived-tiers-example.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/effect-reactivity-test/effect-reactivity-test.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/effect-reactivity-test/effect-reactivity-test.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/effect-reactivity-test/effect-reactivity-test.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-comparison/batching-comparison.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-comparison/batching-comparison.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-comparison/batching-comparison.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-comparison/batching-comparison.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-demo/batching-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-demo/batching-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-demo/batching-demo.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/batching-demo/batching-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/enhancers/devtools-demo/devtools-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/entities/entities-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/entities/entities-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/entities/entities-demo.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/entities/entities-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/entity-sort-comparer/entity-sort-comparer-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/forms/forms-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/forms/forms-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/forms/forms-demo.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/forms/forms-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/granular-reactivity/granular-reactivity-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/markers/markers-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/markers/markers-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/markers/markers-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/recommended-architecture/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/recommended-architecture/recommended-architecture.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/recommended-architecture/recommended-architecture.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/recommended-architecture/recommended-architecture.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/restoration/restoration-demo.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/restoration/restoration-demo.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/restoration/restoration-demo.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/restoration/restoration-demo.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/signals/signals-examples.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/signals/signals-examples.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/signals/signals-examples.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/whats-new/whats-new.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/whats-new/whats-new.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/examples/whats-new/whats-new.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/pages/fundamentals-page/fundamentals-page.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/pages/fundamentals-page/fundamentals-page.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/pages/fundamentals-page/fundamentals-page.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/features/fundamentals/pages/fundamentals-page/fundamentals-page.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-card/example-card.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-card/example-card.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-card/example-card.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/code-tabs.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/code-tabs.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/emission-log.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/emission-log.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/example.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/example.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/example.types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/stackblitz.service.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/stackblitz.service.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/state-inspector.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/state-inspector.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/example-shell/track-emissions.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/components/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/styles/_example-card.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/styles/_fundamentals.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/styles/_mixins.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/styles/_utilities.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/styles/_variables.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/examples/shared/styles/index.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/library-versions.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-diagram.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-diagram.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-diagram.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-diagram.types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-diagrams.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-overview.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-overview.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-overview.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/architecture-overview/architecture-overview.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/angular-native-aa.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/angular-native-memory.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/angular-native-vs-historical.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/angular-native-vs-universal.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/callable-locations-aa.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/callable-locations.generated.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmark.engine.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmark.engine.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmark.workloads.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmark.workloads.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmarks.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmarks.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmarks.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/benchmarks/v15-benchmarks.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/documentation/documentation.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/documentation/documentation.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/documentation/documentation.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/documentation/documentation.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/frameworks/frameworks.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/frameworks/frameworks.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/frameworks/frameworks.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/legacy-changelog/legacy-changelog.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/legacy-changelog/legacy-changelog.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/legacy-changelog/legacy-changelog.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/migration-recipe/migration-recipe.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/migration-recipe/migration-recipe.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/migration-recipe/migration-recipe.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/migration-recipe/migration-recipe.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/realistic-benchmark-history/realistic-benchmark-history.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/realistic-benchmark-history/realistic-benchmark-history.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/realistic-benchmark-history/realistic-benchmark-history.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/route-links.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/start-here/start-here.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/start-here/start-here.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/start-here/start-here.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/start-here/start-here.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/whats-new-14/whats-new-14.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/whats-new-14/whats-new-14.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/whats-new-14/whats-new-14.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/why-causality/why-causality.component.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/why-causality/why-causality.component.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/why-causality/why-causality.component.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/pages/why-causality/why-causality.component.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/performance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/sanity-checks/standard-syntax-examples.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/services/benchmarks.service.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/services/performance-monitor.service.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/services/realistic-benchmark.service.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/shared/models.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/shared/route-metadata.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/api.service.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/app-store.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/app-store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/ops/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/ops/post.ops.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/ops/ui.ops.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/ops/user.ops.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/app-tree.provider.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/app-tree.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/state/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/state/posts.state.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/state/shared.state.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/state/ui.state.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/tree/state/users.state.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/store/types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/app/version.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/benchmarks.d.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/index.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/main.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/_breakpoints.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/_components.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/_layout.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/_typography.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/_utilities.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/_variables.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/styles/main.scss": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/src/test-setup.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/tsconfig.app.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/demo/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/index.html": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/public/favicon.ico": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/app/app.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/app/app.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/app/reference-store.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/app/reference-store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/assets/.gitkeep": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/main.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/src/styles.css": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/tsconfig.app.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "apps/react-reference/vite.config.mts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "eslint.config.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "jest.preset.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "llms.txt": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "migrations.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "nx.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/eslint.config.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/rollup.config.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/rollup.custom.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/absent-collection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/absent-path-write.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/angular-realization-invariants.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/angular-validation-null.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/audit-entity-terminals.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/audit-native-tooling.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/audit-observation-lifecycle.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/batching-dynamic-field.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/carrier.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/construction-bound-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/construction-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/construction-input.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/construction-input.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/construction-input.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/construction-resource-cleanup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/current-read-capability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/current-read-capability.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/declarative-construction.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/declared-publication-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/define-store.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/define-store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/define-store.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/demarcation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/designated-collection-omission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/e-active-selection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/e-composition-nulls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/e-granularity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/e2s0-identity-function.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/effective-presence-install-reentry.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/effective-presence-successor.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/entity-granular-reactivity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/entity-native-obligation-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/histc2-form-dom.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/histc2-form-ingress.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/histc2-signal-forms.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/hydration-accessor.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/joint-native-frontier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/joint-rich-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/keyed-construction-cleanup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/link-native-address.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/native-leaf-experiment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/native-storage-0-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/observation-adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/opaque-leaf-restoration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/open-record-access.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/parent-freshness-entity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/parent-freshness-focused.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/parent-snapshot-currentness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/plain-member-absence-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/public-root-initialization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/public-surface.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/reactivity-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/readonly.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/restoration-reactivity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/scalar-frame-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/selected-active-id-preparation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/selected-callback-facade.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/ssr-transfer.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/subject-epoch-non-retaining-observer.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/subject-state-weak-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/to-writable-signal.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/transaction-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/lib/whole-value-new-keys.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/src/test-setup.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/tsconfig.lib.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/tsconfig.lib.prod.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/tsconfig.typecheck.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/angular/vitest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/CHANGELOG.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/ENHANCERS.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/eslint.config.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/forwarding-retention.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/ng-package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/retention-probe.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/rollup.config.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/rollup.custom.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/scripts/extract-coverage.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/scripts/extract-coverage.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/scripts/position-identity-prototype.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/scripts/rollback-viability-prototype.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/active-transaction-context.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/batching-ownership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/carrier-propagation.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching-adversarial.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching-context-safety.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching-detachment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching-semantic-scopes.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching.behavior.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/batching.types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/external-baseline-coalescing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/batching/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools-impl.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools-jump-0-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools-jump-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools-sanitize.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/devtools.types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/devtools/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/enhancer-cleanup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/enhancer-safety.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/add-many-overwrite-hardening.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/add-many-overwrite-reversal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/add-many-redo-order.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/clear-undoable.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/coalesced-turn-reversal-defect.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/collection-order-refusals.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/compensation-provenance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/compound-compensation-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/compound-compensation-retry-readiness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/declarative-structural-transition-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/designation-coalescing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/entity-field-presence-capture.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/entity-membership-capture.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/external-authored-baseline-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/external-authored-baseline.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/hidden-collection-nesting.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/hidden-terminal-reversal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/hist0-baseline.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/hist0-remaining.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/histc2-door.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/historical-materialization-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/jump-undo-equivalence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/leaf-write-history.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/membership-declarative-delivery-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/membership-reversal-delivery.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/multi-collection-subject-collision.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/never-claimed-retirement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/object-valued-field-reversal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/order-boundary-evidence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/outcome-provenance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/p0c-row-divergence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/paired-order-composer.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/paired-ordinary-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/pending-active-entity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/pending-footprint-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/pending-membership-admission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/pending-overlap-admission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/pending-overlap.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/planner-public-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/position-capture-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/rekey-claim-width-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-audit-regression.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-claim-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-idle-density.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-metadata.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-missing-anchors.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-operation-outcome.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-queued-authority.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-reactivity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-reader-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-reader.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration-structured-authority.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration.behavior.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/restoration.types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/reversal-delivery-coherence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/reversal-known-limitations.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/rollback-then-undoable.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/set-all-order-reversal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/snapshot-sharing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/turn-effect-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/turn-member-images.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/two-setall-turn.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/restoration/zero-net-compensation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/test-helpers/types-equals.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/E-expanded-lifetime-anchor.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/confirmed-destroy.gc.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/confirmed-destroy.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/confirmed-turn-reader.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/descriptor-retention.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/history-retention-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/membership-history-projection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/membership-queued-evidence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-admission-segments.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-order-interference.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-segment-compilation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-source-notification-pairing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/native-structural-composition-gates.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/occupancy-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/occupancy-composition.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/occupancy-inspection-chronology.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/paired-order-witness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/probe-char.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/proposal-0-kernel.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/proposal-inspection-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/proposal-inspection-safety.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/proposal-rejection-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/proposal-review-surface-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/queued-inspection-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/r6-liveness-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/r8-overlap-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/rekey-supersession-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/rekeyed-rollback-defect.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/retired-backing-ownership-null.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/rollback-refusal-legibility.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/rollback-refusal-scope.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-authority-selftest.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-authority-trace-selftest.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-authority.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-composition-adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-composition-domain.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-composition-selftest.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-composition.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-contract.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-current-adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-current.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-structural-adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-structural-domain.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-structural.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-supplemental-selftest.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/semantics-supplemental.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/settlement-inspection-terminality.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/studio-unused-cost.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transactions-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transactions-entity-field-rollback.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transactions.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transactions.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transactions.types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/transactions.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/turn-feed-0-1-identity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/turn-feed-0-2-reachability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/turn-feed-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/tx-ledger-0-cases34.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/tx-ledger-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/tx-ledger-c3.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/tx-ownership.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/tx-surface-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/transactions/update-then-remove-rollback.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/typing/all-chains.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/typing/all-subsets.generated.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/enhancers/typing/helpers-types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/er-divergence-probe.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/internals.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/kernel-carrier.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a1-independent-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a1-ingress.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a1-installed-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a2-1-construction-materialisation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a2-2-tree-scoped-rehydration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a2-3-1-rollback-cancellation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a2-3-settlement-placement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a2-4-drain-ownership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/a3-tx-status-falsifier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/absent-collection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/absent-path-write.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/accessor-store-coherence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/address-repair-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/admission-refusal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/after-commit-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/after-commit-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/aggregate-independent-input.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/aggregate-installed-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/aggregate-native-input-default-control.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/aggregate-owner-construction.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/apply-state-pollution.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/apply-state-unknown-key.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-entity-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-entity-projection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-entity-terminals.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-native-tooling.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-observation-lifecycle.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-structured-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit-structured-restoration-address.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit/audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/audit/audit.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/authored-removal-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/authored-removal-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/authored-removal-obligations.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/batch-duplicate-ids.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/batch-duplicate-interceptors.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/benchmarks.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/bind-branch-0-acquisition-turn.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/branch-omission-correctness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/callable-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/callable-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/canonical-snapshot-adapter.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/change-reporting.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/collection-contributor-core.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/collection-natural-egress.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/comparison-full-state-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/complete-structural-sequence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/conforming-collection-prototype.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/constants.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/construction-bound-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/construction-resource-cleanup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/core-independent-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/current-read-capability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/declaration-extensibility-e5-fork.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/declaration-finally-precedence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/declarative-extension-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/demarcation-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/derive-footprint.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/derived-not-state.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/derived-projection-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/descriptor-merge-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/descriptor-role-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/diag-journal-0-inventory.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/dynamic-member-enrollment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/dynamic-member-reactivation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/dynamic-vs-entitymap-domain.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e-granularity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e-hooks.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e-membership-reachability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e-ordering-rekey.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e-subject-identity-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e2-precision-null.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e2b-authorship.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e2c-real-causal-path.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e2s-structural-null.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/e2s00-member-access.kernel.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/effective-presence-install-reentry.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/effective-presence-reentry.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/effective-presence-successor.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/egress-0-userland-link.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/egress-1-observation-vs-consequence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-chain.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-metadata-authority.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-method-forwarding.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-protocol-continuity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/enhancer-types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-active-prepend-changeid.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-add-many-anchors.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-array-diagnostic.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-bulk-mutations.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-egress-footprint-delivery.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-egress-footprint.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-ids-identity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-input-view-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-inspection-egress.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-key-evidence-public.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-large-batches.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-lifetime-ledger-null.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-link-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-membership-link-restoration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-membership-producer.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-membership-view.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-missing-id-guard.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-native-input-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-node-cache.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-obligation-matrix.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-observation-gate.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-occupancy-steps.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-order-carrier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-own-property-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-predicate-churn.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-projection-seed.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-realization-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-replay-tap-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-replay-taps.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-restoration-authority.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-restore-diff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-selection-lifetime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-composition-slice.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-point-recurrence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-rekey-vacancy-recurrence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-structural-inverses.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-structure-faults.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-structure-interceptors.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-structure-slice.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-topology.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-semantic-transition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-set-all-staging.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-signal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-signal.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-sort-comparer.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-tap-reads.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-update-one-equivalence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/entity-wrong-method-guard.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/error-reporter.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/error-surface-2.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/experimental-publication/entity.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/experimental-publication/projection.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/experimental-publication/proof-retirement.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/external.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/fixed-window-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/fixed-window-retirement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/forwarding-retention-probe.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/held-continuation-probe.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/heterogeneous-atomicity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/hydration-snapshot.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/hydration-snapshot.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/identity-through-seams-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/incremental-materialization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-explicit-continuation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-prepared-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-prepared-unit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-public-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-refusal-branches.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/independent-scalar-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/indexed-source-owner-cross-baseline.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/indexed-source-owner-payload.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/indexed-source-owner-prefix.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/indexed-source-owner-prepend.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/indexed-source-owner-s4.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/indexed-source-owner-subset.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/inspection-egress-conformance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/a1-publication-installation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/acquire-projection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/acquire-projection.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/auto-batching.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/canonical-snapshot.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/authority-assessment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/authority-assessment.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/causal-types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/confirmed-rollback-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/effect-applier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/effect-applier.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/place-field-reversals-while-rows-exist.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/planner-contiguous-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/realization-context.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/realization-context.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/reapply-planner.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/reapply-planner.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/reclamation-eligibility.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/reclamation-eligibility.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/redo-assessment.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/redo-assessment.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/reversal-planner.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/target-transition-key-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/target-transition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/transaction-capture-bridge.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/transaction-capture-bridge.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/transient-rows.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/turn-store.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/turn-store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/cell-identity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/cell-identity.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/cell-runtime.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/commit-consequence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/commit-consequence.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/confirmed-turn-view.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/construction-accessor.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/construction-allocation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/construction-branch.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/custom-markers.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/derived-types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/derived.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diag-journal-1-grouping.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-1-correlation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-ownership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-retention.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/diagnostic-journal.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/flush-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/flush-probe.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/journal-live-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/leaf-observation-support-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/owner-scope-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/supersession-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/diagnostics/tree-capabilities-live.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/enhancer-requirements.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/enhancer-requirements.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-egress-projection.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-membership-inventory.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-membership-source.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-membership-view.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-projection-seed.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-publication.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/entity-value-transition.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/error-reporter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/exposed-publication.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/link-state-source.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/link-state-view.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/location-runtime-retention.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/location-runtime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/location-runtime.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/marker-materialization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/materialize-markers.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/member-membership.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/merge-derived-guardrail.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/merge-derived.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-adapter-flush-error.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-epoch-error-drain.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-epoch-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-field-selection.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-group-error-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-location-realization.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-occurrence.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-projection-observability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/node-shape.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/observation-adapter.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/observation-substrate.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/ordinary-entity-entries.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/owned-metadata.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/owned-mutation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/owner-invalidation-port.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/owner-invalidation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/path-observation-port.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/physical-commit-clock.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/physical-rows.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/plain-branch-membership.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/position-registry.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/prepared-entity-structure.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/production-substrate-stats.prod.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/production-substrate-stats.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/provenance-spike.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/provenance-spike.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/publication-preparation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/restoration-eligibility.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/restoration-reader.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/restoration-source.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/root-source.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/runtime-tree-plan.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/scalar-publication-coverage.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/selected-entity-disposition.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/selected-write-operation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/snapshot-installation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/source-mutation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/state-location-view.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/subject-reclamation-sink.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/subject-restoration-claims.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/subject-restoration-claims.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tooling-tree.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/transaction-lifecycle-source.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/transaction-lifecycle-view.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-capabilities.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-capabilities.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/append-all.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/deep-clone.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/deep-equal-cycles.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/deep-equal-parity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/deep-equal.property.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/deep-equal.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/get-changes.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/is-built-in-object.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/shared-utils.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/utilities/shared.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/visit-tree.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/write-observation-scope.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/write-observation-scope.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/internals/write-observation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-atomic-preparation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-install-boundary-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-install-validation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-membership-completion.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-membership-phase.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-membership-seal-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-mixed-seal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/joint-readiness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/kernel-snapshot-authority.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/known-input-contract-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/leaf-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/leaf-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/leaf.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/legacy-payload.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-0-three-directions.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-1-relationship.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-2-public-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-2-x-constraint.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-absent-locations.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-address-lifecycle.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-admission.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-async-settlement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-audit-regression.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-authority-carrier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-bare-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-collection-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-collection-type-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-collection-type-0.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-commit-ordering.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-drain-settlement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-inflight-settlement-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-lifetime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-materialized-value-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-materialized-value-0.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-native-address.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-nested-collection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-order-audit-regression.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-order-rollback.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-overlapping-rollback.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-persistence-conformance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-production-path.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-reactive-settlement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-root-source.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-same-turn-settlement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-snapshot-egress.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-state-view-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-state-view.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-structured-address-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link-value-roundtrip.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/link.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/m3-conformance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/m3-representation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/m3-uniform-rule.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/m4-decline-uniformity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/m4-reconstruction.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/main-invocation-scope.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/marker-location-grammar.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/marker-location-grammar.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/marker-roundtrip.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/marker-snapshot-memo.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/composed-acquisition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/entity-map-slice-names.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/entity-map.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/entity-map.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/marker-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/markers/marker-resolution.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/membership-hot-paths.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/membership-input-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/membership-prepared-order.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/mut-participation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/mutation-types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-admission-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-anchor-diagnostic.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-authored-footprint.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-certificate-successor.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-explicit-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-invocation-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/native-window-preparation-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/nested-absence-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/nested-structural-rollback-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/node-accessor.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/noop-copy-write.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/noop-write-warning.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/notifier-ownership-invariant.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/notifier-scope-0-identity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/notifier-scope-0-impact.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/observation-substrate-additions.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/observation-substrate.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/occupancy-successor-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/occupancy-successor-point-work.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/occupancy-successor-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/occurrence-successor.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/open-key-ownership.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/open-key-reachability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/open-record-access.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/oracle-alignment-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-member-presence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-member-publication-facts.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-order-indexed-work.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-order-owner-preparation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-order-source-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-presence-discriminator.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-presence-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/origin-union.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/owner-invalidation-membership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/owner-invalidation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/owner-location-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/owner-replay-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/owner-replay-2.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/owner-transition-cancellation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/packet-admission-r1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/packet-index-adversarial.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/packet-index-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/packet-physical-pair-work.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/parent-freshness-entity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/parent-freshness-focused.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-delivery-ownership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-notifier-attribution.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-notifier-enqueue.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-notifier-membership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-notifier-queued-witness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-notifier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/path-notifier.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/pending-placement-work.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/persistence-decompose-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/checked-value-carrier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/checked-value-carrier.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/declarative-target-binding.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-handle-resolution.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-handle-resolution.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-mutation-frame.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-ordinary-topology.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-placement-stage.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/entity-value-store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/order-restores-for-placement.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/ordinary-key-evidence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/ordinary-key-evidence.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/ordinary-restoration-placement.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/physical-value-pool.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/physical-value-pool.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepare-entity-target.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepare-structural-target.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepare-structural-target.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-visibility.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/prepared-placement-visibility.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/structural-store.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/structural-store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/subject-record-target.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/physical/subject-record-target.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/placement-snapshot-reuse.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/plain-branch-membership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/plain-member-absence-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/point-admission-followup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/point-owner-resolution-cost.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/point-owner-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/point-result-allocation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/point-result-demand.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/position-identity-prototype.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/possible-owner-window-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/prepared-anchor-work.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/prepared-placement-index.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/prepend-many-order-reversal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/prepend-publication-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/production-link-conformance-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/production-stats-guards.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/public-selected-unit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-confirmed-input-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-evidence-scope-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-independent-isolated-omission-input.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-independent-omission-input.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-membership-provenance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-native-provenance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-obligation-combination.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-proof-retirement.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-retirement-acceptance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-retirement-boundaries.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-role-overlap-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-terminal-consumer-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-terminal-horizon-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-terminal-obligation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-uncertainty-provenance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/publication-validation-window-audit.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/react-link-observation-discriminator.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/readonly-readers.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/readonly.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/readonly.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/real-whole-effect-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/realization-address-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/realization-namespace-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/realization-target-role-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/recipient-cause-classification.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/recipient-positive-counterparts.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/recipient-source-permission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/recipient-window-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/recipient-window-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rehydrate-ownership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rehydration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/replace-one-subject-1.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/restoration-origin.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/restoration-paired-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/restoration-paired-work.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/restoration-scoped-capture.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/restoration-turn-adapter.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/retained-source-public-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rich-unit-source-group.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/rollback-viability-prototype.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/root-accessor-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/root-accessor-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/row-source-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/s3-hydrate-mode-recovery.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/scalar-frame-finalize.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/scalar-frame-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/scalar-native-support.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/selected-callback-facade.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/selected-forwarding-cleanup.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/selected-real-batching-review.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/selected-unit-support.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/semantics-names-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/separate-boundary-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/serialization-zero-state.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/signal-tree-type-matrix.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/signal-tree.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/single-pass-construction.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/singleton-row-allocation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/singleton-row-reuse.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/snapshot-aliasing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/snapshot-builder.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/snapshot-identity-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/staged-draft-editing-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/state-location-view-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/state-location-view.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/structural-admission-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/structural-admission-sequence.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/structural-completeness.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/structured-address-producer.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/subject-address-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/subject-address-cardinality-0.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/tap-rekey-necessity.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/terminal-carriers.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/transaction-observer-failure.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/transaction-reentrant-order.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/traversal-diagnostics.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/tree-error-attribution.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/tree-error-public-contract.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/type-surface-protection.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/types-schema.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/types.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/undo-nonscalar-leaf.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/undo-redo.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/undoable.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/unwrap-symbol-keys.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/update-and-report.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/upsert-many-reversal.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/utils.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/value-work-handoff.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/walker-conformance.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/whole-bounded-qualification.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/whole-getter-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/whole-mixed-promises.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/whole-unowned-publication-authorized.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/whole-value-membership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/whole-value-new-keys.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/write-context.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/write-context.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/write-only-marker.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/lib/write-participation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/public-barrel-carrier.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/react-observation-contract.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/reactive-test-realization.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/tooling-admission.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/src/transaction-realization-contract.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/tsconfig.lib.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/tsconfig.lib.prod.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/tsconfig.typecheck.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/vitest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/kernel/vitest.retention.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/rollup.config.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/rollup.custom.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/absent-collection.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/absent-path-write.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/designated-collection-omission.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/joint-native-frontier.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/joint-rich-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/lib/declared-publication-composition.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/lib/entity-native-obligation-composition.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/lib/hydration-accessor.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/lib/link-native-address.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/lib/open-record-access.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/opaque-leaf-restoration.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/ownership.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/parent-freshness-counterparts.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/pending-turn-realization.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/plain-member-absence-observation.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/public-surface.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/scalar-frame-publication.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/selected-callback-facade.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/transaction-realization.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/use-signal-tree.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/use-signal-tree.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/use-signal-tree.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/src/whole-value-new-keys.spec.tsx": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/tsconfig.lib.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/tsconfig.lib.prod.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/react/vitest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/rollup.config.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/rollup.custom.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/absent-collection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/absent-path-write.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/audit-entity-terminals.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/audit-native-tooling.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/audit-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/batching-dynamic-field.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/carrier.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/construction-input.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/declared-publication-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/designated-collection-omission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/entity-native-obligation-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/hydration-accessor.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/joint-native-frontier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/joint-rich-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/link-native-address.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/native-publication-error-boundary.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/opaque-leaf-restoration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/open-record-access.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/parent-freshness-counterparts.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/plain-member-absence-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/scalar-frame-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/selected-callback-facade.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/solid-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/solid-observation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/transaction-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/src/lib/whole-value-new-keys.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/tsconfig.lib.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/tsconfig.lib.prod.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/solid/vitest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/package.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/rollup.config.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/rollup.custom.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/index.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/absent-collection.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/absent-path-write.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/audit-entity-terminals.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/audit-native-tooling.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/audit-observation-lifecycle.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/batching-dynamic-field.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/carrier.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/construction-input.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/construction-input.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/construction-input.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/current-read-capability.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/current-read-capability.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/declared-publication-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/designated-collection-omission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/entity-native-obligation-composition.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/entity-projection-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/entity-selection-lifetime.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/hydration-accessor.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/joint-direct-independent.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/joint-direct-probe.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/joint-native-frontier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/joint-rich-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/joint-rollback-frontier.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/link-native-address.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/opaque-leaf-restoration.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/open-record-access.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/ownership.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/parent-freshness-counterparts.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/plain-member-absence-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/prepared-selection-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/scalar-frame-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/selected-active-id-preparation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/selected-callback-facade.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/settlement-publication.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/terminal-carriers.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/tooling-admission.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/transaction-realization.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/vue-observation.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/vue-observation.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/vue-observation.typing.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/src/lib/whole-value-new-keys.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/tsconfig.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/tsconfig.lib.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/tsconfig.lib.prod.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/tsconfig.spec.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "packages/vue/vitest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "pnpm-lock.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "pnpm-workspace.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/__tests__/metrics.test.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/adapters/claude.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/adapters/gemini.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/adapters/openai.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/adapters/openrouter.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/adapters/perplexity.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/aggregate.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/libraries/ngrx-signals.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/libraries/signaltree.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/001-counter.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/002-paginated-users.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/003-debounced-search.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/004-derived-state.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/005-form-marker.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/006-undo-redo.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/007-deep-state.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/prompts/008-multi-marker.yaml": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/results.gitignore": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/results/.gitignore": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/runner.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ai-codegen-benchmark/scorer.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/benchmarks/data-model-profile.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/benchmarks/deep-equality-cost.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/benchmarks/fair-signalstore-headtohead.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/benchmarks/performance-benchmark.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/benchmarks/performance-benchmark.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/benchmarks/task-collection-update.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/build-demo-site.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/bundle-size-analysis.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/check-bundle-size.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/check-publish-candidate.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ci-checks.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/ci-publish.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/consolidated-bundle-analysis.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/deploy-benchmark-site.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/deprecate-packages.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/esbuild-analyze.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/finalize-changelog.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/generate-enhancer-typing-tests.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/generate-spa-route-shells.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/lib/metrics.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/lint-readme-apis.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/perf-suite.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/compare-suite.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/developer-experience.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/entity-crud-performance.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/performance-runner.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/proxy-call-overhead.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/recursion-diagnostic.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/recursive-metrics.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/recursive-performance-real.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/recursive-performance.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/performance/v4-vs-v5-comparison.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/architecture-connectors.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/benchmarks.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/demo-production-bundle.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/demo-routes.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/export-v15-benchmarks.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/hover-language.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/layout-system.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/mobile-layout.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/route-smoke.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/route-smoke.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/serve-dist.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/playwright/visual-language.spec.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/pre-publish-validation.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/prepare-publish-artifacts.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/prepare-release.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/publish-all.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/publish-artifact-integrity.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/publish-candidate.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/release-packages.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/release-plan.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/release-version.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/release.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/replace-hex-with-tokens.py": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/resolve-workspace-specs.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/run-devtools-smoke.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/run-ngrx-middleware-bench.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/sanity-checks.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/test-coverage.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/test-tree-shaking.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/validate-docs.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-changelog-entry.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-clean-checkout-release-flow.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-dist.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-exports.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-jsdoc-stripping.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-no-broken-dts.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-package-hygiene.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-packages.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-production-bundle-no-perf-instrumentation.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-publish-architecture.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-publish-artifacts.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-publish-candidate.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-release-state.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-signaltree-migration.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-tree-shaking.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "scripts/verify-version-claims.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "specs/examples/ngrx-signal-store/invoice-editor/dx-notes.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "specs/examples/ngrx-signal-store/invoice-editor/store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "specs/examples/signaltree/invoice-editor/dx-notes.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "specs/examples/signaltree/invoice-editor/store.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/GATES.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/ai-migrations/@nx/eslint/23.1.0/convert-to-flat-config.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/ai-migrations/@nx/eslint/23.1.0/migrate-ban-types-rule.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/ai-migrations/@nx/jest/23.1.0/verify-typecheck.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/ai-migrations/@nx/vitest/23.1.0/ai-instructions-for-vitest-4.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/angular-coupling-budget.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/angular-coupling-control.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/angular-service-census.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/api-baseline.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/api-callable-baseline.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/api-callable-inventory-selftest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/api-callable-inventory.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/api-inventory.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/api-surface.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bare-module-identity-control.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bare-module-list.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/batch-updates-authoring-control.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/batch-updates-claimants.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/batch-updates-consumers.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/batch-updates-ledger-control.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-active-node-subject-index.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-active-retired-lifetime.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-angular-leaf-memory-worker.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-angular-leaf-memory.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-angular-leaf-strategies-worker.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-angular-leaf-strategies.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-array-leaf.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-build-ab-v3.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-build-ab.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-c6-baseline.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-c6-discriminator.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-c6-interleaved.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-c6-worker.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-callable-locations-worker.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-callable-locations.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-capability-density.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-causal-representation.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-compare.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-depth-latency.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-entity-churn-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-entity-layers.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-entity-physical-density.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-entity-realization-matrix.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-entity-realization-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-history-ownership.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-kernel-snapshot-authority.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-leaf-equality.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-physical-target-layout.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-positionid-substrate.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-predicate-memo.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-public-collection-layers.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-raw-signals.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-restoration-active-density.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-restoration-hot-path.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-restoration-idle-density.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-retention-arms.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-root-read-cost.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-segmented-subject-storage.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-ssr-payload.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-state-scale.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-subject-record-consolidation.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-subject-slot-reachability.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-update-matrix.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-v14-v15-control.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-value-handle-carriers.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-vs-signalstore.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bench-workload-classes.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/build/clean-dist-declarations.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/build/create-rollup-config.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/build/workspace-specs.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/bundle-reachability.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/c6-perf-aa.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/c6-perf-baseline-interleaved.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/c6-perf-baseline.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/c6-perf-decision-rule.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/c6-perf-knownbad.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/census-detectors.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/census-mutation-proof.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-angular-coupling-budget.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-benchmark-api-selftest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-bundle-budget.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-callable-inventory.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-declaration-closure-fixtures.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-declaration-closure.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-declaration-docs.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-demo-coverage.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-devmode-consumers.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-devmode-foldable.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-doc-links.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-documented-examples.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-documented-imports.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-documented-symbols.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-error-codes.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-forwarding-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-historical-ab-isolation.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-kernel-neutrality.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-kernel-ownership.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-lint-budget.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-memory-harness.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-numeric-claims.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-publish-manifests.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-rc-public-dispositions.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-release-claims.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-retired-lifetime-gross-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-semantic-discoverability.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-signal-identity-durability.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-snapshot-parent-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-source-controls.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-source-controls.spec.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-spec-types-selftest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/check-spec-types.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/codemods/remove-console.js": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/cpu-candidate-manifest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/cross-review.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/cross-review/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/cross-review/contract.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/cross-review/review.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/l15-retention/probe.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/l15-retention/run-teardown-gc.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/l15-retention/run.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/l15-retention/teardown-gc.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/native-publication-diagnostics/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/native-publication-diagnostics/replay.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/native-publication-diagnostics/run.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/PROTOCOL.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/README.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/RESULTS.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/assertions.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/collect-evidence.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/composition-cases.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/current-characterization.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/current-entry.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/current.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/draft.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/entity-churn.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-churn-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-current.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-extension-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-first-source.mjs.txt": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-human-agent-scenario.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-main-final.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/draft-supplemental.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-attacks.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-before-bounded-revision.mjs.txt": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-before-revision-extensions.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-extension-second.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-final.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-first-source.mjs.txt": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-main-attacks.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-main-extensions.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-main-final.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-mutations-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-v2-entity-churn.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-v2-final-source.mjs.txt": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-v2-frozen-draft.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/frontier-v2-long-pending.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/manifest.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/prepared-churn-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/prepared-extension-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/prepared-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/prepared-long-pending.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/prepared-mutations-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/prepared-safety.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/replay-extension-second.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/replay-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/replay-mutations-corrected.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/replay-mutations-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/replay-review-scenario.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/signaltree-current-behavior-first.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/evidence/signaltree-current-options-final.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/extension-cases.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/extensions.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/frontier-attacks.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/frontier.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/long-pending.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/mutation-runner.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/mutations.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/prepared.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/replay.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/review-scenario.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/runner-selftest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/runner.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/scalar-cases.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/experiments/transaction-options/structural-cases.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/find-dead-exports.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/fixtures/angular-aot/main.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/gen-kernel-ownership-ledger.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/generate-architecture-diagrams.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/generate-deep-typing-proofs.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/generate-version-env.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/generate-version-env.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/held-continuation-probe/project.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/import-scan.cjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/kernel-ownership-census.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/kernel-ownership-census.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/kernel-ownership-ledger-header.md": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/lib/heap-quiescence.d.mts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/lib/heap-quiescence.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/lib/heap-quiescence.selftest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/lint-budget.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/measure-bundle-sizes.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/measure-enhancer-deltas.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/memory-compare.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/memory-report.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/module-state-evidence-control.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/module-state-evidence.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/module-state-evidence.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/module-state-parity.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/numeric-claims-baseline.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/package-generation-census.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/package-namespace-closure.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/probe-bounded-history-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/probe-heap-object-census.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/probe-history-sample-isolation.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/probe-history-subject-ownership.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/probe-restoration-required-set.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/probe-staged-retention.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/public-surface-census-parity.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/run-core-vitest.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/run-cpu-v3.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/run-quiet-cpu.sh": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/run-semantics-supplemental.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/size-compare.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/size-report.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/spec-type-baseline.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/subject-identity-census.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/subject-identity-census.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/tree-config-consumers.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/triage-calibration.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-angular-aot-consumer.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-angular-consumer.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-angular-store-runtime.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-built-barrels.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-consumer-typecheck.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-gates.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-history-defects.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-react-consumer.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-restoration-capacity.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-setall-neighbour-search.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-solid-consumer.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/verify-tarball-consumer.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/workspace-projects.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tools/write-metadata-subjectids.mjs": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tsconfig.base.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tsconfig.typecheck-all.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tsconfig.typecheck-specs.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "tsdoc-metadata.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "typedoc.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "types.d.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "vercel.json": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "vitest.config.ts": {
+    "mode": "0o644",
+    "symlink": false
+  },
+  "vitest.workspace.ts": {
+    "mode": "0o644",
+    "symlink": false
+  }
+}

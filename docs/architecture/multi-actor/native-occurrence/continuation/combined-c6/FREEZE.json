@@ -1,0 +1,28 @@
+{
+  "manifestSha256": "925bd916560115e5fffd9c761e2eeca6a170f43dab0c8214aa5c7177315b69b4",
+  "patchSha256": "e299f8b10e219089f6b72a4ce27cd7fcb934161f26386e02a17e289d76bcc475",
+  "reviewSha256": "c92a581ff8a3debb1760604f585b7fb74add2ef9768d85657b4534339628489a",
+  "files": 2994,
+  "changedFiles": [
+    "packages/angular/src/lib/construction-resource-cleanup.spec.ts",
+    "packages/angular/src/lib/keyed-construction-cleanup.spec.ts",
+    "packages/kernel/src/lib/construction-resource-cleanup.spec.ts",
+    "packages/kernel/src/lib/dynamic-member-enrollment.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+    "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+    "packages/kernel/src/lib/internals/construction-allocation.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/internals/materialize-markers.ts",
+    "packages/kernel/src/lib/internals/member-membership.ts",
+    "packages/kernel/src/lib/internals/native-occurrence.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "packages/kernel/src/lib/internals/position-registry.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts",
+    "packages/kernel/src/lib/signal-tree.ts"
+  ],
+  "unmodifiedC5ChangeCount": 23
+}

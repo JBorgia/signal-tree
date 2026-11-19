@@ -1,0 +1,7 @@
+{
+  "manifestSha256": "d911ae7768e8e1a43eceb99ef5277988a6ff9e59c910337bb1e6b79db4d1b71d",
+  "verifiedFiles": 2996,
+  "copy": "manifest-listed files only; no archived dependency link copied",
+  "dependencyRepair": "cp -cR working root node_modules to own candidate/node_modules; no install; matching pnpm-lock.yaml",
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+}

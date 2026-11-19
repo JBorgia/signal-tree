@@ -1,0 +1,34 @@
+{
+  "selection": 280,
+  "started": 280,
+  "completed": 280,
+  "counts": {
+    "passed": 1383,
+    "expectedFailureSatisfied": 1
+  },
+  "result": {
+    "project": "kernel",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 170.19768408301752,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  "runEndSeen": true,
+  "unexpectedFiles": [],
+  "priorOverlap": [],
+  "unionCompleted": 636,
+  "unionUnstarted": 0,
+  "unionIncomplete": [
+    "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "packages/kernel/src/lib/entity-large-batches.spec.ts"
+  ],
+  "unionObservedCounts": {
+    "passed": 7040,
+    "failed": 19,
+    "skipped": 12,
+    "expectedFailureSatisfied": 5
+  },
+  "largeGateRemainsBlocked": true
+}

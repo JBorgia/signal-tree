@@ -1,0 +1,18 @@
+{
+  "frozen": {
+    "checked": 3045,
+    "differences": []
+  },
+  "original": {
+    "checked": 3045,
+    "differences": []
+  },
+  "candidate": {
+    "checked": 3045,
+    "differences": [
+      "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts",
+      "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts",
+      "packages/kernel/src/lib/structural-admission-sequence.spec.ts"
+    ]
+  }
+}

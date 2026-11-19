@@ -1,0 +1,58 @@
+[
+  {
+    "pid": 48784,
+    "ppid": 48665,
+    "rssBytes": 147456,
+    "birth": "Tue Nov 3 11:10:07 2026",
+    "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48792,
+    "ppid": 48784,
+    "rssBytes": 48218112,
+    "birth": "Tue Nov 3 11:10:08 2026",
+    "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48852,
+    "ppid": 48792,
+    "rssBytes": 48300032,
+    "birth": "Tue Nov 3 11:10:17 2026",
+    "command": "node tools/run-core-vitest.mjs src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48869,
+    "ppid": 48852,
+    "rssBytes": 1933312,
+    "birth": "Tue Nov 3 11:10:18 2026",
+    "command": "node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config vitest.config.ts src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48870,
+    "ppid": 48869,
+    "rssBytes": 212992,
+    "birth": "Tue Nov 3 11:10:18 2026",
+    "command": "(dirname)"
+  },
+  {
+    "pid": 48878,
+    "ppid": 48869,
+    "rssBytes": 54624256,
+    "birth": "Tue Nov 3 11:10:18 2026",
+    "command": "node /private/tmp/st-large-qualification/screen-candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48892,
+    "ppid": 48878,
+    "rssBytes": 19480576,
+    "birth": "Tue Nov 3 11:10:19 2026",
+    "command": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  },
+  {
+    "pid": 48893,
+    "ppid": 48878,
+    "rssBytes": 53166080,
+    "birth": "Tue Nov 3 11:10:20 2026",
+    "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  }
+]

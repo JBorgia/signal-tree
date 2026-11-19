@@ -1,0 +1,23 @@
+{
+  "checkedAt": "2026-11-03T17:59:03.536943+00:00",
+  "checks": [
+    {
+      "root": "/private/tmp/st-v16-integration-candidate",
+      "filesChecked": 3127,
+      "mismatches": [],
+      "manifestSha256": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670"
+    },
+    {
+      "root": "/private/tmp/st-c28-r3-reader-test-composition/candidate",
+      "filesChecked": 3127,
+      "mismatches": [],
+      "manifestSha256": "0af649ba10c55e784d95ae323dcde8322ba018e465110c2a70a36ea2d4cb3949"
+    },
+    {
+      "root": "/private/tmp/st-v16-integration-evidence/dispatch-mutant",
+      "filesChecked": 3127,
+      "mismatches": [],
+      "manifestSha256": "d6b202163bb1456a1c44b31b5b03bfa1fd12953347e30d5fb072d48b2214aa30"
+    }
+  ]
+}

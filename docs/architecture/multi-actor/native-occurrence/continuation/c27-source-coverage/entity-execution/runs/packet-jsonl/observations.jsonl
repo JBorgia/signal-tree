@@ -1,0 +1,3 @@
+{"name":"ROW-RECEIPT-OBSERVATION","value":{"initial":{"state":"eligible","basis":"declared"},"afterRollback":{"state":"superseded"},"sent":[{"id":"a","n":0}]}}
+{"name":"ROW-RECEIPT-FINAL","value":{"status":{"state":"superseded"},"sent":[{"id":"a","n":0}]}}
+{"name":"COLLECTION-UNKNOWN-RECEIPT","value":{"state":"started","basis":"surviving"}}

@@ -1,0 +1,34 @@
+{
+  "frozen8f9": {
+    "checkedFiles": 3124,
+    "mismatches": []
+  },
+  "isolatedBaseline": {
+    "checkedFiles": 3124,
+    "mismatches": []
+  },
+  "candidate": {
+    "checkedFiles": 3127,
+    "mismatches": []
+  },
+  "changed": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts"
+  ],
+  "added": [
+    "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "packages/kernel/src/lib/internals/entity-preparation-reader.ts",
+    "packages/kernel/src/lib/preparation-reader-comparison.spec.ts"
+  ],
+  "frozenOraclesUnchanged": true,
+  "historical": {
+    "/private/tmp/st-c28-r3-private-snapshot-baseline/INTEGRATION-FINAL.spec.ts": true,
+    "/private/tmp/st-c28-r3-private-snapshot-baseline/FINAL.spec.ts": true,
+    "/private/tmp/st-c28-r3-private-snapshot-baseline/ADDITIONAL-REPORT.md": true
+  },
+  "unsupportedCFile": {
+    "path": "/private/tmp/st-c28-r3-private-snapshot-baseline/ADDITIONAL-FINAL.spec.ts",
+    "sha256": "fcb47a8ec142c1cbc7a85e7cef88bedce4f7b04d77791f8a71d7cf3beb37ea8a",
+    "note": "Read-only; never edited by this task."
+  }
+}

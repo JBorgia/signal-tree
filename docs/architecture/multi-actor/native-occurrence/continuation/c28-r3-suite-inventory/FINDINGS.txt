@@ -1,0 +1,615 @@
+packages/kernel/src/enhancers/batching/batching-semantic-scopes.spec.ts
+23: // /private/tmp/st-v16-integration-evidence/scope-deferral/first-with-direct-control.spec.ts
+24: // /private/tmp/st-v16-integration-evidence/scope-deferral/designation-control.spec.ts
+packages/kernel/src/enhancers/restoration/restoration-operation-outcome.spec.ts
+10: // (/private/tmp/signaltree-observation-audit/observation-audit.spec.ts, 8/4).
+packages/kernel/src/enhancers/restoration/reversal-known-limitations.spec.ts
+20:  * - `... — desired` states the correct behaviour and is marked `it.fails`.
+packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts
+29:  * `it.fails` so the release tag could be verified without the contract's own
+34:  * Which is exactly what the marker was for. `it.fails` turns RED when a case
+packages/kernel/src/enhancers/transactions/semantics-current.spec.ts
+1: import { writeFileSync } from 'node:fs';
+67:     if (process.env['SEMANTICS_REPORT'])
+68:       writeFileSync(process.env['SEMANTICS_REPORT'], report, 'utf8');
+packages/kernel/src/lib/approved-current-obligation.spec.ts
+1: import {appendFileSync} from 'node:fs';
+7:  const output=process.env['ST_TWO_HISTORY_OUTPUT'];if(!output)throw Error('Observation output required');
+15:  const record=(phase:string)=>appendFileSync(output,JSON.stringify({history,phase,state:tree.$(),sent,receipts:{historical:historical?.read()??null,fresh:fresh?.read()??null},settled,settleError:settleError??null,notices,historyReads,freshReads,errors,inspection:{p:inspect(p),a:inspect(a),b:inspect(b)}})+'\n');
+packages/kernel/src/lib/benchmarks.spec.ts
+21:  * and `PERF_FAIL_ON_VIOLATION`). So they run here ON DEMAND via `ST_PERF=1`
+25: const RUN_TIMING = process.env['ST_PERF'] === '1';
+26: const timingDescribe = describe.runIf(RUN_TIMING);
+packages/kernel/src/lib/cached-current-input.spec.ts
+1: import { appendFileSync } from 'node:fs';
+60:     const sink = process.env.ST_CACHED_INPUT_OUTPUT;
+61:     if (sink) appendFileSync(sink, JSON.stringify(observation) + '\n');
+packages/kernel/src/lib/comparison-full-state-0.spec.ts
+2: import { readFileSync } from 'node:fs';
+397:       readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
+410:     const src = readFileSync(join(SRC, 'lib/link.ts'), 'utf8');
+426:     const src = readFileSync(join(SRC, 'lib/link.ts'), 'utf8');
+442:     const src = readFileSync(join(SRC, 'lib/link.ts'), 'utf8');
+packages/kernel/src/lib/descriptor-role-0.spec.ts
+2: import { readFileSync } from 'node:fs';
+99:       readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
+108: const ADAPTER = readFileSync(
+packages/kernel/src/lib/entity-restoration-authority.spec.ts
+188:    * ZERO-OWNER RECLAMATION. Was an `it.todo` while nothing drove reclamation;
+packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
+1: import {appendFileSync} from 'node:fs';
+8: // Research-only private cast; never a shipping API assertion.
+33:   const counts=structure(captured);const output=process.env['ST_EQUAL_OWNER_TRACE'];if(!output)throw Error('Research diagnostic requires ST_EQUAL_OWNER_TRACE');appendFileSync(output,JSON.stringify({route,n,inheritedQ,captured:'before extra probe declaration',...counts})+'\n');
+packages/kernel/src/lib/fixed-window-retirement.spec.ts
+2: import {writeFileSync} from 'node:fs';
+30:  writeFileSync(`/private/tmp/st-fixed-window-retirement-cancellation-successor/provenance-${cause}.json`,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,out
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
+1: import {appendFileSync} from 'node:fs';
+10: const log=(v:unknown)=>appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/independent.jsonl',JSON.stringify(v)+'\n');
+packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
+1: import {appendFileSync} from 'node:fs';
+12:   appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/terminal.jsonl',JSON.stringify({kind,outcome,immediate,terminal:childSent,root:rootSent})+'\n');
+packages/kernel/src/lib/independent-prepared-boundary.spec.ts
+2: import {writeFileSync} from 'node:fs';
+13:   writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order.json',JSON.stringify({pending,after,error:String(error),confirmError:String(confirmError)},null,2));
+25:  try{q.rollback();const data=packets.map(p=>({physical:p.physical,ordinary:p.ordinary,steps:p.steps}));writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/packet-${order}.json`,JSON.stringify(data,null,2));
+36:  const data={calls,after,sameSupport,afterAdoptionReject:row()};writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/absence-${mode}.json`,JSON.stringify(data,null,2));
+packages/kernel/src/lib/independent-prepared-unit.spec.ts
+2: import {writeFileSync} from 'node:fs';
+11: const record=(name:string,data:unknown)=>{const dir=process.env['ST_PREPARED_REVIEW_OUTPUT'];if(!dir)throw new Error('fresh output directory required');writeFileSync(`${dir}/${name}.json`,JSON.stringify(data,null,2));};
+packages/kernel/src/lib/independent-scalar-publication.spec.ts
+8: import { writeFileSync } from 'node:fs';
+34:   if(process.env['ST_PREPARED_REVIEW_OUTPUT'])writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],`sibling-window-${openerFirst}.json`),JSON.stringify({owner,observations},null,2)+'\n');
+packages/kernel/src/lib/nested-structural-rollback-1.spec.ts
+231:     const runner = stillRed ? it.fails : it;
+packages/kernel/src/lib/opaque-current-input.spec.ts
+1: import { appendFileSync } from 'node:fs';
+8:   if (process.env.ST_OPAQUE_INPUT_OUTPUT) appendFileSync(process.env.ST_OPAQUE_INPUT_OUTPUT, JSON.stringify(value) + '\n');
+packages/kernel/src/lib/open-key-reachability.spec.ts
+17:   it.fails('a promised arbitrary descendant is a usable location', () => {
+packages/kernel/src/lib/ordinary-restoration-placement.spec.ts
+1: import { writeFileSync } from 'node:fs';
+71:     if(process.env['ST_PREPARED_REVIEW_OUTPUT']) writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],'placement-work.json'),JSON.stringify({sizes:[32,1024],stageReads:counts})+'\n');
+133:   if(process.env['ST_PREPARED_REVIEW_OUTPUT'])writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],'recipient-placement-work.json'),JSON.stringify(measurements)+'\n');
+packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts
+1: import { mkdirSync, writeFileSync } from 'node:fs';
+67:       const out = process.env.ST_PACKET_PAIR_OUTPUT;
+69:         mkdirSync(out, { recursive: true });
+70:         writeFileSync(
+packages/kernel/src/lib/packet-physical-pair-work.spec.ts
+1: import { mkdirSync, writeFileSync } from 'node:fs';
+52:       const output = process.env.ST_PACKET_PAIR_OUTPUT;
+54:         mkdirSync(output, { recursive: true });
+55:         writeFileSync(
+packages/kernel/src/lib/parent-freshness-focused.spec.ts
+2: import {writeFileSync} from 'node:fs';import {join} from 'node:path';
+13: function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}
+packages/kernel/src/lib/parent-snapshot-currentness.spec.ts
+2: import {writeFileSync} from 'node:fs';
+20: function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
+packages/kernel/src/lib/persistence-decompose-0.spec.ts
+2: import { readFileSync } from 'node:fs';
+packages/kernel/src/lib/point-result-allocation.spec.ts
+1: import {appendFileSync} from 'node:fs';
+24:  const output=process.env.ST_POINT_ALLOCATION_OUTPUT;
+25:  if(output)appendFileSync(output,JSON.stringify({width,size,writes:200,...measured})+'\n');
+packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts
+2: import { appendFileSync } from 'node:fs';
+134:       const output = process.env.ST_MEMBERSHIP_REPLAY_OUTPUT;
+136:         appendFileSync(
+packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts
+1: import { mkdirSync, writeFileSync } from 'node:fs';
+24: const RUN_TIMING = process.env['ST_PERF'] === '1';
+25: const timingDescribe = describe.runIf(RUN_TIMING);
+26: const OUTPUT_FILE = process.env['ST_PERF_OUTPUT_FILE'];
+1089:   mkdirSync(parts.join('/'), { recursive: true });
+1090:   writeFileSync(OUTPUT_FILE, JSON.stringify(report, null, 2));
+packages/kernel/src/lib/production-stats-guards.spec.ts
+1: import { readdirSync, readFileSync, statSync } from 'node:fs';
+31:       const lines = readFileSync(file, 'utf8').split('\n');
+packages/kernel/src/lib/public-selected-unit.spec.ts
+2: import {writeFileSync} from 'node:fs';
+21:   const directory=process.env['ST_PUBLIC_DIAGNOSTIC_OUTPUT'];if(!directory)throw new Error('unique evidence output directory required');
+22:   writeFileSync(`${directory}/${order}-${followup}.json`,JSON.stringify(result,null,2));
+packages/kernel/src/lib/public-sibling-current-obligation.spec.ts
+1: import { appendFileSync } from 'node:fs';
+54:       const sink = process.env.ST_PUBLIC_SIBLING_OUTPUT;
+55:       if (sink) appendFileSync(sink, JSON.stringify({ mode, historyCalls, rows, notices,
+packages/kernel/src/lib/publication-retirement-acceptance.spec.ts
+47:  if(process.env['ST_RETIREMENT_FAULT']==='naive-retire')b.source.retire(b.subject!);
+packages/kernel/src/lib/recipient-window-review.spec.ts
+2: import {appendFileSync} from 'node:fs';
+9: const output='/private/tmp/st-joint-phase-successor-r4/runs/recipient-traces.jsonl';
+13:  try{const first=c.declare({kind:'unknown'},write);await flush();expect(sent).toEqual([]);const second=c.declare({kind:'unknown'},write);await flush();appendFileSync(output,JSON.stringify({scope,first:first.read(),second:second.read(),sent})+'\n');expect(second.read()).toMatchObject({state:'no-write'});expect(first.read()).toMat
+26:  await flush();appendFileSync(output,JSON.stringify({known,records,error:error&&{code:(error as {code?:string}).code,stage:(error as {stage?:string}).stage,reason:(error as {reason?:string}).reason},receipt:receipt?.read(),sent})+'\n');
+packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
+2: import { appendFileSync } from 'node:fs';
+15:  appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/getter.jsonl',JSON.stringify({partial,reads,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
+packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
+2: import { appendFileSync } from 'node:fs';
+14:  appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/participant.jsonl',JSON.stringify({seen,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
+packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
+2: import { appendFileSync } from 'node:fs';
+14:  appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/preparation-scalar.jsonl',JSON.stringify({seen,error,n:t.$.n(),left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
+packages/kernel/src/lib/singleton-row-allocation.spec.ts
+1: import {appendFileSync} from 'node:fs';
+22:  const output=process.env.ST_SINGLETON_ALLOCATION_OUTPUT;
+23:  if(output)appendFileSync(output,JSON.stringify({width,size,writes:200,...measured})+'\n');
+packages/kernel/src/lib/tree-error-public-contract.spec.ts
+2: import { readFileSync } from 'node:fs';
+251:       readFileSync(join(c, 'lib/signal-tree.ts'), 'utf8');
+264:     const index = readFileSync(join(SRC, 'index.ts'), 'utf8');
+packages/kernel/src/lib/whole-bounded-qualification.spec.ts
+1: import {writeFileSync} from 'node:fs';
+9: const traces:unknown[]=[];afterAll(()=>writeFileSync(process.env.TMPDIR+'/whole-qualification.json',JSON.stringify(traces,null,2)));
+packages/kernel/src/lib/whole-getter-controls.spec.ts
+1: import {writeFileSync} from 'node:fs';
+9: afterAll(()=>{writeFileSync(process.env.TMPDIR+'/whole-getters.json',JSON.stringify(results,null,2));});
+packages/kernel/src/lib/internals/derived.spec.ts
+938:   // ST_PERF=1 (matches the convention in benchmarks.spec.ts / stored.spec.ts).
+939:   describe.runIf(process.env['ST_PERF'] === '1')(
+packages/kernel/src/lib/internals/provenance-spike.spec.ts
+34:  * The four still-red cases are marked `it.fails` as executable evidence. If a
+35:  * future seam makes one pass, `it.fails` flips it RED and forces a re-read.
+110:   it.fails(
+155:   it.fails(
+248:   it.fails(
+266:   it.fails(
+packages/kernel/src/lib/internals/diagnostics/flush-0.spec.ts
+7: import { writeFileSync } from 'node:fs';
+263:     writeFileSync('/tmp/flush-0.txt', findings.join('\n') + '\n');
+packages/kernel/src/lib/internals/diagnostics/flush-probe.spec.ts
+1: import { writeFileSync } from 'node:fs';
+75:     writeFileSync('/tmp/flush-probe.txt', out.join('\n') + '\n');
+packages/kernel/src/lib/internals/diagnostics/leaf-observation-support-0.spec.ts
+17: import { writeFileSync } from 'node:fs';
+130:     writeFileSync('/tmp/leaf-support-0.txt', rows.join('\n') + '\n');
+packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts
+16: import { writeFileSync } from 'node:fs';
+200:     writeFileSync('/tmp/owner-evidence-0.txt', out.join('\n\n') + '\n');
+packages/kernel/src/lib/internals/diagnostics/owner-scope-0.spec.ts
+16: import { writeFileSync } from 'node:fs';
+177:     writeFileSync('/tmp/owner-scope-leak.json', JSON.stringify(seen, null, 1));
+228:     writeFileSync(
+229:       '/tmp/owner-scope-0.txt',
+packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.spec.ts
+5: const P_FIRST_NAME = 3 as PositionId;
+6: const P_LAST_NAME = 4 as PositionId;
+21:           owner: P_FIRST_NAME,
+51:           owner: P_FIRST_NAME,
+58:           owner: P_LAST_NAME,
+70:           owner: P_FIRST_NAME,
+82:           owner: P_FIRST_NAME,
+99:         [P_FIRST_NAME]: 2,
+100:         [P_LAST_NAME]: 1,
+103:     expect(history.getFrontier(P_FIRST_NAME)).toBe(2);
+104:     expect(history.getFrontier(P_LAST_NAME)).toBe(1);
+117:           owner: P_FIRST_NAME,
+141:           owner: P_FIRST_NAME,
+159:           owner: P_FIRST_NAME,
+172:         [P_FIRST_NAME]: 4,
+188:           owner: P_FIRST_NAME,
+200:           owner: P_FIRST_NAME,
+229:           owner: P_FIRST_NAME,
+260:     expect(history.getFrontier(P_FIRST_NAME)).toBeUndefined();
+274:           owner: P_FIRST_NAME,
+331:           owner: P_FIRST_NAME,
+354:           owner: P_FIRST_NAME,
+366:         [P_FIRST_NAME]: 2,
+381:           owner: P_FIRST_NAME,
+409:         [P_FIRST_NAME]: 1,
+425:           owner: P_FIRST_NAME,
+437:           owner: P_FIRST_NAME,
+468:         [P_FIRST_NAME]: 2,
+483:           owner: P_FIRST_NAME,
+495:           owner: P_FIRST_NAME,
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts
+587: const P_FIRST_NAME = 3 as PositionId;
+588: const P_LAST_NAME = 4 as PositionId;
+598:   [P_FIRST_NAME]: P_PROFILE,
+599:   [P_LAST_NAME]: P_PROFILE,
+672:       [P_FIRST_NAME]: 'Ada',
+680:         owner: P_FIRST_NAME,
+690:     expect(turn.participants).toEqual([P_FIRST_NAME]);
+698:       [P_FIRST_NAME]: 'Ada',
+705:         owner: P_FIRST_NAME,
+730:       [P_FIRST_NAME]: 'Ada',
+737:       [P_FIRST_NAME]: 'Ada',
+738:       [P_LAST_NAME]: 'Lovelace',
+746:         owner: P_FIRST_NAME,
+753:         owner: P_LAST_NAME,
+762:         owner: P_FIRST_NAME,
+785:       [P_FIRST_NAME]: 'Ada',
+786:       [P_LAST_NAME]: 'Lovelace',
+794:         owner: P_FIRST_NAME,
+807:         owner: P_FIRST_NAME,
+814:         owner: P_LAST_NAME,
+827:         owner: P_FIRST_NAME,
+847:         [P_FIRST_NAME]: 'Joan',
+848:         [P_LAST_NAME]: 'Hopper',
+855:         [P_FIRST_NAME]: 3,
+856:         [P_LAST_NAME]: 2,
+859:         [P_FIRST_NAME]: [1, 2, 3],
+860:         [P_LAST_NAME]: [2],
+868:       [P_FIRST_NAME]: 'Ada',
+876:         owner: P_FIRST_NAME,
+892:         owner: P_FIRST_NAME,
+903:       [P_FIRST_NAME]: 'A',
+911:         owner: P_FIRST_NAME,
+920:         [P_FIRST_NAME]: 'B',
+934:       [P_FIRST_NAME]: 'A',
+942:         owner: P_FIRST_NAME,
+959:       [P_FIRST_NAME]: 'B',
+963:         [P_FIRST_NAME]: 'B',
+970:         [P_FIRST_NAME]: pendingTurn.id,
+973:         [P_FIRST_NAME]: [pendingTurn.id],
+981:       [P_FIRST_NAME]: 'A',
+988:         owner: P_FIRST_NAME,
+1002:         owner: P_FIRST_NAME,
+1011:         [P_FIRST_NAME]: 'C',
+1027:         [P_FIRST_NAME]: 'C',
+1034:         [P_FIRST_NAME]: pendingTurn.id,
+1037:         [P_FIRST_NAME]: [pendingTurn.id],
+1044:       [P_FIRST_NAME]: 'A',
+1051:         owner: P_FIRST_NAME,
+1063:         [P_FIRST_NAME]: 'B',
+1076:       [P_FIRST_NAME]: 'A',
+1083:         owner: P_FIRST_NAME,
+1093:         owner: P_FIRST_NAME,
+1104:       [P_FIRST_NAME]: 'C',
+1110:       [P_FIRST_NAME]: 'A',
+1118:         owner: P_FIRST_NAME,
+1127:         owner: P_FIRST_NAME,
+1142:       [P_FIRST_NAME]: 'C',
+1157:         owner: P_FIRST_NAME,
+1163:       [P_FIRST_NAME]: 'A',
+1171:           owner: P_FIRST_NAME,
+1176:       participants: [P_FIRST_NAME],
+1192:         owner: P_FIRST_NAME,
+1198:       [P_FIRST_NAME]: 'C',
+1206:           owner: P_FIRST_NAME,
+1211:       participants: [P_FIRST_NAME],
+1218:       [P_FIRST_NAME]: 'A',
+1226:         owner: P_FIRST_NAME,
+1235:         owner: P_FIRST_NAME,
+1242:         owner: P_FIRST_NAME,
+1257:       [P_FIRST_NAME]: 'D',
+1272:         owner: P_FIRST_NAME,
+1277:         owner: P_FIRST_NAME,
+1283:       [P_FIRST_NAME]: 'A',
+1298:         owner: P_FIRST_NAME,
+1303:         owner: P_FIRST_NAME,
+1309:       [P_FIRST_NAME]: 'D',
+1317:           owner: P_FIRST_NAME,
+1324:           owner: P_FIRST_NAME,
+1329:       participants: [P_FIRST_NAME],
+1410:       [P_FIRST_NAME]: 'Ada',
+1421:         owner: P_FIRST_NAME,
+1433:         [P_FIRST_NAME]: 'Grace',
+1441:         [P_FIRST_NAME]: turn.id,
+1444:         [P_FIRST_NAME]: [turn.id],
+1455:         [P_FIRST_NAME]: 'Ada',
+1470:         [P_FIRST_NAME]: 0,
+1481:         owner: P_FIRST_NAME,
+1514:         owner: P_FIRST_NAME,
+1526:         [P_FIRST_NAME]: 3,
+1534:         [P_FIRST_NAME]: 3,
+1539:         [P_FIRST_NAME]: [3],
+1547:       [P_FIRST_NAME]: 0,
+1555:         owner: P_FIRST_NAME,
+1564:         owner: P_FIRST_NAME,
+1583:         [P_FIRST_NAME]: 1,
+1591:         [P_FIRST_NAME]: 1,
+1594:         [P_FIRST_NAME]: [1],
+1602:         owner: P_FIRST_NAME,
+1610:         [P_FIRST_NAME]: 3,
+1618:         [P_FIRST_NAME]: 3,
+1621:         [P_FIRST_NAME]: [1, 3],
+1628:       [P_FIRST_NAME]: 'A',
+1637:         owner: P_FIRST_NAME,
+1643:     expect(runtime.undoAt(P_FIRST_NAME)).toEqual({
+1660:         [P_FIRST_NAME]: 'A',
+1679:       [P_FIRST_NAME]: 'A',
+1687:         owner: P_FIRST_NAME,
+1709:         owner: P_FIRST_NAME,
+1717:         [P_FIRST_NAME]: 'C',
+1725:         [P_FIRST_NAME]: 2,
+1728:         [P_FIRST_NAME]: [2],
+1735:       [P_FIRST_NAME]: 'Ada',
+1736:       [P_LAST_NAME]: 'Lovelace',
+1745:         owner: P_FIRST_NAME,
+1752:         owner: P_LAST_NAME,
+1765:         owner: P_FIRST_NAME,
+1800:       [P_FIRST_NAME]: 'Ada',
+1808:         owner: P_FIRST_NAME,
+1837:       [P_FIRST_NAME]: 'Ada',
+1845:         owner: P_FIRST_NAME,
+1869:         owner: P_FIRST_NAME,
+1879:       [P_FIRST_NAME]: 'Ada',
+1880:       [P_LAST_NAME]: 'Lovelace',
+1888:         owner: P_FIRST_NAME,
+1895:         owner: P_LAST_NAME,
+1908:         owner: P_FIRST_NAME,
+1928:         [P_FIRST_NAME]: 'Grace',
+1929:         [P_LAST_NAME]: 'Hopper',
+1933:         [P_FIRST_NAME]: [1, 2],
+1934:         [P_LAST_NAME]: [1],
+1937:         [P_FIRST_NAME]: 2,
+1938:         [P_LAST_NAME]: 1,
+1943:         [P_FIRST_NAME]: 1,
+1944:         [P_LAST_NAME]: 1,
+1947:         [P_FIRST_NAME]: [1],
+1948:         [P_LAST_NAME]: [1],
+1954:         owner: P_FIRST_NAME,
+1963:       [P_FIRST_NAME]: 'Ada',
+1972:         owner: P_FIRST_NAME,
+1995:     expect(runtime.undoAt(P_FIRST_NAME)).toEqual({
+2000:     expect(runtime.assessRedo(P_FIRST_NAME, t1.id)).toBe('eligible');
+2001:     expect(runtime.redoConfirmedOperation(P_FIRST_NAME, t1.id)).toEqual({
+2007:         [P_FIRST_NAME]: 'Grace',
+2012:         [P_FIRST_NAME]: [1],
+2016:         [P_FIRST_NAME]: 1,
+2022:         [P_FIRST_NAME]: 1,
+2026:         [P_FIRST_NAME]: [1],
+2034:       [P_FIRST_NAME]: 'Ada',
+2041:         owner: P_FIRST_NAME,
+2050:         owner: P_FIRST_NAME,
+2071:       [P_FIRST_NAME]: 'Ada',
+2080:         owner: P_FIRST_NAME,
+2093:         owner: P_FIRST_NAME,
+2129:       [P_FIRST_NAME]: 'Ada',
+2137:         owner: P_FIRST_NAME,
+2150:         owner: P_FIRST_NAME,
+2179:       [P_FIRST_NAME]: 'Ada',
+2188:         owner: P_FIRST_NAME,
+2228:       [P_FIRST_NAME]: 'Ada',
+2236:         owner: P_FIRST_NAME,
+2270:       [P_FIRST_NAME]: 'Ada',
+2278:         owner: P_FIRST_NAME,
+2307:         owner: P_FIRST_NAME,
+2317:       [P_FIRST_NAME]: 'Ada',
+2326:         owner: P_FIRST_NAME,
+2349:     expect(runtime.undoAt(P_FIRST_NAME)).toEqual({
+2364:         [P_FIRST_NAME]: 'Grace',
+2369:         [P_FIRST_NAME]: [1],
+2373:         [P_FIRST_NAME]: 1,
+2379:         [P_FIRST_NAME]: 1,
+2383:         [P_FIRST_NAME]: [1],
+2390:         owner: P_FIRST_NAME,
+packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts
+13: const P_FIRST_NAME = 3 as PositionId;
+14: const P_LAST_NAME = 4 as PositionId;
+28:           owner: P_FIRST_NAME,
+49:         [P_FIRST_NAME, 'Ada'],
+81:           owner: P_FIRST_NAME,
+91:       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
+121:               effects: [{ owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' }],
+143:           owner: P_FIRST_NAME,
+156:       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
+189:           owner: P_FIRST_NAME,
+214:         [P_FIRST_NAME, 'Ada'],
+235:         [P_FIRST_NAME]: [1],
+239:         [P_FIRST_NAME]: 1,
+247:         [P_FIRST_NAME]: 1,
+256:         owner: P_FIRST_NAME,
+278:   expect(firstName).toBe(P_FIRST_NAME);
+279:   expect(lastName).toBe(P_LAST_NAME);
+packages/kernel/src/lib/internals/causal-runtime/confirmed-rollback-composition.spec.ts
+11: const P_FIRST_NAME = 3 as PositionId;
+22:     expect(firstName).toBe(P_FIRST_NAME);
+27:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+38:           owner: P_FIRST_NAME,
+46:     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);
+81:         owner: P_FIRST_NAME,
+86:     expect(values.get(P_FIRST_NAME)).toBe('A');
+93:           owner: P_FIRST_NAME,
+98:       participants: [P_FIRST_NAME],
+117:         owner: P_FIRST_NAME,
+122:     expect(values.get(P_FIRST_NAME)).toBe('C');
+129:           owner: P_FIRST_NAME,
+134:       participants: [P_FIRST_NAME],
+147:     expect(firstName).toBe(P_FIRST_NAME);
+152:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+163:           owner: P_FIRST_NAME,
+170:           owner: P_FIRST_NAME,
+178:     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'D']]);
+213:         owner: P_FIRST_NAME,
+220:         owner: P_FIRST_NAME,
+225:     expect(values.get(P_FIRST_NAME)).toBe('A');
+242:         owner: P_FIRST_NAME,
+249:         owner: P_FIRST_NAME,
+254:     expect(values.get(P_FIRST_NAME)).toBe('D');
+261:           owner: P_FIRST_NAME,
+268:           owner: P_FIRST_NAME,
+273:       participants: [P_FIRST_NAME],
+packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts
+13: const P_FIRST_NAME = 3 as PositionId;
+14: const P_LAST_NAME = 4 as PositionId;
+28:           owner: P_FIRST_NAME,
+35:           owner: P_LAST_NAME,
+47:           owner: P_FIRST_NAME,
+68:         [P_FIRST_NAME, 'Ada'],
+69:         [P_LAST_NAME, 'Lovelace'],
+101:           owner: P_FIRST_NAME,
+113:       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
+144:               effects: [{ owner: P_FIRST_NAME, before: 'Grace', after: 'Ada' }],
+166:           owner: P_FIRST_NAME,
+178:       baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
+211:           owner: P_FIRST_NAME,
+218:           owner: P_LAST_NAME,
+230:           owner: P_FIRST_NAME,
+242:         [P_FIRST_NAME, 'Ada'],
+243:         [P_LAST_NAME, 'Lovelace'],
+263:         [P_FIRST_NAME]: [1, 2],
+264:         [P_LAST_NAME]: [1],
+267:         [P_FIRST_NAME]: 2,
+268:         [P_LAST_NAME]: 1,
+275:         [P_FIRST_NAME]: 1,
+276:         [P_LAST_NAME]: 1,
+284:         owner: P_FIRST_NAME,
+300:           owner: P_FIRST_NAME,
+354:         [P_FIRST_NAME, 'A'],
+378:         owner: P_FIRST_NAME,
+407:   expect(firstName).toBe(P_FIRST_NAME);
+408:   expect(lastName).toBe(P_LAST_NAME);
+packages/kernel/src/lib/internals/causal-runtime/effect-applier.spec.ts
+7: const P_FIRST_NAME = 3 as PositionId;
+8: const P_LAST_NAME = 4 as PositionId;
+21:           owner: P_FIRST_NAME,
+28:           owner: P_LAST_NAME,
+67:         owner: P_LAST_NAME,
+74:         owner: P_FIRST_NAME,
+91:           owner: P_FIRST_NAME,
+129:           owner: P_FIRST_NAME,
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts
+30: const P_FIRST_NAME = 4 as PositionId;
+31: const P_LAST_NAME = 5 as PositionId;
+322:       [P_FIRST_NAME, 'Ada'],
+323:       [P_LAST_NAME, 'Lovelace'],
+337:     values.set(P_FIRST_NAME, 'Grace');
+339:       owner: P_FIRST_NAME,
+343:     values.set(P_LAST_NAME, 'Hopper');
+345:       owner: P_LAST_NAME,
+354:       { owner: P_FIRST_NAME, before: 'Ada', after: 'Grace' },
+357:       { owner: P_LAST_NAME, before: 'Lovelace', after: 'Hopper' },
+packages/kernel/src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts
+12: const P_FIRST_NAME = 3 as PositionId;
+24:     expect(firstName).toBe(P_FIRST_NAME);
+29:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+39:           owner: P_FIRST_NAME,
+51:           owner: P_FIRST_NAME,
+61:     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);
+100:     expect(values.get(P_FIRST_NAME)).toBe('C');
+101:     expect(realizationContext.getCurrentValue(P_FIRST_NAME)).toBe('C');
+118:         owner: P_FIRST_NAME,
+123:     expect(values.get(P_FIRST_NAME)).toBe('A');
+140:         owner: P_FIRST_NAME,
+145:     expect(values.get(P_FIRST_NAME)).toBe('C');
+156:     expect(firstName).toBe(P_FIRST_NAME);
+161:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+171:           owner: P_FIRST_NAME,
+178:           owner: P_FIRST_NAME,
+185:     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);
+219:           owner: P_FIRST_NAME,
+226:     expect(values.get(P_FIRST_NAME)).toBe('A');
+238:     expect(firstName).toBe(P_FIRST_NAME);
+245:         [P_FIRST_NAME, 'A'],
+257:           owner: P_FIRST_NAME,
+276:           owner: P_FIRST_NAME,
+285:       [P_FIRST_NAME, 'C'],
+328:     expect(values.get(P_FIRST_NAME)).toBe('C');
+346:         owner: P_FIRST_NAME,
+351:     expect(values.get(P_FIRST_NAME)).toBe('A');
+363:     expect(firstName).toBe(P_FIRST_NAME);
+368:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+378:           owner: P_FIRST_NAME,
+390:           owner: P_FIRST_NAME,
+397:     const values = new Map<PositionId, unknown>([[P_FIRST_NAME, 'C']]);
+429:     expect(values.get(P_FIRST_NAME)).toBe('C');
+432:     expect(realizationContext.getCurrentValue(P_FIRST_NAME)).toBe('C');
+447:         owner: P_FIRST_NAME,
+452:     expect(values.get(P_FIRST_NAME)).toBe('A');
+packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts
+18: const P_FIRST_NAME = 3 as PositionId;
+184:           owner: P_FIRST_NAME,
+206:           baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
+228:           owner: P_FIRST_NAME,
+249:           baselineValues: new Map([[P_FIRST_NAME, 'Ada']]),
+475:           owner: P_FIRST_NAME,
+480:       participants: [P_FIRST_NAME],
+581:           owner: P_FIRST_NAME,
+619:             [P_FIRST_NAME, 'Ada'],
+1294:   expect(firstName).toBe(P_FIRST_NAME);
+packages/kernel/src/lib/internals/causal-runtime/realization-context.spec.ts
+6: const P_FIRST_NAME = 3 as PositionId;
+13:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+24:           owner: P_FIRST_NAME,
+36:           owner: P_FIRST_NAME,
+44:     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
+46:       source.getValueWithoutConfirmedTurn(confirmed.id, P_FIRST_NAME)
+48:     expect(source.getValueWithoutPendingTurn(1, P_FIRST_NAME)).toBe('C');
+52:     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
+54:       source.getValueWithoutConfirmedTurn(confirmed.id, P_FIRST_NAME)
+62:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+73:           owner: P_FIRST_NAME,
+85:           owner: P_FIRST_NAME,
+92:           owner: P_FIRST_NAME,
+102:     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('D');
+104:       source.getValueWithoutConfirmedTurn(confirmed.id, P_FIRST_NAME)
+106:     expect(source.getValueWithoutPendingTurn(1, P_FIRST_NAME)).toBe('D');
+120:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+132:           owner: P_FIRST_NAME,
+146:           owner: P_FIRST_NAME,
+157:     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
+158:     expect(source.getValueWithoutConfirmedTurn(t2.id, P_FIRST_NAME)).toBe('B');
+172:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+184:           owner: P_FIRST_NAME,
+199:           owner: P_FIRST_NAME,
+210:     expect(source.getCurrentValue(P_FIRST_NAME)).toBe('C');
+211:     expect(source.getValueWithoutConfirmedTurn(t2.id, P_FIRST_NAME)).toBe('A');
+225:       baselineValues: new Map([[P_FIRST_NAME, 'A']]),
+237:           owner: P_FIRST_NAME,
+251:           owner: P_FIRST_NAME,
+266:             owner: P_FIRST_NAME,
+271:         participants: [P_FIRST_NAME],
+packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
+1: import { appendFileSync } from 'node:fs';
+36:       appendFileSync('/private/tmp/st-joint-phase-successor-r4/runs/completion.jsonl',JSON.stringify({observed,stack:new Error().stack})+'\n');
+packages/kernel/src/lib/internals/causal-runtime/turn-store.spec.ts
+6: const P_FIRST_NAME = 3 as PositionId;
+7: const P_LAST_NAME = 4 as PositionId;
+23:           owner: P_FIRST_NAME,
+43:           owner: P_FIRST_NAME,
+55:       participants: [P_FIRST_NAME, P_THEME],
+60:     expect(store.getTurnIdsForPosition(P_FIRST_NAME)).toEqual([1]);
+62:     expect(store.getTurnsForPosition(P_FIRST_NAME)).toEqual([turn]);
+64:     expect(store.getFrontier(P_FIRST_NAME)).toBe(1);
+75:         [P_FIRST_NAME]: [1],
+79:         [P_FIRST_NAME]: 1,
+94:           owner: P_FIRST_NAME,
+107:           owner: P_FIRST_NAME,
+112:       participants: [P_FIRST_NAME],
+121:     expect(store.getTurnIdsForPosition(P_FIRST_NAME)).toEqual([]);
+122:     expect(store.getFrontier(P_FIRST_NAME)).toBeUndefined();
+139:           owner: P_FIRST_NAME,
+189:           owner: P_FIRST_NAME,
+212:     expect(store.getTurnIdsForPosition(P_FIRST_NAME)).toEqual([1]);
+237:           owner: P_FIRST_NAME,
+252:           owner: P_FIRST_NAME,
+257:       participants: [P_FIRST_NAME],
+264:     expect(store.getTurnIdsForPosition(P_FIRST_NAME)).toEqual([1]);
+266:     expect(store.getFrontier(P_FIRST_NAME)).toBe(1);
+293:           owner: P_FIRST_NAME,
+298:       participants: [P_FIRST_NAME],
+307:           owner: P_FIRST_NAME,
+312:       participants: [P_FIRST_NAME],
+327:           owner: P_FIRST_NAME,
+352:         [P_FIRST_NAME]: [1],
+355:         [P_FIRST_NAME]: 1,
+369:           owner: P_FIRST_NAME,
+400:           owner: P_FIRST_NAME,
+411:     expect(store.getTurnIdsForPosition(P_FIRST_NAME)).toEqual([3]);
+413:     expect(store.getFrontier(P_FIRST_NAME)).toBe(3);
+419:         [P_FIRST_NAME]: [3],
+423:         [P_FIRST_NAME]: 3,
+437:           owner: P_LAST_NAME,
+445:           owner: P_FIRST_NAME,
+454:     expect(turn.participants).toEqual([P_LAST_NAME, P_FIRST_NAME]);
+455:     expect(store.getTurnIdsForPosition(P_FIRST_NAME)).toEqual([1]);
+456:     expect(store.getTurnIdsForPosition(P_LAST_NAME)).toEqual([1]);
+459:     expect(store.getFrontier(P_FIRST_NAME)).toBe(1);
+460:     expect(store.getFrontier(P_LAST_NAME)).toBe(1);
+466:         [P_LAST_NAME]: [1],
+467:         [P_FIRST_NAME]: [1],
+470:         [P_LAST_NAME]: 1,
+471:         [P_FIRST_NAME]: 1,
+packages/angular/src/lib/kernel-comparison.benchmark.spec.ts
+5: const RUN_TIMING = process.env['ST_PERF'] === '1';
+41: describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', () => {
+packages/angular/src/lib/parent-freshness-focused.spec.ts
+2: import {writeFileSync} from 'node:fs';import {join} from 'node:path';
+13: function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}
+packages/angular/src/lib/parent-snapshot-currentness.spec.ts
+2: import {writeFileSync} from 'node:fs';
+21: function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
+COUNTS {'kernel': 638, 'angular': 52, 'react': 19, 'vue': 34, 'solid': 22}

@@ -1,0 +1,68 @@
+[
+  {
+    "source": "MECHANISM.md",
+    "archive": "MECHANISM.md",
+    "sourceSha256": "7b391a5b391a255d6ac46fdfff95594f3f38122ec0fb17a9624bc942845f611e",
+    "archiveSha256": "7b391a5b391a255d6ac46fdfff95594f3f38122ec0fb17a9624bc942845f611e"
+  },
+  {
+    "source": "INPUT-PLAN-SNAPSHOT.json",
+    "archive": "INPUT-PLAN-SNAPSHOT.json",
+    "sourceSha256": "728447bda09e22c8d34bc90f2646bc010580b6e7cfa27850ce28f3079e6b638d",
+    "archiveSha256": "728447bda09e22c8d34bc90f2646bc010580b6e7cfa27850ce28f3079e6b638d"
+  },
+  {
+    "source": "MAIN-first.log",
+    "archive": "MAIN-first.log",
+    "sourceSha256": "322d5a7057e16daa0dd1177e3a16d6a6307a9ef14b3228a4f5256ecdfd984580",
+    "archiveSha256": "322d5a7057e16daa0dd1177e3a16d6a6307a9ef14b3228a4f5256ecdfd984580"
+  },
+  {
+    "source": "EXACT-SEAMS.md",
+    "archive": "EXACT-SEAMS.md",
+    "sourceSha256": "a24f701e54c1b77e00074861aa60a104d633d0d336f645d13d5f557cd23f1a4b",
+    "archiveSha256": "a24f701e54c1b77e00074861aa60a104d633d0d336f645d13d5f557cd23f1a4b"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "02aba88c81c413700ef4af2f9bf8facc422cabf01fddf6a31b4ec2d777b16568",
+    "archiveSha256": "82a24298afa4def7f49fa3b8ccf399d7a83c70580e44e1e2c7b584bf84bc2dd1"
+  },
+  {
+    "source": "OWNER-AUTHORITY.md",
+    "archive": "OWNER-AUTHORITY.md",
+    "sourceSha256": "7b115e635b2aafd2beba0d3eed35a6244e37a0763ff5ca1615773cfcf5518e60",
+    "archiveSha256": "7b115e635b2aafd2beba0d3eed35a6244e37a0763ff5ca1615773cfcf5518e60"
+  },
+  {
+    "source": "DISCRIMINATORS.md",
+    "archive": "DISCRIMINATORS.md",
+    "sourceSha256": "ad6d700201a81a52ea9c24b4d73bc8883ebc99cb2d682ad31472877cec2e752c",
+    "archiveSha256": "ad6d700201a81a52ea9c24b4d73bc8883ebc99cb2d682ad31472877cec2e752c"
+  },
+  {
+    "source": "MAIN-PREWRITTEN.spec.ts",
+    "archive": "MAIN-PREWRITTEN.spec.ts",
+    "sourceSha256": "7025a024c85722832cc863df8b718265ad2de55bed610255e72bdfbc8469d2e9",
+    "archiveSha256": "7025a024c85722832cc863df8b718265ad2de55bed610255e72bdfbc8469d2e9"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "15ef4b8ff7a1b707169a36b8db60344367be08c8e3fe8468ec61979b0ca176db",
+    "archiveSha256": "15ef4b8ff7a1b707169a36b8db60344367be08c8e3fe8468ec61979b0ca176db"
+  },
+  {
+    "source": "SOURCE-IDENTITIES.json",
+    "archive": "SOURCE-IDENTITIES.json",
+    "sourceSha256": "e5080e984444509d3b0382ba383806585eb4bba35eceabdb2f119a018aea9791",
+    "archiveSha256": "e5080e984444509d3b0382ba383806585eb4bba35eceabdb2f119a018aea9791"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "39e6bfd2c30ebcf463685a3fecb59124460675860c223454fdc68a19d25542f3",
+    "archiveSha256": "39e6bfd2c30ebcf463685a3fecb59124460675860c223454fdc68a19d25542f3"
+  }
+]

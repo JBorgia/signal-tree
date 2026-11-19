@@ -1,0 +1,9 @@
+{
+  "manifestSHA256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "overlays": {
+    "packages/kernel/src/enhancers/restoration/restoration.spec.ts": "e1b2631108d1c89e0c12000286709eda21dd486ab1ae1fcce641d7f7f9625b13",
+    "packages/kernel/src/lib/transaction-observer-failure.spec.ts": "53b154fd9e2fc71909313f61de2e3b8415db243cc096af0c2c5ebd096efacac4",
+    "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts": "5e9ba0c6b3990a50322270073c26d9ba7c2e557935f6048343c2dde086a816a5",
+    "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts": "74220c38abc41437ea29b78073832fa8c3b64c7a5affab7d40e7c03271d150b7"
+  }
+}

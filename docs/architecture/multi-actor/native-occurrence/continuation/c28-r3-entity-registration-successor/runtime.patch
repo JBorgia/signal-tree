@@ -1,0 +1,49 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,7 +1,7 @@
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+-import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
++import { entityPublicationOrdinary, currentEntityPublicationInputs, type EntityPublicationParticipant, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
+ import * as lifecycle from './lifecycle';
+ import { currentNativePublicationInputs } from './private';
+ 
+@@ -57,7 +57,7 @@
+ }
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+-registerEntityPublicationFactory(() => {
++export const createEntityPublicationParticipant: () => EntityPublicationParticipant = () => {
+   const fields=new Map<number,Map<string,NativeFieldEndpoint>>();
+   const members=new Map<number,Member>();
+   const placements=new Map<number,Requirement>();
+@@ -296,4 +296,4 @@
+     },
+     retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);retirements++;},
+   };
+-});
++};
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,7 +1,7 @@
+ import type { PublicationDeclaration, PublicationReceipt } from './publication-declaration';
+ import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
+-import './experimental-publication/entity';
+-import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
++import { createEntityPublicationParticipant } from './experimental-publication/entity';
++import { registerEntityPublicationFactory, entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+ import { entityValueTransition } from './internals/entity-value-transition';
+ import type { NativeRequirement } from './experimental-publication/lifecycle';
+ import { combineTerminalRecords } from './internals/intrinsic-mutation';
+@@ -59,6 +59,10 @@
+ import type { NodeAccessor } from './node-accessor';
+ import type { ConstructionOf } from './internals/construction-accessor';
+ import type { ResolveLeafDefinitions } from './types';
++
++// Consume the factory at module initialization, before application writes.
++// Participant state remains lazy and source-owned; Link calls do not register.
++registerEntityPublicationFactory(createEntityPublicationParticipant);
+ 
+ /** Physical topology and eligible semantic facts have distinct existing carriers. */
+ function applyCollectionNotification(

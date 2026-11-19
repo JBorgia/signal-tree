@@ -1,0 +1,8 @@
+🔍 Verifying TypeScript declaration structure in dist/packages/...
+✅ angular: declaration entry ./src/index.d.ts exists
+✅ kernel: declaration entry ./dist/index.d.ts exists
+✅ react: declaration entry ./src/index.d.ts exists
+✅ solid: declaration entry ./src/index.d.ts exists
+✅ vue: declaration entry ./src/index.d.ts exists
+
+✅ All packages have their manifest-declared TypeScript entry

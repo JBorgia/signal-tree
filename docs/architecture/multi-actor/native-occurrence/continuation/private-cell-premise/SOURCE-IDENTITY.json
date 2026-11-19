@@ -1,0 +1,23 @@
+{
+  "root": "/private/tmp/st-c21-undispatched-kernel/candidate",
+  "baselineManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "files": {
+    "packages/kernel/src/lib/internals/location-runtime.ts": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5",
+    "packages/kernel/src/lib/internals/native-location-realization.ts": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+    "packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts": "52fbe6757c711b19c45e5f60ce0264a52e993aecb4d7beadae7e658f4b7d948b",
+    "packages/kernel/src/lib/internals/native-projection-observability.spec.ts": "b115832fd17811562761944da54c8595e04e0329a4f7c56cf6bec4c2700cf6ed",
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts": "08e290c23ee194877e87cb9430fffab1aa7842e580e01f90de640ecca358b34e",
+    "packages/kernel/src/lib/internals/custom-markers.spec.ts": "eb2a3b8a843913099c1de4a79eaf3f1a6966d864c5c07c89d5ac946b0c83aa4b",
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354",
+    "packages/kernel/src/lib/internals/materialize-markers.ts": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381",
+    "packages/kernel/src/lib/internals/location-runtime.spec.ts": "7836045fbbf1d17e4cbe284e690e16ee802784bb1bf3d14d7d949cafdef1bbef",
+    "packages/kernel/src/adapter.ts": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+    "packages/kernel/src/reactive-test-realization.ts": "90e78553ebc8818f9ff3c68cf196bb1f8bde73ca2997352fd0f1a20390a0041e",
+    "packages/kernel/src/lib/signal-tree.ts": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "packages/kernel/src/enhancers/restoration/restoration.ts": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+    "packages/kernel/src/enhancers/devtools/devtools-impl.ts": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9"
+  }
+}

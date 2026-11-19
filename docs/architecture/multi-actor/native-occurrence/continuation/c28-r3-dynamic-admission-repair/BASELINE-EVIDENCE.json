@@ -1,0 +1,11 @@
+{
+  "source": "/private/tmp/st-c28-r3-dynamic-admission-trace",
+  "unchangedAndMinimal": "/private/tmp/st-c28-r3-dynamic-admission-trace/runs/unchanged-and-minimal-first",
+  "result": {
+    "exit": 1,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "reproSha256": "3526790e67d94dcb6dc2acd491c66d78bd264311bd053a86d03843b0edd8def0",
+  "frozenR3ManifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+}

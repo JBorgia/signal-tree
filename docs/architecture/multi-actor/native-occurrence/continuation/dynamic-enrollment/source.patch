@@ -1,0 +1,307 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -8,7 +8,7 @@
+ import { getRetainedMembershipPath } from '../internals/member-membership';
+ import type { WriteMetadata } from '../mutation-types';
+ import { getActiveWriteContext } from '../write-context';
+-import { combineTerminalRecords, preparePublicationMutations, registerMembershipPublication, registerBranchPublicationInputs, registerNativePublicationFactory, registerPublicationSnapshots, type MembershipPublicationEdit, type IntrinsicMutation, type PreparedPublicationUnit } from '../internals/intrinsic-mutation';
++import { combineTerminalRecords, stagePublicationMutations, preparePublicationMutations, registerMembershipPublication, registerBranchPublicationInputs, registerNativePublicationFactory, registerPublicationSnapshots, type MembershipPublicationEdit, type IntrinsicMutation, type PreparedPublicationUnit } from '../internals/intrinsic-mutation';
+ import * as projection from './projection';
+ import * as lifecycle from './lifecycle';
+ export {stampSource,subscribeProjection,deliverEqual} from './projection';
+@@ -163,34 +163,76 @@
+  const source=b.source&&b.occurrences.get(b.source);
+  return {proof:b.index.proof(),present:!source||b.index.exposed(source)};
+ }
++/** Detached descendant plans; registrations become live only with source installation. */
++function prepareDescendantEnrollment(channel:object,b:Binding,edit:MembershipPublicationEdit,requirement:lifecycle.NativeRequirement,inspection:boolean) {
++ const occurrences=edit.preparedOccurrences;
++ if(!occurrences?.length||!b.aggregate)return undefined;
++ const fresh=occurrences.filter(value=>!b.occurrences.has(value.source));
++ if(!fresh.length)return undefined;
++ const fields=fresh.flatMap(value=>{
++  const node=value.source;if(!isWritableLocation(node)||getEntityPublicationBinding(node))return [];
++  const address=getNodeAddress(node),relative=address&&relativeSourceAddress(b.address??[],address);
++  if(!address||relative===undefined)throw Error('Prepared field has no recipient address');
++  const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:[],unknown:false});facts.add(fact);
++  const registration=stagePublicationMutations(node,(m,input,native)=>prepareScalar(channel,m,input,node,native),completeScalar,()=>captureValueInput(channel,node));
++  return [{node,address,relative,fact,registration}];
++ });
++ const install={set(){
++  for(const field of fields){b.fields.set(field.node,{address:field.address,relative:field.relative});
++   b.fieldFacts.set(field.node,field.fact);b.completedFields.set(field.node,field.fact);fieldAt(b.fieldTrie,field.relative,true)!.field=field.node;
++   field.registration.install();b.releases.push(field.registration.release);
++  }
++ }};
++ return {record:{writes:[{map:install,key:undefined,value:undefined}],adds:[]},validate:()=>{
++  if(bindings.get(channel)?.index!==b.index||bindings.get(channel)?.current!==b.current)throw Error('Dynamic recipient changed during preparation');
++ },activate:()=>{
++  if(bindings.get(channel)?.index!==b.index)return;
++  // Enrollment callbacks write internal proof tables only. No unit is complete yet.
++  for(const occurrence of fresh){const handle=b.index.enrollCaptured(occurrence);b.occurrences.set(occurrence.source,handle);}
++  for(const field of fields){installFact(b,field.node,'value',field.fact,requirement);if(!inspection)b.initialized.add(field.node);}
++  if(inspection){
++   const handle=b.occurrences.get(edit.child);if(handle)b.index.setPresence(handle,false,lifecycle.initialRequirement());
++   const slot=slotNode(b,[...edit.address,edit.key])?.slots.get(edit.child);
++   if(slot){const state={present:false,fact:b.baselineStructure};b.presence.set(slot,state);b.completedPresence.set(slot,state);}
++  }
++ }};
++}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+  const physicalView={requirement:unavailableInput()};
+  const viewDomain=negativeViews.get(domainKey)??new Map<object,NativeView>();
+  const viewWrites=[{map:memberViews,key:edit.child,value:physicalView},{map:negativeViews,key:domainKey,value:viewDomain},...(!edit.present?[{map:viewDomain,key:edit.child,value:physicalView}]:[])];
+- if(meta?.participation==='inspection')return {record:{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},completion:{parts:[]}};
++ const inspection=meta?.participation==='inspection';
+  const authored=nativeAuthorship(edit.child);const native=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,branchInputs.flatMap(scope=>scope.native));
+  const address=[...edit.address,edit.key],found:object[]=[];let cursor=tries.get(edit.registry);if(cursor)found.push(...cursor.channels);for(const key of address){cursor=cursor?.children.get(key);if(!cursor)break;found.push(...cursor.channels);}collect(trieFor(edit.registry,address,false),found);const channels=[...new Set(found)];
+- physicalView.requirement=native.requirement;
++ if(!inspection)physicalView.requirement=native.requirement;
+  const domain=nativeNegativeDomains.get(domainKey)??new Map<object,lifecycle.NativeRequirement>();
+- const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];const finalizeRecipients:(()=>void)[]=[];
++ const records=[combineTerminalRecords(native.record,{writes:[...viewWrites,{map:nativeMembers,key:edit.child,value:native.requirement},{map:nativeNegativeDomains,key:domainKey,value:domain},...(!edit.present?[{map:domain,key:edit.child,value:native.requirement}]:[])],deletes:edit.present?[{map:domain,key:edit.child},{map:viewDomain,key:edit.child}]:[],adds:[]})!];const parts:{channel:object;unit:Unit}[]=[];const finalizeRecipients:(()=>void)[]=[];const enrollments:NonNullable<ReturnType<typeof prepareDescendantEnrollment>>[]=[];
+  for(const channel of channels){const b=bindings.get(channel);if(!b?.source||!b.address)continue;const inside=relativeSourceAddress(b.address,address);if(inside!==undefined){if(!b.aggregate&&(inside.length!==0||edit.child!==b.source))continue;}else if(!reaches(edit.child,b.address.slice(address.length),b.source))continue;
+-  const indexed=slotNode(b,address);if(!indexed)continue;const slot=indexed.slots.get(edit.child)??slotFor(edit.branch,edit.key,edit.child);const previous=b.current;
++  const enrollment=prepareDescendantEnrollment(channel,b,edit,inspection?unavailableInput():native.requirement,inspection);
++  if(enrollment){enrollments.push(enrollment);records.push(enrollment.record);finalizeRecipients.push(enrollment.validate);}
++  if(inspection)continue;
++  const indexed=slotNode(b,address);if(!indexed&&!enrollment)continue;const slot=indexed?.slots.get(edit.child)??slotFor(edit.branch,edit.key,edit.child);const previous=b.current;
+   const attributed=meta?.transactionId;const known=typeof attributed==='number'?lifecycle.ownerCell(b.owner,attributed):undefined;
+   const valid=attributed===undefined||!!known&&meta?.transactionOwner===lifecycle.ownerToken(b.owner);
+   const uncertainty:lifecycle.RecipientUncertainty={invalidAttribution:!valid,unobservedOrigin:meta?.origin!==undefined};
+   const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin);
+   const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown});facts.add(fact);
+   let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});const state=Object.freeze({present:edit.present,fact});
+-  const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
++  const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(edit.ordinary?.before.present??b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
+   const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],uncertainty,fact.blockers,native.requirement);
+   if(record.finalize)finalizeRecipients.push(record.finalize);
+-  records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:indexed.slots,key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
+- }
+- const record=combineTerminalRecords(...records);return record?{record,completion:{parts},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
+-}
+-function completeMembership(completion:object):void{for(const {channel,unit}of(completion as {parts:{channel:object;unit:Unit}[]}).parts)completeScalar({channel,unit});}
++  records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:{set(){indexSlot(b,slot);}},key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
++ }
++ const record=combineTerminalRecords(...(inspection?[{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},...enrollments.map(value=>value.record)]:records));return record?{record,completion:{parts,enrollments},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
++}
++function completeMembership(completion:object):void{
++ const state=completion as {parts:{channel:object;unit:Unit}[];enrollments?:{activate():void}[]};
++ for(const enrollment of state.enrollments??[])enrollment.activate();
++ state.enrollments=undefined;
++ for(const {channel,unit}of state.parts)completeScalar({channel,unit});
++}
+ function ready(channel:object,b:Binding):void{
+  for(const unit of b.pending){
+   if(!unit.complete)break;
+@@ -352,9 +394,9 @@
+   }
+   wakeChannel(channel);
+  },edge=>nativeMembers.get(edge.child)??lifecycle.initialRequirement(),(edge,occurrence,requirement)=>{
+-  const slot=slotFor(edge.parent,edge.key,edge.child),fact=nativeFact(requirement);
++  const slot=slotNode(binding,edge.address)?.slots.get(edge.child)??slotFor(edge.parent,edge.key,edge.child),fact=nativeFact(requirement);
+   const state={present:edge.present,fact};binding.occurrences.set(edge.child,occurrence);
+-  binding.presence.set(slot,state);binding.completedPresence.set(slot,state);indexSlot(binding,slot);
++  if(!binding.presence.has(slot))binding.presence.set(slot,state);if(!binding.completedPresence.has(slot))binding.completedPresence.set(slot,state);indexSlot(binding,slot);
+   return proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);};
+  });
+  binding={index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -288,6 +288,15 @@
+   preparers.set(prepare, {complete,captureInput});
+   composePublication(source);
+   return () => { if (preparers.delete(prepare)) composePublication(source); };
++}
++
++/** No source registration is reachable until the producer installs this record. */
++export function stagePublicationMutations(node: object, prepare: PublicationPreparer,
++ complete: PublicationCompleter, captureInput?: PublicationInputCapture) {
++ if(!SOURCES.has(node))throw new Error('Prepared descendant lacks native publication source');
++ let release:(()=>void)|undefined;
++ return {install:()=>{release=preparePublicationMutations(node,prepare,complete,captureInput);},
++ release:()=>{release?.();release=undefined;}};
+ }
+ 
+ function composePublication(source: SourceRecord): void {
+@@ -325,6 +334,7 @@
+ 
+ /** Optional ordinary-membership admission; producers retain descriptor authority. */
+ export interface MembershipPublicationEdit {
++  readonly preparedOccurrences?: readonly import('./native-occurrence').NativeOccurrence[];
+   readonly registry: object;
+   readonly branch: object;
+   readonly address: readonly string[];
+--- a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ b/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -1,3 +1,4 @@
++import { inheritObservationForAddedMember } from './observation-substrate';
+ import { installTerminalRecord, combineTerminalRecords, membershipPublicationPreparer, completePreparedPublication } from './intrinsic-mutation';
+ import { reportContainedObserverError } from './error-reporter';
+ import type { TerminalRecordPlan } from './intrinsic-mutation';
+@@ -28,7 +29,9 @@
+   publishMembershipChange,
+ } from './snapshot-authority';
+ import { pathObservation } from './path-observation-port';
+-import { linkAddedMember } from './member-membership';
++import { ordinaryMemberSnapshot } from './plain-branch-membership';
++import { prepareNativeMemberOccurrences } from './native-occurrence';
++import { linkAddedMember, prepareFreshMemberPresence } from './member-membership';
+ // ⚠️ THE PORT, NOT THE ENGINE. Marker processors are handed the neutral
+ // observation port; the only thing any of them calls on it is `notify`. Typing
+ // this as `PathObservationPort` claimed the whole engine surface and is what let a
+@@ -797,8 +800,15 @@
+   const prepare = membershipPublicationPreparer;
+   const registry = prepare ? getPositionRegistry(branch) : undefined;
+   const address = registry ? getNodeAddress(branch) : undefined;
++  const fresh = isTraversableNode(child) ? prepareFreshMemberPresence(branch,key,child) : undefined;
++  const occurrence = prepare && registry && address && isTraversableNode(child)
++    ? prepareNativeMemberOccurrences(branch,key,child) : undefined;
++  // Read the detached canonical child's ordinary image before any install or delivery.
++  const ordinary = fresh ? {before:{present:false as const},after:fresh.present
++    ? {present:true as const,value:ordinaryMemberSnapshot(child)} : {present:false as const}} : undefined;
+   const unit = prepare && registry && address && isTraversableNode(child)
+-    ? prepare({registry,branch,address,key,child,present:true}) : undefined;
++    ? prepare({registry,branch,address,key,child,present:true,ordinary,preparedOccurrences:occurrence?.occurrences}) : undefined;
++  fresh?.validate();occurrence?.validate();
+   const records = combineTerminalRecords(responsibility,unit?.record);
+   let failed = false;
+   try {
+@@ -824,9 +834,12 @@
+   if (records) {
+     installTerminalRecord(records);
+   }
++  fresh?.install();
+   // Under a branch that has been omitted before, so an omission above it is
+   // visible to the new member too (`isAbsentMember`).
+   linkAddedMember(branch as object, key, child);
++  // Claim only the child that actually installed; abandoned plans own no live observer.
++  inheritObservationForAddedMember(branch, child);
+ 
+   (branch as Record<symbol, Map<string, unknown> | undefined>)[KEY_INDEX]?.set(
+     key,
+--- a/packages/kernel/src/lib/internals/member-membership.ts
++++ b/packages/kernel/src/lib/internals/member-membership.ts
+@@ -204,11 +204,9 @@
+   );
+ }
+ function ownOrdinaryAbsence(node: unknown): boolean {
+-  const binding = memberBinding(node);
+-  return (
+-    binding !== undefined &&
+-    !readOrdinaryMemberPresence(binding.parent, binding.key)
+-  );
++  for(let binding=memberBinding(node);binding;binding=memberBinding(binding.parent))
++    if(!readOrdinaryMemberPresence(binding.parent,binding.key))return true;
++  return false;
+ }
+ 
+ /** Dev-mode cross-check of cached answers, one read in this many (8g). */
+@@ -508,8 +506,7 @@
+     );
+     if (
+       descriptor?.enumerable === false ||
+-      (path.length === 0 &&
+-        !readOrdinaryMemberPresence(binding.parent, binding.key))
++      !readOrdinaryMemberPresence(binding.parent, binding.key)
+     )
+       outer = path.length;
+     path.push(binding);
+@@ -1013,3 +1010,20 @@
+       }
+   }
+ }
++
++/** Prepare the ordinary exception for a newly materialized physical edge. */
++export function prepareFreshMemberPresence(branch: object,key: string,child: object) {
++ const parent=nodeOf(branch),previous=ordinaryPresenceSources.get(parent);
++ const descriptor=Object.getOwnPropertyDescriptor(parent,key);
++ const source=previous??new OrdinaryMemberPresenceSource();
++ const edit=source.prepare(key,child,false,true,getActiveWriteContext()?.participation==='inspection');
++ return {present:edit.after,validate:()=>{
++  if(ordinaryPresenceSources.get(parent)!==previous||Object.getOwnPropertyDescriptor(parent,key)?.value!==descriptor?.value)throw new Error('Fresh membership preparation reentered installation');
++  source.validate(edit);
++ },install:()=>{
++  const delta=source.install(edit);ordinaryPresenceSources.set(parent,source);
++  if(!edit.after){markHasDormant(parent);const peer=peerOf(parent);if(peer)markHasDormant(peer);linkMember(parent,key,child);linkDescendants(child);}
++  const runtime=getTreeScalarSlotRuntime(parent);
++  if(runtime&&delta){ordinaryDivergences.set(runtime,(ordinaryDivergences.get(runtime)??0)+delta);runtime.enableAbsence?.(ABSENCE);}
++ }};
++}
+--- a/packages/kernel/src/lib/internals/native-occurrence.ts
++++ b/packages/kernel/src/lib/internals/native-occurrence.ts
+@@ -48,3 +48,37 @@
+   issued.add(result);return result;
+ }
+ export function isNativeOccurrence(value: NativeOccurrence): boolean { return issued.has(value); }
++
++/** Source construction authority: authenticate a detached addition against its live parent. */
++export function prepareNativeMemberOccurrences(parent: object, key: string, child: object) {
++  const ancestry = captureNativeOccurrence(parent);
++  const address = getNodeAddress(parent);
++  if (!address || Object.getOwnPropertyDescriptor(occurrenceIdentity(parent), key))
++    throw new Error('Prepared native member is not a fresh edge');
++  const occurrences: NativeOccurrence[] = [];
++  const seen=new Set<object>();
++  const visit = (node: object, edges: readonly NativeOccurrenceEdge[]): void => {
++    const expected=edges.at(-1)?.address??[],actual=getNodeAddress(node);
++    if(getPositionRegistry(node)!==getPositionRegistry(parent)||!actual||actual.length!==expected.length||actual.some((part,i)=>part!==expected[i])||seen.has(node))
++      throw new Error('Prepared native member has invalid source identity');
++    seen.add(node);
++    const occurrence = Object.freeze({root: ancestry.root, source: node, edges: Object.freeze([...edges])});
++    issued.add(occurrence); occurrences.push(occurrence);
++    if (getEntityPublicationBinding(node)) return;
++    const storage = occurrenceIdentity(node);
++    for (const name of Object.getOwnPropertyNames(storage)) {
++      const descriptor = Object.getOwnPropertyDescriptor(storage, name);
++      if (!descriptor || !('value' in descriptor) || !isTraversableNode(descriptor.value) || !getNodeAddress(descriptor.value)) continue;
++      visit(descriptor.value, [...edges, Object.freeze({parent: node, key:name, child:descriptor.value,
++        address: Object.freeze([...address,key,...getNodeAddress(descriptor.value)!.slice(address.length+1)]), present:descriptor.enumerable===true})]);
++    }
++  };
++  visit(child,[...ancestry.edges,Object.freeze({parent,key,child,address:Object.freeze([...address,key]),present:true})]);
++  return {occurrences:Object.freeze(occurrences),validate:()=>{
++    const current=captureNativeOccurrence(parent);
++    if (current.root!==ancestry.root || current.edges.length!==ancestry.edges.length ||
++        current.edges.some((edge,i)=>edge.child!==ancestry.edges[i].child||edge.present!==ancestry.edges[i].present) ||
++        Object.getOwnPropertyDescriptor(occurrenceIdentity(parent),key))
++      throw new Error('Prepared native member ancestry changed');
++  }};
++}
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -59,6 +59,7 @@
+   readdedDuringStructuralWrite,
+   republishMembers,
+   setMemberPresence,
++  readOrdinaryMemberPresence,
+   structuralWrites,
+ } from './internals/member-membership';
+ import { getOwnedPositionIds } from './internals/owned-mutation';
+@@ -76,7 +77,6 @@
+ import { captureBranchMembershipIfObserved } from './internals/path-observation-port';
+ import {
+   installDormantObservation,
+-  inheritObservationForAddedMember,
+ } from './internals/observation-substrate';
+ import { terminateOwnerInvalidation } from './internals/owner-invalidation-port';
+ import { defineRootTree } from './internals/root-source';
+@@ -1042,7 +1042,6 @@
+         !Object.prototype.hasOwnProperty.call(targetObj, key)
+       ) {
+         const { child, responsibility } = buildAddition();
+-        inheritObservationForAddedMember(branch, child);
+         installPreparedMember(branch, key, child, responsibility);
+         // Invalidate the installed membership before later application equality
+         // or updaters can read it. Native delivery remains owned by the group.
+@@ -1310,7 +1309,7 @@
+           // otherwise come back with its retained storage. Measured before v16 8d:
+           // `$({ a: undefined, count: 0 })` re-added an omitted `a` as `{ v: 1 }`.
+           // "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE" (case 18).
+-          !descriptor.enumerable &&
++          (!descriptor.enumerable || !readOrdinaryMemberPresence(targetObj,key)) &&
+           installed?.has(key) &&
+           setMemberPresence(targetObj, key, 'active')
+         ) {

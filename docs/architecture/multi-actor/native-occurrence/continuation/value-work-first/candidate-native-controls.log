@@ -1,0 +1,38 @@
+
+> nx run kernel:test --testFile=native-certificate-successor.spec.ts,publication-enrollment-adjudicated.spec.ts,publication-enrollment-invariance.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=native-certificate-successor.spec.ts,publication-enrollment-adjudicated.spec.ts,publication-enrollment-invariance.spec.ts --maxWorkers=1
+
+(node:92857) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92920) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c17-value-work-correction/candidate/packages/kernel
+
+No test files found, exiting with code 1
+
+filter: native-certificate-successor.spec.ts,publication-enrollment-adjudicated.spec.ts,publication-enrollment-invariance.spec.ts
+include: **/*.spec.ts, tests/**/*.spec.ts, src/**/*.spec.ts, src/**/lib/**/*.spec.ts
+exclude:  **/node_modules/**, **/typing/**, **/*.generated.spec.ts, **/all-chains.spec.ts, **/all-subsets.spec.ts, **/*/typing.spec.ts, **/lib/typing.spec.ts, **/*typing-chain.spec.ts, **/*typing*.spec.ts, **/diag-journal-1-eviction.spec.ts, **/link-lifetime.spec.ts, **/location-runtime-retention.spec.ts, **/forwarding-retention-probe.spec.ts
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=native-certificate-successor.spec.ts,publication-enrollment-adjudicated.spec.ts,publication-enrollment-invariance.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      763ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     746ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    746ms

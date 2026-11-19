@@ -1,0 +1,18 @@
+{
+  "AB-FIRST.jsonl": "de7a810abcd9031d54cfeda5fb85697f8198f35f6338d14b6d54424a6375dec0",
+  "trace/AB-TRACE-FIRST.jsonl": "9b1f099c4f9a7d03e8809810ec7c5c5530ff02fd5d1ae0fedee463ab99830d4c",
+  "trace/instrumentation.patch": "5cd123ea3f5c1d07cec131849b4da47b5ef83f1c9758b34396fe5c27d9f70ed2",
+  "runs/public-horizon-first/first.log": "5941a520193efea11a2928ced3801222230b608355b645ad8f85b9fcee00b7c3",
+  "candidate/packages/kernel/src/lib/approved-current-obligation.spec.ts": "b74ab938c968cd284a27b6c3ce54a16c27ecb6f897d2ec30a820fe619189e0e3",
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "qualification": "d437aa15f4cf1f9aeac90bc94b676d4aa6fc5568bb488453750920180f072148",
+    "frozenR1": "d437aa15f4cf1f9aeac90bc94b676d4aa6fc5568bb488453750920180f072148",
+    "equal": true
+  },
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "qualification": "d64344f66b5df1463cc89e810bb370296902d450f527342f8cbbfd755f230815",
+    "frozenR1": "d64344f66b5df1463cc89e810bb370296902d450f527342f8cbbfd755f230815",
+    "equal": true
+  },
+  "tracePublicObservationsMatchOriginal": true
+}

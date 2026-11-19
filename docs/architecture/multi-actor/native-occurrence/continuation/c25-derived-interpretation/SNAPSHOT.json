@@ -1,0 +1,21 @@
+{
+  "IDENTITY.json": "40d2bb3d7c7db1b60e1f7a0ed8507bb235585e588fc2550c4bfe9820a2e7e011",
+  "REVIEW.md": "c7fc2830954f122236b26054082e1a79f3d0e1d21bae1e373f1ecf91fbcd10a8",
+  "inputs/C24-RETENTION-OBSERVATIONS.jsonl": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d",
+  "inputs/C24-fixture.ts": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f",
+  "inputs/C25-EXPECTATIONS.md": "d164232edc696dd3eb2e36ccb8539e563c8c19ca9d299693d93d6b980094c550",
+  "inputs/ROOTS-DERIVED.jsonl": "88a396b8fabb73b3dab3451079f3604438b2746888d4df1487f989510ada35c4",
+  "inputs/derived-COMMAND.json": "c9a5b2e59ccd477e38beeac9cf5487668d64cd472eb858f8b0852ec821bdf3f8",
+  "inputs/derived-RESULT.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+  "inputs/derived-SOURCE.json": "5528578d343934c63631e548322ccc5c8b8761f0b058fd0c29de83ee040b88d3",
+  "inputs/derived-first.log": "2152717282bea2b735b64c713191b4c778ce15db2c1c4e804e9f4eecc7fd76e3",
+  "inputs/derived-fixture.ts": "f37542afc66d0ef3092b947e3132f8d9996673f90b9e79e9b159540f4469a7e9",
+  "inputs/instrument-roots.py": "699194e280dcd0af6609e2ea556eb37f66248ae91ceddd054cc201268ac06928",
+  "inputs/instrumentation-final.patch": "bf8f6361083e88203dc8729e73af020575ac50562e7e510abb450c8c958491b1",
+  "inputs/instrumented/enhancers/transactions/transactions.ts": "79e41d25b785b98daae85c58ef2f398cd0b7835230648b41fd2c9b7bf18cb32a",
+  "inputs/instrumented/lib/experimental-publication/lifecycle.ts": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23",
+  "inputs/instrumented/lib/experimental-publication/private.ts": "7447a9cc5fae7989427183265611da7885cba2fb66023b934d2102b1480ded47",
+  "inputs/instrumented/lib/internals/native-scalar-selection.ts": "5fc14ca9ff02b7f433d62fa4372384c708022289369e0371852b571e76ae50ab",
+  "inputs/literal-ROOTS-LARGE.jsonl": "9b8a1bcf8542bc08061359bd7c4773ac996880affa4967d6068cfdded39fc4f4",
+  "inputs/literal-fixture.ts": "31520de0dbdd368c721c25a5fda71fe79e773ad436889516d9ae40a7da43a436"
+}

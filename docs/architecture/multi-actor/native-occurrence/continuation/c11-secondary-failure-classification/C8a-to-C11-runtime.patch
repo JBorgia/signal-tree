@@ -1,0 +1,598 @@
+--- C8a/packages/kernel/src/lib/entity-signal.ts
++++ C11/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './internals/snapshot-installation';
+ import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { PublicationPreparation } from './internals/publication-preparation';
+ import { reportContainedObserverError } from './internals/error-reporter';
+@@ -435,6 +436,11 @@
+ 
+   // Source-owned install epoch makes library readers current before notifications.
+   let installedReadRevision=0;
++  let snapshotIdentity: object | undefined;
++  const advanceInstalledRead = (): void => {
++    installedReadRevision++;
++    if (snapshotIdentity) markSnapshotInstalled(snapshotIdentity);
++  };
+   const createVersionedProjection = <TValue>(
+     compute: () => TValue
+   ): ReadableCell<TValue> => {
+@@ -672,7 +678,7 @@
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
+         if(publication.unit) installTerminalRecord(publication.unit.record);
+-        installedReadRevision++;
++        advanceInstalledRead();
+       },
+       invalidate(): void {
+         let failed = false;
+@@ -1052,19 +1058,50 @@
+           if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+         installPlacement();
+         if(publication.unit)installTerminalRecord(publication.unit.record);
+-        installedReadRevision++;
++        advanceInstalledRead();
+         if(!publicationPhase)complete();
+       },
+     };
+   }
+ 
++  type OrdinaryPointPreparation = {
++    changes: CommittedEntityMutation[];
++    install: ReturnType<typeof ordinaryTopology.prepareInstall>;
++    interval: ReturnType<typeof ordinaryTopology.prepareInstall>['interval'];
++    ordinaryEndpoints: {
++      readonly before: readonly number[];
++      readonly after: readonly number[];
++      readonly domain?: readonly number[];
++    } | undefined;
++  };
++  type OrdinaryRichPreparation = OrdinaryPointPreparation & {
++    byPhysicalSubject: Map<number, readonly CommittedEntityMutation[]>;
++    byStep: Array<readonly CommittedEntityMutation[]>;
++  };
+   function prepareOrdinaryTopology(
++    demand: 'point',
++    changes: readonly CommittedEntityMutation[],
++    physical?: ReturnType<typeof structuralStore.preparePlacement>,
++    authoredOrder?: readonly number[],
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
++  ): OrdinaryPointPreparation;
++  function prepareOrdinaryTopology(
++    demand: 'rich',
++    changes: readonly CommittedEntityMutation[],
++    physical?: ReturnType<typeof structuralStore.preparePlacement>,
++    authoredOrder?: readonly number[],
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
++  ): OrdinaryRichPreparation;
++  function prepareOrdinaryTopology(
++    demand: 'point' | 'rich',
+     changes: readonly CommittedEntityMutation[],
+     physical = structuralStore.preparePlacement(),
+     authoredOrder?: readonly number[],
+     authoredDomain?: readonly number[],
+     physicalEntries?: PreparedPlacementEntries<K>
+-  ) {
++  ): OrdinaryPointPreparation | OrdinaryRichPreparation {
+     const placement = ordinaryTopology.preparePlacement(
+       structuralStore.preparePlacement()
+     );
+@@ -1083,11 +1120,13 @@
+     const staged = new Map<number, Presence>();
+     const keys = new Map<K, number | undefined>();
+     const selected: CommittedEntityMutation[] = [];
+-    const byStep: Array<readonly CommittedEntityMutation[]> = [];
+-    const byPhysicalSubject = new Map<
+-      number,
+-      readonly CommittedEntityMutation[]
+-    >();
++    // Only the rich frame consumer needs these per-step/per-subject indexes.
++    // Point writes still prepare the same completed ordinary changes and install.
++    const byStep: Array<readonly CommittedEntityMutation[]> | undefined =
++      demand === 'rich' ? [] : undefined;
++    const byPhysicalSubject = demand === 'rich'
++      ? new Map<number, readonly CommittedEntityMutation[]>()
++      : undefined;
+     const read = (subject: number): Presence => {
+       const row = placement.read(subject);
+       if (!row.present) return { present: false };
+@@ -1237,12 +1276,14 @@
+           write(change.subject, { ...ordinary, value: change.after as E });
+         }
+       }
+-      const previous = byPhysicalSubject.get(change.subject);
+-      byPhysicalSubject.set(
+-        change.subject,
+-        previous === undefined ? group : [...previous, ...group]
+-      );
+-      byStep.push(group);
++      if (byPhysicalSubject) {
++        const previous = byPhysicalSubject.get(change.subject);
++        byPhysicalSubject.set(
++          change.subject,
++          previous === undefined ? group : [...previous, ...group]
++        );
++      }
++      byStep?.push(group);
+       selected.push(...group);
+     }
+     let ordinaryEndpoints:
+@@ -1302,12 +1343,20 @@
+       completedChanges.set(change, completed);
+       return completed;
+     };
+-    for (const [subject, group] of byPhysicalSubject)
+-      byPhysicalSubject.set(subject, group.map(completeChange));
+-    return {
+-      changes: selected.map(completeChange),
++    if (byPhysicalSubject)
++      for (const [subject, group] of byPhysicalSubject)
++        byPhysicalSubject.set(subject, group.map(completeChange));
++    const completed = selected.map(completeChange);
++    if (byPhysicalSubject && byStep) return {
++      changes: completed,
+       byPhysicalSubject,
+       byStep: byStep.map((group) => group.map(completeChange)),
++      install: installPlacement,
++      interval: installPlacement.interval,
++      ordinaryEndpoints,
++    };
++    return {
++      changes: completed,
+       install: installPlacement,
+       interval: installPlacement.interval,
+       ordinaryEndpoints,
+@@ -1461,6 +1510,7 @@
+         };
+     }
+     const ordinaryPlan = prepareOrdinaryTopology(
++      'rich',
+       changes,
+       physicalPlacement,
+       frame.ordinaryOrder,
+@@ -1583,14 +1633,14 @@
+         const result = frame.commit(
+           observe ? () => observe(ordinaryPlan.changes, delivery => observations.push(delivery)) : undefined,
+           responsibility, structuralFrontier, valueTransitions,
+-          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); installedReadRevision++; installed = true; }
++          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); advanceInstalledRead(); installed = true; }
+         );
+         if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
+         // Capture installed facts inside their actual bulk unit. Delivery belongs
+         // to detached completion, so sibling facts precede listener reentry.
+         if (membershipTap) {
+           releaseMembership = holdEntityMembershipDelivery(api);
+-          membershipTap(MEMBERSHIP_FACTS, frame.mutations);
++          membershipTap(MEMBERSHIP_FACTS, frame.mutations, frame.orderEndpoints);
+         }
+         return resultOf(result);
+       },
+@@ -2493,7 +2543,7 @@
+       nextValue,
+       fields
+     );
+-    const ordinaryPlan = prepareOrdinaryTopology([
++    const ordinaryPlan = prepareOrdinaryTopology('point', [
+       {
+         subject: subjectId,
+         before: transition.ordinaryBefore,
+@@ -2535,7 +2585,7 @@
+     ordinaryPlan.install();
+     if (plan) installTerminalRecord(plan);
+     if(publication.unit) installTerminalRecord(publication.unit.record);
+-    installedReadRevision++;
++    advanceInstalledRead();
+     const observations:Array<()=>void>=[];
+     capture?.(ordinaryPlan.changes,delivery=>observations.push(delivery));
+     physicalCommitClock?.advance();
+@@ -5586,6 +5636,7 @@
+   });
+   // The materializer stamps the returned collection identity, not its raw
+   // proxy target. Source enrollment must retain that same identity.
++  snapshotIdentity = proxy;
+   defineEntityPublicationBinding(proxy as object, { source: entityPublication });
+   return proxy;
+ }
+--- C8a/packages/kernel/src/lib/internals/entity-membership-inventory.ts
++++ C11/packages/kernel/src/lib/internals/entity-membership-inventory.ts
+@@ -5,6 +5,7 @@
+   MEMBERSHIP_OPEN,
+   MEMBERSHIP_OPEN_ORDER,
+   type EntityMembershipInstruction,
++  type EntityMembershipOrderEndpoints,
+   type EntityMembershipStore,
+ } from './entity-membership-source';
+ 
+@@ -242,10 +243,12 @@
+   return changes;
+ }
+ 
+-/** Point deltas of one committed mutation frame; never scans the collection. */
++/** Point facts stay sparse. Explicit order endpoints are already prepared;
++ * only their supplied arrays are compared, never a new live-store snapshot. */
+ function frameChanges(
+   store: EntityMembershipStore,
+-  instructions: readonly EntityMembershipInstruction[]
++  instructions: readonly EntityMembershipInstruction[],
++  order?: EntityMembershipOrderEndpoints
+ ): EntityMembershipChange[] {
+   const changes: EntityMembershipChange[] = [];
+   for (const instruction of instructions) {
+@@ -275,6 +278,9 @@
+       changes.push({ kind: 'remove', lifetimeId, key });
+     }
+   }
++  if (order && survivingOrderChanged(order.before, order.after)) {
++    changes.push({ kind: 'reorder', before: order.before, after: order.after });
++  }
+   return changes;
+ }
+ 
+@@ -299,16 +305,16 @@
+   });
+   const units: { unit: EntityMembershipUnit; before?: MembershipOrder }[] = [];
+   // The tap runs only from later structural operations, never during attach.
+-  const store: EntityMembershipStore = source((phase, instructions) => {
++  const store: EntityMembershipStore = source((phase, instructions, order) => {
+     const truth = store;
+     if (phase === MEMBERSHIP_FACTS) {
+       // Inside a diffed bulk unit the close diff already covers this frame.
+       if (
+         inventory.observed() &&
+-        instructions &&
++        (instructions || order) &&
+         !units.some((open) => open.before)
+       )
+-        inventory.begin().commit(frameChanges(truth, instructions));
++        inventory.begin().commit(frameChanges(truth, instructions ?? [], order));
+     } else if (phase === MEMBERSHIP_OPEN || phase === MEMBERSHIP_OPEN_ORDER) {
+       units.push({
+         unit: inventory.begin(),
+--- C8a/packages/kernel/src/lib/internals/entity-membership-source.ts
++++ C11/packages/kernel/src/lib/internals/entity-membership-source.ts
+@@ -38,9 +38,16 @@
+   readonly toKey?: string | number;
+ };
+ 
++/** Prepared physical placement; ordinary publication authority is separate. */
++export type EntityMembershipOrderEndpoints = {
++  readonly before: readonly number[];
++  readonly after: readonly number[];
++};
++
+ export type EntityMembershipTap = (
+   phase: number,
+-  instructions?: readonly EntityMembershipInstruction[]
++  instructions?: readonly EntityMembershipInstruction[],
++  order?: EntityMembershipOrderEndpoints
+ ) => void;
+ 
+ /** What an observer may read from the collection's structural truth. */
+--- C8a/packages/kernel/src/lib/internals/location-runtime.ts
++++ C11/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './snapshot-installation';
+ import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation,type SelectedOutcome} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+@@ -489,6 +490,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
++          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+           if (observer) observer({intent:'replace',before:before as T,after:changed ? next : before as T,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+@@ -523,6 +525,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
++          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+           mutationSource2.observer?.({intent:'derive',before,after:changed ? next : before,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+--- C8a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ C11/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -25,6 +25,7 @@
+ import type { TreeCapability } from '../types';
+ import {
+   bindSnapshotParent,
++  markSnapshotInstalled,
+   markSnapshotVolatile,
+   materializeSnapshotNode,
+   publishMembershipChange,
+@@ -855,6 +856,7 @@
+   // Under a branch that has been omitted before, so an omission above it is
+   // visible to the new member too (`isAbsentMember`).
+   linkAddedMember(branch as object, key, child);
++  markSnapshotInstalled(branch);
+   // Claim only the child that actually installed; abandoned plans own no live observer.
+   inheritObservationForAddedMember(branch, child);
+ 
+--- C8a/packages/kernel/src/lib/internals/member-membership.ts
++++ C11/packages/kernel/src/lib/internals/member-membership.ts
+@@ -28,7 +28,7 @@
+ import { getOwnedPositionIds } from './owned-metadata';
+ import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+ import { capturePathReAddIfObserved } from './path-observation-port';
+-import { publishMembershipChange } from './snapshot-authority';
++import { markSnapshotInstalled, publishMembershipChange } from './snapshot-authority';
+ import {
+   getTreeScalarSlotRuntime,
+   type MemberAbsence,
+@@ -996,6 +996,20 @@
+       if (ordinaryDivergences.get(runtime)) runtime.enableAbsence?.(ABSENCE);
+       else if (!omittedMembers.get(runtime)) runtime.disableAbsence?.();
+     }
++    if (changed) {
++      markSnapshotInstalled(parent);
++      // A held descendant can have a cached value even without a demanded parent.
++      const mark = (node: unknown): void => {
++        if (!isNodeAccessor(node)) return;
++        markSnapshotInstalled(node);
++        for (const key of Reflect.ownKeys(node)) {
++          if (key === 'caller' || key === 'arguments') continue;
++          const descriptor = Object.getOwnPropertyDescriptor(node, key);
++          if (descriptor && 'value' in descriptor) mark(descriptor.value);
++        }
++      };
++      mark(child);
++    }
+     return changed;
+   } catch (error) {
+     failed = true;
+--- C8a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ C11/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -1,3 +1,4 @@
++import { bindSnapshotInstalledReader, markSnapshotInstalled } from './snapshot-installation';
+ import {consumeSelected} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+@@ -104,6 +105,7 @@
+       throw new Error('Expected a native writable cell realization');
+ 
+     const location = markTreeCell(realized.cell as unknown as Location<T>);
++    bindSnapshotInstalledReader(location, read);
+     const mutationSource1 = observable
+       ? registerIntrinsicMutationSource<T>(location as object)
+       : unobservableMutationSource<T>();
+@@ -114,6 +116,7 @@
+         const observer = mutationSource1.observer;
+         const before = observer ? realized.peek() : undefined;
+         const changed = write(next, 'replace');
++        if (changed) markSnapshotInstalled(location);
+         if (observer) {
+           observer({
+             intent: 'replace',
+@@ -128,6 +131,7 @@
+         const before = realized.peek();
+         const next = update(before);
+         const changed = write(next, 'derive');
++        if (changed) markSnapshotInstalled(location);
+         const observer = mutationSource1.observer;
+         if (observer) {
+           observer({
+--- C8a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ C11/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,4 @@
++import { bindSnapshotInstalledReader } from './snapshot-installation';
+ import type {ConstructionAllocation} from './construction-allocation';
+ import { PublicationPreparation } from './publication-preparation';
+ import { completeScalarFrame } from './tree-scalar-slot-runtime';
+@@ -166,6 +167,7 @@
+   publication.bind(slotIndex, realized.token);
+   const leaf = markTreeCell(native as unknown as Location<T>);
+   holder.leaf = leaf;
++  bindSnapshotInstalledReader(leaf, () => liveness.absence?.isAbsent(leaf) ? undefined : kernel.readSlot<T>(slotIndex));
+   const mutationSource = registerIntrinsicMutationSource<T>(leaf as object);
+ 
+   // `reAdd` re-adds and announces an absent leaf's path, and says whether it
+--- C8a/packages/kernel/src/lib/internals/snapshot-authority.ts
++++ C11/packages/kernel/src/lib/internals/snapshot-authority.ts
+@@ -1,3 +1,5 @@
++import { MATERIALIZED, SNAPSHOT_PARENT, type MaterializedSnapshot } from './snapshot-installation';
++export { bindSnapshotParent, markSnapshotInstalled, readSnapshotTerminal } from './snapshot-installation';
+ import type { Location, ReadableCell } from './cell-runtime';
+ import { isNodeAccessor, snapshotNodeKey } from './node-shape';
+ import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+@@ -10,12 +12,6 @@
+ 
+ declare const ngDevMode: boolean | undefined;
+ 
+-interface MaterializedSnapshot<T> {
+-  observe: ReadableCell<T>;
+-}
+-
+-const MATERIALIZED = new WeakMap<object, MaterializedSnapshot<unknown>>();
+-const SNAPSHOT_PARENT = new WeakMap<object, WeakRef<object>>();
+ const TREE_STORES = new WeakSet<object>();
+ const VOLATILE_SNAPSHOTS = new WeakSet<object>();
+ const MEMBERSHIP_REVISION = new WeakMap<object, Location<number>>();
+@@ -25,13 +21,6 @@
+ 
+ export function isSnapshotNode(node: object): boolean {
+   return TREE_STORES.has(node) || isNodeAccessor(node);
+-}
+-
+-export function bindSnapshotParent(node: object, parent: object): void {
+-  SNAPSHOT_PARENT.set(
+-    snapshotNodeKey(node),
+-    new WeakRef(snapshotNodeKey(parent))
+-  );
+ }
+ 
+ export function markSnapshotVolatile(node: object): void {
+@@ -84,17 +73,57 @@
+ 
+   if (!snapshot) {
+     const membershipRevision = membershipRevisionFor(key, locations);
++    // Register before the first evaluation, including a cold reentrant build.
++    let observe: ReadableCell<T> | undefined;
++    const record: MaterializedSnapshot<T> = {
++      generation: 0,
++      get observe() { return observe ??= locations.createDerived(read); },
++    };
+     const read = () => {
++      if (record.attempt) record.attempt.built = true;
++      const generation = record.generation;
++      const previousCache = record.cache;
+       membershipRevision();
+       const built = build();
+       if (typeof ngDevMode === 'undefined' || ngDevMode) {
+         if (built !== null && typeof built === 'object') Object.freeze(built);
+       }
++      // Never cache an output spanning an installation, nor retry its callback.
++      if (generation !== record.generation) return built;
++      if (record.cache?.generation === generation &&
++          (record.cache.pendingObservation || record.cache !== previousCache)) {
++        record.cache.pendingObservation = false;
++        return record.cache.value;
++      }
++      // An ordinary runtime invalidation can come from a foreign/custom source
++      // without an install hook. Only an early current-read winner is reusable.
++      record.cache = { generation, value: built, pendingObservation: false };
+       return built;
+     };
+-    snapshot = { observe: locations.createDerived(read) };
+-    MATERIALIZED.set(key, snapshot as MaterializedSnapshot<unknown>);
++    MATERIALIZED.set(key, record as MaterializedSnapshot<unknown>);
++    snapshot = record;
+   }
+ 
+-  return snapshot.observe();
++  const previous = snapshot.attempt;
++  const receipt = { built: false };
++  snapshot.attempt = receipt;
++  try {
++    const observed = snapshot.observe();
++    if (receipt.built) return observed;
++    if (snapshot.cache?.generation === snapshot.generation) return snapshot.cache.value;
++    // Observe was cached by the runtime: read installed truth without publishing.
++    // Use the same tracked builder; a later real observe pass still collects all
++    // dependencies and may allocate a temporary output before reusing this one.
++    const generation = snapshot.generation;
++    const built = build();
++    if (typeof ngDevMode === 'undefined' || ngDevMode) {
++      if (built !== null && typeof built === 'object') Object.freeze(built);
++    }
++    if (generation !== snapshot.generation) return built;
++    if (snapshot.cache?.generation === generation) return snapshot.cache.value;
++    snapshot.cache = { generation, value: built, pendingObservation: true };
++    return built;
++  } finally {
++    snapshot.attempt = previous;
++  }
+ }
+--- C8a/packages/kernel/src/lib/internals/snapshot-installation.ts
++++ C11/packages/kernel/src/lib/internals/snapshot-installation.ts
+@@ -0,0 +1,41 @@
++import type { ReadableCell } from './cell-runtime';
++import { snapshotNodeKey } from './node-shape';
++
++// Existing snapshot authority state, isolated from realization initialization.
++export interface MaterializedSnapshot<T> {
++  observe: ReadableCell<T>;
++  generation: number;
++  cache?: { generation: number; value: T; pendingObservation: boolean };
++  attempt?: { built: boolean };
++}
++
++export const MATERIALIZED = new WeakMap<object, MaterializedSnapshot<unknown>>();
++export const SNAPSHOT_PARENT = new WeakMap<object, WeakRef<object>>();
++
++export function bindSnapshotParent(node: object, parent: object): void {
++  SNAPSHOT_PARENT.set(
++    snapshotNodeKey(node),
++    new WeakRef(snapshotNodeKey(parent))
++  );
++}
++
++// Source readers do not publish native mirrors. Keys and ancestry remain weak.
++const INSTALLED_READERS = new WeakMap<object, () => unknown>();
++export function bindSnapshotInstalledReader(node: object, read: () => unknown): void {
++  INSTALLED_READERS.set(node, read);
++}
++export function readSnapshotTerminal<T>(node: ReadableCell<T>, parent: object): T {
++  bindSnapshotParent(node as object, parent);
++  const observed = node();
++  const installed = INSTALLED_READERS.get(node as object);
++  return installed ? installed() as T : observed;
++}
++export function markSnapshotInstalled(node: object): void {
++  let current: object | undefined = snapshotNodeKey(node);
++  while (current) {
++    const snapshot = MATERIALIZED.get(current);
++    if (snapshot) snapshot.generation++;
++    current = SNAPSHOT_PARENT.get(current)?.deref();
++  }
++}
++
+--- C8a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ C11/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './snapshot-installation';
+ import { PublicationPreparation } from './publication-preparation';
+ import {getActiveWriteContext} from '../write-context';
+ import { prepareScalarSourcePublication, completeScalarSourcePublication, installTerminalRecord } from './intrinsic-mutation';
+@@ -258,6 +259,10 @@
+       for(const p of shadowPlans){if(p.keep)inspectionBaseline.set(p.slotIndex,p.value);else inspectionBaseline.delete(p.slotIndex);}
+       for (const unit of units) installTerminalRecord(unit.record);
+       const revision=(changed.length||shadowPlans.length)&&options?.advanceRevision!==false?advanceRevision():getCommittedRevision();
++      for (const {slotIndex} of changed) {
++        const source = publicationSources[slotIndex];
++        if (source) markSnapshotInstalled(source);
++      }
+       return {revision,changedSlots:changed.map(x=>x.slotIndex),...(publication ? {publication} : {})};
+     };
+   };
+@@ -339,6 +344,8 @@
+         installTerminalRecord(plan);
+       }
+       advanceRevision();
++      const source = publicationSources[slotIndex];
++      if (!equal && source) markSnapshotInstalled(source);
+       return {changed:semanticChanged,physicalChanged:!equal};
+     },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {
+--- C8a/packages/kernel/src/lib/utils.ts
++++ C11/packages/kernel/src/lib/utils.ts
+@@ -10,6 +10,7 @@
+ } from './internals/location-runtime';
+ import {
+   bindSnapshotParent,
++  readSnapshotTerminal,
+   isSnapshotNode,
+   materializeSnapshotNode,
+ } from './internals/snapshot-authority';
+@@ -456,7 +457,7 @@
+         ? unwrapBranchForWriteCapture(value)
+         : value();
+     } else if (isReactiveStateValue(value)) {
+-      result[key] = (value as ReadableCell<unknown>)();
++      result[key] = readSnapshotTerminal(value as ReadableCell<unknown>, node);
+     } else if (
+       typeof value === 'object' &&
+       value !== null &&
+@@ -525,6 +526,7 @@
+     }
+ 
+     if (isNodeAccessor(value)) {
++      bindSnapshotParent(value as object, node);
+       // Take the child's materialisation AS IS. Calling `unwrap()` on it again
+       // deep-copied a plain object that was already plain — pure waste, and it
+       // destroyed the structural sharing the memo exists to produce: every
+@@ -534,9 +536,9 @@
+         ? unwrapBranchForWriteCapture(value)
+         : value();
+     } else if (isReactiveStateValue(value)) {
+-      (result as Record<symbol, unknown>)[sym] = (
+-        value as ReadableCell<unknown>
+-      )();
++      (result as Record<symbol, unknown>)[sym] = readSnapshotTerminal(
++        value as ReadableCell<unknown>, node
++      );
+     } else if (
+       typeof value === 'object' &&
+       value !== null &&

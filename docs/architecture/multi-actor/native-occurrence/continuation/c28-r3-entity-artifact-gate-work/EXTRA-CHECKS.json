@@ -1,0 +1,7 @@
+{
+  "seal": "sha256-47d2cda5e7664deefabbb1f514ff8d6d3b74900b35d877def46f55bb6809199f",
+  "sealedGate": "passed",
+  "wrongSeal": "rejected",
+  "emptyCache": "setup failure before any runtime/mutation",
+  "emptyCacheEvidence": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0ubW4B"
+}

@@ -1,0 +1,39 @@
+Creating project graph nodes with @nx/vitest
+
+
+> nx run kernel:test packet-index-adversarial.spec.ts packet-index-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts packet-index-review.spec.ts --maxWorkers=1
+
+(node:96790) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96797) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-oracle-alignment-successor/candidate/packages/kernel
+
+(node:96805) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96922) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  29 passed (29)
+   Start at  20:37:21
+   Duration  24.98s (transform 4.74s, setup 0ms, import 8.86s, tests 31ms, environment 14.00s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      27.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     27.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    27.9s

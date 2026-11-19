@@ -1,0 +1,85 @@
+{
+  "registeredAt": "2026-11-04T01:25:11.778075+00:00",
+  "scope": "Single physical-image reuse compared with frozen fe18 runtime; no instruments, no broad architecture search; all dimensions separate",
+  "profiles": [
+    {
+      "kind": "bare",
+      "size": 0
+    },
+    {
+      "kind": "point",
+      "size": 1000
+    },
+    {
+      "kind": "projection",
+      "size": 1000
+    },
+    {
+      "kind": "confirm",
+      "size": 1000
+    },
+    {
+      "kind": "rollback",
+      "size": 1000
+    },
+    {
+      "kind": "heap-populated",
+      "size": 1000
+    },
+    {
+      "kind": "heap-pending",
+      "size": 1000
+    }
+  ],
+  "maxFreshCostChildren": 84,
+  "perProfile": "two retained A/A controls then five alternating AB/BA pairs:12 children; not five ABBA quadruplets",
+  "sequence": "serial fresh Node processes, one per schedule row, no favorable retries or separate cost preflight",
+  "firstAssertions": "first A/A invocation already exercises unchanged assertions; no smoke campaign",
+  "failurePolicy": {
+    "semanticAssertion": "preserve first failure; stop remaining invocations and interpretation for that profile; independent profiles may continue",
+    "quiescenceNonconvergence": "preserve as unresolved; stop remaining invocations for that heap profile, do not claim retained size",
+    "resourceTimeoutTelemetrySetupImportIntegrityMalformedOutputCleanup": "stop entire packet; preserve completed/partial records and report incomplete",
+    "noRetries": true
+  },
+  "operationalGuards": {
+    "childAbsoluteSeconds": 180,
+    "aggregateOwnedRssBytes": 4294967296,
+    "hostMemoryBytes": 34359738368,
+    "memoryPressureFreePercentageFloor": 25.0,
+    "pollSleepSeconds": 0.5,
+    "telemetryUnavailable": "abort",
+    "interpretation": "sampled operational abort policies; not library budgets or guaranteed available bytes; perPID RSS and command latency recorded",
+    "processCensusTimeoutSeconds": 30
+  },
+  "workloadProtocol": {
+    "timing": "unchanged child.mjs operation bodies;10% warmup, assertions inside measured loops, sync wall/process CPU and separate two-setImmediate drain",
+    "heap": "ONLY corrected child-heap-v2.mjs; synchronous helper scopes, WeakRefs, shared64KiB/3stable/max40 quiescence unchanged",
+    "flags": [
+      "--expose-gc"
+    ],
+    "production": "globalThis.ngDevMode=false before runtime imports in unchanged harness",
+    "heapFlagsScope": "existing cost characterization protocol only; no max-heap flags, no profiler, no functional130k replay"
+  },
+  "inputChecks": "full source before/after packet, artifact/harness/dependency hashes before/after each child, all outside workload execution; both artifact seals bound to successful build receipts",
+  "bindingsSha256": "d05d5e896e2dcf11a956d70b743ffc11e04b2be389a75315dd3b31ed84aa7010",
+  "scheduleSha256": "89a33d1b3dc8420c7c5a16c6a31fc215dc7bb7e7ae43479c1cea3c085c71cdf2",
+  "runnerSha256": "42d4976ee3225072b83612bf8fdc5a027ed2a64bdc24f9b5b3f5d22215c8cd44",
+  "harnessHashes": {
+    "child.mjs": "ea5dbb54d68f2585f9823f013ab9558a3a586a5f76ad3ce265c41838d4164da3",
+    "child-heap-v2.mjs": "568504985dfc13630e0555727fd97cf34714988a6496339616032139e1ac43fb",
+    "heap-quiescence.mjs": "b9df8334d2ece2ba6f3e2eb4fb7aef7d45ff00fd8eb62c94ccbabc0937551186"
+  },
+  "review": {
+    "sourceOnly": "gate_review: detached singleton image can be reused; missing-pair and multi-edit retain copies;6cell independent fixture executed separately"
+  },
+  "analysisRules": {
+    "samples": "report all raw samples; comparative medians/ranges from5 per arm, A/A controls separate",
+    "uncertainty": "A/A variability is not a confidence interval; overlapping ranges or median differences inside same-arm variability remain directionally unresolved, not equivalence",
+    "heap": "whole-process heap deltas, not dominator/retained sizes; negative pending deltas are not negative owner storage; WeakRef clearance finite only",
+    "oneSize": "1000-row populated size cannot establish growth/slope/constant overhead; primed handles do not establish universal cold allocation savings",
+    "decision": "No numerical bound change, cost acceptance or production adoption; all dimensions evaluated separately."
+  },
+  "exclusiveSlot": "Main owns sole heavy slot; no calibrated exclusive-core or host-contention claim",
+  "noOld324Campaign": true,
+  "noBroadNx": true
+}

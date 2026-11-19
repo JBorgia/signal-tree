@@ -1,0 +1,14 @@
+{
+  "files": 3127,
+  "mismatches": [],
+  "sourceManifest": "812a3ad5d6843e95a791aaf001927d54f67738626360a50afb9f7871fdfcd302",
+  "checks": {
+    "kernel": 93,
+    "angular": 4,
+    "react": 3,
+    "vue": 4,
+    "solid": 4,
+    "sourceTypecheck": "pass"
+  },
+  "limits": "Focused source checks only; React matched one file. No build, bundle, heap or full-suite claim."
+}

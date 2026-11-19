@@ -1,0 +1,35 @@
+
+> nx run kernel:test independent-restoration-review.spec.ts
+
+> node tools/run-core-vitest.mjs independent-restoration-review.spec.ts
+
+(node:89409) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:89416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-occurrence-independent-review/replica/packages/kernel
+
+(node:89423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  12:52:43
+   Duration  922ms (transform 508ms, setup 0ms, import 610ms, tests 23ms, environment 201ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

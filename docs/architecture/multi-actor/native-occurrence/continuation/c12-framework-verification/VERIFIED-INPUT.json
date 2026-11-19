@@ -1,0 +1,7 @@
+{
+  "manifest_sha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+  "all_files_verified": 3053,
+  "dependency_source": "/private/tmp/st-dormant-publication-feasibility/candidate/node_modules",
+  "lock_sha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+  "dependency_use": "read-only package links; private command shims and caches"
+}

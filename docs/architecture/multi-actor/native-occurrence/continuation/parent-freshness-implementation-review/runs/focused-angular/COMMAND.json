@@ -1,0 +1,28 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "angular",
+    "parent-freshness-focused.spec.ts",
+    "parent-snapshot-currentness.spec.ts",
+    "parent-freshness-grouped.spec.ts",
+    "bounded-reentry-baseline.spec.ts",
+    "bounded-reentry-targeted.spec.ts",
+    "construction-input.spec.ts",
+    "construction-resource-cleanup.spec.ts",
+    "keyed-construction-cleanup.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-parent-freshness-implementation-independent/candidate-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-parent-freshness-implementation-independent/candidate-data",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-parent-freshness-implementation-independent/runs/focused-angular/observations"
+  }
+}

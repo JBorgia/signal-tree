@@ -1,0 +1,1514 @@
+[
+  {
+    "ordinal": 1,
+    "id": "bare-0-retained-aa0",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 2,
+    "id": "bare-0-retained-aa1",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 3,
+    "id": "bare-0-retained-sample0",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 4,
+    "id": "bare-0-selected-sample0",
+    "profile": "bare",
+    "size": 0,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 5,
+    "id": "bare-0-selected-sample1",
+    "profile": "bare",
+    "size": 0,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 6,
+    "id": "bare-0-retained-sample1",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 7,
+    "id": "bare-0-retained-sample2",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 8,
+    "id": "bare-0-selected-sample2",
+    "profile": "bare",
+    "size": 0,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 9,
+    "id": "bare-0-selected-sample3",
+    "profile": "bare",
+    "size": 0,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 10,
+    "id": "bare-0-retained-sample3",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 11,
+    "id": "bare-0-retained-sample4",
+    "profile": "bare",
+    "size": 0,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 12,
+    "id": "bare-0-selected-sample4",
+    "profile": "bare",
+    "size": 0,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "bare",
+      "0"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 13,
+    "id": "point-1000-retained-aa0",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 14,
+    "id": "point-1000-retained-aa1",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 15,
+    "id": "point-1000-retained-sample0",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 16,
+    "id": "point-1000-selected-sample0",
+    "profile": "point",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 17,
+    "id": "point-1000-selected-sample1",
+    "profile": "point",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 18,
+    "id": "point-1000-retained-sample1",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 19,
+    "id": "point-1000-retained-sample2",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 20,
+    "id": "point-1000-selected-sample2",
+    "profile": "point",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 21,
+    "id": "point-1000-selected-sample3",
+    "profile": "point",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 22,
+    "id": "point-1000-retained-sample3",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 23,
+    "id": "point-1000-retained-sample4",
+    "profile": "point",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 24,
+    "id": "point-1000-selected-sample4",
+    "profile": "point",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "point",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 25,
+    "id": "projection-1000-retained-aa0",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 26,
+    "id": "projection-1000-retained-aa1",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 27,
+    "id": "projection-1000-retained-sample0",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 28,
+    "id": "projection-1000-selected-sample0",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 29,
+    "id": "projection-1000-selected-sample1",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 30,
+    "id": "projection-1000-retained-sample1",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 31,
+    "id": "projection-1000-retained-sample2",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 32,
+    "id": "projection-1000-selected-sample2",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 33,
+    "id": "projection-1000-selected-sample3",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 34,
+    "id": "projection-1000-retained-sample3",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 35,
+    "id": "projection-1000-retained-sample4",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 36,
+    "id": "projection-1000-selected-sample4",
+    "profile": "projection",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "projection",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 37,
+    "id": "confirm-1000-retained-aa0",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 38,
+    "id": "confirm-1000-retained-aa1",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 39,
+    "id": "confirm-1000-retained-sample0",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 40,
+    "id": "confirm-1000-selected-sample0",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 41,
+    "id": "confirm-1000-selected-sample1",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 42,
+    "id": "confirm-1000-retained-sample1",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 43,
+    "id": "confirm-1000-retained-sample2",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 44,
+    "id": "confirm-1000-selected-sample2",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 45,
+    "id": "confirm-1000-selected-sample3",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 46,
+    "id": "confirm-1000-retained-sample3",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 47,
+    "id": "confirm-1000-retained-sample4",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 48,
+    "id": "confirm-1000-selected-sample4",
+    "profile": "confirm",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "confirm",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 49,
+    "id": "rollback-1000-retained-aa0",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 50,
+    "id": "rollback-1000-retained-aa1",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 51,
+    "id": "rollback-1000-retained-sample0",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 52,
+    "id": "rollback-1000-selected-sample0",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 53,
+    "id": "rollback-1000-selected-sample1",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 54,
+    "id": "rollback-1000-retained-sample1",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 55,
+    "id": "rollback-1000-retained-sample2",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 56,
+    "id": "rollback-1000-selected-sample2",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 57,
+    "id": "rollback-1000-selected-sample3",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 58,
+    "id": "rollback-1000-retained-sample3",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 59,
+    "id": "rollback-1000-retained-sample4",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 60,
+    "id": "rollback-1000-selected-sample4",
+    "profile": "rollback",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "rollback",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 61,
+    "id": "heap-populated-1000-retained-aa0",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 62,
+    "id": "heap-populated-1000-retained-aa1",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 63,
+    "id": "heap-populated-1000-retained-sample0",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 64,
+    "id": "heap-populated-1000-selected-sample0",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 65,
+    "id": "heap-populated-1000-selected-sample1",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 66,
+    "id": "heap-populated-1000-retained-sample1",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 67,
+    "id": "heap-populated-1000-retained-sample2",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 68,
+    "id": "heap-populated-1000-selected-sample2",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 69,
+    "id": "heap-populated-1000-selected-sample3",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 70,
+    "id": "heap-populated-1000-retained-sample3",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 71,
+    "id": "heap-populated-1000-retained-sample4",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 72,
+    "id": "heap-populated-1000-selected-sample4",
+    "profile": "heap-populated",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-populated",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 73,
+    "id": "heap-pending-1000-retained-aa0",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 74,
+    "id": "heap-pending-1000-retained-aa1",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "aa1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 75,
+    "id": "heap-pending-1000-retained-sample0",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 76,
+    "id": "heap-pending-1000-selected-sample0",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample0",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 77,
+    "id": "heap-pending-1000-selected-sample1",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 78,
+    "id": "heap-pending-1000-retained-sample1",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample1",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 79,
+    "id": "heap-pending-1000-retained-sample2",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 80,
+    "id": "heap-pending-1000-selected-sample2",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample2",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 81,
+    "id": "heap-pending-1000-selected-sample3",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 82,
+    "id": "heap-pending-1000-retained-sample3",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample3",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 83,
+    "id": "heap-pending-1000-retained-sample4",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "retained",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  },
+  {
+    "ordinal": 84,
+    "id": "heap-pending-1000-selected-sample4",
+    "profile": "heap-pending",
+    "size": 1000,
+    "arm": "selected",
+    "label": "sample4",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-v16-representative-cost/harness/child-heap-v2.mjs",
+      "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "heap-pending",
+      "1000"
+    ],
+    "cwd": "/private/tmp/st-v16-representative-cost/harness",
+    "childTimeoutSeconds": 180
+  }
+]

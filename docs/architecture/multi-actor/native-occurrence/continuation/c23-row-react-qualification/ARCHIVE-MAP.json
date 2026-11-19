@@ -1,0 +1,140 @@
+[
+  {
+    "source": "EXPECTATIONS.md",
+    "archive": "EXPECTATIONS.md",
+    "sourceSha256": "d7dbf5cd4b9650750bdee1d7ecb7fb167ccbbdb374b4abfac7fcbbbfa40c2a3b",
+    "archiveSha256": "d7dbf5cd4b9650750bdee1d7ecb7fb167ccbbdb374b4abfac7fcbbbfa40c2a3b"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "2081dabab6d66884be8fbab07dd08b93bb1cfa216a20f2f148e395fbfc19c1fa",
+    "archiveSha256": "2081dabab6d66884be8fbab07dd08b93bb1cfa216a20f2f148e395fbfc19c1fa"
+  },
+  {
+    "source": "INPUT.json",
+    "archive": "INPUT.json",
+    "sourceSha256": "b0fee11bef13d05a54cd6c9e4653c3f702c3b6d1b9cf5d32ef2d3ee3e86b6ba7",
+    "archiveSha256": "b0fee11bef13d05a54cd6c9e4653c3f702c3b6d1b9cf5d32ef2d3ee3e86b6ba7"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+    "archiveSha256": "69b7e1a3ed5d3717ab97cf1669c731fc8d8b609344354944fdbb6f2426bcac5a"
+  },
+  {
+    "source": "FIRST-PREPARATION-ERROR.txt",
+    "archive": "FIRST-PREPARATION-ERROR.txt",
+    "sourceSha256": "4d75e459a7d961925a5185a8d629598f220f6503a265c9b60e5936196490c199",
+    "archiveSha256": "4d75e459a7d961925a5185a8d629598f220f6503a265c9b60e5936196490c199"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "1709d9f8ab1daf490ac0efb199838850e6cd2b3e3e76405153488d42109fff7a",
+    "archiveSha256": "1709d9f8ab1daf490ac0efb199838850e6cd2b3e3e76405153488d42109fff7a"
+  },
+  {
+    "source": "CHECKPOINT.md",
+    "archive": "CHECKPOINT.md",
+    "sourceSha256": "b5277d256803dc3b29eb12bc5e3645c53011f5bbf4782a794ba20b506a974f19",
+    "archiveSha256": "b5277d256803dc3b29eb12bc5e3645c53011f5bbf4782a794ba20b506a974f19"
+  },
+  {
+    "source": "SNAPSHOT-CANDIDATE.json",
+    "archive": "SNAPSHOT-CANDIDATE.json.gz",
+    "sourceSha256": "2f2ed3778e0dd2b5a24c372d48349accaf3ab647e240c8d87ab432524ce699fe",
+    "archiveSha256": "96396902cfbeb462c037c43c7e3882d326bc572ae2551a02e3e84795d82aba84"
+  },
+  {
+    "source": "CLASSIFICATION.md",
+    "archive": "CLASSIFICATION.md",
+    "sourceSha256": "643c3705b17021d3843343bc19c39f48374b52732894e8d476a2c0035107efea",
+    "archiveSha256": "643c3705b17021d3843343bc19c39f48374b52732894e8d476a2c0035107efea"
+  },
+  {
+    "source": "OWNED-PROCESS-CHECK.json",
+    "archive": "OWNED-PROCESS-CHECK.json",
+    "sourceSha256": "3ad9ae22171102aaf046dd7ce68322e8250d7ccc2309e0f11547b5209ae58cfe",
+    "archiveSha256": "3ad9ae22171102aaf046dd7ce68322e8250d7ccc2309e0f11547b5209ae58cfe"
+  },
+  {
+    "source": "FREEZE.json",
+    "archive": "FREEZE.json",
+    "sourceSha256": "6cad66d7e98793c7e7b97eaf443df67daced555f25871fb8581b5a33e094638a",
+    "archiveSha256": "6cad66d7e98793c7e7b97eaf443df67daced555f25871fb8581b5a33e094638a"
+  },
+  {
+    "source": "tests.patch",
+    "archive": "tests.patch",
+    "sourceSha256": "76ce8628185577348fa8f72e2ac8970b95e2b670519a64ad58292e69fa44cbde",
+    "archiveSha256": "76ce8628185577348fa8f72e2ac8970b95e2b670519a64ad58292e69fa44cbde"
+  },
+  {
+    "source": "make-tests.py",
+    "archive": "make-tests.py",
+    "sourceSha256": "70570c7fd1b06819b2235ea7806f7f0ea5035fefa9d6a4c113cedd3b63808910",
+    "archiveSha256": "70570c7fd1b06819b2235ea7806f7f0ea5035fefa9d6a4c113cedd3b63808910"
+  },
+  {
+    "source": "runs/react/RESULT.json",
+    "archive": "runs/react/RESULT.json",
+    "sourceSha256": "bbc3151792e9679dbbd3b77f9361c6582f2bf5b0fa279f091e03619daac2da65",
+    "archiveSha256": "bbc3151792e9679dbbd3b77f9361c6582f2bf5b0fa279f091e03619daac2da65"
+  },
+  {
+    "source": "runs/react/first.log",
+    "archive": "runs/react/first.log",
+    "sourceSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996",
+    "archiveSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996"
+  },
+  {
+    "source": "runs/react/SOURCE-BEFORE.json",
+    "archive": "runs/react/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "2f2ed3778e0dd2b5a24c372d48349accaf3ab647e240c8d87ab432524ce699fe",
+    "archiveSha256": "96396902cfbeb462c037c43c7e3882d326bc572ae2551a02e3e84795d82aba84"
+  },
+  {
+    "source": "runs/react/COMMAND.json",
+    "archive": "runs/react/COMMAND.json",
+    "sourceSha256": "087bb9e8c144a17a8664262deb8d9554761b887d30750ad4405d7aa6b18860b6",
+    "archiveSha256": "087bb9e8c144a17a8664262deb8d9554761b887d30750ad4405d7aa6b18860b6"
+  },
+  {
+    "source": "runs/react/PROCESS.json",
+    "archive": "runs/react/PROCESS.json",
+    "sourceSha256": "693081284815dd34f9231e738b91037a8b5e620f3ce980694d2a98bfb35eb095",
+    "archiveSha256": "693081284815dd34f9231e738b91037a8b5e620f3ce980694d2a98bfb35eb095"
+  },
+  {
+    "source": "runs/kernel/RESULT.json",
+    "archive": "runs/kernel/RESULT.json",
+    "sourceSha256": "505801c6cb8ff7f3167c186ff1aac8c8c6eb4e2e540feab59a88463315f55431",
+    "archiveSha256": "505801c6cb8ff7f3167c186ff1aac8c8c6eb4e2e540feab59a88463315f55431"
+  },
+  {
+    "source": "runs/kernel/first.log",
+    "archive": "runs/kernel/first.log",
+    "sourceSha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0",
+    "archiveSha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0"
+  },
+  {
+    "source": "runs/kernel/SOURCE-BEFORE.json",
+    "archive": "runs/kernel/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "2f2ed3778e0dd2b5a24c372d48349accaf3ab647e240c8d87ab432524ce699fe",
+    "archiveSha256": "96396902cfbeb462c037c43c7e3882d326bc572ae2551a02e3e84795d82aba84"
+  },
+  {
+    "source": "runs/kernel/COMMAND.json",
+    "archive": "runs/kernel/COMMAND.json",
+    "sourceSha256": "f5533159c1711c3e666979f7328149d596ab0584e4f6a3b46131b8c429e220ef",
+    "archiveSha256": "f5533159c1711c3e666979f7328149d596ab0584e4f6a3b46131b8c429e220ef"
+  },
+  {
+    "source": "runs/kernel/PROCESS.json",
+    "archive": "runs/kernel/PROCESS.json",
+    "sourceSha256": "6f4fb4619138a751537351e6621eb8c7eeb59cf65c5d1924739b3e8ad2179377",
+    "archiveSha256": "6f4fb4619138a751537351e6621eb8c7eeb59cf65c5d1924739b3e8ad2179377"
+  }
+]

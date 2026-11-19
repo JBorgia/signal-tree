@@ -1,0 +1,14 @@
+{
+  "c10": {
+    "root": "/private/tmp/st-native-combined-c10-promoted/candidate",
+    "manifest": "/private/tmp/st-native-combined-c10-promoted/SNAPSHOT.json",
+    "hash": "de88e207c66e65a1a191d05ab4f2b5b2a4deeead71a06f239f278e28dee70dc4",
+    "files": 3042
+  },
+  "c8a": {
+    "root": "/private/tmp/st-native-combined-c8a/candidate",
+    "manifest": "/private/tmp/st-native-combined-c8a/SNAPSHOT-C8a.json",
+    "hash": "04ba51dec86f537921521cf0a8ef5276c788e48b9a4e4abc24c7c5d14eda9652",
+    "files": 3031
+  }
+}

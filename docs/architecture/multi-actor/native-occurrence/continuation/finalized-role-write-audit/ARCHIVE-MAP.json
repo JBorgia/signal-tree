@@ -1,0 +1,116 @@
+[
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "bf4a44236f32bd1b18572ebd9ae7d161953916f18d94b85e0c555f8cbe18f8c4",
+    "archiveSha256": "bf4a44236f32bd1b18572ebd9ae7d161953916f18d94b85e0c555f8cbe18f8c4"
+  },
+  {
+    "source": "SOURCE-AFTER.json",
+    "archive": "SOURCE-AFTER.json",
+    "sourceSha256": "fef56985ba0ac1c81f046c7588dbf404376d6c63945cc316da7f86d347e0e92c",
+    "archiveSha256": "fef56985ba0ac1c81f046c7588dbf404376d6c63945cc316da7f86d347e0e92c"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "3b7b5a672fc8107f7a41a75d43f2e2a4d6ca9658807a47eb1bf3128b1e72531d",
+    "archiveSha256": "3b7b5a672fc8107f7a41a75d43f2e2a4d6ca9658807a47eb1bf3128b1e72531d"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "64ed53d4f1508a5e3fe22262ab11fa51ec794b1e1c0dd66f49735bd076588acf",
+    "archiveSha256": "64ed53d4f1508a5e3fe22262ab11fa51ec794b1e1c0dd66f49735bd076588acf"
+  },
+  {
+    "source": "HYPOTHESIS.md",
+    "archive": "HYPOTHESIS.md",
+    "sourceSha256": "1aaa797923457234281d160a07c67e382a01a59e36ddd8825147440e1c7cd934",
+    "archiveSha256": "1aaa797923457234281d160a07c67e382a01a59e36ddd8825147440e1c7cd934"
+  },
+  {
+    "source": "production-reference-scan.txt",
+    "archive": "production-reference-scan.txt",
+    "sourceSha256": "a3e86d0830ae0d5f8f00eea9d84c4a00ff05a2e1a40c31e8c167076159c36ba2",
+    "archiveSha256": "a3e86d0830ae0d5f8f00eea9d84c4a00ff05a2e1a40c31e8c167076159c36ba2"
+  },
+  {
+    "source": "source/enhancers/transactions/transactions.ts",
+    "archive": "source/enhancers/transactions/transactions.ts.gz",
+    "sourceSha256": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+    "archiveSha256": "714e7cbdf96504ee04496c423a0389919ffbaea510f9559ee70f360250169e53"
+  },
+  {
+    "source": "source/lib/link.ts",
+    "archive": "source/lib/link.ts",
+    "sourceSha256": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65",
+    "archiveSha256": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65"
+  },
+  {
+    "source": "source/lib/experimental-publication/private.ts",
+    "archive": "source/lib/experimental-publication/private.ts",
+    "sourceSha256": "501bc25e28a2eae0c33adc608cd85c773b95e80a12a57c3ecc4c8d378327daa9",
+    "archiveSha256": "501bc25e28a2eae0c33adc608cd85c773b95e80a12a57c3ecc4c8d378327daa9"
+  },
+  {
+    "source": "source/lib/experimental-publication/projection.ts",
+    "archive": "source/lib/experimental-publication/projection.ts",
+    "sourceSha256": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3",
+    "archiveSha256": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3"
+  },
+  {
+    "source": "source/lib/experimental-publication/recipient-occurrence.ts",
+    "archive": "source/lib/experimental-publication/recipient-occurrence.ts",
+    "sourceSha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+    "archiveSha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327"
+  },
+  {
+    "source": "source/lib/experimental-publication/entity.ts",
+    "archive": "source/lib/experimental-publication/entity.ts",
+    "sourceSha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+    "archiveSha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8"
+  },
+  {
+    "source": "source/lib/experimental-publication/lifecycle.ts",
+    "archive": "source/lib/experimental-publication/lifecycle.ts",
+    "sourceSha256": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6",
+    "archiveSha256": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6"
+  },
+  {
+    "source": "source/lib/experimental-publication/proof-retirement.ts",
+    "archive": "source/lib/experimental-publication/proof-retirement.ts",
+    "sourceSha256": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4",
+    "archiveSha256": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4"
+  },
+  {
+    "source": "source/lib/internals/native-field-selection.ts",
+    "archive": "source/lib/internals/native-field-selection.ts",
+    "sourceSha256": "29d02197f19a11912ff6967ac770e17c28f56c7e7776e8df06deeafee07413a6",
+    "archiveSha256": "29d02197f19a11912ff6967ac770e17c28f56c7e7776e8df06deeafee07413a6"
+  },
+  {
+    "source": "source/lib/internals/entity-publication.ts",
+    "archive": "source/lib/internals/entity-publication.ts",
+    "sourceSha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "archiveSha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79"
+  },
+  {
+    "source": "source/lib/internals/publication-preparation.ts",
+    "archive": "source/lib/internals/publication-preparation.ts",
+    "sourceSha256": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587",
+    "archiveSha256": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587"
+  },
+  {
+    "source": "source/lib/internals/native-scalar-selection.ts",
+    "archive": "source/lib/internals/native-scalar-selection.ts",
+    "sourceSha256": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+    "archiveSha256": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8"
+  },
+  {
+    "source": "source/lib/internals/intrinsic-mutation.ts",
+    "archive": "source/lib/internals/intrinsic-mutation.ts",
+    "sourceSha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+    "archiveSha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30"
+  }
+]

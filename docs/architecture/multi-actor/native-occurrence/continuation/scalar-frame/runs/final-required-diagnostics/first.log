@@ -1,0 +1,137 @@
+
+> nx run kernel:test publication-enrollment-invariance.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs publication-enrollment-invariance.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1
+
+(node:88463) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88471) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:88480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/whole-value-new-keys.spec.ts (26 tests | 2 failed) 10042ms
+     × keeps a pre-existing Link observing newly supplied descendants 5004ms
+     × delivers completed partial membership to Link when a later value throws 5002ms
+(node:88607) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-enrollment-invariance.spec.ts (16 tests | 6 failed) 54ms
+   × enrollment invariance branch: before-pending 8ms
+   × enrollment invariance branch: during-pending 3ms
+   × enrollment invariance branch: enroll-in-updater 4ms
+   × enrollment invariance root: before-pending 2ms
+   × enrollment invariance root: during-pending 2ms
+   × enrollment invariance root: enroll-in-updater 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: before-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: enroll-in-updater
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: before-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: enroll-in-updater
+AssertionError: expected [ { pair: { x: +0, y: +0 }, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "pair": {
++       "x": 0,
++       "y": 0,
++     },
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > keeps a pre-existing Link observing newly supplied descendants
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/lib/whole-value-new-keys.spec.ts:88:3
+     86|   });
+     87|
+     88|   it('keeps a pre-existing Link observing newly supplied descendants',…
+       |   ^
+     89|     const tree = signalTree({ rows: {} as Record<string, { n: number }…
+     90|     const sent: unknown[] = [];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > delivers completed partial membership to Link when a later value throws
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/lib/whole-value-new-keys.spec.ts:446:3
+    444|   });
+    445|
+    446|   it('delivers completed partial membership to Link when a later value…
+       |   ^
+    447|     const initial: { trigger: { x: number }[]; fresh?: number } = { tr…
+    448|     const tree = signalTree(initial);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  8 failed | 34 passed (42)
+   Start at  17:30:51
+   Duration  11.80s (transform 803ms, setup 0ms, import 1.05s, tests 10.10s, environment 463ms)
+
+Warning: command "node tools/run-core-vitest.mjs publication-enrollment-invariance.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      12.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     12.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    12.3s

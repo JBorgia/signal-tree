@@ -1,0 +1,68 @@
+
+> nx run kernel:test --testFile=value-work-handoff.spec.ts --testNamePattern=private author reentry during reduction --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=value-work-handoff.spec.ts --testNamePattern="private author reentry during reduction" --maxWorkers=1
+
+(node:90981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c17-value-work-correction/candidate/packages/kernel
+
+(node:90995) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/value-work-handoff.spec.ts (13 tests | 1 failed | 12 skipped) 36ms
+   × private author reentry during reduction keeps live selection and subsequent sibling payload 32ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/value-work-handoff.spec.ts > private author reentry during reduction keeps live selection and subsequent sibling payload
+AssertionError: expected [ { a: 2, b: +0 }, { a: +0, b: 3 } ] to deeply equal [ { a: 2, b: +0 }, { a: 2, b: 3 } ]
+
+- Expected
++ Received
+
+@@ -2,9 +2,9 @@
+    {
+      "a": 2,
+      "b": 0,
+    },
+    {
+-     "a": 2,
++     "a": 0,
+      "b": 3,
+    },
+  ]
+
+ ❯ src/lib/value-work-handoff.spec.ts:48:245
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 skipped (13)
+   Start at  11:52:13
+   Duration  1.79s (transform 1.00s, setup 0ms, import 1.20s, tests 36ms, environment 429ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=value-work-handoff.spec.ts --testNamePattern="private author reentry during reduction" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.5s

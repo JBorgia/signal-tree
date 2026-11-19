@@ -1,0 +1,71 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -436,7 +436,8 @@
+ 
+   // Source-owned install epoch makes library readers current before notifications.
+   let installedReadRevision=0;
+-  let snapshotIdentity: object | undefined;
++  // Construction may advance before the returned proxy identity is available.
++  let snapshotIdentity: object | undefined = undefined;
+   const advanceInstalledRead = (): void => {
+     installedReadRevision++;
+     if (snapshotIdentity) markSnapshotInstalled(snapshotIdentity);
+--- a/packages/kernel/src/lib/native-authored-footprint.spec.ts
++++ b/packages/kernel/src/lib/native-authored-footprint.spec.ts
+@@ -6,7 +6,7 @@
+  const tree=signalTree({rows:entityMap<{id:string;x:number;y:number},string>()});
+  const rows=tree.$.rows;rows.addOne({id:'a',x:7,y:0});
+  const packets:EntityPublicationPacket[]=[];
+- const off=getEntityPublicationBinding(rows)!.source.subscribe({prepare(packet){packets.push(packet);return undefined;},complete(){}});
++ const off=getEntityPublicationBinding(rows)!.source.subscribe({prepare(packet){packets.push(packet);return undefined;},complete(){/* This fixture records preparation only. */}});
+  const scope=()=>packets.at(-1)?.steps?.find(step=>step.authoredFootprint)?.authoredFootprint;
+  try{
+   rows.setAll([{id:'a',x:7,y:0}]);expect(scope()).toEqual({kind:'whole'});
+--- a/packages/kernel/src/lib/value-work-handoff.spec.ts
++++ b/packages/kernel/src/lib/value-work-handoff.spec.ts
+@@ -18,7 +18,7 @@
+ it('already delivered A then equal dependent B does not rearm value work',async()=>{const s=fixture();try{s.c.declare({kind:'independent'},()=>s.t.$.a(1));await flush();expect(s.sent).toEqual([{a:1,b:0}]);s.c.declare({kind:'dependent',owners:[s.q]},()=>s.t.$.b(0));await flush();expect(s.sent).toEqual([{a:1,b:0}]);s.q.confirm();await flush();expect(s.sent).toEqual([{a:1,b:0}]);s.t.$.a(2);await flush();expect(s.sent).toEqual([{a:1,b:0},{a:2,b:0}]);}finally{s.dispose();}});
+ it('equal-only private frame does not invent value work',async()=>{const s=fixture();try{const r=getTreeScalarSlotRuntime(s.t.$)!,f=r.beginFrame();f.set(r.resolveScalarSlot(getOwnedPositionIds(s.t.$.a)![0])!,0);f.set(r.resolveScalarSlot(getOwnedPositionIds(s.t.$.b)![0])!,0);f.commit();s.q.confirm();await flush();expect(s.sent).toEqual([]);}finally{s.dispose();}});
+ it('private reads do not consume and old prefix acknowledgment cannot clear newer work',()=>{
+- const regs=vi.spyOn(life,'registerConnection');const t=signalTree({a:0});const c=link(t.$,{set:()=>{}});const channel=regs.mock.calls.at(-1)![0];
++ const regs=vi.spyOn(life,'registerConnection');const t=signalTree({a:0});const c=link(t.$,{set:()=>{/* This fixture inspects private projection receipts only. */}});const channel=regs.mock.calls.at(-1)![0];
+  try{t.$.a(1);const first=read(channel)!;expect(first.payload).toEqual({a:1});expect(first.changed).toBe(true);expect(read(channel)!.changed).toBe(true);t.$.a(2);const second=read(channel)!;expect(second.workEpoch).toBeGreaterThan(first.workEpoch);ack(channel,first);expect(read(channel)!.changed).toBe(true);ack(channel,second);expect(read(channel)!.changed).toBe(false);ack(channel,first);expect(read(channel)!.changed).toBe(false);c.dispose();expect(()=>ack(channel,second)).not.toThrow();}finally{c.dispose();t.destroy();regs.mockRestore();}
+ });
+ it('private legacy same-fact adoption consumes work without sticky refresh',async()=>{
+@@ -34,8 +34,8 @@
+  try{s.c.declare({kind:'independent'},()=>s.t.$.a(1));await flush();expect(entered).toBe(true);expect(inside).toBeUndefined();expect(s.sent).toEqual([{a:1,b:0}]);}finally{spy.mockRestore();s.dispose();regs.mockRestore();}
+ });
+ it('endpoint reentry selects latest value under later support-only pending revision',async()=>{
+- const t=signalTree({a:0,b:0}),foreign=signalTree({z:0},{enhancers:[transactions()]});const q=foreign.transact(()=>foreign.$.z(7));const sent:unknown[]=[];let entered=false;let c:C;
+- c=link(t.$,{set:v=>{sent.push(v);if(!entered){entered=true;c.declare({kind:'independent'},()=>t.$.a(2));c.declare({kind:'dependent',owners:[q]},()=>t.$.b(0));}}}) as C;
++ const t=signalTree({a:0,b:0}),foreign=signalTree({z:0},{enhancers:[transactions()]});const q=foreign.transact(()=>foreign.$.z(7));const sent:unknown[]=[];let entered=false;
++ const c=link(t.$,{set:v=>{sent.push(v);if(!entered){entered=true;c.declare({kind:'independent'},()=>t.$.a(2));c.declare({kind:'dependent',owners:[q]},()=>t.$.b(0));}}}) as C;
+  try{c.declare({kind:'independent'},()=>t.$.a(1));await flush();expect(sent).toEqual([{a:1,b:0}]);q.confirm();await flush();expect(sent).toEqual([{a:1,b:0},{a:2,b:0}]);await c.settled();}finally{c.dispose();q.confirm();t.destroy();foreign.destroy();}
+ });
+ it('held value work is released by disposal without endpoint send',async()=>{const s=fixture();try{s.c.declare({kind:'independent'},()=>s.t.$.a(1));s.c.declare({kind:'dependent',owners:[s.q]},()=>s.t.$.b(0));await flush();expect(s.sent).toEqual([]);let done=false;const wait=s.c.settled().then(()=>{done=true;});s.c.dispose();await flush();expect(done).toBe(true);s.q.confirm();await flush();expect(s.sent).toEqual([]);await wait;}finally{s.dispose();}});
+--- a/packages/kernel/src/lib/whole-bounded-qualification.spec.ts
++++ b/packages/kernel/src/lib/whole-bounded-qualification.spec.ts
+@@ -9,7 +9,7 @@
+ const traces:unknown[]=[];afterAll(()=>writeFileSync(process.env.TMPDIR+'/whole-qualification.json',JSON.stringify(traces,null,2)));
+ function evidence(row:object,key:string){const b=getEntityPublicationBinding(row)!;return b.source.evidence()!.field(b.subject!,key,'ordinary') as life.NativeRequirement;}
+ for(const route of ['setAll','replaceOne','row'] as const)for(const pending of [false,true])it(`post-install whole error ${route} pending=${pending}`,async()=>{
+- const t=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]}),foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:7});await flush();const row=rows.byIdOrFail('a'),before=evidence(row,'x');const sent:unknown[]=[];const c=link(rows,{set:v=>{sent.push(v);}}) as Declared;const off=row.x.subscribe(()=>{}),starts=vi.spyOn(life,'started');const q=pending?foreign.transact(()=>foreign.$.z(9)):undefined;const inspection=q?.inspect();let calls=0,atThrow:life.NativeRequirement|undefined,caught:unknown;const sentinel=Error('post-install getter');const supplied={id:'a',get x(){if(++calls===7){atThrow=evidence(row,'x');throw sentinel;}return 7;}};
++ const t=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]}),foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:7});await flush();const row=rows.byIdOrFail('a'),before=evidence(row,'x');const sent:unknown[]=[];const c=link(rows,{set:v=>{sent.push(v);}}) as Declared;const off=row.x.subscribe(()=>{/* Keep the field subscribed without observing its value here. */}),starts=vi.spyOn(life,'started');const q=pending?foreign.transact(()=>foreign.$.z(9)):undefined;const inspection=q?.inspect();let calls=0,atThrow:life.NativeRequirement|undefined,caught:unknown;const sentinel=Error('post-install getter');const supplied={id:'a',get x(){if(++calls===7){atThrow=evidence(row,'x');throw sentinel;}return 7;}};
+  try{try{c.declare({kind:'independent'},()=>{if(route==='setAll')rows.setAll([supplied]);else if(route==='replaceOne')rows.replaceOne('a',supplied);else row(supplied);});}catch(e){caught=e;}
+   expect(caught).toBe(sentinel);expect(atThrow).toBeDefined();expect(atThrow).not.toBe(before);expect(evidence(row,'x')).toBe(atThrow);expect(life.nativeRequirementReady(atThrow!)).toBe(true);expect(life.nativeProof(atThrow!).invalid).toBe(true);expect(sent).toEqual([]);
+   await flush();expect(sent).toEqual(pending?[]:[[{id:'a',x:7}]]);if(q){expect(q.inspect()).toEqual(inspection);expect(life.nativeProof(atThrow!).possible?.some(o=>o.outcome==='pending')).toBe(true);q.confirm();await flush();expect(sent).toEqual([[{id:'a',x:7}]]);}
+@@ -32,12 +32,12 @@
+  }finally{c.dispose();t.destroy();foreign.destroy();}
+ });
+ it('whole authorship without a collection recipient refreshes native evidence before late enrollment',async()=>{
+- const t=signalTree({rows:entityMap<{id:string;x:number;y:number},string>(),bridge:0}),foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:0,y:0});await flush();const row=rows.byIdOrFail('a');const bridge=link(t.$.bridge,{set:()=>{}}) as Declared;const q=foreign.transact(()=>foreign.$.z(9));let late:ReturnType<typeof link>|undefined;
++ const t=signalTree({rows:entityMap<{id:string;x:number;y:number},string>(),bridge:0}),foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:0,y:0});await flush();const row=rows.byIdOrFail('a');const bridge=link(t.$.bridge,{set:()=>{/* This fixture intentionally discards destination values. */}}) as Declared;const q=foreign.transact(()=>foreign.$.z(9));let late:ReturnType<typeof link>|undefined;
+  try{rows.updateOne('a',{x:7});const previous=evidence(row,'x');expect(life.nativeProof(previous).unknown).toBe(true);bridge.declare({kind:'independent'},()=>rows.replaceOne('a',{id:'a',x:7,y:0}));expect(evidence(row,'x')).not.toBe(previous);expect(life.nativeProof(evidence(row,'x')).unknown).toBe(false);const sent:unknown[]=[];late=link(rows,{set:v=>{sent.push(v);}});bridge.declare({kind:'independent'},()=>rows.updateOne('a',{y:1}));await flush();expect(sent).toEqual([[{id:'a',x:7,y:1}]]);expect(foreign.$.z()).toBe(9);
+  }finally{late?.dispose();bridge.dispose();q.rollback();t.destroy();foreign.destroy();}
+ });
+ for(const otherPending of [false,true])it(`terminal owner characterization otherPending=${otherPending}`,async()=>{
+- const t=signalTree({rows:entityMap<{id:string;x:number;y:number},string>()},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:0,y:0});await flush();const row=rows.byIdOrFail('a'),c=link(rows,{set:()=>{}}) as Declared;const q=t.transact(()=>rows.updateOne('a',{x:7}));q.confirm();await flush();const before=evidence(row,'x');const r=otherPending?t.transact(()=>rows.updateOne('a',{y:1})):undefined;const y=evidence(row,'y');
++ const t=signalTree({rows:entityMap<{id:string;x:number;y:number},string>()},{enhancers:[transactions()]});const rows=t.$.rows;rows.addOne({id:'a',x:0,y:0});await flush();const row=rows.byIdOrFail('a'),c=link(rows,{set:()=>{/* This fixture intentionally discards destination values. */}}) as Declared;const q=t.transact(()=>rows.updateOne('a',{x:7}));q.confirm();await flush();const before=evidence(row,'x');const r=otherPending?t.transact(()=>rows.updateOne('a',{y:1})):undefined;const y=evidence(row,'y');
+  try{c.declare({kind:'independent'},()=>rows.replaceOne('a',{id:'a',x:7,y:otherPending?1:0}));await flush();traces.push({case:'terminal',otherPending,sameEndpoint:evidence(row,'x')===before,beforeDestination:life.nativeProof(before).destination?.map(o=>o.outcome)??[],afterDestination:life.nativeProof(evidence(row,'x')).destination?.map(o=>o.outcome)??[]});if(r){expect(evidence(row,'y')).toBe(y);r.rollback();await flush();}expect(row()).toEqual({id:'a',x:7,y:0});
+  }finally{c.dispose();t.destroy();}
+ });

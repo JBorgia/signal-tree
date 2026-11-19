@@ -1,0 +1,107 @@
+[
+  {
+    "name": "cached-current",
+    "changedFile": "packages/angular/src/lib/observation-adapter.ts",
+    "baseSha256": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+    "mutantSha256": "478f777bcdd37dc3bfbc4978c9674f7d8b4111fe2729cb74b6e9dca126e8ca33",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "--",
+      "selected-callback-facade",
+      "-t",
+      "realizes fresh tap reads",
+      "--maxWorkers=2"
+    ],
+    "exit": 1,
+    "restored": true
+  },
+  {
+    "name": "per-read-metadata",
+    "changedFile": "packages/angular/src/lib/observation-adapter.ts",
+    "baseSha256": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+    "mutantSha256": "6565f1377ad25c147e3f3c4ed93f9be75f6138423d014ed83903f997c8278ce9",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "--",
+      "selected-callback-facade",
+      "-t",
+      "retains coherent native metadata",
+      "--maxWorkers=2"
+    ],
+    "exit": 1,
+    "restored": true
+  },
+  {
+    "name": "premature-publication",
+    "changedFile": "packages/kernel/src/lib/internals/native-location-realization.ts",
+    "baseSha256": "6db3a9a744a42b3359803f787c7e84810c5e60a47caa49fe7888b85137b41b40",
+    "mutantSha256": "8f63a65793a6c22930381a8e79171ae6a3e3464e5d67a9998fd3a29baf2f5efe",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "--",
+      "selected-callback-facade",
+      "-t",
+      "keeps ordinary selected observation granular",
+      "--maxWorkers=2"
+    ],
+    "exit": 1,
+    "restored": true
+  },
+  {
+    "name": "dropped-tracking",
+    "changedFile": "packages/angular/src/lib/observation-adapter.ts",
+    "baseSha256": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+    "mutantSha256": "b0002b2ea9aa77f4ee624b3d4576aafce47ecaf77767fad15a745fd7c0287ec2",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "--",
+      "current-read-capability",
+      "-t",
+      "source-linked producer preserves held",
+      "--maxWorkers=2"
+    ],
+    "exit": 1,
+    "restored": true
+  },
+  {
+    "name": "overwritten-callback-writes",
+    "changedFile": "packages/kernel/src/lib/entity-signal.ts",
+    "baseSha256": "0d1f5c890b991976cb387145a2a4185d079514ecc67db962228ab3e1e58610c6",
+    "mutantSha256": "d7ee1464c13c861e8f989c826fcc16c2948d901ced5903118a4f756220a684b7",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "angular",
+      "--skip-nx-cache",
+      "--",
+      "selected-callback-facade",
+      "-t",
+      "realizes fresh tap reads",
+      "--maxWorkers=2"
+    ],
+    "exit": 1,
+    "restored": true
+  }
+]

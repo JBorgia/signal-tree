@@ -1,0 +1,126 @@
+{
+  "angular-unchanged": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  4 passed (4)",
+      "      Tests  26 passed (26)"
+    ]
+  },
+  "baseline-angular-install-reentry": {
+    "exit": 1,
+    "testTotals": [
+      "\n\n Test Files  1 failed (1)",
+      "      Tests  3 failed | 3 passed (6)"
+    ]
+  },
+  "baseline-kernel-controls": {
+    "exit": 1,
+    "testTotals": [
+      "\n\n Test Files  1 failed | 2 passed (3)",
+      "      Tests  5 failed | 12 passed (17)"
+    ]
+  },
+  "cold-controls-kernel": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  7 passed (7)"
+    ]
+  },
+  "cold-proof-kernel": {
+    "exit": 1,
+    "testTotals": [
+      "\n\n Test Files  1 failed (1)",
+      "      Tests  2 failed | 4 passed (6)"
+    ]
+  },
+  "final-controls-angular": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  2 passed (2)",
+      "      Tests  13 passed (13)"
+    ]
+  },
+  "final-controls-kernel": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  3 passed (3)",
+      "      Tests  17 passed (17)"
+    ]
+  },
+  "first-ordinary": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  1 passed | 91 skipped (92)"
+    ]
+  },
+  "install-reentry-angular": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  6 passed (6)"
+    ]
+  },
+  "install-reentry-kernel": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  6 passed (6)"
+    ]
+  },
+  "kernel-unchanged": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  6 passed (6)",
+      "      Tests  122 passed (122)"
+    ]
+  },
+  "new-controls-angular": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  7 passed (7)"
+    ]
+  },
+  "new-controls-kernel": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  6 passed (6)"
+    ]
+  },
+  "react-absent": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  12 passed (12)"
+    ]
+  },
+  "reentry-kernel": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  4 passed (4)"
+    ]
+  },
+  "solid-absent": {
+    "exit": 0,
+    "testTotals": [
+      "\n Test Files  1 passed (1)",
+      "      Tests  14 passed (14)"
+    ]
+  },
+  "source-types": {
+    "exit": 0,
+    "testTotals": []
+  },
+  "spec-types": {
+    "exit": 1,
+    "testTotals": []
+  },
+  "spec-types-corrected-fixtures": {
+    "exit": 0,
+    "testTotals": []
+  }
+}

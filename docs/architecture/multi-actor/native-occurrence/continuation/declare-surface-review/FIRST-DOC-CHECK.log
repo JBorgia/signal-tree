@@ -1,0 +1,38 @@
+847 relative link(s) across 194 live surface(s); 824 resolve.
+
+❌ 23 broken link(s):
+
+   docs/architecture/multi-actor/native-occurrence/continuation/declare-surface-review/root-contracts/RELEASE-CURRENT.md
+      :26  ->  docs/architecture/multi-actor/IMPLEMENTATION.md
+      :33  ->  docs/architecture/multi-actor/framework-current-read/DECISION.md
+      :39  ->  AGENTS.md
+      :45  ->  .github/VALIDATION_GUIDE.md
+      :45  ->  RELEASE_PROCESS.md
+      :51  ->  RELEASE-1.0.md
+      :51  ->  TODO.md
+      :52  ->  docs/architecture/SIGNALTREE-15-CONTEXT.md
+      :71  ->  docs/architecture/multi-actor/native-occurrence/FINAL-DISPOSITION.md
+      :71  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :126  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :156  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :157  ->  docs/architecture/multi-actor/native-occurrence/continuation/AUTHORSHIP-GUIDANCE.md
+   docs/architecture/multi-actor/native-occurrence/continuation/declare-surface-review/root-contracts/docs/architecture/multi-actor/PLAN.md
+      :4  ->  ../../audits/2026-10-29-multi-actor-product/README.md
+      :47  ->  ../../audits/2026-10-29-multi-actor-product/ACCEPTANCE.md
+      :54  ->  IMPLEMENTATION.md
+   docs/architecture/multi-actor/native-occurrence/continuation/declare-surface-review/root-contracts/docs/contributor-contracts.md
+      :93  ->  architecture/signaltree-15-product-decisions.md
+      :95  ->  architecture/SIGNALTREE-15-CONTEXT.md
+      :98  ->  ../.github/skills/adversarial-confirmation/references/protocol.md
+   docs/architecture/multi-actor/native-occurrence/continuation/declare-surface-review/root-contracts/docs/review-contract.md
+      :23  ->  ../.github/skills/adversarial-confirmation/references/protocol.md
+   docs/architecture/multi-actor/native-occurrence/continuation/declare-surface-review/root-contracts/docs/support-policy.md
+      :61  ->  research/api-breaking-reset-0.md
+      :147  ->  guides/migration-v14-v15.md
+      :149  ->  legacy/README.md
+
+   Fix the path, or delete the link. If the target is a file that was
+   deliberately removed, say so in prose instead of linking to it —
+   docs/architecture/schema-enhancer-plan.md does that for a deleted
+   spike artifact.
+

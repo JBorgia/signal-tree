@@ -1,0 +1,130 @@
+
+> nx run kernel:test independent-intercept-leaf-signals.spec.ts independent-heterogeneous-live-subject.spec.ts complete-structural-sequence.spec.ts structural-completeness.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-intercept-leaf-signals.spec.ts independent-heterogeneous-live-subject.spec.ts complete-structural-sequence.spec.ts structural-completeness.spec.ts --maxWorkers=1
+
+(node:29237) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/oracle/packages/kernel
+
+(node:29270) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/internals/independent-intercept-leaf-signals.spec.ts (9 tests | 5 failed) 27ms
+     × passes `meta` from withWriteContext to onWrite on .set() 11ms
+     × passes `meta` from withWriteContext to onWrite on .update() 1ms
+     × passes meta=undefined when no withWriteContext frame is active 1ms
+     × captures meta synchronously — context from outer frame is observed even through nested set calls 1ms
+     × captures the innermost meta when withWriteContext frames nest 0ms
+(node:29274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29328) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/internals/independent-intercept-leaf-signals.spec.ts > interceptLeafSignals — WriteMetadata passthrough (PR1) > passes `meta` from withWriteContext to onWrite on .set()
+AssertionError: expected { intent: 'hydrate', …(2), …(1) } to deeply equal { intent: 'hydrate', …(2), …(1) }
+
+Compared values have no visual difference.
+
+ ❯ src/lib/internals/independent-intercept-leaf-signals.spec.ts:55:26
+     53|     expect(list[0].next).toBe(1);
+     54|     expect(list[0].prev).toBe(0);
+     55|     expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       |                          ^
+     56|       intent: 'hydrate',
+     57|       origin: 'external',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/internals/independent-intercept-leaf-signals.spec.ts > interceptLeafSignals — WriteMetadata passthrough (PR1) > passes `meta` from withWriteContext to onWrite on .update()
+AssertionError: expected { intent: 'user', …(1), …(1) } to deeply equal { intent: 'user', …(1), …(1) }
+
+Compared values have no visual difference.
+
+ ❯ src/lib/internals/independent-intercept-leaf-signals.spec.ts:74:26
+     72|
+     73|     expect(list).toHaveLength(1);
+     74|     expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       |                          ^
+     75|       intent: 'user',
+     76|       mutationIntent: 'derive',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/internals/independent-intercept-leaf-signals.spec.ts > interceptLeafSignals — WriteMetadata passthrough (PR1) > passes meta=undefined when no withWriteContext frame is active
+AssertionError: expected { mutationIntent: 'replace', …(1) } to deeply equal { mutationIntent: 'replace', …(1) }
+
+Compared values have no visual difference.
+
+ ❯ src/lib/internals/independent-intercept-leaf-signals.spec.ts:93:26
+     91|
+     92|     expect(list).toHaveLength(1);
+     93|     expect(list[0].meta).toEqual(withScalarPublicationCoverage({ mutat…
+       |                          ^
+     94|     expect(list[0].ownerPath).toBe('count');
+     95|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/lib/internals/independent-intercept-leaf-signals.spec.ts > interceptLeafSignals — WriteMetadata passthrough (PR1) > captures meta synchronously — context from outer frame is observed even through nested set calls
+AssertionError: expected { intent: 'bulk', …(1), …(1) } to deeply equal { intent: 'bulk', …(1), …(1) }
+
+Compared values have no visual difference.
+
+ ❯ src/lib/internals/independent-intercept-leaf-signals.spec.ts:135:26
+    133|
+    134|     expect(list).toHaveLength(2);
+    135|     expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       |                          ^
+    136|       intent: 'bulk',
+    137|       mutationIntent: 'replace',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/lib/internals/independent-intercept-leaf-signals.spec.ts > interceptLeafSignals — WriteMetadata passthrough (PR1) > captures the innermost meta when withWriteContext frames nest
+AssertionError: expected { intent: 'hydrate', …(1), …(1) } to deeply equal { intent: 'hydrate', …(1), …(1) }
+
+Compared values have no visual difference.
+
+ ❯ src/lib/internals/independent-intercept-leaf-signals.spec.ts:160:26
+    158|
+    159|     expect(list).toHaveLength(2);
+    160|     expect(list[0].meta).toEqual(withScalarPublicationCoverage({
+       |                          ^
+    161|       intent: 'hydrate',
+    162|       mutationIntent: 'replace',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  5 failed | 22 passed (27)
+   Start at  10:27:50
+   Duration  6.96s (transform 1.71s, setup 0ms, import 2.82s, tests 233ms, environment 2.99s)
+
+Warning: command "node tools/run-core-vitest.mjs independent-intercept-leaf-signals.spec.ts independent-heterogeneous-live-subject.spec.ts complete-structural-sequence.spec.ts structural-completeness.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      8.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     8.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    8.3s

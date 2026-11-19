@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test react scalar-frame-publication whole-value-new-keys entity-native-obligation-composition branch-declaration-qualification --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:31:11.216Z",
+    "endTime": "2026-11-03T05:31:18.450Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "react:test",
+      "target": "test",
+      "projectName": "react",
+      "hash": "7178497398637083331",
+      "startTime": "2026-11-03T05:31:11.246Z",
+      "endTime": "2026-11-03T05:31:18.450Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

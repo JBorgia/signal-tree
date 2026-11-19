@@ -1,0 +1,7 @@
+{
+  "packages/kernel/src/lib/oracle-alignment-independent.spec.ts": "fce9b17f9a732c6c33caa293d9d6ccdb9316970878853f5e1f0b2187f1dc0c61",
+  "packages/kernel/src/lib/entity-egress-footprint.spec.ts": "3769add882e22a3798070fa29f97543da03e47cbcf879af67b71ec68a8a572a8",
+  "packages/kernel/src/lib/branch-omission-correctness.spec.ts": "2e24443db2c8ebf7a434864453b2b9ac7ee757db790c8888be357148cc278fdf",
+  "packages/kernel/src/lib/link-commit-ordering.spec.ts": "49c26727b88e2cd994afec1c7768d664b3db5f438da8c69c4d136baedb34cf9c",
+  "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts": "2078b018d3cdeec8bd32e47e0b02bf341bce0864902e59428d712f833e84eae7"
+}

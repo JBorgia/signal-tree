@@ -1,0 +1,32 @@
+[
+  {
+    "source": "RESULT.json",
+    "archive": "RESULT.json",
+    "sourceSha256": "2f0fdd70f0b55d082feecbeeb533e97ad231dc69024cfa0dee3bae9b3f9c32c5",
+    "archiveSha256": "2f0fdd70f0b55d082feecbeeb533e97ad231dc69024cfa0dee3bae9b3f9c32c5"
+  },
+  {
+    "source": "first.log",
+    "archive": "first.log",
+    "sourceSha256": "e09e14437b1ddd1fe8e1469c63c0dfb3cce1c2b229577c42623d3b1cc979e682",
+    "archiveSha256": "e09e14437b1ddd1fe8e1469c63c0dfb3cce1c2b229577c42623d3b1cc979e682"
+  },
+  {
+    "source": "COMMAND.json",
+    "archive": "COMMAND.json",
+    "sourceSha256": "671b59fdd4256ceca8dd6691072d528da01eba14b3b5cb20e36019c666d9d2ce",
+    "archiveSha256": "671b59fdd4256ceca8dd6691072d528da01eba14b3b5cb20e36019c666d9d2ce"
+  },
+  {
+    "source": "diagnostics/provenance-foreign-callback.json",
+    "archive": "diagnostics/provenance-foreign-callback.json",
+    "sourceSha256": "ecfaabe2d041e57d60171f54fda6399ef949f576a61ce4327279c57a9685dd7c",
+    "archiveSha256": "ecfaabe2d041e57d60171f54fda6399ef949f576a61ce4327279c57a9685dd7c"
+  },
+  {
+    "source": "diagnostics/provenance-external.json",
+    "archive": "diagnostics/provenance-external.json",
+    "sourceSha256": "95adf920ed5159c558c624dcfb7b710ad3c42a2598304cb55b8e3e19a28ee676",
+    "archiveSha256": "95adf920ed5159c558c624dcfb7b710ad3c42a2598304cb55b8e3e19a28ee676"
+  }
+]

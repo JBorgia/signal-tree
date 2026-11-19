@@ -1,0 +1,29 @@
+{
+  "manifestSha256": "94ac87f1e1c29f8ffdcd0b1041b8da1d9b9c3ed734bac5a8e7e1976b96504a82",
+  "sourceFilesVerified": 2930,
+  "changedFilesFromPredecessor": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/independent-explicit-continuation.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/native-field-selection.ts",
+    "packages/kernel/src/lib/internals/native-location-realization.ts",
+    "packages/kernel/src/lib/internals/selected-write-operation.ts",
+    "packages/kernel/src/lib/main-invocation-scope.spec.ts",
+    "packages/kernel/src/lib/native-explicit-handoff.spec.ts",
+    "packages/kernel/src/lib/native-invocation-handoff.spec.ts",
+    "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "packages/kernel/src/lib/selected-unit-support.spec.ts"
+  ],
+  "frozenSourceUnchanged": true,
+  "predecessorSourceUnchanged": true,
+  "unchanged17FixtureSha256": "c990f5125ed89f00f806c7c7cb1698b00059f8992551cac0965c2f2b6694a436",
+  "additionalFixtureSha256": "95b6e7cccbb3874f999cbe3a6377486e27d785372b273bf1ef5586a581dd9007",
+  "runtimeDiffSha256": "df73c5401c38cccd618d877c81df382848d427dfa866f24ba1de6b3c5d7cde92",
+  "rootHead": "628d302dadb082a48c58528651c9088234d0a777",
+  "rootBranch": "fix/d1-d2-forward-port",
+  "expandedBoundaryFixtureSha256": "a4763269937c6d6085745cdef58775e6ee23e3d2ac6b112875bd14f11e1e0941",
+  "mainFixtureMatches": true,
+  "sourceVerifiedAfterAdditionalControls": true
+}

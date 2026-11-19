@@ -1,0 +1,15 @@
+{
+  "status": "source frozen for independent review; no activation",
+  "predecessorManifestSHA256": "a801391e26f62d725a99bda9deb1267020482604d67202e810687811fb017b38",
+  "sourceManifestSHA256": "010d069cabb8c020758fdc50f7b477655504bd9961ff99bf79becc2e1cfe18ca",
+  "sourcePatchSHA256": "8bfcadde9d93a4e10f41ebeb2c725dc7c1f0f8a5851904d8445b45a9b7e0efd9",
+  "testsPatchSHA256": "f8571355dbe153f114b307a011e838c06431d3c963ab9111e3073706169cdbdd",
+  "changedRuntime": [
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "addedSpecs": [
+    "packages/kernel/src/lib/collection-natural-egress.spec.ts",
+    "packages/kernel/src/lib/row-source-independent.spec.ts"
+  ],
+  "files": 2945
+}

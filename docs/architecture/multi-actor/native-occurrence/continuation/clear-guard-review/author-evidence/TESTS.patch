@@ -1,0 +1,155 @@
+--- a/packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts
++++ b/packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts
+@@ -10,6 +10,14 @@
+ // enhancers/restoration/large-batch-restoration-v16-controls.spec.ts (its own
+ // worker: a 130k-row tree is not reclaimed before the next case allocates).
+ import { describe, expect, it } from 'vitest';
++import { rollbackPendingTurnAt } from './internals/causal-runtime/pending-rollback';
++import { TurnStore } from './internals/causal-runtime/turn-store';
++import { AppliedTurnProjection } from './internals/causal-runtime/applied-turn-projection';
++import { createRealizationContextSource } from './internals/causal-runtime/realization-context';
++import { createPositionRegistry } from './internals/position-registry';
++import type { ReversalEffect } from './internals/causal-runtime/causal-types';
++import { getEntityPublicationBinding } from './internals/entity-publication';
++import { createEntityEgressProjection } from './internals/entity-egress-projection';
+ import { signalTree } from './signal-tree';
+ import { entityMap } from './markers/entity-map';
+ import { getPathNotifier } from './path-notifier';
+@@ -80,6 +88,7 @@
+   );
+ });
+ 
++// Historical purpose (the direct legacy helper is now guarded separately):
+ // v16 addition, same mechanism class as the donor's findIndex guard: rolling
+ // back a pending turn chose each effect's dominant structural effect with a
+ // scan of every structural effect in the turn (pending-rollback.ts), so a
+@@ -139,25 +148,117 @@
+       );
+       try {
+         tree.$.rows.setAll(rows(count));
++        const projection = createEntityEgressProjection(
++          rows(count).map((row) => ({
++            key: row.id,
++            row,
++            subjectId: getEntityPublicationBinding(
++              tree.$.rows.byIdOrFail(row.id)
++            )!.subject!,
++          }))
++        );
++        const stop = getEntityPublicationBinding(tree.$.rows)!.source.subscribe(
++          {
++            prepare(packet) {
++              return {
++                record: projection.prepare(packet).record,
++                completion: {},
++              };
++            },
++            complete() {
++              /* The prepared egress record already adopted ordinary truth. */
++            },
++          }
++        );
+         const replacement =
+           mode === 'replacing every id' ? rows(count, count) : [];
+         const pending = tree.transact(() => tree.$.rows.setAll(replacement));
++        expect(tree.$.rows.all()).toEqual(replacement);
++        expect(projection.value()).toEqual(replacement);
+         const visits = findVisits(() => pending.rollback());
+-        // Global Array.find visits: indexed dominant lookup uses 2n for
+-        // replacement (n for clear); replacement placement adds one
+-        // chain-head visit. This fixture is one contiguous restored chain,
+-        // not a whole-planner complexity bound. The old dominant scan
+-        // alone visited m(m+1)/2 candidates.
+-        expect(
+-          visits,
+-          'find predicate visits during rollback'
+-        ).toBeLessThanOrEqual(
+-          mode === 'replacing every id' ? 2 * count + 1 : 2 * count
+-        );
+-        expect(tree.$.rows.ids()).toEqual(rows(count).map(({ id }) => id));
++        try {
++          // Assert physical and ordinary values/order before the work guard, so
++          // a search-cost mutant cannot hide a semantically incorrect restore.
++          expect(tree.$.rows.ids()).toEqual(rows(count).map(({ id }) => id));
++          expect(tree.$.rows.all()).toEqual(rows(count));
++          expect(projection.value()).toEqual(rows(count));
++          // Current authority-selected compensation bypasses legacy dominance.
++          // For this contiguous chain: physical head search N, ordinary head
++          // search N, final-adjacency replay head 1. This is a partial find-work
++          // contract, not total planner linearity or a release-size budget.
++          // A repeated whole-domain placement search must still fail this guard.
++          expect(
++            visits,
++            'find predicate visits during rollback'
++          ).toBeLessThanOrEqual(2 * count + 1);
++        } finally {
++          stop();
++        }
+       } finally {
+         tree.destroy();
+       }
+     });
+   });
+ });
++
++describe('legacy pending rollback dominant structural search work', () => {
++  it.each([256, 1024])(
++    'keeps direct unselected compensation indexed (%i rows)',
++    (count) => {
++      const topology = createPositionRegistry();
++      const authority = topology.allocate(),
++        owner = topology.allocate(authority);
++      const store = new TurnStore(),
++        appliedTurns = new AppliedTurnProjection(store);
++      const initial = rows(count);
++      const pending = store.admitPending({
++        id: 1,
++        effects: initial.map((row) => ({
++          path: `rows.${row.id}`,
++          ownerPath: 'rows',
++          owner,
++          subjectId: row.id,
++          structural: 'remove' as const,
++          before: row,
++          after: undefined,
++        })),
++      });
++      let applied: readonly ReversalEffect[] | undefined;
++      let result: ReturnType<typeof rollbackPendingTurnAt> | undefined;
++      const visits = findVisits(() => {
++        // Deliberately omit selectedCompensation: exercise the supported legacy
++        // helper route that public authority-selected rollback now bypasses.
++        result = rollbackPendingTurnAt({
++          authority,
++          turnId: pending.id,
++          store,
++          topology,
++          realizationContext: createRealizationContextSource({
++            store,
++            appliedTurns,
++          }),
++          port: {
++            applyAtomically(effects) {
++              applied = effects;
++            },
++          },
++        });
++      });
++      expect(result).toEqual({ ok: true, turnId: pending.id });
++      expect(
++        applied?.map((effect) => ({
++          subject: effect.subjectId,
++          kind: effect.structural,
++          value: effect.after,
++        }))
++      ).toEqual(
++        initial.map((row) => ({ subject: row.id, kind: 'add', value: row }))
++      );
++      expect(store.getPendingTurn(pending.id)).toBeUndefined();
++      expect(
++        visits,
++        'direct legacy dominant search visits'
++      ).toBeLessThanOrEqual(count);
++    }
++  );
++});

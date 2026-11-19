@@ -1,0 +1,14 @@
+{
+  "observed": {},
+  "physical": 1,
+  "payload": {
+    "b": {
+      "n": 2
+    }
+  },
+  "after": {
+    "b": {
+      "n": 2
+    }
+  }
+}

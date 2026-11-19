@@ -1,0 +1,3 @@
+undefined
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command failed with EACCES: /private/tmp/st-installed-5727cd8f/source nx build kernel --skip-nx-cache
+spawn /private/tmp/st-installed-5727cd8f/source EACCES

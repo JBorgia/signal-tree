@@ -1,0 +1,60 @@
+
+> nx run kernel:test dynamic-member-collection-inventory.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs dynamic-member-collection-inventory.spec.ts --maxWorkers=1
+
+(node:75618) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75625) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-member-enrollment-successor/candidate/packages/kernel
+
+(node:75632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/dynamic-member-collection-inventory.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ❯ src/lib/dynamic-member-collection-inventory.spec.ts (1 test | 1 failed) 10ms
+   × inventories keyed ordinary construction of a genuine nested collection separately 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/dynamic-member-collection-inventory.spec.ts > inventories keyed ordinary construction of a genuine nested collection separately
+AssertionError: expected undefined to be defined
+ ❯ src/lib/dynamic-member-collection-inventory.spec.ts:15:51
+     13|  try{
+     14|   const child=materializeMember(users,'b',{rows:entityMap<{id:string;n…
+     15|   expect(getEntityPublicationBinding(child.rows)).toBeDefined();await …
+       |                                                   ^
+     16|   expect(sent.at(-1)).toEqual({b:{rows:{all:[]}}});
+     17|   child.rows.addOne({id:'a',n:1});await tick();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  19:57:22
+   Duration  818ms (transform 497ms, setup 0ms, import 595ms, tests 10ms, environment 136ms)
+
+Warning: command "node tools/run-core-vitest.mjs dynamic-member-collection-inventory.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

@@ -1,0 +1,820 @@
+[
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-xAGRQ3/result.json",
+    "passed": false,
+    "error": [
+      "AssertionError [ERR_ASSERTION]: public root resolves elsewhere"
+    ],
+    "arms": [],
+    "inputsUnchanged": true
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-UzLnuw/result.json",
+    "passed": false,
+    "error": [
+      "AssertionError [ERR_ASSERTION]: mutant/production: incomplete or unrecognized runtime failure"
+    ],
+    "arms": [
+      {
+        "label": "baseline",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      },
+      {
+        "label": "mutant",
+        "modes": {
+          "installed": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "receipt-consumer",
+              "failures": [
+                {
+                  "name": "field changed receipt / independent",
+                  "message": "changed write must not return no-write"
+                }
+              ]
+            }
+          ],
+          "production": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "infrastructure",
+              "entry": "receipt-consumer"
+            }
+          ]
+        }
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-suDqcd/result.json",
+    "passed": false,
+    "error": [
+      "AssertionError [ERR_ASSERTION]: gate inputs changed"
+    ],
+    "arms": [
+      {
+        "label": "baseline",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      },
+      {
+        "label": "mutant",
+        "modes": {
+          "installed": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "receipt-consumer",
+              "failures": [
+                {
+                  "name": "field changed receipt / independent",
+                  "message": "changed write must not return no-write"
+                }
+              ]
+            }
+          ],
+          "production": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "receipt-consumer",
+              "failures": [
+                {
+                  "name": "field changed receipt / independent",
+                  "message": "changed write must not return no-write"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "label": "recovery",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      }
+    ],
+    "inputsUnchanged": null
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-y9T1MF/result.json",
+    "passed": true,
+    "error": [],
+    "arms": [
+      {
+        "label": "baseline",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-AAslZt/result.json",
+    "passed": true,
+    "error": [],
+    "arms": [
+      {
+        "label": "baseline",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      },
+      {
+        "label": "mutant",
+        "modes": {
+          "installed": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "receipt-consumer",
+              "failures": [
+                {
+                  "name": "field changed receipt / independent",
+                  "message": "changed write must not return no-write"
+                }
+              ]
+            }
+          ],
+          "production": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "receipt-consumer",
+              "failures": [
+                {
+                  "name": "field changed receipt / independent",
+                  "message": "changed write must not return no-write"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "label": "recovery",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-VdP18I/result.json",
+    "passed": false,
+    "error": [
+      "AssertionError [ERR_ASSERTION]: mutant/installed: registration mutant survived behavioral detection"
+    ],
+    "arms": [
+      {
+        "label": "baseline",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      },
+      {
+        "label": "mutant",
+        "modes": {
+          "installed": [
+            {
+              "kind": "behavior",
+              "entry": "consumer",
+              "failures": [
+                {
+                  "name": "collection independent useful9",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "collection independent foreign window",
+                  "message": "independent useful9 must deliver exactly once"
+                },
+                {
+                  "name": "field dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "row dependent foreign input",
+                  "message": "premature dependent publication while foreign owner pending"
+                },
+                {
+                  "name": "collection dependent foreign input",
+                  "message": "confirmation must yield exact useful9 once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "lifecycle-consumer",
+              "failures": [
+                {
+                  "name": "pre-Link pending collection confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "pre-Link pending collection rollback",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links confirm",
+                  "message": "useful terminal output exactly once"
+                },
+                {
+                  "name": "late collection multiple Links rollback",
+                  "message": "useful terminal output exactly once"
+                }
+              ]
+            },
+            {
+              "kind": "behavior",
+              "entry": "receipt-consumer",
+              "failures": [
+                {
+                  "name": "field changed receipt / independent",
+                  "message": "changed write must not return no-write"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/result.json",
+    "passed": true,
+    "error": [],
+    "arms": [
+      {
+        "label": "baseline",
+        "modes": {
+          "installed": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ],
+          "production": [
+            {
+              "kind": "pass",
+              "entry": "consumer",
+              "total": 8
+            },
+            {
+              "kind": "pass",
+              "entry": "lifecycle-consumer",
+              "total": 6
+            },
+            {
+              "kind": "pass",
+              "entry": "receipt-consumer",
+              "total": 6
+            }
+          ]
+        }
+      }
+    ],
+    "inputsUnchanged": true
+  },
+  {
+    "path": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0ubW4B/result.json",
+    "passed": false,
+    "error": [
+      "Error: baseline-ci failed during setup/control (see 013-baseline-ci)"
+    ],
+    "arms": [],
+    "inputsUnchanged": true
+  }
+]

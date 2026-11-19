@@ -1,0 +1,66 @@
+
+> nx run kernel:test scalar-frame-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts --maxWorkers=1
+
+(node:31170) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:31177) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:31184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (14 tests | 2 failed) 25ms
+   × coalesced ABA coverage requires every contribution; mixed=false 3ms
+   × coalesced ABA coverage requires every contribution; mixed=true 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > coalesced ABA coverage requires every contribution; mixed=false
+ FAIL  src/lib/scalar-frame-publication.spec.ts > coalesced ABA coverage requires every contribution; mixed=true
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:72:16
+     70|   // Ordinary notification coalescing remains one ABA result. The omit…
+     71|   // recipient on either contribution cannot borrow the other's receip…
+     72|   expect(seen).toHaveLength(1);expect(seen[0].value).toBe(0);expect(sc…
+       |                ^
+     73|  }finally{off();n.clear();}
+     74| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 12 passed (14)
+   Start at  17:15:38
+   Duration  735ms (transform 397ms, setup 0ms, import 476ms, tests 25ms, environment 160ms)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

@@ -1,0 +1,23 @@
+--- a/packages/angular/src/lib/observation-adapter.ts
++++ b/packages/angular/src/lib/observation-adapter.ts
+@@ -24,7 +24,7 @@
+     computing = true;
+     nativeFault = undefined;
+     try {
+-      const value = readCurrent();
++      const value = untracked(readCurrent);
+       ownFailure = undefined;
+       return value;
+     } catch (error) {
+@@ -51,9 +51,9 @@
+           // Only this computation's remembered own-recipe failure qualifies.
+           // Marker=false alone also describes fresh dependency/cycle failures.
+           if (frame.evaluated || !ownFailure || !Object.is(ownFailure.error, error)) throw error;
+-          return readCurrent();
++          return untracked(readCurrent);
+         }
+-        return frame.evaluated ? value : readCurrent();
++        return frame.evaluated ? value : untracked(readCurrent);
+       } finally { active = previous; }
+     },
+   });

@@ -1,0 +1,170 @@
+[
+  {
+    "facade": "kernel",
+    "case": "marker-E1.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "kernel",
+    "case": "marker-E3.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "kernel",
+    "case": "marker-E4.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "kernel",
+    "case": "marker-E5-child.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "kernel",
+    "case": "marker-E5-self.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 6,
+    "candidateCalls": 6
+  },
+  {
+    "facade": "kernel",
+    "case": "sort-E1.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "kernel",
+    "case": "sort-E3.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 8,
+    "candidateCalls": 8
+  },
+  {
+    "facade": "kernel",
+    "case": "sort-E4.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 6,
+    "candidateCalls": 8
+  },
+  {
+    "facade": "kernel",
+    "case": "sort-E5-child.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 6,
+    "candidateCalls": 8
+  },
+  {
+    "facade": "kernel",
+    "case": "sort-E5-self.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 8,
+    "candidateCalls": 8
+  },
+  {
+    "facade": "kernel",
+    "case": "grouped-false",
+    "baseComparisons": 8,
+    "candidateComparisons": 8,
+    "derivedRuns": 3
+  },
+  {
+    "facade": "kernel",
+    "case": "grouped-true",
+    "baseComparisons": 9,
+    "candidateComparisons": 10,
+    "derivedRuns": 3
+  },
+  {
+    "facade": "angular",
+    "case": "marker-E1.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "angular",
+    "case": "marker-E3.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "angular",
+    "case": "marker-E4.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "angular",
+    "case": "marker-E5-child.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "angular",
+    "case": "marker-E5-self.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 5,
+    "candidateCalls": 5
+  },
+  {
+    "facade": "angular",
+    "case": "sort-E1.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 4,
+    "candidateCalls": 4
+  },
+  {
+    "facade": "angular",
+    "case": "sort-E3.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 4,
+    "candidateCalls": 4
+  },
+  {
+    "facade": "angular",
+    "case": "sort-E4.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 4,
+    "candidateCalls": 4
+  },
+  {
+    "facade": "angular",
+    "case": "sort-E5-child.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 4,
+    "candidateCalls": 4
+  },
+  {
+    "facade": "angular",
+    "case": "sort-E5-self.json",
+    "firstCallExactWithoutStack": true,
+    "baseCalls": 4,
+    "candidateCalls": 4
+  },
+  {
+    "facade": "angular",
+    "case": "grouped-false",
+    "baseComparisons": 10,
+    "candidateComparisons": 10,
+    "derivedRuns": 3
+  },
+  {
+    "facade": "angular",
+    "case": "grouped-true",
+    "baseComparisons": 9,
+    "candidateComparisons": 10,
+    "derivedRuns": 3
+  }
+]

@@ -1,0 +1,78 @@
+{
+  "c10PromotedManifestSha256": "de88e207c66e65a1a191d05ab4f2b5b2a4deeead71a06f239f278e28dee70dc4",
+  "records": [
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/RELEASE-CURRENT.md",
+      "copy": "candidate-evidence/RELEASE-CURRENT.md",
+      "sha256": "22619dc9ef9f7b069579d493075f1cfee225a2025daf80e52c5d5d7350fd1e44",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/packages/kernel/src/lib/link.ts",
+      "copy": "candidate-evidence/packages/kernel/src/lib/link.ts",
+      "sha256": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+      "copy": "candidate-evidence/packages/kernel/src/lib/experimental-publication/private.ts",
+      "sha256": "b5b6ba96c5c96c10e2c0bb8561b21b16ec75a377d8d60c015f149bece321539d",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "copy": "candidate-evidence/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "sha256": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+      "copy": "candidate-evidence/packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+      "sha256": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/docs/audits/2026-10-17-incumbent-readiness/link-declared-native/README.md",
+      "copy": "candidate-evidence/docs/audits/2026-10-17-incumbent-readiness/link-declared-native/README.md",
+      "sha256": "7af5dba877f7f311e0291f64a97502473415ab9581fb6adf172dfdaf896ea83e",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/private/tmp/st-native-combined-c10-promoted/candidate/docs/audits/2026-10-17-incumbent-readiness/link-api-proposal/PROPOSAL.md",
+      "copy": "candidate-evidence/docs/audits/2026-10-17-incumbent-readiness/link-api-proposal/PROPOSAL.md",
+      "sha256": "abe39cc508e5aa4f5bdd37ded8bcba6d793c430ab76685b2c72ee4fc3e249c6f",
+      "matchesC10Manifest": true
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/PLAN.md",
+      "copy": "root-authority/docs/architecture/multi-actor/PLAN.md",
+      "sha256": "8d1746835c158580713e4e0696c75296fbc962fd2197edd547834a536d70fa91"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/IMPLEMENTATION.md",
+      "copy": "root-authority/docs/architecture/multi-actor/IMPLEMENTATION.md",
+      "sha256": "5152f1b591b297bd3e069bad7aea1632ec40c45dbca079d5216eb8e7fdd7dde0"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/native-occurrence/EXPLICIT-HANDOFF.md",
+      "copy": "root-authority/docs/architecture/multi-actor/native-occurrence/EXPLICIT-HANDOFF.md",
+      "sha256": "9031581bcbd60f05d4c23dd74cdd19d5f17be1844a166a1da94f3595ed1e7449"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/native-occurrence/continuation/README.md",
+      "copy": "root-authority/docs/architecture/multi-actor/native-occurrence/continuation/README.md",
+      "sha256": "a84ec12420bdce5783c9308b8db157ffe857f697624dc0ab832174cc401c5384"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/docs/audits/2026-10-29-multi-actor-product/README.md",
+      "copy": "root-authority/docs/audits/2026-10-29-multi-actor-product/README.md",
+      "sha256": "2bb0b1f2664760cdd49ea95912468c147b6802bd8048ef11f131e1ed92de4eb8"
+    },
+    {
+      "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/v15-production-surface-audit.md",
+      "copy": "root-authority/docs/architecture/v15-production-surface-audit.md",
+      "sha256": "3bda4188e2e4485ceac6ce303ce47dfa731346111d6543d0a9c7c73285f355f7"
+    }
+  ],
+  "verification": "Source-only this adjudication; prior exact keys probe is preserved in ../full-run-classification/runs/focused-c10/first.log"
+}

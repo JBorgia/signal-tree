@@ -1,0 +1,92 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -195,19 +195,28 @@
+  if((p.terminalRejectedRoles??0)!==0||p.owners.some(x=>x.outcome==='rolled-back'||x.outcome==='abandoned')){setOperationState(op,{state:'conservative',reason:'rejected-dependency'});return;}
+  setOperationState(op,p.owners.some(x=>x.outcome==='pending')?{state:'held',reason:'pending-dependency'}:{state:'eligible',basis:'declared'});
+ }
++/** Preparation-site causes; recipient domain uncertainty is not unobserved authorship. */
++export type RecipientUncertainty=Readonly<{
++ unobservedOrigin?:boolean;
++ invalidAttribution?:boolean;
++ uncapturedUpdaterInput?:boolean;
++ recipientDomain?:boolean;
++}>;
+ /** Snapshot declaration responsibility before native installation, never at delivery. */
+-export function prepareRevision(channel:object,revision:object,known:readonly OwnerCell[],unknown=false,blockers:readonly OwnerCell[]=[],native?:NativeRequirement,projectionPending=false):TerminalRecordPlan & {finalize?:()=>void} {
++export function prepareRevision(channel:object,revision:object,known:readonly OwnerCell[],uncertainty:RecipientUncertainty={},blockers:readonly OwnerCell[]=[],native?:NativeRequirement,projectionPending=false):TerminalRecordPlan & {finalize?:()=>void} {
+  const c=connections.get(channel);
+  const writes:TerminalRecordPlan['writes'][number][]=[];
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+  const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+  if(!c||c.disposed)return {writes,adds};
++ const unknown=!!(uncertainty.unobservedOrigin||uncertainty.invalidAttribution||uncertainty.uncapturedUpdaterInput||uncertainty.recipientDomain);
++ const unobservedAuthorship=!!(uncertainty.unobservedOrigin||uncertainty.invalidAttribution||uncertainty.uncapturedUpdaterInput);
+  const active=[...stack];
+  const matches=active.filter(f=>f.channel===channel);
+  const nativeEvidence=native?nativeProof(native):undefined;
+  // Recipient enrollment must not turn destination D into a declaration input.
+  const required=uniqueOwners([...active.flatMap(frameOwners),...(nativeEvidence?.input??[]),...(nativeEvidence?.validation??[])]);
+- const op:Operation={recipientWindow:[],incomplete:matches.length===0||unknown||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
++ const op:Operation={recipientWindow:[],incomplete:matches.length===0||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+  if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:true,invalid:false};
+  writes.push({map:c.ops,key:revision,value:op});
+  for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -67,7 +67,7 @@
+ function pathValue(value:unknown,path:readonly string[]):{present:boolean;value:unknown}{for(const key of path){if(value===null||typeof value!=='object'||!Object.prototype.hasOwnProperty.call(value,key))return {present:false,value:undefined};value=(value as Record<string,unknown>)[key];}return {present:true,value};}
+ function maskPayload(b:Binding):unknown{let result=b.valuePayload;for(const [slot,state]of b.completedPresence){if(state.present||!slot.address)continue;const relative=relativeSourceAddress(b.address??[],slot.address);if(!relative?.length)continue;const omit=(value:unknown,depth:number):unknown=>{if(value===null||typeof value!=='object')return value;const row={...value};const key=relative[depth];if(depth===relative.length-1)delete(row as Record<string,unknown>)[key];else if(Object.prototype.hasOwnProperty.call(row,key))Object.defineProperty(row,key,{value:omit((row as Record<string,unknown>)[key],depth+1),enumerable:true,configurable:true,writable:true});return row;};result=omit(result,0);}return result;}
+ 
+-type InputEvidence={facts:readonly Fact[];unknown:boolean};
++type InputEvidence={facts:readonly Fact[];recipientDomainUnknown:boolean};
+ type BranchInput={recipients:ReadonlyMap<object,InputEvidence>;native:readonly lifecycle.NativeInput[]};
+ const branchInputs:BranchInput[]=[];
+ // One current requirement per native value identity, independent of subscribers.
+@@ -138,7 +138,7 @@
+   for(const key of new Set(keys)){const b=bindings.get(key);if(!b?.address)continue;const within=relativeSourceAddress(b.address,address);const encloses=relativeSourceAddress(address,b.address);if(within===undefined&&encloses===undefined)continue;const captured:Fact[]=[];let covered=false;
+    if(b.aggregate){if(within!==undefined)covered=true;const fields:object[]=[];fieldNodes(fieldAt(b.fieldTrie,within??[]),fields);captured.push(b.baselineStructure);for(const field of fields){const info=b.fields.get(field)!;const states=presenceForField(b,info.address);const absent=states.filter(state=>!state.present);captured.push(...(absent.length?absent.map(state=>state.fact):[b.fieldFacts.get(field)!,...states.map(state=>state.fact)]));}}
+    else captured.push(...((captureValueInput(key) as {facts:readonly Fact[]}|undefined)?.facts??[]));
+-   recipients.set(key,{facts:Object.freeze([...new Set(captured)]),unknown:!covered});
++   recipients.set(key,{facts:Object.freeze([...new Set(captured)]),recipientDomainUnknown:!covered});
+   }
+  }
+  const input:BranchInput={recipients,native:Object.freeze(nativeInputs(node,supplied))};branchInputs.push(input);return input;
+@@ -179,11 +179,12 @@
+   const indexed=slotNode(b,address);if(!indexed)continue;const slot=indexed.slots.get(edit.child)??slotFor(edit.branch,edit.key,edit.child);const previous=b.current;
+   const attributed=meta?.transactionId;const known=typeof attributed==='number'?lifecycle.ownerCell(b.owner,attributed):undefined;
+   const valid=attributed===undefined||!!known&&meta?.transactionOwner===lifecycle.ownerToken(b.owner);
+-  const unknown=!valid||meta?.origin!==undefined;
++  const uncertainty:lifecycle.RecipientUncertainty={invalidAttribution:!valid,unobservedOrigin:meta?.origin!==undefined};
++  const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin);
+   const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown});facts.add(fact);
+   let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});const state=Object.freeze({present:edit.present,fact});
+   const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
+-  const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],unknown,fact.blockers,native.requirement);
++  const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],uncertainty,fact.blockers,native.requirement);
+   if(record.finalize)finalizeRecipients.push(record.finalize);
+   records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:indexed.slots,key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
+  }
+@@ -264,14 +265,20 @@
+  const valid=attributed===undefined||!!known&&meta?.transactionOwner===lifecycle.ownerToken(b.owner);
+  const previous=b.current;
+  const ownInput=mutation.intent==='derive'?(input as {facts?:readonly Fact[]}|undefined)?.facts:undefined;
+- const scopes=branchInputs.map(scope=>scope.recipients.get(channel)??{facts:[],unknown:false});const captured=ownInput||scopes.length?Object.freeze([...new Set([...(ownInput??[]),...scopes.flatMap(scope=>scope.facts)])]):undefined;
++ const scopes=branchInputs.map(scope=>scope.recipients.get(channel)??{facts:[],recipientDomainUnknown:false});const captured=ownInput||scopes.length?Object.freeze([...new Set([...(ownInput??[]),...scopes.flatMap(scope=>scope.facts)])]):undefined;
+  const native=(nativeUnit as {requirement?:lifecycle.NativeRequirement}|undefined)?.requirement;
+  const nativeKnown=native?lifecycle.nativeProof(native).destination??[]:known?[known]:[];
+- const unknown=!clean&&(!valid||meta?.origin!==undefined||(mutation.intent==='derive'&&!ownInput)||scopes.some(scope=>scope.unknown));
++ // Preserve the distinct admission causes: only domain mismatch is recipient-only.
++ const uncertainty:lifecycle.RecipientUncertainty=clean?{}:{
++  invalidAttribution:!valid,unobservedOrigin:meta?.origin!==undefined,
++  uncapturedUpdaterInput:mutation.intent==='derive'&&!ownInput,
++  recipientDomain:scopes.some(scope=>scope.recipientDomainUnknown),
++ };
++ const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin||uncertainty.uncapturedUpdaterInput||uncertainty.recipientDomain);
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+  const unit:Unit={native,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
+- const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,unknown,fact.blockers,native,b.aggregate);
++ const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,uncertainty,fact.blockers,native,b.aggregate);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+  return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined},finalize:plan.finalize};

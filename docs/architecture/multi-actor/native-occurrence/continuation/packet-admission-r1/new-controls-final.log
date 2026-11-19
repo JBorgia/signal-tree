@@ -1,0 +1,35 @@
+
+> nx run kernel:test packet-admission-r1.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs packet-admission-r1.spec.ts --maxWorkers=1
+
+(node:42386) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:42394) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-index-admission-r1/candidate/packages/kernel
+
+(node:42430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  19:46:33
+   Duration  814ms (transform 480ms, setup 0ms, import 574ms, tests 10ms, environment 152ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

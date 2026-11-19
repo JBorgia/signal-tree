@@ -1,0 +1,326 @@
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildViteTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:113:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:63:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+(node:26913) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+> nx run kernel:build
+
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/index.ts, /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/adapter.ts, /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/internals.ts → ../../dist/packages/kernel...
+kernel: (node:26999) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+kernel: (Use `node --trace-warnings ...` to show where the warning was created)
+kernel:   dist/adapter.js 3.42 KB
+kernel:   dist/internals.js 6.836 KB
+kernel:   dist/index.js 711 Bytes
+kernel:   dist/lib/internals/observation-substrate.js 4.483 KB
+kernel:   dist/lib/internals/owner-invalidation.js 3.213 KB
+kernel:   dist/lib/internals/canonical-snapshot.js 316 Bytes
+kernel:   dist/lib/internals/native-location-realization.js 9.479 KB
+kernel:   dist/lib/internals/native-tree-scalar-leaf-runtime.js 7.578 KB
+kernel:   dist/lib/internals/observation-adapter.js 210 Bytes
+kernel:   dist/lib/signal-tree.js 83.941 KB
+kernel:   dist/lib/internals/location-runtime.js 15.292 KB
+kernel:   dist/lib/internals/restoration-eligibility.js 4.964 KB
+kernel:   dist/lib/internals/node-shape.js 2.039 KB
+kernel:   dist/lib/internals/construction-branch.js 525 Bytes
+kernel:   dist/lib/internals/write-observation-scope.js 2.384 KB
+kernel:   dist/lib/write-context.js 2.497 KB
+kernel:   dist/enhancers/transactions/transactions.js 149.803 KB
+kernel:   dist/lib/internals/position-registry.js 3.111 KB
+kernel:   dist/lib/internals/tree-capabilities.js 3.656 KB
+kernel:   dist/lib/internals/write-observation.js 1.446 KB
+kernel:   dist/lib/internals/confirmed-turn-view.js 1.245 KB
+kernel:   dist/lib/internals/state-location-view.js 4.304 KB
+kernel:   dist/lib/internals/link-state-view.js 3.879 KB
+kernel:   dist/lib/internals/transaction-lifecycle-view.js 4.656 KB
+kernel:   dist/lib/internals/restoration-reader.js 4.249 KB
+kernel:   dist/lib/internals/entity-membership-view.js 7.692 KB
+kernel:   dist/lib/leaf.js 833 Bytes
+kernel:   dist/lib/readonly.js 68 Bytes
+kernel:   dist/lib/types.js 855 Bytes
+kernel:   dist/lib/undoable.js 2.767 KB
+kernel:   dist/lib/external.js 5.909 KB
+kernel:   dist/lib/internals/error-reporter.js 5.895 KB
+kernel:   dist/lib/link.js 29.702 KB
+kernel:   dist/enhancers/batching/batching.js 12.864 KB
+kernel:   dist/enhancers/restoration/restoration.js 168.737 KB
+kernel:   dist/enhancers/devtools/devtools.js 2.561 KB
+kernel:   dist/lib/internals/owned-mutation.js 6.944 KB
+kernel:   dist/lib/internals/owned-metadata.js 1.842 KB
+kernel:   dist/lib/internals/member-membership.js 31.545 KB
+kernel:   dist/lib/internals/intrinsic-mutation.js 4.381 KB
+kernel:   dist/lib/internals/production-substrate-stats.prod.js 97 Bytes
+kernel:   dist/lib/constants.js 2.888 KB
+kernel:   dist/enhancers/index.js 3.354 KB
+kernel:   dist/lib/internals/materialize-markers.js 23.161 KB
+kernel:   dist/lib/internals/path-observation-port.js 2.646 KB
+kernel:   dist/lib/internals/owner-invalidation-port.js 427 Bytes
+kernel:   dist/lib/internals/root-source.js 713 Bytes
+kernel:   dist/lib/internals/mutation-capture-runtime.js 2.607 KB
+kernel:   dist/lib/internals/tree-scalar-slot-port.js 528 Bytes
+kernel:   dist/lib/internals/tree-scalar-leaf-runtime.js 4.793 KB
+kernel:   dist/lib/internals/physical-commit-clock.js 726 Bytes
+kernel:   dist/lib/internals/merge-derived.js 6.423 KB
+kernel:   dist/lib/utils.js 24.365 KB
+kernel:   dist/lib/internals/snapshot-authority.js 2.659 KB
+kernel:   dist/lib/internals/cell-identity.js 2.79 KB
+kernel:   dist/lib/internals/tree-scalar-slot-runtime.js 7.54 KB
+kernel:   dist/lib/internals/utilities/is-built-in-object.js 1.689 KB
+kernel:   dist/lib/internals/exposed-publication.js 1.423 KB
+kernel:   dist/lib/internals/plain-branch-membership.js 35.572 KB
+kernel:   dist/lib/internals/physical-rows.js 1.48 KB
+kernel:   dist/lib/internals/causal-runtime/post-application-failure.js 1.306 KB
+kernel:   dist/lib/internals/subject-restoration-claims.js 5.724 KB
+kernel:   dist/lib/write-participation.js 2.433 KB
+kernel:   dist/lib/internals/commit-consequence.js 7.603 KB
+kernel:   dist/lib/internals/transaction-lifecycle-source.js 372 Bytes
+kernel:   dist/lib/internals/entity-membership-source.js 2.531 KB
+kernel:   dist/lib/internals/causal-runtime/applied-turn-projection.js 5.63 KB
+kernel:   dist/lib/internals/causal-runtime/target-transition.js 31 KB
+kernel:   dist/lib/internals/causal-runtime/pending-rollback.js 13.939 KB
+kernel:   dist/lib/internals/causal-runtime/transaction-lifecycle.js 10.069 KB
+kernel:   dist/lib/internals/causal-runtime/realization-context.js 2.385 KB
+kernel:   dist/lib/internals/causal-runtime/tree-realization-adapter.js 70.71 KB
+kernel:   dist/lib/internals/causal-runtime/turn-store.js 7.141 KB
+kernel:   dist/lib/internals/intercept-leaf-signals.js 12.475 KB
+kernel:   dist/lib/path-notifier.js 25.251 KB
+kernel:   dist/lib/internals/visit-tree.js 930 Bytes
+kernel:   dist/lib/internals/tooling-tree.js 193 Bytes
+kernel:   dist/lib/internals/link-state-source.js 1.436 KB
+kernel:   dist/lib/internals/restoration-source.js 908 Bytes
+kernel:   dist/lib/internals/entity-membership-inventory.js 8.318 KB
+kernel:   dist/lib/enhancer-types.js 148 Bytes
+kernel:   dist/lib/markers/entity-map.js 12.722 KB
+kernel:   dist/lib/internals/entity-projection-seed.js 2.897 KB
+kernel:   dist/lib/internals/entity-egress-projection.js 4.792 KB
+kernel:   dist/lib/internals/source-mutation.js 3.292 KB
+kernel:   dist/enhancers/devtools/devtools-impl.js 51.55 KB
+kernel:   dist/enhancers/restoration/order-boundary-evidence.js 4.962 KB
+kernel:   dist/lib/internals/causal-runtime/transient-rows.js 2.235 KB
+kernel:   dist/lib/internals/subject-reclamation-sink.js 4.575 KB
+kernel:   dist/lib/internals/utilities/append-all.js 378 Bytes
+kernel:   dist/lib/internals/utilities/deep-equal.js 12.457 KB
+kernel:   dist/lib/internals/runtime-tree-plan.js 309 Bytes
+kernel:   dist/lib/physical/prepare-entity-target.js 7.152 KB
+kernel:   dist/lib/internals/utilities/deep-clone.js 2.731 KB
+kernel:   dist/lib/internals/causal-runtime/scoped-value-addressing.js 221 Bytes
+kernel:   dist/lib/entity-signal.js 141.476 KB
+kernel:   dist/lib/physical/prepare-structural-target.js 2.55 KB
+kernel:   dist/lib/physical/entity-mutation-frame.js 5.477 KB
+kernel:   dist/lib/physical/entity-handle-resolution.js 478 Bytes
+kernel:   dist/lib/physical/entity-value-store.js 792 Bytes
+kernel:   dist/lib/physical/structural-store.js 14.599 KB
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (27:37): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-authority.ts:27:37
+kernel: [7m27[0m   c.equal(f.candidate.readVisible().y, y, 'visible y');
+kernel: [7m  [0m [91m                                    ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (29:39): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-authority.ts:29:39
+kernel: [7m29[0m   c.equal(f.candidate.readCanonical().y, y, 'canonical y');
+kernel: [7m  [0m [91m                                      ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (77:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:77:37
+kernel: [7m77[0m         f.candidate.readCanonical().x,
+kernel: [7m  [0m [91m                                    ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (81:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:81:27
+kernel: [7m81[0m       c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+kernel: [7m  [0m [91m                          ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (85:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:85:27
+kernel: [7m85[0m       c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+kernel: [7m  [0m [91m                          ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (158:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:158:25
+kernel: [7m158[0m     c.equal(snapshot(f).x, 2, 'later literal visible');
+kernel: [7m   [0m [91m                        ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (163:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:163:25
+kernel: [7m163[0m     c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+kernel: [7m   [0m [91m                        ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (205:23): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:205:23
+kernel: [7m205[0m             c.equal(s.x, 0, 'refused x never published');
+kernel: [7m   [0m [91m                      ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (206:23): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:206:23
+kernel: [7m206[0m             c.equal(s.y, 0, 'refused y never published');
+kernel: [7m   [0m [91m                      ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:27
+kernel: [7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+kernel: [7m   [0m [91m                          ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:37
+kernel: [7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+kernel: [7m   [0m [91m                                    ~[0m
+kernel: created ../../dist/packages/kernel in 7.5s
+kernel: /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/index.ts, /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/adapter.ts, /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/packages/kernel/src/internals.ts → ../../dist/packages/kernel/dist...
+kernel: created ../../dist/packages/kernel/dist in 4.1s
+
+
+
+ NX   Successfully ran target build for project kernel
+
+
+  Run duration:      14.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     14.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:build    14.3s

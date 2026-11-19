@@ -1,0 +1,77 @@
+
+> nx run kernel:test parent-freshness-focused.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs parent-freshness-focused.spec.ts --maxWorkers=1
+
+(node:76878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76894) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel
+
+(node:76901) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/parent-freshness-focused.spec.ts (7 tests | 1 failed) 35ms
+   × direct replace and derive capture read installed backing before native publication 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/parent-freshness-focused.spec.ts > direct replace and derive capture read installed backing before native publication
+AssertionError: expected [] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "mirror": 2,
+-     "parent": {
+-       "n": 2,
+-     },
+-   },
+-   {
+-     "mirror": 3,
+-     "parent": {
+-       "n": 3,
+-     },
+-   },
+- ]
++ []
+
+ ❯ src/lib/parent-freshness-focused.spec.ts:54:78
+     52|  const t=signalTree({box:{n:1}},{enhancers:[transactions()]});t.$.box(…
+     53|  const off=observeIntrinsicMutations(t.$.box.n,()=>{seen.push({parent:…
+     54|  try{t.$.box.n(2);t.$.box.n(n=>n+1);save('direct-capture',seen);expect…
+       |                                                                              ^
+     55| });
+     56|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  09:17:28
+   Duration  1.03s (transform 612ms, setup 0ms, import 720ms, tests 35ms, environment 191ms)
+
+Warning: command "node tools/run-core-vitest.mjs parent-freshness-focused.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.5s

@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/private/tmp/st-c26-independent-review/exact-helper-model.ts"
+  ],
+  "timeoutSeconds": 20,
+  "sourceSha256": "64721176a09b00dc575f16e9aec89a28f954f16322c5f1279bf2f9025056897a"
+}

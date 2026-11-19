@@ -1,0 +1,39 @@
+{
+  "project": "solid",
+  "counts": {
+    "passed": 135,
+    "failed": 1
+  },
+  "discoveredFiles": 22,
+  "startedFiles": 22,
+  "completedFiles": 22,
+  "missingCompletion": [],
+  "unexpectedModules": [],
+  "runEndSeen": true,
+  "result": {
+    "project": "solid",
+    "exit": 1,
+    "watchdog": null,
+    "elapsedSeconds": 41.306355375098065,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  "failures": [
+    {
+      "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts",
+      "name": "publishes newly supplied ordinary keys through the solid facade",
+      "state": "failed",
+      "expectedFailure": false,
+      "mode": "run",
+      "errors": [
+        {
+          "name": "Error",
+          "message": "Scalar selection requires prepared admission",
+          "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts:42:14\n    at withWriteContext (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/write-context.ts:65:12)"
+        }
+      ],
+      "classification": "unclassified first failure; no runtime/fixture causality inferred"
+    }
+  ]
+}

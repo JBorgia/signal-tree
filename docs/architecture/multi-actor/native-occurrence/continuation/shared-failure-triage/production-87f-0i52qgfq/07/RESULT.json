@@ -1,0 +1,15 @@
+{
+  "number": 7,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+    "fullName": "audit entity boundaries row and field links retain ownership, enhanced=false",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 8 skipped (9)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 2.2445619106292725
+}

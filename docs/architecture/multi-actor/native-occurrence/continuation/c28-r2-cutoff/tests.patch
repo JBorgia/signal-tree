@@ -1,0 +1,297 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/approved-current-obligation.spec.ts
+@@ -0,0 +1,51 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions,type PublicationReceipt,type PendingTransaction} from '../index';
++const drain=async()=>{for(let i=0;i<160;i++)await Promise.resolve();};
++const errorData=(error:unknown)=>error instanceof Error?{name:error.name,message:error.message,...Object.fromEntries(['code','stage','reason','cause'].filter(key=>key in error).map(key=>[key,(error as unknown as Record<string,unknown>)[key]]))}:{thrown:error};
++it.each(['A','B'] as const)('approved current-obligation counterpart %s',async(history)=>{
++ const output=process.env['ST_TWO_HISTORY_OUTPUT'];if(!output)throw Error('Observation output required');
++ const tree=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});
++ const sent:unknown[]=[];const errors:unknown[]=[];const historyReads:unknown[]=[];const freshReads:unknown[]=[];
++ const c=link(tree.$.pair,{set:value=>{sent.push(value);}});
++ let historical:PublicationReceipt|undefined,fresh:PublicationReceipt|undefined;
++ let p!:PendingTransaction,a!:PendingTransaction,b!:PendingTransaction;let settled=false;let settleError:unknown;let notices=0;
++ const off=tree.$.pair.x.subscribe(()=>notices++);
++ const inspect=(handle:PendingTransaction|undefined)=>{if(!handle)return null;try{return handle.inspect();}catch(error){return {inspectionError:errorData(error)};}};
++ const record=(phase:string)=>appendFileSync(output,JSON.stringify({history,phase,state:tree.$(),sent,receipts:{historical:historical?.read()??null,fresh:fresh?.read()??null},settled,settleError:settleError??null,notices,historyReads,freshReads,errors,inspection:{p:inspect(p),a:inspect(a),b:inspect(b)}})+'\n');
++ const admitHistory=(owner:PendingTransaction)=>{
++  try{historical=c.declare({kind:'dependent',owners:[p,owner]},()=>tree.$(input=>{
++   historyReads.push({q:input.q,x:input.pair.x});
++   return {...input,pair:{x:input.q>0?input.pair.x:0,y:input.pair.y}};
++  }));}catch(error){errors.push({stage:'historical-admission',error:errorData(error)});}
++ };
++ try{
++  await drain();p=tree.transact(()=>tree.$.pair.x(7));await drain();record('p-pending');
++  a=tree.transact(()=>tree.$.q(1));if(history==='A')admitHistory(a);await drain();record('a-pending');
++  a.confirm();await drain();record('a-confirmed');
++  b=tree.transact(()=>tree.$.q(2));if(history==='B')admitHistory(b);await drain();record('b-pending');
++  b.confirm();await drain();record('before-fresh');
++  // Establish the matched public workload, not a desired receipt/transport oracle.
++  expect(tree.$()).toEqual({pair:{x:7,y:0},q:2});
++  expect(historyReads).toEqual([{q:history==='A'?1:2,x:7}]);
++  const priorInspection=p.inspect();
++  void c.settled().then(()=>{settled=true;},error=>{settleError=errorData(error);});
++  try{fresh=c.declare({kind:'dependent',owners:[p,a]},()=>tree.$(input=>{
++   freshReads.push({q:input.q,x:input.pair.x});
++   return {...input,pair:{x:input.q>0?input.pair.x:0,y:input.pair.y}};
++  }));}catch(error){errors.push({stage:'fresh-admission',error:errorData(error)});}
++  record('fresh-immediate');await drain();record('fresh-drained');
++  expect.soft(fresh?.read()).toEqual({state:'no-write'});
++  expect.soft(historical?.read()).toEqual({state:'conservative',reason:'unknown'});
++  expect.soft(sent).toEqual([]);expect.soft(settled).toBe(false);
++  expect.soft(freshReads).toEqual([{q:2,x:7}]);expect.soft(notices).toBe(1);expect.soft(errors).toEqual([]);
++  // Preserve actual ownership; this assertion does not prescribe admission status.
++  expect(p.inspect()).toEqual(priorInspection);
++  try{p.confirm();}catch(error){errors.push({stage:'p-confirm',error:errorData(error)});}
++  await drain();record('p-confirmed');
++  expect.soft(historical?.read()).toEqual({state:'started',basis:'surviving'});
++  expect.soft(fresh?.read()).toEqual({state:'no-write'});expect.soft(sent).toEqual([{x:7,y:0}]);expect.soft(settled).toBe(true);
++  await drain();record('duplicate-drain');expect.soft(sent).toEqual([{x:7,y:0}]);
++  c.dispose();await drain();record('disposed');expect.soft(fresh?.read()).toEqual({state:'no-write'});expect.soft(historical?.read()).toEqual({state:'started',basis:'surviving'});expect.soft(sent).toEqual([{x:7,y:0}]);
++ }finally{off();c.dispose();tree.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/current-cutoff-r2.spec.ts
+@@ -0,0 +1,65 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++import * as l from './experimental-publication/lifecycle';
++import {installTerminalRecord} from './internals/intrinsic-mutation';
++const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++for(const activationFirst of [true,false])it(`source and recipient projection wait for both barriers: activationFirst=${activationFirst}`,()=>{
++ const tree=signalTree({x:0},{enhancers:[transactions()]});const a=tree.transact(()=>tree.$.x(1));a.confirm();
++ const channel={};l.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
++ let raw!:l.NativeRequirement,source!:l.NativeRequirement,cell!:l.OwnerCell;const revision={};
++ try{
++  l.runDeclaration(channel,{kind:'dependent',owners:[a]},()=>{
++   const prepared=l.prepareNativeRequirement([],false,[]);raw=prepared.requirement;cell=l.nativeProof(raw).validation![0];
++   expect(cell.outcome).toBe('confirmed');const mask=new Set([cell]);
++   source=l.combineScalarNativeRequirements([raw],mask);
++   expect.soft(l.nativeProof(source).validation).toContain(cell);
++   const plan=l.prepareRevision(channel,revision,[],{},[],source,true,raw,mask);
++   installTerminalRecord(prepared.record);l.finalizeNativeRequirement(raw);installTerminalRecord(plan);plan.finalize?.();
++   if(activationFirst)l.completeScalarNativeRequirement(source,raw);
++   expect(l.nativeRequirementReady(source)).toBe(false);
++   const projected=l.projectRevision(channel,revision,l.nativeProof(source),true);
++   expect.soft(projected.validation).toContain(cell);
++  });
++  if(!activationFirst){
++   expect(l.nativeRequirementReady(source)).toBe(false);
++   expect.soft(l.nativeProof(source).validation).toContain(cell);
++   expect.soft(l.proof(channel,revision)?.validation).toContain(cell);
++   l.completeScalarNativeRequirement(source,raw);
++  }
++  expect(l.nativeRequirementReady(source)).toBe(true);expect(source.components).toBeUndefined();
++  expect(l.nativeProof(raw).validation).toContain(cell); // issued/raw validation never rewritten
++  expect(l.nativeProof(source).validation??[]).not.toContain(cell);
++  expect(l.finalizedRetirement(source)?.blocked).toBe(true); // original explicit role still blocks retirement
++  const projected=l.projectRevision(channel,revision,l.nativeProof(source),false);
++  expect(projected.validation??[]).not.toContain(cell);
++ }finally{l.disposeConnection(channel);tree.destroy();}
++});
++it('projected source preserves invalidity and exact readiness sentinel after cleanup',()=>{
++ const tree=signalTree({x:0},{enhancers:[transactions()]});const a=tree.transact(()=>tree.$.x(1));a.confirm();
++ const channel={};l.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});const sentinel=new Error('R2 readiness sentinel');
++ let source!:l.NativeRequirement,raw!:l.NativeRequirement;let later=0,caught:unknown;
++ try{
++  l.runDeclaration(channel,{kind:'dependent',owners:[a]},()=>{
++   const prepared=l.prepareNativeRequirement([],false,[]);raw=prepared.requirement;const cell=l.nativeProof(raw).validation![0];
++   source=l.combineScalarNativeRequirements([raw],new Set([cell]));installTerminalRecord(prepared.record);l.finalizeNativeRequirement(raw);
++  });
++  l.onNativeRequirementReady(raw,()=>{throw sentinel;});l.onNativeRequirementReady(raw,()=>later++);
++  try{l.completeScalarNativeRequirement(source,raw);}catch(error){caught=error;}
++  expect(caught).toBe(sentinel);expect(later).toBe(1);expect(source.components).toBeUndefined();expect(l.finalizedRetirement(source)?.blocked).toBe(true);
++  expect(l.nativeProof(raw).validation).toHaveLength(1);expect(l.nativeProof(source).validation??[]).toHaveLength(0);
++ }finally{l.disposeConnection(channel);tree.destroy();}
++});
++it('genuine open historical contributor holds; closed fresh admission can be no-write',async()=>{
++ const tree=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});const sent:unknown[]=[];const c=link(tree.$.pair,{set:v=>{sent.push(v);}});
++ try{
++  const p=tree.transact(()=>tree.$.pair.x(7)),q=tree.transact(()=>tree.$.q(1));const before=p.inspect();let callbacks=0;
++  const earlier=c.declare({kind:'dependent',owners:[p,q]},()=>{
++   tree.$(v=>{callbacks++;return {...v,pair:{...v.pair}};});q.confirm();
++   // The first installation is still inside this raw validation horizon.
++   tree.$.pair(v=>{callbacks++;return {...v};});expect(sent).toEqual([]);
++  });await drain();expect(sent).toEqual([]);expect(p.inspect()).toEqual(before);
++  const fresh=c.declare({kind:'dependent',owners:[p,q]},()=>tree.$.pair(v=>{callbacks++;return {...v};}));await drain();
++  expect.soft(fresh.read()).toEqual({state:'no-write'});expect.soft(earlier.read().state).not.toBe('superseded');expect(sent).toEqual([]);expect(callbacks).toBe(3);
++  p.confirm();await drain();await c.settled();await drain();expect(sent).toEqual([{x:7,y:0}]);expect.soft(earlier.read()).toEqual({state:'started',basis:'surviving'});expect.soft(fresh.read()).toEqual({state:'no-write'});
++ }finally{c.dispose();tree.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/scalar-horizon-lifecycle-controls.spec.ts
+@@ -0,0 +1,172 @@
++import { expect, it } from 'vitest';
++import { leaf, link, signalTree, transactions } from '../index';
++
++type Declaration = { kind: 'independent' } | { kind: 'dependent'; owners: readonly object[] };
++type DeclaringLink = ReturnType<typeof link> & {
++  declare(input: Declaration, work: () => unknown): unknown;
++};
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++const setup = () => {
++  const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++  const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
++  const sent: { x: number; y: number }[] = [];
++  const connection = link(tree.$.pair, { set: value => { sent.push(value); } }) as DeclaringLink;
++  const q = foreign.transact(() => foreign.$.q(1));
++  let p!: ReturnType<typeof tree.transact>;
++  connection.declare({ kind: 'dependent', owners: [q] }, () => {
++    p = tree.transact(() => tree.$.pair.x(7));
++  });
++  return { tree, foreign, sent, connection, p, q,
++    destroy() { connection.dispose(); tree.destroy(); foreign.destroy(); } };
++};
++
++it('completed scalar setters inside an open horizon preserve p and inherited q', async () => {
++  const s = setup();
++  let calls = 0;
++  try {
++    await drain();
++    const pBefore = s.p.inspect(), qBefore = s.q.inspect();
++    s.connection.declare({ kind: 'dependent', owners: [s.p, s.q] }, () => {
++      s.tree.$.pair(current => { calls++; return { ...current, y: 1 }; });
++      // Setters have returned; declaration validation is still open.
++      expect(s.tree.$.pair()).toEqual({ x: 7, y: 1 });
++      expect(s.sent).toEqual([]);
++    });
++    expect(calls).toBe(1);
++    expect(s.p.inspect()).toEqual(pBefore);
++    expect(s.q.inspect()).toEqual(qBefore);
++    await drain(); expect(s.sent).toEqual([]);
++    s.p.confirm(); await drain(); expect(s.sent).toEqual([]);
++    s.q.confirm(); await drain();
++    expect(s.sent).toEqual([{ x: 7, y: 1 }]);
++    await s.connection.settled();
++    await drain(); expect(s.sent).toEqual([{ x: 7, y: 1 }]);
++  } finally { s.destroy(); }
++});
++
++it('native scalar support survives closed derived invocations with no source recipient', async () => {
++  const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++  const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
++  const anchorTree = signalTree({ value: 0 });
++  const anchorSent: number[] = [], sent: { x: number; y: number }[] = [];
++  const anchor = link(anchorTree.$.value, { set: value => { anchorSent.push(value); } }) as DeclaringLink;
++  let recipient: DeclaringLink | undefined;
++  try {
++    const q = foreign.transact(() => foreign.$.q(1));
++    let p!: ReturnType<typeof tree.transact>;
++    anchor.declare({ kind: 'dependent', owners: [q] }, () => {
++      p = tree.transact(() => tree.$.pair.x(7));
++    });
++    let calls = 0;
++    for (let i = 0; i < 4; i++) {
++      anchor.declare({ kind: 'dependent', owners: [p, q] }, () => {
++        tree.$.pair(current => { calls++; return { ...current }; });
++      });
++    }
++    expect(calls).toBe(4); expect(anchorSent).toEqual([]);
++    expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++    p.confirm(); await drain();
++    recipient = link(tree.$.pair, { set: value => { sent.push(value); } }) as DeclaringLink;
++    recipient.declare({ kind: 'independent' }, () => tree.$.pair.y(1));
++    await drain(); expect(sent).toEqual([]);
++    expect(foreign.$.q()).toBe(1);
++    q.confirm(); await drain();
++    expect(sent).toEqual([{ x: 7, y: 1 }]);
++    await recipient.settled(); await drain();
++    expect(sent).toEqual([{ x: 7, y: 1 }]); expect(anchorSent).toEqual([]);
++  } finally { recipient?.dispose(); anchor.dispose(); tree.destroy(); foreign.destroy(); anchorTree.destroy(); }
++});
++
++it('replacement during the horizon preserves a saved input alias without reinstalling its endpoint', async () => {
++  const s = setup();
++  let saved!: { x: number; y: number };
++  let holder: ReturnType<typeof makeHolder> | undefined;
++  let oldLink: DeclaringLink | undefined;
++  const oldSent: { input: { x: number; y: number }; stamp: number }[] = [];
++  function makeHolder(value: { x: number; y: number }) {
++    return signalTree({ input: leaf(value), stamp: 0 });
++  }
++  try {
++    s.connection.declare({ kind: 'dependent', owners: [s.p, s.q] }, () => {
++      s.tree.$.pair(current => ({ ...current }));
++      saved = s.tree.$.pair();
++      s.tree.$.pair({ x: 9, y: 0 });
++      expect(saved).toEqual({ x: 7, y: 0 });
++      expect(s.tree.$.pair()).toEqual({ x: 9, y: 0 });
++    });
++    holder = makeHolder(saved);
++    oldLink = link(holder.$, { set: value => { oldSent.push(value); } }) as DeclaringLink;
++    let calls = 0;
++    oldLink.declare({ kind: 'dependent', owners: [s.p, s.q] }, () => {
++      holder!.$(current => {
++        calls++; expect(current.input).toBe(saved);
++        return { input: current.input, stamp: 1 };
++      });
++    });
++    expect(calls).toBe(1);
++    await drain(); expect(s.sent).toEqual([]); expect(oldSent).toEqual([]);
++    s.p.confirm(); await drain(); expect(s.sent).toEqual([]); expect(oldSent).toEqual([]);
++    s.q.confirm(); await drain();
++    expect(s.sent).toEqual([{ x: 9, y: 0 }]);
++    expect(oldSent).toEqual([{ input: { x: 7, y: 0 }, stamp: 1 }]);
++    expect(s.tree.$.pair()).toEqual({ x: 9, y: 0 });
++    expect(saved).toEqual({ x: 7, y: 0 });
++    await Promise.all([s.connection.settled(), oldLink.settled()]);
++    await drain(); expect(s.sent).toHaveLength(1); expect(oldSent).toHaveLength(1);
++  } finally { oldLink?.dispose(); holder?.destroy(); s.destroy(); }
++});
++
++it('disposing the Link inside an outer horizon does not discard source obligations', async () => {
++  const s = setup();
++  const lateSent: { x: number; y: number }[] = [];
++  let late: DeclaringLink | undefined;
++  try {
++    s.connection.declare({ kind: 'dependent', owners: [s.p, s.q] }, () => {
++      s.tree.$.pair(current => ({ ...current }));
++      s.connection.dispose();
++      expect(s.tree.$.pair()).toEqual({ x: 7, y: 0 });
++    });
++    await drain(); expect(s.sent).toEqual([]);
++    s.p.confirm(); await drain();
++    late = link(s.tree.$.pair, { set: value => { lateSent.push(value); } }) as DeclaringLink;
++    late.declare({ kind: 'independent' }, () => s.tree.$.pair.y(1));
++    await drain(); expect(lateSent).toEqual([]);
++    s.q.confirm(); await drain();
++    expect(lateSent).toEqual([{ x: 7, y: 1 }]); expect(s.sent).toEqual([]);
++    await late.settled(); await drain(); expect(lateSent).toHaveLength(1);
++  } finally { late?.dispose(); s.destroy(); }
++});
++
++it('throwing outer callback retains nested installed work and leaves fresh declarations usable', async () => {
++  const tree = signalTree({ pair: { x: 0, y: 0 } });
++  const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
++  const recovery = signalTree({ value: 0 });
++  const sent: { x: number; y: number }[] = [], recovered: number[] = [];
++  const parent = link(tree.$.pair, { set: () => { /* This Link owns the outer declaration only. */ } }) as DeclaringLink;
++  const fresh = link(recovery.$.value, { set: value => { recovered.push(value); } }) as DeclaringLink;
++  let child: DeclaringLink | undefined;
++  const sentinel = new Error('outer callback sentinel');
++  try {
++    const q = foreign.transact(() => foreign.$.q(1));
++    let caught: unknown, calls = 0;
++    try {
++      parent.declare({ kind: 'independent' }, () => {
++        tree.$.pair.x(7);
++        child = link(tree.$.pair, { set: value => { sent.push(value); } }) as DeclaringLink;
++        child.declare({ kind: 'independent' }, () => { calls++; tree.$.pair.y(1); });
++        throw sentinel;
++      });
++    } catch (error) { caught = error; }
++    expect(caught).toBe(sentinel); expect(calls).toBe(1);
++    expect(tree.$.pair()).toEqual({ x: 7, y: 1 });
++    child!.declare({ kind: 'independent' }, () => tree.$.pair.y(8));
++    fresh.declare({ kind: 'independent' }, () => recovery.$.value(2));
++    await drain(); expect(sent).toEqual([]); expect(recovered).toEqual([2]);
++    q.confirm(); await drain();
++    expect(sent).toEqual([{ x: 7, y: 8 }]);
++    await Promise.all([child!.settled(), fresh.settled()]);
++    await drain(); expect(sent).toHaveLength(1); expect(recovered).toEqual([2]);
++  } finally { child?.dispose(); parent.dispose(); fresh.dispose(); tree.destroy(); foreign.destroy(); recovery.destroy(); }
++});

@@ -1,0 +1,41 @@
+✔ rebind inverse retains a certified absent endpoint, distinct from present undefined (0.469958ms)
+✔ join preserves certified absence support while emitting own present undefined (0.162125ms)
+✔ same segment keeps first baseline and latest after selection; inverse restores q as D (1.2395ms)
+✔ distinct segments cannot capture-compose; compensation keeps both field effects (0.142209ms)
+✔ equal no-effect retains selection; declaration cannot discard destination obligation (0.164625ms)
+✔ omitted superseded effect produces no inverse selection (0.089667ms)
+✔ continuous selected occupancy transfers first endpoint across segments (0.112041ms)
+✔ discontinuous structural endpoints remain separate; no omitted bridge invented (0.057ms)
+✔ remove/add cancellation retains synthetic field baseline and latest authored selection (0.163584ms)
+✔ ordinary add lowers to physical rekey without substituting ordinary support (0.088875ms)
+✔ history references survive supersession/held output and release exactly (0.088458ms)
+✔ join staged order, mixed fields, and exclusion support; never adopt extra source row (0.233291ms)
+✔ same-value changed support is selected only with staged permission; peer stays peer (0.117709ms)
+✔ hidden/restored old lifetime may retain peer; same key new lifetime cannot alias it (0.110042ms)
+✔ held exact completion rejects changed source frontier; immutable captured map still renders (0.092084ms)
+✔ rebind equal native field values do not invent synthetic ownership from different support (0.053875ms)
+✔ q7 -> r11 -> r7 normalizes away: retain native q selection, rejectr has no inverse (0.072541ms)
+✔ q7 -> r11 -> r13 retains admitted endpoint then selected inverse restores q (0.034917ms)
+✔ selective omitted field keeps later confirmed selection; another selected slot may restore (0.050292ms)
+✔ observed later-confirmed refusal preserves all field support without an inverse (0.035917ms)
+✔ delimiter collision in occurrence/dimension retains distinct values and support (0.076458ms)
+✔ opaque same-string occurrence tokens and numeric/string identities cannot alias (0.06675ms)
+✔ rebind field tokens preserve tuple boundaries and canonicalize only exact identity (0.082792ms)
+✔ render __proto__ as own enumerable data without changing prototype (0.045625ms)
+✔ absent own rebind field does not read inherited getter (0.0515ms)
+✔ normalizer produces q retained selection from captured baseline, not supplied retained q (0.413792ms)
+✔ x5 omit/readd g y13 transforms before and final after payload/support together (0.41075ms)
+✔ before rewrite excludes entity subjects and does not create absent intermediate branch (0.076667ms)
+✔ final frontier includes coalesced descendant absent from effects; stale capture refuses (0.632ms)
+✔ paired deletion keeps certified absence while own undefined remains present (0.085083ms)
+✔ rebind absence is derived from exact row-domain requirement and renders no property (0.276875ms)
+✔ absent-both member stays only while a descendant effect survives initial filter (0.083541ms)
+✔ paired normalizer matches actual frozen source for member rewrite and scalar netzero (1.850375ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 153.906917

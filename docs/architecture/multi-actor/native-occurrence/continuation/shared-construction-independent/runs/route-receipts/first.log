@@ -1,0 +1,67 @@
+
+> nx run kernel:test construction-routes-review.spec.ts keyed-construction-cleanup.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs construction-routes-review.spec.ts keyed-construction-cleanup.spec.ts --maxWorkers=1
+
+(node:41810) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41817) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-shared-construction-independent/candidate/packages/kernel
+
+(node:41824) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/construction-routes-review.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ❯ src/lib/construction-routes-review.spec.ts (6 tests | 1 failed) 17ms
+   × route keyed=false: installed receipt survives completion reentry and throw 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/construction-routes-review.spec.ts > route keyed=false: installed receipt survives completion reentry and throw
+AssertionError: expected [ 'a', 'b', 'a' ] to deeply equal [ 'a', 'b' ]
+
+- Expected
++ Received
+
+  [
+    "a",
+    "b",
++   "a",
+  ]
+
+ ❯ src/lib/construction-routes-review.spec.ts:22:73
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 10 passed (11)
+   Start at  20:58:49
+   Duration  1.11s (transform 451ms, setup 0ms, import 596ms, tests 35ms, environment 326ms)
+
+Warning: command "node tools/run-core-vitest.mjs construction-routes-review.spec.ts keyed-construction-cleanup.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.5s

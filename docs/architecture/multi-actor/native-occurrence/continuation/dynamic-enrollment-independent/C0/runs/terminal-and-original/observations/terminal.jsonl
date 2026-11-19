@@ -1,0 +1,8 @@
+{"kind":"scalar","outcome":"confirm","immediate":[],"terminal":[null],"root":[{"other":1}]}
+{"kind":"scalar","outcome":"rollback","immediate":[],"terminal":[null],"root":[{"other":1}]}
+{"kind":"empty","outcome":"confirm","immediate":[],"terminal":[[]],"root":[{"other":1}]}
+{"kind":"empty","outcome":"rollback","immediate":[],"terminal":[[]],"root":[{"other":1}]}
+{"kind":"collection","outcome":"confirm","immediate":[],"terminal":[[]],"root":[{"other":1}]}
+{"kind":"collection","outcome":"rollback","immediate":[],"terminal":[[]],"root":[{"other":1}]}
+{"kind":"mixed","outcome":"confirm","immediate":[],"terminal":[null],"root":[{"other":1}]}
+{"kind":"mixed","outcome":"rollback","immediate":[],"terminal":[null],"root":[{"other":1}]}

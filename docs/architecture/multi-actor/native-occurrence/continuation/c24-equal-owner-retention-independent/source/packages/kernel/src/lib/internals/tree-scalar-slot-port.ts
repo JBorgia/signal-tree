@@ -1,0 +1,100 @@
+import type {ConstructionAllocation} from './construction-allocation';
+import { PublicationPreparation } from './publication-preparation';
+import type { PositionId } from '../types';
+import type { Location } from './cell-runtime';
+import { isTraversableNode } from './node-shape';
+import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
+
+/**
+ * The NODE-ATTACHED SCALAR-SLOT PORT.
+ *
+ * SCALAR-SLOT-PORT-SPLIT-0. "Does this node carry a scalar-slot runtime, and
+ * which one?" is a neutral fact about a node. It lived in the Angular runtime
+ * file only because that file happened to define it, which made seven KERNEL
+ * modules import the ADAPTER — the dependency this split inverts.
+ *
+ *     PACKAGE LOCATION FOLLOWS SEMANTIC OWNERSHIP.
+ *
+ * The TREE-FACING contract (leaves), distinct from the physical slot
+ * substrate that keeps the name `TreeScalarSlotRuntime`.
+ *
+ * Leaves are universal `Location` values: causal storage and ordinary storage
+ * expose the same read, write, peek, and subscription contract.
+ */
+export type SlotIndex = number;
+
+export interface ScalarSlotMutationFrame {
+  set(slotIndex: SlotIndex, value: unknown): void;
+  update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+  discard(): void;
+  prepareCommit?(options?: {
+    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+    publish?: boolean;
+  }): () => ScalarSlotCommitResult;
+  commit(options?: {
+    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+    publish?: boolean;
+  }): ScalarSlotCommitResult;
+}
+
+/**
+ * Member liveness, installed on a tree's leaves by its first omission
+ * (`member-membership.ts`, v16 8e). Until then each leaf read and write sees
+ * one empty slot: a tree that never omits a member runs none of it.
+ */
+export interface MemberAbsence {
+  /** True when the node, or a member above it, is omitted. */
+  isAbsent(node: unknown): boolean;
+  /** Re-add an absent written node's path; whether membership changed. */
+  reAdd(node: unknown): boolean;
+  /** Ordinary existence adoption can be meaningful while physical presence is unchanged. */
+  needsAdmission?(node: unknown): boolean;
+}
+
+export interface TreeScalarLeafRuntime {
+  /** Install member liveness on every leaf of this tree. */
+  enableAbsence?(absence: MemberAbsence): void;
+  /**
+   * Remove it again: no member of this tree is omitted, so no leaf can be
+   * absent or need re-adding (v16 8g).
+   */
+  disableAbsence?(): void;
+  createLeaf<T>(
+    initialValue: T,
+    equal: (current: T, next: T) => boolean,
+    positionId?: PositionId,
+    allocation?: ConstructionAllocation
+  ): Location<T>;
+  beginFrame(): ScalarSlotMutationFrame;
+  runInvalidationGroup(run: () => void): void;
+  publishPrepared(result: ScalarSlotCommitResult): void;
+  resolveScalarSlot(positionId: PositionId): SlotIndex | undefined;
+  resolveScalarLeaf(positionId: PositionId): Location<unknown> | undefined;
+  revision(): number;
+  slotCount(): number;
+}
+
+const TREE_SCALAR_SLOT_RUNTIME = Symbol.for('SignalTree:ScalarSlotRuntime');
+
+export function defineTreeScalarSlotRuntime(
+  node: object,
+  runtime: TreeScalarLeafRuntime
+): void {
+  Object.defineProperty(node, TREE_SCALAR_SLOT_RUNTIME, {
+    value: runtime,
+    enumerable: false,
+    configurable: true,
+  });
+}
+
+export function getTreeScalarSlotRuntime(
+  node: unknown
+): TreeScalarLeafRuntime | undefined {
+  if (!isTraversableNode(node)) {
+    return undefined;
+  }
+
+  return (node as Record<symbol, TreeScalarLeafRuntime | undefined>)[
+    TREE_SCALAR_SLOT_RUNTIME
+  ];
+}

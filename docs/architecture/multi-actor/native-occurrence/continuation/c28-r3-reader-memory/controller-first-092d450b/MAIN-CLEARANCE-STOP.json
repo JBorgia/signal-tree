@@ -1,0 +1,22 @@
+{
+  "at": "2026-11-03T16:11:17.085571+00:00",
+  "reason": "Main reported active Nx67793 after supervisor launch; administrative stop before Main clearance",
+  "supervisors": [
+    36564
+  ],
+  "ownedSignals": [
+    {
+      "pid": 36694,
+      "birth": "Tue Nov 3 09:10:51 2026",
+      "signal": "SIGTERM",
+      "run": "baseline-128-r1"
+    },
+    {
+      "pid": 36692,
+      "birth": "Tue Nov 3 09:10:50 2026",
+      "signal": "SIGTERM",
+      "run": "baseline-128-r1"
+    }
+  ],
+  "noRetry": true
+}

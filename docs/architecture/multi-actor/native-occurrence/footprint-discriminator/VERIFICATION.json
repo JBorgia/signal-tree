@@ -1,0 +1,13 @@
+{
+  "frozenSourceFilesVerified": 2918,
+  "copiedSourceFilesVerified": 2918,
+  "cases": 12,
+  "observedAndUnobservedMatch": true,
+  "sameTreeRollbackRestoresZero": true,
+  "foreignRollbackRetainsSeven": true,
+  "qInspectionUnchangedByEqualWrite": true,
+  "noPreSettlementSevenDelivery": true,
+  "firstAndCleanupCorrectedObservationsMatch": true,
+  "fixtureSha256": "03c4e8dc580b7b2a22644e25eb70e2c6925f7ca7564523ff8f6fb374efccb882",
+  "sourceManifestSha256": "80a0116269b26af939f775b9a10ff8a79d99b6e9b556a17b05137ab5e3f67502"
+}

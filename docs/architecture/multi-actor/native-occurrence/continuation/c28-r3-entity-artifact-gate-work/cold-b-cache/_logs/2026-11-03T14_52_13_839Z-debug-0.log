@@ -1,0 +1,81 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm install /private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-angular-16.0.0-dev.tgz /private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-kernel-16.0.0-dev.tgz /private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-react-16.0.0-dev.tgz /private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-solid-16.0.0-dev.tgz /private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-vue-16.0.0-dev.tgz
+8 verbose argv "install" "--save-exact" "--ignore-scripts" "--no-audit" "--no-fund" "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-angular-16.0.0-dev.tgz" "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-kernel-16.0.0-dev.tgz" "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-react-16.0.0-dev.tgz" "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-solid-16.0.0-dev.tgz" "/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-vue-16.0.0-dev.tgz"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b-cache/_logs/2026-11-03T14_52_13_839Z-
+10 verbose logfile /private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b-cache/_logs/2026-11-03T14_52_13_839Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @signal-tree/react@file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-react-16.0.0-dev.tgz
+15 silly fetch manifest react@19.2.8
+16 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+17 http fetch GET 200 https://registry.npmjs.org/react 371ms (cache miss)
+18 silly packumentCache full:https://registry.npmjs.org/react set size:undefined disposed:false
+19 silly fetch manifest tslib@2.8.1
+20 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+21 http fetch GET 200 https://registry.npmjs.org/tslib 60ms (cache miss)
+22 silly packumentCache full:https://registry.npmjs.org/tslib set size:undefined disposed:false
+23 silly fetch manifest @signal-tree/solid@file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-solid-16.0.0-dev.tgz
+24 silly fetch manifest solid-js@1.9.15
+25 silly packumentCache full:https://registry.npmjs.org/solid-js cache-miss
+26 http fetch GET 200 https://registry.npmjs.org/solid-js 117ms (cache miss)
+27 silly packumentCache full:https://registry.npmjs.org/solid-js set size:undefined disposed:false
+28 silly fetch manifest @signal-tree/vue@file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-vue-16.0.0-dev.tgz
+29 silly fetch manifest vue@3.5.42
+30 silly packumentCache full:https://registry.npmjs.org/vue cache-miss
+31 http fetch GET 200 https://registry.npmjs.org/vue 104ms (cache miss)
+32 silly packumentCache full:https://registry.npmjs.org/vue set size:undefined disposed:false
+33 silly fetch manifest typescript@6.0.3
+34 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+35 http fetch GET 200 https://registry.npmjs.org/typescript 291ms (cache miss)
+36 silly packumentCache full:https://registry.npmjs.org/typescript set size:undefined disposed:false
+37 silly fetch manifest @signal-tree/angular@file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-angular-16.0.0-dev.tgz
+38 silly fetch manifest @angular/core@22.0.7
+39 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore cache-miss
+40 http fetch GET 200 https://registry.npmjs.org/@angular%2fcore 125ms (cache miss)
+41 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore set size:undefined disposed:false
+42 silly fetch manifest @angular/compiler@22.0.7
+43 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler cache-miss
+44 http fetch GET 200 https://registry.npmjs.org/@angular%2fcompiler 117ms (cache miss)
+45 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler set size:undefined disposed:false
+46 silly fetch manifest rxjs@7.8.2
+47 silly packumentCache full:https://registry.npmjs.org/rxjs cache-miss
+48 http fetch GET 200 https://registry.npmjs.org/rxjs 89ms (cache miss)
+49 silly packumentCache full:https://registry.npmjs.org/rxjs set size:undefined disposed:false
+50 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+51 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+52 http fetch GET 200 https://registry.npmjs.org/zone.js 49ms (cache miss)
+53 silly packumentCache full:https://registry.npmjs.org/zone.js set size:undefined disposed:false
+54 silly fetch manifest @signal-tree/kernel@file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-kernel-16.0.0-dev.tgz
+55 silly placeDep ROOT @signal-tree/angular@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-angular-16.0.0-dev.tgz
+56 silly placeDep ROOT @signal-tree/kernel@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-kernel-16.0.0-dev.tgz
+57 silly placeDep ROOT @signal-tree/react@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-react-16.0.0-dev.tgz
+58 silly placeDep ROOT @signal-tree/solid@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-solid-16.0.0-dev.tgz
+59 silly placeDep ROOT @signal-tree/vue@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../../st-c28-r3-registration-lint-combined/tarballs/signal-tree-vue-16.0.0-dev.tgz
+60 silly fetch manifest @signal-tree/kernel@16.0.0-dev
+61 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel cache-miss
+62 http fetch GET 200 https://registry.npmjs.org/@signal-tree%2fkernel 58ms (cache miss)
+63 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel set size:undefined disposed:false
+64 silly reify moves {}
+65 http cache @signal-tree/vue@file:/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-vue-16.0.0-dev.tgz 1ms (cache hit)
+66 http cache @signal-tree/solid@file:/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-solid-16.0.0-dev.tgz 0ms (cache hit)
+67 http cache @signal-tree/react@file:/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-react-16.0.0-dev.tgz 0ms (cache hit)
+68 http cache @signal-tree/kernel@file:/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-kernel-16.0.0-dev.tgz 0ms (cache hit)
+69 http cache @signal-tree/angular@file:/private/tmp/st-c28-r3-registration-lint-combined/tarballs/signal-tree-angular-16.0.0-dev.tgz 0ms (cache hit)
+70 silly ADD node_modules/@signal-tree/vue
+71 silly ADD node_modules/@signal-tree/solid
+72 silly ADD node_modules/@signal-tree/react
+73 silly ADD node_modules/@signal-tree/kernel
+74 silly ADD node_modules/@signal-tree/angular
+75 verbose cwd /private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b
+76 verbose os Darwin 25.2.0
+77 verbose node v24.15.0
+78 verbose npm  v11.12.1
+79 verbose exit 0
+80 info ok

@@ -1,0 +1,9 @@
+undefined->undefined realized: 0 frame(s) []
+
+OWNED   {"path":"rows.A","ownerPath":"rows","before":{"id":"A","name":"Alpha"},"after":{"id":"A","name":"Server"},"origin":"external","participation":"realized","ownerId":2,"subjectIds":[1],"positionIds":[2],"metaKeys":["intent","origin","participation","ownerId"]}
+
+UNOWNED {"path":"rows","ownerPath":"rows","origin":"external","participation":"realized","subjectIds":[1],"positionIds":[2],"metaKeys":["intent","origin","participation"]}
+
+DISCRIMINATORS (owned, unowned): {"subjectIds present":[true,true],"positionIds present":[true,true],"meta has keys":[true,true],"ownerPath present":[true,true]}
+
+SCALAR frame: path=total ownerPath=total equal=true ownerId=3

@@ -1,0 +1,20 @@
+{
+  "freeze-focused": {
+    "exit": 0,
+    "elapsedSeconds": 28.888847666967195,
+    "matchesFrozenManifest": true,
+    "sourceUnchangedDuringRun": true
+  },
+  "freeze-source-types": {
+    "exit": 0,
+    "elapsedSeconds": 5.992942540964577,
+    "matchesFrozenManifest": true,
+    "sourceUnchangedDuringRun": true
+  },
+  "freeze-spec-types": {
+    "exit": 0,
+    "elapsedSeconds": 15.908855042012874,
+    "matchesFrozenManifest": true,
+    "sourceUnchangedDuringRun": true
+  }
+}

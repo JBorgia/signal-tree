@@ -1,0 +1,18 @@
+{
+  "status": "PREPARED_UNEXECUTED",
+  "files": {
+    "REVIEW.md": "0e8a14c9fb06cf8291867aa05e7d26d71ac26e5444c605f6f28bd44ed511a19b",
+    "SOURCE-IDENTITY.json": "a52411318136157e7b6f7bab4b30dbc23b06d0311156f7b344ffda9b107b7391",
+    "TESTS.patch": "4642a9981f70df493ddb4036b7a285f4b752cd27b4a8325486178561911e0fa4",
+    "packet/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f",
+    "sources/packages/kernel/src/lib/entity-input-view-contract.spec.ts": "029d2177c3dc6e551e99fadbd59e913c7c0fd92f99ae7df316b974b166327f22",
+    "sources/packages/kernel/src/lib/experimental-publication/lifecycle.ts": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8",
+    "sources/packages/kernel/src/lib/experimental-publication/private.ts": "e149c3a27faba6092ea16f9ef9d785f1598529e8446da8fa38df6e82c3b439dd",
+    "sources/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "8716481749be0ee620ffb956226d98643ddbb1893b8f2904513509305a973515",
+    "sources/packages/kernel/src/lib/leaf-contract.spec.ts": "630981d58bc3499c394cd0a82a6775c6833d33f24b5af147506ac408535dcad1",
+    "sources/packages/kernel/src/lib/leaf.ts": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e",
+    "sources/packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts": "616faea3d7cf11b7dddcf533a81cd55c2cd0b6f675ecc72a0869edb3a9d8adf4",
+    "sources/packages/kernel/src/lib/signal-tree.ts": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "sources/packages/kernel/src/lib/utils.ts": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232"
+  }
+}

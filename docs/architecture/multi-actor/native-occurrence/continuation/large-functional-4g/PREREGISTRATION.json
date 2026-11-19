@@ -1,0 +1,86 @@
+{
+  "registeredAt": "2026-11-03T18:22:29.185837+00:00",
+  "authorization": "Main explicitly authorized one NEW finite protocol remaining3original130k cases after accepting INDEPENDENT-RESOURCE-INTERPRETATION.md; sole heavy slot retained",
+  "candidate": "/private/tmp/st-v16-integration-candidate",
+  "manifestSha256": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+  "commandsFile": "/private/tmp/st-large-qualification-4g/COMMANDS.json",
+  "commandsSha256": "9d5786375c4c3026b4b353a6c357c092cd39082c56b1370db8192a3b0b9fba48",
+  "maxSelectedInvocations": 3,
+  "oneAttemptEach": true,
+  "firstFailureStopsProtocol": true,
+  "noFurtherCapIncreases": true,
+  "graphPrecheck": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "show",
+    "project",
+    "kernel",
+    "--json"
+  ],
+  "graphDirectory": "/private/tmp/st-large-qualification/graph-original",
+  "graphRule": "reuse exact-cwd existing graph data; allow normal Nx validation, no forced stale cache or transplant",
+  "limits": {
+    "graphWallSeconds": 180,
+    "invocationWallSeconds": 360,
+    "structuredNoProgressSeconds": 180,
+    "aggregateOwnedRssBytes": 4294967296,
+    "hostMemsizeBytes": 34359738368,
+    "memoryPressureFreePercentageFloor": 25.0,
+    "pollSleepSeconds": 0.5,
+    "telemetryUnavailable": "abort",
+    "testTimeoutsMs": [
+      120000,
+      120000,
+      120000
+    ]
+  },
+  "telemetry": "per PID RSS bytes,PID,PPID,birth,command; aggregate and raw host percentage; ps and memory_pressure latency, monotonic poll start/end; sampled abort thresholds may overshoot, not OS limits or guaranteed available bytes",
+  "sourceChecks": "full manifest only before/after each invocation, never during live telemetry loop",
+  "noHeapFlags": true,
+  "noRuntimeEdits": true,
+  "reusedReceipts": [
+    {
+      "id": "original-membership",
+      "receipt": "/private/tmp/st-large-qualification/runs/original-membership/RESULT.json",
+      "sha256": "5514bd3d4cd0a28e6593e46d0f63cc2230155aa4b5e3e152d7771f6db40dda54"
+    },
+    {
+      "id": "screen-membership",
+      "receipt": "/private/tmp/st-large-qualification/runs/screen-membership/RESULT.json",
+      "sha256": "fca5959bd9327e509692d4f8087ac9f7b1ac4e3bbc4a9b35c907c985d0176167"
+    },
+    {
+      "id": "screen-replacement-undo-redo",
+      "receipt": "/private/tmp/st-large-qualification/runs/screen-replacement-undo-redo/RESULT.json",
+      "sha256": "8c2b4cc88efb5bf7a813d4cbacecf08195477fd5f811f1edd0a5b2d02ddbbd62"
+    },
+    {
+      "id": "screen-restoration-jumps",
+      "receipt": "/private/tmp/st-large-qualification/runs/screen-restoration-jumps/RESULT.json",
+      "sha256": "1a082b873506fb241b239dd2687d358df9b4b3d48506975f0b9d0dba7dca8ec0"
+    },
+    {
+      "id": "screen-restoration-truncation",
+      "receipt": "/private/tmp/st-large-qualification/runs/screen-restoration-truncation/RESULT.json",
+      "sha256": "fb2dcea15c099f358acf0fb6485d1fea67042c31f531c8d02ede567194296e1b"
+    },
+    {
+      "id": "nine-small-cases",
+      "receipt": "/private/tmp/st-v16-integration-evidence/runs/i4-neighbour-search/RESULT.json",
+      "sha256": "263587075136d56502193a3b1609ea663a51153641de2bda6d9323033180728e"
+    }
+  ],
+  "oldStop": {
+    "path": "/private/tmp/st-large-qualification/STOP.json",
+    "sha256": "84d2ed6f6934ec212fdb1a733833604ace2e9333ce56e898ac347ff35b01a94f",
+    "classification": "failed operational qualification, not assertion failure or OOM"
+  },
+  "review": {
+    "path": "/private/tmp/st-large-qualification/INDEPENDENT-RESOURCE-INTERPRETATION.md",
+    "sha256": "24f3792190d7b0b910160f040594f5ef5190257ab1cfe3a4f20e680068e2516c"
+  },
+  "installedWorkflowReport": "/private/tmp/st-v16-installed-evidence/REPORT.md",
+  "controllerSha256": "2304660fc82835dfaf7ed7ee1a8413593e0a5e25fc8021ec4a4eb0d48a6ad98d",
+  "reporterSha256": "ac85bd84552f9a2997071061a1afb7bff2057875850650ee6da49f99a6400761"
+}

@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "node",
+    "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/C22/gate.mjs"
+  ],
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution",
+  "exit": 1,
+  "capture": "exact gate algorithm, fixtures and build flags; added metafile:true and output recording; absolute arm paths"
+}

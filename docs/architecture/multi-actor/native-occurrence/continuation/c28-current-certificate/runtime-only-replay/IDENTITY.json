@@ -1,0 +1,10 @@
+{
+  "manifestSha256": "986f7a94c80734070fc51395ca8eee63d808a4fbf949dadc48f5de1e4c48b3b2",
+  "removedOverlaySha256": "b2ec08a95fd20319a50b01293afb1441de820cbf78e51ecf600cb5cd5ec3b66d",
+  "runtimeEqualsSavedPreInstrumentation": true,
+  "fixtureSha256": "bc1504926067188a541e76e9b2e3539c3a8b1cf678ab7362949e55b8caa328d4",
+  "changedFromFrozenManifestPaths": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ]
+}

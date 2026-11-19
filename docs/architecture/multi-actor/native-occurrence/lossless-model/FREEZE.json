@@ -1,0 +1,9 @@
+{
+  "initial-test.log": "889e81bf5ef7f34d69f55953e2a1690421497e678cf71e32397fa81a36c48750",
+  "test.log": "f512cd1728b3823ad858306ac2eb68d7973a9c48f63aef327cfe8875bde5d5ad",
+  "model.test.mjs": "36cb387ecf22ddcee62b10008348ea48e3fcae072bfacdfe601fb72ce77affc5",
+  "RESULTS.md": "1cb60a26fd773b0a83b752c161d7c0d5477fadff8faae87b2283fa6401936a05",
+  "PREDECESSOR-VERIFIED.json": "cb8ae6cdb5298f668806bfce1a31a35b4579b5ee5796e4236ccbcc4b33c545a5",
+  "model.mjs": "5155f85a1de1d7d60e1d329423682672873733caca2b3d1a659f693807fe6126",
+  "predecessor-counterexamples.json": "23361802bad1fb9105d017a2412d70fef5ad8709df9665110bd774bb69ad3a5e"
+}

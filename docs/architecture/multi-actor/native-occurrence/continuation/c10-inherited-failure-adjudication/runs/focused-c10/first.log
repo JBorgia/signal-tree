@@ -1,0 +1,323 @@
+Creating project graph nodes with 2 plugins
+  - @nx/vite/plugin
+  - @nx/vitest
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildViteTargets (/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:113:29)
+    at /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:63:44
+    at /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 10)
+      at configResolved (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+Creating project graph nodes with @nx/vitest
+(node:20806) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+
+> nx run kernel:test tree-error-public-contract.spec.ts occurrence-successor.spec.ts entity-tap-reads.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs tree-error-public-contract.spec.ts occurrence-successor.spec.ts entity-tap-reads.spec.ts --maxWorkers=1
+
+(node:21558) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21565) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/candidate/packages/kernel
+
+(node:21575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occurrence-successor.spec.ts (16 tests | 3 failed) 167ms
+   × exact replacement cancels only its old slot and disposal cancels remaining slots 7ms
+   × finalization work is independent of unrelated enrolled sibling count 6ms
+   × hidden unresolved support does not block selection reduction and reappearance restores it 1ms
+(node:21596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/tree-error-public-contract.spec.ts (8 tests | 1 failed) 67ms
+     × the Link handle is still exactly three members 5ms
+(node:21630) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-tap-reads.spec.ts (13 tests | 1 failed) 132ms
+     × a cell held from before the tap keeps its cache until the group ends 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-tap-reads.spec.ts > ids and held cells inside a tap (v16 8f review) > a cell held from before the tap keeps its cache until the group ends
+AssertionError: expected [ [ 'b' ], [ 'b' ] ] to deeply equal [ [ 'a', 'b' ], [ 'b' ] ]
+
+- Expected
++ Received
+
+@@ -1,8 +1,7 @@
+  [
+    [
+-     "a",
+      "b",
+    ],
+    [
+      "b",
+    ],
+
+ ❯ src/lib/entity-tap-reads.spec.ts:278:18
+    276|     tree.transact(() => rows.removeOne('a'));
+    277|     await flush();
+    278|     expect(seen).toEqual([['a', 'b'], ['b']]);
+       |                  ^
+    279|     expect(held()).toEqual([B]);
+    280|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > exact replacement cancels only its old slot and disposal cancels remaining slots
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/occurrence-successor.spec.ts:65:30
+     63|    expect(index.inspect().subscriptions).toBe(1);
+     64|   });
+     65|   expect(index.unresolved()).toBe(0);expect(index.inspect().finalized)…
+       |                              ^
+     66|   life.runDeclaration(channel,{kind:'independent'},()=>{
+     67|    const p=life.prepareNativeRequirement([],false,[]);installTerminalR…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > finalization work is independent of unrelated enrolled sibling count
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/lib/occurrence-successor.spec.ts:87:38
+     85|     index.replace(handles[0],'value',p.requirement);before=index.inspe…
+     86|    });
+     87|    expect(index.inspect().finalized).toBe(1);work.push(index.inspect()…
+       |                                      ^
+     88|   }finally{index.dispose();life.disposeConnection(channel);tree.destro…
+     89|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > hidden unresolved support does not block selection reduction and reappearance restores it
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/occurrence-successor.spec.ts:117:87
+    115|    index.setPresence(branch,false,life.initialRequirement());
+    116|   });expect(wakes).toBe(0);expect(index.unresolved()).toBe(0);
+    117|   index.setPresence(branch,true,life.initialRequirement());expect(inde…
+       |                                                                                       ^
+    118|  }finally{index.dispose();life.disposeConnection(channel);tree.destroy…
+    119| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/lib/tree-error-public-contract.spec.ts > PUBLIC: delivery semantics > the Link handle is still exactly three members
+AssertionError: expected [ 'declare', 'dispose', …(2) ] to deeply equal [ 'dispose', 'retrieve', 'settled' ]
+
+- Expected
++ Received
+
+  [
++   "declare",
+    "dispose",
+    "retrieve",
+    "settled",
+  ]
+
+ ❯ src/lib/tree-error-public-contract.spec.ts:238:35
+    236|     const l = link(tree.$.settings.theme, { set: failing });
+    237|
+    238|     expect(Object.keys(l).sort()).toEqual(['dispose', 'retrieve', 'set…
+       |                                   ^
+    239|     l.dispose();
+    240|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  5 failed | 32 passed (37)
+   Start at  10:09:21
+   Duration  9.92s (transform 2.47s, setup 0ms, import 3.55s, tests 366ms, environment 4.17s)
+
+Warning: command "node tools/run-core-vitest.mjs tree-error-public-contract.spec.ts occurrence-successor.spec.ts entity-tap-reads.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      11.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     11.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    11.2s

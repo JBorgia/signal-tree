@@ -1,0 +1,26 @@
+[
+  {
+    "pgid": 91872,
+    "witnesses": [
+      {
+        "pid": 91872,
+        "ppid": 91853,
+        "pgid": 91872,
+        "birth": "Mon Nov 2 13:53:12 2026",
+        "raw": "91872 91853 91872 Ss     0.0  18736 Mon Nov  2 13:53:12 2026     /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/detached-control.py /private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/control-detached child"
+      }
+    ]
+  },
+  {
+    "pgid": 91853,
+    "witnesses": [
+      {
+        "pid": 91853,
+        "ppid": 91850,
+        "pgid": 91853,
+        "birth": "Mon Nov 2 13:53:12 2026",
+        "raw": "91853 91850 91853 Ss     0.0  18784 Mon Nov  2 13:53:12 2026     /Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/detached-control.py /private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/control-detached"
+      }
+    ]
+  }
+]

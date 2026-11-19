@@ -1,0 +1,18 @@
+{
+  "predecessorFiles": 2943,
+  "predecessorMismatches": [],
+  "changedPaths": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/internals/materialize-markers.ts",
+    "packages/kernel/src/lib/markers/entity-map.ts",
+    "packages/kernel/src/lib/signal-tree.ts"
+  ],
+  "addedTests": [
+    "packages/kernel/src/lib/publication-retirement-acceptance.spec.ts",
+    "packages/kernel/src/lib/publication-retirement-boundaries.spec.ts"
+  ],
+  "acceptanceUnchanged": true,
+  "originalLifetimeUnchanged": true
+}

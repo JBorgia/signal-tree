@@ -1,0 +1,20 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/independent-review",
+  "argv": [
+    "/Users/jonathanborgia/.local/bin/claude",
+    "-p",
+    "--tools",
+    "",
+    "--strict-mcp-config",
+    "--mcp-config",
+    "{\"mcpServers\":{}}",
+    "--setting-sources",
+    "",
+    "--settings",
+    "{\"disableAllHooks\":true}",
+    "--no-session-persistence",
+    "--output-format",
+    "json"
+  ],
+  "stdin": "PROMPT.txt"
+}

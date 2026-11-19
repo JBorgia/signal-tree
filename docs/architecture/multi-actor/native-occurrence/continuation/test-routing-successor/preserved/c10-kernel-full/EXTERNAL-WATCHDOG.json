@@ -1,0 +1,8 @@
+{
+  "pid": 10460,
+  "parent": 828,
+  "timestamp": "2026-11-02T10:10:48.423042-07:00",
+  "reason": "Worker exceeds ten minutes CPU-active without completed-file reporting; resource safeguard, not preregistered acceptance criterion. Unfinished cases remain unexecuted/incomplete and must be isolated.",
+  "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js\n",
+  "parentCommand": "node /private/tmp/st-native-combined-c10-promoted/candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts --maxWorkers=1\n"
+}

@@ -1,0 +1,76 @@
+[
+  {
+    "id": "@signal-tree/vue@16.0.0-dev",
+    "name": "@signal-tree/vue",
+    "version": "16.0.0-dev",
+    "size": 12790,
+    "unpackedSize": 34474,
+    "shasum": "4ba73697ee5e3781f3731dac673299ab0d718f74",
+    "integrity": "sha512-SeZyFW68NfHsGyI9L4rqtL8LLYhtTRSrwGrj3d05GKG6YDIg7EChT2fYxKt6rqva8JT7uDGp7xPcG11xiqDZKw==",
+    "filename": "signal-tree-vue-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 3523,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 493,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/construction-input.js",
+        "size": 1027,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/vue-observation.js",
+        "size": 2723,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 11671,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 897,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 1570,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/carrier.d.ts",
+        "size": 346,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/construction-input.d.ts",
+        "size": 497,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/vue-observation.d.ts",
+        "size": 147,
+        "mode": 420
+      }
+    ],
+    "entryCount": 12,
+    "bundled": []
+  }
+]

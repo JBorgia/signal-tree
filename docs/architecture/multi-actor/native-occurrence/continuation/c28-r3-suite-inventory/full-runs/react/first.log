@@ -1,0 +1,204 @@
+
+> nx run react:test --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-r3-compatibility-inventory/full-reporter.mjs
+
+> pnpm exec tsc --noEmit -p packages/react/tsconfig.spec.json && npx vitest run --config packages/react/vitest.config.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-r3-compatibility-inventory/full-reporter.mjs
+
+(node:22237) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:22254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-r3-compatibility-inventory/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-r3-compatibility-inventory/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24)
+[90m    ... 3 lines matching cause stack trace ...[39m
+    at async Promise.all (index 2)
+    at async resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at async _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at async createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at async createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: [32m'EXTENDS_RESOLVE'[39m,
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-r3-compatibility-inventory/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+  [90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)[39m
+  [90m    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)[39m
+  [90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)[39m
+  [90m    at require.resolve (node:internal/modules/helpers:171:31)[39m
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at async configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/[4mvite-tsconfig-paths[24m/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: [32m'MODULE_NOT_FOUND'[39m,
+    requireStack: [
+      [32m'/private/tmp/st-r3-compatibility-inventory/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+    ]
+  },
+  tsconfigFile: [32m'/private/tmp/st-r3-compatibility-inventory/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+}
+
+ RUN  v4.1.9 /private/tmp/st-r3-compatibility-inventory/candidate/packages/react
+
+(node:22300) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/absent-collection.spec.tsx (12 tests) 130ms
+(node:22311) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/transaction-realization.spec.tsx (26 tests) 121ms
+(node:22317) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/equal-owner-facade-controls.spec.tsx (8 tests) 62ms
+(node:22347) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/pending-turn-realization.spec.tsx (4 tests) 26ms
+(node:22351) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/use-signal-tree.spec.tsx (7 tests) 46ms
+(node:22353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole unowned / confirm
+DECLARATION-QUALIFICATION {"case":"React branch/false/confirm","sent":[{"x":7,"y":0}],"receipt":{"state":"started","basis":"declared"},"physical":{"x":99,"y":0},"notifications":1}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole unowned / rollback
+DECLARATION-QUALIFICATION {"case":"React branch/false/rollback","sent":[{"x":7,"y":0}],"receipt":{"state":"started","basis":"declared"},"physical":{"x":99,"y":0},"notifications":1}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole actual-owner / confirm
+DECLARATION-QUALIFICATION {"case":"React branch/true/confirm","sent":[],"receipt":{"state":"no-write"},"physical":{"x":7,"y":0},"notifications":0}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole actual-owner / rollback
+DECLARATION-QUALIFICATION {"case":"React branch/true/rollback","sent":[],"receipt":{"state":"no-write"},"physical":{"x":7,"y":0},"notifications":0}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch disposed held receipt releases waiter without settling owner
+DECLARATION-QUALIFICATION {"case":"React branch/held-dispose","sent":[],"receipt":{"state":"no-write"}}
+
+ ❯ src/branch-declaration-qualification.spec.tsx (6 tests | 3 failed) 46ms
+   ✓ React branch equal whole unowned / confirm 25ms
+   ✓ React branch equal whole unowned / rollback 8ms
+   × React branch equal whole actual-owner / confirm 5ms
+   × React branch equal whole actual-owner / rollback 2ms
+   ✓ React branch no-write receipt and declaration after disposal 2ms
+   × React branch disposed held receipt releases waiter without settling owner 2ms
+(node:22354) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/parent-freshness-counterparts.spec.tsx (3 tests) 47ms
+(node:22356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/absent-path-write.spec.tsx (8 tests) 82ms
+(node:22358) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/opaque-leaf-restoration.spec.tsx (6 tests) 68ms
+(node:22374) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/whole-value-new-keys.spec.tsx (3 tests | 1 failed) 59ms
+   × publishes newly supplied ordinary keys through the React facade 40ms
+   ✓ keeps failed transaction observations coherent (seeded=false) 14ms
+   ✓ keeps failed transaction observations coherent (seeded=true) 3ms
+(node:22375) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/declared-publication-composition.spec.tsx (3 tests) 43ms
+(node:22382) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/selected-callback-facade.spec.tsx (3 tests) 33ms
+(node:22402) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/designated-collection-omission.spec.tsx (6 tests) 68ms
+(node:22416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/plain-member-absence-observation.spec.tsx (3 tests) 43ms
+(node:22419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-native-obligation-composition.spec.tsx (3 tests) 29ms
+(node:22421) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/ownership.spec.tsx (2 tests) 31ms
+(node:22423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/scalar-frame-publication.spec.tsx (2 tests) 31ms
+(node:22424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-native-address.spec.tsx (2 tests) 20ms
+(node:22431) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/joint-native-frontier.spec.tsx (1 test) 48ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/branch-declaration-qualification.spec.tsx > React branch equal whole actual-owner / confirm
+ FAIL  src/branch-declaration-qualification.spec.tsx > React branch equal whole actual-owner / rollback
+AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'
+ ❯ src/branch-declaration-qualification.spec.tsx:31:70
+     29|   if(!receipt)throw Error('missing receipt');
+     30|   expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(r…
+     31|   if(owned){expect(sent).toEqual([]);expect(['held','conservative']).t…
+       |                                                                      ^
+     32|   const initialStatus=receipt.read();let settled=false;const wait=c.se…
+     33|   await step(()=>pending[terminal]());
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/branch-declaration-qualification.spec.tsx > React branch disposed held receipt releases waiter without settling owner
+AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'
+ ❯ src/branch-declaration-qualification.spec.tsx:61:103
+     59|   let pending!:ReturnType<typeof tree.transact>;await step(()=>{pendin…
+     60|   await step(()=>{receipt=c.declare({kind:'independent'},()=>source(va…
+     61|   expect(sent).toEqual([]);if(!receipt)throw Error('missing receipt');…
+       |                                                                                                       ^
+     62|   let settled=false;const wait=c.settled().then(()=>{settled=true;});a…
+     63|   c.dispose();await step(()=>{});expect(settled).toBe(true);await wait…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/whole-value-new-keys.spec.tsx > publishes newly supplied ordinary keys through the React facade
+Error: Scalar selection requires prepared admission
+ ❯ ../kernel/src/enhancers/transactions/transactions.ts:2891:25
+    2889|     const endpoint=Object.is(old?.kind==='set'?old.before:mutation.bef…
+    2890|     const admission=mutation.preparedTerminal?.scalarAdmission;
+    2891|     if(!admission)throw new Error('Scalar selection requires prepared …
+       |                         ^
+    2892|     // These are this attempt's detached effect objects, not installed…
+    2893|     bindFieldEndpoints(admission.effect,pair);
+ ❯ prepareScalarSelection ../kernel/src/lib/internals/native-scalar-selection.ts:7:263
+ ❯ Object.prepare ../kernel/src/lib/experimental-publication/private.ts:180:55
+ ❯ publicationPreparer ../kernel/src/lib/internals/intrinsic-mutation.ts:329:32
+ ❯ preparePublication ../kernel/src/lib/internals/location-runtime.ts:483:18
+ ❯ ../kernel/src/lib/internals/location-runtime.ts:490:13
+ ❯ Object.commitRecorded ../kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34
+ ❯ ../kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35
+ ❯ Object.replace ../kernel/src/lib/internals/location-runtime.ts:488:26
+ ❯ node.n ../kernel/src/lib/internals/location-runtime.ts:461:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  2 failed | 17 passed (19)
+      Tests  4 failed | 104 passed (108)
+   Start at  21:26:13
+   Duration  16.50s (transform 1.15s, setup 0ms, import 4.90s, tests 1.03s, environment 8.07s)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/react/tsconfig.spec.json && npx vitest run --config packages/react/vitest.config.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-r3-compatibility-inventory/full-reporter.mjs" exited with non-zero status code
+
+
+ NX   Running target test for project react failed
+
+Failed tasks:
+
+- react:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      21.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     21.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        react:test    21.8s

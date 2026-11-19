@@ -1,0 +1,92 @@
+[
+  {
+    "source": "run-gate.py",
+    "archive": "run-gate.py",
+    "sourceSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  {
+    "source": "SNAPSHOT-C12.json",
+    "archive": "SNAPSHOT-C12.json.gz",
+    "sourceSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+    "archiveSha256": "a82f4764727aa7b40c594a13cef71981ba733cbfdfa41a67b9826dee1ee7c639"
+  },
+  {
+    "source": "ADDITIONAL-PATCHES.json",
+    "archive": "ADDITIONAL-PATCHES.json",
+    "sourceSha256": "a33aba482f94fd5a48945d6cd94d39ea17b4a1e85a24f0a4c897e290e3cf8ebe",
+    "archiveSha256": "a33aba482f94fd5a48945d6cd94d39ea17b4a1e85a24f0a4c897e290e3cf8ebe"
+  },
+  {
+    "source": "RESULTS.md",
+    "archive": "RESULTS.md",
+    "sourceSha256": "8001c470b85cbb885bd34e26a14d64e280ad2e70bb91803bc5ecccc41e8984f4",
+    "archiveSha256": "8001c470b85cbb885bd34e26a14d64e280ad2e70bb91803bc5ecccc41e8984f4"
+  },
+  {
+    "source": "COMPOSITION.json",
+    "archive": "COMPOSITION.json",
+    "sourceSha256": "46c10759ce5dfa803a0364a33fb8b4ff462d1c255b4b4f1829bb29752e5cd02a",
+    "archiveSha256": "46c10759ce5dfa803a0364a33fb8b4ff462d1c255b4b4f1829bb29752e5cd02a"
+  },
+  {
+    "source": "runs/combined-kernel-focused/RESULT.json",
+    "archive": "runs/combined-kernel-focused/RESULT.json",
+    "sourceSha256": "5ae4fa6ac0efd5626076a9a1f75372401c2964d0ff637c3918c7a0a15b524eb4",
+    "archiveSha256": "5ae4fa6ac0efd5626076a9a1f75372401c2964d0ff637c3918c7a0a15b524eb4"
+  },
+  {
+    "source": "runs/combined-kernel-focused/first.log",
+    "archive": "runs/combined-kernel-focused/first.log",
+    "sourceSha256": "da6bbb72f15b065281a1ee94accfbc6a6ff4bb4555e4b3a44bc11026e06aa399",
+    "archiveSha256": "da6bbb72f15b065281a1ee94accfbc6a6ff4bb4555e4b3a44bc11026e06aa399"
+  },
+  {
+    "source": "runs/combined-kernel-focused/SOURCE-BEFORE.json",
+    "archive": "runs/combined-kernel-focused/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+    "archiveSha256": "a82f4764727aa7b40c594a13cef71981ba733cbfdfa41a67b9826dee1ee7c639"
+  },
+  {
+    "source": "runs/combined-kernel-focused/SOURCE-AFTER.json",
+    "archive": "runs/combined-kernel-focused/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/combined-kernel-focused/COMMAND.json",
+    "archive": "runs/combined-kernel-focused/COMMAND.json",
+    "sourceSha256": "df8e4813d23a504f85ef6fd45f2c5130d772868dc328fc7a66ce147555fb664f",
+    "archiveSha256": "df8e4813d23a504f85ef6fd45f2c5130d772868dc328fc7a66ce147555fb664f"
+  },
+  {
+    "source": "runs/combined-kernel-focused/observations/kernel-ordinary.json",
+    "archive": "runs/combined-kernel-focused/observations/kernel-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/combined-kernel-focused/observations/terminal-window.json",
+    "archive": "runs/combined-kernel-focused/observations/terminal-window.json",
+    "sourceSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5",
+    "archiveSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5"
+  },
+  {
+    "source": "runs/combined-kernel-focused/observations/direct-capture.json",
+    "archive": "runs/combined-kernel-focused/observations/direct-capture.json",
+    "sourceSha256": "3760490e25d7a149b1e25cb28bc8dd27fd2d5e2d2aea075c42f7ca0dceedd01e",
+    "archiveSha256": "3760490e25d7a149b1e25cb28bc8dd27fd2d5e2d2aea075c42f7ca0dceedd01e"
+  },
+  {
+    "source": "runs/combined-kernel-focused/observations/builder-work.json",
+    "archive": "runs/combined-kernel-focused/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/combined-kernel-focused/observations/kernel-keyed.json",
+    "archive": "runs/combined-kernel-focused/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  }
+]

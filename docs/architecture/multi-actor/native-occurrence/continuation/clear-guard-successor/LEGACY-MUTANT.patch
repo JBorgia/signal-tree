@@ -1,0 +1,15 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts
+@@ -150,9 +150,9 @@
+     turn.effects
+       .filter((effect, index) => {
+         if (effect.subjectId !== undefined) {
+-          const dominantStructuralEffect = dominantStructuralEffects
+-            .get(effect.subjectId)
+-            ?.find((candidate) => sameSubjectScope(candidate, effect));
++          const dominantStructuralEffect = turn.effects.find(candidate =>
++            (candidate.structural === 'add' || candidate.structural === 'remove') &&
++            sameSubjectScope(candidate, effect));
+           if (
+             dominantStructuralEffect &&
+             (dominantStructuralEffect === effect ||

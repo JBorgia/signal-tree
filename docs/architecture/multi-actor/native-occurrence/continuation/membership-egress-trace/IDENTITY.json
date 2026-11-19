@@ -1,0 +1,43 @@
+{
+  "candidateManifestSHA256": "a801391e26f62d725a99bda9deb1267020482604d67202e810687811fb017b38",
+  "verifiedFiles": 2943,
+  "mismatches": [],
+  "baselineCommit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "files": {
+    "packages/kernel/src/lib/link.ts": {
+      "candidate": "1e9b0a856eb980edaf0f07afe2d0189b3cdcf2d3e636e33c2faa07cf6c340dc4",
+      "baseline87f": "d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901",
+      "instrumented": "1e9b0a856eb980edaf0f07afe2d0189b3cdcf2d3e636e33c2faa07cf6c340dc4"
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "candidate": "79d7a077ff92c33d07438843d291e41e8e16bc91b5e92eb00e81f492d6178da7",
+      "baseline87f": null,
+      "instrumented": "3f5fdfa380afa6ea4e1fe254e2e3135a50a3b2e0e07dc4f6a76336c66c2329e7"
+    },
+    "packages/kernel/src/lib/internals/member-membership.ts": {
+      "candidate": "bfad0d5f63050e5c774d0a903783f5472b44a9e74259e94ce5c09ff80262183b",
+      "baseline87f": "e748154443c4769a66572cf7eff6f4224ba7e1619f2d542fe301ebaf64283906",
+      "instrumented": "bfad0d5f63050e5c774d0a903783f5472b44a9e74259e94ce5c09ff80262183b"
+    },
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts": {
+      "candidate": "6ce91d97dca19d448a7893856c7eca04e3eebafb6fc9e0cb76916ee1a32202cf",
+      "baseline87f": "4116ebdd4e7d300bf47e6f14260c914e6698116f6fbae3a30279fd7aceec12d7",
+      "instrumented": "6ce91d97dca19d448a7893856c7eca04e3eebafb6fc9e0cb76916ee1a32202cf"
+    },
+    "packages/kernel/src/lib/internals/native-occurrence.ts": {
+      "candidate": "421873e7534602a1328dc1d04dd3f09e80f955b66445b1d0b4044316a00773bc",
+      "baseline87f": null,
+      "instrumented": "421873e7534602a1328dc1d04dd3f09e80f955b66445b1d0b4044316a00773bc"
+    },
+    "packages/kernel/src/lib/branch-omission-correctness.spec.ts": {
+      "candidate": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99",
+      "baseline87f": "01d32e4714e0b68452ab45bcd7d31ff6c89ba5ecd5d4765efd56cc27fe6c4d99",
+      "instrumented": "071bfffcf0e4b0adcf8a58a249a57b91003b1620d59b43eecd1749bda490acc0"
+    },
+    "packages/kernel/src/lib/link-absent-locations.spec.ts": {
+      "candidate": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+      "baseline87f": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+      "instrumented": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9"
+    }
+  }
+}

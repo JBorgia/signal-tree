@@ -1,0 +1,129 @@
+--- a/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
+@@ -52,13 +52,15 @@
+       } else {
+         expect(error).toBeUndefined();
+         if (!receipt) throw new Error('Dependent declaration returned no receipt');
+-        expect(receipt.read()).toEqual({ state: 'held', reason: 'pending-dependency' });
++        expect(Object.isFrozen(receipt)).toBe(true);
++        expect(Object.isFrozen(receipt.read())).toBe(true);
+       }
+       // Contradiction is not rollback of the callback's installed writes.
+       expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+       expect(tree.$.x()).toBe(7);
+       expect(p.inspect()).toEqual(ownership);
+       await drain();
++      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'conservative', reason: 'unknown' });
+       expect(sent).toEqual([]);
+       let settled = false;
+       const wait = c.settled().then(() => { settled = true; });
+@@ -69,7 +71,7 @@
+       expect(sent).toEqual([{ x: 7, y: 0 }]);
+       expect(settled).toBe(true);
+       await wait;
+-      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'started', basis: 'declared' });
++      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'started', basis: 'surviving' });
+       await drain();
+       expect(sent).toEqual([{ x: 7, y: 0 }]);
+     } finally { c.dispose(); tree.destroy(); }
+--- a/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
+@@ -13,14 +13,18 @@
+  const visit=(r:life.NativeRequirement,d:number)=>{visits++;unique.add(r);depth=Math.max(depth,d);for(const child of r.components??[]){edges++;visit(child,d+1);}};
+  visit(root,0);return {nodes:unique.size,componentTraversalVisits:visits,edges,depth,owners:new Set(life.nativeProof(root).owners).size,ready:life.nativeRequirementReady(root)};
+ }
++// One transparent wrapper shared by the observation and its forwarding witness.
++function observeSelection(original:typeof selection.prepareScalarSelection,observe:(args:Parameters<typeof original>)=>void):typeof original {
++ return (...args:Parameters<typeof original>)=>{observe(args);return original(...args);};
++}
+ for(const route of ['leaf','whole'] as const)for(const n of [64,256])for(const inheritedQ of [false,true])it(`fixed obligation retention ${route} ${n} q=${inheritedQ}`,async()=>{
+  const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});const sent:unknown[]=[];
+  const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;const node=t.$.pair.x;let captured:life.NativeRequirement|undefined;let notices=0;
+  const original=selection.prepareScalarSelection;
+- const spy=vi.spyOn(selection,'prepareScalarSelection').mockImplementation((registry,source,mutation,before,proposed)=>{
++ const spy=vi.spyOn(selection,'prepareScalarSelection').mockImplementation(observeSelection(original,args=>{
++  const [registry,source,,before]=args;
+   if(registry===getPositionRegistry(node)&&getOwnedPositionIds(source)?.[0]===getOwnedPositionIds(node)?.[0])captured=before.requirement as life.NativeRequirement;
+-  return original(registry,source,mutation,before,proposed);
+- });
++ }));
+  let off=()=>{};
+  try{
+   const q=inheritedQ?other.transact(()=>other.$.q(1)):undefined;let p!:ReturnType<typeof t.transact>;
+@@ -36,3 +40,22 @@
+   expect(sent).toEqual([{x:7,y:0}]);await c.settled();
+  }finally{spy.mockRestore();off();c.dispose();t.destroy();other.destroy();}
+ });
++it('selection observation forwards exact true false and omitted optional arguments',()=>{
++ const registry={},node={},before={present:true,value:0,requirement:life.initialRequirement()},proposed={present:true,value:1,requirement:life.initialRequirement()};
++ const mutation={intent:'replace',before:0,after:1,changed:true} as const;
++ const result={endpoint:proposed};const sentinel=new Error('selection witness');let fail=false;
++ const seen:Parameters<typeof selection.prepareScalarSelection>[]=[];const forwarded:boolean[]=[];
++ const release=selection.registerScalarSelection(registry,(actualNode,actualMutation,actualBefore,actualProposed,allow)=>{
++  expect(actualNode).toBe(node);expect(actualMutation).toBe(mutation);expect(actualBefore).toBe(before);expect(actualProposed).toBe(proposed);forwarded.push(allow);
++  if(fail)throw sentinel;return result;
++ });
++ const original=selection.prepareScalarSelection;
++ const spy=vi.spyOn(selection,'prepareScalarSelection').mockImplementation(observeSelection(original,args=>{seen.push(args);}));
++ try{
++  expect(selection.prepareScalarSelection(registry,node,mutation,before,proposed,true)).toBe(result);
++  expect(selection.prepareScalarSelection(registry,node,mutation,before,proposed,false)).toBe(result);
++  expect(selection.prepareScalarSelection(registry,node,mutation,before,proposed)).toBe(result);
++  expect(seen.map(args=>args.length)).toEqual([6,6,5]);expect(seen.map(args=>args[5])).toEqual([true,false,undefined]);expect(forwarded).toEqual([true,false,false]);
++  fail=true;let caught:unknown;try{selection.prepareScalarSelection(registry,node,mutation,before,proposed,true);}catch(error){caught=error;}expect(caught).toBe(sentinel);
++ }finally{spy.mockRestore();release();}
++});
+--- a/packages/react/src/branch-declaration-qualification.spec.tsx
++++ b/packages/react/src/branch-declaration-qualification.spec.tsx
+@@ -28,12 +28,12 @@
+   expect(source()).toEqual(value(7));expect(ui()).toBe(7);expect(notifications).toBe(0);expect(pending.inspect()).toEqual(before);expect(owned?source.x():owner.$.z()).toBe(7);
+   if(!receipt)throw Error('missing receipt');
+   expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(receipt.read())).toBe(true);
+-  if(owned){expect(sent).toEqual([]);expect(['held','conservative']).toContain(receipt.read().state);}else{expect(sent).toEqual([value(7)]);expect(receipt.read().state).toBe('started');}
++  if(owned){expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});}else{expect(sent).toEqual([value(7)]);expect(receipt.read().state).toBe('started');}
+   const initialStatus=receipt.read();let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(!owned);
+   await step(()=>pending[terminal]());
+   const final=owned&&terminal==='rollback'?0:7;
+   expect(source()).toEqual(value(final));expect(ui()).toBe(final);expect(sent).toEqual([value(final)]);expect(settled).toBe(true);await wait;
+-  expect(receipt.read().state).toBe('started');if(!owned)expect(receipt.read()).toEqual(initialStatus);
++  expect(receipt.read().state).toBe(owned?'no-write':'started');expect(receipt.read()).toEqual(initialStatus);
+   const terminalStatus=receipt.read();expect(Reflect.set(terminalStatus,'state','forged')).toBe(false);
+   c.dispose();
+   await step(()=>source.x(99));expect(ui()).toBe(99);
+@@ -53,14 +53,31 @@
+   expect(calls).toBe(0);await step(()=>{});expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});
+  }finally{c.dispose();unmount();tree.destroy();owner.destroy();}
+ });
+-it('React branch disposed held receipt releases waiter without settling owner',async()=>{
++it('React branch no-write receipt retains older pending work until disposal',async()=>{
+  const {tree,source,owner,sent,c,unmount}=await setup();let receipt:Receipt|undefined;
+  try{
+   let pending!:ReturnType<typeof tree.transact>;await step(()=>{pending=tree.transact(()=>source.x(7));});const before=pending.inspect();
+   await step(()=>{receipt=c.declare({kind:'independent'},()=>source(value(7)));});
+-  expect(sent).toEqual([]);if(!receipt)throw Error('missing receipt');expect(['held','conservative']).toContain(receipt.read().state);
++  expect(sent).toEqual([]);if(!receipt)throw Error('missing receipt');expect(receipt.read()).toEqual({state:'no-write'});
+   let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(false);
+-  c.dispose();await step(()=>{});expect(settled).toBe(true);await wait;expect(receipt.read()).toEqual({state:'disposed'});expect(pending.inspect()).toEqual(before);expect(source.x()).toBe(7);
+-  await step(()=>pending.rollback());expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});
+- }finally{console.info('DECLARATION-QUALIFICATION',JSON.stringify({case:'React branch/held-dispose',sent,receipt:receipt?.read()}));c.dispose();unmount();tree.destroy();owner.destroy();}
++  c.dispose();await step(()=>{});expect(settled).toBe(true);await wait;expect(receipt.read()).toEqual({state:'no-write'});expect(pending.inspect()).toEqual(before);expect(source.x()).toBe(7);
++  await step(()=>pending.rollback());expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});
++ }finally{console.info('DECLARATION-QUALIFICATION',JSON.stringify({case:'React branch/no-write-dispose',sent,receipt:receipt?.read()}));c.dispose();unmount();tree.destroy();owner.destroy();}
+ });
++it('React genuinely authored dependent branch receipt disposes while native UI stays current',async()=>{
++ const tree=signalTree({pair:{x:0,y:0},z:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(tree.$.pair,{set:v=>{sent.push(v);}});const hook=renderHook(()=>useSignalTree(tree,$=>$.pair.x()));
++ try{
++  let p!:ReturnType<typeof tree.transact>;await step(()=>{p=tree.transact(()=>tree.$.z(7));});const before=p.inspect();
++  let calls=0;let receipt:ReturnType<typeof c.declare>|undefined;
++  await step(()=>{receipt=c.declare({kind:'dependent',owners:[p]},()=>{calls++;tree.$.pair({x:tree.$.z(),y:0});});});
++  if(!receipt)throw Error('missing authored receipt');
++  expect(calls).toBe(1);expect(tree.$()).toEqual({pair:value(7),z:7});expect(hook.result.current).toBe(7);expect(p.inspect()).toEqual(before);expect(sent).toEqual([]);
++  const held=receipt.read();expect(held).toEqual({state:'held',reason:'pending-dependency'});expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(held)).toBe(true);
++  let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(false);
++  c.dispose();await step(()=>{});await wait;expect(settled).toBe(true);expect(receipt.read()).toEqual({state:'disposed'});expect(Object.isFrozen(receipt.read())).toBe(true);
++  expect(held).toEqual({state:'held',reason:'pending-dependency'});expect(p.inspect()).toEqual(before);expect(tree.$()).toEqual({pair:value(7),z:7});expect(hook.result.current).toBe(7);expect(sent).toEqual([]);
++  await step(()=>p.rollback());expect(tree.$()).toEqual({pair:value(7),z:0});expect(hook.result.current).toBe(7);expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});
++  await step(()=>tree.$.pair.x(9));expect(hook.result.current).toBe(9);await step(()=>{});expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});
++ }finally{c.dispose();hook.unmount();tree.destroy();}
++});

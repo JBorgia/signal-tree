@@ -1,0 +1,18 @@
+{
+  "tsconfig.node16.json": {
+    "original": "/private/tmp/st-c23-public-packed-proof/consumer/tsconfig.node16.json",
+    "sha256": "60d1cd03195bc6645a6cafa50afbce8d9725005cdb53f3a593aa9e2cb624c7b6"
+  },
+  "runtime.mjs": {
+    "original": "/private/tmp/st-c23-public-packed-proof/consumer/runtime.mjs",
+    "sha256": "e22130d6a79be55d65cf01c8cbd3fc2d8db82d11050f4357b419053a7617c04c"
+  },
+  "tsconfig.bundler.json": {
+    "original": "/private/tmp/st-c23-public-packed-proof/consumer/tsconfig.bundler.json",
+    "sha256": "b44b64979fa830100f23c698846ecf3d2aedeae97c7891900c1c3a94c001fb62"
+  },
+  "src/public-declare.ts": {
+    "original": "/private/tmp/st-c23-public-packed-proof/consumer/src/public-declare.ts",
+    "sha256": "639a3a5ed8d713703d88d10149667f08195f6c4b5fe6c085f0de1af4c2f8cee7"
+  }
+}

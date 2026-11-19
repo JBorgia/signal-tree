@@ -1,0 +1,15 @@
+{
+  "number": 8,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "fullName": "entityMap \u2014 collection queries are lazily derived (13.5.0) a single-entity update does not rebuild the collection",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 9 skipped (10)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 2.5555858612060547
+}

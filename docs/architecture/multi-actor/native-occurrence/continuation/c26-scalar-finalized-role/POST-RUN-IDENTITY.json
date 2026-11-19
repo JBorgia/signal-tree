@@ -1,0 +1,28 @@
+{
+  "candidateManifest": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+  "candidateAllMatch": true,
+  "C25AllMatch": true,
+  "files": 3083,
+  "workerRunResults": {
+    "first-gate": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "first-gate-complete": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "unchanged-focused": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "source-types": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

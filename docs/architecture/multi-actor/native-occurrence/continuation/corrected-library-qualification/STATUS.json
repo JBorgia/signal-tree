@@ -1,0 +1,37 @@
+{
+  "phase": "library functional partition closed with one preserved assertion failure; source preserved before approved app overlay",
+  "runningSession": null,
+  "counts": {
+    "ordinaryPassed": 7177,
+    "expectedFailureSuccesses": 5,
+    "unexpectedFailed": 1,
+    "skipped": 12,
+    "uniqueFiles": 652,
+    "focusedReusedCases": 79,
+    "I4ReusedCases": 13,
+    "expectedFailureIdentities": [
+      {
+        "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+        "title": "4. transaction rolls back \u2014 effects become rolled-back, not committed"
+      },
+      {
+        "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+        "title": "6. committed effect + later rolled-back transaction => partial"
+      },
+      {
+        "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+        "title": "10. SUB-PREDICTION A: one transaction may contain two provenance scopes"
+      },
+      {
+        "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+        "title": "12. a reversal names its cause and does not implicate the other scope"
+      },
+      {
+        "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/open-key-reachability.spec.ts",
+        "title": "a promised arbitrary descendant is a usable location"
+      }
+    ],
+    "deduplicatedUnionExact": true
+  },
+  "heavySlot": "exclusive"
+}

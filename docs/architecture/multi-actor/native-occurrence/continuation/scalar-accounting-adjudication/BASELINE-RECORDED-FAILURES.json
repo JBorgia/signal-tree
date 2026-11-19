@@ -1,0 +1,130 @@
+{
+  "identities": {
+    "predecessor": {
+      "source": "/private/tmp/st-native-explicit-handoff-successor/candidate",
+      "manifestSha256": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+      "dependencies": "/private/tmp/v16-transition-qualification/node_modules",
+      "versions": {
+        "nx": "23.1.0",
+        "vitest": "4.1.9",
+        "typescript": "6.0.3",
+        "@angular/core": "22.0.7",
+        "react": "19.2.8",
+        "vue": "3.5.42",
+        "solid-js": "1.9.15"
+      }
+    },
+    "successor": {
+      "source": "/private/tmp/st-prepared-paired-successor/candidate",
+      "manifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+      "dependencies": "/private/tmp/v16-transition-qualification/node_modules",
+      "versions": {
+        "nx": "23.1.0",
+        "vitest": "4.1.9",
+        "typescript": "6.0.3",
+        "@angular/core": "22.0.7",
+        "react": "19.2.8",
+        "vue": "3.5.42",
+        "solid-js": "1.9.15"
+      }
+    }
+  },
+  "cases": [
+    {
+      "before": {
+        "project": "kernel",
+        "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "fullName": "rollback of a collection omission refuses, typed, when the collection changed while omitted (restoration first)",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts:545:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "fixtureClass": "unchanged"
+      },
+      "after": {
+        "project": "kernel",
+        "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "fullName": "rollback of a collection omission refuses, typed, when the collection changed while omitted (restoration first)",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts:545:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "fixtureClass": "unchanged"
+      }
+    },
+    {
+      "before": {
+        "project": "kernel",
+        "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "fullName": "rollback of a collection omission refuses, typed, when the collection changed while omitted (transactions alone)",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts:545:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "fixtureClass": "unchanged"
+      },
+      "after": {
+        "project": "kernel",
+        "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "fullName": "rollback of a collection omission refuses, typed, when the collection changed while omitted (transactions alone)",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts:545:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "fixtureClass": "unchanged"
+      }
+    },
+    {
+      "before": {
+        "project": "kernel",
+        "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "fullName": "rollback of a collection omission refuses, typed, when the collection changed while omitted (transactions first)",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts:545:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "fixtureClass": "unchanged"
+      },
+      "after": {
+        "project": "kernel",
+        "file": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+        "fullName": "rollback of a collection omission refuses, typed, when the collection changed while omitted (transactions first)",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected 'SignalTree could not rollback the pen\u2026' to match /later-confirmed-dependency/\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts:545:40\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        ],
+        "fixtureClass": "unchanged"
+      }
+    },
+    {
+      "before": {
+        "project": "kernel",
+        "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+        "fullName": "Complexity guard: production scalar substrate proves compiled scalar reads and writes stay constant in logical work",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected { slotReads: +0, slotWrites: 1, \u2026(19) } to deeply equal { slotReads: 1, slotWrites: 1, \u2026(19) }\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts:1133:23\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+        ],
+        "fixtureClass": "unchanged"
+      },
+      "after": {
+        "project": "kernel",
+        "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+        "fullName": "Complexity guard: production scalar substrate proves compiled scalar reads and writes stay constant in logical work",
+        "duplicateOrdinal": 1,
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected { slotReads: +0, slotWrites: 1, \u2026(19) } to deeply equal { slotReads: 1, slotWrites: 1, \u2026(19) }\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts:1133:23\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+        ],
+        "fixtureClass": "unchanged"
+      }
+    }
+  ]
+}

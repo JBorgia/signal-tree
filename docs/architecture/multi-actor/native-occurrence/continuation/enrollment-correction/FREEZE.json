@@ -1,0 +1,51 @@
+{
+  "frozen": true,
+  "baseManifestSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+  "manifestSha256": "ae2d5bb7b2be7fe06cadc5bd09c1bba531ca9e305739ca2d06fad238cd5b4378",
+  "files": 3054,
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/recipient-source-permission.spec.ts"
+  ],
+  "patches": {
+    "runtime.patch": "1636a26aa6257c248f416f98f120ebbda9c7d24069d24f9663c51362c9843fa2",
+    "tests.patch": "aca2003a6d2172f1241923c8cf827b2aeef6e3fbba5a4249537506706e923233",
+    "FROM-C12.patch": "fb2e0b8fa56396febe1f2e0434b9c798b0c3b8005d8e29b13c07e3cdd135e902"
+  },
+  "patchApplyVerified": true,
+  "baseSourceUnchanged": true,
+  "results": {
+    "discriminators": {
+      "exit": 0,
+      "elapsedSeconds": 11.036672749905847,
+      "source_unchanged": true
+    },
+    "original-enrollment": {
+      "exit": 0,
+      "elapsedSeconds": 13.00349183299113,
+      "source_unchanged": true
+    },
+    "retained-first-failures": {
+      "exit": 1,
+      "elapsedSeconds": 7.21617791603785,
+      "source_unchanged": true
+    },
+    "source-types": {
+      "exit": 0,
+      "elapsedSeconds": 8.343804584001191,
+      "source_unchanged": true
+    },
+    "spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 25.887852084008045,
+      "source_unchanged": true
+    },
+    "uncertainty-horizon-retirement": {
+      "exit": 0,
+      "elapsedSeconds": 9.25120433291886,
+      "source_unchanged": true
+    }
+  },
+  "requiredSemanticMerge": "Scalar observeRevision must initialize declared:false. Verify private.allowed/admit/started and combined original scalar invalidation safety plus six progress; text merge is insufficient."
+}

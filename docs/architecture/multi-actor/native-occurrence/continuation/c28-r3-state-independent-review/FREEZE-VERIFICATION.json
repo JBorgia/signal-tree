@@ -1,0 +1,9 @@
+{
+  "BASE-MANIFEST.json": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "MANIFEST.json": "b528cc06421748f41b570e45ad841786c565dece483cd306922a0e77b49a21b7",
+  "runtime.patch": "d82886f6eea6aa5b8f5036f43197d321e6b4817c2079ca6ad1e0feaba119f645",
+  "runs/repaired-two-first/first.log": "fba1746f3196f728ae0df3d6fe0a25ec3d8a4efd15c01cb4cd4e7699fc6061af",
+  "runs/baseline-stale-first/first.log": "4573022391494303ea0e2ba758fe048b6e809374102851613b3c3a3c651a93e0",
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "097f45acbce6dea82c4e984464780ac1ce1bb2539a6731df11c338a01ba73dc7",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "472604e60240ae135f77c11968669d6e0f8321df4137399fd8fb685eb54569f1"
+}

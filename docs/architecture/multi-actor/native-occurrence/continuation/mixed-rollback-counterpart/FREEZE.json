@@ -1,0 +1,10 @@
+{
+  "status": "frozen-test-only-ready-for-composition-review",
+  "baselineEntriesVerified": 3066,
+  "runtimeChanged": false,
+  "specSHA256": "bbbc1db97df42d362bbef97a15afcc3562e4a19fe4fb3a4a0d83004cf1613bec",
+  "manifestSHA256": "09e06aa82c5d5443a65ccec7d7b180f1df51a8eaad15c50006a866a7e5fd7c0c",
+  "patchSHA256": "17706d6c7747e2e35b880b9042345aac96bfe9cde8bfdc79b3f2cfa98cca2a4e",
+  "independentPremiseReview": "/private/tmp/st-mixed-rollback-test-premise-review/CONCRETE-COUNTERPART-REVIEW.md",
+  "independentFinalReview": "/private/tmp/st-mixed-rollback-test-premise-review/FIXTURE-CLEANUP-ADDENDUM.md"
+}

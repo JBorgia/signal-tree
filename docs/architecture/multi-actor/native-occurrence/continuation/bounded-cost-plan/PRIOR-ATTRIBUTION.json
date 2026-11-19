@@ -1,0 +1,432 @@
+{
+  "total": 14200,
+  "identical_histograms_at_both_sizes": true,
+  "modules": {
+    "lib/experimental-publication/entity.ts": 5000,
+    "lib/internals/entity-publication.ts": 2800,
+    "lib/entity-signal.ts": 2600,
+    "lib/internals/intrinsic-mutation.ts": 1200,
+    "lib/experimental-publication/private.ts": 1000,
+    "lib/internals/utilities/deep-equal.ts": 800,
+    "lib/internals/location-runtime.ts": 600,
+    "lib/physical/entity-value-store.ts": 200,
+    "lib/experimental-publication/lifecycle.ts": 0
+  },
+  "operators": {
+    "Array.Symbol(Symbol.iterator)": 6200,
+    "Map.Symbol(Symbol.iterator)": 2000,
+    "Array.map": 1600,
+    "Object.keys": 1200,
+    "Array.push": 1200,
+    "Array.filter": 1200,
+    "Set.Symbol(Symbol.iterator)": 400,
+    "Array.slice": 200,
+    "Array.find": 200,
+    "Array.some": 0,
+    "Array.every": 0
+  },
+  "sites": [
+    {
+      "module": "lib/internals/intrinsic-mutation.ts",
+      "site": "    at combineTerminalRecords (packages/kernel/src/lib/internals/intrinsic-mutation.ts:20:25)",
+      "operation": "Array.filter",
+      "visits": 1200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at AdmissionMetadata.array (packages/kernel/src/lib/internals/entity-publication.ts:76:16)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 800
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at AdmissionMetadata.edit (packages/kernel/src/lib/internals/entity-publication.ts:64:123)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 600
+    },
+    {
+      "module": "lib/internals/utilities/deep-equal.ts",
+      "site": "    at equalsInner (packages/kernel/src/lib/internals/utilities/deep-equal.ts:228:24)",
+      "operation": "Object.keys",
+      "visits": 400
+    },
+    {
+      "module": "lib/internals/utilities/deep-equal.ts",
+      "site": "    at equalsInner (packages/kernel/src/lib/internals/utilities/deep-equal.ts:229:24)",
+      "operation": "Object.keys",
+      "visits": 400
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at rowViews (packages/kernel/src/lib/experimental-publication/entity.ts:106:108)",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:119:29)",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at rowFields (packages/kernel/src/lib/experimental-publication/entity.ts:105:126)",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:153:66)",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2371:16)",
+      "operation": "Object.keys",
+      "visits": 200
+    },
+    {
+      "module": "lib/physical/entity-value-store.ts",
+      "site": "    at EntityValueStore.prepareValueTransition (packages/kernel/src/lib/physical/entity-value-store.ts:70:18)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1171:16)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1269:17)",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1281:16)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1281:16)",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at prepareOrdinaryTopology (packages/kernel/src/lib/entity-signal.ts:1343:32)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2563:28)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at authoredFootprint (packages/kernel/src/lib/entity-signal.ts:2501:66)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at commitExistingSubjectValue (packages/kernel/src/lib/entity-signal.ts:2564:119)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at prepareEntityPublication (packages/kernel/src/lib/entity-signal.ts:2525:411)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at packages/kernel/src/lib/entity-signal.ts:2525:464",
+      "operation": "Array.slice",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at AdmissionMetadata.prepare (packages/kernel/src/lib/internals/entity-publication.ts:85:31)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at packages/kernel/src/lib/internals/entity-publication.ts:89:126",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:97:17)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:97:70)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:97:53)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:98:39)",
+      "operation": "Array.find",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:109:17)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:118:19)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:124:17)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:140:19)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:154:19)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:165:27)",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:165:18)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:165:22)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:165:70)",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:166:27)",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:166:18)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:166:22)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/entity.ts",
+      "site": "    at Object.prepare (packages/kernel/src/lib/experimental-publication/entity.ts:166:69)",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:234:37)",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:248:62)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at EntityPublicationSource.prepare (packages/kernel/src/lib/internals/entity-publication.ts:248:62)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at Object.finalize (packages/kernel/src/lib/internals/entity-publication.ts:253:20)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/private.ts",
+      "site": "    at suppliedViews (packages/kernel/src/lib/experimental-publication/private.ts:98:76)",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/private.ts",
+      "site": "    at nativeInputs (packages/kernel/src/lib/experimental-publication/private.ts:112:50)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/private.ts",
+      "site": "    at nativeInputs (packages/kernel/src/lib/experimental-publication/private.ts:112:13)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/private.ts",
+      "site": "    at nativeInputs (packages/kernel/src/lib/experimental-publication/private.ts:112:13)",
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/private.ts",
+      "site": "    at nativeInputs (packages/kernel/src/lib/experimental-publication/private.ts:112:80)",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/location-runtime.ts",
+      "site": "    at publish (packages/kernel/src/lib/internals/location-runtime.ts:403:18)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/location-runtime.ts",
+      "site": "    at Object.runInvalidationGroup (packages/kernel/src/lib/internals/location-runtime.ts:421:32)",
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/location-runtime.ts",
+      "site": "    at packages/kernel/src/lib/internals/location-runtime.ts:385:20",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at complete (packages/kernel/src/lib/entity-signal.ts:2588:17)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/internals/entity-publication.ts",
+      "site": "    at EntityPublicationSource.complete (packages/kernel/src/lib/internals/entity-publication.ts:270:16)",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "module": "lib/entity-signal.ts",
+      "site": "    at updateOnePrivate (packages/kernel/src/lib/entity-signal.ts:2389:20)",
+      "operation": "Object.keys",
+      "visits": 200
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:157:34)",
+      "operation": "Array.map",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:158:38)",
+      "operation": "Array.map",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:170:44)",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:173:59)",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:173:90)",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:174:18)",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeProof (packages/kernel/src/lib/experimental-publication/lifecycle.ts:174:49)",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at Module.finalizeNativeRequirement (packages/kernel/src/lib/experimental-publication/lifecycle.ts:205:50)",
+      "operation": "Array.filter",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at captureNativeInput (packages/kernel/src/lib/experimental-publication/lifecycle.ts:153:70)",
+      "operation": "Array.filter",
+      "visits": 0
+    },
+    {
+      "module": "lib/internals/intrinsic-mutation.ts",
+      "site": "    at Object.source.publicationInputCapture (packages/kernel/src/lib/internals/intrinsic-mutation.ts:321:30)",
+      "operation": "Array.map",
+      "visits": 0
+    },
+    {
+      "module": "lib/internals/location-runtime.ts",
+      "site": "    at packages/kernel/src/lib/internals/location-runtime.ts:392:44",
+      "operation": "Array.push",
+      "visits": 0
+    },
+    {
+      "module": "lib/experimental-publication/lifecycle.ts",
+      "site": "    at nativeRequirementReady (packages/kernel/src/lib/experimental-publication/lifecycle.ts:121:123)",
+      "operation": "Array.every",
+      "visits": 0
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "files": {
+    "CONTRACT-ADJUDICATION.md": "0e9eff4bba29871ddb289f15b5a530c97813911ca87c50a651bef1394ea9f180",
+    "DESIGN.md": "5a4ba267eb9a5246b16a446fd90380b76abc1af689b976bd47ab181c15786bb9",
+    "DISCRIMINATORS.md": "e8a161283e4648face63b51593ed6a544560a15dc847e56f81d63b0e1f0c0d76",
+    "FRAME-CALLERS.txt": "a97df84c6686f2f8d560e480d4d50e4b89bf786d9453a7352d4c6729eb196382",
+    "PREDECESSOR-SPEC-TYPES.log": "5d0c81494f12dfecd75831082743fe864208e23afb01c6b358d4cd09aaaac200",
+    "REVIEW-REQUEST.md": "6170c5f9083b0fb2c061afe9c21caf4d764aa351ac9690d80e981bef990d08ca",
+    "fixture-emit-results.json": "660e38e75741449aa95331bf9b723b071026ec18cab9b6cebfe295db7d72e7c4",
+    "fixture-only.patch": "fb56dff86a8a1c6945f973d2fc1ebe174b7f7e95187b439f267ab0215ae94053"
+  },
+  "sourceManifestSha256": "80a0116269b26af939f775b9a10ff8a79d99b6e9b556a17b05137ab5e3f67502",
+  "status": "design-only frozen for Faraday quick mechanism review; no runtime patch"
+}

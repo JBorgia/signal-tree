@@ -1,0 +1,14 @@
+{
+  "focusedRun": {
+    "absoluteSeconds": 180
+  },
+  "build": {
+    "noOutputSeconds": 180,
+    "absoluteSeconds": 900
+  },
+  "artifactCommands": {
+    "noOutputSeconds": 180,
+    "absoluteSeconds": 300
+  },
+  "timeout": "TERM then KILL only owned process group"
+}

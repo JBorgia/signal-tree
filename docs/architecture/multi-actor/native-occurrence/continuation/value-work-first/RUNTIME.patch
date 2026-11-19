@@ -1,0 +1,132 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -25,7 +25,27 @@
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+ type CollectionSupport={occurrence:OccurrenceHandle;payload:unknown;relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>};
+ type LegacyScalar={value:unknown;relative:readonly string[];revision:number};
+-type Binding={legacyScalars:LegacyScalar[];index:RecipientOccurrences;occurrences:Map<object,OccurrenceHandle>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
++type SelectedProjection=Readonly<{fact:Fact;payload:unknown;workEpoch:number}>;
++type ProjectionReceipt=SelectedProjection & Readonly<{changed:boolean}>;
++// Prepared Binding wrappers share this recipient-owned handoff state.
++type DeliveryState={produced:number;taken:number;reducing:boolean;projected?:SelectedProjection};
++const receiptOwners=new WeakMap<ProjectionReceipt,DeliveryState>();
++function selectProjection(b:Binding,fact:Fact,payload:unknown,changed:boolean):void {
++ if(changed)b.delivery.produced++;
++ b.delivery.projected=Object.freeze({fact,payload,workEpoch:b.delivery.produced});
++}
++function selectedReceipt(channel:object):ProjectionReceipt|undefined {
++ const live=bindings.get(channel),selected=live?.delivery.projected;
++ if(!live||live.delivery.reducing||live.pending.size||!selected||selected.fact!==live.current)return;
++ const receipt=Object.freeze({...selected,changed:selected.workEpoch>live.delivery.taken});
++ receiptOwners.set(receipt,live.delivery);return receipt;
++}
++/** Transfer only the captured prefix after Link has adopted it without callbacks. */
++export function acknowledgeProjection(channel:object,receipt:ProjectionReceipt):void {
++ const delivery=bindings.get(channel)?.delivery;
++ if(delivery&&receiptOwners.get(receipt)===delivery)delivery.taken=Math.max(delivery.taken,receipt.workEpoch);
++}
++type Binding={legacyScalars:LegacyScalar[];index:RecipientOccurrences;occurrences:Map<object,OccurrenceHandle>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;delivery:DeliveryState;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+ const ownProofs=new WeakMap<Fact,Proof>();
+@@ -235,6 +255,9 @@
+  if(failed)throw first;
+ }
+ function ready(channel:object,b:Binding):void{
++ if(b.delivery.reducing)return;
++ b.delivery.reducing=true;
++ try{
+  for(const unit of b.pending){
+   if(!unit.complete)break;
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+@@ -292,11 +315,12 @@
+    // is already current. That setter may collapse to this exact revision.
+    const predecessor=effectivePredecessor(unit.previous);
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+-   b.projected=Object.freeze({fact:unit.fact,changed:unit.changed,payload:support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined)});
++   selectProjection(b,unit.fact,support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined),unit.changed);
+   }
+   unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+  if(!b.pending.size)drainLegacyScalars(channel,b);
++ }finally{b.delivery.reducing=false;}
+ }
+ function wakeChannel(channel:object):void{queueMicrotask(()=>{const b=bindings.get(channel);if(b)ready(channel,b);callbacks.get(channel)?.();});}
+ function captureValueInput(channel:object,field?:object):object|undefined{const b=bindings.get(channel);if(!b)return;const info=field&&b.fields.get(field);const states=info?presenceForField(b,info.address):[...b.presence.values()];const absent=states.filter(state=>!state.present);return {facts:Object.freeze(absent.length?absent.map(state=>state.fact):[b.baselineStructure,field?b.fieldFacts.get(field)!:b.valueFact,...states.map(state=>state.fact)])};}
+@@ -389,7 +413,7 @@
+  const index=new RecipientOccurrences(()=>{
+   if(bindings.get(channel)?.index!==index)return;
+   const current=bindings.get(channel)!;
+-  if(current.projected&&current.current===current.projected.fact){
++  if(current.delivery.projected&&current.current===current.delivery.projected.fact){
+    const support=projectionSupport(current);
+    proofs.set(current.current,lifecycle.projectRevision(channel,current.current,support.proof,index.unresolved()!==0));
+   }
+@@ -400,7 +424,7 @@
+   if(!binding.presence.has(slot))binding.presence.set(slot,state);if(!binding.completedPresence.has(slot))binding.completedPresence.set(slot,state);indexSlot(binding,slot);
+   return proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);};
+  });
+- const binding:Binding={legacyScalars:[],index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
++ const binding:Binding={delivery:{produced:0,taken:0,reducing:false},legacyScalars:[],index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
+  if(identity.supported&&source){
+   const enroll=(node:object)=>{const occurrence=index.enroll(node);binding.occurrences.set(node,occurrence);return occurrence;};
+   enroll(source);
+@@ -499,10 +523,10 @@
+  lifecycle.observeRevision(channel,fact,proof,b.index.unresolved()!==0);
+  b.valuePayload=payload;
+  if(b.current)lifecycle.supersede(channel,b.current);
+- b.current=fact;b.projected=Object.freeze({fact,payload:support.present?(b.aggregate?maskPayload(b):payload):undefined,changed:true});
++ b.current=fact;selectProjection(b,fact,support.present?(b.aggregate?maskPayload(b):payload):undefined,true);
+  return fact;
+ }
+-export function refreshSource(channel:object):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined{const b=bindings.get(channel);if(b)ready(channel,b);return b?.projected&&b.projected.fact===b.current?b.projected:undefined;}
++export function refreshSource(channel:object):ProjectionReceipt|undefined{const b=bindings.get(channel);if(b)ready(channel,b);return selectedReceipt(channel);}
+ export function pendingWork(channel:object):readonly Promise<void>[]{return [...(bindings.get(channel)?.pending??[])].map(x=>x.promise);}
+ 
+ // Native scope admission is independent of recipient registration and disposal.
+@@ -526,9 +550,9 @@
+   project(channel,undefined,applyAtRelativePath(b.valuePayload,contribution.relative,contribution.value),contribution.relative);
+  }
+ }
+-export function projectScalarContribution(channel:object,value:unknown,relative:readonly string[],revision:number):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined {
++export function projectScalarContribution(channel:object,value:unknown,relative:readonly string[],revision:number):ProjectionReceipt|undefined {
+  const b=bindings.get(channel);if(!b)return;
+  b.legacyScalars.push({value,relative,revision});
+  ready(channel,b);
+- return b.projected&&b.projected.fact===b.current?b.projected:undefined;
+-}
++ return selectedReceipt(channel);
++}
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -825,7 +825,7 @@
+           if(scalarPublicationCovers(contribution.meta,consequenceKey) ||
+              !research.scalarContributionIsCurrent(consequenceKey,relative,contribution.revision))continue;
+           const receipt=research.projectScalarContribution(consequenceKey,contribution.value,relative,contribution.revision);
+-          if(receipt){eligible=receipt.payload as T;researchFact=receipt.fact;}
++          if(receipt)adoptResearchProjection(receipt);
+         }
+       }else{
+         researchFact = relative.length === 0 ? research.evidence(meta) : undefined;
+@@ -1043,12 +1043,16 @@
+     );
+     observeLink();
+   };
++  function adoptResearchProjection(receipt:NonNullable<ReturnType<typeof research.refreshSource>>):void {
++    // Callback-free ownership transfer. Support changes never clear Link's work.
++    researchFact=receipt.fact;
++    eligible=receipt.payload as T;
++    if(receipt.changed)dirty=true;
++    research.acknowledgeProjection(consequenceKey,receipt);
++  }
+   const researchRefresh = (): void => {
+-    const receipt = research.refreshSource(consequenceKey);
+-    if (!receipt || receipt.fact === researchFact) return;
+-    researchFact = receipt.fact;
+-    eligible = receipt.payload as T;
+-    if(receipt.changed !== false) dirty = true;
++    const receipt=research.refreshSource(consequenceKey);
++    if(receipt)adoptResearchProjection(receipt);
+   };
+   const offFlush = notifier.onFlush?.(() => {
+     researchRefresh();

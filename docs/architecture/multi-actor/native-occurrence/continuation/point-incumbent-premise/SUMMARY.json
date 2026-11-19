@@ -1,0 +1,21 @@
+{
+  "incumbentCommit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "countsAtBothPopulations": 800,
+  "perUpdate": 4,
+  "allEventsEqualBetweenPopulations": true,
+  "originalCounterAndAttributedCounterAgree": true,
+  "C21Unmodified": {
+    "count": 13800,
+    "perUpdate": 69,
+    "deltaFromIncumbent": 13000
+  },
+  "frozenA": {
+    "count": 13000,
+    "perUpdate": 65,
+    "deltaFromIncumbent": 12200
+  },
+  "sourceUnchanged": true,
+  "snapshotSha256": "b1d6437abcbf295f17275949ca25c4c163f42cdf283b0a4652b1285d89e33506",
+  "testsPassed": 4,
+  "unrelatedFiltered": 9
+}

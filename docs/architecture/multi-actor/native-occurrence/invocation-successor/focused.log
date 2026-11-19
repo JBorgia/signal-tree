@@ -1,0 +1,43 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts
+
+(node:20594) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-invocation-successor/candidate/packages/kernel
+
+(node:20609) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20608) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  5 passed (5)
+      Tests  25 passed (25)
+   Start at  13:59:59
+   Duration  1.16s (transform 2.70s, setup 0ms, import 3.47s, tests 175ms, environment 1.44s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack",
+    "pnpm",
+    "nx",
+    "run-many",
+    "-t",
+    "build",
+    "--projects=kernel,angular,react,vue,solid",
+    "--parallel=1",
+    "--skip-nx-cache",
+    "--outputStyle=stream"
+  ],
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate",
+  "settings": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "NODE_OPTIONS": "--require=/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/diagnostic-redirect.cjs --report-on-signal --report-signal=SIGUSR2 --report-exclude-env --report-exclude-network --report-directory=/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/reports --require=/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/report-ready.cjs",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/nx-data",
+    "TMPDIR": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/tmp",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/observations",
+    "ST_BUILD_DIAGNOSTIC": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/run"
+  },
+  "noProgressSeconds": 180,
+  "postEmissionIdleSeconds": 30,
+  "idleCpuMaxDeltaSeconds": 0.2,
+  "oneReportPerPidBirth": true,
+  "progressDefinition": "changed nonempty streamed build output excluding Node report-writing messages; emission belongs to exact named package; diagnostic messages do not reset deadline"
+}

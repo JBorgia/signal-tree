@@ -1,0 +1,21 @@
+{
+  "id": "heap-populated-1000-selected-sample1",
+  "ordinal": 65,
+  "profile": "heap-populated",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample1",
+  "exit": 0,
+  "pid": 71015,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 1.3034543340327218,
+  "telemetrySamples": 2,
+  "maxObservedOwnedRssBytes": 176029696,
+  "minimumObservedHostFreePercentage": 42.0,
+  "attempts": 1
+}

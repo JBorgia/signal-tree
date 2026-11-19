@@ -1,0 +1,12 @@
+{
+  "calls": 1,
+  "after": {
+    "id": "a",
+    "z": 99
+  },
+  "sameSupport": true,
+  "afterAdoptionReject": {
+    "id": "a",
+    "z": 7
+  }
+}

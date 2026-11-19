@@ -1,0 +1,26 @@
+✔ primary failure survives every cleanup and reporting failure (0.738541ms)
+✔ cleanup failure after successful assertions remains a failed test (0.076791ms)
+✔ review is immutable, detached, unforgeable locally, and invalidated by revision (1.165417ms)
+✔ backend rejects reviewed operation after a relevant human edit, including ABA (0.796084ms)
+✔ two agents and human independently edit the same entity; rejection preserves later work (0.55775ms)
+✔ explicit read dependencies reject a proposal when an external input changes (0.965209ms)
+✔ lost acknowledgment is uncertain; retry keeps command identity and applies once (0.6825ms)
+✔ explicit unknown UI actor remains unknown through asynchronous delivery (0.29725ms)
+✔ definitive persistence failure does not install state or report success (0.148916ms)
+✔ server permission revocation overrides local approval (0.086166ms)
+✔ unrelated acknowledgment cannot mark success; backend rejects key reuse (0.141917ms)
+✔ unsupported proposal data is rejected before recording or revising (0.382917ms)
+✔ external snapshots and reviews cannot mutate operation or accepted state (0.149542ms)
+✔ forget and dispose refuse unresolved work and release terminal records (1.2605ms)
+✔ adapter reentry cannot duplicate an in-flight attempt (0.746917ms)
+✔ synchronous transport throw cannot be interpreted as definitive rejection (0.631417ms)
+✔ an approved operation cannot be changed through a retained draft reference (0.18375ms)
+✔ permission rejection and lost acknowledgment remain distinct terminal outcomes (0.214917ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 44.59775

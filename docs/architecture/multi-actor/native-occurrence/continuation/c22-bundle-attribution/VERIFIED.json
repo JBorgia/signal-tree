@@ -1,0 +1,8 @@
+{
+  "C22MatchesOriginalFreshBuild": true,
+  "artifactsUnchangedAcrossGraphs": true,
+  "fixtureResults": 8,
+  "baselineNxSuccessReceipt": true,
+  "baselineWaitpidExit": null,
+  "baselineSupervisor": "sandbox ps failure before ownership registration; adopt attempt found launcher already exited; external census confirms attested three PIDs gone; no retry"
+}

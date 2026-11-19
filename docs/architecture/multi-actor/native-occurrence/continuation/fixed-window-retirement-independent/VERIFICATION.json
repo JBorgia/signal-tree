@@ -1,0 +1,21 @@
+{
+  "authorManifestFilesVerified": 2975,
+  "allAuthorFreezeFilesUnchanged": true,
+  "allRuntimeIdentical": true,
+  "onlyInheritedTestChange": "diagnostic output path; assertions unchanged",
+  "newTestSHA256": "fc27d5b4672c4f786d3fea0485034e1a6197f7204edf1cf0441ecdbdfa102edd",
+  "artifacts": {
+    "REVIEW.md": "3b67578aa96c46e38604dd0d5b981cca0185418de085bd97663338df3117308b",
+    "JOINT-INTERFACE.md": "188c23883bc2ee7bc4f43dc783b1429cf6f3c300bccfd42d9d13c1e134660b66",
+    "COMMANDS.md": "9e12ef31164af17b50efb50e948a7c96c30d298d972bda7ead39e55bd10afd3b",
+    "original-replay.log": "de2c2592210585008c70b726d0fbadec82a06f2456b8c9bf039d2212a3a2b2de",
+    "independent-first.log": "64788bc88e62ede70d4f7efda7e5234d423757c5720d4b46c6e181074ae90a73",
+    "independent-final.log": "2a55496c9bb77be510403c5bda8c434a49197a9570fa43fc028cf00ce49cc368",
+    "independent-complete.log": "a30703f1c0f42927da719063d620e93ffe19742eec03259a2ba3a8f6ab214b16",
+    "source-types.log": "d8af163ddecaad59bc81f108e7dbe2dec278dabd8cfa02390d6b42dac7f45f17",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "review-tests.patch": "36585414f49c91c603edc7dce0bdb3430c7cadee761c4c8da023055a3dee7e11",
+    "output-redirect.patch": "d4f3af76fcd6732c7cd7b4e27ae4a9d21a0a3d4fdb8b18b1be602d07f9d675b0",
+    "first-seven.spec.ts": "0a19aa3d3a14a9a5de428c314a4c8cd13f447e73ae0f483615ca48b2a541ffbd"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "number": 1,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+    "fullName": "entity link ownership controls bare field ignores another row, collection, and tree",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 8 skipped (9)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 8.555447101593018
+}

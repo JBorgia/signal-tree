@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel scalar-native-support.spec.ts parent-proof-safety-falsifier.spec.ts native-certificate-successor.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T18:09:26.357Z",
+    "endTime": "2026-11-02T18:09:31.302Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "3444943085613985301",
+      "startTime": "2026-11-02T18:09:26.435Z",
+      "endTime": "2026-11-02T18:09:31.299Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

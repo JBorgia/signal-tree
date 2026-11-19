@@ -1,0 +1,171 @@
+{
+  "status": "DESIGN_SCOPE_INSUFFICIENT; no new runtime implemented or promoted",
+  "frozenRuntime": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "baselineBranchHead": "9a9770a63bbece5267f6c439270209ccaf9ef3ee",
+  "counter": {
+    "releasedV15": 800,
+    "frozenV16": 13000,
+    "nativePreparePrefix": 5000,
+    "sizes": [
+      2000,
+      20000
+    ],
+    "updates": 200,
+    "originalBound": "<2000 unchanged",
+    "meaning": "Scope floor only if incumbent prefix stays unchanged; not semantic minimum; no prototype result"
+  },
+  "cost": {
+    "children": 24,
+    "valid": 24,
+    "profiles": [
+      "construction",
+      "point",
+      "heap-populated"
+    ],
+    "comparisonSamplesPerArm": 3,
+    "separateReleasedV15AA": 2,
+    "rows": [
+      {
+        "profile": "construction",
+        "metric": "sync_ms",
+        "releasedV15Median": 24.791541000000002,
+        "frozenV16Median": 234.17379200000002,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            24.789042000000002,
+            24.791541000000002,
+            32.558082999999996
+          ],
+          "v16": [
+            234.17379200000002,
+            234.8295,
+            213.884542
+          ]
+        }
+      },
+      {
+        "profile": "construction",
+        "metric": "sync_cpu_ms",
+        "releasedV15Median": 51.68,
+        "frozenV16Median": 434.13,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            51.68,
+            50.28,
+            69.273
+          ],
+          "v16": [
+            434.13,
+            439.716,
+            393.764
+          ]
+        }
+      },
+      {
+        "profile": "construction",
+        "metric": "total_cpu_ms",
+        "releasedV15Median": 51.829,
+        "frozenV16Median": 434.218,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            51.829,
+            50.431,
+            69.584
+          ],
+          "v16": [
+            434.218,
+            439.801,
+            393.887
+          ]
+        }
+      },
+      {
+        "profile": "point",
+        "metric": "sync_ms",
+        "releasedV15Median": 3.029167000000001,
+        "frozenV16Median": 33.31770800000001,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            2.7040000000000006,
+            3.5369580000000056,
+            3.029167000000001
+          ],
+          "v16": [
+            41.096542,
+            33.31770800000001,
+            27.33466700000001
+          ]
+        }
+      },
+      {
+        "profile": "point",
+        "metric": "sync_cpu_ms",
+        "releasedV15Median": 7.408,
+        "frozenV16Median": 62.643,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            6.948,
+            8.593,
+            7.408
+          ],
+          "v16": [
+            81.4,
+            62.643,
+            57.55
+          ]
+        }
+      },
+      {
+        "profile": "point",
+        "metric": "total_cpu_ms",
+        "releasedV15Median": 7.588,
+        "frozenV16Median": 62.895,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            7.146,
+            8.768,
+            7.588
+          ],
+          "v16": [
+            81.735,
+            62.895,
+            62.459
+          ]
+        }
+      },
+      {
+        "profile": "heap-populated",
+        "metric": "live_minus_baseline_bytes",
+        "releasedV15Median": 4726600,
+        "frozenV16Median": 17756736,
+        "direction": "selected-higher",
+        "rawValues": {
+          "v15": [
+            4725192,
+            4726600,
+            4726600
+          ],
+          "v16": [
+            17755624,
+            17756736,
+            17758352
+          ]
+        }
+      }
+    ],
+    "provenanceCorrection": "BASELINE-BINDING-CORRECTION.json; stale copied buildReceipts preserved in original bindings; correct executed roots/manifests verified",
+    "limits": "No new architecture tested; no pending-heap/peak-allocation or semantic parity claim; one heap size;3samples/arm descriptive host evidence"
+  },
+  "tests": {
+    "firstGate": "101 pass,2 failures(originalbound+malformednew7chargecontrol)",
+    "correctedPrefixControl": "2 pass;5000prefixatbothsizes;known7/throwundefined/patchrestorationpass",
+    "semanticOracles": "Incumbent-only baseline evidence;no sparse runtime conformance claim"
+  },
+  "disposition": "GeneralreleaseHOLD; no thresholdwaiver or semantics/productscopechange; no automatic runtime/cost successor"
+}

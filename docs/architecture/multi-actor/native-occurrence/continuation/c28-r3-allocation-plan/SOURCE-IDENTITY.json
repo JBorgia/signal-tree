@@ -1,0 +1,12 @@
+{
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+  "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+  "packages/kernel/src/lib/experimental-publication/entity.ts": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "1fd0ec87c7c10e8f27fd424e48544b44164a5aff548344540a9e83e1f53b187b",
+  "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+  "packages/kernel/src/lib/physical/entity-value-store.ts": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+  "packages/kernel/src/lib/physical/prepare-entity-target.ts": "d0d52d5f0a54f902e72826358896cbead8a282a9bbba2490bff8b1efee1407db",
+  "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f",
+  "packages/kernel/src/enhancers/restoration/restoration.ts": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4"
+}

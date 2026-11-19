@@ -1,0 +1,81 @@
+
+> nx run kernel:test recipient-window-independent.spec.ts recipient-window-review.spec.ts publication-enrollment-invariance.spec.ts aggregate-native-input-independent.spec.ts aggregate-installed-publication.spec.ts publication-evidence-scope-controls.spec.ts collection-contributor-core.spec.ts known-input-contract-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-window-independent.spec.ts recipient-window-review.spec.ts publication-enrollment-invariance.spec.ts aggregate-native-input-independent.spec.ts aggregate-installed-publication.spec.ts publication-evidence-scope-controls.spec.ts collection-contributor-core.spec.ts known-input-contract-review.spec.ts --maxWorkers=1
+
+(node:92912) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-recipient-window-classification-successor/candidate/packages/kernel
+
+(node:92926) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92934) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92935) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92936) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/aggregate-installed-publication.spec.ts (15 tests | 1 failed) 34ms
+     × ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof 4ms
+(node:92937) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92938) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92943) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/aggregate-installed-publication.spec.ts > authorized existing-key branch/root installed publication > ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof
+AssertionError: expected { state: 'validating' } to match object { state: 'conservative', …(1) }
+
+- Expected
++ Received
+
+  {
+-   "reason": "unknown",
+-   "state": "conservative",
++   "state": "validating",
+  }
+
+ ❯ src/lib/aggregate-installed-publication.spec.ts:132:27
+    130|    const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...in…
+    131|    // Historical hold oracle corrected by 75c645eb's explicit recipien…
+    132|    expect(receipt.read()).toMatchObject({state:'conservative',reason:'…
+       |                           ^
+    133|    await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).to…
+    134|    expect(receipt.read()).toMatchObject({state:'started',basis:'surviv…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  1 failed | 66 passed (67)
+   Start at  19:29:41
+   Duration  3.22s (transform 506ms, setup 0ms, import 1.07s, tests 215ms, environment 1.32s)
+
+Warning: command "node tools/run-core-vitest.mjs recipient-window-independent.spec.ts recipient-window-review.spec.ts publication-enrollment-invariance.spec.ts aggregate-native-input-independent.spec.ts aggregate-installed-publication.spec.ts publication-evidence-scope-controls.spec.ts collection-contributor-core.spec.ts known-input-contract-review.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.6s

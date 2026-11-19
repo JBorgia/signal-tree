@@ -1,0 +1,16 @@
+const fs=require('fs'),assert=require('assert/strict');
+const deps='/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/';
+const ts=require(deps+'typescript'),fg=require(deps+'.pnpm/node_modules/fast-glob');
+const root='/private/tmp/st-native-combined-c18/candidate/packages/kernel';
+const s=fs.readFileSync(root+'/vitest.config.ts','utf8'),ast=ts.createSourceFile('config.ts',s,ts.ScriptTarget.Latest,true);let test;
+function visit(n){if(ts.isPropertyAssignment(n)&&n.name.getText(ast)==='test'&&ts.isObjectLiteralExpression(n.initializer))test=n.initializer;ts.forEachChild(n,visit);}visit(ast);assert(test);
+const patterns=name=>{const p=test.properties.find(p=>p.name?.getText(ast)===name);assert(p&&ts.isArrayLiteralExpression(p.initializer));return p.initializer.elements.map(n=>{assert(ts.isStringLiteral(n));return n.text;});};
+const included=fg.sync(patterns('include'),{cwd:root,ignore:patterns('exclude'),onlyFiles:true}).sort();
+assert(included.includes('src/lib/whole-bounded-qualification.spec.ts'));
+assert(included.includes('src/lib/value-work-handoff.spec.ts'));
+for(const n of ['whole-late-getter.spec.ts','whole-mixed-trace.spec.ts'])assert(!included.some(p=>p.endsWith('/'+n)));
+const body=fs.readFileSync(root+'/src/lib/whole-bounded-qualification.spec.ts','utf8');
+assert(body.includes("it('mixed whole refreshes only unowned support while actual owned field holds then rolls back'"));
+assert(body.includes("expect(sent.at(-1)).toEqual([{id:'a',x:0,y:9}])"));
+assert(!/\bit\.(skip|todo|fails|only)\b/.test(body));
+fs.writeFileSync(__dirname+'/discovery.json',JSON.stringify({include:patterns('include'),exclude:patterns('exclude'),discoveredCount:included.length,mixedRollbackLive:true,archivalFilesOutsideCandidate:true,files:included},null,2)+'\n');console.log('Static configured-glob discovery: mixed rollback live; only intended files absent; no test execution.');

@@ -1,0 +1,92 @@
+[
+  {
+    "source": "run-gate.py",
+    "archive": "run-gate.py",
+    "sourceSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  {
+    "source": "RESULTS.md",
+    "archive": "RESULTS.md",
+    "sourceSha256": "46eae56a26c995e0591b87381388b3c51bb6b944ce6e9457f0f81f3cf9ad7e03",
+    "archiveSha256": "46eae56a26c995e0591b87381388b3c51bb6b944ce6e9457f0f81f3cf9ad7e03"
+  },
+  {
+    "source": "COMPOSITION.json",
+    "archive": "COMPOSITION.json",
+    "sourceSha256": "f95a578d58d064a58f84678501239d4b142dd003b855e4b472a2ff09d805c8c4",
+    "archiveSha256": "f95a578d58d064a58f84678501239d4b142dd003b855e4b472a2ff09d805c8c4"
+  },
+  {
+    "source": "SNAPSHOT-C16.json",
+    "archive": "SNAPSHOT-C16.json.gz",
+    "sourceSha256": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+    "archiveSha256": "f2fd12688615fd03844426ebb6caca33bc301ce476890700d81ccc4bd359518a"
+  },
+  {
+    "source": "SEMANTIC-MERGE.md",
+    "archive": "SEMANTIC-MERGE.md",
+    "sourceSha256": "38f87bf664e5f7fe6ea64e4b1c6bedde98168e1300d61732068a048d0a93670a",
+    "archiveSha256": "38f87bf664e5f7fe6ea64e4b1c6bedde98168e1300d61732068a048d0a93670a"
+  },
+  {
+    "source": "runs/precedence-composition/RESULT.json",
+    "archive": "runs/precedence-composition/RESULT.json",
+    "sourceSha256": "5ee32969c8e16264cac5e71e1978906fc74d18bb3ebb06da5d93bbf6f8febe2f",
+    "archiveSha256": "5ee32969c8e16264cac5e71e1978906fc74d18bb3ebb06da5d93bbf6f8febe2f"
+  },
+  {
+    "source": "runs/precedence-composition/first.log",
+    "archive": "runs/precedence-composition/first.log",
+    "sourceSha256": "033595d16817babb47f093dcec7b621f2a99a30f0b28da14c026dc5e989aa4c8",
+    "archiveSha256": "033595d16817babb47f093dcec7b621f2a99a30f0b28da14c026dc5e989aa4c8"
+  },
+  {
+    "source": "runs/precedence-composition/SOURCE-BEFORE.json",
+    "archive": "runs/precedence-composition/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "59ded6e89a9c98916863972657a52353073ab1605d262f312a38ab715992cd89",
+    "archiveSha256": "0a50b6908351672689d80eb7dc480f2423e0e5c4e49db9899054ac8cf663f562"
+  },
+  {
+    "source": "runs/precedence-composition/SOURCE-AFTER.json",
+    "archive": "runs/precedence-composition/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/precedence-composition/COMMAND.json",
+    "archive": "runs/precedence-composition/COMMAND.json",
+    "sourceSha256": "257c2b952f421f0437c1fd3dd1f3e6946f659dc34a825786854799e5834dbe1c",
+    "archiveSha256": "257c2b952f421f0437c1fd3dd1f3e6946f659dc34a825786854799e5834dbe1c"
+  },
+  {
+    "source": "runs/affected-lint/RESULT.json",
+    "archive": "runs/affected-lint/RESULT.json",
+    "sourceSha256": "82cd97a23e0ea1c3341e318c044fdf0b1a971ba5c10a118a8c087ef6465be7b0",
+    "archiveSha256": "82cd97a23e0ea1c3341e318c044fdf0b1a971ba5c10a118a8c087ef6465be7b0"
+  },
+  {
+    "source": "runs/affected-lint/first.log",
+    "archive": "runs/affected-lint/first.log",
+    "sourceSha256": "31c4bd4f4f85e334cb077efa591f92e39dd68571d2c1f0cbaffb499419cd9ee1",
+    "archiveSha256": "31c4bd4f4f85e334cb077efa591f92e39dd68571d2c1f0cbaffb499419cd9ee1"
+  },
+  {
+    "source": "runs/affected-lint/SOURCE-BEFORE.json",
+    "archive": "runs/affected-lint/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "59ded6e89a9c98916863972657a52353073ab1605d262f312a38ab715992cd89",
+    "archiveSha256": "0a50b6908351672689d80eb7dc480f2423e0e5c4e49db9899054ac8cf663f562"
+  },
+  {
+    "source": "runs/affected-lint/SOURCE-AFTER.json",
+    "archive": "runs/affected-lint/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/affected-lint/COMMAND.json",
+    "archive": "runs/affected-lint/COMMAND.json",
+    "sourceSha256": "efdbe720b6103897472f38750ecfe549f9481cb6f71ce224896367d928461ba5",
+    "archiveSha256": "efdbe720b6103897472f38750ecfe549f9481cb6f71ce224896367d928461ba5"
+  }
+]

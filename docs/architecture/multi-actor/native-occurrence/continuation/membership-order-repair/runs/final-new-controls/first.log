@@ -1,0 +1,41 @@
+
+> nx run kernel:test prepend-review-lifetime-replay.spec.ts membership-prepared-order.spec.ts entity-membership-view-v16-controls.spec.ts placement-snapshot-reuse.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs prepend-review-lifetime-replay.spec.ts membership-prepared-order.spec.ts entity-membership-view-v16-controls.spec.ts placement-snapshot-reuse.spec.ts --maxWorkers=1
+
+(node:81298) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81305) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-membership-order-c8a/candidate/packages/kernel
+
+(node:81341) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81342) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81343) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81344) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  29 passed (29)
+   Start at  09:29:08
+   Duration  1.79s (transform 450ms, setup 0ms, import 746ms, tests 138ms, environment 614ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

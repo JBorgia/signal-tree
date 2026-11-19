@@ -1,0 +1,22 @@
+{
+  "removedActiveFile": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+  "removedActiveCases": {
+    "aggregate-independent-input.spec.ts": 4,
+    "recipient-cause-classification.spec.ts": 2
+  },
+  "originalFilesPreserved": "originals/",
+  "firstFailuresPreserved": "ORIGINAL-FAILURE-STACKS.txt",
+  "retainedClassifierCases": [
+    "external-origin confirm",
+    "external-origin rollback",
+    "unknown-declaration confirm",
+    "unknown-declaration rollback"
+  ],
+  "counterparts": {
+    "aggregate": 8,
+    "domainOnly": 2,
+    "nativeWindow": 2
+  },
+  "validUnknownAssertionsChanged": false,
+  "recipientSourcePermissionSpecChanged": false
+}

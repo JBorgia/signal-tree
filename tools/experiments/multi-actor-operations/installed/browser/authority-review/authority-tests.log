@@ -1,0 +1,20 @@
+✔ independent: all command fields and nested mutations remain bound (2.109291ms)
+✔ independent: host must return literal true and exceptions mint no authority (0.270333ms)
+✔ independent: callback mutation cannot change captured approval (0.421708ms)
+✔ independent: nested authorization cannot exceed capacity (0.135209ms)
+✔ independent: accessors and executable or non-JSON data fail closed (0.133625ms)
+✔ independent: proxy-triggered revocation or disposal during capture prevents use (0.156042ms)
+✔ independent: backend rejects malformed approved proposals without partial writes (0.545708ms)
+✔ independent: receipts replay across permission change, failures stay terminal, changed content cannot reuse ID (0.214375ms)
+✔ server gate requires authenticated-host approval bound to exact command (2.026291ms)
+✔ approval cannot bypass current backend permission or changed input versions (0.1665ms)
+✔ revocation, bounded retention and disposal remove unused authority (0.1125ms)
+✔ authorization callback reentry cannot mint after disposal (0.081292ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40.645375

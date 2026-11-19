@@ -1,0 +1,9 @@
+import assert from 'node:assert/strict';
+import {signalTree,transactions,link,onTreeError} from '@signal-tree/angular';
+import {transactionLifecycleReader} from '@signal-tree/kernel/internals';
+const tree=signalTree({x:0},{enhancers:[transactions()]});const reader=transactionLifecycleReader(tree);const facts=[];let calls=0;const errors=[];
+const stop=reader.subscribe(e=>{facts.push(e.kind);if(e.kind==='confirmed')throw new Error('lifecycle observer');});
+const stopErrors=onTreeError(e=>errors.push(e));
+const connection=link(tree.$.x,{set(){calls++;throw new Error('endpoint observer');}});
+try{const tx=tree.transact(()=>tree.$.x.set(1));assert.doesNotThrow(()=>tx.confirm());await connection.settled();assert.equal(reader.snapshot().pending.length,0);assert.ok(facts.includes('confirmed'));assert.ok(calls>0);console.log(JSON.stringify({confirmThrew:false,pending:0,calls,reportedErrors:errors.length,limit:'These public observer failures do not escape confirm; no native success/confirm-throw case established.'}));}
+finally{connection.dispose();stop();stopErrors();tree.destroy();}

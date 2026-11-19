@@ -1,0 +1,47 @@
+[
+  {
+    "case": "entity batches larger than the argument limit > undo and redo of a setAll that replaced every row",
+    "exit": 0,
+    "selectedPassCount": 1,
+    "workerPids": [
+      58618
+    ],
+    "maxObservedAggregateRssBytes": 2795274240,
+    "minimumObservedMemoryPressureFreePercentage": 32.0,
+    "telemetrySamples": 105,
+    "maxCensusLatencySeconds": 0.3456794999074191,
+    "maxHostTelemetryLatencySeconds": 0.054363332921639085,
+    "sourceMismatches": [],
+    "remainingOwned": []
+  },
+  {
+    "case": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit",
+    "exit": 0,
+    "selectedPassCount": 1,
+    "workerPids": [
+      59352
+    ],
+    "maxObservedAggregateRssBytes": 1711292416,
+    "minimumObservedMemoryPressureFreePercentage": 32.0,
+    "telemetrySamples": 51,
+    "maxCensusLatencySeconds": 0.3796122909989208,
+    "maxHostTelemetryLatencySeconds": 0.05641979200299829,
+    "sourceMismatches": [],
+    "remainingOwned": []
+  },
+  {
+    "case": "v16 restoration of turns larger than the argument limit > releases the claims of a truncated turn that cleared more rows than the argument limit",
+    "exit": 0,
+    "selectedPassCount": 1,
+    "workerPids": [
+      59649
+    ],
+    "maxObservedAggregateRssBytes": 1904017408,
+    "minimumObservedMemoryPressureFreePercentage": 33.0,
+    "telemetrySamples": 24,
+    "maxCensusLatencySeconds": 0.22926116699818522,
+    "maxHostTelemetryLatencySeconds": 0.03783004195429385,
+    "sourceMismatches": [],
+    "remainingOwned": []
+  }
+]

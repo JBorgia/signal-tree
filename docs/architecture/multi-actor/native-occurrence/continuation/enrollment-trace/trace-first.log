@@ -1,0 +1,131 @@
+
+> nx run kernel:test enrollment-trace-review.spec.ts --testNamePattern=enrollment invariance (branch|root): (before-pending|during-pending|enroll-in-updater)|ancestor updater argument wider|publishes an independent existing value --maxWorkers=1
+
+> node tools/run-core-vitest.mjs enrollment-trace-review.spec.ts --testNamePattern="enrollment invariance (branch|root): (before-pending|during-pending|enroll-in-updater)|ancestor updater argument wider|publishes an independent existing value" --maxWorkers=1
+
+(node:37185) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-enrollment-isolation-trace/candidate/packages/kernel
+
+(node:37199) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/enrollment-trace-review.spec.ts (51 tests | 7 failed | 43 skipped) 38ms
+   × enrollment invariance branch: before-pending 19ms
+   × enrollment invariance branch: during-pending 5ms
+   × enrollment invariance branch: enroll-in-updater 2ms
+   × enrollment invariance root: before-pending 3ms
+   × enrollment invariance root: during-pending 3ms
+   × enrollment invariance root: enroll-in-updater 2ms
+     × ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/enrollment-trace-review.spec.ts > enrollment invariance branch: before-pending
+ FAIL  src/lib/enrollment-trace-review.spec.ts > enrollment invariance branch: during-pending
+ FAIL  src/lib/enrollment-trace-review.spec.ts > enrollment invariance branch: enroll-in-updater
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  src/lib/enrollment-trace-review.spec.ts > enrollment invariance root: before-pending
+ FAIL  src/lib/enrollment-trace-review.spec.ts > enrollment invariance root: during-pending
+ FAIL  src/lib/enrollment-trace-review.spec.ts > enrollment invariance root: enroll-in-updater
+AssertionError: expected [ { pair: { x: +0, y: +0 }, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "pair": {
++       "x": 0,
++       "y": 0,
++     },
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  src/lib/enrollment-trace-review.spec.ts > authorized existing-key branch/root installed publication > ancestor updater argument wider than descendant recipient stays unknown rather than borrowing sibling input proof
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/aggregate-installed-publication.spec.ts:131:69
+    129|   try{
+    130|    const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...in…
+    131|    await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).to…
+       |                                                                     ^
+    132|    expect(owner.$.z()).toBe(7);p.rollback();await flush();expect(sent)…
+    133|   }finally{c.dispose();t.destroy();owner.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 1 passed | 43 skipped (51)
+   Start at  17:16:51
+   Duration  839ms (transform 461ms, setup 0ms, import 556ms, tests 38ms, environment 173ms)
+
+Warning: command "node tools/run-core-vitest.mjs enrollment-trace-review.spec.ts --testNamePattern="enrollment invariance (branch|root): (before-pending|during-pending|enroll-in-updater)|ancestor updater argument wider|publishes an independent existing value" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

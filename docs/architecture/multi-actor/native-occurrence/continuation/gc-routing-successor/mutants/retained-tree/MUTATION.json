@@ -1,0 +1,5 @@
+{
+  "file": "packages/kernel/src/lib/forwarding-retention-probe.spec.ts",
+  "find": " tree.destroy();await flush();",
+  "replace": " tree.destroy();Object.assign(box,{__gateRetainedTree:tree});await flush();"
+}

@@ -1,0 +1,65 @@
+{
+  "frozen": true,
+  "baselineManifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "manifestSha256": "905af11731583b81a9690e2fdaf8a2e0cc71fad4d375f0f5ec1d7a944a012816",
+  "runtimeManifestSha256": "ed9ba57cef9d7d571215972e05a7752b2ab8af36dc474f0f37ce1fc705613c45",
+  "runtimePatchSha256": "60618b8a84caebf0e22ded45c538d446528577c0e94c9a5280cfa74763870e67",
+  "testsPatchSha256": "4cc9ce95f82a87c95a4584e5ad65b1b995d2b35a880de8b23b2b46eed9828b27",
+  "runs": {
+    "angular-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "fixture-types-corrected": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "kernel-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "lifecycle-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "public-types-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "react-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "solid-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "source-types-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "spec-types-final": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "spec-types-first": {
+      "exit": 1,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "vue-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

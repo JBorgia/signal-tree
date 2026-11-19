@@ -1,0 +1,18 @@
+{
+  "current": {
+    "originalChanges": [],
+    "copiedOriginalChanges": [],
+    "manifestSha256": "7b055b6d93f495d6b26d156a087fe9996b100ad5013d10b8153ede5394fde633",
+    "fixtureSha256": "2a6a89b3aff4226bdc2a4070db8db648bd222390a296582e35691b9e9f0ce5f9"
+  },
+  "baseline": {
+    "originalChanges": [],
+    "copiedOriginalChanges": [],
+    "manifestSha256": "731175d019aa865613d7acb1d13cf21de613e4649eeab5aed03459c062873d4e",
+    "fixtureSha256": "2a6a89b3aff4226bdc2a4070db8db648bd222390a296582e35691b9e9f0ce5f9"
+  },
+  "snapshotA": {
+    "manifestSha256": "b226c1d39c85e49265446b2bf83d3e5bdb64c2dae1ade93a466baceac1641e0a",
+    "mismatches": []
+  }
+}

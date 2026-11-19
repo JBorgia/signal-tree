@@ -1,0 +1,11 @@
+--- 
++++ 
+@@ -4,7 +4,7 @@
+ import * as lifecycle from './experimental-publication/lifecycle';
+ import type {NativeInput,NativeRequirement,OwnerCell} from './experimental-publication/lifecycle';
+ type View={requirement:NativeRequirement};
+-const text=readFileSync(new URL('./experimental-publication/private.ts',import.meta.url),'utf8');
++const text=readFileSync(process.env.ST_INPUT_SOURCE!,'utf8');
+ const start=text.indexOf('function nativeInputs('),end=text.indexOf('\nfunction nativeAuthorship',start);
+ if(start<0||end<0)throw Error('nativeInputs source boundary missing');
+ const compiled=ts.transpile(text.slice(start,end)+'\nreturn nativeInputs;', {target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.None});

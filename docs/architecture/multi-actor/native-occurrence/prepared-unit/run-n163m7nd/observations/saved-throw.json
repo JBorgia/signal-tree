@@ -1,0 +1,7 @@
+{
+  "first": 7,
+  "error": "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — selected preflight refuses [effect-validation-failed]",
+  "lateError": "undefined",
+  "value": 0,
+  "sameSupport": false
+}

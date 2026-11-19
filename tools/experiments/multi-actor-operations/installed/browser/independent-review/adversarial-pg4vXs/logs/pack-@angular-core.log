@@ -1,0 +1,526 @@
+[
+  {
+    "id": "@angular/core@22.0.7",
+    "name": "@angular/core",
+    "version": "22.0.7",
+    "size": 1656561,
+    "unpackedSize": 7111066,
+    "shasum": "0d9bec31fd996712447ab13bacbbd8bcf2e0bf0b",
+    "integrity": "sha512-A5xKJx5wuuZfeJhShyZvbgicYtT3Jpw/5wJd1cfrcKU+i63CagRIg9jSktTW/e+2hxG1tIQrfKQUGeclmsAUUA==",
+    "filename": "angular-core-22.0.7.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1105,
+        "mode": 493
+      },
+      {
+        "path": "README.md",
+        "size": 290,
+        "mode": 493
+      },
+      {
+        "path": "event-dispatch-contract.min.js",
+        "size": 476,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_attribute-chunk.mjs",
+        "size": 218,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_attribute-chunk.mjs.map",
+        "size": 1165,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_debug_node-chunk.mjs",
+        "size": 733172,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_debug_node-chunk.mjs.map",
+        "size": 2765851,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_effect-chunk.mjs",
+        "size": 12478,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_effect-chunk.mjs.map",
+        "size": 47266,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_not_found-chunk.mjs",
+        "size": 993,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_not_found-chunk.mjs.map",
+        "size": 3908,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_pending_tasks-chunk.mjs",
+        "size": 104008,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_pending_tasks-chunk.mjs.map",
+        "size": 468767,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_resource-chunk.mjs",
+        "size": 17770,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_resource-chunk.mjs.map",
+        "size": 64477,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_untracked-chunk.mjs",
+        "size": 3239,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_untracked-chunk.mjs.map",
+        "size": 10777,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_weak_ref-chunk.mjs",
+        "size": 227,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/_weak_ref-chunk.mjs.map",
+        "size": 598,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/core.mjs",
+        "size": 132976,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/core.mjs.map",
+        "size": 473301,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/primitives-di.mjs",
+        "size": 583,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/primitives-di.mjs.map",
+        "size": 3688,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/primitives-event-dispatch.mjs",
+        "size": 25767,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/primitives-event-dispatch.mjs.map",
+        "size": 124824,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/primitives-signals.mjs",
+        "size": 5927,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/primitives-signals.mjs.map",
+        "size": 19089,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/rxjs-interop.mjs",
+        "size": 8389,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/rxjs-interop.mjs.map",
+        "size": 34151,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/testing.mjs",
+        "size": 88222,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/testing.mjs.map",
+        "size": 272955,
+        "mode": 493
+      },
+      {
+        "path": "package.json",
+        "size": 2610,
+        "mode": 493
+      },
+      {
+        "path": "resources/best-practices.md",
+        "size": 2636,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/apply_import_manager-BsCkDgPj.cjs",
+        "size": 3132,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/can-match-snapshot-required.cjs",
+        "size": 4147,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/change-detection-eager.cjs",
+        "size": 6964,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/cleanup-unused-imports.cjs",
+        "size": 14825,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/common-to-standalone-migration.cjs",
+        "size": 17447,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/compiler_host-CY14HvaP.cjs",
+        "size": 14443,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/control-flow-migration.cjs",
+        "size": 82063,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/http-xhr-backend.cjs",
+        "size": 4489,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/imports-CKV-ITqD.cjs",
+        "size": 4212,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/incremental-hydration.cjs",
+        "size": 3891,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/index-CYvBVnIF.cjs",
+        "size": 43632,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/inject-migration.cjs",
+        "size": 63033,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/json-file-RJY0pCW_.cjs",
+        "size": 79103,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/leading_space-BTPRV0wu.cjs",
+        "size": 911,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/migrate_ts_type_references-y9gtOKjH.cjs",
+        "size": 88714,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/model-output.cjs",
+        "size": 9521,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/ng_component_template-DPAF1aEA.cjs",
+        "size": 7618,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/ng_decorators-IVztR9rk.cjs",
+        "size": 1348,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/ngclass-to-class-migration.cjs",
+        "size": 22525,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/ngstyle-to-style-migration.cjs",
+        "size": 20322,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/nodes-ZSQ7WZRB.cjs",
+        "size": 511,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/output-migration.cjs",
+        "size": 28526,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/parse_html-C8eKA9px.cjs",
+        "size": 4039,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/project_paths-LBcwW5BF.cjs",
+        "size": 22261,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/project_tsconfig_paths-BejwmdOG.cjs",
+        "size": 2962,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/property_name-BCpALNpZ.cjs",
+        "size": 785,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/route-lazy-loading.cjs",
+        "size": 21282,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/router-testing-module-migration.cjs",
+        "size": 21897,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/safe-optional-chaining.cjs",
+        "size": 27047,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/self-closing-tags-migration.cjs",
+        "size": 8633,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/signal-input-migration.cjs",
+        "size": 70804,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/signal-queries-migration.cjs",
+        "size": 53524,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/signals.cjs",
+        "size": 1905,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/standalone-migration.cjs",
+        "size": 107884,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/strict-safe-navigation-narrow.cjs",
+        "size": 1231,
+        "mode": 493
+      },
+      {
+        "path": "schematics/bundles/strict-templates-default.cjs",
+        "size": 2513,
+        "mode": 493
+      },
+      {
+        "path": "schematics/collection.json",
+        "size": 4314,
+        "mode": 493
+      },
+      {
+        "path": "schematics/migrations.json",
+        "size": 1915,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/cleanup-unused-imports/schema.json",
+        "size": 199,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/common-to-standalone-migration/schema.json",
+        "size": 434,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/control-flow-migration/schema.json",
+        "size": 612,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/inject-migration/schema.json",
+        "size": 1577,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/ngclass-to-class-migration/schema.json",
+        "size": 670,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/ngstyle-to-style-migration/schema.json",
+        "size": 633,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/output-migration/schema.json",
+        "size": 695,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/route-lazy-loading/schema.json",
+        "size": 420,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/router-testing-module-migration/schema.json",
+        "size": 443,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/self-closing-tags-migration/schema.json",
+        "size": 413,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/signal-input-migration/schema.json",
+        "size": 1200,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/signal-queries-migration/schema.json",
+        "size": 1207,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/signals/schema.json",
+        "size": 2114,
+        "mode": 493
+      },
+      {
+        "path": "schematics/ng-generate/standalone-migration/schema.json",
+        "size": 1205,
+        "mode": 493
+      },
+      {
+        "path": "third_party/@mcp-b/webmcp-types/dist/common.d.ts",
+        "size": 6171,
+        "mode": 493
+      },
+      {
+        "path": "third_party/@mcp-b/webmcp-types/dist/json-schema.d.ts",
+        "size": 8372,
+        "mode": 493
+      },
+      {
+        "path": "third_party/@mcp-b/webmcp-types/index.d.ts",
+        "size": 292,
+        "mode": 493
+      },
+      {
+        "path": "third_party/@mcp-b/webmcp-types/LICENSE",
+        "size": 1075,
+        "mode": 493
+      },
+      {
+        "path": "types/_api-chunk.d.ts",
+        "size": 12422,
+        "mode": 493
+      },
+      {
+        "path": "types/_chrome_dev_tools_performance-chunk.d.ts",
+        "size": 28758,
+        "mode": 493
+      },
+      {
+        "path": "types/_debug_node-chunk.d.ts",
+        "size": 283853,
+        "mode": 493
+      },
+      {
+        "path": "types/_effect-chunk.d.ts",
+        "size": 1680,
+        "mode": 493
+      },
+      {
+        "path": "types/_event_dispatcher-chunk.d.ts",
+        "size": 14010,
+        "mode": 493
+      },
+      {
+        "path": "types/_formatter-chunk.d.ts",
+        "size": 9146,
+        "mode": 493
+      },
+      {
+        "path": "types/_weak_ref-chunk.d.ts",
+        "size": 203,
+        "mode": 493
+      },
+      {
+        "path": "types/core.d.ts",
+        "size": 377217,
+        "mode": 493
+      },
+      {
+        "path": "types/primitives-di.d.ts",
+        "size": 4079,
+        "mode": 493
+      },
+      {
+        "path": "types/primitives-event-dispatch.d.ts",
+        "size": 2957,
+        "mode": 493
+      },
+      {
+        "path": "types/primitives-signals.d.ts",
+        "size": 5261,
+        "mode": 493
+      },
+      {
+        "path": "types/rxjs-interop.d.ts",
+        "size": 7934,
+        "mode": 493
+      },
+      {
+        "path": "types/testing.d.ts",
+        "size": 29538,
+        "mode": 493
+      }
+    ],
+    "entryCount": 102,
+    "bundled": []
+  }
+]

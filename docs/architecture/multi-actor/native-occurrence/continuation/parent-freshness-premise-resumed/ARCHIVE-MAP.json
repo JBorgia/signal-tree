@@ -1,0 +1,68 @@
+[
+  {
+    "source": "identity-and-results.json",
+    "archive": "identity-and-results.json",
+    "sourceSha256": "45c330aa6cde20b6b2f303e291280779b1fcee9891888b4828412c3603404a49",
+    "archiveSha256": "45c330aa6cde20b6b2f303e291280779b1fcee9891888b4828412c3603404a49"
+  },
+  {
+    "source": "mechanism-input-identity.json",
+    "archive": "mechanism-input-identity.json",
+    "sourceSha256": "6855f4975711eba1e66118b25179398612b8a23bd946df3b7f2aa61e533404c3",
+    "archiveSha256": "6855f4975711eba1e66118b25179398612b8a23bd946df3b7f2aa61e533404c3"
+  },
+  {
+    "source": "reviewed-DESIGN.md",
+    "archive": "reviewed-DESIGN.md",
+    "sourceSha256": "967f245b55fadcb152e6c7370752ca04ef0cc0f14cbd092b10dff88c950940da",
+    "archiveSha256": "967f245b55fadcb152e6c7370752ca04ef0cc0f14cbd092b10dff88c950940da"
+  },
+  {
+    "source": "reviewed-HOOKS.md",
+    "archive": "reviewed-HOOKS.md",
+    "sourceSha256": "fbc3bcfad250fc6778d17dfca3b95fe48334c5cb09640b1054f8e92748356da5",
+    "archiveSha256": "fbc3bcfad250fc6778d17dfca3b95fe48334c5cb09640b1054f8e92748356da5"
+  },
+  {
+    "source": "FINAL-VERIFICATION.json",
+    "archive": "FINAL-VERIFICATION.json",
+    "sourceSha256": "32a45f309298d31e158cd312a23e6c36bd298d419fe3cdc8cc2ee7030ac0b6e2",
+    "archiveSha256": "32a45f309298d31e158cd312a23e6c36bd298d419fe3cdc8cc2ee7030ac0b6e2"
+  },
+  {
+    "source": "C7a-to-C8-entity-signal.diff",
+    "archive": "C7a-to-C8-entity-signal.diff",
+    "sourceSha256": "ee229a10bc3b1a4f87abbcc8d905302aa3e7775b73b7327e0a90da5801d67a68",
+    "archiveSha256": "ee229a10bc3b1a4f87abbcc8d905302aa3e7775b73b7327e0a90da5801d67a68"
+  },
+  {
+    "source": "COMMANDS.json",
+    "archive": "COMMANDS.json",
+    "sourceSha256": "213a04ae14671948c61754ec6ac31156d384728fded01382a9bbd94977e9f8e1",
+    "archiveSha256": "213a04ae14671948c61754ec6ac31156d384728fded01382a9bbd94977e9f8e1"
+  },
+  {
+    "source": "source-evidence.txt",
+    "archive": "source-evidence.txt.gz",
+    "sourceSha256": "49b54490a144e53dad40497417a3dd0544b4d74900b1153e9cc5f47dd75dce1c",
+    "archiveSha256": "3de97d42a0ac1115bdd7c71dbd44160fec68dd0210574f4d7bd735be7b05d937"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "67f077aff6a88b21413ab25b22b645ed8a0f84b7bbae977d38ca56ead15f5217",
+    "archiveSha256": "67f077aff6a88b21413ab25b22b645ed8a0f84b7bbae977d38ca56ead15f5217"
+  },
+  {
+    "source": "reviewed-REENTRY-CACHE-RULES.md",
+    "archive": "reviewed-REENTRY-CACHE-RULES.md",
+    "sourceSha256": "5274297976e4ebbfaa2889dceb3ffd968b0063fdfa4e81ced24f85e16fbfaead",
+    "archiveSha256": "5274297976e4ebbfaa2889dceb3ffd968b0063fdfa4e81ced24f85e16fbfaead"
+  },
+  {
+    "source": "tests.patch",
+    "archive": "tests.patch",
+    "sourceSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463",
+    "archiveSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463"
+  }
+]

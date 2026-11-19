@@ -1,0 +1,82 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/baseline/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm install /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-kernel-16.0.0-dev.tgz /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-angular-16.0.0-dev.tgz /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-react-16.0.0-dev.tgz /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-vue-16.0.0-dev.tgz /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-solid-16.0.0-dev.tgz
+8 verbose argv "install" "--save-exact" "--ignore-scripts" "--no-audit" "--no-fund" "--package-lock" "true" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-kernel-16.0.0-dev.tgz" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-angular-16.0.0-dev.tgz" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-react-16.0.0-dev.tgz" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-vue-16.0.0-dev.tgz" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-solid-16.0.0-dev.tgz"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a-cache/_logs/2026-11-03T14_58_56_012Z-
+10 verbose logfile /private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a-cache/_logs/2026-11-03T14_58_56_012Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly logfile done cleaning log files
+14 silly idealTree buildDeps
+15 silly fetch manifest @signal-tree/react@file:../clean-tarballs/signal-tree-react-16.0.0-dev.tgz
+16 silly fetch manifest react@19.2.8
+17 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+18 http cache https://registry.npmjs.org/react 12ms (cache hit)
+19 silly packumentCache full:https://registry.npmjs.org/react set size:7107539 disposed:false
+20 silly fetch manifest tslib@2.8.1
+21 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+22 http cache https://registry.npmjs.org/tslib 11ms (cache hit)
+23 silly packumentCache full:https://registry.npmjs.org/tslib set size:111280 disposed:false
+24 silly fetch manifest @signal-tree/solid@file:../clean-tarballs/signal-tree-solid-16.0.0-dev.tgz
+25 silly fetch manifest solid-js@1.9.15
+26 silly packumentCache full:https://registry.npmjs.org/solid-js cache-miss
+27 http cache https://registry.npmjs.org/solid-js 5ms (cache hit)
+28 silly packumentCache full:https://registry.npmjs.org/solid-js set size:2380133 disposed:false
+29 silly fetch manifest @signal-tree/vue@file:../clean-tarballs/signal-tree-vue-16.0.0-dev.tgz
+30 silly fetch manifest vue@3.5.42
+31 silly packumentCache full:https://registry.npmjs.org/vue cache-miss
+32 http cache https://registry.npmjs.org/vue 7ms (cache hit)
+33 silly packumentCache full:https://registry.npmjs.org/vue set size:2131124 disposed:false
+34 silly fetch manifest typescript@6.0.3
+35 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+36 http cache https://registry.npmjs.org/typescript 21ms (cache hit)
+37 silly packumentCache full:https://registry.npmjs.org/typescript set size:15886235 disposed:false
+38 silly fetch manifest @signal-tree/angular@file:../clean-tarballs/signal-tree-angular-16.0.0-dev.tgz
+39 silly fetch manifest @angular/core@22.0.7
+40 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore cache-miss
+41 http cache https://registry.npmjs.org/@angular%2fcore 7ms (cache hit)
+42 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore set size:3237919 disposed:false
+43 silly fetch manifest @angular/compiler@22.0.7
+44 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler cache-miss
+45 http cache https://registry.npmjs.org/@angular%2fcompiler 11ms (cache hit)
+46 silly packumentCache full:https://registry.npmjs.org/@angular%2fcompiler set size:2875999 disposed:false
+47 silly fetch manifest rxjs@7.8.2
+48 silly packumentCache full:https://registry.npmjs.org/rxjs cache-miss
+49 http cache https://registry.npmjs.org/rxjs 4ms (cache hit)
+50 silly packumentCache full:https://registry.npmjs.org/rxjs set size:1079918 disposed:false
+51 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+52 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+53 http cache https://registry.npmjs.org/zone.js 4ms (cache hit)
+54 silly packumentCache full:https://registry.npmjs.org/zone.js set size:381980 disposed:false
+55 silly fetch manifest @signal-tree/kernel@file:../clean-tarballs/signal-tree-kernel-16.0.0-dev.tgz
+56 silly placeDep ROOT @signal-tree/angular@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../clean-tarballs/signal-tree-angular-16.0.0-dev.tgz
+57 silly placeDep ROOT @signal-tree/kernel@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../clean-tarballs/signal-tree-kernel-16.0.0-dev.tgz
+58 silly placeDep ROOT @signal-tree/react@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../clean-tarballs/signal-tree-react-16.0.0-dev.tgz
+59 silly placeDep ROOT @signal-tree/solid@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../clean-tarballs/signal-tree-solid-16.0.0-dev.tgz
+60 silly placeDep ROOT @signal-tree/vue@16.0.0-dev OK for: entity-registration-consumer@0.0.0 want: file:../clean-tarballs/signal-tree-vue-16.0.0-dev.tgz
+61 silly fetch manifest @signal-tree/kernel@16.0.0-dev
+62 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel cache-miss
+63 http cache https://registry.npmjs.org/@signal-tree%2fkernel 3ms (cache hit)
+64 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel set size:78524 disposed:false
+65 silly reify moves {}
+66 http cache @signal-tree/vue@file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-vue-16.0.0-dev.tgz 0ms (cache hit)
+67 http cache @signal-tree/react@file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-react-16.0.0-dev.tgz 0ms (cache hit)
+68 http cache @signal-tree/kernel@file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-kernel-16.0.0-dev.tgz 0ms (cache hit)
+69 http cache @signal-tree/solid@file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-solid-16.0.0-dev.tgz 0ms (cache hit)
+70 http cache @signal-tree/angular@file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs/signal-tree-angular-16.0.0-dev.tgz 0ms (cache hit)
+71 silly ADD node_modules/@signal-tree/vue
+72 silly ADD node_modules/@signal-tree/solid
+73 silly ADD node_modules/@signal-tree/react
+74 silly ADD node_modules/@signal-tree/kernel
+75 silly ADD node_modules/@signal-tree/angular
+76 verbose cwd /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/baseline
+77 verbose os Darwin 25.2.0
+78 verbose node v24.15.0
+79 verbose npm  v11.12.1
+80 verbose exit 0
+81 info ok

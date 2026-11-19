@@ -1,0 +1,14 @@
+{
+  "baseline": "/private/tmp/st-native-combined-c11",
+  "manifest_sha256": "72e43df2f1d42678ee67e72064f46c971feede115efb767294f52a8275c44788",
+  "verified_read_files": {
+    "packages/kernel/src/lib/absent-collection.spec.ts": "b217969571e40fa6839759e5fd5f24b9093ba5d5796e0004a762b11dec63d047",
+    "packages/kernel/src/lib/parent-freshness-entity.spec.ts": "7e224cb7c28f9b2f6878a30a1c9c33d60a726717573892e4c513cac0f8a85bc3",
+    "packages/kernel/src/lib/marker-snapshot-memo.spec.ts": "095014433ebaa1e702f8173e84b70b0fe122f58ad35ae3337d652cde2cbf23f7",
+    "packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts": "616faea3d7cf11b7dddcf533a81cd55c2cd0b6f675ecc72a0869edb3a9d8adf4",
+    "packages/kernel/src/lib/ordinary-presence-discriminator.spec.ts": "65da8178f977561bb234071fe90cea7c1a40b772c05f49f15a3dafc7c63221d7",
+    "packages/kernel/src/lib/parent-freshness-focused.spec.ts": "c31ab537a83917af1211f5ae863d4847f393032f480c50296fddc20ab9d6ba72"
+  },
+  "runtime_runs": [],
+  "successor_review": "awaiting immutable manifest"
+}

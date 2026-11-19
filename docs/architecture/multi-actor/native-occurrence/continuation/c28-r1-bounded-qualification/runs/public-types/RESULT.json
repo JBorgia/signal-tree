@@ -1,0 +1,10 @@
+{
+  "name": "public-types",
+  "exit": 0,
+  "timeout": false,
+  "elapsedSeconds": 2.505411959020421,
+  "attempts": 1,
+  "sourceMismatches": [],
+  "ownedGroupPresent": false,
+  "manifest": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b"
+}

@@ -1,0 +1,476 @@
+[
+  {
+    "pid": 14326,
+    "ppid": 14319,
+    "rssBytes": 901120,
+    "birth": "Tue Nov 3 12:27:05 2026"
+  },
+  {
+    "pid": 14343,
+    "ppid": 14326,
+    "rssBytes": 62128128,
+    "birth": "Tue Nov 3 12:27:05 2026"
+  },
+  {
+    "pid": 14374,
+    "ppid": 14358,
+    "rssBytes": 133332992,
+    "birth": "Tue Nov 3 12:27:07 2026"
+  },
+  {
+    "pid": 14358,
+    "ppid": 14343,
+    "rssBytes": 53395456,
+    "birth": "Tue Nov 3 12:27:07 2026"
+  },
+  {
+    "pid": 14381,
+    "ppid": 14374,
+    "rssBytes": 59752448,
+    "birth": "Tue Nov 3 12:27:08 2026"
+  },
+  {
+    "pid": 14389,
+    "ppid": 14381,
+    "rssBytes": 19939328,
+    "birth": "Tue Nov 3 12:27:08 2026"
+  },
+  {
+    "pid": 14393,
+    "ppid": 14381,
+    "rssBytes": 95715328,
+    "birth": "Tue Nov 3 12:27:09 2026"
+  },
+  {
+    "pid": 14394,
+    "ppid": 14381,
+    "rssBytes": 95453184,
+    "birth": "Tue Nov 3 12:27:09 2026"
+  },
+  {
+    "pid": 14400,
+    "ppid": 14381,
+    "rssBytes": 89128960,
+    "birth": "Tue Nov 3 12:27:11 2026"
+  },
+  {
+    "pid": 14401,
+    "ppid": 14381,
+    "rssBytes": 89161728,
+    "birth": "Tue Nov 3 12:27:11 2026"
+  },
+  {
+    "pid": 14409,
+    "ppid": 14381,
+    "rssBytes": 103694336,
+    "birth": "Tue Nov 3 12:27:12 2026"
+  },
+  {
+    "pid": 14408,
+    "ppid": 14381,
+    "rssBytes": 107593728,
+    "birth": "Tue Nov 3 12:27:12 2026"
+  },
+  {
+    "pid": 14413,
+    "ppid": 14381,
+    "rssBytes": 135020544,
+    "birth": "Tue Nov 3 12:27:14 2026"
+  },
+  {
+    "pid": 14414,
+    "ppid": 14381,
+    "rssBytes": 131973120,
+    "birth": "Tue Nov 3 12:27:14 2026"
+  },
+  {
+    "pid": 14421,
+    "ppid": 14381,
+    "rssBytes": 72679424,
+    "birth": "Tue Nov 3 12:27:15 2026"
+  },
+  {
+    "pid": 14424,
+    "ppid": 14381,
+    "rssBytes": 52477952,
+    "birth": "Tue Nov 3 12:27:15 2026"
+  },
+  {
+    "pid": 14429,
+    "ppid": 14381,
+    "rssBytes": 77496320,
+    "birth": "Tue Nov 3 12:27:16 2026"
+  },
+  {
+    "pid": 14430,
+    "ppid": 14381,
+    "rssBytes": 64258048,
+    "birth": "Tue Nov 3 12:27:16 2026"
+  },
+  {
+    "pid": 14433,
+    "ppid": 14381,
+    "rssBytes": 98729984,
+    "birth": "Tue Nov 3 12:27:17 2026"
+  },
+  {
+    "pid": 14434,
+    "ppid": 14381,
+    "rssBytes": 99319808,
+    "birth": "Tue Nov 3 12:27:17 2026"
+  },
+  {
+    "pid": 14438,
+    "ppid": 14381,
+    "rssBytes": 138936320,
+    "birth": "Tue Nov 3 12:27:18 2026"
+  },
+  {
+    "pid": 14440,
+    "ppid": 14381,
+    "rssBytes": 50741248,
+    "birth": "Tue Nov 3 12:27:19 2026"
+  },
+  {
+    "pid": 14446,
+    "ppid": 14381,
+    "rssBytes": 94273536,
+    "birth": "Tue Nov 3 12:27:19 2026"
+  },
+  {
+    "pid": 14447,
+    "ppid": 14381,
+    "rssBytes": 94683136,
+    "birth": "Tue Nov 3 12:27:19 2026"
+  },
+  {
+    "pid": 14450,
+    "ppid": 14381,
+    "rssBytes": 127877120,
+    "birth": "Tue Nov 3 12:27:20 2026"
+  },
+  {
+    "pid": 14451,
+    "ppid": 14381,
+    "rssBytes": 130301952,
+    "birth": "Tue Nov 3 12:27:20 2026"
+  },
+  {
+    "pid": 14453,
+    "ppid": 14381,
+    "rssBytes": 98959360,
+    "birth": "Tue Nov 3 12:27:21 2026"
+  },
+  {
+    "pid": 14458,
+    "ppid": 14381,
+    "rssBytes": 94814208,
+    "birth": "Tue Nov 3 12:27:21 2026"
+  },
+  {
+    "pid": 14464,
+    "ppid": 14381,
+    "rssBytes": 98828288,
+    "birth": "Tue Nov 3 12:27:22 2026"
+  },
+  {
+    "pid": 14463,
+    "ppid": 14381,
+    "rssBytes": 99287040,
+    "birth": "Tue Nov 3 12:27:22 2026"
+  },
+  {
+    "pid": 14467,
+    "ppid": 14381,
+    "rssBytes": 0,
+    "birth": "Tue Nov 3 12:27:23 2026"
+  },
+  {
+    "pid": 14470,
+    "ppid": 14381,
+    "rssBytes": 37109760,
+    "birth": "Tue Nov 3 12:27:24 2026"
+  },
+  {
+    "pid": 14471,
+    "ppid": 14381,
+    "rssBytes": 1032192,
+    "birth": "Tue Nov 3 12:27:24 2026"
+  },
+  {
+    "pid": 14475,
+    "ppid": 14381,
+    "rssBytes": 95141888,
+    "birth": "Tue Nov 3 12:27:25 2026"
+  },
+  {
+    "pid": 14476,
+    "ppid": 14381,
+    "rssBytes": 95141888,
+    "birth": "Tue Nov 3 12:27:25 2026"
+  },
+  {
+    "pid": 14493,
+    "ppid": 14381,
+    "rssBytes": 95535104,
+    "birth": "Tue Nov 3 12:27:25 2026"
+  },
+  {
+    "pid": 14494,
+    "ppid": 14381,
+    "rssBytes": 95895552,
+    "birth": "Tue Nov 3 12:27:25 2026"
+  },
+  {
+    "pid": 14497,
+    "ppid": 14381,
+    "rssBytes": 127942656,
+    "birth": "Tue Nov 3 12:27:26 2026"
+  },
+  {
+    "pid": 14498,
+    "ppid": 14381,
+    "rssBytes": 124682240,
+    "birth": "Tue Nov 3 12:27:26 2026"
+  },
+  {
+    "pid": 14503,
+    "ppid": 14381,
+    "rssBytes": 72384512,
+    "birth": "Tue Nov 3 12:27:28 2026"
+  },
+  {
+    "pid": 14504,
+    "ppid": 14381,
+    "rssBytes": 72515584,
+    "birth": "Tue Nov 3 12:27:28 2026"
+  },
+  {
+    "pid": 14507,
+    "ppid": 14381,
+    "rssBytes": 103743488,
+    "birth": "Tue Nov 3 12:27:29 2026"
+  },
+  {
+    "pid": 14508,
+    "ppid": 14381,
+    "rssBytes": 104415232,
+    "birth": "Tue Nov 3 12:27:29 2026"
+  },
+  {
+    "pid": 14513,
+    "ppid": 14381,
+    "rssBytes": 89079808,
+    "birth": "Tue Nov 3 12:27:30 2026"
+  },
+  {
+    "pid": 14514,
+    "ppid": 14381,
+    "rssBytes": 89325568,
+    "birth": "Tue Nov 3 12:27:30 2026"
+  },
+  {
+    "pid": 14517,
+    "ppid": 14381,
+    "rssBytes": 114409472,
+    "birth": "Tue Nov 3 12:27:31 2026"
+  },
+  {
+    "pid": 14518,
+    "ppid": 14381,
+    "rssBytes": 113967104,
+    "birth": "Tue Nov 3 12:27:31 2026"
+  },
+  {
+    "pid": 14525,
+    "ppid": 14381,
+    "rssBytes": 72630272,
+    "birth": "Tue Nov 3 12:27:32 2026"
+  },
+  {
+    "pid": 14524,
+    "ppid": 14381,
+    "rssBytes": 72482816,
+    "birth": "Tue Nov 3 12:27:32 2026"
+  },
+  {
+    "pid": 14528,
+    "ppid": 14381,
+    "rssBytes": 90161152,
+    "birth": "Tue Nov 3 12:27:33 2026"
+  },
+  {
+    "pid": 14529,
+    "ppid": 14381,
+    "rssBytes": 91095040,
+    "birth": "Tue Nov 3 12:27:33 2026"
+  },
+  {
+    "pid": 14535,
+    "ppid": 14381,
+    "rssBytes": 51822592,
+    "birth": "Tue Nov 3 12:27:34 2026"
+  },
+  {
+    "pid": 14536,
+    "ppid": 14381,
+    "rssBytes": 49512448,
+    "birth": "Tue Nov 3 12:27:34 2026"
+  },
+  {
+    "pid": 14539,
+    "ppid": 14381,
+    "rssBytes": 98598912,
+    "birth": "Tue Nov 3 12:27:35 2026"
+  },
+  {
+    "pid": 14540,
+    "ppid": 14381,
+    "rssBytes": 98598912,
+    "birth": "Tue Nov 3 12:27:35 2026"
+  },
+  {
+    "pid": 14544,
+    "ppid": 14381,
+    "rssBytes": 98467840,
+    "birth": "Tue Nov 3 12:27:36 2026"
+  },
+  {
+    "pid": 14543,
+    "ppid": 14381,
+    "rssBytes": 98435072,
+    "birth": "Tue Nov 3 12:27:36 2026"
+  },
+  {
+    "pid": 14557,
+    "ppid": 14381,
+    "rssBytes": 118800384,
+    "birth": "Tue Nov 3 12:27:37 2026"
+  },
+  {
+    "pid": 14555,
+    "ppid": 14381,
+    "rssBytes": 118587392,
+    "birth": "Tue Nov 3 12:27:37 2026"
+  },
+  {
+    "pid": 14574,
+    "ppid": 14381,
+    "rssBytes": 82755584,
+    "birth": "Tue Nov 3 12:27:38 2026"
+  },
+  {
+    "pid": 14575,
+    "ppid": 14381,
+    "rssBytes": 83132416,
+    "birth": "Tue Nov 3 12:27:39 2026"
+  },
+  {
+    "pid": 14596,
+    "ppid": 14381,
+    "rssBytes": 59080704,
+    "birth": "Tue Nov 3 12:27:40 2026"
+  },
+  {
+    "pid": 14587,
+    "ppid": 14381,
+    "rssBytes": 117014528,
+    "birth": "Tue Nov 3 12:27:39 2026"
+  },
+  {
+    "pid": 14608,
+    "ppid": 14381,
+    "rssBytes": 95256576,
+    "birth": "Tue Nov 3 12:27:41 2026"
+  },
+  {
+    "pid": 14607,
+    "ppid": 14381,
+    "rssBytes": 95043584,
+    "birth": "Tue Nov 3 12:27:41 2026"
+  },
+  {
+    "pid": 14624,
+    "ppid": 14381,
+    "rssBytes": 67239936,
+    "birth": "Tue Nov 3 12:27:42 2026"
+  },
+  {
+    "pid": 14626,
+    "ppid": 14381,
+    "rssBytes": 29655040,
+    "birth": "Tue Nov 3 12:27:42 2026"
+  },
+  {
+    "pid": 14635,
+    "ppid": 14381,
+    "rssBytes": 94715904,
+    "birth": "Tue Nov 3 12:27:43 2026"
+  },
+  {
+    "pid": 14636,
+    "ppid": 14381,
+    "rssBytes": 94912512,
+    "birth": "Tue Nov 3 12:27:43 2026"
+  },
+  {
+    "pid": 14645,
+    "ppid": 14381,
+    "rssBytes": 131252224,
+    "birth": "Tue Nov 3 12:27:43 2026"
+  },
+  {
+    "pid": 14650,
+    "ppid": 14381,
+    "rssBytes": 1032192,
+    "birth": "Tue Nov 3 12:27:44 2026"
+  },
+  {
+    "pid": 14656,
+    "ppid": 14381,
+    "rssBytes": 109117440,
+    "birth": "Tue Nov 3 12:27:45 2026"
+  },
+  {
+    "pid": 14655,
+    "ppid": 14381,
+    "rssBytes": 109527040,
+    "birth": "Tue Nov 3 12:27:45 2026"
+  },
+  {
+    "pid": 14664,
+    "ppid": 14381,
+    "rssBytes": 88784896,
+    "birth": "Tue Nov 3 12:27:46 2026"
+  },
+  {
+    "pid": 14665,
+    "ppid": 14381,
+    "rssBytes": 88309760,
+    "birth": "Tue Nov 3 12:27:46 2026"
+  },
+  {
+    "pid": 14672,
+    "ppid": 14381,
+    "rssBytes": 76431360,
+    "birth": "Tue Nov 3 12:27:47 2026"
+  },
+  {
+    "pid": 14671,
+    "ppid": 14381,
+    "rssBytes": 76054528,
+    "birth": "Tue Nov 3 12:27:47 2026"
+  },
+  {
+    "pid": 14675,
+    "ppid": 14381,
+    "rssBytes": 115097600,
+    "birth": "Tue Nov 3 12:27:48 2026"
+  },
+  {
+    "pid": 14676,
+    "ppid": 14381,
+    "rssBytes": 112623616,
+    "birth": "Tue Nov 3 12:27:48 2026"
+  }
+]

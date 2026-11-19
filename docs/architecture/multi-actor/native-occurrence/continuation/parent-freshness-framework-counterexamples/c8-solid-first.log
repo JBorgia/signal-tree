@@ -1,0 +1,177 @@
+
+> nx run solid:test parent-freshness-counterparts --maxWorkers=1
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts parent-freshness-counterparts --maxWorkers=1
+
+(node:92820) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:92832) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92868) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-other-frameworks/c8-baseline/packages/solid
+
+(node:92875) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/parent-freshness-counterparts.spec.ts (2 tests | 2 failed) 15ms
+   × installed parent freshness and retained native dependencies (throw=false) 13ms
+   × installed parent freshness and retained native dependencies (throw=true) 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=false)
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=true)
+AssertionError: expected { old: { n: 10 } } to deeply equal { old: { n: 10 }, a: { n: 1 } }
+
+- Expected
++ Received
+
+  {
+-   "a": {
+-     "n": 1,
+-   },
+    "old": {
+      "n": 10,
+    },
+  }
+
+ ❯ src/lib/parent-freshness-counterparts.spec.ts:69:25
+     67|     expect(caught).toBe(fail ? sentinel : undefined);
+     68|     expect(calls).toBe(1);
+     69|     expect.soft(during).toEqual({ old: { n: 10 }, a: { n: 1 } });
+       |                         ^
+     70|     expect.soft(ancestor?.rows).toEqual(during);
+     71|     expect.soft(ancestor).not.toBe(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=false)
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=true)
+AssertionError: expected { rows: { old: { n: 10 } }, …(1) } not to be { rows: { old: { n: 10 } }, …(1) } // Object.is equality
+
+Compared values have no visual difference.
+
+ ❯ src/lib/parent-freshness-counterparts.spec.ts:71:31
+     69|     expect.soft(during).toEqual({ old: { n: 10 }, a: { n: 1 } });
+     70|     expect.soft(ancestor?.rows).toEqual(during);
+     71|     expect.soft(ancestor).not.toBe(before);
+       |                               ^
+     72|     expect.soft(ancestor?.sibling).toBe(siblingBefore);
+     73|     expect.soft(afterNested).toEqual({ old: { n: 10 }, a: { n: 1 }, b:…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=false)
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=true)
+AssertionError: expected { old: { n: 10 } } to deeply equal { old: { n: 10 }, a: { n: 1 }, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "a": {
+-     "n": 1,
+-   },
+-   "b": {
+-     "n": 2,
+-   },
+    "old": {
+      "n": 10,
+    },
+  }
+
+ ❯ src/lib/parent-freshness-counterparts.spec.ts:73:30
+     71|     expect.soft(ancestor).not.toBe(before);
+     72|     expect.soft(ancestor?.sibling).toBe(siblingBefore);
+     73|     expect.soft(afterNested).toEqual({ old: { n: 10 }, a: { n: 1 }, b:…
+       |                              ^
+     74|     expect.soft(cached).toBe(nativeBefore);
+     75|     expect.soft(countDuring).toBe(countBefore);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=false)
+AssertionError: expected { old: { n: 10 } } to deeply equal { old: { n: 10 }, a: { n: 1 }, …(1) }
+
+- Expected
++ Received
+
+  {
+-   "a": {
+-     "n": 1,
+-   },
+-   "b": {
+-     "n": 2,
+-   },
+    "old": {
+      "n": 10,
+    },
+  }
+
+ ❯ src/lib/parent-freshness-counterparts.spec.ts:76:26
+     74|     expect.soft(cached).toBe(nativeBefore);
+     75|     expect.soft(countDuring).toBe(countBefore);
+     76|     expect(heldBranch()).toEqual({ old: { n: 10 }, a: { n: 1 }, b: { n…
+       |                          ^
+     77|     expect(heldBranch()).not.toBe(branchBefore);
+     78|     expect(installedRow(heldBranch['a'])).toBe(retainedA);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (throw=true)
+AssertionError: expected { old: { n: 10 }, b: { n: 2 } } to deeply equal { old: { n: 10 }, a: { n: 1 }, …(1) }
+
+- Expected
++ Received
+
+@@ -1,9 +1,6 @@
+  {
+-   "a": {
+-     "n": 1,
+-   },
+    "b": {
+      "n": 2,
+    },
+    "old": {
+      "n": 10,
+
+ ❯ src/lib/parent-freshness-counterparts.spec.ts:76:26
+     74|     expect.soft(cached).toBe(nativeBefore);
+     75|     expect.soft(countDuring).toBe(countBefore);
+     76|     expect(heldBranch()).toEqual({ old: { n: 10 }, a: { n: 1 }, b: { n…
+       |                          ^
+     77|     expect(heldBranch()).not.toBe(branchBefore);
+     78|     expect(installedRow(heldBranch['a'])).toBe(retainedA);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  09:49:02
+   Duration  721ms (transform 519ms, setup 0ms, import 620ms, tests 15ms, environment 0ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts parent-freshness-counterparts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project solid failed
+
+Failed tasks:
+
+- solid:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        solid:test    3.4s

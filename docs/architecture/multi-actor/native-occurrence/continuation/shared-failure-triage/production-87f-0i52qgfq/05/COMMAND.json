@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "link-commit-boundary-carrier.spec.ts",
+    "--testNamePattern=the durable commit boundary, carried by public Link a FOREIGN tree's open transaction neither absorbs nor delays this tree's write",
+    "--reporter=verbose",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate",
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+    "fullName": "the durable commit boundary, carried by public Link a FOREIGN tree's open transaction neither absorbs nor delays this tree's write",
+    "duplicateOrdinal": 1
+  },
+  "fixtureSha256": "c96291c63c49b0ac5cc3c312af6c68d31581573b145595b7307ed239d4748751",
+  "environment": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "ST_OBSERVATIONS": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/05/observations/native.jsonl",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/05/observations/prepared",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/05/observations/public"
+  },
+  "filterNote": "Equivalent full-name regex; literal whitespace and hyphens need no escape. No fixture or timeout changes."
+}

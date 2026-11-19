@@ -1,0 +1,20 @@
+{
+  "status": "frozen for independent review; known point-work regression and inherited structural failures retained",
+  "candidate": "/private/tmp/st-packet-index-successor/candidate",
+  "sha256": {
+    "BASE-SOURCE-SHA256.json": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "SOURCE-SHA256.json": "5688501724309578e31b18cad1e67d37d775e3f679611ef631339ac88e5354e0",
+    "runtime.patch": "90590972fc3bea5d944af55f275bfcbb01413d521d4a4b127f9f977a38ec4472",
+    "tests.patch": "36ab6c58aed19e2008c61fcf9b5c8cf7a165ea13016e3401fe433cfdf971ae24",
+    "VERIFICATION.json": "f136cfb9ed341919de57e126febc93b341ef939e151043bd41a77aee89aece98",
+    "RESULTS.md": "476bb787e3a954890a06bd479b54822dc17ff0fe6d38ffbf4c5f25cd16ffe452",
+    "REVIEW-REQUEST.md": "45feba7736f5a36fd018c2ef8ef4fda68c639ebfe6c5dc1205c9a93162c0ec5e",
+    "COMMANDS.md": "57261c7bc2b4087dfeb814237d04b6f49694d5cad4408803afbd3cf26c416860",
+    "focused-final.log": "32f23487abe698760e026af15f19218a2b101e648ecbcb7b7438e4a8c0057c91",
+    "adversarial-final.log": "66a9dcfa7eb67c1c314936de2caf8d0b5cc453de6f0b8a91f2ae79b2e9874f6e",
+    "source-types-final.log": "b66dc44249ea7ef2c1d257939ca947fbba93f496580b8265b122632b43d93070",
+    "spec-types-final-2.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "candidate-point.log": "302e933621529d920ac759e1627b8b1ccd7566b8ca3074c159bbada4444a9096",
+    "baseline-check-point.log": "bb2f6c028dbee4b1f372af5fae5bc7bf1086a962feb968a748649bcb3250de1a"
+  }
+}

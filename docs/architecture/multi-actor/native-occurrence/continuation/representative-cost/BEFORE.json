@@ -1,0 +1,8 @@
+{
+  "sourceMismatches": [],
+  "inputMismatches": [],
+  "host": {
+    "raw": "The system has 34359738368 (2097152 pages with a page size of 16384).\nSystem-wide memory free percentage: 42%\n",
+    "freePercentage": 42.0
+  }
+}

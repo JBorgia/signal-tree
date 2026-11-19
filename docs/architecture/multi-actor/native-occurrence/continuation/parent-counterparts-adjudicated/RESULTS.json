@@ -1,0 +1,46 @@
+{
+  "vue-final": {
+    "exit": 0,
+    "testSummary": [
+      "Tests  3 passed (3)"
+    ]
+  },
+  "solid-final": {
+    "exit": 0,
+    "testSummary": [
+      "Tests  3 passed (3)"
+    ]
+  },
+  "react-final": {
+    "exit": 0,
+    "testSummary": [
+      "Tests  3 passed (3)"
+    ]
+  },
+  "c8-vue-final": {
+    "exit": 1,
+    "testSummary": [
+      "Tests  3 failed (3)"
+    ]
+  },
+  "c8-solid-final": {
+    "exit": 1,
+    "testSummary": [
+      "Tests  3 failed (3)"
+    ]
+  },
+  "c8-react-final": {
+    "exit": 1,
+    "testSummary": [
+      "Tests  3 failed (3)"
+    ]
+  },
+  "source-types": {
+    "exit": 0,
+    "testSummary": []
+  },
+  "spec-types": {
+    "exit": 0,
+    "testSummary": []
+  }
+}

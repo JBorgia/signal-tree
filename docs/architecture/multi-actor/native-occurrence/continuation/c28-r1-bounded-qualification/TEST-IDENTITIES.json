@@ -1,0 +1,156 @@
+[
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/link-declaration-public.spec.ts",
+    "sha256": "dbd54bf992ac94dc19c7efff7837138b8e557830328f7f51454a4b742930960a",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/link-declaration-public.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "sha256": "ba57c2d624c7d1dfa09c01f7eabf1dac0999b76fb15a32e5755631466916ec9d",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "sha256": "4a1ec6941b086135ab6233b506c0815d1db16d3a8c429d70689a68ef85b530be",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "sha256": "8028723fc87c052cea7ef2c256fd0fb87b3c9014cc73226b712e4477c61ac945",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/equal-owner-selection-companion.spec.ts",
+    "sha256": "d9f8dd0775b5006d6294f1063b442dd3d856955c0b61752867eedc0e5ccd60fc",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/equal-owner-selection-companion.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "sha256": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "sha256": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel54",
+    "path": "packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts",
+    "sha256": "3137c15af4c45b2c681f239e68c12b70057efa05f84b0ef12a1f85bd32bed692",
+    "archive": "/private/tmp/st-c27-public-composition/candidate/packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "sha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "sha256": "d1ebb43f942137ddfeb4d51a3f219f8e4f2fa8da468d1ce8dc17728054ce8731",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts",
+    "sha256": "43d91b8f25b3d0b347e545ac2d1d744d8c8e8145979df7e1f612355d45233e5b",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/recipient-source-permission.spec.ts",
+    "sha256": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/recipient-source-permission.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/recipient-window-independent.spec.ts",
+    "sha256": "886c2626b1a5f0892a4610577d798039795133b1103ddfe3a5af2c065c741dae",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/recipient-window-independent.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "sha256": "06cf63fe0338d8e3e94e0d10ff3f04d59468cd8b029798c4d430d013fc6d8d34",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "sha256": "cb2219188fb4587d2777c05ae7a9bb0a74538bb4ef68149db3f126e5282d219f",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "sha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "kernel59",
+    "path": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "sha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "archive": "/private/tmp/st-c27-remaining-failure-replay/candidate/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "angular-focused",
+    "path": "packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "sha256": "d431664a34accaf94c46d76d0329e462fb0464cda4fa2c1ff0bb8d1afd190510",
+    "archive": "/private/tmp/st-c26-finite-followup/candidate/packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "react-focused",
+    "path": "packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "sha256": "7c7525c6fb3fa73d38a6afe7c5f8da49981bf4da49a417272005d8b4120867d1",
+    "archive": "/private/tmp/st-c26-finite-followup/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "unchanged": true
+  },
+  {
+    "job": "vue-focused",
+    "path": "packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "sha256": "1107c9e81c960dc7507690bfde9599aad87e8c40d811fc6eab0d8a5a914ca6f9",
+    "archive": "/private/tmp/st-c26-finite-followup/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "solid-focused",
+    "path": "packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "sha256": "f0cf9ad14f4ddaeb4acc566fbe8b7cd47edf1615cbf363e8eec5a54f3a322ebe",
+    "archive": "/private/tmp/st-c26-finite-followup/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "unchanged": true
+  },
+  {
+    "job": "solid-focused",
+    "path": "packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "sha256": "2cb46070ecfed68beaa74cbc59850db078bd8dcc1dfd105dc018191fd34c0c1e",
+    "archive": "/private/tmp/st-c26-finite-followup/candidate/packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "unchanged": true
+  }
+]

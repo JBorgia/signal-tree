@@ -1,0 +1,42 @@
+{
+  "records": [
+    {
+      "kind": "before",
+      "at": 1793656038.891778,
+      "rows": [
+        {
+          "pid": 31421,
+          "ppid": 1,
+          "pgid": 31403,
+          "birth": "Mon Nov 2 14:41:53 2026",
+          "raw": "31421     1 31403 S      0.2  69312 Mon Nov  2 14:41:53 2026     node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+        },
+        {
+          "pid": 31812,
+          "ppid": 31421,
+          "pgid": 31403,
+          "birth": "Mon Nov 2 14:42:35 2026",
+          "raw": "31812 31421 31403 Z      0.0      0 Mon Nov  2 14:42:35 2026     <defunct>"
+        }
+      ]
+    },
+    {
+      "kind": "SIGKILL",
+      "at": 1793656039.293544,
+      "witness": {
+        "pid": 31421,
+        "ppid": 1,
+        "pgid": 31403,
+        "birth": "Mon Nov 2 14:41:53 2026",
+        "raw": "31421     1 31403 S      0.4  69392 Mon Nov  2 14:41:53 2026     node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+      }
+    },
+    {
+      "kind": "census",
+      "at": 1793656039.734423,
+      "rows": []
+    }
+  ],
+  "finalRows": [],
+  "liveNonZombieRemain": false
+}

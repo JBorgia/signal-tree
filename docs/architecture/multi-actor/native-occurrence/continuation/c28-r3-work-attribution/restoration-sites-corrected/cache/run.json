@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel restoration-site-attribution.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:36:25.180Z",
+    "endTime": "2026-11-03T04:36:41.181Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "5401536955112288054",
+      "startTime": "2026-11-03T04:36:25.265Z",
+      "endTime": "2026-11-03T04:36:41.176Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

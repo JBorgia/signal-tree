@@ -1,0 +1,20 @@
+{
+  "node": "24.15.0",
+  "officialNodeIndex": "https://nodejs.org/dist/index.json",
+  "officialNodeIndexSha256": "6b27fe5766e87929d16ccdde05c516cbdd12200eab62b28d4b2f31d34e21481a",
+  "ciBundledNpm": "11.12.1",
+  "ciFullFocusedVersion": "11.12.1",
+  "publishWorkflowRange": "^11.5.1",
+  "publishRangeLookupUtc": "2026-11-03T15:18:47.032007+00:00",
+  "publishHighestMatchingVersion": "11.21.1",
+  "publishRangeMetadataSha256": "a22a55f05e6f9f0e51c6ccc779e5cd76ef408fe1a8704d64040627c58d16b693",
+  "publishExactSmoke": {
+    "exit": 0,
+    "npm": "11.21.1",
+    "seal": "sha256-f349d92ace4237eedf6822b515ceda8273acf3a3f0fbdaa6bb7df9d4fc496e1f",
+    "dateUtc": "2026-11-03T15:17:11.803230+00:00"
+  },
+  "scope": "11.12.1 full F1 focused positive/negative/recovery; 11.21.1 single normal sealed gate with fresh setup; not future range versions or a second mutation campaign",
+  "installedExactNpmIntegrity": "sha512-YTzL6QBEJXyHcTu0JiUc7RKMp+mzlJtl7rGLmERaXUQeFHIMc9atdr6G9M9C8vDWbv40epoTQAzNL2/PtZVDhQ==",
+  "installedExactNpmLockSha256": "662d634158c36ca8665bd506908cd64f7a465bf5e01987a68a70b0c8977d5960"
+}

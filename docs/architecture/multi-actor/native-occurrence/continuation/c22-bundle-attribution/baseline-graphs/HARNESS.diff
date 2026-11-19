@@ -1,0 +1,21 @@
+--- /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/tools/check-bundle-budget.mjs	2026-10-19 00:45:16
++++ /private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/baseline-graphs/gate.mjs	2026-11-02 14:38:54
+@@ -27,15 +27,14 @@
+  * PROD bump needs a genuine justification; a DEV bump usually means a new
+  * diagnostic and can just say so.
+  */
+-import { build } from 'esbuild';
++import { build } from './capture.mjs';
+ import { gzipSync } from 'node:zlib';
+ import { mkdtempSync, writeFileSync } from 'node:fs';
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
+ 
+-const CORE = new URL('../dist/packages/kernel/dist/index.js', import.meta.url)
+-  .pathname;
+-const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
++const CORE = "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/dist/packages/kernel/dist/index.js";
++const REPO_NODE_MODULES = "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/candidate/node_modules";
+ 
+ /**
+  * This gate measures BUILT OUTPUT (`dist/`), not source — and for a long time

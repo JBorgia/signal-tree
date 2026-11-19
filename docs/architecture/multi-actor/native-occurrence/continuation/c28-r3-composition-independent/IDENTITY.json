@@ -1,0 +1,17 @@
+{
+  "verifiedUnchangedFiles": 3102,
+  "fixture": "1469e3995f95ac634e1b29c2520fbde84b3d05aa5309b6360fa1b459da7256c8",
+  "sha256": {
+    "REVIEW.md": "4383593927c764b69a11626044672ab2ccbc49f85c3efffe684432aa11acb9cd",
+    "SOURCE-MANIFEST.json": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+    "COMPOSITION.json": "de1ad00166c7619432d17eb95457d2ebbf03bce75cf7006ed0acacbe318d8b0d",
+    "LAYER-AUDIT.json": "a5317cd908adb199b98174868dac3693065c6c17c50d2fdadd753b2e82e2c2ea",
+    "PRODUCER-EQUALITY.json": "a8d22222250494885d304f09af86a090b250c4d88eb544d1eeedecc6878afb43",
+    "TESTS.patch": "571675fa6faf71fd145c0c3cf5cb534c2a28a4913ac08248c6e22b605994b539",
+    "ingress-first/COMMAND.json": "52c427a76334be34b6a5140ae0036adcbe15fb6ddfe6f2e95561a1f6e0b87135",
+    "ingress-first/RESULT.json": "9c1affae9919487fe1d9e1162aef920d31e227581212fdb279756e3e1ad965a4",
+    "ingress-first/first.log": "56152ad0fd61c79317028ee91b2316dc19063be20d6931a17138838d6684a162",
+    "prepare.py": "bb9f4c48be3ef6e0f664d66d0bfcb6f39ab9ec37fd5c6d39353045ca9c171e50",
+    "run.py": "11f2480d08385efc90b35621dc49d86e354c13f5539cb779a3477606234a3ef1"
+  }
+}

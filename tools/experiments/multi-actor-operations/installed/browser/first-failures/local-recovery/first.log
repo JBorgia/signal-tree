@@ -1,0 +1,22 @@
+{"stage":"refusal","phase":"delivering","busy":false,"pending":"1,2","message":"SignalTree could not rollback the pending transaction: turn 2 depends on state this rollback would invalidate, so reversing turn 1 is no longer safe [later-confirmed-dependency]"}
+{"stage":"after blocker rollback/retry/reject/dispose","phase":"delivering","pending":"1","destroyed":0}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: terminal rejection must remain locally recoverable
++ actual - expected
+
++ 'delivering'
+- 'failed'
+
+    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/first-failures/local-recovery/reproduce.mjs:10:14 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'delivering',
+  expected: 'failed',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

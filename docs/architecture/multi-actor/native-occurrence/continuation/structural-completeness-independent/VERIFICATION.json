@@ -1,0 +1,9 @@
+{
+  "manifestSha256": "14be1df54242880b5a10aa8b0822da6fa999d4586ac51047eee1c1dcac2cefe2",
+  "files": 2947,
+  "changed": {
+    "/private/tmp/st-structural-completeness-successor/candidate": [],
+    "/private/tmp/st-structural-completeness-independent/candidate": []
+  },
+  "publicFixtureIdentical": true
+}

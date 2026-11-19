@@ -1,0 +1,61 @@
+--- R3/packages/kernel/src/lib/link-commit-ordering.spec.ts
++++ composed/packages/kernel/src/lib/link-commit-ordering.spec.ts
+@@ -175,26 +175,45 @@
+     const rec = recordingStorage();
+     const tree = makeTree(rec, 'pco-refused');
+ 
+-    // Force the fail-closed refusal path.
+-    const port = getTreeRealizationPort(
+-      (tree as unknown as { $: object }).$
+-    ) as { validateEffects?: (...args: unknown[]) => unknown } | undefined;
+-    const original = port?.validateEffects;
+-    if (port && typeof original === 'function') {
+-      port.validateEffects = () => ({ kind: 'structural-drift' });
+-    }
+-
++    const { transactionLifecycleReader } = await import(
++      './internals/transaction-lifecycle-view'
++    );
++    const port = getTreeRealizationPort(tree.$);
++    if (!port?.prepareSelectedUnit) {
++      throw new Error('Expected selected preparation port');
++    }
++    const original = port.prepareSelectedUnit;
+     const pending = tree.transact(() => {
+       tree.$.a('a1');
+     });
+-
++    const reader = transactionLifecycleReader(tree);
++    if (!reader) throw new Error('Expected transaction lifecycle reader');
++    const beforePending = reader.snapshot().pending;
++    expect(beforePending).toHaveLength(1);
++    const beforeState = tree.$();
++    expect(beforeState).toEqual({ a: 'a1', b: 'b0' });
++
++    // Inject generic selected-preparation refusal before any installable plan.
++    // This is not an authentic structural-drift witness.
++    const refusal = new Error('injected pre-install selected preparation failure');
++    let refusalCalls = 0;
++    let returnedPlans = 0;
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw refusal;
++      const plan = original.apply(this, args);
++      returnedPlans++;
++      return plan;
++    };
+     expect(original).toBeTypeOf('function');
+     try {
+       expect(() => pending.rollback()).toThrow();
++      expect(refusalCalls).toBe(1);
++      expect(returnedPlans).toBe(0);
++      expect(tree.$()).toEqual(beforeState);
++      expect(reader.snapshot().pending).toEqual(beforePending);
+     } finally {
+-      if (port && typeof original === 'function') {
+-        port.validateEffects = original as typeof port.validateEffects;
+-      }
++      port.prepareSelectedUnit = original;
+     }
+ 
+     // Refusal did not settle the tree, even if the next write is unrelated.

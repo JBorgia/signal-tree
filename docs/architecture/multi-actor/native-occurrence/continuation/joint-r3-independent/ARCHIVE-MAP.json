@@ -1,0 +1,74 @@
+[
+  {
+    "source": "MINIMAL-TRIAGE.json",
+    "archive": "MINIMAL-TRIAGE.json",
+    "sourceSha256": "e02f6c98453749a2b901bc2b8f2a9631ef83029169c917fc67cbed7c4fabb00b",
+    "archiveSha256": "e02f6c98453749a2b901bc2b8f2a9631ef83029169c917fc67cbed7c4fabb00b"
+  },
+  {
+    "source": "drain.log",
+    "archive": "drain.log",
+    "sourceSha256": "e8935a38fdec416f5f49fb8eca0d7bd5c345da5c154b91d86477d939ad7e7930",
+    "archiveSha256": "e8935a38fdec416f5f49fb8eca0d7bd5c345da5c154b91d86477d939ad7e7930"
+  },
+  {
+    "source": "standalone.log",
+    "archive": "standalone.log",
+    "sourceSha256": "5edbdf2480b953c4417c8222ccd4c86b64bea5a6eaab811daac324be91e84185",
+    "archiveSha256": "5edbdf2480b953c4417c8222ccd4c86b64bea5a6eaab811daac324be91e84185"
+  },
+  {
+    "source": "candidate-minimal-membership.log",
+    "archive": "candidate-minimal-membership.log",
+    "sourceSha256": "1689a094c3da6f9c7ab24d13b2266402f7a5c43be5c30e6ce4f6f0ce8bf09c11",
+    "archiveSha256": "1689a094c3da6f9c7ab24d13b2266402f7a5c43be5c30e6ce4f6f0ce8bf09c11"
+  },
+  {
+    "source": "FINAL-VERIFICATION.json",
+    "archive": "FINAL-VERIFICATION.json",
+    "sourceSha256": "74649a4e7625699edbcb5502b3850f6dec6f1d5bb46150e870fdd29803318b60",
+    "archiveSha256": "74649a4e7625699edbcb5502b3850f6dec6f1d5bb46150e870fdd29803318b60"
+  },
+  {
+    "source": "r2-minimal-membership.log",
+    "archive": "r2-minimal-membership.log",
+    "sourceSha256": "9c3b28749ad19f3983ccdf20824a9283b74620b985979d93265d4a5cab9b7afc",
+    "archiveSha256": "9c3b28749ad19f3983ccdf20824a9283b74620b985979d93265d4a5cab9b7afc"
+  },
+  {
+    "source": "vue.log",
+    "archive": "vue.log",
+    "sourceSha256": "23c5566d5c0f91b6420052e62139e94aa2ea29e4bc46c2ba6773383aa2ed6699",
+    "archiveSha256": "23c5566d5c0f91b6420052e62139e94aa2ea29e4bc46c2ba6773383aa2ed6699"
+  },
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "a2269f44bee43216babf4f7aed3eca003e9d90318a1395c54997c056b65135c5",
+    "archiveSha256": "a2269f44bee43216babf4f7aed3eca003e9d90318a1395c54997c056b65135c5"
+  },
+  {
+    "source": "c0-minimal-membership.log",
+    "archive": "c0-minimal-membership.log",
+    "sourceSha256": "c1fad4735cdb1d9e82ed555ba1026121aa2e6e1d55e81831f73d10d2ecccd37e",
+    "archiveSha256": "c1fad4735cdb1d9e82ed555ba1026121aa2e6e1d55e81831f73d10d2ecccd37e"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "80fa4e9bf5f0b6e3aa45f50a99d7be8772ea43e9bc26cf4a9823cfe574862ac5",
+    "archiveSha256": "80fa4e9bf5f0b6e3aa45f50a99d7be8772ea43e9bc26cf4a9823cfe574862ac5"
+  },
+  {
+    "source": "focused.log",
+    "archive": "focused.log",
+    "sourceSha256": "d3bf1af928e962f9510db16c1b3f1cd019a2c2467424d4446e91ce5cb95012a5",
+    "archiveSha256": "d3bf1af928e962f9510db16c1b3f1cd019a2c2467424d4446e91ce5cb95012a5"
+  },
+  {
+    "source": "run-minimal-triage.py",
+    "archive": "run-minimal-triage.py",
+    "sourceSha256": "4fd681ac3030391987ec37219a38235773041ddb68e8c37283e1aec0756281a2",
+    "archiveSha256": "4fd681ac3030391987ec37219a38235773041ddb68e8c37283e1aec0756281a2"
+  }
+]

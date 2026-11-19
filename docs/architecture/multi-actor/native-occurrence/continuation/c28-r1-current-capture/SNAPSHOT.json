@@ -1,0 +1,23 @@
+{
+  "status": "Frozen bounded R1 prototype; independent review before broader qualification",
+  "manifestSha256": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b",
+  "baseManifestSha256": "986f7a94c80734070fc51395ca8eee63d808a4fbf949dadc48f5de1e4c48b3b2",
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "added": [
+    "packages/kernel/src/lib/current-capture-r1.spec.ts",
+    "packages/kernel/src/lib/current-validation.spec.ts",
+    "packages/kernel/src/lib/opaque-current-input.spec.ts"
+  ],
+  "runtimePatchSha256": "6509ca669862704b62bc0eafd9704231c7cdcfdbc78c201bf32a48890dee4da5",
+  "testsPatchSha256": "922c4405cc132473a1d8f622e9c81d18ada4d2e4e2e8ef77df802149f3cc58bc",
+  "baseUnchanged": true,
+  "runtime": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "d64344f66b5df1463cc89e810bb370296902d450f527342f8cbbfd755f230815",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "d437aa15f4cf1f9aeac90bc94b676d4aa6fc5568bb488453750920180f072148"
+  },
+  "originalRegressionUnchanged": true,
+  "independentOpaqueUnchanged": true
+}

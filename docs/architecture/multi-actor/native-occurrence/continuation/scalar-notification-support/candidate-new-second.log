@@ -1,0 +1,54 @@
+
+> nx run kernel:test --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --maxWorkers=1
+
+(node:61586) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-scalar-support-correction/candidate/packages/kernel
+
+(node:61637) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-native-support.spec.ts (8 tests | 1 failed) 78ms
+   × private repeated uncovered observations retain one wrapper and release subscriptions 5ms
+(node:61673) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-native-support.spec.ts > private repeated uncovered observations retain one wrapper and release subscriptions
+AssertionError: expected 1 to be greater than 1
+ ❯ src/lib/scalar-native-support.spec.ts:26:142
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 8 passed (9)
+   Start at  11:03:48
+   Duration  3.93s (transform 1.37s, setup 0ms, import 1.93s, tests 101ms, environment 1.50s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.6s

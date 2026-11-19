@@ -1,0 +1,17 @@
+{
+  "REPORT.md": "65b162d3ab12ad136a9844f672e18b76e4f0fe831b970bf934ec635a6df26959",
+  "STOP.json": "84d2ed6f6934ec212fdb1a733833604ace2e9333ce56e898ac347ff35b01a94f",
+  "I7-PARTITION.json": "103704a68ead0e0457a532b5674701d7178070b9b850ed89ab964c5937464f61",
+  "FINAL-SOURCE-PRESERVATION.json": "22602cfa7825f9c231530d976375b8ed318c65e0bb0663b5846b70b98a236353",
+  "FINAL-ARTIFACT-PRESERVATION.json": "23b9d890b09562fec1a3576409b87cb11a26dec504b9dc4170c6fc9ce23c28ee",
+  "PREREGISTRATION.json": "935820eae67d38b13f3f674a45515a805e9e4f77fb242692fc8d17a3ebaceb10",
+  "CONTROLLER-BOUNDARY-ADDENDUM.json": "fb0d7647499e95dfdae9db32d295345bf1062153e44922eac3cac0bf2ef58578",
+  "runs/screen-restoration-truncation/RESULT.json": "fb2dcea15c099f358acf0fb6485d1fea67042c31f531c8d02ede567194296e1b",
+  "runs/original-membership/RESULT.json": "5514bd3d4cd0a28e6593e46d0f63cc2230155aa4b5e3e152d7771f6db40dda54",
+  "runs/graph-screen/RESULT.json": "25ed6cc6f0f9e17e2c73330a654ab333aa7794ab97944748ebbdc55d3c2b849e",
+  "runs/screen-restoration-jumps/RESULT.json": "1a082b873506fb241b239dd2687d358df9b4b3d48506975f0b9d0dba7dca8ec0",
+  "runs/screen-replacement-undo-redo/RESULT.json": "8c2b4cc88efb5bf7a813d4cbacecf08195477fd5f811f1edd0a5b2d02ddbbd62",
+  "runs/graph-original/RESULT.json": "a7f7990e44d4a1852856e9e297a091b31a6bf869dc9e25bf2898bc229dbc2d30",
+  "runs/screen-membership/RESULT.json": "fca5959bd9327e509692d4f8087ac9f7b1ac4e3bbc4a9b35c907c985d0176167",
+  "runs/original-replacement-undo-redo/RESULT.json": "84d2ed6f6934ec212fdb1a733833604ace2e9333ce56e898ac347ff35b01a94f"
+}

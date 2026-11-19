@@ -1,0 +1,20 @@
+{
+  "C5Manifest": "/private/tmp/st-native-combined-c5/SNAPSHOT-C5.json",
+  "C5ManifestSha256": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+  "filesVerified": 2986,
+  "mismatches": [],
+  "inputs": {
+    "tools/verify-gates.mjs": "21ac1c5f2e2e1b347af819f685d0b9ce7c58bc330092312c9819a2d6b8980843",
+    "package.json": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    ".nvmrc": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "scripts/release-plan.mjs": "752d60968fe43ebb7b605f903a1effdc63f2c0c714c7b537f0bc8c8e486e9dfb",
+    ".github/VALIDATION_GUIDE.md": "1fb6eba4bccad5f4f5517ea13a4bcf9b7649b1d62114ba903f8cb85f99660ef7",
+    ".github/instructions/build-pipeline.instructions.md": "5aa2d25f7e8226168b60948bd9ae8c050bc1e7c4329c331f350814f72a337df7",
+    "docs/support-policy.md": "b65aac2d81986a940c6259404eae344fbe77d3ca5466fc326b203d31499c04bd",
+    "tools/check-bundle-budget.mjs": "df55eac6244aa92a4972358fda41b8cbe809caf3c97745a814e9aa8aa8c7215a",
+    "scripts/playwright/route-smoke.config.ts": "cf3a40ea2883a1ff78f83cf5af9c0ad5081fbf70d62d91242d7c73c0002bb808",
+    "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872"
+  },
+  "C6": "No frozen C6 path/manifest found at audit time",
+  "R3": "No R3 successor freeze found; concrete scope read from st-joint-phase-r2-independent/R3-HANDOFF"
+}

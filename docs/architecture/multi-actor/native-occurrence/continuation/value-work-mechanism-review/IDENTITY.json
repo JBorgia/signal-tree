@@ -1,0 +1,20 @@
+{
+  "manifest": "02aba88c81c413700ef4af2f9bf8facc422cabf01fddf6a31b4ec2d777b16568",
+  "verifiedEntries": 3060,
+  "inputs": {
+    "/private/tmp/st-c12-enrollment-independent-review/VALUE-WORK-DESIGN.md": "6c65a7eccf7fcf3ed38c877e3216de4f799ab8fc64cd9b47767edefdf9849115",
+    "/private/tmp/st-c12-enrollment-independent-review/REVIEW.md": "a622cbd56b2fd5885293b8a8565936a7a62eb4b412ea79d3e21ddb7af59ec514",
+    "/private/tmp/st-c12-enrollment-independent-review/c15-equal-sibling-command.json": "509ea9693ed8017a9354d87ebf1ddecd91fd708507cab17941c4f15cd12582a6",
+    "/private/tmp/st-c12-enrollment-independent-review/c15-equal-sibling-exit.json": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "/private/tmp/st-c12-enrollment-independent-review/c15-equal-sibling.log": "f3b5bb54320cdfd759d3c3c987bc1cf7f8a368fbaf7742fdddfb00273c506f03",
+    "/private/tmp/st-c12-enrollment-independent-review/baseline-equal-sibling-command.json": "c597ab07cbb3f380dda0af7469f7e587afea9565a48a845f4119ab51aca4317a",
+    "/private/tmp/st-c12-enrollment-independent-review/baseline-equal-sibling-exit.json": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "/private/tmp/st-c12-enrollment-independent-review/baseline-equal-sibling.log": "a7778ae9c7590d78ccdc2903d0187a7910bfb9ed41d14416dd0090b6b02a3941",
+    "/private/tmp/st-c12-enrollment-independent-review/c15-equal-proof-trace-observations": "b2f803f4f1a90361853edf6c06189f9bf1872e13349dddb033cf4ed0ddc08dcd",
+    "/private/tmp/st-native-combined-c15/candidate/packages/kernel/src/lib/link.ts": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+    "/private/tmp/st-native-combined-c15/candidate/packages/kernel/src/lib/experimental-publication/private.ts": "bef039b862454e6609a54eb48cd0f46d8083e278488f1142de3245340bf933ba",
+    "/private/tmp/st-native-combined-c15/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts": "6ab1c578bd5ba3fd5e8f62998f17c513066c5219cb3ebfe5b2522160f26873f8",
+    "/private/tmp/st-native-combined-c15/candidate/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+    "/private/tmp/st-native-combined-c15/candidate/packages/kernel/src/lib/scalar-frame-publication.spec.ts": "e8554d47371ca1891279bf17387418018b17993be9b843f5b7a50eb9516e1075"
+  }
+}

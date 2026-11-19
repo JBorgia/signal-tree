@@ -1,0 +1,35 @@
+
+> nx run kernel:test effective-presence-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs effective-presence-independent.spec.ts --maxWorkers=1
+
+(node:45906) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45914) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-effective-presence-independent-review/candidate/packages/kernel
+
+(node:45998) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:38:44
+   Duration  3.05s (transform 1.79s, setup 0ms, import 2.13s, tests 33ms, environment 644ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.1s

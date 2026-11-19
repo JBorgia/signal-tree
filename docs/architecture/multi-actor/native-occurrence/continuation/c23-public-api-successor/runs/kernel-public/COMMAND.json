@@ -1,0 +1,16 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "src/lib/link-declaration-public.spec.ts",
+    "src/lib/tree-error-public-contract.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c23-declare-public-successor/candidate",
+  "node": "24.15.0",
+  "noOutputDeadlineSeconds": 180
+}

@@ -1,0 +1,37 @@
+{
+  "alias-resolution": {
+    "exit": 0,
+    "elapsedSeconds": 21.84509849990718,
+    "source_unchanged": true
+  },
+  "alias-resolution-no-hmr": {
+    "exit": 0,
+    "elapsedSeconds": 23.290672207949683,
+    "source_unchanged": true
+  },
+  "graph": {
+    "exit": 0,
+    "elapsedSeconds": 40.518625624943525,
+    "source_unchanged": true
+  },
+  "react-tests": {
+    "exit": 0,
+    "elapsedSeconds": 273.2407684579957,
+    "source_unchanged": true
+  },
+  "reference-build": {
+    "exit": 130,
+    "elapsedSeconds": 224.37913250003476,
+    "source_unchanged": true
+  },
+  "reference-build-direct": {
+    "exit": 0,
+    "elapsedSeconds": 10.27184608404059,
+    "source_unchanged": true
+  },
+  "reference-tests": {
+    "exit": 0,
+    "elapsedSeconds": 67.68964108300861,
+    "source_unchanged": true
+  }
+}

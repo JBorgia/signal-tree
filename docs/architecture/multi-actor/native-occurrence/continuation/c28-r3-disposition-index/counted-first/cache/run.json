@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel restoration-scaling-slice-corrected.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:46:57.482Z",
+    "endTime": "2026-11-03T04:47:00.834Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14424027791518483197",
+      "startTime": "2026-11-03T04:46:57.596Z",
+      "endTime": "2026-11-03T04:47:00.832Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

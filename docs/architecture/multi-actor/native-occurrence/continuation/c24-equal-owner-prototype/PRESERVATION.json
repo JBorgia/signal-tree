@@ -1,0 +1,15 @@
+{
+  "Main13Unchanged": true,
+  "React6Unchanged": true,
+  "runtimeChangedFiles": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/native-scalar-selection.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts"
+  ]
+}

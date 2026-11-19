@@ -1,0 +1,67 @@
+{
+  "C19manifest": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "C21manifest": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "C19toC21": {
+    "packages/kernel/src/lib/recipient-window-review.spec.ts": {
+      "C19": "a6196ef6b47bf7a167e17e60e2d1ad19feb132afafd6575999e85f4356ed7361",
+      "C21": "f933ed3a4e9b401b08925966648c9a6316444b402d4b78ff5f45c8ae52e3b86d"
+    },
+    "packages/kernel/src/lib/recipient-positive-counterparts.spec.ts": {
+      "C19": null,
+      "C21": "af371d339dd11a4a60a53a1ad1eff583f899cece5d9465d4c6f9f46def3c7e29"
+    },
+    "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts": {
+      "C19": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56",
+      "C21": "208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a"
+    },
+    "packages/kernel/src/lib/occurrence-successor.spec.ts": {
+      "C19": "dcda43411b62f894d7b0402801a2ecedaafeeb23d431af46538d98e8663e4462",
+      "C21": "4938fe5f5c3e6f987cafb2f67982ae3f0745038678557f6b81765000a185548a"
+    }
+  },
+  "originalSpecSha256": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+  "sameOriginalC19": true,
+  "probeSha256": "3c6061908a0dc64c3c6bc0c7b3753c4022cd1e9d37d182f26557d787f956fe59",
+  "originalImports": [
+    "vitest",
+    "./signal-tree",
+    "./markers/entity-map",
+    "./undoable",
+    "./internals/entity-membership-view",
+    "../enhancers/restoration/restoration"
+  ],
+  "probeImports": [
+    "node:fs",
+    "vitest",
+    "./signal-tree",
+    "./markers/entity-map",
+    "./undoable",
+    "./internals/entity-membership-view",
+    "../enhancers/restoration/restoration"
+  ],
+  "relativeImportsSame": true,
+  "sameReporterBytes": true,
+  "fullrunModuleEnds": 276,
+  "fullrunLastModules": [
+    {
+      "kind": "module-end",
+      "at": "2026-11-02T20:30:51.187Z",
+      "file": "/private/tmp/st-native-combined-c21/candidate/packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts"
+    },
+    {
+      "kind": "module-start",
+      "at": "2026-11-02T20:30:51.900Z",
+      "file": "/private/tmp/st-native-combined-c21/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts"
+    },
+    {
+      "kind": "module-end",
+      "at": "2026-11-02T20:30:51.907Z",
+      "file": "/private/tmp/st-native-combined-c21/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts"
+    },
+    {
+      "kind": "module-start",
+      "at": "2026-11-02T20:30:52.570Z",
+      "file": "/private/tmp/st-native-combined-c21/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "project": "angular",
+  "run": "angular",
+  "counts": {
+    "passed": 302,
+    "skipped": 3
+  },
+  "discoveredFiles": 52,
+  "selectedFiles": 52,
+  "startedFiles": 52,
+  "completedFiles": 52,
+  "missingCompletion": [],
+  "unexpectedModules": [],
+  "runEndSeen": true,
+  "result": {
+    "project": "angular",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 50.86503225006163,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  "failures": []
+}

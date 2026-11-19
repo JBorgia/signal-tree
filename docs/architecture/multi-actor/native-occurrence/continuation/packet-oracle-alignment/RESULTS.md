@@ -1,0 +1,15 @@
+# Packet private-oracle alignment — test-only successor
+
+Runtime is byte-identical to frozen packet-point-admission successor, manifest542125745ddaad67aead344961bdfb408e43c6447938f6834413038a90ad413d. Only packet-index-adversarial.spec.ts and packet-index-review.spec.ts change. No author candidate, root source, structural-sequence assertion, point budget or public contract change.
+
+Original complete test files and author eleven-failure/cost logs are preserved in originals/. Fresh unchanged two-file baseline:20 pass/8 fail (baseline-original.log). The exact eight failures match the authorized private-oracle alignment. An interrupted copy/setup attempt and missing-manifest startup log are preserved as baseline-first.log where present; those are not test results. No implementation change was made to obtain baseline or corrected outcomes.
+
+The aligned two-file suite passes29/29. Eight historical cases are replaced by meaningful current-contract assertions; one additional test retains the unsafe precedence input as an exact preinstall refusal. ORACLE-MAPPING.md gives original→replacement semantics. The known-bug diagnostic is now a live regression, not skipped: it attempts the finalizer corruption, verifies immutability, and actually installs/completes the unchanged7 packet with matching native endpoint and responsibility. Other finalizer/recipient tests assert the exact propagated append exception, unchanged frozen metadata, and absence of install/completion. No engine-specific error text is assumed; the source-owned unsupported-shape refusal is matched by its precise message.
+
+Full existing selected replay:81 pass/3 fail across84 cases (focused.log). Only the original structural-admission-sequence tests remain red: ordered remove/rekey vacancy; ordinary remove before physical omission; numeric/string occupancy. They are byte-identical and not reclassified. This selection corresponds to author's83 cases plus the new unsafe-precedence refusal.
+
+Commands and exits are in COMMAND-RESULTS.json; run-aligned.py preserves exact workload/environment. Baseline command used the same Nx command as aligned-first, before applying align-oracles.py. Pinned Node24.15.0/pnpm10.17.0, Nx cache disabled, one worker. No performance/heap/timing comparison or integration approval is claimed. Original cost gate remains a separate required failure, never an oracle to align.
+
+SOURCE-SHA256.json SHA25697aaedeef46bb224ce28e063798b2ea868d7a03ef519adf157293a577415754e identifies the test-only candidate. VERIFICATION.json verifies unchanged author sources and that only the two spec files differ. tests.patch is ready for Main review; this report does not approve its own integration.
+
+Unchanged point replay still fails at15,800 visits against less-than2,000 (point.log); no gate edit or cost acceptance. Spec-type ratchet passes with no baseline change (spec-types.log). Source types were not repeated: runtime/types/configuration remain exactly frozen, and the changed specs passed their own type gate.

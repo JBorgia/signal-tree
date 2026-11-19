@@ -1,0 +1,1 @@
+[{"event":"supersede","fact":1},{"event":"supersede","fact":2},{"event":"refresh","fact":3,"payload":{"a":1,"b":0},"changed":false},{"event":"refresh","fact":3,"payload":{"a":1,"b":0},"changed":false},{"event":"final","sent":[]}]

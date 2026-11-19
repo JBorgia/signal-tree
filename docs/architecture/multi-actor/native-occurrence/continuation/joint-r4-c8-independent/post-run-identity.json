@@ -1,0 +1,104 @@
+{
+  "r4_original": {
+    "files": 3009,
+    "mismatches": []
+  },
+  "r4_copy": {
+    "files": 3009,
+    "mismatches": []
+  },
+  "r3_copy": {
+    "files": 3008,
+    "mismatches": []
+  },
+  "selected_controls": [
+    {
+      "file": "packages/kernel/src/lib/plain-branch-membership.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/membership-reversal-delivery.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/membership-declarative-delivery-v16-controls.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/transactions/membership-history-projection.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/pending-membership-admission.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/whole-value-membership.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/enhancers/transactions/membership-queued-evidence.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/joint-membership-completion.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": false
+    },
+    {
+      "file": "packages/kernel/src/lib/joint-membership-phase.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/joint-membership-seal-independent.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/joint-mixed-seal.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/joint-install-boundary-independent.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/joint-install-validation.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/publication-membership-provenance.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-membership-producer.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-membership-view.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts",
+      "matches_R4": true,
+      "unchanged_from_R3": true
+    }
+  ],
+  "added_test_only": [
+    "candidate/packages/kernel/src/lib/r4-review-prepend-payload.spec.ts"
+  ]
+}

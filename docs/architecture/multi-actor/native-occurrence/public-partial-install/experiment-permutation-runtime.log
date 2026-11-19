@@ -1,0 +1,69 @@
+
+> nx run kernel:test public-partial-install.spec.ts
+
+> node tools/run-core-vitest.mjs public-partial-install.spec.ts
+
+(node:99142) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:99156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-public-partial-install-comparison/experiment/packages/kernel
+
+(node:99170) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/public-partial-install.spec.ts (4 tests | 2 failed) 23ms
+   × public onUpdate refuses x inverse after y; retry, writes=xy 16ms
+   × public onUpdate refuses x inverse after y; confirm, writes=xy 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/public-partial-install.spec.ts > public onUpdate refuses x inverse after y; retry, writes=xy
+ FAIL  src/lib/public-partial-install.spec.ts > public onUpdate refuses x inverse after y; confirm, writes=xy
+AssertionError: expected { x: 7, y: +0 } to deeply equal { x: 7, y: 11 }
+
+- Expected
++ Received
+
+  {
+    "x": 7,
+-   "y": 11,
++   "y": 0,
+  }
+
+ ❯ src/lib/public-partial-install.spec.ts:25:30
+     23|   expect(firstError).toBeDefined();expect(calls.some(c=>c.changes.x===…
+     24|   // Existing atomic-refusal safety: refusing a required inverse canno…
+     25|   expect(afterFailure.value).toEqual({x:7,y:11});
+       |                              ^
+     26|  }finally{off();t.destroy();}
+     27| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 2 passed (4)
+   Start at  15:08:17
+   Duration  857ms (transform 515ms, setup 0ms, import 619ms, tests 23ms, environment 141ms)
+
+Warning: command "node tools/run-core-vitest.mjs public-partial-install.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel entity-registration-original entity-registration-lifecycle entity-registration-receipts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:48:34.708Z",
+    "endTime": "2026-11-03T05:48:37.452Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14046916399107316941",
+      "startTime": "2026-11-03T05:48:34.738Z",
+      "endTime": "2026-11-03T05:48:37.451Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

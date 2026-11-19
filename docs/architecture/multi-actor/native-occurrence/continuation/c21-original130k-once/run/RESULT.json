@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "watchdog": null,
+  "targetCaseStartObserved": false,
+  "onePassedInDefaultReporter": false,
+  "ownedGroupStillPresent": false,
+  "sourceUnchanged": true,
+  "changed": [],
+  "qualifiedPass": false
+}

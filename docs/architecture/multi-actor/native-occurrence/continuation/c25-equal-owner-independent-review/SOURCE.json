@@ -1,0 +1,10 @@
+{
+  "provisional": true,
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": "1b89f829ae3d3672fd9f8f7c04b16b9cd8db027403fb9056a0da7d6251037f16",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8",
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "030f259dd5cfe14b6c8456c19e33ebd1c7015b4bd0b65613bb01d4a326ac53b6",
+    "packages/kernel/src/lib/equal-owner-current-input.spec.ts": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3"
+  },
+  "changedDuringCapture": []
+}

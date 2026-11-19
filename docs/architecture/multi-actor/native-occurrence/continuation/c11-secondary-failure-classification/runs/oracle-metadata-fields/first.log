@@ -1,0 +1,63 @@
+
+> nx run kernel:test independent-metadata-fields.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-metadata-fields.spec.ts --maxWorkers=1
+
+(node:29722) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29748) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/oracle/packages/kernel
+
+(node:29772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/internals/independent-metadata-fields.spec.ts (9 tests | 1 failed) 28ms
+     × reports owner paths for built-in markers at their owning positions 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/internals/independent-metadata-fields.spec.ts > interceptLeafSignals — WriteMetadata passthrough (PR1) > reports owner paths for built-in markers at their owning positions
+AssertionError: expected [] to deeply equal [ 'ScalarPublicationCoverage' ]
+
+- Expected
++ Received
+
+- [
+-   "ScalarPublicationCoverage",
+- ]
++ []
+
+ ❯ onWrite src/lib/internals/independent-metadata-fields.spec.ts:35:44
+
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:249:7
+ ❯ src/lib/internals/independent-metadata-fields.spec.ts:119:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  10:28:53
+   Duration  1.40s (transform 562ms, setup 0ms, import 680ms, tests 28ms, environment 474ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-metadata-fields.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.4s

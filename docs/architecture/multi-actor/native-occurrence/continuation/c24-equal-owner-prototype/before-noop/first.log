@@ -1,0 +1,69 @@
+
+> nx run kernel:test equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern=does not acquire
+
+> node tools/run-core-vitest.mjs equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern="does not acquire"
+
+(node:57156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:57164) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c24-equal-owner/candidate/packages/kernel
+
+(node:57178) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/equal-owner-admission.spec.ts (11 tests | 1 failed | 10 skipped) 37ms
+   × equal declaration inside unrelated transaction does not acquire destination ownership 36ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/equal-owner-admission.spec.ts > equal declaration inside unrelated transaction does not acquire destination ownership
+AssertionError: expected [] to deeply equal [ { x: 7, y: +0 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "x": 7,
+-     "y": 0,
+-   },
+- ]
++ []
+
+ ❯ src/lib/equal-owner-admission.spec.ts:46:16
+     44|   const q=other.transact(()=>other.$.q(1));t.$.pair.x(7);await drain()…
+     45|   const p=t.transact(()=>{t.$.z(1);c.declare({kind:'independent'},()=>…
+     46|   expect(sent).toEqual([{x:7,y:0}]);expect(t.$.z()).toBe(1);expect(oth…
+       |                ^
+     47|   p.rollback();await drain();expect(t.$.pair.x()).toBe(7);expect(t.$.z…
+     48|   q.rollback();await drain();expect(sent).toEqual([{x:7,y:0}]);await c…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  15:15:19
+   Duration  3.39s (transform 1.53s, setup 0ms, import 1.84s, tests 37ms, environment 1.22s)
+
+Warning: command "node tools/run-core-vitest.mjs equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern="does not acquire"" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.9s

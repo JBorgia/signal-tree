@@ -1,0 +1,35 @@
+
+> nx run held-continuation-probe:extended
+
+> corepack pnpm exec vitest run --root packages/kernel --config forwarding-retention.config.ts
+
+(node:23668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:23669) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-forwarding-cleanup-successor/candidate/packages/kernel
+
+(node:23676) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:44:24
+   Duration  2.74s (transform 1.05s, setup 0ms, import 1.28s, tests 753ms, environment 498ms)
+
+
+
+
+ NX   Successfully ran target extended for project held-continuation-probe
+
+
+  Run duration:      3.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        held-continuation-probe:extended    3.6s

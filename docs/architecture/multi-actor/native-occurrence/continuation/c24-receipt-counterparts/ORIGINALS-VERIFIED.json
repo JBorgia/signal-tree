@@ -1,0 +1,10 @@
+{
+  "st-c24-facade-controls": {
+    "snapshotSha256": "90ac51bee09aacfdbadf9e3b8c262d888127af776106deb5e3a283e247373626",
+    "verifiedArtifacts": 11
+  },
+  "st-c24-kernel-adversarial-controls": {
+    "snapshotSha256": "ab9bb1e3d80f4ba658e0f46602948105415776cdb62268d0eae6678c0d07d25e",
+    "verifiedArtifacts": 7
+  }
+}

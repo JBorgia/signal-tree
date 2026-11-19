@@ -1,0 +1,6 @@
+{
+  "result": "PASS",
+  "claim": "retained disposed coordinator and review do not retain adapter dependency",
+  "cycles": 30,
+  "limit": "sampled collectibility, not universal GC or retained byte attribution"
+}

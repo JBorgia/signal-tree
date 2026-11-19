@@ -1,0 +1,61 @@
+
+> nx run kernel:test point-result-demand.spec.ts point-result-allocation.spec.ts ordinary-order-owner-preparation.spec.ts ordinary-order-source-boundaries.spec.ts ordinary-restoration-placement.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts singleton-row-reuse.spec.ts current-read-capability.spec.ts joint-membership-phase.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs point-result-demand.spec.ts point-result-allocation.spec.ts ordinary-order-owner-preparation.spec.ts ordinary-order-source-boundaries.spec.ts ordinary-restoration-placement.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts singleton-row-reuse.spec.ts current-read-capability.spec.ts joint-membership-phase.spec.ts --maxWorkers=1
+
+(node:68024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68031) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-point-demand-c8a/candidate/packages/kernel
+
+(node:68038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68043) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68074) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68075) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68076) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68077) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68079) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68084) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68089) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68090) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  14 passed (14)
+      Tests  104 passed (104)
+   Start at  09:09:03
+   Duration  9.53s (transform 910ms, setup 0ms, import 2.41s, tests 2.25s, environment 3.33s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      10.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     10.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    10.0s

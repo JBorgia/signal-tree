@@ -1,0 +1,16 @@
+{
+  "typescript": "6.0.3",
+  "options": "ES2022/ESNext/removeComments; transpilation equivalence only, not typechecking or packed build",
+  "result": [
+    {
+      "path": "packages/kernel/src/lib/link.ts",
+      "emittedJavaScriptIdentical": true,
+      "sha256": "558cd2c6b7d4bfcfe8dcef9f9a2d50796bbcede27545770c12555d38692478d9"
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "emittedJavaScriptIdentical": true,
+      "sha256": "b313d9498965cfeb4858e8f84bbdbf3897bdb053e57c12948d092a73d905b3be"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+# Recipient-window source-cause correction
+
+Base is the frozen `/private/tmp/st-recipient-window-successor/candidate`, verified against its manifest. This new copy preserves that candidate and all original fixtures. No packet-index change is included.
+
+Authority: 75c645eb AUTHORITY lines19–22 and POLICY-DECISION lines20–23 preserve recipient-only uncertainty fallback. A matching declaration with a wider native argument than the recipient domain remains conservative, but may deliver coherent ordinary state on a surviving basis under the existing tree-local gates. Missing declaration, explicit unknown declaration/origin, invalid attribution, or uncaptured updater input retain fixed authorship possible-owner windows. Native D/I/V, inherited unknown/possible evidence and shared validation remain lower bounds; no declaration permission is synthesized.
+
+Implementation: carry named source causes from private preparation into lifecycle instead of classifying from the aggregate coverageUnknown bit. Distinguish domain mismatch captured by beginBranchInput from write-context origin/attribution and missing supplied updater evidence. Derive conservative status from all causes; only non-domain causes or missing/unknown declaration capture a new recipient window. Retain the existing finalization frontier, inherited-window union, projection preservation, no-op semantics, terminal wake and disposal.
+
+Historical oracle corrections authorized by the owner: known actual pending input contradicting independent throws prescribed after-callback error with writes retained, no returned receipt (247cfec7 lines156–171); keep Main confirm/reject controls unchanged. Wider recipient-only hold expectation is obsolete under the explicit 75c645eb exception: require useful immediate surviving send, never declared basis, preserve owner state and later terminal check. Archive originals and baseline red before changes.
+
+Finite gate: unchanged enrollment/lifecycle/validation and both existing immediate-fallback controls; all predecessor nine window controls; independent reviewer nine controls; Main two known-input terminal controls; new cause-specific combinations. No public API, policy, budgets or native input lowering changes. Freeze exact source/patch/results for independent review; author tests do not grant acceptance.

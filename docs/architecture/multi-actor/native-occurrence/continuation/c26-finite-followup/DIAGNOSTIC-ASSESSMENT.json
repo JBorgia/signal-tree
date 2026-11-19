@@ -1,0 +1,25 @@
+{
+  "checkpoints": [
+    0,
+    1,
+    2,
+    4,
+    64,
+    256
+  ],
+  "selectedOneNodeAllCheckpoints": true,
+  "enumeratedRootCountsEqualAt": [
+    2,
+    4,
+    64,
+    256
+  ],
+  "usefulTerminalAssertion": "Executed unchanged in passing original-derived test body",
+  "runnerFilter": "Nx omitted -t from effective test command; actual file executed both existing cases",
+  "notClaimed": [
+    "general heap bound",
+    "owner-history bound",
+    "entity normalization",
+    "performance"
+  ]
+}

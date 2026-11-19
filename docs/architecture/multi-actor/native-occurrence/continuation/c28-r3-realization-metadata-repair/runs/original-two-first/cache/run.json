@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel transaction-safety tree-realization-adapter --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:58:37.597Z",
+    "endTime": "2026-11-03T04:58:43.061Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14432423702973332603",
+      "startTime": "2026-11-03T04:58:37.689Z",
+      "endTime": "2026-11-03T04:58:43.059Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

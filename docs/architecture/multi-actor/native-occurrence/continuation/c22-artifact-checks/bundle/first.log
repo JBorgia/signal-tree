@@ -1,0 +1,18 @@
+target                   prod (ships)      dev (diagnostics)
+──────────────────────────────────────────────────────────────────
+signaltree-bare        ❌ 17.53/12.41KB   ❌ 19.88/14.79KB
+signaltree-entities    ❌ 43.33/26.16KB   ❌ 46.26/28.98KB
+
+❌ Bundle budget exceeded.
+
+  PROD over  — the shipped artifact exceeds its current limit. Compare a
+               fresh baseline with the same toolchain, then inspect the
+               emitted graph. Distinguish optional reachability from
+               required behavior; do not assume an optional-module leak.
+
+  DEV over   — measure the production/development difference and check
+               diagnostic folding (`node tools/check-devmode-foldable.mjs`).
+               A flat production result alone does not justify a higher
+               development limit. Budget changes need measured rationale
+               and owner approval; this result remains failed.
+

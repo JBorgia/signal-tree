@@ -1,0 +1,68 @@
+{
+  "vue": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 30.194389750016853,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "totals": [
+      "Test Files  33 passed (33)",
+      "Tests  215 passed (215)"
+    ]
+  },
+  "angular": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 93.60499408305623,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "totals": [
+      "Test Files  50 passed | 1 skipped (51)",
+      "Tests  294 passed | 3 skipped (297)"
+    ]
+  },
+  "solid": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 23.828559792018496,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "totals": [
+      "Test Files  20 passed (20)",
+      "Tests  126 passed (126)"
+    ]
+  },
+  "source-types": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 10.396840624976903,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "totals": []
+  },
+  "react": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 48.1074907919392,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "totals": [
+      "Test Files  17 passed (17)",
+      "Tests  94 passed (94)"
+    ]
+  },
+  "spec-types": {
+    "result": {
+      "exit": 0,
+      "elapsedSeconds": 19.28789212508127,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "totals": []
+  }
+}

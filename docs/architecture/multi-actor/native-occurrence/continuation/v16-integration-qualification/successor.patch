@@ -1,0 +1,96 @@
+--- a/packages/kernel/src/lib/cold-row-responsibility.spec.ts
++++ b/packages/kernel/src/lib/cold-row-responsibility.spec.ts
+@@ -17,6 +17,15 @@
+   const path = process.env['ST_COLD_OUTPUT'];
+   if (!path) return;
+   appendFileSync(path, JSON.stringify({ name, value }) + '\n');
++}
++function expectNoRetainedFacades(
++  inventories: readonly (EntitySubjectPhysicalInventory<string> | undefined)[]
++): void {
++  for (const inventory of inventories) {
++    if (inventory === undefined) continue;
++    expect(inventory.nodeFacadeMaterialized).toBe(false);
++    expect(inventory.fieldFacadesMaterialized).toEqual([]);
++  }
+ }
+ function watch(tree: ReturnType<typeof make>) {
+   const rows = tree.$.rows;
+@@ -62,15 +71,19 @@
+       const before = currentHandles.map(h.inventory);
+       expect(before.map(x => x?.nodeFacadeMaterialized)).toEqual([false, false]);
+       expect(before.map(x => x?.fieldFacadesMaterialized)).toEqual([[], []]);
+-      h.setPhase('undo'); tree.undo(); h.setPhase('off'); await drain();
++      h.setPhase('undo'); tree.undo(); h.setPhase('off');
++      const afterUndo = currentHandles.map(h.inventory);
++      expectNoRetainedFacades(afterUndo);
++      await drain();
+       expect(tree.$.rows.all()).toEqual(old); expect(sent.at(-1)).toEqual(old);
+       expect(old.map(row => h.handle(row.id).subjectId)).toEqual(originalHandles.map(x => x.subjectId));
+-      const afterUndo = currentHandles.map(h.inventory);
+-      h.setPhase('redo'); tree.redo(); h.setPhase('off'); await drain();
++      h.setPhase('redo'); tree.redo(); h.setPhase('off');
++      const afterRedo = currentHandles.map(h.inventory);
++      expectNoRetainedFacades(afterRedo);
++      await drain();
+       expect(tree.$.rows.all()).toEqual(replacement); expect(sent.at(-1)).toEqual(replacement);
+       tree.$.rows.updateOne('c', { n: 8 }); await drain();
+       expect(sent).toEqual([replacement, old, replacement, [{ id: 'c', n: 8 }, replacement[1]]]);
+-      const afterRedo = currentHandles.map(h.inventory);
+       h.setPhase('late-field'); const field = tree.$.rows.byIdOrFail('c').n;
+       expect(getOwnedPositionIds(field)).toEqual(h.owner);
+       expect(getOwnedSubjectIds(field)).toEqual([currentHandles[0].subjectId]);
+@@ -97,11 +110,14 @@
+       expect(inspection.changes.length).toBeGreaterThan(0);
+       expect(inspection.changes.some(change => change.address?.[0] === 'rows')).toBe(true);
+       const afterInspection = currentHandles.map(h.inventory);
++      expectNoRetainedFacades(afterInspection);
+       await drain(); record('transaction-pending', { sent: [...sent] }); expect(sent).toEqual([]); expect(tree.$.rows.all()).toEqual(replacement);
+-      h.setPhase('rollback'); pending.rollback(); settled = true; h.setPhase('off'); await drain();
++      h.setPhase('rollback'); pending.rollback(); settled = true; h.setPhase('off');
++      const afterRollback = currentHandles.map(h.inventory);
++      expectNoRetainedFacades(afterRollback);
++      await drain();
+       record('transaction-rolled-back', { sent: [...sent] }); expect(tree.$.rows.all()).toEqual(old); expect(sent).toEqual([old]);
+       expect(old.map(row => h.handle(row.id).subjectId)).toEqual(originalHandles.map(x => x.subjectId));
+-      const afterRollback = currentHandles.map(h.inventory);
+       tree.$.rows.updateOne('a', { n: 9 }); await drain();
+       expect(sent).toEqual([old, [{ id: 'a', n: 9 }, old[1]]]);
+       record('cold-transaction', { owner: h.owner, before, inspection, afterInspection, afterRollback, calls: h.calls, sent });
+--- a/packages/kernel/src/lib/internals/entity-preparation-reader.ts
++++ b/packages/kernel/src/lib/internals/entity-preparation-reader.ts
+@@ -1,3 +1,5 @@
++import { isTraversableNode } from './node-shape';
++
+ /** Collection-owned physical preparation read; not a public collection API. */
+ type EntityPreparationReader = (key: string | number) => unknown;
+ const READER = Symbol('signaltree.entityPreparationReader');
+@@ -16,7 +18,7 @@
+ export function getEntityPreparationReader(
+   node: unknown
+ ): EntityPreparationReader | undefined {
+-  if (node === null || (typeof node !== 'object' && typeof node !== 'function')) {
++  if (!isTraversableNode(node)) {
+     return undefined;
+   }
+   const reader = (node as Record<symbol, unknown>)[READER];
+--- a/packages/kernel/src/lib/preparation-reader-comparison.spec.ts
++++ b/packages/kernel/src/lib/preparation-reader-comparison.spec.ts
+@@ -91,7 +91,7 @@
+  });
+  it('genuinely capability-absent collection double retains receiver and live-value non-enumeration',()=>{
+   let calls=0,gets=0;const value={id:'a',get n(){gets++;return 1;}};
+-  const rows={byIdOrFail(this:unknown,key:string){expect(this).toBe(rows);expect(key).toBe('a');calls++;return value;},changeId(){},removeOne(){},__findKeyBySubjectId(){return 'a';}};
++  const rows={byIdOrFail(this:unknown,key:string){expect(this).toBe(rows);expect(key).toBe('a');calls++;return value;},changeId(){return undefined;},removeOne(){return undefined;},__findKeyBySubjectId(){return 'a';}};
+   expect(capability(rows)).toBeUndefined();const adapter=adapterFor(rows,11,7);
+   expect(adapter.validateEffects([{owner:7,subjectId:11,structural:'remove',before:'a',after:undefined}])).toBeUndefined();expect(calls).toBeGreaterThan(0);expect(gets).toBe(0);
+   record('absent-fallback',{calls,gets});
+@@ -99,7 +99,7 @@
+  it('present capability errors propagate and undefined is not fallback',()=>{
+   const tree=signalTree({rows:entityMap<Row,string>()});try{
+    const symbol=capability(tree.$.rows);expect(symbol).toBeDefined();const sentinel=Error('reader sentinel');let reads=0,fallbacks=0;
+-   const rows={byIdOrFail(){fallbacks++;return {id:'a',n:1};},changeId(){},removeOne(){},__findKeyBySubjectId(){return 'a';},[symbol!]:()=>{reads++;throw sentinel;}};
++   const rows={byIdOrFail(){fallbacks++;return {id:'a',n:1};},changeId(){return undefined;},removeOne(){return undefined;},__findKeyBySubjectId(){return 'a';},[symbol!]:()=>{reads++;throw sentinel;}};
+    const effects:ReversalEffect[]=[{owner:7,subjectId:11,structural:'remove',before:'a',after:undefined}];const adapter=adapterFor(rows,11,7);
+    expect(()=>adapter.validateEffects(effects)).toThrow(sentinel);expect(reads).toBe(1);expect(fallbacks).toBe(0);
+    Reflect.set(rows,symbol!,()=>{reads++;return undefined;});expect(adapter.validateEffects(effects)).toBeUndefined();expect(reads).toBe(2);expect(fallbacks).toBe(0);

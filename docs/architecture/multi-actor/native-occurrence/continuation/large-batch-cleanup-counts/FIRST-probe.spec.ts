@@ -1,0 +1,102 @@
+import { afterAll, expect, it } from 'vitest';
+import { writeFileSync } from 'node:fs';
+import { undoable } from './undoable';
+import { restoration } from '../enhancers/restoration/restoration';
+import { signalTree } from './signal-tree';
+import { entityMap } from './markers/entity-map';
+import { entityMembershipReader } from './internals/entity-membership-view';
+type Site = { calls: number; visits: number; stack: string };
+type Count = { totalCalls: number; totalVisits: number; sites: Record<string, Site> };
+// Match the original large-batch spec's loaded module graph.
+void undoable; void restoration;
+const output: unknown[] = [];
+const nativeFilter = Array.prototype.filter;
+function measured(action: () => void): Count {
+  const sites = new Map<string, Site>();
+  let collecting = false;
+  Array.prototype.filter = function<T>(this: T[], predicate: (v:T,i:number,a:T[])=>unknown, thisArg?: unknown): T[] {
+    if (collecting || typeof predicate !== 'function') return Reflect.apply(nativeFilter, this, [predicate, thisArg]);
+    let stack = '', key = 'unclassified';
+    collecting = true;
+    try {
+      stack = new Error('filter callsite').stack ?? '';
+      for (const line of stack.split('\n')) {
+        if (line.includes('/packages/kernel/src/') && !line.includes('large-batch-cleanup-count-probe.spec.ts')) { key = line.trim(); break; }
+      }
+    } finally { collecting = false; }
+    let site = sites.get(key);
+    if (!site) { site = { calls: 0, visits: 0, stack }; sites.set(key, site); }
+    site.calls++;
+    return Reflect.apply(nativeFilter, this, [function(value:T,index:number,array:T[]) {
+      site.visits++;
+      return Reflect.apply(predicate, thisArg, [value,index,array]);
+    }]);
+  };
+  try { action(); } finally { Array.prototype.filter = nativeFilter; }
+  let totalCalls=0,totalVisits=0;
+  for(const site of sites.values()){totalCalls+=site.calls;totalVisits+=site.visits;}
+  return {totalCalls,totalVisits,sites:Object.fromEntries(sites)};
+}
+async function measuredAsync(action: () => Promise<void>): Promise<Count> {
+  const sites = new Map<string, Site>();
+  let collecting = false;
+  Array.prototype.filter = function<T>(this: T[], predicate: (v:T,i:number,a:T[])=>unknown, thisArg?: unknown): T[] {
+    if (collecting || typeof predicate !== 'function') return Reflect.apply(nativeFilter, this, [predicate, thisArg]);
+    let stack = '', key = 'unclassified';
+    collecting = true;
+    try {
+      stack = new Error('filter callsite').stack ?? '';
+      for (const line of stack.split('\n')) {
+        if (line.includes('/packages/kernel/src/') && !line.includes('large-batch-cleanup-count-probe.spec.ts')) { key = line.trim(); break; }
+      }
+    } finally { collecting = false; }
+    let site = sites.get(key);
+    if (!site) { site = { calls: 0, visits: 0, stack }; sites.set(key, site); }
+    site.calls++;
+    return Reflect.apply(nativeFilter, this, [function(value:T,index:number,array:T[]) {
+      site.visits++;
+      return Reflect.apply(predicate, thisArg, [value,index,array]);
+    }]);
+  };
+  try { await action(); } finally { Array.prototype.filter = nativeFilter; }
+  let totalCalls=0,totalVisits=0;
+  for(const site of sites.values()){totalCalls+=site.calls;totalVisits+=site.visits;}
+  return {totalCalls,totalVisits,sites:Object.fromEntries(sites)};
+}
+afterAll(()=>writeFileSync(process.env.TMPDIR+'/cleanup-filter-counts.json',JSON.stringify(output,null,2)));
+it('native filter parity and restoration calibration',()=>{
+  const exercise=()=>{const a=[1,,3,4],context={min:2};const seen:unknown[]=[];const result=a.filter(function(this:typeof context,v,i,array){seen.push([v,i,array===a,this===context]);if(i===0){a[2]=5;delete a[3];a.push(9);}return v>this.min;},context);return {result,seen};};
+  const plain=exercise();let actual:ReturnType<typeof exercise>|undefined;const count=measured(()=>{actual=exercise();});expect(actual).toEqual(plain);expect(count.totalVisits).toBe(2);expect(Array.prototype.filter).toBe(nativeFilter);
+  const sentinel={failure:'predicate'};let caught:unknown;try{measured(()=>{[1].filter(()=>{throw sentinel;});});}catch(error){caught=error;}expect(caught).toBe(sentinel);expect(Array.prototype.filter).toBe(nativeFilter);
+  let species=0;class Derived extends Array<number>{static get [Symbol.species](){species++;return Array;}}
+  let result:number[]=[];measured(()=>{result=new Derived(1,2,3).filter(v=>v>1);});expect(result).toEqual([2,3]);expect(Object.getPrototypeOf(result)).toBe(Array.prototype);expect(species).toBe(1);
+});
+const drain=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
+for(const n of [16,32,64,128])for(const observed of [false,true])it(`full lifecycle filter visits N=${n} membership=${observed}`,async()=>{
+  async function run(instrumented:boolean){
+    const tree=signalTree({rows:entityMap<{id:number;n:number},number>()});
+    const reader=observed?entityMembershipReader(tree):undefined;if(observed)expect(reader).toBeDefined();let events=0;
+    const stop=observed?reader!.subscribe(()=>{events++;}):()=>{/* No subscription. */};
+    const initial=Array.from({length:n},(_,i)=>({id:i,n:i})),replacement=Array.from({length:n},(_,i)=>({id:i+n,n:i}));
+    const stages:unknown[]=[];const states:unknown[]=[];let stopped=false,destroyed=false;
+    try{
+      const inputs=[initial,replacement,[]],labels=['setAll-initial','setAll-disjoint-replace','setAll-empty-clear'];
+      for(let i=0;i<3;i++){
+        const beforeEvents=events;const action=()=>tree.$.rows.setAll(inputs[i]);
+        const counts=instrumented?measured(action):undefined;if(!instrumented)action();
+        const state={count:tree.$.rows.count(),ids:tree.$.rows.ids(),events:events-beforeEvents};
+        expect(state.count).toBe(inputs[i].length);expect(state.ids).toEqual(inputs[i].map(r=>r.id));states.push(state);stages.push({stage:labels[i],...counts,events:state.events});
+      }
+      const finalCount=tree.$.rows.count();expect(finalCount).toBe(0);if(observed)expect(events).toBeGreaterThan(0);else expect(events).toBe(0);
+      const beforeCleanup=events;
+      let counts=instrumented?measured(stop):undefined;if(!instrumented)stop();stopped=true;stages.push({stage:'stop',...counts,events:events-beforeCleanup});expect(events).toBe(beforeCleanup);
+      counts=instrumented?measured(()=>tree.destroy()):undefined;if(!instrumented)tree.destroy();destroyed=true;stages.push({stage:'destroy',...counts,events:events-beforeCleanup});expect(events).toBe(beforeCleanup);
+      counts=instrumented?await measuredAsync(drain):undefined;if(!instrumented)await drain();stages.push({stage:'microtask-drain-12',...counts,events:events-beforeCleanup});expect(events).toBe(beforeCleanup);
+      expect(Array.prototype.filter).toBe(nativeFilter);
+      if(reader){expect(()=>reader.snapshot()).toThrow(/STUDIO_TREE_DESTROYED/);expect(()=>reader.subscribe(()=>{/* Refused subscription. */})).toThrow(/STUDIO_TREE_DESTROYED/);}
+      expect(()=>entityMembershipReader(tree)).toThrow(/STUDIO_TREE_DESTROYED/);
+      return {states,stages,events,cleanup:{finalCount,eventsAfterCleanup:events-beforeCleanup,readerRefused:true}};
+    }finally{if(!stopped)stop();if(!destroyed)tree.destroy();}
+  }
+  const plain=await run(false),counted=await run(true);expect(counted.states).toEqual(plain.states);expect(counted.events).toBe(plain.events);expect(counted.cleanup).toEqual(plain.cleanup);output.push({n,observed,parity:true,cleanup:counted.cleanup,events:counted.events,stages:counted.stages});
+});

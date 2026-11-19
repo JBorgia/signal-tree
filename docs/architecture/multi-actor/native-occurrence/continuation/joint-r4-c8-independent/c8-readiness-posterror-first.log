@@ -1,0 +1,63 @@
+
+> nx run kernel:test c8-review-composition.spec.ts --testNamePattern=membership readiness error --maxWorkers=1
+
+> node tools/run-core-vitest.mjs c8-review-composition.spec.ts --testNamePattern="membership readiness error" --maxWorkers=1
+
+(node:51074) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51081) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-r4-review-resumed/c8-candidate/packages/kernel
+
+(node:51088) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/c8-review-composition.spec.ts (5 tests | 1 failed | 4 skipped) 18ms
+   × membership readiness error retains installed enrollment and drains recipient completion 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/c8-review-composition.spec.ts > membership readiness error retains installed enrollment and drains recipient completion
+AssertionError: expected {} to deeply equal { a: { n: 1 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 1,
+-   },
+- }
++ {}
+
+ ❯ src/lib/c8-review-composition.spec.ts:50:441
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  08:55:25
+   Duration  852ms (transform 483ms, setup 0ms, import 569ms, tests 18ms, environment 184ms)
+
+Warning: command "node tools/run-core-vitest.mjs c8-review-composition.spec.ts --testNamePattern="membership readiness error" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

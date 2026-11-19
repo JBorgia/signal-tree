@@ -1,0 +1,21 @@
+{
+  "id": "point-1000-selected-sample0",
+  "ordinal": 16,
+  "profile": "point",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample0",
+  "exit": 0,
+  "pid": 69979,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.8393780419137329,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1146880,
+  "minimumObservedHostFreePercentage": 45.0,
+  "attempts": 1
+}

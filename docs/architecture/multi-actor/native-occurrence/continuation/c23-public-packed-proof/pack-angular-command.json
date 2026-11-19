@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "npm",
+    "pack",
+    "--ignore-scripts",
+    "--json",
+    "--pack-destination",
+    "/private/tmp/st-c23-public-packed-proof/tarballs"
+  ],
+  "cwd": "/private/tmp/st-c23-declare-public-successor/candidate/dist/packages/angular",
+  "noProgressSeconds": 180
+}

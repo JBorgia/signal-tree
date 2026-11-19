@@ -1,0 +1,272 @@
+--- a/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts
+@@ -542,7 +542,8 @@
+         error = caught;
+       }
+       expect(error).toMatchObject({ code: 'SIGNALTREE_ROLLBACK_FAILED' });
+-      expect((error as Error).message).toMatch(/later-confirmed-dependency/);
++      expect(error).toMatchObject({ cause: { kind: 'effect-validation-failed' } });
++      expect((error as Error).message).toContain("the entity collection at 'g.rows' was omitted and changed");
+       expect(tree.$()).toEqual({ g: { k: 1 }, count: 0 });
+       // Refused, not settled: the transaction can still be confirmed.
+       pending.confirm();
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts
+@@ -0,0 +1,65 @@
++import { afterEach, expect, it } from 'vitest';
++import { createTreeScalarSlotRuntime } from './tree-scalar-slot-runtime';
++import { createPhysicalCommitClock } from './physical-commit-clock';
++import { withWriteContext } from '../write-context';
++import { installProductionSubstrateStatsForTesting, clearProductionSubstrateStatsForTesting, resetProductionSubstrateStatsForTesting } from './production-substrate-stats';
++afterEach(clearProductionSubstrateStatsForTesting);
++for (const sharedClock of [false,true]) it(`counts preparation and actual once-only installation separately (shared clock ${sharedClock})`,()=>{
++ const stats=installProductionSubstrateStatsForTesting();
++ const r=createTreeScalarSlotRuntime(sharedClock?createPhysicalCommitClock():undefined);
++ const a=r.createSlot(0,Object.is),b=r.createSlot(1,Object.is);
++ const frame=r.beginFrame();frame.set(a,10);frame.set(b,11);
++ const install=frame.prepareCommit();
++ expect({...stats}).toMatchObject({slotReads:0,slotWrites:0,revisionIncrements:0,equalityChecks:2});
++ const result=install();
++ expect({...stats}).toMatchObject({slotReads:0,slotWrites:2,revisionIncrements:1,equalityChecks:2});
++ expect(result.changedSlots).toEqual([a,b]); expect(r.revision()).toBe(1);
++ expect(r.readSlot(a)).toBe(10);expect(r.readSlot(b)).toBe(11);expect(stats.slotReads).toBe(2);
++ const before={...stats};expect(()=>install()).toThrow('already used');expect({...stats}).toEqual(before);
++});
++it('counts direct commits, suppressed revision, no-op and discard by actual events',()=>{
++ const stats=installProductionSubstrateStatsForTesting(),r=createTreeScalarSlotRuntime();const a=r.createSlot(0,Object.is);
++ const discarded=r.beginFrame();discarded.set(a,1);discarded.discard();
++ expect({...stats}).toMatchObject({slotWrites:0,equalityChecks:0,revisionIncrements:0});
++ const f=r.beginFrame();f.set(a,1);f.commit({advanceRevision:false});
++ expect({...stats}).toMatchObject({slotWrites:1,equalityChecks:1,revisionIncrements:0});expect(r.revision()).toBe(0);
++ resetProductionSubstrateStatsForTesting(stats);const noop=r.beginFrame();noop.set(a,1);noop.commit();
++ expect({...stats}).toMatchObject({slotWrites:0,equalityChecks:1,revisionIncrements:0});
++ resetProductionSubstrateStatsForTesting(stats);r.commitSlot(a,2);
++ expect({...stats}).toMatchObject({slotWrites:1,equalityChecks:1,revisionIncrements:1});expect(r.readSlot(a)).toBe(2);
++});
++it('counts fresh equality throws without counting uninstalled writes',()=>{
++ const stats=installProductionSubstrateStatsForTesting(),r=createTreeScalarSlotRuntime();const error=new Error('equality');
++ const a=r.createSlot(0,Object.is),b=r.createSlot(1,()=>{throw error;});
++ const f=r.beginFrame();f.set(a,10);f.set(b,11);expect(()=>f.prepareCommit()).toThrow(error);
++ expect({...stats}).toMatchObject({slotReads:0,slotWrites:0,equalityChecks:2,revisionIncrements:0});
++ expect(r.readSlot(a)).toBe(0);expect(r.readSlot(b)).toBe(1);expect(r.revision()).toBe(0);
++});
++it('stale install counts only the independently installed write',()=>{
++ const stats=installProductionSubstrateStatsForTesting(),r=createTreeScalarSlotRuntime();const a=r.createSlot(0,Object.is),b=r.createSlot(0,Object.is);
++ const f=r.beginFrame();f.set(a,1);const install=f.prepareCommit();r.commitRecorded(b,2);
++ expect(()=>install()).toThrow('Stale prepared');
++ expect({...stats}).toMatchObject({slotReads:0,slotWrites:1,equalityChecks:2,revisionIncrements:1});
++ expect(r.readSlot(a)).toBe(0);expect(r.readSlot(b)).toBe(2);
++});
++it('reentry counts the surviving nested write but never the refused outer installation',()=>{
++ const stats=installProductionSubstrateStatsForTesting(),r=createTreeScalarSlotRuntime();const b=r.createSlot(0,Object.is);
++ const a=r.createSlot(0,()=>{r.commitSlot(b,2);return false;});
++ const f=r.beginFrame();f.set(a,1);expect(()=>f.prepareCommit()).toThrow('Reentrant scalar preparation');
++ expect({...stats}).toMatchObject({slotReads:0,slotWrites:1,equalityChecks:2,revisionIncrements:1});
++ expect(r.readSlot(a)).toBe(0);expect(r.readSlot(b)).toBe(2);
++});
++it('ordinary authority-only frame advances revision without assigning equal physical value',()=>{
++ const stats=installProductionSubstrateStatsForTesting(),r=createTreeScalarSlotRuntime();const a=r.createSlot(0,Object.is);
++ withWriteContext({participation:'inspection'},()=>r.commitRecorded(a,1));
++ resetProductionSubstrateStatsForTesting(stats);const f=r.beginFrame();f.set(a,1);f.commit();
++ expect({...stats}).toMatchObject({slotWrites:0,revisionIncrements:1,equalityChecks:2});expect(r.readSlot(a)).toBe(1);
++ resetProductionSubstrateStatsForTesting(stats);r.commitRecorded(a,2);
++ expect({...stats}).toMatchObject({slotWrites:1,revisionIncrements:1,equalityChecks:1});
++});
++it('recorded shadow comparison counts both actual equality calls',()=>{
++ const stats=installProductionSubstrateStatsForTesting(),r=createTreeScalarSlotRuntime();const a=r.createSlot(0,Object.is);
++ withWriteContext({participation:'inspection'},()=>r.commitRecorded(a,1));resetProductionSubstrateStatsForTesting(stats);
++ r.commitRecorded(a,1);
++ expect({...stats}).toMatchObject({slotWrites:1,revisionIncrements:1,equalityChecks:2,slotReads:0});
++});
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -151,13 +151,12 @@
+     physicalCommitClock?.revision() ?? revision;
+ 
+   const advanceRevision = (): number => {
+-    const nextRevision = physicalCommitClock?.advance();
+-    if (nextRevision !== undefined) {
+-      return nextRevision;
+-    }
+-
+-    revision += 1;
+-    return revision;
++    const nextRevision = physicalCommitClock?.advance() ?? ++revision;
++    // Count the actual clock advance, shared by recorded and prepared installs.
++    if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++      recordProductionSubstrateStat('revisionIncrements');
++    }
++    return nextRevision;
+   };
+ 
+   const assertSlotIndex = (slotIndex: SlotIndex): void => {
+@@ -197,6 +196,9 @@
+     for(const [slotIndex,nextValue] of staged){
+       const has=inspectionBaseline.has(slotIndex);
+       const before=has?inspectionBaseline.get(slotIndex):values[slotIndex];
++      if (has && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('equalityChecks');
++      }
+       const equal=has?equalities[slotIndex](before,nextValue):!physical.has(slotIndex);
+       const keep=inspection&&!equal;
+       if(keep!==has || keep&&!Object.is(inspectionBaseline.get(slotIndex),before))shadowPlans.push({slotIndex,keep,value:before});
+@@ -207,7 +209,12 @@
+       if(used)throw new Error('Prepared scalar commit already used');
+       if(getCommittedRevision()!==base)throw new Error('Stale prepared scalar commit');
+       used=true;
+-      for(const {slotIndex,nextValue}of changed)values[slotIndex]=nextValue;
++      for (const { slotIndex, nextValue } of changed) {
++        values[slotIndex] = nextValue;
++        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++          recordProductionSubstrateStat('slotWrites');
++        }
++      }
+       for(const p of shadowPlans){if(p.keep)inspectionBaseline.set(p.slotIndex,p.value);else inspectionBaseline.delete(p.slotIndex);}
+       const revision=(changed.length||shadowPlans.length)&&options?.advanceRevision!==false?advanceRevision():getCommittedRevision();
+       return {revision,changedSlots:changed.map(x=>x.slotIndex)};
+@@ -262,6 +269,9 @@
+       const inspection=getActiveWriteContext()?.participation==='inspection';
+       const shadowed=inspectionBaseline.has(slotIndex);
+       const ordinaryBefore=shadowed?inspectionBaseline.get(slotIndex):values[slotIndex];
++      if (shadowed && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('equalityChecks');
++      }
+       const authorityEqual=shadowed?equalities[slotIndex](ordinaryBefore,value):equal;
+       if(getCommittedRevision()!==base)throw new Error('Scalar authority equality reentered installation');
+       const semanticChanged=inspection?!equal:!authorityEqual;
+@@ -287,9 +297,6 @@
+         installTerminalRecord(plan);
+       }
+       advanceRevision();
+-      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+-        recordProductionSubstrateStat('revisionIncrements');
+-      }
+       return {changed:semanticChanged,physicalChanged:!equal};
+     },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {
+--- a/packages/kernel/src/lib/packet-index-adversarial.spec.ts
++++ b/packages/kernel/src/lib/packet-index-adversarial.spec.ts
+@@ -26,7 +26,7 @@
+ 
+ it('remove followed by restored same subject preserves final endpoint and per-edit restoredFields precedence',()=>{
+  const s=new EntityPublicationSource();const r=removal(1);const restored=Object.freeze({present:true,value:5,requirement:initialRequirement()});const selected=Object.freeze({present:true,value:8,requirement:initialRequirement()});
+- const add:Edit=Object.freeze({...edit(1,11),structural:{kind:'add',subject:1},restoredFields:new Map([['x',restored]])});
++ const add:Edit=Object.freeze({...edit(1,11),structural:Object.freeze({kind:'add' as const,subject:1}),restoredFields:new Map([['x',restored]])});
+  try{install(s,packet([r,add],{steps:[{ordinal:0,ordinary:[r],physical:[r]},{ordinal:1,ordinary:[add],physical:[add]}],prepareResponsibility:selection=>{expect(selection!.proposed(1,'x').value).toBe(11);selection!.choose(1,'x',selected);return undefined;}}));expect(before(s)).toBe(restored);expect(s.inspect().negativePresence).toBe(0);
+  }finally{s.dispose();}
+ });
+@@ -80,21 +80,31 @@
+  try{install(s,packet([a,b],{steps:[{ordinal:0,ordinary:[a],physical:[a]},{ordinal:1,ordinary:[b],physical:[b]}]}));expect(calls).toBe(1);}finally{off();s.dispose();}
+ });
+ 
+-for(const mutation of ['append','subject','kind'] as const)it(`private admission mutation refuses before installation: ${mutation}`,()=>{
+- const s=new EntityPublicationSource();const a:Edit={...edit(1,7),structural:{kind:'add',subject:1}};const edits:Edit[]=[a];const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:selection=>{
++for(const mutation of ['append','subject','kind'] as const)it(`admitted private metadata cannot change before installation: ${mutation}`,()=>{
++ const s=new EntityPublicationSource();const a:Edit={...edit(1,7),structural:{kind:'add',subject:1}};const edits:Edit[]=[a];const installed=new Map<string,number>();let attempts=0;
++ const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:selection=>{
++  attempts++;expect(selection!.proposed(1,'x').value).toBe(7);
++  expect(Object.isFrozen(edits)).toBe(true);expect(Object.isFrozen(a)).toBe(true);expect(Object.isFrozen(a.structural)).toBe(true);
++  const changed=mutation==='append'?Reflect.set(edits,1,edit(1,11)):mutation==='subject'?Reflect.set(a,'subject',2):Reflect.set(a.structural!,'kind','remove');
++  expect(changed).toBe(false);expect(edits).toEqual([a]);expect(a.subject).toBe(1);expect(a.structural!.kind).toBe('add');
+   expect(selection!.proposed(1,'x').value).toBe(7);
+-  if(mutation==='append')edits.push(edit(1,11));
+-  else if(mutation==='subject')Reflect.set(a,'subject',2);
+-  else Reflect.set(a.structural!,'kind','remove');
+-  return undefined;
++  return {writes:[{map:installed,key:'accepted',value:7}],adds:[]};
+  }};
+- try{expect(()=>s.prepare(p)).toThrow('admission structure changed');expect(s.inspect().rows).toBe(0);expect(s.inspect().presence).toBe(0);}finally{s.dispose();}
++ try{const u=s.prepare(p)!;expect(attempts).toBe(1);expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);expect(installed.get('accepted')).toBe(7);expect(s.inspect().rows).toBe(1);expect(before(s).value).toBe(7);expect(before(s,2).present).toBe(false);}finally{s.dispose();}
+ });
+ 
+-it('later private recipient mutation refuses at finalize, before prepared responsibility installs',()=>{
+- const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();const a=edit(1,7);const edits=[a];const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:1,value:7}],adds:[]})};
+- const off=s.subscribe({prepare(){edits.push(edit(1,11));return undefined;},complete(){}});
+- try{const u=s.prepare(p)!;expect(()=>u.finalize!()).toThrow('admission structure changed');expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++it('recipient append attempt throws during prepare before responsibility or source installation',()=>{
++ const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();const a=edit(1,7);const edits=[a];let attempted=0,completed=0;let mutationError:unknown,prepareError:unknown;
++ const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:1,value:7}],adds:[]})};
++ const off=s.subscribe({prepare(){attempted++;try{edits.push(edit(1,11));}catch(error){mutationError=error;throw error;}throw Error('immutable append unexpectedly succeeded');},complete(){completed++;}});
++ try{try{s.prepare(p);}catch(error){prepareError=error;}expect(attempted).toBe(1);expect(Object.isFrozen(edits)).toBe(true);expect(mutationError).toBeInstanceOf(TypeError);expect(prepareError).toBe(mutationError);expect(edits).toEqual([a]);expect(completed).toBe(0);expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++});
++
++it('original frozen-shell precedence input refuses before callbacks and preserves borrowed structural metadata',()=>{
++ const s=new EntityPublicationSource();const r=removal(1),structural={kind:'add' as const,subject:1};const restored=Object.freeze({present:true,value:5,requirement:initialRequirement()});
++ const add:Edit=Object.freeze({...edit(1,11),structural,restoredFields:new Map([['x',restored]])});const descriptors=Object.getOwnPropertyDescriptors(structural);let responsibility=0,recipients=0;
++ const off=s.subscribe({prepare(){recipients++;return undefined;},complete(){throw Error('refusal cannot complete');}});
++ try{expect(()=>s.prepare(packet([r,add],{steps:[{ordinal:0,ordinary:[r],physical:[r]},{ordinal:1,ordinary:[add],physical:[add]}],prepareResponsibility:()=>{responsibility++;return undefined;}}))).toThrow('Frozen entity publication edit contains mutable admission metadata');expect([responsibility,recipients]).toEqual([0,0]);expect(Object.getOwnPropertyDescriptors(structural)).toEqual(descriptors);expect(Object.isFrozen(structural)).toBe(false);expect(s.inspect().rows).toBe(0);expect(s.inspect().negativePresence).toBe(0);}finally{off();s.dispose();}
+ });
+ 
+ for(const separate of [false,true])it(`authored removal dedup is same-step only, separate=${separate}`,()=>{
+@@ -108,11 +118,11 @@
+  try{install(s,packet([a],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x')).toMatchObject({present:true,value:undefined});expect(selection!.proposed(1,'missing')).toMatchObject({present:false,value:undefined});seen=true;return undefined;}}));expect(seen).toBe(true);expect(s.inspect().fields).toBe(fields===null?1:0);}finally{s.dispose();}
+ });
+ 
+-it('held support uses captured admitted subjects after source retirement and later private array mutation',()=>{
++it('held support retains admitted subjects after retirement and denied private array mutation',()=>{
+  const s=new EntityPublicationSource();const requirement=initialRequirement();requirement.proof={owners:[],unknown:true,invalid:false};
+  const a:Edit={...edit(1,7),restoredFields:new Map([['x',{present:true,value:7,requirement}]])};const edits=[a];let support:(()=>object)|undefined;
+  const off=s.subscribe({prepare(_p,native){support=(native as {support:()=>object}).support;return undefined;},complete(){}});
+- try{install(s,{owner:1,id:{},meta:undefined,ordinary:edits,physical:[a]});s.retire(1);edits.length=0;expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);}finally{off();s.dispose();}
++ try{install(s,{owner:1,id:{},meta:undefined,ordinary:edits,physical:[a]});expect(typeof support).toBe('function');expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);s.retire(1);expect(s.inspect().rows).toBe(0);expect(Object.isFrozen(edits)).toBe(true);expect(Reflect.set(edits,'length',0)).toBe(false);expect(edits).toEqual([a]);expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);}finally{off();s.dispose();}
+ });
+ 
+ it('deferred point aggregation indexes final packet once, including repeated ordinals',()=>{
+--- a/packages/kernel/src/lib/packet-index-review.spec.ts
++++ b/packages/kernel/src/lib/packet-index-review.spec.ts
+@@ -3,16 +3,16 @@
+ import {EntityPublicationSource,entityPublicationOrdinary,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
+ import {installTerminalRecord} from './internals/intrinsic-mutation';
+ const edit=(x:number):Edit=>({subject:1,before:undefined,after:{x},fields:['x']});
+-it('recipient finalizer admission mutation must refuse before installation',()=>{
+- const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();
++it('recipient finalizer append throws before responsibility and source installation',()=>{
++ const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();let attempts=0,completions=0;let mutationError:unknown,finalizeError:unknown;
+  const packet:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})};
+- const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){edits.push(edit(99));}};},complete(){}});
+- try{const unit=source.prepare(packet)!;expect(()=>{unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);}).toThrow('admission structure changed');expect(installed.size).toBe(0);}finally{off();source.dispose();}
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){attempts++;try{edits.push(edit(99));}catch(error){mutationError=error;throw error;}throw Error('immutable append unexpectedly succeeded');}};},complete(){completions++;}});
++ try{const unit=source.prepare(packet)!;expect(attempts).toBe(0);try{unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);}catch(error){finalizeError=error;}expect(attempts).toBe(1);expect(Object.isFrozen(edits)).toBe(true);expect(mutationError).toBeInstanceOf(TypeError);expect(finalizeError).toBe(mutationError);expect(edits).toEqual([a]);expect(completions).toBe(0);expect(installed.size).toBe(0);expect(source.inspect().rows).toBe(0);}finally{off();source.dispose();}
+ });
+-it('recipient finalizer mutation diagnostic proves accepted stale native endpoint',()=>{
+- const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();
+- const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){edits.push(edit(99));}};},complete(){}});
+- try{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})})!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);expect(edits.map(e=>e.after)).toEqual([{x:7},{x:99}]);expect(installed.get('accepted')).toBe(7);off();let observed:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{observed=s!.before(1,'x').value;return undefined;}});expect(observed).toBe(7);}finally{off();source.dispose();}
++it('regression: denied finalizer append cannot pair changed packet with stale native endpoint',()=>{
++ const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();let attempts=0,completions=0;
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){attempts++;expect(Object.isFrozen(edits)).toBe(true);expect(Reflect.set(edits,1,edit(99))).toBe(false);expect(edits).toEqual([a]);}};},complete(){completions++;}});
++ try{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})})!;expect(installed.size).toBe(0);expect(source.inspect().rows).toBe(0);unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);expect([attempts,completions]).toEqual([1,1]);expect(edits.map(e=>e.after)).toEqual([{x:7}]);expect(installed.get('accepted')).toBe(7);off();let observed:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{observed=s!.before(1,'x').value;return undefined;}});expect(observed).toBe(7);expect(source.inspect().rows).toBe(1);}finally{off();source.dispose();}
+ });
+ 
+ it('duplicate step and edit identities preserve reverse-find oracle and restored endpoint priority',()=>{
+--- a/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts
++++ b/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts
+@@ -1104,7 +1104,7 @@
+       try {
+         resetProductionSubstrateStatsForTesting(stats);
+         expect(harness.readTarget()).toBe(Math.floor(size / 2));
+-        expect(stats).toEqual<ProductionSubstrateStats>({
++        expect({ ...stats }).toEqual<ProductionSubstrateStats>({
+           slotReads: 1,
+           slotWrites: 0,
+           equalityChecks: 0,
+@@ -1130,8 +1130,8 @@
+ 
+         resetProductionSubstrateStatsForTesting(stats);
+         harness.setTarget(size + 1);
+-        expect(stats).toEqual<ProductionSubstrateStats>({
+-          slotReads: 1,
++        expect({ ...stats }).toEqual<ProductionSubstrateStats>({
++          slotReads: 0,
+           slotWrites: 1,
+           equalityChecks: 1,
+           revisionIncrements: 1,
+@@ -1166,7 +1166,7 @@
+         try {
+           resetProductionSubstrateStatsForTesting(stats);
+           frameHarness.commitFrame(width, size * 10_000 + width);
+-          expect(stats).toEqual<ProductionSubstrateStats>({
++          expect({ ...stats }).toEqual<ProductionSubstrateStats>({
+             slotReads: 0,
+             slotWrites: width,
+             equalityChecks: width,

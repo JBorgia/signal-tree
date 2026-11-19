@@ -1,0 +1,56 @@
+[
+  {
+    "source": "run-gate.py",
+    "archive": "run-gate.py",
+    "sourceSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  {
+    "source": "SNAPSHOT-C14.json",
+    "archive": "SNAPSHOT-C14.json.gz",
+    "sourceSha256": "3f6ebe5bab4f82766422810aca4d710eb9f720ee16216dfa8e20c1a4bb03bae8",
+    "archiveSha256": "32863d7a00eec7ad27c56af4044ff85ca481594a2eb02ad381c147a2dffe6151"
+  },
+  {
+    "source": "RESULTS.md",
+    "archive": "RESULTS.md",
+    "sourceSha256": "3eaba760c314fda745e0660ee2d5b7fb36aecaae95686ba345b64d7c2c8a5187",
+    "archiveSha256": "3eaba760c314fda745e0660ee2d5b7fb36aecaae95686ba345b64d7c2c8a5187"
+  },
+  {
+    "source": "COMPOSITION.json",
+    "archive": "COMPOSITION.json",
+    "sourceSha256": "c5d7253b05e5b208080ee12c049d634c2973fdeeb8e94ab1c953a5b72c879ad5",
+    "archiveSha256": "c5d7253b05e5b208080ee12c049d634c2973fdeeb8e94ab1c953a5b72c879ad5"
+  },
+  {
+    "source": "runs/scalar-composition/RESULT.json",
+    "archive": "runs/scalar-composition/RESULT.json",
+    "sourceSha256": "1e69efa988db2109193cdd2f88f660f58a27f2cf927579ffeedb3ce75db8b063",
+    "archiveSha256": "1e69efa988db2109193cdd2f88f660f58a27f2cf927579ffeedb3ce75db8b063"
+  },
+  {
+    "source": "runs/scalar-composition/first.log",
+    "archive": "runs/scalar-composition/first.log",
+    "sourceSha256": "09515958f561f6a09b99c6e9dc6b5dbc02491ae7da7efabae38f86df70147e48",
+    "archiveSha256": "09515958f561f6a09b99c6e9dc6b5dbc02491ae7da7efabae38f86df70147e48"
+  },
+  {
+    "source": "runs/scalar-composition/SOURCE-BEFORE.json",
+    "archive": "runs/scalar-composition/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "82d074b9d0d59a7c84dca3a964b66dac8c67ebb7a0df93be7ab30d635d82ee1e",
+    "archiveSha256": "7d206f632bc68b1cc96c80f57094d320440e36516587e4dcb1004d5fbbcd74db"
+  },
+  {
+    "source": "runs/scalar-composition/SOURCE-AFTER.json",
+    "archive": "runs/scalar-composition/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/scalar-composition/COMMAND.json",
+    "archive": "runs/scalar-composition/COMMAND.json",
+    "sourceSha256": "8b1e1b6aade6144d90e699f58233484caa99ca43ae1026a2318af14bf7035a66",
+    "archiveSha256": "8b1e1b6aade6144d90e699f58233484caa99ca43ae1026a2318af14bf7035a66"
+  }
+]

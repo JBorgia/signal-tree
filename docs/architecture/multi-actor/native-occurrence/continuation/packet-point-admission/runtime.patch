@@ -1,0 +1,21 @@
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -200,6 +200,9 @@
+   }
+   preparePoint(packet:EntityPublicationPacket):PreparedPublicationUnit|undefined {
+     if(!pointPreparation)return this.prepare(packet);
++    // Refusal must not enroll a source or leave a phantom empty group behind.
++    // Complete all admission work before publishing deferred bookkeeping.
++    packet=this.admission.prepare(packet);
+     let group=pointPreparation.get(this);
+     if(!group){
+       const source=this;
+@@ -209,7 +212,7 @@
+       group={state,publication:{record:{writes:[{map:gate,key:undefined,value:undefined}],adds:[]},completion,finalize:()=>{if(!state.finalized){state.finalized=true;state.unit?.finalize?.();}}}};
+       pointPreparation.set(this,group);
+     }
+-    group.state.packets.push(this.admission.prepare(packet));return group.publication;
++    group.state.packets.push(packet);return group.publication;
+   }
+   prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;

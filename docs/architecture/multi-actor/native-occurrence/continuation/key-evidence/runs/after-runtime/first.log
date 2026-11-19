@@ -1,0 +1,96 @@
+
+> nx run kernel:test entity-missing-id-guard.spec.ts entity-key-evidence-public.spec.ts ordinary-key-evidence.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-missing-id-guard.spec.ts entity-key-evidence-public.spec.ts ordinary-key-evidence.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:91829) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91843) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-key-evidence-successor/candidate/packages/kernel
+
+(node:91855) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ × src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > retains undefined separately from spelled and typed keys 14ms
+   → rows.map is not a function
+ × src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > production mode retains undefined without warning 2ms
+   → tree.$.rows.map is not a function
+ × src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > retains null separately from spelled and typed keys 1ms
+   → rows.map is not a function
+ × src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > production mode retains null without warning 1ms
+   → tree.$.rows.map is not a function
+(node:91866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > warns when entities have no id and no selectId 12ms
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > does NOT warn when a selectId is provided 1ms
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > does NOT warn when entities have an id field 0ms
+(node:91870) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key undefined (undefined) 2ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key undefined (undefined) 1ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key null (object) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key null (object) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key undefined (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key undefined (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key 1 (number) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key 1 (number) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key 1 (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key 1 (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > uses the rekey destination 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > refuses missing source evidence 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > retains undefined separately from spelled and typed keys
+ FAIL  src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > retains null separately from spelled and typed keys
+TypeError: rows.map is not a function
+ ❯ src/lib/entity-key-evidence-public.spec.ts:21:56
+     19|         rows.addOne(row('1', 5));
+     20|         rows.addOne(row('right', 6));
+     21|         const values: ReadonlyMap<unknown, Row> = rows.map();
+       |                                                        ^
+     22|         expect([...values.keys()]).toEqual(['left', key, String(key), …
+     23|         expect([...values.values()].map(e => e.value)).toEqual([1,2,3,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > production mode retains undefined without warning
+ FAIL  src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > production mode retains null without warning
+TypeError: tree.$.rows.map is not a function
+ ❯ src/lib/entity-key-evidence-public.spec.ts:35:63
+     33|       try {
+     34|         tree.$.rows.addOne(row(key, 7));
+     35|         const values: ReadonlyMap<unknown, Row> = tree.$.rows.map();
+       |                                                               ^
+     36|         expect(values.size).toBe(1);
+     37|         expect(values.get(key)?.value).toBe(7);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  4 failed | 15 passed (19)
+   Start at  17:02:19
+   Duration  2.27s (transform 984ms, setup 0ms, import 1.28s, tests 40ms, environment 584ms)
+
+Warning: command "node tools/run-core-vitest.mjs entity-missing-id-guard.spec.ts entity-key-evidence-public.spec.ts ordinary-key-evidence.spec.ts --reporter=verbose --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.8s

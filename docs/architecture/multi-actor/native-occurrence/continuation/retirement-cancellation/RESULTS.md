@@ -1,0 +1,11 @@
+# Exact subscription cancellation successor
+
+Fresh copy of the preserved fixed-window retirement author snapshot; no integration authorization implied. Runtime change is confined to onOwnerCellTransition in lifecycle.ts: each returned disposer is once-only, clears its observer callback, and removes the cell index only if that index still names its own observer set. New registrations cannot be detached by an obsolete handle. No terminal outcome, proof mutation, readiness, retirement input classification, or source scan changed.
+
+Faraday final report and exact ten-control fixture are archived in review-inputs. Baseline-first.log reproduces the original two failures with eight passing controls before any runtime correction. Corrected-first.log has all fifteen reviewer/general cancellation controls passing. Added cases exercise repeated disposal, already queued cancellation, and callback reentry registering a replacement observer. The real source-metadata stranded-request assertion remains unchanged.
+
+Final Nx replay: 126/126 tests across fourteen files pass (original 111 plus reviewer ten plus five new cancellation cases). Strict source and spec types pass. Unchanged naive-retire fault injection still fails the foreign pending exclusion control as expected; it is not a green test. COMMAND-RESULTS.json and run-final.py preserve commands, environment, exit statuses and workload; raw logs remain alongside this report. No performance or heap claim, full integration or release qualification.
+
+All 2,975 original author manifest files reverified unchanged. Candidate contains exactly one runtime delta, an output-path-only redirect in the original retirement fixture, and two added test files. The ten-control independent fixture is byte-identical to Faraday final. The original snapshot and first failures are preserved. SOURCE-SHA256.json identifies all 2,977 candidate source files. runtime.patch, tests.patch and output-redirect.patch separate implementation, assertions and artifact routing.
+
+Independent review is required before integration. Falsify with a cancelled handle invoked repeatedly after same-cell re-registration, cancellation after queued notification, callback self-cancellation/re-registration, and the unchanged real retirement source request. Broad integration and joint readiness-phase compatibility have not been rerun here.

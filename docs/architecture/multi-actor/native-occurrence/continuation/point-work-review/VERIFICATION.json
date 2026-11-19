@@ -1,0 +1,19 @@
+{
+  "snapshotSha256": "8f793371ff6c1e0159b412f4b56021fda3590a4966bef24f18b58872f8a90146",
+  "verifiedPaths": 3067,
+  "counterByteExactSha256": "c00fca7b2807d6f676a2fe6ca40c678cf32c20d200c11dd30d3fd62a6b4aadb7",
+  "rawEventsEqual": true,
+  "all200Writes69AtBothSizes": true,
+  "originalAndAttributedTotal": 13800,
+  "modules": {
+    "lib/entity-signal.ts": 2600,
+    "lib/physical/entity-value-store.ts": 200,
+    "lib/internals/utilities/deep-equal.ts": 800,
+    "lib/internals/entity-publication.ts": 2800,
+    "lib/experimental-publication/lifecycle.ts": 0,
+    "lib/experimental-publication/entity.ts": 4600,
+    "lib/internals/intrinsic-mutation.ts": 1200,
+    "lib/experimental-publication/private.ts": 1000,
+    "lib/internals/location-runtime.ts": 600
+  }
+}

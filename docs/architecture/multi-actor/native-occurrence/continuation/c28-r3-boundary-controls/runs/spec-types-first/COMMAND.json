@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "tools/check-spec-types.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-boundary-controls/r2-copy",
+  "node": "v24.15.0",
+  "pnpm": "10.17.0",
+  "manifestSHA256": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "verifiedBefore": 3093,
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-boundary-controls/runs/spec-types-first/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-boundary-controls/runs/spec-types-first/nx-data",
+    "TMPDIR": "/private/tmp/st-c28-r3-boundary-controls/runs/spec-types-first/tmp",
+    "ST_COMPARATOR_BOUNDARY_OUTPUT": "/private/tmp/st-c28-r3-boundary-controls/runs/spec-types-first/observations.jsonl"
+  },
+  "timeoutSeconds": 180
+}

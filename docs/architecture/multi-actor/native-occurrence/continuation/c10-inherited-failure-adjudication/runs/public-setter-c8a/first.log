@@ -1,0 +1,35 @@
+
+> nx run kernel:test independent-public-readiness.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-public-readiness.spec.ts --maxWorkers=1
+
+(node:22850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22866) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/full-run-classification/oracle/packages/kernel
+
+(node:22880) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:11:59
+   Duration  3.60s (transform 2.16s, setup 0ms, import 2.73s, tests 19ms, environment 666ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.6s

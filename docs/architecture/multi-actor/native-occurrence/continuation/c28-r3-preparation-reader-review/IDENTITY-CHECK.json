@@ -1,0 +1,12 @@
+{
+  "manifestFileSha256": "812a3ad5d6843e95a791aaf001927d54f67738626360a50afb9f7871fdfcd302",
+  "files": 3127,
+  "mismatches": [],
+  "changedPaths": [
+    "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/entity-preparation-reader.ts",
+    "packages/kernel/src/lib/preparation-reader-comparison.spec.ts"
+  ]
+}

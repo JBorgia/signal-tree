@@ -1,0 +1,9 @@
+{
+  "cwd": "/private/tmp/st-c26-lifecycle-controls/c26-copy",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "tools/check-spec-types.mjs"
+  ],
+  "node": "24.15.0",
+  "updateFlag": false
+}

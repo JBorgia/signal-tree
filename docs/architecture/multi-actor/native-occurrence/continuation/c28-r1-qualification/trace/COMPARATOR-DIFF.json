@@ -1,0 +1,208 @@
+[
+  {
+    "history": "A",
+    "relative": [
+      "x"
+    ],
+    "noop": true,
+    "difference": {}
+  },
+  {
+    "history": "A",
+    "relative": [
+      "y"
+    ],
+    "noop": false,
+    "difference": {
+      "roles": {
+        "prior": {
+          "owners": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "validation": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "possible": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        },
+        "effective": {
+          "owners": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            },
+            {
+              "owner": 1,
+              "id": 2,
+              "outcome": "confirmed"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "validation": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            },
+            {
+              "owner": 1,
+              "id": 2,
+              "outcome": "confirmed"
+            }
+          ],
+          "possible": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      }
+    }
+  },
+  {
+    "history": "B",
+    "relative": [
+      "x"
+    ],
+    "noop": true,
+    "difference": {}
+  },
+  {
+    "history": "B",
+    "relative": [
+      "y"
+    ],
+    "noop": false,
+    "difference": {
+      "roles": {
+        "prior": {
+          "owners": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "validation": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "possible": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        },
+        "effective": {
+          "owners": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            },
+            {
+              "owner": 2,
+              "id": 2,
+              "outcome": "confirmed"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "validation": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            },
+            {
+              "owner": 2,
+              "id": 2,
+              "outcome": "confirmed"
+            }
+          ],
+          "possible": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      }
+    }
+  }
+]

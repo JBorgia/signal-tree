@@ -1,0 +1,38 @@
+--- original occurrence-successor.spec.ts
++++ diagnostic copy
+@@ -56,7 +56,7 @@
+  try{
+   const a=index.enroll(tree.$.a),b=index.enroll(tree.$.b);
+   life.runDeclaration(channel,{kind:'independent'},()=>{
+-   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+    index.replace(a,'value',p.requirement);index.replace(b,'value',p.requirement);
+    expect(index.unresolved()).toBe(2);
+    index.replace(a,'value',life.initialRequirement());expect(index.unresolved()).toBe(1);
+@@ -64,7 +64,7 @@
+   });
+   expect(index.unresolved()).toBe(0);expect(index.inspect().finalized).toBe(1);expect(wakes).toBe(1);
+   life.runDeclaration(channel,{kind:'independent'},()=>{
+-   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+    index.replace(a,'value',p.requirement);index.dispose();expect(index.inspect().subscriptions).toBe(0);
+   });expect(wakes).toBe(1);
+  }finally{index.dispose();life.disposeConnection(channel);tree.destroy();}
+@@ -81,7 +81,7 @@
+    for(const handle of handles)index.replace(handle,'value',life.initialRequirement());
+    let before=0;
+    life.runDeclaration(channel,{kind:'independent'},()=>{
+-    const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++    const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+     index.replace(handles[0],'value',p.requirement);before=index.inspect().propagated;
+    });
+    expect(index.inspect().finalized).toBe(1);work.push(index.inspect().propagated-before);
+@@ -108,7 +108,7 @@
+  try{
+   const branch=index.enroll(tree.$.branch),x=index.enroll(tree.$.branch.x);
+   life.runDeclaration(channel,{kind:'independent'},()=>{
+-   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+    index.replace(x,'value',p.requirement);expect(index.unresolved()).toBe(1);
+    index.setPresence(branch,false,life.initialRequirement());expect(index.unresolved()).toBe(0);
+    index.setPresence(branch,true,life.initialRequirement());expect(index.unresolved()).toBe(1);

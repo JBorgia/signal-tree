@@ -1,0 +1,11 @@
+{
+  "frozen": true,
+  "baseManifestSha256": "905af11731583b81a9690e2fdaf8a2e0cc71fad4d375f0f5ec1d7a944a012816",
+  "manifestSha256": "e4ab440c101fbac6cc89f22924dba0842c3670ea519ac33087f62175c74e26e3",
+  "runtimePatchSha256": "3b3d210534b969affc9decd28585a8aa6fcae443b991f03351c76372bffd04bc",
+  "testsPatchSha256": "fd68c0e6359d8f3515822e700e4d25b24106cddf470f925df7a8dc770b3b8076",
+  "runtimeFilesChanged": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts"
+  ],
+  "allOtherBaseFilesUnchanged": true
+}

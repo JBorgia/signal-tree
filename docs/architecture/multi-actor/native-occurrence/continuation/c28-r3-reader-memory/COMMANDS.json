@@ -1,0 +1,170 @@
+[
+  {
+    "arm": "baseline",
+    "size": 128,
+    "replicate": 1,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/baseline/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "ba8a4ebcbcffa0cba60992bedf39eb201989cf5f46c8bf971c7670bc0bc034ce",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/baseline-128-r1"
+  },
+  {
+    "arm": "reader",
+    "size": 128,
+    "replicate": 1,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/reader/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "ba8a4ebcbcffa0cba60992bedf39eb201989cf5f46c8bf971c7670bc0bc034ce",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/reader-128-r1"
+  },
+  {
+    "arm": "reader",
+    "size": 512,
+    "replicate": 1,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/reader/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "8e97bbebbd08fa87cbdd632c225df3b7ce9b2fa212929a6d94f1062d7647cde1",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/reader-512-r1"
+  },
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 1,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/baseline/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "8e97bbebbd08fa87cbdd632c225df3b7ce9b2fa212929a6d94f1062d7647cde1",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/baseline-512-r1"
+  },
+  {
+    "arm": "baseline",
+    "size": 2048,
+    "replicate": 1,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/baseline/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "dbaf5e4693377a336009c72c7204f62e80c91bb5b7a7a262ee7c09e23801b3d1",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/baseline-2048-r1"
+  },
+  {
+    "arm": "reader",
+    "size": 2048,
+    "replicate": 1,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/reader/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "dbaf5e4693377a336009c72c7204f62e80c91bb5b7a7a262ee7c09e23801b3d1",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/reader-2048-r1"
+  },
+  {
+    "arm": "reader",
+    "size": 512,
+    "replicate": 2,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/reader/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "8e97bbebbd08fa87cbdd632c225df3b7ce9b2fa212929a6d94f1062d7647cde1",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/reader-512-r2"
+  },
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 2,
+    "cwd": "/private/tmp/st-c28-r3-reader-memory/baseline/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "src/lib/entity-large-batches.spec.ts",
+      "--testNamePattern=^entity batches larger than the argument limit",
+      "--skip-nx-cache",
+      "--maxWorkers=1",
+      "--reporter=default",
+      "--reporter=/private/tmp/st-c28-r3-reader-memory/full-reporter.mjs"
+    ],
+    "testSha256": "8e97bbebbd08fa87cbdd632c225df3b7ce9b2fa212929a6d94f1062d7647cde1",
+    "runDir": "/private/tmp/st-c28-r3-reader-memory/runs/baseline-512-r2"
+  }
+]

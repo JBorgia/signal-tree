@@ -1,0 +1,35 @@
+
+> nx run kernel:test independent-observation-wrapper-gc.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-observation-wrapper-gc.spec.ts --maxWorkers=1
+
+(node:65720) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65730) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/scalar-support-implementation-review/frozen-d0b54e14/candidate/packages/kernel
+
+(node:65737) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  11:13:00
+   Duration  3.75s (transform 1.51s, setup 0ms, import 1.79s, tests 1.13s, environment 610ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.7s

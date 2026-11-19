@@ -1,0 +1,20 @@
+[
+  {
+    "source": "STATUS.md",
+    "archive": "STATUS.md",
+    "sourceSha256": "19aa0795afa3b90845ce07d2d3e4c647ad2a58b957c1fb7f2aad34ea40fde9f8",
+    "archiveSha256": "19aa0795afa3b90845ce07d2d3e4c647ad2a58b957c1fb7f2aad34ea40fde9f8"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "8329648a98e479b218f8932b2348322df592b0f03f4c15e8f31134a4ae1bc9ae",
+    "archiveSha256": "8329648a98e479b218f8932b2348322df592b0f03f4c15e8f31134a4ae1bc9ae"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "1438855982de667c3ed5c77120c75dfd248c4fc9753940ffa545bfd346fda1c8",
+    "archiveSha256": "1438855982de667c3ed5c77120c75dfd248c4fc9753940ffa545bfd346fda1c8"
+  }
+]

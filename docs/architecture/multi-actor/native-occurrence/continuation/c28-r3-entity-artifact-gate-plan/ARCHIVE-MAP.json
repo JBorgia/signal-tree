@@ -1,0 +1,32 @@
+[
+  {
+    "source": "PACKET-HASHES.json",
+    "archive": "PACKET-HASHES.json",
+    "sourceSha256": "101afa1e960b330e3ade73720977bb3345663a9e94600b7d169b6e269d37144b",
+    "archiveSha256": "101afa1e960b330e3ade73720977bb3345663a9e94600b7d169b6e269d37144b"
+  },
+  {
+    "source": "INPUTS.json",
+    "archive": "INPUTS.json",
+    "sourceSha256": "6cc0c896c1a9860591a8fac52869de24c74c05ef7db43f36c2fd3e74cdbb4790",
+    "archiveSha256": "6cc0c896c1a9860591a8fac52869de24c74c05ef7db43f36c2fd3e74cdbb4790"
+  },
+  {
+    "source": "PLAN.md",
+    "archive": "PLAN.md",
+    "sourceSha256": "8355c8f4b3342e372c3a753d34d8bb2c5f81df5988fdfe9f8d97065f47a645ac",
+    "archiveSha256": "8355c8f4b3342e372c3a753d34d8bb2c5f81df5988fdfe9f8d97065f47a645ac"
+  },
+  {
+    "source": "CASES.md",
+    "archive": "CASES.md",
+    "sourceSha256": "84c2ef77ad325501d69e03497d00db07c13cb6af9efdda37bf6e36eed7a958c7",
+    "archiveSha256": "84c2ef77ad325501d69e03497d00db07c13cb6af9efdda37bf6e36eed7a958c7"
+  },
+  {
+    "source": "SETUP-INVESTIGATION.md",
+    "archive": "SETUP-INVESTIGATION.md",
+    "sourceSha256": "fed595791cc5ed8dde9b599c947ab93a17fc5a1e7416c01f424b5db58a46f358",
+    "archiveSha256": "fed595791cc5ed8dde9b599c947ab93a17fc5a1e7416c01f424b5db58a46f358"
+  }
+]

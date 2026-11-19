@@ -1,0 +1,28 @@
+{
+  "baseline-frozen": {
+    "manifestSha256": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+    "checkedFiles": 3124,
+    "excludedOverlay": null,
+    "mismatches": []
+  },
+  "baseline-measurement": {
+    "manifestSha256": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+    "checkedFiles": 3123,
+    "excludedOverlay": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "mismatches": [],
+    "overlayMatchesLastRun": true
+  },
+  "reader-frozen": {
+    "manifestSha256": "812a3ad5d6843e95a791aaf001927d54f67738626360a50afb9f7871fdfcd302",
+    "checkedFiles": 3127,
+    "excludedOverlay": null,
+    "mismatches": []
+  },
+  "reader-measurement": {
+    "manifestSha256": "42b24d55377490c7c51cf552004cd9141584d8ec8bfad075e2724afd6a55cfed",
+    "checkedFiles": 3124,
+    "excludedOverlay": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "mismatches": [],
+    "overlayMatchesLastRun": true
+  }
+}

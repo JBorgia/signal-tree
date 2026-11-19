@@ -1,0 +1,39 @@
+{
+  "sourcesMatchExtraction": {
+    "lifecycle.ts": true,
+    "entity.ts": true
+  },
+  "chunks": {
+    "proof-type": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    },
+    "combine-proof": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    },
+    "requirement-types": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    },
+    "readiness-and-composite": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    },
+    "native-proof": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    },
+    "owner-transition-check": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    },
+    "retirement-predicate": {
+      "hashMatches": true,
+      "exactChunkInModel": true
+    }
+  },
+  "modelSha256": "aa8587260c2d102ee1452def2677f235e3f464898c5f1009242661e2355f0291",
+  "mainReplaySha256": "a5d04152bbcfb3c34e38101bb57201208a97b6442627773baf869b5ca3133548",
+  "newExecutions": 0
+}

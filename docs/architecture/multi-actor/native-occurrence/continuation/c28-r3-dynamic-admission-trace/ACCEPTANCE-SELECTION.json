@@ -1,0 +1,65 @@
+[
+  {
+    "project": "kernel",
+    "path": "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "sha256": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "kernel",
+    "path": "packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts",
+    "sha256": "52fbe6757c711b19c45e5f60ce0264a52e993aecb4d7beadae7e658f4b7d948b",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "kernel",
+    "path": "packages/kernel/src/lib/construction-resource-cleanup.spec.ts",
+    "sha256": "496166c0f764d338e13fa17d653143381b15044908498fa3e3731f15c0d7c501",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "kernel",
+    "path": "packages/kernel/src/enhancers/transactions/native-admission-segments.spec.ts",
+    "sha256": "bf11ff4b26137f4f87f7dc7c23d0d00e5a46c4c7807cabae43852bd07b9d0675",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "angular",
+    "path": "packages/angular/src/lib/whole-value-new-keys.spec.ts",
+    "sha256": "4b253ccd9d584b4bd768b20fc4e7e115051e8f3d11a51e4380141256967e11b4",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "react",
+    "path": "packages/react/src/whole-value-new-keys.spec.tsx",
+    "sha256": "ebe6def4d9922612ce386949ca67b3f476b9bae46e3dd4f9660b2d9a4b234667",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "vue",
+    "path": "packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "sha256": "53d4c578d5de844431dbe2cb81d9e89ea2e8338defc544cc4fdaba230055d97d",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "solid",
+    "path": "packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "sha256": "b857f1b9b00b4b91429bb2382df0e5fb5557564e062feb4f837d4736a7786416",
+    "selection": "entire unchanged file",
+    "executedThisStep": false
+  },
+  {
+    "project": "kernel",
+    "path": "packages/kernel/src/lib/dynamic-admission-minimal.spec.ts",
+    "sha256": "9b05c34ed5fb83d9b06de6a5ff85e74d598f3889cc842fb8c1eb0df2f924622f",
+    "selection": "unchanged existing minimal static/dynamic pair; test-only addition to base",
+    "executedThisStep": false
+  }
+]

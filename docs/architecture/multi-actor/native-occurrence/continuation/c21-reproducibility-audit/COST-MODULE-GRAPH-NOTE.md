@@ -1,0 +1,17 @@
+# Point cost: module graph versus production artifact (source-only)
+
+Exact C21 manifest 73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27. No new experiment, artifact build, runtime edit or original-test edit.
+
+The original entity-granular-reactivity spec imports entityMap from `../index` and signalTree from `./signal-tree`. `packages/kernel/src/index.ts:167` re-exports link. `lib/link.ts:2` imports `./experimental-publication/entity` for side effects; that module registers the entity native factory at entity.ts:60. EntityPublicationSource.prepare calls nativeParticipant at entity-publication.ts:231; nativeParticipant at :198 lazily constructs the native source once a factory is registered, independent of recipient enrollment. The comment at :135 explicitly states native ownership belongs to the collection even without recipients.
+
+The fresh 13,800 trace measures this loaded source-test graph. Its native preparation stacks demonstrate that this factory was active. It is not a measurement of a freshly built, tree-shaken production bare fixture. `packages/kernel/package.json` declares `sideEffects:false`; that is packaging metadata, not evidence that a particular emitted consumer artifact removes link registration or its work. No fresh artifact has been inspected here, so unused-code elimination, different production counts and production savings are not claimed. Original root import, assertions and <2000 budget remain unchanged.
+
+Late enrollment / native evidence before the first connection **is an existing tested semantic requirement within the loaded graph**:
+
+- `publication-native-provenance.spec.ts:21–25` writes a transaction before every connection, then creates the output Link and optional passive source Link. Root/branch/updateAndReport and none/late/dispose variants assert contradiction for false independence and useful delivery after the real dependency settles.
+- `entity-native-input-independent.spec.ts:28–69` includes the `none` source-recipient variant: source entity removal must still be carried by a public root snapshot into a scalar output declaration, reject false independence, and deliver after the actual owner settles while another owner remains pending. The source collection cannot defer all native bookkeeping until it has a recipient.
+- `native-certificate-successor.spec.ts:34` and `scalar-native-support.spec.ts:61` retain shared parent invalidation across late child enrollment and require useful settlement. These are source/proof lifecycle controls, not permission to equate recipients with native support.
+
+These fixtures statically import Link via the public barrel before their bodies run. They establish **writes before Link construction/enrollment**, not writes before Link's module is first loaded in a separately tree-shaken graph. I did not locate a dynamic-import-after-write control in this bounded inspection; no universal module-loading guarantee is inferred. A later production cost comparison would need an exact fresh installed/bundled fixture, emitted dependency/registration inspection, and the relevant no-source-recipient/late-enrollment controls. That work is not run or authorized by this note.
+
+Consequently the point result is representative of the original source fixture with native publication loaded and no collection recipients. It remains a real fixed counted-overhead failure of that fixture. It is neither a demonstrated whole-collection scaling failure nor a bare-production cost measurement or waiver.

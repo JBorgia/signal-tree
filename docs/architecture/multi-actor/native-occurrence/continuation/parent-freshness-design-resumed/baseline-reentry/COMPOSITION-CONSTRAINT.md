@@ -1,0 +1,1 @@
+User steering: later C8 includes R4 entity installedReadRevision/createVersionedProjection source-current mechanism. C7a characterization does not describe C8. Do not duplicate collection reader/epoch work. Main selects the later proof baseline; no C8 source imported here. Reported manifest prefix 3ad1… is not a verified full identity in this investigation.

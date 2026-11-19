@@ -1,0 +1,16 @@
+{
+  "cwd": "/private/tmp/st-membership-egress-trace/candidate",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "link-absent-locations.spec.ts",
+    "-t",
+    "a collection.*no enhancers.*an omission",
+    "--maxWorkers=1"
+  ],
+  "exit": 1
+}

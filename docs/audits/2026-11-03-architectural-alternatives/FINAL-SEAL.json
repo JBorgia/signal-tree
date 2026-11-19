@@ -1,0 +1,16 @@
+{
+  "baselineCommit": "9a9770a63bbece5267f6c439270209ccaf9ef3ee",
+  "frozenCandidateCommit": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+  "runtime": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "productionPackagesDiffEmpty": true,
+  "frozenCandidateClean": true,
+  "pushedAttributionBaselineClean": true,
+  "originalPointGateUnchanged": true,
+  "prototypeImplemented": false,
+  "runtimePromoted": false,
+  "costChildrenValid": 24,
+  "costInputAndSourceMismatches": [],
+  "correctProvenanceSidecarPreservesOriginal": true,
+  "docsGates": "4/4pass",
+  "replayLintExit": 0
+}

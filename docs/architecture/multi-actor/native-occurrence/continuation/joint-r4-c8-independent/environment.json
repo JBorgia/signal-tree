@@ -1,0 +1,10 @@
+{
+  "dependency_source": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "copy": "APFS cp -cR (independent files)",
+  "rebased_bin_wrappers": 647,
+  "nx": "23.1.0",
+  "vitest": "4.1.9",
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "lock_matches_dependency_source": true
+}

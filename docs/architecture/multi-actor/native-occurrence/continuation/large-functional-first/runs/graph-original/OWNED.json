@@ -1,0 +1,23 @@
+[
+  {
+    "pid": 49408,
+    "ppid": 49308,
+    "rssBytes": 147456,
+    "birth": "Tue Nov 3 11:11:20 2026",
+    "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx show project kernel --json"
+  },
+  {
+    "pid": 49413,
+    "ppid": 49408,
+    "rssBytes": 56754176,
+    "birth": "Tue Nov 3 11:11:21 2026",
+    "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js show project kernel --json"
+  },
+  {
+    "pid": 49646,
+    "ppid": 49413,
+    "rssBytes": 20529152,
+    "birth": "Tue Nov 3 11:11:46 2026",
+    "command": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  }
+]

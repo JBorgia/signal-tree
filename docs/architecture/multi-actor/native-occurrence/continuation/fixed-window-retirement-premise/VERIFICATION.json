@@ -1,0 +1,11 @@
+{
+  "copy": {
+    "checked": 2971,
+    "mismatches": []
+  },
+  "author": {
+    "checked": 2971,
+    "mismatches": []
+  },
+  "traceFixtureSha256": "5b5c882c1b59daa6d86a86881c7d2058d6bc009a4e105077b846abff591ef92d"
+}

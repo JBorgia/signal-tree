@@ -1,0 +1,66 @@
+{
+  "manifestUnchanged": true,
+  "changed": [],
+  "runs": {
+    "angular": {
+      "exit": 0,
+      "elapsedSeconds": 24.339239374967292
+    },
+    "c7a-controls": {
+      "exit": 1,
+      "elapsedSeconds": 7.682443041005172
+    },
+    "initial-source-types": {
+      "exit": 1,
+      "elapsedSeconds": 0.17731841607019305
+    },
+    "joint-composition": {
+      "exit": 0,
+      "elapsedSeconds": 12.358523624949157
+    },
+    "membership-regression": {
+      "exit": 0,
+      "elapsedSeconds": 8.657742250012234
+    },
+    "placement-composition": {
+      "exit": 0,
+      "elapsedSeconds": 6.8012967080576345
+    },
+    "react": {
+      "exit": 0,
+      "elapsedSeconds": 11.518859624979086
+    },
+    "recipient-composition": {
+      "exit": 0,
+      "elapsedSeconds": 8.473286291002296
+    },
+    "retirement-composition": {
+      "exit": 1,
+      "elapsedSeconds": 2.5713027919409797
+    },
+    "scalar-accounting-exact": {
+      "exit": 0,
+      "elapsedSeconds": 1.305291915894486
+    },
+    "scalar-regression": {
+      "exit": 0,
+      "elapsedSeconds": 7.6691749159945175
+    },
+    "solid": {
+      "exit": 0,
+      "elapsedSeconds": 7.199688708060421
+    },
+    "source-types": {
+      "exit": 0,
+      "elapsedSeconds": 4.895050209015608
+    },
+    "spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 6.674496458028443
+    },
+    "vue": {
+      "exit": 0,
+      "elapsedSeconds": 10.595045874943025
+    }
+  }
+}

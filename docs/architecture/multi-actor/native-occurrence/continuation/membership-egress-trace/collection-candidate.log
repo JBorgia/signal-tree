@@ -1,0 +1,108 @@
+
+> nx run kernel:test link-absent-locations.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs link-absent-locations.spec.ts --maxWorkers=1
+
+(node:73260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73370) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-membership-egress-trace/candidate/packages/kernel
+
+(node:73391) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/link-absent-locations.spec.ts (21 tests | 5 failed) 372ms
+       × an omission, and re-adds of the location and of a sibling 4ms
+       × an omission, and re-adds of the location and of a sibling 7ms
+       × undo, redo and jumpTo across the omission and the re-adds 3ms
+       × an omission, and re-adds of the location and of a sibling 7ms
+       × undo, redo and jumpTo across the omission and the re-adds 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > an omission, and re-adds of the location and of a sibling
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > an omission, and re-adds of the location and of a sibling
+AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]
+
+- Expected:
+[
+  {
+    "id": "s",
+    "n": 2,
+  },
+]
+
++ Received:
+{
+  "all": [],
+}
+
+ ❯ expectExposed src/lib/link-absent-locations.spec.ts:144:66
+    142|     if (!held) {
+    143|       await connection.settled();
+    144|       expect(endpoint, `${source.name} endpoint after ${label}`).toEqu…
+       |                                                                  ^
+    145|         location.present ? source.exposed(tree) : source.absent
+    146|       );
+ ❯ step src/lib/link-absent-locations.spec.ts:174:7
+ ❯ src/lib/link-absent-locations.spec.ts:192:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > undo, redo and jumpTo across the omission and the re-adds
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > undo, redo and jumpTo across the omission and the re-adds
+AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]
+
+- Expected:
+[
+  {
+    "id": "s",
+    "n": 2,
+  },
+]
+
++ Received:
+{
+  "all": [],
+}
+
+ ❯ expectExposed src/lib/link-absent-locations.spec.ts:144:66
+    142|     if (!held) {
+    143|       await connection.settled();
+    144|       expect(endpoint, `${source.name} endpoint after ${label}`).toEqu…
+       |                                                                  ^
+    145|         location.present ? source.exposed(tree) : source.absent
+    146|       );
+ ❯ step src/lib/link-absent-locations.spec.ts:174:7
+ ❯ src/lib/link-absent-locations.spec.ts:216:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 16 passed (21)
+   Start at  16:54:30
+   Duration  3.12s (transform 1.45s, setup 0ms, import 1.81s, tests 372ms, environment 720ms)
+
+Warning: command "node tools/run-core-vitest.mjs link-absent-locations.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.2s

@@ -1,0 +1,37 @@
+
+> nx run kernel:test publication-retirement-acceptance.spec.ts entity-publication-work-lifetime.spec.ts
+
+> node tools/run-core-vitest.mjs publication-retirement-acceptance.spec.ts entity-publication-work-lifetime.spec.ts
+
+(node:87509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87527) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-publication-retirement-successor/candidate/packages/kernel
+
+(node:87690) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  12 passed (12)
+   Start at  17:01:15
+   Duration  7.08s (transform 9.52s, setup 0ms, import 11.72s, tests 468ms, environment 1.35s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      8.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     8.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    8.2s

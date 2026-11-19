@@ -1,0 +1,20 @@
+[
+  {
+    "source": "README.md",
+    "archive": "README.md",
+    "sourceSha256": "d0c8d1044ad6a5d4588bfe79b626f7713a078c09f58cc5fe499e074e6d79f81c",
+    "archiveSha256": "d0c8d1044ad6a5d4588bfe79b626f7713a078c09f58cc5fe499e074e6d79f81c"
+  },
+  {
+    "source": "INPUTS.json",
+    "archive": "INPUTS.json",
+    "sourceSha256": "d38584084b59790d9442acd0b74405dc1df45bf842a01ca6028dd06b6fe923c4",
+    "archiveSha256": "d38584084b59790d9442acd0b74405dc1df45bf842a01ca6028dd06b6fe923c4"
+  },
+  {
+    "source": "TESTS.patch",
+    "archive": "TESTS.patch",
+    "sourceSha256": "9a673e22d417ec38b0a3bfa256ab0aa3806cdad7c96a25bcda7ab5b3958e6711",
+    "archiveSha256": "9a673e22d417ec38b0a3bfa256ab0aa3806cdad7c96a25bcda7ab5b3958e6711"
+  }
+]

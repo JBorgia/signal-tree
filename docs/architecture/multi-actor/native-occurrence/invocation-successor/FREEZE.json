@@ -1,0 +1,30 @@
+{
+  "status": "bounded correction passes focused25; independent review pending",
+  "originalFourTestsUnchanged": true,
+  "predecessorFilesVerified": 2923,
+  "changedPaths": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/native-field-selection.ts",
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "packages/kernel/src/lib/native-invocation-handoff.spec.ts"
+  ],
+  "sourceManifestSha256": "5d2a2893bde2e196f79c69985a425bb30974e5028ac9b2ad833db9d1a9c83272",
+  "runtimePatchSha256": "23f988db710add731c60ca7cb42e16cea62ad01449a71a1d11708c888702e4cf",
+  "files": {
+    "source-types-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source.patch": "46d2794069f0d88fb7dbe5ec4bb8b072b7b3949335e4b0b0bd4dc9683b412d7a",
+    "first-runtime.log": "f088538a1b00f27348d8b80ca7065fbcbabd8f490b62222ab35a718344fc122c",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "SOURCE-SHA256.json": "5d2a2893bde2e196f79c69985a425bb30974e5028ac9b2ad833db9d1a9c83272",
+    "runtime.patch": "23f988db710add731c60ca7cb42e16cea62ad01449a71a1d11708c888702e4cf",
+    "PREREGISTERED.md": "0865e1870974a4f75a03ea3287e2283d3f03bf1c64b2f83b0dc6b25789b4912a",
+    "RESULTS.md": "13df9c2515bba3d27d146f650be5ec71d6fc10a7c91272c4881ac52957f2121e",
+    "spec-types-first.log": "6ffe646f36cf495f69eca3b7fd6362824fa1252111d0a82ac874053d17ef883c",
+    "fixture-final.log": "651c0dafe46701755b31e976fca7fe343b671812e0f93f2e6ce2892497a07163",
+    "preregistered.spec.ts": "c500f183223aa465d6f2001693e46b1ecc6ef86783453677fc76830fc529fe1f",
+    "source-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused.log": "6d704aa79695159af187c67263acea9e8c471a4b816b9d5eee27025d2941b33b"
+  }
+}

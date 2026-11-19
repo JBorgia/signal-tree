@@ -1,0 +1,33 @@
+# Public A/B result: contract and bounded-retention options
+
+**The distinction is now publicly observed, not merely an internal comparator difference. It is still not an expressly specified promise that every historical confirmed I/V identity must distinguish no-write.** Removing it would change current observable receipts, including an older issued receipt's lifecycle; it cannot be presented as a transparently equivalent representation optimization. Neither observation nor underspecified prose selects the policy.
+
+Independently read the test and all20 raw JSONL records, then compared the packet interpretation. AB-RAW-CHECK.json preserves hashes and checks matched state, empty pre-confirm output, error absence, exact final output/settlement and terminal stickiness. No new runs or runtime/oracle edits.
+
+## What the sequence establishes
+
+Both arms use real transact handles. In A the historical updater consumes a pending; in B it consumes b pending. a and b both confirm before the decisive call. Identical fresh dependent[p,a] updaters then read q2/x7 once, while p remains pending and ordinary state is identical. This is legitimate use of an authentic confirmed handle, not a private proof injection. It is intentionally different history, not identical past behavior.
+
+After fresh drain, A leaves the historical receipt conservative/unknown and the fresh receipt no-write. B supersedes the historical receipt and leaves the fresh one conservative/unknown. After p confirms, both send exactly one{x:7,y:0} and settle; A's historical receipt starts/surviving while fresh remains no-write, whereas B's fresh receipt starts/surviving and historical remains superseded. Extra drain and disposal preserve those statuses. No errors and no extra equal-value notification are observed.
+
+The test asserts setup/state/ownership premises; most transport/receipt results are observations rather than test assertions. Reading their raw values establishes this finite result, not a universal regression gate or a hypothetical C28 outcome. Mapping the difference to sameProof is source-backed interpretation, not instrumented proof-array tracing.
+
+## Required promises versus observed distinction
+
+Approved PROPOSAL.md:36–44 and CURRENT-SPEC.md:40–48 require authentic dependency semantics, native obligation preservation, current/nested validation, no relevant authorship→no-write, final relevant revision/fallback attribution and sticky terminals. They do not define relevance by exact historical confirmed I/V membership or promise a table mapping A to no-write and B to supersession. No separate clause was found making that particular identity distinction normative.
+
+But “no relevant authorship” also does not establish that both must be no-write: the new explicit a is validation evidence in both invocations, and the documents do not resolve when already-satisfied validation changes relevant authorship. The explicit confirmed-handle qualification requirement is not permission to erase that evidence. Preserving fresh validation while deciding how historical evidence affects receipt relevance are separate requirements.
+
+Current revision selection explains the observed receipt attribution. Once one revision is selected, started must still refer to its endpoint invocation; an implementation cannot assign started to both receipts simply to hide a compatibility difference. Already terminal issued statuses must never be rewritten. Older nonterminal receipts may legitimately transition, but changing WHICH transition occurs under the same public sequence is an observable change—not equivalent merely because sent values match.
+
+## Concrete options, no selection
+
+1. **Preserve exact current A/B distinction.** Retain enough historical membership information to answer whether fresh confirmed a was already in the relevant I/V sets, including the old/new receipt attribution. This need not be the entire OwnerCell graph: a separate representation could reduce edges or payload retention. However arbitrary later handles can query historical membership; a fixed-size identity-free summary cannot exactly answer all such queries. Numeric IDs, persistent sets or metadata attached to live issued evidence move/change the storage tradeoff rather than prove a general history-independent bound. This option requires its own lifetime accounting and must not mutate issued inputs/tickets.
+2. **Define future-certificate relevance modulo selected satisfied history.** A bounded current certificate could omit eligible historical confirmed I/V, while current explicit a still participates in validation, nested contradiction/error handling and current admission. This could make A/B receipt outcomes coincide or change their attribution. It is a deliberate observable semantic reconciliation requiring centralized scope/compatibility disposition; the current optimization authorization and this review do not select it. Keep old terminal receipts sticky and old issued captures unchanged; preregister both old/new receipt histories before implementation.
+3. **Defer that reconciliation and retain the narrow C26 guarantee.** Keep the proven ancestry bound, record distinct-owner history as open, and consider only improvements demonstrably preserving A/B (for example reducing unnecessary reference edges without losing membership). Do not call this general L15 closure. No settlement sweep is implied: a sweep still must answer the same membership/receipt question and additionally risks changing idle aliases and attribution.
+
+## Recommended next bounded action
+
+Preserve this A/B packet as a compatibility discriminator alongside sequential-qi growth; do not relax it into a payload-only pass. Separate mandatory invariants from the currently observed receipt mapping in the central decision record. For ANY candidate direction, require fresh confirmed-handle validation/contradiction tests, issued-pending-capture preservation, bound destination witness, pending/abandoned exact references, rejected/unknown/retirement facts, exact useful output and old/new receipt attribution. A source-current certificate handoff must isolate saved views and update occurrence bookkeeping coherently.
+
+The evidence narrows the choice: one cannot simultaneously erase all distinguishing historical information and claim exact preservation of the demonstrated receipt behavior using a stateless summary. It does NOT prove unbounded OwnerCell objects are the only representation, establish that the distinction is a required forever promise, or authorize changing it. No owner question, policy selection or runtime change was made.

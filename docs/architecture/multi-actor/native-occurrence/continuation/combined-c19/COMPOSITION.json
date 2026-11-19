@@ -1,0 +1,9 @@
+{
+  "inputs": [
+    "/private/tmp/st-native-combined-c18/SNAPSHOT-C18.json",
+    "/private/tmp/st-c18-lint-maintenance/SNAPSHOT.json",
+    "/private/tmp/st-native-combined-c18/SNAPSHOT-C18.json"
+  ],
+  "changes": [],
+  "conflicts": []
+}

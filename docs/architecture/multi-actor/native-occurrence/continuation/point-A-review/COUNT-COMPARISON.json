@@ -1,0 +1,28 @@
+{
+  "baseline": {
+    "totalEachPopulation": 13800,
+    "visitsEveryUpdate": 69,
+    "privateOperationVisits": {
+      "Array.push": 200,
+      "Array.map": 400,
+      "Array.Symbol(Symbol.iterator)": 200,
+      "Set.Symbol(Symbol.iterator)": 200
+    }
+  },
+  "A": {
+    "totalEachPopulation": 13000,
+    "visitsEveryUpdate": 65,
+    "privateOperationVisits": {
+      "Array.push": 200
+    }
+  },
+  "delta": 800,
+  "sameHistogramsAcrossSizes": true,
+  "nonPrivateHistogramsEqualAfterDocumentedNormalization": true,
+  "normalizations": [
+    "baseline/A checkout prefix",
+    "private.ts shifted line/column",
+    "captureNativeInput vs Module.captureNativeInput (same source site,200 empty filter calls)"
+  ],
+  "expectedUnchangedBudgetFailure": true
+}

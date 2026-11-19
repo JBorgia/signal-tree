@@ -1,0 +1,33 @@
+{
+  "frozenInputMismatches": {
+    "baseline": [],
+    "reader": []
+  },
+  "frozenFileCounts": {
+    "baseline": 3124,
+    "reader": 3127
+  },
+  "selectedCopiesLatestAfterRunChecks": {
+    "baseline": {
+      "latestAfterRun": "/private/tmp/st-c28-r3-reader-memory/R1/runs/baseline-2048-r1/RESULT.json",
+      "runtimeMismatches": [],
+      "overlayHashMatchesRecordedCommandAndSnapshot": true,
+      "overlaySha256": "dbaf5e4693377a336009c72c7204f62e80c91bb5b7a7a262ee7c09e23801b3d1"
+    },
+    "reader": {
+      "latestAfterRun": "/private/tmp/st-c28-r3-reader-memory/R1/runs/reader-512-r1/RESULT.json",
+      "runtimeMismatches": [],
+      "overlayHashMatchesRecordedCommandAndSnapshot": true,
+      "overlaySha256": "8e97bbebbd08fa87cbdd632c225df3b7ce9b2fa212929a6d94f1062d7647cde1"
+    }
+  },
+  "historicalControllerAndPreregistrationUnchanged": true,
+  "reviewedR1ControllerUnchanged": true,
+  "runDirectories": 5,
+  "unstarted": [
+    "reader-2048-r1",
+    "reader-512-r2",
+    "baseline-512-r2"
+  ],
+  "noRetries": true
+}

@@ -1,0 +1,1 @@
+{"cases":2,"result":"PASS","limit":"Explicit ngOnDestroy invocation retains live in-memory owner; no durable transfer or actual navigation survival claim"}

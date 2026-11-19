@@ -1,0 +1,4 @@
+{
+  "typescript": ">=5.9 <6.0",
+  "@angular/compiler": "21.0.0"
+}

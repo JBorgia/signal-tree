@@ -1,0 +1,444 @@
+
+> nx run react-reference:test --run --maxWorkers=1
+
+> vitest --run --maxWorkers=1
+
+(node:61620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+2026-11-02T20:15:04.969Z vite-tsconfig-paths options.root   == [90mundefined[39m
+2026-11-02T20:15:04.969Z vite-tsconfig-paths project root   == /private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference
+2026-11-02T20:15:04.969Z vite-tsconfig-paths workspace root == /private/tmp/st-c20-tsconfig-scan-successor/candidate
+2026-11-02T20:15:05.043Z vite-tsconfig-paths projects: [
+  [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference/tsconfig.json'[39m,
+  [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/react/tsconfig.json'[39m
+]
+2026-11-02T20:15:05.081Z vite-tsconfig-paths config loaded: {
+  configPath: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference/tsconfig.app.json'[39m,
+  config: {
+    extends: [32m'./tsconfig.json'[39m,
+    compilerOptions: {
+      outDir: [32m'../../dist/out-tsc'[39m,
+      types: [
+        [32m'node'[39m,
+        [32m'@nx/react/typings/cssmodule.d.ts'[39m,
+        [32m'@nx/react/typings/image.d.ts'[39m,
+        [32m'vite/client'[39m
+      ],
+      jsx: [32m'react-jsx'[39m,
+      allowJs: [33mfalse[39m,
+      allowSyntheticDefaultImports: [33mtrue[39m,
+      strict: [33mtrue[39m,
+      rootDir: [32m'../..'[39m,
+      sourceMap: [33mtrue[39m,
+      declaration: [33mfalse[39m,
+      moduleResolution: [32m'bundler'[39m,
+      emitDecoratorMetadata: [33mtrue[39m,
+      experimentalDecorators: [33mtrue[39m,
+      importHelpers: [33mtrue[39m,
+      target: [32m'es2015'[39m,
+      module: [32m'esnext'[39m,
+      lib: [ [32m'es2015'[39m, [32m'dom'[39m, [32m'es2021'[39m ],
+      downlevelIteration: [33mtrue[39m,
+      skipLibCheck: [33mtrue[39m,
+      esModuleInterop: [33mtrue[39m,
+      skipDefaultLibCheck: [33mtrue[39m,
+      baseUrl: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate'[39m,
+      paths: {
+        [32m'@signal-tree/angular'[39m: [ [32m'packages/angular/src/index.ts'[39m ],
+        [32m'@signal-tree/kernel/adapter'[39m: [ [32m'packages/kernel/src/adapter.ts'[39m ],
+        [32m'@signal-tree/kernel/internals'[39m: [ [32m'packages/kernel/src/internals.ts'[39m ],
+        [32m'@signal-tree/kernel'[39m: [ [32m'packages/kernel/src/index.ts'[39m ],
+        [32m'@signal-tree/react'[39m: [ [32m'packages/react/src/index.ts'[39m ]
+      },
+      noUncheckedSideEffectImports: [33mfalse[39m,
+      ignoreDeprecations: [32m'6.0'[39m
+    },
+    exclude: [
+      [32m'src/**/*.spec.ts'[39m,
+      [32m'src/**/*.test.ts'[39m,
+      [32m'src/**/*.spec.tsx'[39m,
+      [32m'src/**/*.test.tsx'[39m,
+      [32m'src/**/*.spec.js'[39m,
+      [32m'src/**/*.test.js'[39m,
+      [32m'src/**/*.spec.jsx'[39m,
+      [32m'src/**/*.test.jsx'[39m,
+      [32m'vite.config.ts'[39m,
+      [32m'vite.config.mts'[39m,
+      [32m'vitest.config.ts'[39m,
+      [32m'vitest.config.mts'[39m
+    ],
+    include: [ [32m'src/**/*.js'[39m, [32m'src/**/*.jsx'[39m, [32m'src/**/*.ts'[39m, [32m'src/**/*.tsx'[39m ],
+    files: [],
+    compileOnSave: [33mfalse[39m
+  }
+}
+2026-11-02T20:15:05.082Z vite-tsconfig-paths compiled globs: {
+  includers: [
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.js$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.jsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.tsx$/[39m
+  ],
+  excluders: [
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.tsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.tsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.js$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.js$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.jsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.jsx$/[39m,
+    [31m/^\.\/vite\.config\.ts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vite\.config\.ts$/[39m,
+    [31m/^\.\/vite\.config\.mts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vite\.config\.mts$/[39m,
+    [31m/^\.\/vitest\.config\.ts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vitest\.config\.ts$/[39m,
+    [31m/^\.\/vitest\.config\.mts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vitest\.config\.mts$/[39m,
+    [31m/^\.\.\/\.\.\/dist\/out-tsc\/((?:[^/]*(?:\/|$))*)$/[39m
+  ]
+}
+2026-11-02T20:15:05.082Z vite-tsconfig-paths config loaded: {
+  configPath: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference/tsconfig.spec.json'[39m,
+  config: {
+    extends: [32m'./tsconfig.json'[39m,
+    compilerOptions: {
+      outDir: [32m'../../dist/out-tsc'[39m,
+      types: [
+        [32m'vitest/globals'[39m,
+        [32m'vitest/importMeta'[39m,
+        [32m'vite/client'[39m,
+        [32m'node'[39m,
+        [32m'vitest'[39m,
+        [32m'@nx/react/typings/cssmodule.d.ts'[39m,
+        [32m'@nx/react/typings/image.d.ts'[39m
+      ],
+      jsx: [32m'react-jsx'[39m,
+      allowJs: [33mfalse[39m,
+      allowSyntheticDefaultImports: [33mtrue[39m,
+      strict: [33mtrue[39m,
+      rootDir: [32m'../..'[39m,
+      sourceMap: [33mtrue[39m,
+      declaration: [33mfalse[39m,
+      moduleResolution: [32m'bundler'[39m,
+      emitDecoratorMetadata: [33mtrue[39m,
+      experimentalDecorators: [33mtrue[39m,
+      importHelpers: [33mtrue[39m,
+      target: [32m'es2015'[39m,
+      module: [32m'esnext'[39m,
+      lib: [ [32m'es2015'[39m, [32m'dom'[39m, [32m'es2021'[39m ],
+      downlevelIteration: [33mtrue[39m,
+      skipLibCheck: [33mtrue[39m,
+      esModuleInterop: [33mtrue[39m,
+      skipDefaultLibCheck: [33mtrue[39m,
+      baseUrl: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate'[39m,
+      paths: {
+        [32m'@signal-tree/angular'[39m: [ [32m'packages/angular/src/index.ts'[39m ],
+        [32m'@signal-tree/kernel/adapter'[39m: [ [32m'packages/kernel/src/adapter.ts'[39m ],
+        [32m'@signal-tree/kernel/internals'[39m: [ [32m'packages/kernel/src/internals.ts'[39m ],
+        [32m'@signal-tree/kernel'[39m: [ [32m'packages/kernel/src/index.ts'[39m ],
+        [32m'@signal-tree/react'[39m: [ [32m'packages/react/src/index.ts'[39m ]
+      },
+      noUncheckedSideEffectImports: [33mfalse[39m,
+      ignoreDeprecations: [32m'6.0'[39m
+    },
+    include: [
+      [32m'vite.config.ts'[39m,
+      [32m'vite.config.mts'[39m,
+      [32m'vitest.config.ts'[39m,
+      [32m'vitest.config.mts'[39m,
+      [32m'src/**/*.test.ts'[39m,
+      [32m'src/**/*.spec.ts'[39m,
+      [32m'src/**/*.test.tsx'[39m,
+      [32m'src/**/*.spec.tsx'[39m,
+      [32m'src/**/*.test.js'[39m,
+      [32m'src/**/*.spec.js'[39m,
+      [32m'src/**/*.test.jsx'[39m,
+      [32m'src/**/*.spec.jsx'[39m,
+      [32m'src/**/*.d.ts'[39m
+    ],
+    files: [],
+    compileOnSave: [33mfalse[39m,
+    exclude: [ [32m'../../node_modules'[39m, [32m'../../tmp'[39m ]
+  }
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths compiled globs: {
+  includers: [
+    [31m/^\.\/vite\.config\.ts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vite\.config\.ts$/[39m,
+    [31m/^\.\/vite\.config\.mts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vite\.config\.mts$/[39m,
+    [31m/^\.\/vitest\.config\.ts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vitest\.config\.ts$/[39m,
+    [31m/^\.\/vitest\.config\.mts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vitest\.config\.mts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.tsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.tsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.js$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.js$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.test\.jsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.jsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.d\.ts$/[39m
+  ],
+  excluders: [
+    [31m/^\.\.\/\.\.\/node_modules\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\.\/\.\.\/tmp\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\.\/\.\.\/dist\/out-tsc\/((?:[^/]*(?:\/|$))*)$/[39m
+  ]
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths config loaded: {
+  configPath: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference/tsconfig.json'[39m,
+  config: {
+    compilerOptions: {
+      jsx: [32m'react-jsx'[39m,
+      allowJs: [33mfalse[39m,
+      allowSyntheticDefaultImports: [33mtrue[39m,
+      strict: [33mtrue[39m,
+      types: [ [32m'vite/client'[39m, [32m'vitest'[39m ],
+      rootDir: [32m'../..'[39m,
+      sourceMap: [33mtrue[39m,
+      declaration: [33mfalse[39m,
+      moduleResolution: [32m'bundler'[39m,
+      emitDecoratorMetadata: [33mtrue[39m,
+      experimentalDecorators: [33mtrue[39m,
+      importHelpers: [33mtrue[39m,
+      target: [32m'es2015'[39m,
+      module: [32m'esnext'[39m,
+      lib: [ [32m'es2015'[39m, [32m'dom'[39m, [32m'es2021'[39m ],
+      downlevelIteration: [33mtrue[39m,
+      skipLibCheck: [33mtrue[39m,
+      esModuleInterop: [33mtrue[39m,
+      skipDefaultLibCheck: [33mtrue[39m,
+      baseUrl: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate'[39m,
+      paths: {
+        [32m'@signal-tree/angular'[39m: [ [32m'packages/angular/src/index.ts'[39m ],
+        [32m'@signal-tree/kernel/adapter'[39m: [ [32m'packages/kernel/src/adapter.ts'[39m ],
+        [32m'@signal-tree/kernel/internals'[39m: [ [32m'packages/kernel/src/internals.ts'[39m ],
+        [32m'@signal-tree/kernel'[39m: [ [32m'packages/kernel/src/index.ts'[39m ],
+        [32m'@signal-tree/react'[39m: [ [32m'packages/react/src/index.ts'[39m ]
+      },
+      noUncheckedSideEffectImports: [33mfalse[39m,
+      ignoreDeprecations: [32m'6.0'[39m
+    },
+    files: [],
+    include: [],
+    references: [
+      { path: [32m'./tsconfig.app.json'[39m },
+      { path: [32m'./tsconfig.spec.json'[39m }
+    ],
+    extends: [32m'../../tsconfig.base.json'[39m,
+    compileOnSave: [33mfalse[39m,
+    exclude: [ [32m'../../node_modules'[39m, [32m'../../tmp'[39m ]
+  }
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths [!] skipping "/private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference/tsconfig.json" as no files can be matched since "files" is empty and "include" is missing or empty
+2026-11-02T20:15:05.083Z vite-tsconfig-paths config loaded: {
+  configPath: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/react/tsconfig.lib.json'[39m,
+  config: {
+    extends: [32m'./tsconfig.json'[39m,
+    compilerOptions: {
+      baseUrl: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate'[39m,
+      outDir: [32m'../../dist/packages/react/dist'[39m,
+      declarationDir: [32m'../../dist/packages/react/dist'[39m,
+      declaration: [33mtrue[39m,
+      declarationMap: [33mtrue[39m,
+      inlineSources: [33mfalse[39m,
+      module: [32m'ESNext'[39m,
+      types: [ [32m'node'[39m, [32m'react'[39m ],
+      paths: {
+        [32m'@signal-tree/kernel'[39m: [ [32m'dist/packages/kernel/dist/index.d.ts'[39m ],
+        [32m'@signal-tree/kernel/adapter'[39m: [ [32m'dist/packages/kernel/dist/adapter.d.ts'[39m ]
+      },
+      target: [32m'es2022'[39m,
+      moduleResolution: [32m'bundler'[39m,
+      strict: [33mtrue[39m,
+      noImplicitOverride: [33mtrue[39m,
+      noPropertyAccessFromIndexSignature: [33mtrue[39m,
+      noImplicitReturns: [33mtrue[39m,
+      noFallthroughCasesInSwitch: [33mtrue[39m,
+      jsx: [32m'react-jsx'[39m,
+      ignoreDeprecations: [32m'6.0'[39m,
+      rootDir: [32m'../..'[39m,
+      sourceMap: [33mtrue[39m,
+      emitDecoratorMetadata: [33mtrue[39m,
+      experimentalDecorators: [33mtrue[39m,
+      importHelpers: [33mtrue[39m,
+      lib: [ [32m'es2015'[39m, [32m'dom'[39m, [32m'es2021'[39m ],
+      downlevelIteration: [33mtrue[39m,
+      skipLibCheck: [33mtrue[39m,
+      esModuleInterop: [33mtrue[39m,
+      allowSyntheticDefaultImports: [33mtrue[39m,
+      skipDefaultLibCheck: [33mtrue[39m,
+      noUncheckedSideEffectImports: [33mfalse[39m
+    },
+    exclude: [
+      [32m'src/**/*.spec.ts'[39m,
+      [32m'src/**/*.spec.tsx'[39m,
+      [32m'src/**/*.typing.spec.ts'[39m,
+      [32m'vitest.config.ts'[39m
+    ],
+    include: [ [32m'src/**/*.ts'[39m, [32m'src/**/*.tsx'[39m ],
+    files: [],
+    compileOnSave: [33mfalse[39m
+  }
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths compiled globs: {
+  includers: [
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.tsx$/[39m
+  ],
+  excluders: [
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.tsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.typing\.spec\.ts$/[39m,
+    [31m/^\.\/vitest\.config\.ts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vitest\.config\.ts$/[39m,
+    [31m/^\.\.\/\.\.\/dist\/packages\/react\/dist\/((?:[^/]*(?:\/|$))*)$/[39m
+  ]
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths config loaded: {
+  configPath: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/react/tsconfig.spec.json'[39m,
+  config: {
+    extends: [32m'./tsconfig.json'[39m,
+    compilerOptions: {
+      outDir: [32m'../../dist/out-tsc'[39m,
+      module: [32m'ESNext'[39m,
+      target: [32m'es2022'[39m,
+      types: [ [32m'vitest/globals'[39m, [32m'node'[39m, [32m'react'[39m, [32m'react-dom'[39m ],
+      moduleResolution: [32m'bundler'[39m,
+      strict: [33mtrue[39m,
+      noImplicitOverride: [33mtrue[39m,
+      noPropertyAccessFromIndexSignature: [33mtrue[39m,
+      noImplicitReturns: [33mtrue[39m,
+      noFallthroughCasesInSwitch: [33mtrue[39m,
+      jsx: [32m'react-jsx'[39m,
+      ignoreDeprecations: [32m'6.0'[39m,
+      rootDir: [32m'../..'[39m,
+      sourceMap: [33mtrue[39m,
+      declaration: [33mfalse[39m,
+      emitDecoratorMetadata: [33mtrue[39m,
+      experimentalDecorators: [33mtrue[39m,
+      importHelpers: [33mtrue[39m,
+      lib: [ [32m'es2015'[39m, [32m'dom'[39m, [32m'es2021'[39m ],
+      downlevelIteration: [33mtrue[39m,
+      skipLibCheck: [33mtrue[39m,
+      esModuleInterop: [33mtrue[39m,
+      allowSyntheticDefaultImports: [33mtrue[39m,
+      skipDefaultLibCheck: [33mtrue[39m,
+      baseUrl: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate'[39m,
+      paths: {
+        [32m'@signal-tree/angular'[39m: [ [32m'packages/angular/src/index.ts'[39m ],
+        [32m'@signal-tree/kernel/adapter'[39m: [ [32m'packages/kernel/src/adapter.ts'[39m ],
+        [32m'@signal-tree/kernel/internals'[39m: [ [32m'packages/kernel/src/internals.ts'[39m ],
+        [32m'@signal-tree/kernel'[39m: [ [32m'packages/kernel/src/index.ts'[39m ],
+        [32m'@signal-tree/react'[39m: [ [32m'packages/react/src/index.ts'[39m ]
+      },
+      noUncheckedSideEffectImports: [33mfalse[39m
+    },
+    include: [
+      [32m'vitest.config.ts'[39m,
+      [32m'src/**/*.spec.ts'[39m,
+      [32m'src/**/*.spec.tsx'[39m,
+      [32m'src/**/*.typing.spec.ts'[39m
+    ],
+    files: [],
+    compileOnSave: [33mfalse[39m,
+    exclude: [ [32m'../../node_modules'[39m, [32m'../../tmp'[39m ]
+  }
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths compiled globs: {
+  includers: [
+    [31m/^\.\/vitest\.config\.ts\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\/vitest\.config\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.ts$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.spec\.tsx$/[39m,
+    [31m/^\.\/src\/((?:[^/]*(?:\/|$))*)([^/]*)\.typing\.spec\.ts$/[39m
+  ],
+  excluders: [
+    [31m/^\.\.\/\.\.\/node_modules\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\.\/\.\.\/tmp\/((?:[^/]*(?:\/|$))*)$/[39m,
+    [31m/^\.\.\/\.\.\/dist\/out-tsc\/((?:[^/]*(?:\/|$))*)$/[39m
+  ]
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths config loaded: {
+  configPath: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/react/tsconfig.json'[39m,
+  config: {
+    extends: [32m'../../tsconfig.base.json'[39m,
+    compilerOptions: {
+      target: [32m'es2022'[39m,
+      moduleResolution: [32m'bundler'[39m,
+      strict: [33mtrue[39m,
+      noImplicitOverride: [33mtrue[39m,
+      noPropertyAccessFromIndexSignature: [33mtrue[39m,
+      noImplicitReturns: [33mtrue[39m,
+      noFallthroughCasesInSwitch: [33mtrue[39m,
+      module: [32m'preserve'[39m,
+      jsx: [32m'react-jsx'[39m,
+      ignoreDeprecations: [32m'6.0'[39m,
+      rootDir: [32m'../..'[39m,
+      sourceMap: [33mtrue[39m,
+      declaration: [33mfalse[39m,
+      emitDecoratorMetadata: [33mtrue[39m,
+      experimentalDecorators: [33mtrue[39m,
+      importHelpers: [33mtrue[39m,
+      lib: [ [32m'es2015'[39m, [32m'dom'[39m, [32m'es2021'[39m ],
+      downlevelIteration: [33mtrue[39m,
+      skipLibCheck: [33mtrue[39m,
+      esModuleInterop: [33mtrue[39m,
+      allowSyntheticDefaultImports: [33mtrue[39m,
+      skipDefaultLibCheck: [33mtrue[39m,
+      baseUrl: [32m'/private/tmp/st-c20-tsconfig-scan-successor/candidate'[39m,
+      types: [ [32m'@angular/core'[39m, [32m'vitest/globals'[39m ],
+      paths: {
+        [32m'@signal-tree/angular'[39m: [ [32m'packages/angular/src/index.ts'[39m ],
+        [32m'@signal-tree/kernel/adapter'[39m: [ [32m'packages/kernel/src/adapter.ts'[39m ],
+        [32m'@signal-tree/kernel/internals'[39m: [ [32m'packages/kernel/src/internals.ts'[39m ],
+        [32m'@signal-tree/kernel'[39m: [ [32m'packages/kernel/src/index.ts'[39m ],
+        [32m'@signal-tree/react'[39m: [ [32m'packages/react/src/index.ts'[39m ]
+      },
+      noUncheckedSideEffectImports: [33mfalse[39m
+    },
+    files: [],
+    include: [],
+    references: [
+      { path: [32m'./tsconfig.lib.json'[39m },
+      { path: [32m'./tsconfig.spec.json'[39m }
+    ],
+    compileOnSave: [33mfalse[39m,
+    exclude: [ [32m'../../node_modules'[39m, [32m'../../tmp'[39m ]
+  }
+}
+2026-11-02T20:15:05.083Z vite-tsconfig-paths [!] skipping "/private/tmp/st-c20-tsconfig-scan-successor/candidate/packages/react/tsconfig.json" as no files can be matched since "files" is empty and "include" is missing or empty
+
+ RUN  v4.1.9 /private/tmp/st-c20-tsconfig-scan-successor/candidate/apps/react-reference
+
+(node:61635) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ |react-reference| src/app/app.spec.tsx (18 tests) 924ms
+(node:61847) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ |react-reference| src/app/reference-store.spec.ts (8 tests) 73ms
+
+ Test Files  2 passed (2)
+      Tests  26 passed (26)
+   Start at  13:15:05
+   Duration  21.10s (transform 4.32s, setup 0ms, import 7.07s, tests 998ms, environment 10.86s)
+
+
+
+
+ NX   Successfully ran target test for project react-reference
+
+
+  Run duration:      23.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     23.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        react-reference:test    23.6s

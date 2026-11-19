@@ -1,0 +1,30 @@
+[
+  {
+    "workload": "signaltree-bare-dev",
+    "beforeGzipBytes": 20745,
+    "afterGzipBytes": 20745,
+    "deltaGzipBytes": 0,
+    "identicalBundleBytes": true
+  },
+  {
+    "workload": "signaltree-bare-prod",
+    "beforeGzipBytes": 18337,
+    "afterGzipBytes": 18337,
+    "deltaGzipBytes": 0,
+    "identicalBundleBytes": true
+  },
+  {
+    "workload": "signaltree-entities-dev",
+    "beforeGzipBytes": 47747,
+    "afterGzipBytes": 47748,
+    "deltaGzipBytes": 1,
+    "identicalBundleBytes": false
+  },
+  {
+    "workload": "signaltree-entities-prod",
+    "beforeGzipBytes": 44756,
+    "afterGzipBytes": 44757,
+    "deltaGzipBytes": 1,
+    "identicalBundleBytes": false
+  }
+]

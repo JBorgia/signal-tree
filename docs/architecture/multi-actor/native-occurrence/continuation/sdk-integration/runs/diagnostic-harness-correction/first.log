@@ -1,0 +1,31 @@
+
+> nx run kernel:test native-equal-inverse-diagnostic.spec.ts native-netzero-diagnostic.spec.ts public-selected-unit.spec.ts --reporter=json --outputFile=/private/tmp/st-current-read-integration/diagnostic-replay-vitest.json --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-equal-inverse-diagnostic.spec.ts native-netzero-diagnostic.spec.ts public-selected-unit.spec.ts --reporter=json --outputFile=/private/tmp/st-current-read-integration/diagnostic-replay-vitest.json --maxWorkers=1
+
+(node:14535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14542) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14549) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14557) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14558) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+JSON report written to /private/tmp/st-current-read-integration/diagnostic-replay-vitest.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.8s

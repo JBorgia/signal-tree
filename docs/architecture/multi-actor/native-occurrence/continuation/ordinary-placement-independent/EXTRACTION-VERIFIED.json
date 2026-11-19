@@ -1,0 +1,4 @@
+{
+  "executableBodyEqualAfterTypeConstraintAndExportNormalization": true,
+  "rowScopeEqual": true
+}

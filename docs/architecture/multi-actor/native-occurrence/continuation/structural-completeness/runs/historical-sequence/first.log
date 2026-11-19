@@ -1,0 +1,102 @@
+
+> nx run kernel:test structural-admission-sequence.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs structural-admission-sequence.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:7392) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7402) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-structural-completeness-successor/candidate/packages/kernel
+
+(node:7414) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordinary destination occupancy survives inspection-only physical vacancy 13ms
+ ✓ src/lib/structural-admission-sequence.spec.ts > physical occupied destination still refuses after semantic vacancy succeeds 2ms
+ × src/lib/structural-admission-sequence.spec.ts > ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening 5ms
+   → expected { kind: 'structural-drift' } to be undefined
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordinary duplicate add refuses even when inspection removed its physical lifetime 2ms
+ × src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority 2ms
+   → expected { kind: 'structural-drift' } to be undefined
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordinary absent physical present add uses original semantic absence before transfer 4ms
+ × src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys 2ms
+   → expected { kind: 'structural-drift' } to be undefined
+ ✓ src/lib/structural-admission-sequence.spec.ts > prepared semantic admission is invalid after independent installation 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:28:163
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:34:290
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:40:140
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 5 passed (8)
+   Start at  17:06:51
+   Duration  2.00s (transform 1.07s, setup 0ms, import 1.32s, tests 33ms, environment 469ms)
+
+Warning: command "node tools/run-core-vitest.mjs structural-admission-sequence.spec.ts --reporter=verbose --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.7s

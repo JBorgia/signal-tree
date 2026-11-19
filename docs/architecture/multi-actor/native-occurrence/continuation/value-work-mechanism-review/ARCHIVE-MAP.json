@@ -1,0 +1,80 @@
+[
+  {
+    "source": "c15-equal-proof-trace-observations",
+    "archive": "c15-equal-proof-trace-observations",
+    "sourceSha256": "b2f803f4f1a90361853edf6c06189f9bf1872e13349dddb033cf4ed0ddc08dcd",
+    "archiveSha256": "b2f803f4f1a90361853edf6c06189f9bf1872e13349dddb033cf4ed0ddc08dcd"
+  },
+  {
+    "source": "c15-equal-sibling-command.json",
+    "archive": "c15-equal-sibling-command.json",
+    "sourceSha256": "509ea9693ed8017a9354d87ebf1ddecd91fd708507cab17941c4f15cd12582a6",
+    "archiveSha256": "509ea9693ed8017a9354d87ebf1ddecd91fd708507cab17941c4f15cd12582a6"
+  },
+  {
+    "source": "audit.py",
+    "archive": "audit.py",
+    "sourceSha256": "940f085b35419c0eff1e639b89eb18e708f41866cab17e5022462d4aa42cc4f4",
+    "archiveSha256": "940f085b35419c0eff1e639b89eb18e708f41866cab17e5022462d4aa42cc4f4"
+  },
+  {
+    "source": "INDEPENDENT-REVIEW.md",
+    "archive": "INDEPENDENT-REVIEW.md",
+    "sourceSha256": "7ee8e51f6f4613a52d8c14045fe7bc20004fafd1e7b3e7645d9540161c72cb1e",
+    "archiveSha256": "7ee8e51f6f4613a52d8c14045fe7bc20004fafd1e7b3e7645d9540161c72cb1e"
+  },
+  {
+    "source": "VALUE-WORK-DESIGN.md",
+    "archive": "VALUE-WORK-DESIGN.md",
+    "sourceSha256": "6c65a7eccf7fcf3ed38c877e3216de4f799ab8fc64cd9b47767edefdf9849115",
+    "archiveSha256": "6c65a7eccf7fcf3ed38c877e3216de4f799ab8fc64cd9b47767edefdf9849115"
+  },
+  {
+    "source": "baseline-equal-sibling.log",
+    "archive": "baseline-equal-sibling.log",
+    "sourceSha256": "a7778ae9c7590d78ccdc2903d0187a7910bfb9ed41d14416dd0090b6b02a3941",
+    "archiveSha256": "a7778ae9c7590d78ccdc2903d0187a7910bfb9ed41d14416dd0090b6b02a3941"
+  },
+  {
+    "source": "c15-equal-sibling-exit.json",
+    "archive": "c15-equal-sibling-exit.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "baseline-equal-sibling-exit.json",
+    "archive": "baseline-equal-sibling-exit.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "audit.log",
+    "archive": "audit.log",
+    "sourceSha256": "7729d4e5c551b4f68b401e0f9dee02f092f7ca81cb9ff4d5a872c705984b6040",
+    "archiveSha256": "7729d4e5c551b4f68b401e0f9dee02f092f7ca81cb9ff4d5a872c705984b6040"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "f67988e182701465ec3f75443ad5f01ff7c6f49098faf20d53c5c9e13d8f486a",
+    "archiveSha256": "f67988e182701465ec3f75443ad5f01ff7c6f49098faf20d53c5c9e13d8f486a"
+  },
+  {
+    "source": "baseline-equal-sibling-command.json",
+    "archive": "baseline-equal-sibling-command.json",
+    "sourceSha256": "c597ab07cbb3f380dda0af7469f7e587afea9565a48a845f4119ab51aca4317a",
+    "archiveSha256": "c597ab07cbb3f380dda0af7469f7e587afea9565a48a845f4119ab51aca4317a"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "a622cbd56b2fd5885293b8a8565936a7a62eb4b412ea79d3e21ddb7af59ec514",
+    "archiveSha256": "a622cbd56b2fd5885293b8a8565936a7a62eb4b412ea79d3e21ddb7af59ec514"
+  },
+  {
+    "source": "c15-equal-sibling.log",
+    "archive": "c15-equal-sibling.log",
+    "sourceSha256": "f3b5bb54320cdfd759d3c3c987bc1cf7f8a368fbaf7742fdddfb00273c506f03",
+    "archiveSha256": "f3b5bb54320cdfd759d3c3c987bc1cf7f8a368fbaf7742fdddfb00273c506f03"
+  }
+]

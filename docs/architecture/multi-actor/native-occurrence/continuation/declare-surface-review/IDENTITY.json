@@ -1,0 +1,54 @@
+{
+  "manifest": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "files": [
+    {
+      "path": "RELEASE-CURRENT.md",
+      "sha256": "22619dc9ef9f7b069579d493075f1cfee225a2025daf80e52c5d5d7350fd1e44",
+      "matchesC21": true
+    },
+    {
+      "path": "docs/audits/2026-10-17-incumbent-readiness/link-declared-native/README.md",
+      "sha256": "7af5dba877f7f311e0291f64a97502473415ab9581fb6adf172dfdaf896ea83e",
+      "matchesC21": true
+    },
+    {
+      "path": "packages/kernel/src/lib/link.ts",
+      "sha256": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65",
+      "matchesC21": true
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/private.ts",
+      "sha256": "e022f8ce37bb23c659c27b342023b361ba11e4a8dcb16a783ab44f51ad3e9c28",
+      "matchesC21": true
+    },
+    {
+      "path": "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+      "sha256": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+      "matchesC21": true
+    },
+    {
+      "rootContract": "docs/review-contract.md",
+      "sha256": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9"
+    },
+    {
+      "rootContract": "docs/support-policy.md",
+      "sha256": "b65aac2d81986a940c6259404eae344fbe77d3ca5466fc326b203d31499c04bd"
+    },
+    {
+      "rootContract": "docs/contributor-contracts.md",
+      "sha256": "0211a2851f9f5724182555a3ff2c2ebdf89c43f88a6123d5e09fc505b8bd51d2"
+    },
+    {
+      "rootContract": "RELEASE-CURRENT.md",
+      "sha256": "b83dbabe02abd7105b6c4a387fe56e554658c6852f4d761887ab110fbce4c8a0"
+    },
+    {
+      "rootContract": "docs/architecture/multi-actor/PLAN.md",
+      "sha256": "8d1746835c158580713e4e0696c75296fbc962fd2197edd547834a536d70fa91"
+    },
+    {
+      "rootContract": "docs/architecture/multi-actor/native-occurrence/continuation/recipient-classification/authority/247cfec7-PROPOSAL.md",
+      "sha256": "abe39cc508e5aa4f5bdd37ded8bcba6d793c430ab76685b2c72ee4fc3e249c6f"
+    }
+  ]
+}

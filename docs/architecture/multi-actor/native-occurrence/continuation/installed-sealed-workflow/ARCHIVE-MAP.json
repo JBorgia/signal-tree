@@ -1,0 +1,152 @@
+[
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "b46b078f9d2591f34a3b55176550030f7641fcb538bc0f86a21c21c37ed1e44e",
+    "archiveSha256": "b46b078f9d2591f34a3b55176550030f7641fcb538bc0f86a21c21c37ed1e44e"
+  },
+  {
+    "source": "HARNESS-BINDING.json",
+    "archive": "HARNESS-BINDING.json",
+    "sourceSha256": "e589ea4c9ab2027e5519ef021b0bb58cb83c2f69a594f401eb44e8e991dc9e8a",
+    "archiveSha256": "e589ea4c9ab2027e5519ef021b0bb58cb83c2f69a594f401eb44e8e991dc9e8a"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "1c98f14babc6ace8507145bf7261760311e1ffaf9330f51c11838103114686a1",
+    "archiveSha256": "1c98f14babc6ace8507145bf7261760311e1ffaf9330f51c11838103114686a1"
+  },
+  {
+    "source": "ROOT-INPUTS-BEFORE.json",
+    "archive": "ROOT-INPUTS-BEFORE.json.gz",
+    "sourceSha256": "4e9271dac59e97055377b63cfdebf6d4b64b7f2a051cc19d64ca18e16a37f79b",
+    "archiveSha256": "d0369c836ddcfc48dd3748f0922878aac9414fb6fd4ecd16c2e6046688720853"
+  },
+  {
+    "source": "EVIDENCE-SEAL.json",
+    "archive": "EVIDENCE-SEAL.json",
+    "sourceSha256": "817af2d0e2f8038e72b1c0535a758378208668f58cb03c8eb18f4d2b33a4c963",
+    "archiveSha256": "817af2d0e2f8038e72b1c0535a758378208668f58cb03c8eb18f4d2b33a4c963"
+  },
+  {
+    "source": "angular-manifest.json",
+    "archive": "angular-manifest.json",
+    "sourceSha256": "9d911b6188763811005a11019dc6acbd7ceebf6f02ba9af5b7d0ffc7b475c09c",
+    "archiveSha256": "9d911b6188763811005a11019dc6acbd7ceebf6f02ba9af5b7d0ffc7b475c09c"
+  },
+  {
+    "source": "ARTIFACT-MANIFEST.json",
+    "archive": "ARTIFACT-MANIFEST.json",
+    "sourceSha256": "2c13ff3e3e42c8ff1e68a9a584de494bd2a2df7a5619afa239568d88efcab363",
+    "archiveSha256": "2c13ff3e3e42c8ff1e68a9a584de494bd2a2df7a5619afa239568d88efcab363"
+  },
+  {
+    "source": "FINAL-PROCESS-CENSUS.json",
+    "archive": "FINAL-PROCESS-CENSUS.json",
+    "sourceSha256": "0a4c4ee3c073d4a6da34b69c6bc29f0163f6e8a1c083b37e8dbccc13af60c0ec",
+    "archiveSha256": "0a4c4ee3c073d4a6da34b69c6bc29f0163f6e8a1c083b37e8dbccc13af60c0ec"
+  },
+  {
+    "source": "manifest.json",
+    "archive": "manifest.json",
+    "sourceSha256": "c289597e2290f82d6b75a9ac66eba0451b36d80ca3374330f5fdbee85a921c45",
+    "archiveSha256": "c289597e2290f82d6b75a9ac66eba0451b36d80ca3374330f5fdbee85a921c45"
+  },
+  {
+    "source": "ANGULAR-HARNESS-BINDING.json",
+    "archive": "ANGULAR-HARNESS-BINDING.json",
+    "sourceSha256": "2a77e30542ec7c6a6e6d413720b7175ca258faa4fc9efecfa259059e532c9d51",
+    "archiveSha256": "2a77e30542ec7c6a6e6d413720b7175ca258faa4fc9efecfa259059e532c9d51"
+  },
+  {
+    "source": "STATUS.json",
+    "archive": "STATUS.json",
+    "sourceSha256": "4dba8355535e3e8cf9ba71f9878e557a5f689ca8bc708a12e1c32ca2c2152520",
+    "archiveSha256": "4dba8355535e3e8cf9ba71f9878e557a5f689ca8bc708a12e1c32ca2c2152520"
+  },
+  {
+    "source": "FINAL-PRESERVATION.json",
+    "archive": "FINAL-PRESERVATION.json",
+    "sourceSha256": "1555a29878d757e5a7561fbb0a7189b47ee08fceb130d6f79d37e48d7a21bd6f",
+    "archiveSha256": "1555a29878d757e5a7561fbb0a7189b47ee08fceb130d6f79d37e48d7a21bd6f"
+  },
+  {
+    "source": "ROOT-INPUTS-AFTER.json",
+    "archive": "ROOT-INPUTS-AFTER.json",
+    "sourceSha256": "7f6151bc6fd4e6c8060c50cd73884ce67443b190b76dfae7b1a8baad16b6b823",
+    "archiveSha256": "7f6151bc6fd4e6c8060c50cd73884ce67443b190b76dfae7b1a8baad16b6b823"
+  },
+  {
+    "source": "runs/kernel-installed/RESULT.json",
+    "archive": "runs/kernel-installed/RESULT.json",
+    "sourceSha256": "1d50a5d5ffc9f373b68ee368508b02b0be650dae887ab5e0a9db9972edc9853f",
+    "archiveSha256": "1d50a5d5ffc9f373b68ee368508b02b0be650dae887ab5e0a9db9972edc9853f"
+  },
+  {
+    "source": "runs/kernel-installed/first.log",
+    "archive": "runs/kernel-installed/first.log",
+    "sourceSha256": "90a937938d2777ec17dda7ec9aa11c0e8792a3dcb0683ccd7eed596a8aa722fc",
+    "archiveSha256": "90a937938d2777ec17dda7ec9aa11c0e8792a3dcb0683ccd7eed596a8aa722fc"
+  },
+  {
+    "source": "runs/kernel-installed/COMMAND.json",
+    "archive": "runs/kernel-installed/COMMAND.json",
+    "sourceSha256": "32a92957304d47070a86d591fda868466f0f295d7df9ff0853d3815151f99bdf",
+    "archiveSha256": "32a92957304d47070a86d591fda868466f0f295d7df9ff0853d3815151f99bdf"
+  },
+  {
+    "source": "runs/kernel-installed/OWNED.json",
+    "archive": "runs/kernel-installed/OWNED.json",
+    "sourceSha256": "84ec478f5ccff54e11fa4ce3df9ab0c8820a7ee6f238a29a0bfedd01782f292d",
+    "archiveSha256": "84ec478f5ccff54e11fa4ce3df9ab0c8820a7ee6f238a29a0bfedd01782f292d"
+  },
+  {
+    "source": "runs/kernel-installed/EXIT",
+    "archive": "runs/kernel-installed/EXIT",
+    "sourceSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "archiveSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "source": "runs/kernel-installed/PROCESS.json",
+    "archive": "runs/kernel-installed/PROCESS.json",
+    "sourceSha256": "402f63da0b452e569dd1c6c163390fff4740cad6b622d390c53ae838f3b3a4e8",
+    "archiveSha256": "402f63da0b452e569dd1c6c163390fff4740cad6b622d390c53ae838f3b3a4e8"
+  },
+  {
+    "source": "runs/angular-installed/RESULT.json",
+    "archive": "runs/angular-installed/RESULT.json",
+    "sourceSha256": "83ca99745224f415b728536aaccaddd1ac6528f699a2054557c8a91dffabe0b8",
+    "archiveSha256": "83ca99745224f415b728536aaccaddd1ac6528f699a2054557c8a91dffabe0b8"
+  },
+  {
+    "source": "runs/angular-installed/first.log",
+    "archive": "runs/angular-installed/first.log",
+    "sourceSha256": "5a599e398b74e7bdf6eec2c912c0ed31f04e833d7d59aee4df3676d56dd8d745",
+    "archiveSha256": "5a599e398b74e7bdf6eec2c912c0ed31f04e833d7d59aee4df3676d56dd8d745"
+  },
+  {
+    "source": "runs/angular-installed/COMMAND.json",
+    "archive": "runs/angular-installed/COMMAND.json",
+    "sourceSha256": "1ed282b21a578ccf75a4a7e5e0b3ea3cff79af955f15b0bc0b1a18946ccca04d",
+    "archiveSha256": "1ed282b21a578ccf75a4a7e5e0b3ea3cff79af955f15b0bc0b1a18946ccca04d"
+  },
+  {
+    "source": "runs/angular-installed/OWNED.json",
+    "archive": "runs/angular-installed/OWNED.json",
+    "sourceSha256": "78dc8ed3f873019e33750413049de6a55e7aeefaf524b28aae13813c9e3fe1f6",
+    "archiveSha256": "78dc8ed3f873019e33750413049de6a55e7aeefaf524b28aae13813c9e3fe1f6"
+  },
+  {
+    "source": "runs/angular-installed/EXIT",
+    "archive": "runs/angular-installed/EXIT",
+    "sourceSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "archiveSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "source": "runs/angular-installed/PROCESS.json",
+    "archive": "runs/angular-installed/PROCESS.json",
+    "sourceSha256": "c9920996dd77ace4df9e574d51b0ffd32802d3a8d866948b43baaa9b7222c24e",
+    "archiveSha256": "c9920996dd77ace4df9e574d51b0ffd32802d3a8d866948b43baaa9b7222c24e"
+  }
+]

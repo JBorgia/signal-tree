@@ -1,0 +1,112 @@
+
+> nx run kernel:test --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --testFile=scalar-frame-publication.spec.ts --testFile=publication-evidence-scope-controls.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=native-admission-handoff.spec.ts --testFile=publication-retirement-boundaries.spec.ts --testFile=singleton-row-reuse.spec.ts --testFile=packet-index-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --testFile=scalar-frame-publication.spec.ts --testFile=publication-evidence-scope-controls.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=native-admission-handoff.spec.ts --testFile=publication-retirement-boundaries.spec.ts --testFile=singleton-row-reuse.spec.ts --testFile=packet-index-review.spec.ts --maxWorkers=1
+
+(node:62644) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62655) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-scalar-support-correction/candidate/packages/kernel
+
+(node:62666) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62669) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62673) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62679) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62680) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 2 failed) 51ms
+   × composite readiness follows parent finalization without a recipient operation 6ms
+   × omission then restored retained collection selects matching payload and support 19ms
+(node:62681) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/native-certificate-successor.spec.ts:23:55
+     21|    throw sentinel;
+     22|   })).toThrow(sentinel);
+     23|   expect(lifecycle.nativeRequirementReady(composite)).toBe(true);expec…
+       |                                                       ^
+     24|  }finally{lifecycle.disposeConnection(channel);}
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 8 passed (9)
+      Tests  2 failed | 69 passed (71)
+   Start at  11:04:35
+   Duration  7.45s (transform 977ms, setup 0ms, import 2.44s, tests 384ms, environment 3.34s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --testFile=scalar-frame-publication.spec.ts --testFile=publication-evidence-scope-controls.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=native-admission-handoff.spec.ts --testFile=publication-retirement-boundaries.spec.ts --testFile=singleton-row-reuse.spec.ts --testFile=packet-index-review.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      8.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     8.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    8.2s

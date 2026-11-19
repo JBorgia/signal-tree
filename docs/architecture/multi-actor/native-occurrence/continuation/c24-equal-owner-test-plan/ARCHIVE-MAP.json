@@ -1,0 +1,74 @@
+[
+  {
+    "source": "TEST-PLAN-FIRST-E5-FLAW.md",
+    "archive": "TEST-PLAN-FIRST-E5-FLAW.md",
+    "sourceSha256": "74eae0a00231f925aaf29ed75f042212bdd21cb31b2832597c347c46b2d69314",
+    "archiveSha256": "74eae0a00231f925aaf29ed75f042212bdd21cb31b2832597c347c46b2d69314"
+  },
+  {
+    "source": "SNAPSHOT-FIRST.json",
+    "archive": "SNAPSHOT-FIRST.json",
+    "sourceSha256": "aa993bccb23beeef4aeb0e77dbd8b0f3e08199220d2652bb455a9c34371070dc",
+    "archiveSha256": "aa993bccb23beeef4aeb0e77dbd8b0f3e08199220d2652bb455a9c34371070dc"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "9b4c5cda153ccd4a3400de0a795f717924aabf46bd42806d349798dd43ca7944",
+    "archiveSha256": "9b4c5cda153ccd4a3400de0a795f717924aabf46bd42806d349798dd43ca7944"
+  },
+  {
+    "source": "INPUTS.json",
+    "archive": "INPUTS.json",
+    "sourceSha256": "7276e4419c451dbae584565b5bc1c092023119bad08aadeb8c9b14f021eb4bf2",
+    "archiveSha256": "7276e4419c451dbae584565b5bc1c092023119bad08aadeb8c9b14f021eb4bf2"
+  },
+  {
+    "source": "E5-CORRECTION.md",
+    "archive": "E5-CORRECTION.md",
+    "sourceSha256": "40f24b0213422211239cb5b704dccddcccdac1dd452cc12ece6ae7ada46cc0b0",
+    "archiveSha256": "40f24b0213422211239cb5b704dccddcccdac1dd452cc12ece6ae7ada46cc0b0"
+  },
+  {
+    "source": "TEST-PLAN.md",
+    "archive": "TEST-PLAN.md",
+    "sourceSha256": "80bdf2e1ba5718961bda359ee591612b5bb1013a8d14ffbbd830d287cbba378e",
+    "archiveSha256": "80bdf2e1ba5718961bda359ee591612b5bb1013a8d14ffbbd830d287cbba378e"
+  },
+  {
+    "source": "preserved-inputs/specs/neutral-branch.spec.ts",
+    "archive": "preserved-inputs/specs/neutral-branch.spec.ts",
+    "sourceSha256": "d56984d2ee43e62f0df684b5bbc547fbaf40f2be897a5daeb84b49d92f26deec",
+    "archiveSha256": "d56984d2ee43e62f0df684b5bbc547fbaf40f2be897a5daeb84b49d92f26deec"
+  },
+  {
+    "source": "preserved-inputs/specs/row-receipt-counterpart.spec.ts",
+    "archive": "preserved-inputs/specs/row-receipt-counterpart.spec.ts",
+    "sourceSha256": "9d470d18266a43bbc5bda5748646b8e9cc109395abdded0b886fdb4794bf5730",
+    "archiveSha256": "9d470d18266a43bbc5bda5748646b8e9cc109395abdded0b886fdb4794bf5730"
+  },
+  {
+    "source": "preserved-inputs/st-mixed-rollback-test-premise-review/EQUAL-WHOLE-AUTHORITY.md",
+    "archive": "preserved-inputs/st-mixed-rollback-test-premise-review/EQUAL-WHOLE-AUTHORITY.md",
+    "sourceSha256": "7b115e635b2aafd2beba0d3eed35a6244e37a0763ff5ca1615773cfcf5518e60",
+    "archiveSha256": "7b115e635b2aafd2beba0d3eed35a6244e37a0763ff5ca1615773cfcf5518e60"
+  },
+  {
+    "source": "preserved-inputs/react/first.log",
+    "archive": "preserved-inputs/react/first.log",
+    "sourceSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996",
+    "archiveSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996"
+  },
+  {
+    "source": "preserved-inputs/kernel/first.log",
+    "archive": "preserved-inputs/kernel/first.log",
+    "sourceSha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0",
+    "archiveSha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0"
+  },
+  {
+    "source": "preserved-inputs/src/branch-declaration-qualification.spec.tsx",
+    "archive": "preserved-inputs/src/branch-declaration-qualification.spec.tsx",
+    "sourceSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "archiveSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "runtimeManifest": "ed9ba57cef9d7d571215972e05a7752b2ab8af36dc474f0f37ce1fc705613c45",
+  "patch": "60618b8a84caebf0e22ded45c538d446528577c0e94c9a5280cfa74763870e67",
+  "files": {
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "2f54ecaf24bdd1d0a43148dd4f9be8f9fb495881044e54b9640b4cd2db14a027",
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "109ac6e5141ff07a7f36b87864d982d21eb4f4c56e79fe842211edd2775b29e4",
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "1611c4c120bcfd288c2f6b33928594bf38c7c15f7768decb2822a81969834273",
+    "packages/kernel/src/lib/internals/owned-mutation.ts": "b35d57b057771648447bffa99bf3f55ff2d9a8a1488a1735be63d8f048169323",
+    "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts": "f288d131f5aa12ef62c79b5d5237fb284761daef02402422295984be99251fb7"
+  }
+}

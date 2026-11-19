@@ -1,0 +1,51 @@
+{
+  "running": null,
+  "completed": [
+    {
+      "name": "kernel-discovery",
+      "exit": 0
+    },
+    {
+      "name": "root-discovery",
+      "exit": 0
+    },
+    {
+      "name": "replay-discovery",
+      "exit": 0
+    },
+    {
+      "name": "registry",
+      "exit": 0
+    },
+    {
+      "name": "diagnostic-replay",
+      "exit": 0
+    },
+    {
+      "name": "forwarding-retention",
+      "exit": 0
+    },
+    {
+      "name": "existing-retention",
+      "exit": 0
+    },
+    {
+      "name": "forwarding-mutant",
+      "exit": 0
+    },
+    {
+      "name": "existing-mutant",
+      "exit": 0
+    },
+    {
+      "name": "source-types",
+      "exit": 0
+    },
+    {
+      "name": "spec-types",
+      "exit": 0
+    }
+  ],
+  "state": "frozen for independent review",
+  "manifestSha256": "def6910829632965f5b05409864721f568834af11962274573a662c9b1c7ce19"
+}

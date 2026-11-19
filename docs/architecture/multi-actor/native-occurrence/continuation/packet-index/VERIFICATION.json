@@ -1,0 +1,25 @@
+{
+  "baseFilesVerified": 2967,
+  "runtimeChanges": {
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "a253c0b4793919a15cf5d7849576fc086ed32f60fdec654ec28486e72e2e6091"
+  },
+  "baseline-b": {
+    "allocationSpecSHA256": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7",
+    "instrumentedEntitySHA256": "1c918089881a7c43fc98319adcca77be5cd316eb814ad2fd744ac35db3243bba",
+    "jsonlSHA256": "263da088c7c1fd0e7089b11e0bbd2f040a65440131f5d829947baffaa7bbdd92",
+    "logSHA256": "b12637d004fee1a227248c47d0460797cda9554d407a939ba40a3c9a2ea64ce8"
+  },
+  "optimized": {
+    "allocationSpecSHA256": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7",
+    "instrumentedEntitySHA256": "43d0d9112c30870348e149caf907a5d846a90df7f8e21667d2bc9e280b00f7fa",
+    "jsonlSHA256": "6f7a67fb5d80cb6908af89d1c793727e7e49bb1ee5a9b1320b6814321c760f4f",
+    "logSHA256": "9e519e24996bbb0519d1a042357b6ea48aec97c9e4e9134275dcc242262824c2"
+  },
+  "retainedSnapshots": "identical at every phase for all nine matched records",
+  "artifacts": {
+    "runtime.patch": "90590972fc3bea5d944af55f275bfcbb01413d521d4a4b127f9f977a38ec4472",
+    "tests.patch": "36ab6c58aed19e2008c61fcf9b5c8cf7a165ea13016e3401fe433cfdf971ae24",
+    "SOURCE-SHA256.json": "5688501724309578e31b18cad1e67d37d775e3f679611ef631339ac88e5354e0",
+    "BASE-SOURCE-SHA256.json": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd"
+  }
+}

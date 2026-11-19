@@ -1,0 +1,72 @@
+[
+  {
+    "name": "valid",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/valid.json"
+    ],
+    "exit": 0,
+    "expected": 0
+  },
+  {
+    "name": "missing-arm",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/missing-arm.json"
+    ],
+    "exit": 1,
+    "expected": 1
+  },
+  {
+    "name": "duplicate-arm",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/duplicate-arm.json"
+    ],
+    "exit": 1,
+    "expected": 1
+  },
+  {
+    "name": "swapped-artifacts",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/swapped-artifacts.json"
+    ],
+    "exit": 1,
+    "expected": 1
+  },
+  {
+    "name": "missing-artifact",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/missing-artifact.json"
+    ],
+    "exit": 1,
+    "expected": 1
+  },
+  {
+    "name": "failed-child-with-valid-artifact",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/failed-child-with-valid-artifact.json"
+    ],
+    "exit": 1,
+    "expected": 1
+  },
+  {
+    "name": "malformed-round",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c21-gc-routing-successor/check-recorded-matrix.mjs",
+      "/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/malformed-round.json"
+    ],
+    "exit": 1,
+    "expected": 1
+  }
+]

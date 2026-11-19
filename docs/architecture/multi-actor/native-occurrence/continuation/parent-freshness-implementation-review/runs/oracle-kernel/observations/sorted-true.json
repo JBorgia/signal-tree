@@ -1,0 +1,230 @@
+{
+  "calls": 1,
+  "comparisons": 9,
+  "derivedRuns": 3,
+  "events": [
+    {
+      "name": "warm-root",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 0,
+      "end": 1
+    },
+    {
+      "name": "completion-held-all",
+      "kind": "throw",
+      "sameSentinel": true,
+      "message": "sorted original",
+      "start": 1,
+      "end": 2
+    },
+    {
+      "name": "completion-root",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 2,
+      "end": 2
+    },
+    {
+      "name": "completion-derived",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 2,
+      "end": 2
+    },
+    {
+      "name": "add",
+      "kind": "return",
+      "value": null,
+      "start": 1,
+      "end": 2
+    },
+    {
+      "name": "post-root",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 2,
+      "end": 4
+    },
+    {
+      "name": "post-derived",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 4,
+      "end": 4
+    },
+    {
+      "name": "repeat-root",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 4,
+      "end": 4
+    },
+    {
+      "name": "repeat-all",
+      "kind": "return",
+      "value": [
+        {
+          "id": 3,
+          "n": 0
+        },
+        {
+          "id": 2,
+          "n": 1
+        },
+        {
+          "id": 1,
+          "n": 2
+        }
+      ],
+      "start": 4,
+      "end": 4
+    },
+    {
+      "name": "next-collection-write",
+      "kind": "return",
+      "value": 4,
+      "start": 4,
+      "end": 4
+    },
+    {
+      "name": "next-derived",
+      "kind": "return",
+      "value": {
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 4,
+              "n": 4
+            }
+          ]
+        },
+        "other": {
+          "n": 7
+        }
+      },
+      "start": 4,
+      "end": 9
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "time": "2026-11-03T19:20:53.065524+00:00",
+  "candidate": "/private/tmp/st-v16-integration-candidate",
+  "baseManifest": "cae244793913aa51ffe36848a8ba3f6e77af24185323a6141ba6c66a03a5876f",
+  "manifestSha256": "8fb14250ded4d19f3ee380b2cf13df35492dc0170e4e7f5cc0ecd945569289a2",
+  "sourceFiles": 3135,
+  "delta": [
+    {
+      "file": "packages/kernel/src/lib/approved-current-obligation.spec.ts",
+      "before_sha256": "0332eed3cb25c213e6f5f904dd66c4a8a1ec3cf97dea055eb01727f47183587a",
+      "overlay_sha256": "9cf74de61cc878b7469f6003cfcca6275492d19417a43eeca7618e6be1d5acdb"
+    },
+    {
+      "file": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+      "before_sha256": "9e700b7db9e466b97f2358fa2b4a7878b1fa39954eb6b309310bc26bfb48515a",
+      "overlay_sha256": "8fbcc3845ee425c54dda3730c832e786badc40f3499e5a60499d60e158032d31"
+    },
+    {
+      "file": "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+      "before_sha256": "a1422eea8e0b11e87aba1fd97d1e46b2060502035b39e4600f32bde2672ddc54",
+      "overlay_sha256": "41dfd7e9f86c779d985632496dbc603db2dc9cefb4d8095d82197c89e5ac79cc"
+    },
+    {
+      "file": "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+      "before_sha256": "ec20843f4a2a9d4bdd6f68c90ca57646322ef23b3c550b94ec412b1b3b6ea6e8",
+      "overlay_sha256": "26aaf2434c79f19e61b7da0f74f4fa8193bdccbf02f6a4d28914627985a17380"
+    },
+    {
+      "file": "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+      "before_sha256": "e76e91785893b10fd57ae4d07ddf20c7a29b01cfeab0fedd8d62f62f5f7528a3",
+      "overlay_sha256": "8ba727d4016853a2cc5e6acb3198d4fa9341e2c531dded5fac0c9d5c67dea889"
+    },
+    {
+      "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+      "before_sha256": "c4c3601a397f79c5e288af626870c54e41f420f005b0f595b39864eb1f453e42",
+      "overlay_sha256": "7198f788ec2b4a32bf2f952b48da784e8a20a15ad1383c70f77158059ab1be26"
+    },
+    {
+      "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+      "before_sha256": "8629b8622d89bc0e108bce034cbf133a11426578ab5d735184306d96349e6aaf",
+      "overlay_sha256": "6407760946804ed3f8542a66035fa3b0cbe8c7c5e2802600eb215a38acbb85f9"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+      "before_sha256": "78cca9470fb06f63c9f81e5db2b16bcc13ecd2963d920b4eff644f7f29823603",
+      "overlay_sha256": "4f10dba1fc4346844b481750578eda6158a0130e7818bc0834fc61030f911646"
+    },
+    {
+      "file": "packages/kernel/src/lib/optional-diagnostic.spec.ts",
+      "before_sha256": "258311351dfa48cd77ed9e53615a8e418585ec08bdcb487e2060f9f4db25913f",
+      "overlay_sha256": "f44bb2154da01da395438ae4d367a56231e6b0b33d9e3b6dd8c6e7c7b2fe80bd"
+    },
+    {
+      "file": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+      "before_sha256": "b1bb8a17c78346ff52460520999db234899a5dccf43f882e79615e6c1e1525f6",
+      "overlay_sha256": "b1d7b5ed4278aabacad8613d2ca87e4343280431ec3013e07e9b0e6d4f3a37c9"
+    },
+    {
+      "file": "packages/kernel/src/lib/recipient-window-review.spec.ts",
+      "before_sha256": "d24843efe49abf8bc34c617677fb1d3a20dde823e05a8065660d932e34042813",
+      "overlay_sha256": "8a83e1e6fb324f87b871da4489af98e7fe9c074ac5e9018b05d9bedce89a95b2"
+    },
+    {
+      "file": "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+      "before_sha256": "dda2fc391f831056ca9f1edaf7339d2cd9002352d22c237fb093d95def15020e",
+      "overlay_sha256": "97eeb4e35a8319c66861d100bc19889217bd90f03b50ca73ac5f3445814ae533"
+    },
+    {
+      "file": "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+      "before_sha256": "8acabc1a002bf4d2b1d2241b336fa39fa1782583546c55d82b3928bd59faefc2",
+      "overlay_sha256": "45c0dc2d964ad991079fa15c51a4594d56e54ac059d107f8d15cbd867ca46207"
+    },
+    {
+      "file": "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+      "before_sha256": "b126c8227f163215c83b6088a66c5e6ad9bc2b1b0c13fd036cf4648a02109d28",
+      "overlay_sha256": "53c58fafff6837baa004f47873ea2f7f7e4c80142cbba7b33bbd8b1e4a491dbf"
+    },
+    {
+      "file": "packages/kernel/test/optional-diagnostic.ts",
+      "before_sha256": null,
+      "overlay_sha256": "d1873bc877a7f2ffae70d4200cb8facfffcf4133a62a9fbe8dc4cfb3eefb4027"
+    },
+    {
+      "file": "tools/testing/optional-diagnostic.ts",
+      "before_sha256": "d1873bc877a7f2ffae70d4200cb8facfffcf4133a62a9fbe8dc4cfb3eefb4027",
+      "overlay_sha256": null
+    }
+  ],
+  "productionTypeScriptDelta": [],
+  "SDKConfigBudgetDelta": [],
+  "preservedArchiveSha256": "a62d2cf031381828988891e7ef40ad837ee7518c7850c30cc8f40f75c8c7c331",
+  "dependentFrameworkReceipts": "/private/tmp/st-v16-test-doc-composition/runs",
+  "incompleteKernelNotCredited": "/private/tmp/st-v16-test-doc-composition/KERNEL-INCOMPLETE.json",
+  "patchSha256": "4c86e7cb7548e15b2f5d5f2b6d5f90bc550f4220a3ae05cab55634862b6c5792"
+}

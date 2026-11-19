@@ -1,0 +1,228 @@
+
+> nx run kernel:test /private/tmp/st-v16-integration-candidate/packages/kernel/src/active-transaction-context.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/batching-ownership.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching-adversarial.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching-context-safety.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching-detachment.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching-semantic-scopes.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching.behavior.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/external-baseline-coalescing.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/devtools/devtools-jump-0-1.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/devtools/devtools-jump-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/devtools/devtools-sanitize.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/devtools/devtools.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/enhancer-cleanup.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/enhancer-safety.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/add-many-overwrite-hardening.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/add-many-overwrite-reversal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/add-many-redo-order.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/clear-undoable.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/coalesced-turn-reversal-defect.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/collection-order-refusals.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/compensation-provenance.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/compound-compensation-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/compound-compensation-retry-readiness.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/declarative-structural-transition-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/designation-coalescing.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/documented-defects.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/entity-field-presence-capture.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/entity-membership-capture.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/external-authored-baseline-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/external-authored-baseline.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/hidden-collection-nesting.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/hidden-terminal-reversal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/hist0-baseline.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/hist0-remaining.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/histc2-door.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/historical-materialization-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/jump-undo-equivalence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/leaf-write-history.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/membership-declarative-delivery-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/membership-reversal-delivery.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/multi-collection-subject-collision.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/never-claimed-retirement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/object-valued-field-reversal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/order-boundary-evidence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/outcome-provenance.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/p0c-row-divergence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/paired-order-composer.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/paired-ordinary-boundary.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/pending-active-entity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/pending-footprint-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/pending-membership-admission.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/pending-overlap-admission.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/pending-overlap.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/planner-public-boundaries.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/position-capture-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/rekey-claim-width-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-audit-regression.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-claim-boundary.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-idle-density.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-metadata.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-missing-anchors.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-operation-outcome.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-queued-authority.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-reactivity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-reader-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-reader.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration-structured-authority.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.behavior.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/reversal-delivery-coherence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/reversal-known-limitations.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/rollback-then-undoable.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/set-all-order-reversal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/snapshot-sharing.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/turn-effect-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/turn-member-images.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/two-setall-turn.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/zero-net-compensation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/E-expanded-lifetime-anchor.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/confirmed-destroy.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/confirmed-turn-reader.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/descriptor-retention.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/history-retention-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/history-retention-15.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/membership-history-projection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/membership-queued-evidence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-admission-segments.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-01.json
+
+kernel:  RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+kernel:  ✓ src/enhancers/restoration/restoration.spec.ts (114 tests) 408ms
+kernel:  ✓ src/enhancers/restoration/hidden-terminal-reversal.spec.ts (173 tests) 740ms
+kernel: stderr | src/enhancers/devtools/devtools.spec.ts > devTools enhancer (v6 API) > restoration restores EntitySignal-like nodes via setAll(all)
+kernel: SignalTree: applyState REPLACED the live value at "count" with a raw value; its signal is gone. [ST2009]
+kernel:  ✓ src/enhancers/devtools/devtools.spec.ts (17 tests) 44ms
+kernel:  ✓ src/enhancers/restoration/designated-collection-omission.spec.ts (74 tests) 436ms
+kernel:  ✓ src/enhancers/transactions/E-expanded-lifetime-anchor.spec.ts (201 tests) 1043ms
+kernel:  ✓ src/enhancers/restoration/jump-undo-equivalence.spec.ts (39 tests) 3726ms
+kernel:      ✓ 30 generated histories with multi-write turns (restoration alone)  320ms
+kernel:      ✓ 30 generated histories with multi-write turns (transactions first)  418ms
+kernel:      ✓ 30 generated histories with multi-write turns (restoration first)  485ms
+kernel:      ✓ 40 generated histories (restoration alone)  603ms
+kernel:      ✓ 40 generated histories (transactions first)  685ms
+kernel:      ✓ 40 generated histories (restoration first)  677ms
+kernel:  ✓ src/enhancers/restoration/restoration-missing-anchors.spec.ts (26 tests) 207ms
+kernel:  ✓ src/enhancers/transactions/descriptor-retention.spec.ts (21 tests) 192ms
+kernel:  ✓ src/enhancers/restoration/add-many-overwrite-hardening.spec.ts (98 tests) 523ms
+kernel:  ✓ src/enhancers/batching/batching-semantic-scopes.spec.ts (41 tests) 161ms
+kernel:  ✓ src/enhancers/restoration/external-authored-baseline.spec.ts (69 tests) 217ms
+kernel:  ✓ src/enhancers/restoration/multi-collection-subject-collision.spec.ts (7 tests) 263ms
+kernel:  ✓ src/enhancers/restoration/rekey-claim-width-0.spec.ts (12 tests) 287ms
+kernel:  ✓ src/enhancers/restoration/membership-reversal-delivery.spec.ts (216 tests) 1601ms
+kernel:  ✓ src/enhancers/batching/batching.spec.ts (23 tests) 26ms
+kernel:  ✓ src/enhancers/restoration/restoration-reader.spec.ts (11 tests) 99ms
+kernel:  ✓ src/enhancers/restoration/pending-overlap.spec.ts (28 tests) 160ms
+kernel:  ✓ src/enhancers/restoration/order-composition-readiness.spec.ts (24 tests) 150ms
+kernel:  ✓ src/enhancers/restoration/pending-active-entity.spec.ts (64 tests) 275ms
+kernel:  ✓ src/enhancers/restoration/turn-member-images.spec.ts (37 tests) 1817ms
+kernel:      ✓ 60 generated histories  1528ms
+kernel:  ✓ src/enhancers/restoration/hidden-collection-nesting.spec.ts (25 tests) 199ms
+kernel:  ✓ src/enhancers/transactions/confirmed-turn-reader.spec.ts (13 tests) 51ms
+kernel:  ✓ src/enhancers/restoration/reversal-known-limitations.spec.ts (24 tests) 200ms
+kernel:  ✓ src/enhancers/transactions/history-retention-0.spec.ts (13 tests) 190ms
+kernel:  ✓ src/enhancers/restoration/add-many-overwrite-reversal.spec.ts (48 tests) 267ms
+kernel:  ✓ src/enhancers/restoration/pending-overlap-admission.spec.ts (12 tests) 95ms
+kernel:  ✓ src/enhancers/restoration/restoration-idle-density.spec.ts (11 tests) 78ms
+kernel:  ✓ src/enhancers/restoration/hist0-remaining.spec.ts (8 tests) 68ms
+kernel:  ✓ src/enhancers/restoration/histc2-door.spec.ts (13 tests) 77ms
+kernel:  ✓ src/enhancers/restoration/never-claimed-retirement.spec.ts (5 tests) 57ms
+kernel:  ✓ src/enhancers/restoration/restoration-claim-boundary.spec.ts (8 tests) 288ms
+kernel:  ✓ src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts (9 tests) 79ms
+kernel:  ✓ src/enhancers/restoration/compensation-provenance.spec.ts (9 tests) 51ms
+kernel:  ✓ src/enhancers/restoration/entity-membership-capture.spec.ts (11 tests) 359ms
+kernel:  ✓ src/enhancers/restoration/declarative-structural-transition-0.spec.ts (8 tests) 74ms
+kernel:  ✓ src/enhancers/restoration/restoration-operation-outcome.spec.ts (8 tests) 60ms
+kernel:  ✓ src/enhancers/restoration/compound-compensation-controls.spec.ts (9 tests) 134ms
+kernel:  ✓ src/enhancers/restoration/two-setall-turn.spec.ts (21 tests) 152ms
+kernel:  ✓ src/enhancers/restoration/hist0-baseline.spec.ts (7 tests) 84ms
+kernel:  ✓ src/enhancers/restoration/turn-effect-composition.spec.ts (7 tests) 65ms
+kernel:  ✓ src/enhancers/restoration/reversal-delivery-coherence.spec.ts (22 tests) 86ms
+kernel:  ✓ src/enhancers/devtools/devtools-jump-0-1.spec.ts (5 tests) 49ms
+kernel:  ✓ src/enhancers/restoration/p0c-row-divergence.spec.ts (9 tests) 87ms
+kernel:  ✓ src/enhancers/restoration/restoration-queued-authority.spec.ts (11 tests) 83ms
+kernel:  ✓ src/enhancers/transactions/membership-history-projection.spec.ts (10 tests) 129ms
+kernel:  ✓ src/enhancers/restoration/position-capture-0.spec.ts (6 tests) 76ms
+kernel:  ✓ src/enhancers/restoration/restoration-reader-v16-controls.spec.ts (6 tests) 70ms
+kernel:  ✓ src/enhancers/restoration/zero-net-compensation.spec.ts (7 tests) 117ms
+kernel:  ✓ src/enhancers/devtools/devtools-jump-0.spec.ts (3 tests) 57ms
+kernel: stdout | src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts > inspect() path ambiguity > a literal key and a nested path project to the same public path
+kernel: [inspect] LITERAL path : [ 'a.b=current' ] addr: [ '["a.b"]=current' ]
+kernel: [inspect] NESTED  path : [ 'a.b=current' ] addr: [ '["a","b"]=current' ]
+kernel: stdout | src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts > inspect() address — entity FIELDS are distinguishable too > a literal and a nested entity field have different addresses
+kernel: [entity-addr] [{"path":"rows.A.n.a","address":["rows","n.a"],"subject":1,"status":"current"},{"path":"rows.A.n","address":["rows","n"],"subject":1,"status":"current"}]
+kernel:  ✓ src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts (2 tests) 40ms
+kernel:  ✓ src/enhancers/restoration/restoration-audit-regression.spec.ts (15 tests) 137ms
+kernel: stderr | src/enhancers/batching/batching.behavior.spec.ts > batching behavior > setter wrapping reaches callable accessors > preserves the callback failure when its deferred replacement also fails
+kernel: [SignalTree] Secondary error in coalesce(): Error: coalesced write failed
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/batching/batching.behavior.spec.ts:151:28
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+kernel:     at new Promise (<anonymous>)
+kernel:     at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+kernel:     at new Promise (<anonymous>)
+kernel:     at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+kernel:  ✓ src/enhancers/batching/batching.behavior.spec.ts (7 tests) 15ms
+kernel:  ✓ src/enhancers/restoration/pending-membership-admission.spec.ts (7 tests) 144ms
+kernel:  ✓ src/enhancers/restoration/pending-footprint-v16-controls.spec.ts (10 tests) 204ms
+kernel:  ✓ src/enhancers/restoration/collection-order-refusals.spec.ts (9 tests) 112ms
+kernel:  ✓ src/enhancers/restoration/documented-defects.spec.ts (8 tests) 912ms
+kernel:      ✓ two writes inside one sampling window collapse to one entry  381ms
+kernel:      ✓ write-then-revert inside one window is INVISIBLE to the trail  374ms
+kernel:  ✓ src/enhancers/restoration/clear-undoable.spec.ts (7 tests) 93ms
+kernel:  ✓ src/enhancers/batching/external-baseline-coalescing.spec.ts (28 tests) 177ms
+kernel:  ✓ src/enhancers/restoration/external-authored-baseline-v16-controls.spec.ts (8 tests) 71ms
+kernel:  ✓ src/enhancers/restoration/entity-field-presence-capture.spec.ts (12 tests) 101ms
+kernel:  ✓ src/active-transaction-context.spec.ts (18 tests) 34ms
+kernel: stderr | src/enhancers/restoration/registered-slot-guards.spec.ts > restoration capture: the registered slot, not the subject, decides > a record at an unregistered position is read field by field (restoration alone)
+kernel: SignalTree: a write subscriber threw while observing 'synthetic'; delivery continued. [ST2034] Error: hostile record
+kernel:     at Object.get [as v] (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts:76:15)
+kernel:     at enqueueScalarDiff (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4278:15)
+kernel:     at captureEffects (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4340:9)
+kernel:     at captureIntoBucket (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4424:7)
+kernel:     at receiveOrdinaryNotification (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:5131:15)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:480:15
+kernel:     at withoutWriteObservationScopes (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)
+kernel:     at PathNotifier._runNotify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:479:13)
+kernel:     at PathNotifier.flush (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:552:14)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:417:33
+kernel: stderr | src/enhancers/restoration/registered-slot-guards.spec.ts > restoration capture: the registered slot, not the subject, decides > a record at an unregistered position is read field by field (transactions first)
+kernel: SignalTree: a write subscriber threw while observing 'synthetic'; delivery continued. [ST2034] Error: hostile record
+kernel:     at Object.get [as v] (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts:76:15)
+kernel:     at captureEffects (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2175:23)
+kernel:     at captureIntoBucket (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2886:5)
+kernel:     at receiveOrdinaryNotification (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4275:13)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:480:15
+kernel:     at withoutWriteObservationScopes (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)
+kernel:     at PathNotifier._runNotify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:479:13)
+kernel:     at PathNotifier.flush (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:552:14)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:417:33
+kernel:     at processTicksAndRejections (node:internal/process/task_queues:104:5)
+kernel: SignalTree: a write subscriber threw while observing 'synthetic'; delivery continued. [ST2034] Error: hostile record
+kernel:     at Object.get [as v] (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts:76:15)
+kernel:     at enqueueScalarDiff (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4278:15)
+kernel:     at captureEffects (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4340:9)
+kernel:     at captureIntoBucket (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4424:7)
+kernel:     at receiveOrdinaryNotification (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:5131:15)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:480:15
+kernel:     at withoutWriteObservationScopes (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)
+kernel:     at PathNotifier._runNotify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:479:13)
+kernel:     at PathNotifier.flush (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:552:14)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:417:33
+kernel: stderr | src/enhancers/restoration/registered-slot-guards.spec.ts > restoration capture: the registered slot, not the subject, decides > a record at an unregistered position is read field by field (restoration first)
+kernel: SignalTree: a write subscriber threw while observing 'synthetic'; delivery continued. [ST2034] Error: hostile record
+kernel:     at Object.get [as v] (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts:76:15)
+kernel:     at enqueueScalarDiff (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4278:15)
+kernel:     at captureEffects (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4340:9)
+kernel:     at captureIntoBucket (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:4424:7)
+kernel:     at receiveOrdinaryNotification (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/restoration.ts:5131:15)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:480:15
+kernel:     at withoutWriteObservationScopes (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)
+kernel:     at PathNotifier._runNotify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:479:13)
+kernel:     at PathNotifier.flush (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:552:14)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:417:33
+kernel: SignalTree: a write subscriber threw while observing 'synthetic'; delivery continued. [ST2034] Error: hostile record
+kernel:     at Object.get [as v] (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts:76:15)
+kernel:     at captureEffects (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2175:23)
+kernel:     at captureIntoBucket (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2886:5)
+kernel:     at receiveOrdinaryNotification (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4275:13)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:480:15
+kernel:     at withoutWriteObservationScopes (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)
+kernel:     at PathNotifier._runNotify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:479:13)
+kernel:     at PathNotifier.flush (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:552:14)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:417:33
+kernel:     at processTicksAndRejections (node:internal/process/task_queues:104:5)
+kernel:  ✓ src/enhancers/restoration/registered-slot-guards.spec.ts (12 tests) 65ms
+kernel:  ✓ src/enhancers/transactions/history-retention-15.spec.ts (9 tests) 50ms
+kernel:  ✓ src/enhancers/restoration/p0c-divergence.spec.ts (4 tests) 34ms
+kernel:  ✓ src/enhancers/enhancer-cleanup.spec.ts (8 tests) 32ms
+kernel:  ✓ src/enhancers/restoration/compound-compensation-retry-readiness.spec.ts (2 tests) 67ms
+kernel:  ✓ src/enhancers/restoration/entity-field-presence.spec.ts (11 tests) 73ms
+kernel:  ✓ src/enhancers/restoration/coalesced-turn-reversal-defect.spec.ts (3 tests) 36ms
+kernel:  ✓ src/enhancers/restoration/outcome-provenance.spec.ts (22 tests) 65ms
+kernel: stderr | src/enhancers/restoration/snapshot-sharing.spec.ts > restoration snapshot sharing > cost does not scale with untouched state
+kernel: SignalTree: "rows" holds 100 objects with a stable "id" — use entityMap({ selectId: (e) => e.id }). An array leaf rebuilds and re-compares the whole array on every update — two orders of magnitude at 50k. Read-only or replaced wholesale? Leave it plain; otherwise model it as an entityMap. [ST2018]
+kernel:  ✓ src/enhancers/restoration/snapshot-sharing.spec.ts (5 tests) 52ms
+kernel:  ✓ src/enhancers/restoration/object-valued-field-reversal.spec.ts (48 tests) 184ms
+kernel:  ✓ src/enhancers/restoration/restoration-metadata.spec.ts (3 tests) 42ms
+kernel:  ✓ src/enhancers/batching/batching-context-safety.spec.ts (8 tests) 49ms
+kernel:  ✓ src/enhancers/batching/batching-adversarial.spec.ts (12 tests) 79ms
+kernel: stderr | src/enhancers/restoration/committed-entity-capture.spec.ts > committed entity admission evidence > contains observer failures and releases observation independently of capture activation
+kernel: SignalTree: a transaction turn listener threw; the transaction continued. [ST2034] Error: observer
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:116:13
+kernel:     at invoke (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/mutation-capture-runtime.ts:182:49)
+kernel:     at deliver (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/mutation-capture-runtime.ts:189:31)
+kernel:     at Object.publishCommittedEntity (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/mutation-capture-runtime.ts:190:63)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:121:26
+kernel:     at Proxy.assertThrows (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:2798:5)
+kernel:     at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)
+kernel:     at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1216:12)
+kernel:     at Proxy.overwritingMethodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1750:33)
+kernel:     at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)
+kernel:  ✓ src/enhancers/restoration/committed-entity-capture.spec.ts (4 tests) 12ms
+kernel:  ✓ src/enhancers/transactions/native-admission-segments.spec.ts (3 tests) 60ms
+kernel:  ✓ src/enhancers/restoration/planner-public-boundaries.spec.ts (18 tests) 122ms
+kernel:  ✓ src/enhancers/restoration/leaf-write-history.spec.ts (6 tests) 60ms
+kernel:  ✓ src/enhancers/restoration/paired-order-composer.spec.ts (3 tests) 4ms
+kernel:  ✓ src/enhancers/restoration/restoration-structured-authority.spec.ts (5 tests) 72ms
+kernel:  ✓ src/enhancers/restoration/set-all-order-reversal.spec.ts (36 tests) 238ms
+kernel:  ✓ src/enhancers/restoration/historical-materialization-0.spec.ts (5 tests) 46ms
+kernel:  ✓ src/enhancers/batching/batching-detachment.spec.ts (1 test) 441ms
+kernel:    ✓ escaped fields release destroyed owners while live batching and retired-field collection survive  440ms
+kernel:  ✓ src/enhancers/transactions/membership-queued-evidence.spec.ts (4 tests) 38ms
+kernel:  ✓ src/enhancers/restoration/rollback-then-undoable.spec.ts (10 tests) 85ms
+kernel:  ✓ src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts (1 test) 44ms
+kernel:  ✓ src/enhancers/restoration/literal-dotted-collection.spec.ts (40 tests) 155ms
+kernel:  ✓ src/enhancers/devtools/devtools-sanitize.spec.ts (3 tests) 32ms
+kernel:  ✓ src/enhancers/restoration/cross-collection-lifetime.spec.ts (8 tests) 138ms
+kernel:  ✓ src/enhancers/restoration/membership-declarative-delivery-v16-controls.spec.ts (4 tests) 68ms
+kernel:  ✓ src/enhancers/restoration/paired-ordinary-boundary.spec.ts (2 tests) 66ms
+kernel:  ✓ src/enhancers/restoration/order-boundary-evidence.spec.ts (6 tests) 10ms
+kernel:  ✓ src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts (3 tests) 72ms
+kernel:  ✓ src/enhancers/restoration/restoration-reactivity.spec.ts (2 tests) 35ms
+kernel:  ✓ src/batching-ownership.spec.ts (3 tests) 79ms
+kernel:  ✓ src/enhancers/enhancer-safety.spec.ts (3 tests) 6ms
+kernel:  ✓ src/enhancers/restoration/add-many-redo-order.spec.ts (12 tests) 117ms
+kernel:  ✓ src/enhancers/restoration/restoration.behavior.spec.ts (1 test) 42ms
+kernel:  ✓ src/enhancers/transactions/confirmed-destroy.spec.ts (5 tests) 1599ms
+kernel:      ✓ destroyed preserves only legitimate payload owners  346ms
+kernel:      ✓ raw-snapshot preserves only legitimate payload owners  321ms
+kernel:      ✓ reader-snapshot preserves only legitimate payload owners  356ms
+kernel:  ✓ src/enhancers/restoration/designation-coalescing.spec.ts (6 tests) 34ms
+kernel:  Test Files  100 passed (100)
+kernel:       Tests  2115 passed (2115)
+kernel:    Start at  12:24:40
+kernel:    Duration  138.76s (transform 6.42s, setup 0ms, import 49.32s, tests 22.31s, environment 163.61s)
+kernel: JSON report written to /private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-01.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2m 21s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2m 21s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2m 21s

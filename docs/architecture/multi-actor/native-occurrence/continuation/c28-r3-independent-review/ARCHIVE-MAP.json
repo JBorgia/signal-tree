@@ -1,0 +1,80 @@
+[
+  {
+    "source": "DESCRIPTOR-IDENTITY.json",
+    "archive": "DESCRIPTOR-IDENTITY.json",
+    "sourceSha256": "f78ecb67305d6e1c5307d3df1f15983816ab2676f5ba6d5b06cf31adaf52502a",
+    "archiveSha256": "f78ecb67305d6e1c5307d3df1f15983816ab2676f5ba6d5b06cf31adaf52502a"
+  },
+  {
+    "source": "STATUS.md",
+    "archive": "STATUS.md",
+    "sourceSha256": "a67ba86abfc50570c2ca792da2f736ccc1396c3a027e2b7fc469923636503deb",
+    "archiveSha256": "a67ba86abfc50570c2ca792da2f736ccc1396c3a027e2b7fc469923636503deb"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "86eed3e86cab7cc87a1409b023b45d78fab6fc78a0e8b9dc5f4d7c6b208790bd",
+    "archiveSha256": "86eed3e86cab7cc87a1409b023b45d78fab6fc78a0e8b9dc5f4d7c6b208790bd"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "4a0f69851d8292ee99ea88f3b24dba1901cf7b9c2280d2335590aa8cb93538d1",
+    "archiveSha256": "4a0f69851d8292ee99ea88f3b24dba1901cf7b9c2280d2335590aa8cb93538d1"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/private.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/private.ts",
+    "sourceSha256": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+    "archiveSha256": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "sourceSha256": "1fd0ec87c7c10e8f27fd424e48544b44164a5aff548344540a9e83e1f53b187b",
+    "archiveSha256": "1fd0ec87c7c10e8f27fd424e48544b44164a5aff548344540a9e83e1f53b187b"
+  },
+  {
+    "source": "packet/FIRST-GATE-RUNTIME.json",
+    "archive": "packet/FIRST-GATE-RUNTIME.json",
+    "sourceSha256": "a31a24d2096d4c77701158699b34d2e44d8121277e5074b46e11ca580d774ccd",
+    "archiveSha256": "a31a24d2096d4c77701158699b34d2e44d8121277e5074b46e11ca580d774ccd"
+  },
+  {
+    "source": "packet/runtime.patch",
+    "archive": "packet/runtime.patch",
+    "sourceSha256": "e29e34f8b4a5043da4f984c104ad683ba65869c9b2da3a3d5c12bf22ce7db634",
+    "archiveSha256": "e29e34f8b4a5043da4f984c104ad683ba65869c9b2da3a3d5c12bf22ce7db634"
+  },
+  {
+    "source": "packet/RUNTIME-MANIFEST.json",
+    "archive": "packet/RUNTIME-MANIFEST.json",
+    "sourceSha256": "1edb39e668f2a370554f692d455b75fac08a9836003a150acd09e2326368a08c",
+    "archiveSha256": "1edb39e668f2a370554f692d455b75fac08a9836003a150acd09e2326368a08c"
+  },
+  {
+    "source": "packet/MANIFEST.json",
+    "archive": "packet/MANIFEST.json.gz",
+    "sourceSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+    "archiveSha256": "78cfbd7ab83b1b52a7bbb647bd3dc0db891e7bb23dff48d9a00235cb5713861d"
+  },
+  {
+    "source": "packet/runs/final-gate/result.json",
+    "archive": "packet/runs/final-gate/result.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "packet/runs/final-gate/first.log",
+    "archive": "packet/runs/final-gate/first.log",
+    "sourceSha256": "f4caa1792d0ad6811d75d65fb9014b0f5793a57722303bb8d192a2d58dede83d",
+    "archiveSha256": "f4caa1792d0ad6811d75d65fb9014b0f5793a57722303bb8d192a2d58dede83d"
+  },
+  {
+    "source": "packet/runs/final-gate/command.json",
+    "archive": "packet/runs/final-gate/command.json",
+    "sourceSha256": "12f1da699172d29727bedb36ddf69fd8ab605ddb0ba70f9d09f849387744d4ff",
+    "archiveSha256": "12f1da699172d29727bedb36ddf69fd8ab605ddb0ba70f9d09f849387744d4ff"
+  }
+]

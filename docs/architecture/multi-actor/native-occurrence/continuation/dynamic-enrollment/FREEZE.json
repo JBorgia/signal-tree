@@ -1,0 +1,13 @@
+{
+  "status": "frozen for independent implementation review; no integration/activation",
+  "artifacts": {
+    "PREDECESSOR-SNAPSHOT-C0.json": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+    "SOURCE-SHA256.json": "5f9b20cfff783d947cff974fab5e5f3ef9ac15e0e902c1638601166310e70bfb",
+    "source.patch": "301071b8e583a50c8cd6f5e5e87185eeecb1490050abe8380bd4c269b4edddd3",
+    "tests.patch": "bf670a48f0e70c7675a153ec92a902416b774a38c47dc27fb4709e2093ea3c62",
+    "candidate-source.tar.gz": "353d680edca1c53343a2341ca664956ee5636f40f6930f27e41687911d5fb0e5"
+  },
+  "files": 2975,
+  "changed": 7,
+  "C0VerifiedUnchanged": true
+}

@@ -1,0 +1,26 @@
+{
+  "packages/react/rollup.config.cjs": {
+    "baseline": "063eb24aae9153987b0d5e1be264a7c4b0eaca2ffffa1ccee355bd596f596c3d",
+    "successor": "063eb24aae9153987b0d5e1be264a7c4b0eaca2ffffa1ccee355bd596f596c3d"
+  },
+  "packages/react/rollup.custom.mjs": {
+    "baseline": "0a59cdaaf7cc75aa9f0360000af4b01cf799cc8220fd893707bb5aa5a85b87bc",
+    "successor": "0a59cdaaf7cc75aa9f0360000af4b01cf799cc8220fd893707bb5aa5a85b87bc"
+  },
+  "packages/react/project.json": {
+    "baseline": "b882d1918fd2b5510fa4b8916be32630cd69e4bfcf5b9fcde893023aeb850e36",
+    "successor": "b882d1918fd2b5510fa4b8916be32630cd69e4bfcf5b9fcde893023aeb850e36"
+  },
+  "packages/react/tsconfig.lib.prod.json": {
+    "baseline": "691fdbec243ee2a982b56d425eb1f2444c2292ae452eb5026990652af3f01208",
+    "successor": "691fdbec243ee2a982b56d425eb1f2444c2292ae452eb5026990652af3f01208"
+  },
+  "tools/build/create-rollup-config.mjs": {
+    "baseline": "d7266012092614ebab59d1c201ad9b5eb3eaec010a1dc71512e06ec860d40271",
+    "successor": "d7266012092614ebab59d1c201ad9b5eb3eaec010a1dc71512e06ec860d40271"
+  },
+  "tools/build/workspace-specs.mjs": {
+    "baseline": "d94d80dabdb19b61ac9eda601f8fe72b28cb2dcbda76242fcbf873f8ce9b1e00",
+    "successor": "d94d80dabdb19b61ac9eda601f8fe72b28cb2dcbda76242fcbf873f8ce9b1e00"
+  }
+}

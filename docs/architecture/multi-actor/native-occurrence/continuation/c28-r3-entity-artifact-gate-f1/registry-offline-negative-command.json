@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=entity-registration-artifacts,entity-registration-artifacts:self",
+    "--self-test"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+  "env": {
+    "npm_config_cache": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/empty-npm-cache",
+    "npm_config_offline": "true"
+  }
+}

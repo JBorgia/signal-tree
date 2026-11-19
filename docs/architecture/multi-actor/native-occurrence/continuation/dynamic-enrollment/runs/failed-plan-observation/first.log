@@ -1,0 +1,37 @@
+
+> nx run kernel:test dynamic-member-enrollment.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs dynamic-member-enrollment.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1
+
+(node:74954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:74962) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-member-enrollment-successor/candidate/packages/kernel
+
+(node:74971) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:74978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  34 passed (34)
+   Start at  19:57:02
+   Duration  2.82s (transform 632ms, setup 0ms, import 820ms, tests 75ms, environment 1.56s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

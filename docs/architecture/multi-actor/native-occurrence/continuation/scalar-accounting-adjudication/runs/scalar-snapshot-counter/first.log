@@ -1,0 +1,78 @@
+
+> nx run kernel:test scalar-oracle-companion.spec.ts --testNamePattern=proves compiled scalar reads and writes stay constant --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-oracle-companion.spec.ts --testNamePattern="proves compiled scalar reads and writes stay constant" --maxWorkers=1
+
+(node:59348) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:59359) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c1-oracle-independent-review/candidate/packages/kernel
+
+(node:59373) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-oracle-companion.spec.ts (8 tests | 1 failed | 7 skipped) 15ms
+     × proves compiled scalar reads and writes stay constant in logical work 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-oracle-companion.spec.ts > Complexity guard: production scalar substrate > proves compiled scalar reads and writes stay constant in logical work
+AssertionError: expected { Object (slotReads, slotWrites, ...) } to deeply equal { slotReads: +0, slotWrites: 2, …(19) }
+
+- Expected
++ Received
+
+@@ -7,13 +7,13 @@
+    "publicAddPreviousTailReads": 0,
+    "publicUndoPositionEntriesExamined": 0,
+    "publicUndoTurnEffectsExamined": 0,
+    "publicationDependencyReads": 0,
+    "publications": 2,
+-   "revisionIncrements": 1,
++   "revisionIncrements": 0,
+    "slotReads": 0,
+-   "slotWrites": 2,
++   "slotWrites": 0,
+    "structuralActiveKeyEntriesVisited": 0,
+    "structuralActiveKeyLookups": 0,
+    "structuralSubjectTombstones": 0,
+    "structuralSubjectTransfers": 0,
+    "structuralSubjectsCreated": 0,
+
+ ❯ src/lib/scalar-oracle-companion.spec.ts:1169:32
+    1167|           resetProductionSubstrateStatsForTesting(stats);
+    1168|           frameHarness.commitFrame(width, size * 10_000 + width);
+    1169|           expect({ ...stats }).toEqual<ProductionSubstrateStats>({
+       |                                ^
+    1170|             slotReads: 0,
+    1171|             slotWrites: width,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 7 skipped (8)
+   Start at  20:21:23
+   Duration  3.21s (transform 1.48s, setup 0ms, import 1.78s, tests 15ms, environment 1.16s)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-oracle-companion.spec.ts --testNamePattern="proves compiled scalar reads and writes stay constant" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.2s

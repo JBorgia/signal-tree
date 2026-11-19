@@ -1,0 +1,5 @@
+Command: shasum -a 256 -c SHA256SUMS
+Initial cwd: /Users/jonathanborgia/code/signaltree
+Exit: 2
+stderr: shasum: SHA256SUMS: No such file or directory
+Correction: run unchanged command from tools/experiments/multi-actor-operations/installed. Exit 0; every listed file verified. No checksum/content adjustment to make verification pass.

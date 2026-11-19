@@ -1,0 +1,84 @@
+
+> nx run kernel:test occurrence-successor.spec.ts native-certificate-successor.spec.ts core-independent-review.spec.ts collection-contributor-core.spec.ts publication-terminal-consumer-independent.spec.ts
+
+> node tools/run-core-vitest.mjs occurrence-successor.spec.ts native-certificate-successor.spec.ts core-independent-review.spec.ts collection-contributor-core.spec.ts publication-terminal-consumer-independent.spec.ts
+
+(node:72622) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72629) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-occurrence-successor/packages/kernel
+
+(node:72641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72640) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72638) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:72642) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 32ms
+   × omission then restored retained collection selects matching payload and support 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 31 passed (32)
+   Start at  12:47:22
+   Duration  1.64s (transform 3.45s, setup 0ms, import 4.43s, tests 214ms, environment 2.43s)
+
+Warning: command "node tools/run-core-vitest.mjs occurrence-successor.spec.ts native-certificate-successor.spec.ts core-independent-review.spec.ts collection-contributor-core.spec.ts publication-terminal-consumer-independent.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

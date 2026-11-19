@@ -1,0 +1,26 @@
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-signal.ts
+   640:22   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   641:5    warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   683:216  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   683:216  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1453:28   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1537:26   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1541:31   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+   841:48  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   843:77  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   851:97  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1030:46  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1286:46  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1295:33  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1618:22  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1637:92  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1649:72  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1691:55  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  2029:68  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  2029:91  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+✖ 19 problems (0 errors, 19 warnings)
+

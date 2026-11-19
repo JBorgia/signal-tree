@@ -1,0 +1,10 @@
+{
+  "cmd": [
+    "git",
+    "apply",
+    "/private/tmp/st-c21-recipient-positive-counterparts/COUNTERPARTS.patch"
+  ],
+  "cwd": "/private/tmp/st-recipient-counterparts-independent-review/patch-check",
+  "exit": 0,
+  "matchesFrozenCandidate": true
+}

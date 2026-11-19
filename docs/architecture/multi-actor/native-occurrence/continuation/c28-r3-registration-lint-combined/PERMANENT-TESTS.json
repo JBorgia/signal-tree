@@ -1,0 +1,10 @@
+{
+  "manifest": "c90e932a58aa216e7885a2c6c17856b2fefdffb894d68035c32a70daae9c3d84",
+  "files": 3119,
+  "original8SharedBytes": "6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71",
+  "lifecycle6SharedBytes": "e9528a1b3d53c4d14cba76a468227eafe77ad04a31c379e466e0ba3a41f3ee8b",
+  "absoluteWrappersArchived": true,
+  "newReceiptCases": 6,
+  "manualArtifactReplay": "tools/experiments/entity-registration/README.md",
+  "notAutoRegistered": true
+}

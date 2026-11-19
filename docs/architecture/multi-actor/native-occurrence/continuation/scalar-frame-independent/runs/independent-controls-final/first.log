@@ -1,0 +1,64 @@
+
+> nx run kernel:test independent-scalar-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-scalar-publication.spec.ts --maxWorkers=1
+
+(node:96951) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96959) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-independent/candidate/packages/kernel
+
+(node:96966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-scalar-publication.spec.ts (3 tests | 1 failed) 15ms
+   × final scalar frame window includes callback-opened owner openerFirst=false 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-scalar-publication.spec.ts > final scalar frame window includes callback-opened owner openerFirst=false
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/independent-scalar-publication.spec.ts:37:55
+     35|   // Both facts are from one frame whose stores installed after the ne…
+     36|   expect(proof[1].possible?.some(o=>o.owner===owner)).toBe(true);
+     37|   expect(proof[0].possible?.some(o=>o.owner===owner)).toBe(true);
+       |                                                       ^
+     38|  } finally {offA?.();offB?.();pending?.rollback();tree.destroy();forei…
+     39| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  19:32:52
+   Duration  870ms (transform 478ms, setup 0ms, import 570ms, tests 15ms, environment 202ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-scalar-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

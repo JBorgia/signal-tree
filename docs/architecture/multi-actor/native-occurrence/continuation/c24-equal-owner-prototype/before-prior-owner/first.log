@@ -1,0 +1,69 @@
+
+> nx run kernel:test equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern=newer net-zero
+
+> node tools/run-core-vitest.mjs equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern="newer net-zero"
+
+(node:62885) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c24-equal-owner/candidate/packages/kernel
+
+(node:62899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/equal-owner-admission.spec.ts (13 tests | 1 failed | 12 skipped) 37ms
+   × newer net-zero write leaves the older destination owner intact 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/equal-owner-admission.spec.ts > newer net-zero write leaves the older destination owner intact
+AssertionError: expected [ { x: 7, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/equal-owner-admission.spec.ts:66:80
+     64|   const p=t.transact(()=>t.$.pair.x(7));const q=t.transact(()=>{t.$.z(…
+     65|   q.confirm();await drain();expect(sent).toEqual([]);
+     66|   c.declare({kind:'independent'},()=>t.$.pair.x(7));await drain();expe…
+       |                                                                                ^
+     67|   p.rollback();await drain();expect(t.$.pair.x()).toBe(0);expect(t.$.z…
+     68|  }finally{c.dispose();t.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 skipped (13)
+   Start at  15:22:24
+   Duration  2.22s (transform 1.19s, setup 0ms, import 1.41s, tests 37ms, environment 583ms)
+
+Warning: command "node tools/run-core-vitest.mjs equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern="newer net-zero"" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.1s

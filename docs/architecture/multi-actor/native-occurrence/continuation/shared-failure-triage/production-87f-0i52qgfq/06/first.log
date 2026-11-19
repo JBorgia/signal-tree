@@ -1,0 +1,38 @@
+
+> nx run kernel:test entity-missing-id-guard.spec.ts --testNamePattern=entityMap missing-id guard \(dev mode\) warns when entities have no id and no selectId --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-missing-id-guard.spec.ts --testNamePattern="entityMap missing-id guard \(dev mode\) warns when entities have no id and no selectId" --reporter=verbose --maxWorkers=1
+
+(node:38677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:38691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > warns when entities have no id and no selectId 6ms
+ ↓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > does NOT warn when a selectId is provided
+ ↓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > does NOT warn when entities have an id field
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 2 skipped (3)
+   Start at  16:40:40
+   Duration  879ms (transform 513ms, setup 0ms, import 615ms, tests 6ms, environment 173ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

@@ -1,0 +1,13 @@
+{
+  "sameProjectNamesRootsTargetNames": true,
+  "sameCompleteTargetDefinitions": true,
+  "archiveProjectRootsBefore": [],
+  "archiveProjectRootsAfter": [],
+  "sameDiscoveredTestTargets": true,
+  "changedManifestPaths": [
+    ".nxignore"
+  ],
+  "beforeArchiveWarningCount": 5,
+  "afterArchiveWarningCount": 5,
+  "dependencyGraphsEqual": false
+}

@@ -1,0 +1,47 @@
+{
+  "inputs": [
+    "/private/tmp/st-native-combined-c14/SNAPSHOT-C14.json",
+    "/private/tmp/st-native-combined-c15/SNAPSHOT-C15.json",
+    "/private/tmp/st-c14-finally-successor/SNAPSHOT.json"
+  ],
+  "changes": [
+    {
+      "path": "packages/kernel/src/lib/declaration-finally-precedence.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "0f1f563cdf04df7d6f92af7a83474835e7deb503ee017852332f35be3fe2e3ca",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "base": "1d78b2bd0bf2baa50ec83ce44259aa62ce779b02f0730e2e74832a029c61a966",
+      "left": "6ab1c578bd5ba3fd5e8f62998f17c513066c5219cb3ebfe5b2522160f26873f8",
+      "right": "2c4a98173d299a30087678d31ba4aa547712cb235e3a5144361d7e2a54fb5b79",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/experimental-publication/private.ts",
+      "base": "0a0a1a53cb1dd07b2583d50acac4adc930b2cea347cca4ba6b876f0dbbd7b608",
+      "left": "bef039b862454e6609a54eb48cd0f46d8083e278488f1142de3245340bf933ba",
+      "right": "0c5d3281d3f3538a69248e3e648d3d4f5096828aaaafe079e14c4cd7ff7efb22",
+      "method": "three-way",
+      "exit": 0
+    },
+    {
+      "path": "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts",
+      "base": "6cb6c437149e80be2adb037fa683326df650c89c3ed4fa762d3b804cc15f908a",
+      "left": "6cb6c437149e80be2adb037fa683326df650c89c3ed4fa762d3b804cc15f908a",
+      "right": "e32cd6e32c5305f275ead8151bc295d85ff8c966184b98af6141c2371a34e9b4",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/scalar-native-support.spec.ts",
+      "base": "c273bda02a0c7c7c0600dcb33d2dd19cd3f785da8679dddc2b18f7ea64b6b9c6",
+      "left": "c273bda02a0c7c7c0600dcb33d2dd19cd3f785da8679dddc2b18f7ea64b6b9c6",
+      "right": "74acda5f67e00ec0ad070b5ef1562b5f2e18bcc5eb18accb0d4124e99d52bfb1",
+      "method": "incoming"
+    }
+  ],
+  "conflicts": []
+}

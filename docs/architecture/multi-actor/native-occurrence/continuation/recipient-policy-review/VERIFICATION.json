@@ -1,0 +1,30 @@
+{
+  "recipient": {
+    "verifiedFiles": 2968,
+    "differences": {}
+  },
+  "known-input": {
+    "verifiedFiles": 2967,
+    "differences": {}
+  },
+  "sha256": {
+    "COMMANDS.md": "12d31bb104378da0e211aa96c89161dc210c5ed90d874d0136ff55ae6b706107",
+    "CONTRACT-ADJUDICATION.md": "7c0e4790cb647b1186a179b3e3c01b1375a754ce5a1b6423c0736116a3c055a3",
+    "REVIEW.md": "883b9f408f5df5e6d3b0a25567cc6acc7448a6c03a632b5530dc380ec211250c",
+    "membership-first.log": "beee5d1bd1bb680c758f1dfec673ab4483e3b0042ce641a49a53e0c20586a2ad",
+    "adversarial-final.log": "e3d82c2b25b671b0b35181ed3f96ab1c1e03d7d75bdea9e2fdb463339bc23f27",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "spec-types-first.log": "6ec68f2382e91d881d1f0cdea96a106f2ed89d01a6a6ced2acd3c6cf16961a04",
+    "replay.log": "3f07446a0dda1a7e229ed323974fbb11d17df414ae27013c419e365d10cdc257",
+    "adversarial-first.log": "e0fa7b4156fcd8ac859bd170ffd10098f822fcc16c333e0420cf9406f5d4e564",
+    "known-input-replay.log": "c5012deefcb0d9a106c204eb5434d9b863fc6652386f2733c15182313e8987d0",
+    "membership-final.log": "951e94e73603df3c611e3e369e56a758c1ad21dda551181cce3fd5fd82a9346c",
+    "finalize-first.log": "d66e6d7b2772c3402964b564f78c21147ea0072d1561df71666571e9547a5d21",
+    "raw-traces.jsonl": "039cfd23e7b3e85bfe9c5f39853df091eb51ed376f437d03876279f9e36159a7",
+    "raw-traces-first.jsonl": "039cfd23e7b3e85bfe9c5f39853df091eb51ed376f437d03876279f9e36159a7",
+    "review-tests.patch": "eedcc1634225bc623b16af604a45630516b7a4d30ba3f4af8b2f687690ed78ae",
+    "authority/247cfec7-PROPOSAL.md": "abe39cc508e5aa4f5bdd37ded8bcba6d793c430ab76685b2c72ee4fc3e249c6f",
+    "authority/75c645eb-POLICY-DECISION.md": "073190a6d33abc4e091ad264ff9a6a4c6b73f43080d0afebe392467943bb6b7e",
+    "authority/75c645eb-AUTHORITY.md": "2eb8d7e13ba99449f0b379622ce51620058c67112176f178b0824be404834e6a"
+  }
+}

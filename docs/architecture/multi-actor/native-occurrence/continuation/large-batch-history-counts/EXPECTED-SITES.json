@@ -1,0 +1,36 @@
+{
+  "setAll-initial": [
+    "lib/entity-signal.ts:1692:55)",
+    "lib/entity-signal.ts:337:34)",
+    "lib/entity-signal.ts:338:32)",
+    "lib/experimental-publication/lifecycle.ts:154:70)",
+    "lib/internals/entity-membership-inventory.ts:183:34)",
+    "lib/internals/entity-membership-inventory.ts:184:32)",
+    "lib/physical/entity-mutation-frame.ts:226:12)",
+    "lib/physical/prepared-placement-visibility.ts:21:40)"
+  ],
+  "setAll-disjoint-replace": [
+    "lib/entity-signal.ts:1692:55)",
+    "lib/entity-signal.ts:1692:55)",
+    "lib/entity-signal.ts:337:34)",
+    "lib/entity-signal.ts:338:32)",
+    "lib/experimental-publication/lifecycle.ts:154:70)",
+    "lib/internals/entity-membership-inventory.ts:183:34)",
+    "lib/internals/entity-membership-inventory.ts:184:32)",
+    "lib/physical/entity-mutation-frame.ts:226:12)",
+    "lib/physical/prepared-placement-visibility.ts:21:40)"
+  ],
+  "setAll-empty-clear": [
+    "lib/entity-signal.ts:1692:55)",
+    "lib/entity-signal.ts:1692:55)",
+    "lib/entity-signal.ts:337:34)",
+    "lib/entity-signal.ts:338:32)",
+    "lib/experimental-publication/lifecycle.ts:154:70)",
+    "lib/internals/entity-membership-inventory.ts:183:34)",
+    "lib/internals/entity-membership-inventory.ts:184:32)",
+    "lib/physical/entity-mutation-frame.ts:226:12)"
+  ],
+  "stop": [],
+  "destroy": [],
+  "microtask-drain-12": []
+}

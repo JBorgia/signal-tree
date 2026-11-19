@@ -1,0 +1,215 @@
+--- /private/tmp/st-packet-index-admission-r1/candidate/packages/kernel/src/lib/experimental-publication/entity.ts
++++ /private/tmp/st-packet-index-admission-r1/allocation-final/optimized/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,3 +1,4 @@
++import {AllocationMap,countedArray,ownershipMark} from '../allocation-diagnostic';
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+@@ -16,14 +17,14 @@
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+ registerEntityPublicationFactory(() => {
+-  const fields=new Map<number,Map<string,NativeFieldEndpoint>>();
+-  const members=new Map<number,Member>();
+-  const placements=new Map<number,Requirement>();
+-  const views=new Map<number,Map<string,View>>();
+-  const visible=new Map<number,View>();
+-  const placementViews=new Map<number,View>();
+-  const mappings=new Map<number,Requirement>();
+-  const mappingViews=new Map<number,View>();
++  const fields=new AllocationMap<number,Map<string,NativeFieldEndpoint>>("entity.ts:19:16");
++  const members=new AllocationMap<number,Member>("entity.ts:20:17");
++  const placements=new AllocationMap<number,Requirement>("entity.ts:21:20");
++  const views=new AllocationMap<number,Map<string,View>>("entity.ts:22:15");
++  const visible=new AllocationMap<number,View>("entity.ts:23:17");
++  const placementViews=new AllocationMap<number,View>("entity.ts:24:24");
++  const mappings=new AllocationMap<number,Requirement>("entity.ts:25:18");
++  const mappingViews=new AllocationMap<number,View>("entity.ts:26:22");
+   const missing=unavailable();
+   const evidence=(ordinaryFields:Lookup<Map<string,NativeFieldEndpoint>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
+     member:(id,view)=>view==='ordinary'?ordinaryMembers.get(id)?.requirement??missing:physicalMembers.get(id)?.requirement??missing,
+@@ -47,7 +48,7 @@
+   return {
+     captureViews:physicalViews,
+     evidence:()=>({...evidence(),exclusions:()=>{
+-      const result=new Map<number,object>();
++      const result=new AllocationMap<number,object>("entity.ts:50:20");
+       for(const [id,member]of members)if(!member.present)result.set(id,member.requirement);
+       for(const [id,view]of visible)if(view.present===false)result.set(id,view.requirement);
+       return [...result];
+@@ -70,40 +71,40 @@
+       // The stepped helper builds exactly one ordered sequence.
+       const ordinaryEdits=entityPublicationOrdinary(packet);
+       const singleton=ordinaryEdits.length===1?ordinaryEdits[0]:undefined;
+-      const lastOrdinaryBySubject=singleton?undefined:new Map<number,EntityPublicationEdit>();
++      const lastOrdinaryBySubject=singleton?undefined:new AllocationMap<number,EntityPublicationEdit>("entity.ts:73:55");
+       if(lastOrdinaryBySubject)for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
+-      const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
++      const selectedFields=new AllocationMap<number,Map<string,NativeFieldEndpoint>>("entity.ts:75:28");
+       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
+-      const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
++      const proposal=(subject:number,key:string):NativeFieldEndpoint=>{ownershipMark('proposal-lookup');
+         const edit=singleton?.subject===subject?singleton:lastOrdinaryBySubject?.get(subject);
+         if(!edit)throw new Error('Missing admitted field publication');
+         return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
+       };
+       const selections:NativeFieldSelections={before:beforeField,proposed:proposal,choose(subject,key,value){
+-        let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new Map());row.set(key,value);
++        let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new AllocationMap("entity.ts:83:84"));row.set(key,value);
+       }};
+       const responsibility=packet.prepareResponsibility?.(selections);
+       const chosen=(edit:EntityPublicationEdit,key:string):NativeFieldEndpoint=>edit.restoredFields?.get(key)??selectedFields.get(edit.subject)?.get(key)??proposal(edit.subject,key);
+       const writes:TerminalRecordPlan['writes'][number][]=[];
+       const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+-      const nextFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+-      const nextViews=new Map<number,Map<string,View>>();
+-      const nextMembers=new Map<number,Member>();
+-      const nextPlacements=new Map<number,Requirement>();
++      const nextFields=new AllocationMap<number,Map<string,NativeFieldEndpoint>>("entity.ts:89:24");
++      const nextViews=new AllocationMap<number,Map<string,View>>("entity.ts:90:23");
++      const nextMembers=new AllocationMap<number,Member>("entity.ts:91:25");
++      const nextPlacements=new AllocationMap<number,Requirement>("entity.ts:92:28");
+       const removed=new Set<number>();
+-      const nextMappings=new Map<number,Requirement>(),nextMappingViews=new Map<number,View>();
+-      const physicalMembers=new Map<number,View>(),physicalPlacements=new Map<number,View>();
+-      const paired=new Map<EntityPublicationEdit,EntityPublicationEdit>();
++      const nextMappings=new AllocationMap<number,Requirement>("entity.ts:94:26"),nextMappingViews=new AllocationMap<number,View>("entity.ts:94:73");
++      const physicalMembers=new AllocationMap<number,View>("entity.ts:95:29"),physicalPlacements=new AllocationMap<number,View>("entity.ts:95:71");
++      const paired=new AllocationMap<EntityPublicationEdit,EntityPublicationEdit>("entity.ts:96:20");
+       for(const step of packet.steps??[]) for(const edit of [...step.ordinary,...(step.authoredRemoval?[step.authoredRemoval]:[])]) {
+         const physical=step.physical?.find(value=>value.subject===edit.subject);
+         if(physical)paired.set(edit,physical);
+       }
+       // Packets with no explicit steps are one point unit, never a flattened multi-step unit.
+       if(!packet.steps)for(const edit of packet.ordinary){const physical=packet.physical.find(value=>value.subject===edit.subject);if(physical)paired.set(edit,physical);}
+-      const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+-      const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+-      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+-      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
++      const physicalAt=new AllocationMap<EntityPublicationEdit,Map<string,View>>("entity.ts:103:24");
++      const selectedAt=new AllocationMap<EntityPublicationEdit,EntityPublicationEvidence>("entity.ts:104:24");
++      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new AllocationMap("entity.ts:105:126",fields.get(id)));return row;};
++      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new AllocationMap("entity.ts:106:108",views.get(id)));return row;};
+       // Physical support is distinct from ordinary eligibility. Inspection
+       // changes only the physical certificate, including negative membership.
+       for(const edit of packet.physical){
+@@ -116,7 +117,7 @@
+         const row=rowViews(edit.subject);
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+         for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
+-        physicalAt.set(edit,new Map(row));
++        physicalAt.set(edit,new AllocationMap("entity.ts:119:29",row));
+         if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+@@ -148,7 +149,7 @@
+           }else view.set(key,{requirement:fieldRequirement,present:own(physical?.after??edit.after,key)});
+           acquisitions++;
+         }
+-        const ordinaryRow=new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
++        const ordinaryRow=new AllocationMap("entity.ts:151:27",row),physicalRow=new AllocationMap("entity.ts:151:52",physical&&physicalAt.get(physical)||view);
+         for(const key of keys)physicalRow.set(key,{requirement:row.get(key)!.requirement as Requirement,present:own(physical?.after??edit.after,key)});
+         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
+         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
+@@ -171,7 +172,7 @@
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+         const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject!.keys())])]:[subject];
+-        if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
++        if(subject===undefined){const order=new AllocationMap("entity.ts:174:45",placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+         for(const id of selected){
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+           if(member?.present===false)continue;
+--- /private/tmp/st-packet-index-admission-r1/candidate/packages/kernel/src/lib/internals/entity-publication.ts
++++ /private/tmp/st-packet-index-admission-r1/allocation-final/optimized/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -1,3 +1,5 @@
++import {ownedArray,sealed,ownedShell,ownershipMark,defineMetadata} from '../allocation-diagnostic';
++import {countedArray} from '../allocation-diagnostic';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import type { WriteMetadata } from '../mutation-types';
+ import { combineTerminalRecords, installTerminalRecord, type PreparedPublicationUnit } from './intrinsic-mutation';
+@@ -26,11 +28,11 @@
+ /** Preserve authored tombstones even when source ordinary membership was absent. */
+ export function entityPublicationOrdinary(packet: EntityPublicationPacket): readonly EntityPublicationEdit[] {
+   if (!packet.steps) return packet.ordinary;
+-  return packet.steps.flatMap(step => {
++  return countedArray('ordinary-flatMap', packet.steps.flatMap(step => {
+     const removal = step.authoredRemoval;
+     return removal && !step.ordinary.some(edit => edit.subject === removal.subject && edit.structural?.kind === 'remove')
+       ? [...step.ordinary, removal] : step.ordinary;
+-  });
++  }));
+ }
+ export interface EntityPublicationPacket {
+   readonly prepareResponsibility?: (fields?:import('./native-field-selection').NativeFieldSelections)=>import('./intrinsic-mutation').TerminalRecordPlan|undefined;
+@@ -50,47 +52,48 @@
+  * contain no values, certificates or revision authority and do not retain keys.
+  */
+ class AdmissionMetadata {
++  constructor(){ownershipMark('weakset-constructor');ownershipMark('weakset-constructor');ownershipMark('weakset-constructor');}
+   private readonly edits = new WeakSet<EntityPublicationEdit>();
+   private readonly arrays = new WeakSet<readonly EntityPublicationEdit[]>();
+   private readonly packets = new WeakSet<EntityPublicationPacket>();
+   private edit(edit: EntityPublicationEdit): void {
+-    if (this.edits.has(edit)) return;
++    if ((ownershipMark('edits.has'),this.edits.has(edit))) return;
+     // Native producers supply mutable shells. Copy shared metadata before locking
+     // that same edit identity. Already frozen private shells transfer ownership
+     // of their metadata too; no public API accepts publication packets.
+-    if (!Object.isFrozen(edit)) {
+-      if (edit.fields && !Object.isFrozen(edit.fields)) Object.defineProperty(edit,'fields',{value:Object.freeze([...edit.fields]),enumerable:true});
+-      if (edit.structural) Object.defineProperty(edit,'structural',{value:Object.freeze({...edit.structural}),enumerable:true});
++    if (!(ownershipMark('isFrozen-edit'),Object.isFrozen(edit))) {
++      if (edit.fields && !(ownershipMark('isFrozen-fields'),Object.isFrozen(edit.fields))) defineMetadata(edit,'fields',{value:sealed(ownedArray('fields',[...edit.fields])),enumerable:true});
++      if (edit.structural) defineMetadata(edit,'structural',{value:sealed(ownedShell('structural',{...edit.structural})),enumerable:true});
+     } else {
+-      if (edit.fields) Object.freeze(edit.fields);
+-      if (edit.structural) Object.freeze(edit.structural);
++      if (edit.fields) sealed(edit.fields);
++      if (edit.structural) sealed(edit.structural);
+     }
+-    Object.freeze(edit);
+-    this.edits.add(edit);
++    sealed(edit);
++    (ownershipMark('edits.add'),this.edits.add(edit));
+   }
+   private array(edits: readonly EntityPublicationEdit[]): readonly EntityPublicationEdit[] {
+-    if (this.arrays.has(edits)) return edits;
++    if ((ownershipMark('arrays.has'),this.arrays.has(edits))) return edits;
+     for (const edit of edits) this.edit(edit);
+     // These arrays are private source-issued membership, never user row payloads.
+     // Transfer their ownership once instead of duplicating every admitted list.
+-    const result=Object.freeze(edits);
+-    this.arrays.add(result);
++    const result=sealed(edits);
++    (ownershipMark('arrays.add'),this.arrays.add(result));
+     return result;
+   }
+   prepare(packet:EntityPublicationPacket):EntityPublicationPacket {
+-    if(this.packets.has(packet))return packet;
+-    const steps=packet.steps?.map(step=>{
++    if((ownershipMark('packets.has'),this.packets.has(packet)))return packet;
++    const steps=packet.steps?ownedArray('steps',packet.steps.map(step=>{
+       if(step.authoredRemoval)this.edit(step.authoredRemoval);
+       const footprint=step.authoredFootprint;
+-      return Object.freeze({...step,
+-        authoredFootprint:footprint?Object.freeze(footprint.kind==='fields'?{...footprint,fields:Object.freeze([...footprint.fields])}:{...footprint}):undefined,
+-        ordinary:this.array(step.ordinary),physical:step.physical?this.array(step.physical):undefined});
+-    });
+-    const result=Object.freeze({...packet,ordinary:this.array(packet.ordinary),physical:this.array(packet.physical),
+-      steps:steps?Object.freeze(steps):undefined,
+-      ordinaryOrder:packet.ordinaryOrder?Object.freeze([...packet.ordinaryOrder]):undefined,
+-      physicalOrder:packet.physicalOrder?Object.freeze([...packet.physicalOrder]):undefined});
+-    this.packets.add(result);
++      return sealed(ownedShell('step',{...step,
++        authoredFootprint:footprint?sealed(ownedShell('footprint',footprint.kind==='fields'?{...footprint,fields:sealed(ownedArray('footprint-fields',[...footprint.fields]))}:{...footprint})):undefined,
++        ordinary:this.array(step.ordinary),physical:step.physical?this.array(step.physical):undefined}));
++    })):undefined;
++    const result=sealed(ownedShell('packet',{...packet,ordinary:this.array(packet.ordinary),physical:this.array(packet.physical),
++      steps:steps?sealed(steps):undefined,
++      ordinaryOrder:packet.ordinaryOrder?sealed(ownedArray('ordinary-order',[...packet.ordinaryOrder])):undefined,
++      physicalOrder:packet.physicalOrder?sealed(ownedArray('physical-order',[...packet.physicalOrder])):undefined}));
++    (ownershipMark('packets.add'),this.packets.add(result));
+     return result;
+   }
+ }

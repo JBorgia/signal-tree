@@ -1,0 +1,11 @@
+{
+  "reason": "active-case-deadline",
+  "cases": [
+    [
+      "synthetic-detached",
+      "deadline reaches detached descendant"
+    ]
+  ],
+  "ownedPgid": 91853,
+  "at": 1793652793.916745
+}

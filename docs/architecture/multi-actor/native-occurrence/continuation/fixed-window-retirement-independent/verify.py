@@ -1,0 +1,9 @@
+from pathlib import Path
+import hashlib,json,difflib
+p=Path('/private/tmp/st-fixed-window-retirement-independent');a=Path('/private/tmp/st-fixed-window-retirement-successor');h=lambda f:hashlib.sha256(f.read_bytes()).hexdigest();m=json.loads((a/'SOURCE-SHA256.json').read_text());assert all(h(a/'candidate'/k)==v for k,v in m.items());freeze=json.loads((a/'FREEZE.json').read_text());assert all(h(a/k)==v for k,v in freeze['sha256'].items())
+redirect='packages/kernel/src/lib/fixed-window-retirement.spec.ts';assert all(h(p/'candidate'/k)==v for k,v in m.items()if k!=redirect)
+assert (p/'candidate'/redirect).read_text()==(a/'candidate'/redirect).read_text().replace('/private/tmp/st-fixed-window-retirement-successor/provenance-',str(p)+'/provenance-')
+new='packages/kernel/src/lib/fixed-window-independent.spec.ts';(p/'review-tests.patch').write_text(''.join(difflib.unified_diff([],(p/'candidate'/new).read_text().splitlines(True),fromfile='/dev/null',tofile='b/'+new)))
+(p/'output-redirect.patch').write_text(''.join(difflib.unified_diff((a/'candidate'/redirect).read_text().splitlines(True),(p/'candidate'/redirect).read_text().splitlines(True),fromfile='a/'+redirect,tofile='b/'+redirect)))
+files=['REVIEW.md','JOINT-INTERFACE.md','COMMANDS.md','original-replay.log','independent-first.log','independent-final.log','independent-complete.log','source-types.log','spec-types-final.log','review-tests.patch','output-redirect.patch','first-seven.spec.ts']
+(p/'VERIFICATION.json').write_text(json.dumps({'authorManifestFilesVerified':len(m),'allAuthorFreezeFilesUnchanged':True,'allRuntimeIdentical':True,'onlyInheritedTestChange':'diagnostic output path; assertions unchanged','newTestSHA256':h(p/'candidate'/new),'artifacts':{k:h(p/k)for k in files}},indent=2)+'\n');print(len(m),'files verified; author freeze unchanged')

@@ -1,0 +1,56 @@
+[
+  {
+    "pgid": 85679,
+    "witnesses": [
+      {
+        "pid": 85679,
+        "ppid": 85665,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:41:15 2026",
+        "raw": "85679 85665 85679 Ss     0.0  43136 Mon Nov  2 15:41:15 2026     node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx exec -- pnpm exec vitest run --config /private/tmp/st-c24-equal-owner-retention-independent/vitest.config.mjs --maxWorkers=1"
+      },
+      {
+        "pid": 85688,
+        "ppid": 85679,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:41:16 2026",
+        "raw": "85688 85679 85679 S      0.0  78848 Mon Nov  2 15:41:16 2026     node ./node_modules/.bin/../nx/dist/bin/nx.js exec -- pnpm exec vitest run --config /private/tmp/st-c24-equal-owner-retention-independent/vitest.config.mjs --maxWorkers=1"
+      },
+      {
+        "pid": 85821,
+        "ppid": 85688,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:41:28 2026",
+        "raw": "85821 85688 85679 S      0.0  10576 Mon Nov  2 15:41:28 2026     /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+      },
+      {
+        "pid": 86273,
+        "ppid": 85688,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:42:12 2026",
+        "raw": "86273 85688 85679 S      0.0 121184 Mon Nov  2 15:42:12 2026     node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config /private/tmp/st-c24-equal-owner-retention-independent/vitest.config.mjs --maxWorkers=1"
+      },
+      {
+        "pid": 86282,
+        "ppid": 86273,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:42:12 2026",
+        "raw": "86282 86273 85679 S      0.6  98528 Mon Nov  2 15:42:12 2026     node ./node_modules/.bin/../vitest/vitest.mjs run --config /private/tmp/st-c24-equal-owner-retention-independent/vitest.config.mjs --maxWorkers=1"
+      },
+      {
+        "pid": 86289,
+        "ppid": 86282,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:42:13 2026",
+        "raw": "86289 86282 85679 S      0.0  18704 Mon Nov  2 15:42:13 2026     /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+      },
+      {
+        "pid": 86290,
+        "ppid": 86282,
+        "pgid": 85679,
+        "birth": "Mon Nov 2 15:42:13 2026",
+        "raw": "86290 86282 85679 S     26.3  96640 Mon Nov  2 15:42:13 2026     /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+      }
+    ]
+  }
+]

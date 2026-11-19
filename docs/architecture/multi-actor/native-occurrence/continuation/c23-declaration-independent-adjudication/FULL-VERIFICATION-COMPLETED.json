@@ -1,0 +1,10 @@
+{
+  "manifest": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "files": 3067,
+  "changed": [],
+  "fixtures": {
+    "packages/react/src/branch-declaration-qualification.spec.tsx": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "packages/kernel/src/lib/direct-row-declaration-qualification.spec.ts": "b8c6ec372e915a1b1fbec181dcffb072e6c02607274d499177045e834ba1c841"
+  },
+  "authorConfirmedFrozen": true
+}

@@ -1,0 +1,13 @@
+{
+  "command": [
+    "git",
+    "apply",
+    "--reverse",
+    "--check",
+    "/private/tmp/st-c11-packet-pair-index-review/FROM-C11.patch"
+  ],
+  "cwd": "/private/tmp/st-c11-packet-pair-index-review/candidate",
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

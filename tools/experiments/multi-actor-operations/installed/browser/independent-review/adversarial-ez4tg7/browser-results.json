@@ -1,0 +1,47 @@
+{
+  "results": [
+    {
+      "name": "lost rejection acknowledgment retries to definitive failure without a commit",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same-turn double apply sends one command",
+      "outcome": "PASS"
+    },
+    {
+      "name": "overlapping capacity service and apply preserve definitive rejection",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Angular destruction of draft cleans owned tree",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Angular destruction after lost acknowledgment must not orphan owned tree",
+      "outcome": "FAIL",
+      "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 1\nReceived: 0",
+      "errors": [],
+      "snapshot": {
+        "phase": "uncertain",
+        "destroyed": 0,
+        "pending": "1",
+        "busy": false,
+        "message": "Resolve in-flight or uncertain work before disposal"
+      }
+    },
+    {
+      "name": "Angular destruction during delivery must not leave live tree after completion",
+      "outcome": "FAIL",
+      "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 1\nReceived: 0",
+      "errors": [],
+      "snapshot": {
+        "phase": "succeeded",
+        "destroyed": 0,
+        "pending": "",
+        "busy": false,
+        "message": "Backend applied receipt received; native transaction confirmed"
+      }
+    }
+  ],
+  "errors": []
+}

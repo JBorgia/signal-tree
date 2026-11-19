@@ -1,0 +1,36 @@
+import { expect, it } from 'vitest';
+import { entityMap, signalTree, transactions } from '../index';
+import { registerMembershipPublication } from './internals/intrinsic-mutation';
+import { snapshotMarkerNode } from './internals/materialize-markers';
+
+it('independent nested omission keeps identity then real re-add advances held snapshots', () => {
+  type Row = { id: string; n: number };
+  const t = signalTree({ outer: { inner: { rows: entityMap<Row,string>() }, keep: 0 }, other: 0 }, {enhancers:[transactions()]});
+  const rows=t.$.outer.inner.rows, all=rows.all;
+  let off=()=>{};
+  try {
+    rows.addOne({id:'old',n:1});
+    t.$.outer({keep:0} as never);
+    t.$({other:0} as never);
+    const empty=all(), wrapper=snapshotMarkerNode(rows);
+    expect(empty).toEqual([]);expect(wrapper?.value).toEqual({all:[]});
+    let completions=0;
+    off=registerMembershipPublication(e=>e.branch===t.$ && e.key==='outer' && e.present ? {record:{writes:[],adds:[]},completion:{}}:undefined,()=>{
+      completions++;
+      expect(t.$()).toEqual({outer:{keep:2},other:0});
+      expect(all()).toBe(empty);expect(snapshotMarkerNode(rows)).toBe(wrapper);
+    });
+    t.$.outer.keep(2);off();expect(completions).toBe(1);
+    expect(all()).toBe(empty);expect(snapshotMarkerNode(rows)).toBe(wrapper);
+    t.$.outer.keep(2);
+    expect(all()).toBe(empty);expect(snapshotMarkerNode(rows)).toBe(wrapper);
+    rows.addOne({id:'fresh',n:9});
+    expect(all()).toEqual([{id:'fresh',n:9}]);
+    expect(t.$()).toEqual({outer:{inner:{rows:{all:[{id:'fresh',n:9}]}}},other:0});
+    expect(snapshotMarkerNode(rows)).not.toBe(wrapper);
+    const stable=snapshotMarkerNode(rows);t.$.other(3);
+    expect(snapshotMarkerNode(rows)).toBe(stable);
+    rows.updateOne('fresh',{n:10});
+    expect(t.$().outer.inner.rows.all).toEqual([{id:'fresh',n:10}]);
+  }finally{off();t.destroy();}
+});

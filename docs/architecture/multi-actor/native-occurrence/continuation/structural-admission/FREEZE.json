@@ -1,0 +1,8 @@
+{
+  "sourceManifestSha256": "c5bc23c33106f0ba39223c9ac27665732dad087bf65f1342159c9c5093b77221",
+  "changedRuntimeFiles": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts"
+  ],
+  "reason": "First runtime 12 pass / 2 fail. No runtime edits after this boundary; inherited physical key-handoff and ordinary-removal support-identity oracle require disposition."
+}

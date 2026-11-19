@@ -1,0 +1,17 @@
+{
+  "calls": 1,
+  "insideNative": {},
+  "insideDirect": {
+    "a": {
+      "n": 1
+    }
+  },
+  "insideRuns": 1,
+  "initialRuns": 1,
+  "after": {
+    "a": {
+      "n": 1
+    }
+  },
+  "runs": 2
+}

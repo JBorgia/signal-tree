@@ -1,0 +1,1 @@
+Candidate declaration invocation initially reused run name declarations-first already created by baseline; Python runner raised FileExistsError before launching compiler. Baseline continued unaffected. Retry uses distinct candidate-declarations-first. No source/runtime failure.

@@ -1,0 +1,77 @@
+
+> nx run kernel:test membership-reversal-delivery.spec.ts --testNamePattern=left clear \+ right clear --maxWorkers=1
+
+> node tools/run-core-vitest.mjs membership-reversal-delivery.spec.ts --testNamePattern="left clear \+ right clear" --maxWorkers=1
+
+(node:65560) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65567) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-r3-independent/candidate/packages/kernel
+
+(node:65574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts (216 tests | 2 failed | 214 skipped) 39ms
+     × left clear + right clear 31ms
+     × left clear + right clear 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (transactions, restoration) > left clear + right clear
+ FAIL  src/enhancers/restoration/membership-reversal-delivery.spec.ts > membership delivery during reversals (restoration, transactions) > left clear + right clear
+AssertionError: expected [ …(10) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "seq2 remove 1 does not match",
++   "seq2 remove 2 does not match",
++   "seq2 remove 3 does not match",
++   "seq4 remove 1 does not match",
++   "seq4 remove 2 does not match",
++   "seq12 remove 1 does not match",
++   "seq12 remove 2 does not match",
++   "seq12 remove 3 does not match",
++   "seq14 remove 1 does not match",
++   "seq14 remove 2 does not match",
++ ]
+
+ ❯ src/enhancers/restoration/membership-reversal-delivery.spec.ts:223:54
+    221|             replica.compare(reader.snapshot(), 'transaction');
+    222|             run('rollback', () => pending.rollback(), seeded);
+    223|             expect([...problems, ...replica.issues]).toEqual([]);
+       |                                                      ^
+    224|           } finally {
+    225|             error.mockRestore();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 214 skipped (216)
+   Start at  21:29:16
+   Duration  744ms (transform 407ms, setup 0ms, import 486ms, tests 39ms, environment 146ms)
+
+Warning: command "node tools/run-core-vitest.mjs membership-reversal-delivery.spec.ts --testNamePattern="left clear \+ right clear" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

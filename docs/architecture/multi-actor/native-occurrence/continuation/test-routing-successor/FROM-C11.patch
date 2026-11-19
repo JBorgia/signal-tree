@@ -1,0 +1,451 @@
+--- a/packages/kernel/project.json
++++ b/packages/kernel/project.json
+@@ -51,6 +51,14 @@
+     },
+     "lint": {
+       "executor": "@nx/eslint:lint"
++    },
++    "diagnostic-replay": {
++      "executor": "nx:run-commands",
++      "cache": false,
++      "options": {
++        "command": "node tools/experiments/native-publication-diagnostics/run.mjs",
++        "forwardAllArgs": false
++      }
+     }
+   }
+ }
+--- a/packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts
++++ /dev/null
+@@ -1,34 +0,0 @@
+-import {appendFileSync} from 'node:fs';
+-import {expect,it} from 'vitest';
+-import {entityMap,link,signalTree,transactions} from '../index';
+-import {getPathNotifier} from './path-notifier';
+-import {getMutationCaptureRuntime} from './internals/mutation-capture-runtime';
+-import {getEntityPublicationBinding} from './internals/entity-publication';
+-import * as life from './experimental-publication/lifecycle';
+-type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):{read():unknown}};
+-const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+-const clone=(v:unknown):unknown=>v===undefined?null:JSON.parse(JSON.stringify(v));
+-for(const observe of [false,true])for(const route of ['collection','root'] as const)for(const mode of ['independent-equal','r-equal','r-independent-equal','r-changed'] as const)it(`${mode}/${route}/observe=${observe}`,async()=>{
+- const tree=signalTree({branch:{rows:entityMap<{id:string;x:number},string>()},other:0},{enhancers:[transactions()]});const rows=tree.$.branch.rows;
+- rows.addOne({id:'a',x:0});await flush();const row=rows.byIdOrFail('a');
+- const source=getEntityPublicationBinding(rows)!.source;const subject=getEntityPublicationBinding(row)!.subject!;
+- const sent:unknown[]=[];const c=(route==='collection'?link(rows,{set:v=>{sent.push(v);}}):link<() => ReturnType<typeof tree.$>>(tree.$,{set:v=>{sent.push(v);}})) as Experimental;
+- const runtime=getMutationCaptureRuntime(tree)!;const original=runtime.prepareEntityResponsibility;let phase='q';
+- const captures:unknown[]=[];const packets:unknown[]=[];
+- if(observe)runtime.prepareEntityResponsibility=capture=>{const plan=original?.(capture);captures.push({phase,changes:clone(capture.changes),participation:capture.meta?.participation,origin:capture.meta?.origin,plan:plan?{writes:plan.writes.length,adds:plan.adds.length}:null});return plan;};
+- const off=observe?source.subscribe({prepare(packet){packets.push({phase,physical:clone(packet.physical),ordinary:clone(packet.ordinary),steps:clone(packet.steps),participation:packet.meta?.participation,origin:packet.meta?.origin});return undefined;},complete(){}}):()=>{};
+- const names=new Map<life.OwnerCell,string>();const requirements=new WeakMap<object,number>();let reqSerial=0;
+- const proof=(view:'physical'|'ordinary')=>{const ref=source.evidence()!.field(subject,'x',view) as life.NativeRequirement;let id=requirements.get(ref);if(!id)requirements.set(ref,id=++reqSerial);const p=life.nativeProof(ref);return {requirement:id,ready:life.nativeRequirementReady(ref),unknown:p.unknown,invalid:p.invalid,terminalRejectedRoles:p.terminalRejectedRoles??0,historicalWindow:p.historicalWindow??false,unavailableInput:p.unavailableInput??false,...Object.fromEntries((['owners','destination','input','validation','possible'] as const).map(role=>[role,(p[role]??[]).map(cell=>({name:names.get(cell)??'other',outcome:cell.outcome}))]))};};
+- const existing=new Set(life.pendingOwners());const q=tree.transact(()=>rows.updateOne('a',{x:7}));for(const cell of life.pendingOwners())if(!existing.has(cell))names.set(cell,'q');
+- let r:typeof q|undefined;let qRejected=false,rRejected=false;let receipt:ReturnType<Experimental['declare']>|undefined;const stages:unknown[]=[];
+- const snapshot=(error?:unknown)=>{stages.push({phase,value:row.x(),q:clone(q.inspect()),r:r?clone(r.inspect()):null,proof:{ordinary:proof('ordinary'),physical:proof('physical')},receipt:receipt?clone(receipt.read()):null,sent:clone(sent),error:error instanceof Error?{name:error.name,message:error.message}:error??null});};
+- try{
+-  await flush();expect(row.x()).toBe(7);expect(sent).toEqual([]);snapshot();phase='write';
+-  if(mode==='independent-equal')receipt=c.declare({kind:'independent'},()=>rows.updateOne('a',{x:7}));
+-  else{const old=new Set(life.pendingOwners());r=tree.transact(()=>{if(mode==='r-independent-equal')receipt=c.declare({kind:'independent'},()=>rows.updateOne('a',{x:7}));else rows.updateOne('a',{x:mode==='r-changed'?11:7});});for(const cell of life.pendingOwners())if(!old.has(cell))names.set(cell,'r');}
+-  await flush();snapshot();
+-  if(r){phase='reject-r';let error:unknown;try{r.rollback();rRejected=true;}catch(e){error=e;}await flush();snapshot(error);}
+-  phase='reject-q';let error:unknown;try{q.rollback();qRejected=true;}catch(e){error=e;}await flush();snapshot(error);
+-  appendFileSync(process.env['ST_OBSERVATIONS']!,JSON.stringify({mode,route,observe,stages,captures,packets})+'\n');
+- }finally{runtime.prepareEntityResponsibility=original;off();if(r&&!rRejected)r.confirm();if(!qRejected)q.confirm();c.dispose();tree.destroy();}
+-});
+--- a/packages/kernel/src/lib/native-netzero-diagnostic.spec.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-import {appendFileSync} from 'node:fs';
+-import {expect,it} from 'vitest';
+-import {entityMap,link,signalTree,transactions} from '../index';
+-import {getPathNotifier} from './path-notifier';
+-import {getMutationCaptureRuntime} from './internals/mutation-capture-runtime';
+-import {getEntityPublicationBinding} from './internals/entity-publication';
+-import * as life from './experimental-publication/lifecycle';
+-type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):{read():unknown}};
+-const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+-const clone=(v:unknown):unknown=>v===undefined?null:JSON.parse(JSON.stringify(v));
+-for(const observe of [false,true])for(const route of ['collection','root'] as const)for(const mode of ['netzero','changed-twice','later-confirmed'] as const)it(`${mode}/${route}/observe=${observe}`,async()=>{
+- const tree=signalTree({branch:{rows:entityMap<{id:string;x:number},string>()},other:0},{enhancers:[transactions()]});const rows=tree.$.branch.rows;
+- rows.addOne({id:'a',x:0});await flush();const row=rows.byIdOrFail('a');
+- const source=getEntityPublicationBinding(rows)!.source;const subject=getEntityPublicationBinding(row)!.subject!;
+- const sent:unknown[]=[];const c=(route==='collection'?link(rows,{set:v=>{sent.push(v);}}):link<() => ReturnType<typeof tree.$>>(tree.$,{set:v=>{sent.push(v);}})) as Experimental;
+- const runtime=getMutationCaptureRuntime(tree)!;const original=runtime.prepareEntityResponsibility;let phase='q';
+- const captures:unknown[]=[];const packets:unknown[]=[];
+- if(observe)runtime.prepareEntityResponsibility=capture=>{const plan=original?.(capture);captures.push({phase,changes:clone(capture.changes),participation:capture.meta?.participation,origin:capture.meta?.origin,plan:plan?{writes:plan.writes.length,adds:plan.adds.length}:null});return plan;};
+- const off=observe?source.subscribe({prepare(packet){packets.push({phase,physical:clone(packet.physical),ordinary:clone(packet.ordinary),steps:clone(packet.steps),participation:packet.meta?.participation,origin:packet.meta?.origin});return undefined;},complete(){}}):()=>{};
+- const names=new Map<life.OwnerCell,string>();const requirements=new WeakMap<object,number>();let reqSerial=0;
+- const proof=(view:'physical'|'ordinary')=>{const ref=source.evidence()!.field(subject,'x',view) as life.NativeRequirement;let id=requirements.get(ref);if(!id)requirements.set(ref,id=++reqSerial);const p=life.nativeProof(ref);return {requirement:id,ready:life.nativeRequirementReady(ref),unknown:p.unknown,invalid:p.invalid,terminalRejectedRoles:p.terminalRejectedRoles??0,historicalWindow:p.historicalWindow??false,unavailableInput:p.unavailableInput??false,...Object.fromEntries((['owners','destination','input','validation','possible'] as const).map(role=>[role,(p[role]??[]).map(cell=>({name:names.get(cell)??'other',outcome:cell.outcome}))]))};};
+- const existing=new Set(life.pendingOwners());const q=tree.transact(()=>rows.updateOne('a',{x:7}));for(const cell of life.pendingOwners())if(!existing.has(cell))names.set(cell,'q');
+- let r:typeof q|undefined;let qRejected=false,rRejected=false;let receipt:ReturnType<Experimental['declare']>|undefined;const stages:unknown[]=[];
+- const snapshot=(error?:unknown)=>{stages.push({phase,value:row.x(),q:clone(q.inspect()),r:r?clone(r.inspect()):null,proof:{ordinary:proof('ordinary'),physical:proof('physical')},receipt:receipt?clone(receipt.read()):null,sent:clone(sent),error:error instanceof Error?{name:error.name,message:error.message}:error??null});};
+- try{
+-  await flush();expect(row.x()).toBe(7);expect(sent).toEqual([]);snapshot();phase='write';
+-  const old=new Set(life.pendingOwners());
+-  r=tree.transact(()=>{rows.updateOne('a',{x:11});rows.updateOne('a',{x:mode==='netzero'?7:13});});
+-  for(const cell of life.pendingOwners())if(!old.has(cell))names.set(cell,'r');
+-  await flush();snapshot();
+-  if(mode==='later-confirmed'){phase='confirm-s';const oldS=new Set(life.pendingOwners());const newer=tree.transact(()=>rows.updateOne('a',{x:19}));for(const cell of life.pendingOwners())if(!oldS.has(cell))names.set(cell,'s');newer.confirm();await flush();snapshot();}
+-  if(r){phase='reject-r';let error:unknown;try{r.rollback();rRejected=true;}catch(e){error=e;}await flush();snapshot(error);}
+-  phase='reject-q';let error:unknown;try{q.rollback();qRejected=true;}catch(e){error=e;}await flush();snapshot(error);
+-  appendFileSync(process.env['ST_OBSERVATIONS']!,JSON.stringify({mode,route,observe,stages,captures,packets})+'\n');
+- }finally{runtime.prepareEntityResponsibility=original;off();if(r&&!rRejected)r.confirm();if(!qRejected)q.confirm();c.dispose();tree.destroy();}
+-});
+--- a/packages/kernel/vitest.config.ts
++++ b/packages/kernel/vitest.config.ts
+@@ -64,6 +64,7 @@
+       '**/diag-journal-1-eviction.spec.ts',
+       '**/link-lifetime.spec.ts',
+       '**/location-runtime-retention.spec.ts',
++      '**/forwarding-retention-probe.spec.ts',
+     ],
+     coverage: {
+       provider: 'v8',
+--- a/packages/kernel/vitest.retention.config.ts
++++ b/packages/kernel/vitest.retention.config.ts
+@@ -17,6 +17,7 @@
+       'src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts',
+       'src/lib/link-lifetime.spec.ts',
+       'src/lib/internals/location-runtime-retention.spec.ts',
++      'src/lib/forwarding-retention-probe.spec.ts',
+     ],
+   },
+   define: { __DEV__: true },
+--- /dev/null
++++ b/tools/check-forwarding-retention.mjs
+@@ -0,0 +1,57 @@
++#!/usr/bin/env node
++import { createHash } from 'node:crypto';
++import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
++import { join, relative } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { spawnSync } from 'node:child_process';
++
++const ROOT = fileURLToPath(new URL('../', import.meta.url));
++if (process.argv.length !== 2) throw new Error('The forwarding retention gate requires all nine modes; no filters are accepted.');
++const base = join(ROOT, 'artifacts/forwarding-retention');
++mkdirSync(base, { recursive: true });
++const output = mkdtempSync(join(base, 'run-'));
++const save = (name, value) => writeFileSync(join(output, name), JSON.stringify(value, null, 2) + '\n');
++const sourceHashes = {};
++function hashFile(file) {
++  sourceHashes[relative(ROOT, file)] = createHash('sha256').update(readFileSync(file)).digest('hex');
++}
++function hashRuntime(dir) {
++  for (const entry of readdirSync(dir, { withFileTypes: true })) {
++    const file = join(dir, entry.name);
++    if (entry.isDirectory()) hashRuntime(file);
++    else if (entry.name.endsWith('.ts') && !/\.(spec|test)\.ts$/.test(entry.name)) hashFile(file);
++  }
++}
++hashRuntime(join(ROOT, 'packages/kernel/src'));
++for (const name of ['tools/check-forwarding-retention.mjs', 'tools/lib/heap-quiescence.mjs', 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts', 'packages/kernel/vitest.retention.config.ts', '.nvmrc', 'package.json', 'pnpm-lock.yaml']) hashFile(join(ROOT, name));
++save('SOURCE.json', sourceHashes);
++console.log(`Forwarding retention artifacts: ${output}`);
++const results = [];
++for (const arm of ['hold-proceed', 'drop-proceed', 'hold-value']) {
++  for (const scenario of ['success', 'skip', 'caught']) {
++    const name = `${arm}-${scenario}`;
++    const artifact = join(output, `${name}.json`);
++    const env = { NODE_OPTIONS: '--expose-gc', ST_GC_ARM: arm, ST_GC_SCENARIO: scenario, ST_GC_OUTPUT: artifact };
++    const argv = [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', '--root', 'packages/kernel', '--config', 'vitest.retention.config.ts', 'src/lib/forwarding-retention-probe.spec.ts', '--maxWorkers=1'];
++    save(`${name}-COMMAND.json`, { executable: process.execPath, argv, cwd: ROOT, node: process.version, env });
++    const run = spawnSync(process.execPath, argv, { cwd: ROOT, env: { ...process.env, ...env }, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
++    const raw = `${run.stdout ?? ''}${run.stderr ?? ''}`;
++    writeFileSync(join(output, `${name}.log`), raw);
++    const errors = [];
++    if (run.error || run.signal || run.status !== 0) errors.push(run.error?.message ?? `child exit=${run.status} signal=${run.signal}`);
++    try {
++      const sample = JSON.parse(readFileSync(artifact, 'utf8'));
++      if (sample.arm !== arm || sample.scenario !== scenario || sample.node !== process.version ||
++          !Array.isArray(sample.held) || sample.held.length !== 12 ||
++          !Array.isArray(sample.released) || sample.released.length !== 12)
++        errors.push('Missing, mismatched or incomplete original sampling artifact');
++    } catch (error) { errors.push(`Sampling output: ${error.message}`); }
++    results.push({ arm, scenario, exit: errors.length ? 1 : 0, errors, artifact, log: join(output, `${name}.log`) });
++    console.log(`${name}: ${errors.length ? 'FAIL' : 'PASS'}`);
++    if (errors.length) process.stdout.write(raw);
++  }
++}
++const failed = results.length !== 9 || results.some(result => result.exit !== 0);
++save('RESULT.json', { exit: failed ? 1 : 0, requiredModes: 9, executedModes: results.length, results, scope: 'Original nine-mode forwarding collectibility fixtures, not universal reclamation or heap cost.' });
++console.log(`Forwarding retention: ${results.filter(result => !result.exit).length}/9 passed`);
++process.exitCode = failed ? 1 : 0;
+--- /dev/null
++++ b/tools/experiments/native-publication-diagnostics/README.md
+@@ -0,0 +1,44 @@
++# Native publication paired-recording archive
++
++These two diagnostic harnesses were moved from kernel ordinary discovery after
++C11 replay produced 28 unique observations with an explicit ST_OBSERVATIONS sink.
++They assert initial conditions and record later values, proofs, packets and
++caught errors. A successful replay is not a verdict on those later outcomes.
++Both observe=false and observe=true arms remain executable; no assertion changed.
++
++Run with the repository's pinned Node and pnpm:
++
++```sh
++pnpm nx run kernel:diagnostic-replay --skip-nx-cache
++```
++
++The uncached runner prints a fresh directory under
++`artifacts/native-publication-diagnostics/`, supplies the required JSONL sink,
++and records commands, source hashes, raw output and completeness status.
++It requires exactly seven modes × two routes × two observation settings.
++The explicit config selects only the two `.replay.ts` files; both remain in
++`tsconfig.typecheck-specs.json`. No ordinary regression assertion is skipped.
++
++Provenance: frozen C11 manifest SHA-256
++`dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148`.
++Original paths were `packages/kernel/src/lib/native-netzero-diagnostic.spec.ts`
++and `packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts`.
++The interrupted C10 full-run inventory reported 12 and 16 failures respectively
++without the required recording sink. Those first files/logs are preserved in
++`/private/tmp/st-test-routing-successor/preserved/`; the original inventory is
++`/private/tmp/st-native-combined-c10-promoted/runs/kernel-full/REPORTED-FAILURE-GROUPS.json`.
++C11 recording evidence is in
++`/private/tmp/st-native-combined-c11/runs/native-diagnostic-harness/` (including
++EXTRA-ENV.json; COMMAND.json alone omits the external sink setting).
++These references identify this migration's evidence, not portable replay inputs.
++
++Original source hashes:
++
++- `native-equal-inverse-diagnostic.spec.ts`: `3774b2e3bcb983b3b7f85d8280c3907b8fbeb732b8aab9a8cec7b1ec1b157ae9`
++- `native-netzero-diagnostic.spec.ts`: `243e224b7fbf95deaeaf9d42c721c78f0d94449da1ef3c877c7ef2a370138c63`
++
++The forwarding GC probe remains an unchanged asserting spec, routed separately:
++`node tools/verify-gates.mjs --only=forwarding-retention-gc` runs all nine original
++modes; `retention-gc` retains its original three files. Neither route changes GC
++sampling or performance budgets. The remaining interrupted-run failure groups
++are not cleared by this routing change.
+--- /dev/null
++++ b/tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts
+@@ -0,0 +1,34 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {entityMap,link,signalTree,transactions} from '../../../packages/kernel/src/index';
++import {getPathNotifier} from '../../../packages/kernel/src/lib/path-notifier';
++import {getMutationCaptureRuntime} from '../../../packages/kernel/src/lib/internals/mutation-capture-runtime';
++import {getEntityPublicationBinding} from '../../../packages/kernel/src/lib/internals/entity-publication';
++import * as life from '../../../packages/kernel/src/lib/experimental-publication/lifecycle';
++type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):{read():unknown}};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++const clone=(v:unknown):unknown=>v===undefined?null:JSON.parse(JSON.stringify(v));
++for(const observe of [false,true])for(const route of ['collection','root'] as const)for(const mode of ['independent-equal','r-equal','r-independent-equal','r-changed'] as const)it(`${mode}/${route}/observe=${observe}`,async()=>{
++ const tree=signalTree({branch:{rows:entityMap<{id:string;x:number},string>()},other:0},{enhancers:[transactions()]});const rows=tree.$.branch.rows;
++ rows.addOne({id:'a',x:0});await flush();const row=rows.byIdOrFail('a');
++ const source=getEntityPublicationBinding(rows)!.source;const subject=getEntityPublicationBinding(row)!.subject!;
++ const sent:unknown[]=[];const c=(route==='collection'?link(rows,{set:v=>{sent.push(v);}}):link<() => ReturnType<typeof tree.$>>(tree.$,{set:v=>{sent.push(v);}})) as Experimental;
++ const runtime=getMutationCaptureRuntime(tree)!;const original=runtime.prepareEntityResponsibility;let phase='q';
++ const captures:unknown[]=[];const packets:unknown[]=[];
++ if(observe)runtime.prepareEntityResponsibility=capture=>{const plan=original?.(capture);captures.push({phase,changes:clone(capture.changes),participation:capture.meta?.participation,origin:capture.meta?.origin,plan:plan?{writes:plan.writes.length,adds:plan.adds.length}:null});return plan;};
++ const off=observe?source.subscribe({prepare(packet){packets.push({phase,physical:clone(packet.physical),ordinary:clone(packet.ordinary),steps:clone(packet.steps),participation:packet.meta?.participation,origin:packet.meta?.origin});return undefined;},complete(){}}):()=>{};
++ const names=new Map<life.OwnerCell,string>();const requirements=new WeakMap<object,number>();let reqSerial=0;
++ const proof=(view:'physical'|'ordinary')=>{const ref=source.evidence()!.field(subject,'x',view) as life.NativeRequirement;let id=requirements.get(ref);if(!id)requirements.set(ref,id=++reqSerial);const p=life.nativeProof(ref);return {requirement:id,ready:life.nativeRequirementReady(ref),unknown:p.unknown,invalid:p.invalid,terminalRejectedRoles:p.terminalRejectedRoles??0,historicalWindow:p.historicalWindow??false,unavailableInput:p.unavailableInput??false,...Object.fromEntries((['owners','destination','input','validation','possible'] as const).map(role=>[role,(p[role]??[]).map(cell=>({name:names.get(cell)??'other',outcome:cell.outcome}))]))};};
++ const existing=new Set(life.pendingOwners());const q=tree.transact(()=>rows.updateOne('a',{x:7}));for(const cell of life.pendingOwners())if(!existing.has(cell))names.set(cell,'q');
++ let r:typeof q|undefined;let qRejected=false,rRejected=false;let receipt:ReturnType<Experimental['declare']>|undefined;const stages:unknown[]=[];
++ const snapshot=(error?:unknown)=>{stages.push({phase,value:row.x(),q:clone(q.inspect()),r:r?clone(r.inspect()):null,proof:{ordinary:proof('ordinary'),physical:proof('physical')},receipt:receipt?clone(receipt.read()):null,sent:clone(sent),error:error instanceof Error?{name:error.name,message:error.message}:error??null});};
++ try{
++  await flush();expect(row.x()).toBe(7);expect(sent).toEqual([]);snapshot();phase='write';
++  if(mode==='independent-equal')receipt=c.declare({kind:'independent'},()=>rows.updateOne('a',{x:7}));
++  else{const old=new Set(life.pendingOwners());r=tree.transact(()=>{if(mode==='r-independent-equal')receipt=c.declare({kind:'independent'},()=>rows.updateOne('a',{x:7}));else rows.updateOne('a',{x:mode==='r-changed'?11:7});});for(const cell of life.pendingOwners())if(!old.has(cell))names.set(cell,'r');}
++  await flush();snapshot();
++  if(r){phase='reject-r';let error:unknown;try{r.rollback();rRejected=true;}catch(e){error=e;}await flush();snapshot(error);}
++  phase='reject-q';let error:unknown;try{q.rollback();qRejected=true;}catch(e){error=e;}await flush();snapshot(error);
++  appendFileSync(process.env['ST_OBSERVATIONS']!,JSON.stringify({mode,route,observe,stages,captures,packets})+'\n');
++ }finally{runtime.prepareEntityResponsibility=original;off();if(r&&!rRejected)r.confirm();if(!qRejected)q.confirm();c.dispose();tree.destroy();}
++});
+--- /dev/null
++++ b/tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts
+@@ -0,0 +1,36 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {entityMap,link,signalTree,transactions} from '../../../packages/kernel/src/index';
++import {getPathNotifier} from '../../../packages/kernel/src/lib/path-notifier';
++import {getMutationCaptureRuntime} from '../../../packages/kernel/src/lib/internals/mutation-capture-runtime';
++import {getEntityPublicationBinding} from '../../../packages/kernel/src/lib/internals/entity-publication';
++import * as life from '../../../packages/kernel/src/lib/experimental-publication/lifecycle';
++type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):{read():unknown}};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++const clone=(v:unknown):unknown=>v===undefined?null:JSON.parse(JSON.stringify(v));
++for(const observe of [false,true])for(const route of ['collection','root'] as const)for(const mode of ['netzero','changed-twice','later-confirmed'] as const)it(`${mode}/${route}/observe=${observe}`,async()=>{
++ const tree=signalTree({branch:{rows:entityMap<{id:string;x:number},string>()},other:0},{enhancers:[transactions()]});const rows=tree.$.branch.rows;
++ rows.addOne({id:'a',x:0});await flush();const row=rows.byIdOrFail('a');
++ const source=getEntityPublicationBinding(rows)!.source;const subject=getEntityPublicationBinding(row)!.subject!;
++ const sent:unknown[]=[];const c=(route==='collection'?link(rows,{set:v=>{sent.push(v);}}):link<() => ReturnType<typeof tree.$>>(tree.$,{set:v=>{sent.push(v);}})) as Experimental;
++ const runtime=getMutationCaptureRuntime(tree)!;const original=runtime.prepareEntityResponsibility;let phase='q';
++ const captures:unknown[]=[];const packets:unknown[]=[];
++ if(observe)runtime.prepareEntityResponsibility=capture=>{const plan=original?.(capture);captures.push({phase,changes:clone(capture.changes),participation:capture.meta?.participation,origin:capture.meta?.origin,plan:plan?{writes:plan.writes.length,adds:plan.adds.length}:null});return plan;};
++ const off=observe?source.subscribe({prepare(packet){packets.push({phase,physical:clone(packet.physical),ordinary:clone(packet.ordinary),steps:clone(packet.steps),participation:packet.meta?.participation,origin:packet.meta?.origin});return undefined;},complete(){}}):()=>{};
++ const names=new Map<life.OwnerCell,string>();const requirements=new WeakMap<object,number>();let reqSerial=0;
++ const proof=(view:'physical'|'ordinary')=>{const ref=source.evidence()!.field(subject,'x',view) as life.NativeRequirement;let id=requirements.get(ref);if(!id)requirements.set(ref,id=++reqSerial);const p=life.nativeProof(ref);return {requirement:id,ready:life.nativeRequirementReady(ref),unknown:p.unknown,invalid:p.invalid,terminalRejectedRoles:p.terminalRejectedRoles??0,historicalWindow:p.historicalWindow??false,unavailableInput:p.unavailableInput??false,...Object.fromEntries((['owners','destination','input','validation','possible'] as const).map(role=>[role,(p[role]??[]).map(cell=>({name:names.get(cell)??'other',outcome:cell.outcome}))]))};};
++ const existing=new Set(life.pendingOwners());const q=tree.transact(()=>rows.updateOne('a',{x:7}));for(const cell of life.pendingOwners())if(!existing.has(cell))names.set(cell,'q');
++ let r:typeof q|undefined;let qRejected=false,rRejected=false;let receipt:ReturnType<Experimental['declare']>|undefined;const stages:unknown[]=[];
++ const snapshot=(error?:unknown)=>{stages.push({phase,value:row.x(),q:clone(q.inspect()),r:r?clone(r.inspect()):null,proof:{ordinary:proof('ordinary'),physical:proof('physical')},receipt:receipt?clone(receipt.read()):null,sent:clone(sent),error:error instanceof Error?{name:error.name,message:error.message}:error??null});};
++ try{
++  await flush();expect(row.x()).toBe(7);expect(sent).toEqual([]);snapshot();phase='write';
++  const old=new Set(life.pendingOwners());
++  r=tree.transact(()=>{rows.updateOne('a',{x:11});rows.updateOne('a',{x:mode==='netzero'?7:13});});
++  for(const cell of life.pendingOwners())if(!old.has(cell))names.set(cell,'r');
++  await flush();snapshot();
++  if(mode==='later-confirmed'){phase='confirm-s';const oldS=new Set(life.pendingOwners());const newer=tree.transact(()=>rows.updateOne('a',{x:19}));for(const cell of life.pendingOwners())if(!oldS.has(cell))names.set(cell,'s');newer.confirm();await flush();snapshot();}
++  if(r){phase='reject-r';let error:unknown;try{r.rollback();rRejected=true;}catch(e){error=e;}await flush();snapshot(error);}
++  phase='reject-q';let error:unknown;try{q.rollback();qRejected=true;}catch(e){error=e;}await flush();snapshot(error);
++  appendFileSync(process.env['ST_OBSERVATIONS']!,JSON.stringify({mode,route,observe,stages,captures,packets})+'\n');
++ }finally{runtime.prepareEntityResponsibility=original;off();if(r&&!rRejected)r.confirm();if(!qRejected)q.confirm();c.dispose();tree.destroy();}
++});
+--- /dev/null
++++ b/tools/experiments/native-publication-diagnostics/replay.config.ts
+@@ -0,0 +1,18 @@
++import { fileURLToPath } from 'node:url';
++import { defineConfig } from 'vitest/config';
++import kernelConfig from '../../../packages/kernel/vitest.config';
++
++// Replace discovery rather than merging the ordinary include globs.
++export default defineConfig({
++  ...kernelConfig,
++  root: fileURLToPath(new URL('../../../', import.meta.url)),
++  test: {
++    ...kernelConfig.test,
++    include: [
++      'tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts',
++      'tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts',
++    ],
++    maxWorkers: 1,
++    fileParallelism: false,
++  },
++});
+--- /dev/null
++++ b/tools/experiments/native-publication-diagnostics/run.mjs
+@@ -0,0 +1,60 @@
++#!/usr/bin/env node
++import { createHash } from 'node:crypto';
++import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
++import { dirname, join, relative } from 'node:path';
++import { fileURLToPath } from 'node:url';
++import { spawnSync } from 'node:child_process';
++
++const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
++const HERE = dirname(fileURLToPath(import.meta.url));
++if (process.argv.length !== 2) throw new Error('Replay runs the complete paired matrix; no filters are accepted.');
++const base = join(ROOT, 'artifacts/native-publication-diagnostics');
++mkdirSync(base, { recursive: true });
++const output = mkdtempSync(join(base, 'run-'));
++const observations = join(output, 'observations.jsonl');
++const save = (name, value) => writeFileSync(join(output, name), JSON.stringify(value, null, 2) + '\n');
++const sourceHashes = {};
++function hashFile(file) {
++  sourceHashes[relative(ROOT, file)] = createHash('sha256').update(readFileSync(file)).digest('hex');
++}
++function hashRuntime(dir) {
++  for (const entry of readdirSync(dir, { withFileTypes: true })) {
++    const file = join(dir, entry.name);
++    if (entry.isDirectory()) hashRuntime(file);
++    else if (entry.name.endsWith('.ts') && !/\.(spec|test)\.ts$/.test(entry.name)) hashFile(file);
++  }
++}
++hashRuntime(join(ROOT, 'packages/kernel/src'));
++for (const name of ['run.mjs', 'replay.config.ts', 'native-netzero-diagnostic.replay.ts', 'native-equal-inverse-diagnostic.replay.ts']) hashFile(join(HERE, name));
++for (const name of ['.nvmrc', 'package.json', 'pnpm-lock.yaml']) hashFile(join(ROOT, name));
++save('SOURCE.json', sourceHashes);
++const argv = [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', '--config', join(HERE, 'replay.config.ts')];
++save('COMMAND.json', { executable: process.execPath, argv, cwd: ROOT, node: process.version, env: { ST_OBSERVATIONS: observations } });
++console.log(`Diagnostic replay artifacts: ${output}`);
++const run = spawnSync(process.execPath, argv, {
++  cwd: ROOT, env: { ...process.env, ST_OBSERVATIONS: observations }, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
++});
++const raw = `${run.stdout ?? ''}${run.stderr ?? ''}`;
++writeFileSync(join(output, 'first.log'), raw);
++process.stdout.write(raw);
++const errors = [];
++if (run.error || run.signal || run.status !== 0) errors.push(run.error?.message ?? `child exit=${run.status} signal=${run.signal}`);
++const expected = new Set();
++for (const mode of ['netzero', 'changed-twice', 'later-confirmed', 'independent-equal', 'r-equal', 'r-independent-equal', 'r-changed'])
++  for (const route of ['collection', 'root']) for (const observe of [false, true]) expected.add(JSON.stringify([mode, route, observe]));
++let records = [];
++try {
++  records = readFileSync(observations, 'utf8').split('\n').filter(line => line.trim()).map(line => JSON.parse(line));
++  for (const record of records) {
++    const key = JSON.stringify([record.mode, record.route, record.observe]);
++    if (!expected.delete(key)) errors.push(`Unexpected or duplicate record: ${key}`);
++  }
++  if (expected.size || records.length !== 28) errors.push(`Incomplete matrix: ${records.length} records, ${expected.size} missing`);
++} catch (error) { errors.push(`Observation output: ${error.message}`); }
++save('RESULT.json', {
++  exit: errors.length ? 1 : 0, records: records.length, uniqueCompleteMatrix: !expected.size && records.length === 28 && !errors.length,
++  errors, scope: 'Setup and paired recording completeness only; recorded semantic outcomes are not adjudicated.',
++});
++if (errors.length) console.error(errors.join('\n'));
++else console.log('28 unique paired observations recorded; no semantic acceptance verdict.');
++process.exitCode = errors.length ? 1 : 0;
+--- a/tools/verify-gates.mjs
++++ b/tools/verify-gates.mjs
+@@ -110,7 +110,7 @@
+   },
+   {
+     name: 'test:all',
+-    covers: 'behaviour across all published packages AND the demo app',
++    covers: 'ordinary behaviour suites across published packages and the demo; retention-gc and forwarding-retention-gc run separately; diagnostic recording uses explicit replay',
+     // Was `nx test kernel`. The gate's own name said "core" and its summary line
+     // said "core behaviour", so it was honest about what it covered — and what
+     // it covered was one package of eight. The other seven have real suites
+@@ -1191,12 +1191,29 @@
+       'packages/kernel',
+       '--config',
+       'vitest.retention.config.ts',
++      'src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts',
++      'src/lib/link-lifetime.spec.ts',
++      'src/lib/internals/location-runtime-retention.spec.ts',
+     ],
+     env: { NODE_OPTIONS: '--expose-gc' },
+     mutation: {
+       file: 'packages/kernel/src/lib/link-lifetime.spec.ts',
+       find: "  if (mode === 'disposed') connection?.dispose();",
+       replace: "  if (mode === 'disposed') void connection;",
++    },
++  },
++  {
++    name: 'forwarding-retention-gc',
++    covers:
++      'nine forwarding GC fixtures: closed callbacks release sampled receivers/errors, explicit held values survive until release, with positive/negative controls',
++    cmd: ['node', 'tools/check-forwarding-retention.mjs'],
++    env: { NODE_OPTIONS: '--expose-gc' },
++    // Deliberately retain the destroyed receiver in the fixture, not runtime.
++    // The unchanged WeakRef assertions must reject this retained tree.
++    mutation: {
++      file: 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts',
++      find: ' tree.destroy();await flush();',
++      replace: ' tree.destroy();Object.assign(box,{__gateRetainedTree:tree});await flush();',
+     },
+   },
+   {
+--- a/tsconfig.typecheck-specs.json
++++ b/tsconfig.typecheck-specs.json
+@@ -8,6 +8,8 @@
+     "allowJs": false,
+     "strict": true
+   },
+-  "include": ["packages/*/src/**/*.spec.ts", "packages/*/src/**/*.test.ts"],
++  "include": ["packages/*/src/**/*.spec.ts", "packages/*/src/**/*.test.ts",
++    "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts",
++    "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts"],
+   "exclude": ["**/node_modules/**"]
+ }
+--- a/vitest.config.ts
++++ b/vitest.config.ts
+@@ -1,9 +1,14 @@
+-import { defineConfig } from 'vitest/config';
++import { configDefaults, defineConfig } from 'vitest/config';
+ 
+ export default defineConfig({
+   test: {
+     environment: 'node',
+     include: ['scripts/__tests__/**/*.cjs', 'scripts/__tests__/*.cjs', '**/*.spec.ts'],
+     globals: true,
++    // Explicit nine-mode gate supplies GC and scenario/output configuration.
++    exclude: [
++      ...configDefaults.exclude,
++      'packages/kernel/src/lib/forwarding-retention-probe.spec.ts',
++    ],
+   },
+ });

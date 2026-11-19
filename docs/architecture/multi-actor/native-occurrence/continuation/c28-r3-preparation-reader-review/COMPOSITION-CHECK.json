@@ -1,0 +1,14 @@
+[
+  {
+    "path": "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "beforeMatches": true,
+    "afterMatches": true,
+    "exactIntendedSubstitutions": true
+  },
+  {
+    "path": "packages/kernel/src/lib/preparation-reader-comparison.spec.ts",
+    "beforeMatches": true,
+    "afterMatches": true,
+    "exactIntendedSubstitutions": true
+  }
+]

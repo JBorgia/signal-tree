@@ -1,0 +1,12 @@
+{
+  "baseManifest": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+  "ordinaryPlacement": {
+    "packages/kernel/src/lib/entity-signal.ts": "7489aab0e44f0dcec48522a30081207ee5d26bd579c9dfd695fb8673681610d7",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "de3fc72f214550ad6e6b6f069d349f0ce67f6a8f1b26375215a5c85c23bd9895",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "b5e5e6009112701abe83f93582c78c1d5b362f08163b059f34894f236b319e13",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "266488a37342b315e46a42b92768099df84bd45aa96d8bf496375b82d2aea1fc",
+    "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts": "2457836415fea5590d8f949aeb49c9543f088945810a4abcd315a21bdfa8d664",
+    "packages/kernel/src/lib/physical/order-restores-for-placement.ts": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c",
+    "packages/kernel/src/lib/physical/ordinary-restoration-placement.ts": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0"
+  }
+}

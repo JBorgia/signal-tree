@@ -1,0 +1,18 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/retained-source-public-controls.spec.ts: 9 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(9,53): error TS2339: Property 'rows' does not exist on type 'Location<{ s: number; rows?: EntityMapBuilder<Row, string, Record<string, never>> | undefined; } | undefined>'.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(23,43): error TS2339: Property 'rows' does not exist on type 'Location<{ s: number; rows?: EntityMapBuilder<Row, string, Record<string, never>> | undefined; } | undefined>'.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(41,43): error TS2339: Property 'rows' does not exist on type 'Location<{ s: number; rows?: EntityMapBuilder<Row, string, Record<string, never>> | undefined; } | undefined>'.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(47,32): error TS7006: Parameter 'id' implicitly has an 'any' type.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(47,35): error TS7006: Parameter '_changes' implicitly has an 'any' type.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(47,44): error TS7006: Parameter 'context' implicitly has an 'any' type.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(63,43): error TS2339: Property 'rows' does not exist on type 'Location<{ s: number; rows?: EntityMapBuilder<Row, string, Record<string, never>> | undefined; } | undefined>'.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(82,56): error TS2339: Property 'rows' does not exist on type 'Location<{ s: number; rows?: EntityMapBuilder<Row, string, Record<string, never>> | undefined; } | undefined>'.
+packages/kernel/src/lib/retained-source-public-controls.spec.ts(82,85): error TS2339: Property 'rows' does not exist on type 'Location<{ s: number; rows?: EntityMapBuilder<Row, string, Record<string, never>> | undefined; } | undefined>'.

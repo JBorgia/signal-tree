@@ -1,0 +1,13 @@
+{
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "independent-prepared-unit.spec.ts"
+  ],
+  "exit": 1,
+  "frozenSourceUnchanged": true
+}

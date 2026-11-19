@@ -1,0 +1,14 @@
+{
+  "versions": {
+    "node": "v24.15.0",
+    "pnpm": "10.17.0"
+  },
+  "hashes": {
+    "/private/tmp/st-large-qualification/screen-candidate/pnpm-lock.yaml": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+    "/private/tmp/st-large-qualification/screen-candidate/node_modules/.pnpm/lock.yaml": "bfb59363fcda0de5508bdb837555dd1729455a5e7a216fb8e39c411d5986284b",
+    "/private/tmp/st-large-qualification/screen-candidate/node_modules/.modules.yaml": "fb7f00ead6f79b3f168b05223aa6157c2e50098179b9161b824288301e973e21",
+    "/private/tmp/st-large-qualification/screen-candidate/node_modules/vitest/package.json": "e12762a5b629bea6cbb2b0540a8a15c50f3098bb3193d3e319293b58b64c4ed9",
+    "/private/tmp/st-large-qualification/screen-candidate/node_modules/nx/package.json": "1ece57bedcaaa587f62e81194878fa9859e69af0ab830a68769a8b316785afed"
+  },
+  "realNodeModules": "/Users/jonathanborgia/code/signaltree/node_modules"
+}

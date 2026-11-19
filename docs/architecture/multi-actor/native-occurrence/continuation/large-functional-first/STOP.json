@@ -1,0 +1,21 @@
+{
+  "id": "original-replacement-undo-redo",
+  "arm": "original",
+  "exit": -15,
+  "qualified": false,
+  "classification": "aggregate-owned-rss-over2GiB",
+  "reason": "aggregate-owned-rss-over2GiB",
+  "cases": [],
+  "workerPids": [
+    51877
+  ],
+  "remainingOwned": [],
+  "sourceMismatches": [],
+  "dependencyDrift": false,
+  "telemetrySamples": 55,
+  "maxObservedOwnedRssBytes": 2201042944,
+  "minimumObservedHostFreePercentage": 38.0,
+  "elapsedSeconds": 39.90638941701036,
+  "attempts": 1,
+  "completedAt": "2026-11-03T18:15:30.044790+00:00"
+}

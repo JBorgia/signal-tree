@@ -1,0 +1,11 @@
+{
+  "baseManifestSha256": "a13a5e9a2fbbbf89dd0679f712c95c3054f95acd90305170c8e3abcf66eba025",
+  "baselinePathsVerifiedInBothCopies": 3066,
+  "snapshotSha256": "d0d48da4b42e5a0c682e1cb7750cd73b27f425531f12c2f652a4f859e5e63e1b",
+  "probeSha256": "bcfaf468f0728539a29316694d024fb6ccf52d567dd3f1617cd50451fdd268da",
+  "patchSha256": "3b5871b991d645fffc04cc8f69c308b741399455d440d3fe8f5957d31d276bad",
+  "exactVsIntermediateStageRecordsIdentical": true,
+  "runtimeChanges": 0,
+  "records": 16,
+  "testsPassed": 18
+}

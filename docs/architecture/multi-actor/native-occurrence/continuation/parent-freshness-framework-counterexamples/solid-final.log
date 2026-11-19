@@ -1,0 +1,78 @@
+
+> nx run solid:test parent-freshness-counterparts --maxWorkers=1
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts parent-freshness-counterparts --maxWorkers=1
+
+(node:95673) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:95692) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-other-frameworks/candidate/packages/solid
+
+(node:95739) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/parent-freshness-counterparts.spec.ts (3 tests | 1 failed) 17ms
+   × installed parent freshness and retained native dependencies (false / true) 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/parent-freshness-counterparts.spec.ts > installed parent freshness and retained native dependencies (false / true)
+AssertionError: expected { old: { n: 10 }, a: { n: 1 } } to deeply equal { old: { n: 10 }, a: { n: 1 }, …(1) }
+
+- Expected
++ Received
+
+  {
+    "a": {
+      "n": 1,
+    },
+-   "b": {
+-     "n": 2,
+-   },
+    "old": {
+      "n": 10,
+    },
+  }
+
+ ❯ src/lib/parent-freshness-counterparts.spec.ts:111:28
+    109|       expect.soft(cached).toBe(nativeBefore);
+    110|       expect.soft(countDuring).toBe(countBefore);
+    111|       expect(heldBranch()).toEqual(expected);
+       |                            ^
+    112|       expect(heldBranch()).not.toBe(branchBefore);
+    113|       expect(installedRow(heldBranch['a'])).toBe(retainedA);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  09:49:47
+   Duration  763ms (transform 537ms, setup 0ms, import 673ms, tests 17ms, environment 0ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts parent-freshness-counterparts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project solid failed
+
+Failed tasks:
+
+- solid:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        solid:test    3.3s

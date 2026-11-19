@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/lib/fixed-window-retirement.spec.ts
++++ b/packages/kernel/src/lib/fixed-window-retirement.spec.ts
+@@ -27,7 +27,7 @@
+  if(cause==='external'){q=o.transact(()=>o.$.x(7));withWriteContext({origin:'external'},()=>tree.$.rows.removeOne('a'));}else q=o.transact(()=>tree.$.rows.removeOne('a'));
+  const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;
+  try{await flush();expect(fact.retirementOwnWindowOnly).toBe(false);q.confirm();await flush();expect(source.evidence()!.member(id,'ordinary')).toBe(fact);expect(source.inspect().negativePresence).toBe(1);expect(source.inspect().retirementRequests).toBe(0);
+- writeFileSync(`/private/tmp/st-fixed-window-retirement-successor/provenance-${cause}.json`,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}))}},(_key,value)=>value instanceof Set?[...value]:value,2)+'\n');
++ writeFileSync(`/private/tmp/st-fixed-window-retirement-cancellation-successor/provenance-${cause}.json`,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}))}},(_key,value)=>value instanceof Set?[...value]:value,2)+'\n');
+  }finally{tree.destroy();o.destroy();}
+ });
+ it('owner disappearance retains exact unresolved proof but drops unavailable subscription',async()=>{

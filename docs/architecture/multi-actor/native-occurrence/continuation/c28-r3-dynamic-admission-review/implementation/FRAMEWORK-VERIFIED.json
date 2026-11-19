@@ -1,0 +1,62 @@
+{
+  "angular": {
+    "files": {
+      "packages/angular/src/lib/whole-value-new-keys.spec.ts": "4b253ccd9d584b4bd768b20fc4e7e115051e8f3d11a51e4380141256967e11b4"
+    },
+    "result": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "rawSummary": [
+      " Test Files  1 passed (1)",
+      "      Tests  3 passed (3)"
+    ],
+    "rawLogSha256": "035e7df98bd99db1a2eb96c6b5bb6599f7cd3069293537979e56d316e6b27be7"
+  },
+  "react": {
+    "files": {
+      "packages/react/src/whole-value-new-keys.spec.tsx": "ebe6def4d9922612ce386949ca67b3f476b9bae46e3dd4f9660b2d9a4b234667"
+    },
+    "result": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "rawSummary": [
+      " Test Files  1 passed (1)",
+      "      Tests  3 passed (3)"
+    ],
+    "rawLogSha256": "986d68b8578c56af2795605d8ae12c21c1a55985cdd33fb288291290c51c6e6b"
+  },
+  "vue": {
+    "files": {
+      "packages/vue/src/lib/whole-value-new-keys.spec.ts": "53d4c578d5de844431dbe2cb81d9e89ea2e8338defc544cc4fdaba230055d97d"
+    },
+    "result": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "rawSummary": [
+      " Test Files  1 passed (1)",
+      "      Tests  3 passed (3)"
+    ],
+    "rawLogSha256": "661203c754443635833680214cb2382ead76f9bf7d9b9416750d21be4287426d"
+  },
+  "solid": {
+    "files": {
+      "packages/solid/src/lib/whole-value-new-keys.spec.ts": "b857f1b9b00b4b91429bb2382df0e5fb5557564e062feb4f837d4736a7786416"
+    },
+    "result": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "rawSummary": [
+      " Test Files  1 passed (1)",
+      "      Tests  3 passed (3)"
+    ],
+    "rawLogSha256": "70c05a7031d7b1c8186879e90fa7c16ff4f36425b29b30ee8fe923ae7728d10e"
+  }
+}

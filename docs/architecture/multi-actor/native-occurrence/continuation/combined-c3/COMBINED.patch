@@ -1,0 +1,459 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/admission-refusal.spec.ts
+@@ -0,0 +1,33 @@
++import {expect,it} from 'vitest';
++import '../index';
++import {EntityPublicationSource,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
++import {installTerminalRecord} from './internals/intrinsic-mutation';
++import {initialRequirement} from './experimental-publication/lifecycle';
++const message='Frozen entity publication edit contains mutable admission metadata';
++const packet=(ordinary:readonly Edit[],extra:Partial<Packet>={}):Packet=>({owner:1,id:{},meta:undefined,ordinary,physical:ordinary,...extra});
++const install=(s:EntityPublicationSource,p:Packet)=>{const u=s.prepare(p)!;u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);};
++const before=(s:EntityPublicationSource)=>{let value:unknown;s.prepare(packet([],{prepareResponsibility:f=>{value=f!.before(1,'x');return undefined;}}));return value;};
++for(const mutable of ['fields','structural','both'] as const)it(`refuses frozen shell with mutable ${mutable} before callbacks without altering borrowed metadata`,()=>{
++ const s=new EntityPublicationSource();const fields=['x'];const structural={kind:'add' as const,subject:1};const payload={x:7,tags:['a']};
++ if(mutable==='fields')Object.freeze(structural);if(mutable==='structural')Object.freeze(fields);
++ const a:Edit=Object.freeze({subject:1,before:undefined,after:payload,fields,structural});const history={structuralRecord:structural};
++ const savedFields=Object.getOwnPropertyDescriptors(fields),savedStructural=Object.getOwnPropertyDescriptors(structural);let callbacks=0;const record=new Map();
++ const off=s.subscribe({prepare(){callbacks++;return undefined;},complete(){callbacks++;}});
++ try{expect(()=>install(s,packet([a],{prepareResponsibility:()=>{callbacks++;return {writes:[{map:record,key:1,value:7}],adds:[]};}}))).toThrow(message);expect(callbacks).toBe(0);expect(record.size).toBe(0);expect(s.inspect().rows).toBe(0);expect(history.structuralRecord).toBe(structural);expect(Object.getOwnPropertyDescriptors(fields)).toEqual(savedFields);expect(Object.getOwnPropertyDescriptors(structural)).toEqual(savedStructural);expect(Object.isFrozen(payload)).toBe(false);payload.tags.push('b');expect(payload.tags).toEqual(['a','b']);}finally{off();s.dispose();}
++});
++for(const fields of [null,Object.freeze(['x'])] as const)it(`safe frozen metadata accepts mutable payload and proof references, fields=${String(fields)}`,()=>{
++ const s=new EntityPublicationSource();const payload={x:7,tags:['a']};const proof=initialRequirement();const endpoint={present:true,value:7,requirement:proof};const restored=new Map([['x',endpoint]]);
++ const a:Edit=Object.freeze({subject:1,before:undefined,after:payload,fields,structural:Object.freeze({kind:'add' as const,subject:1,value:payload}),restoredFields:restored});let seen:Edit|undefined;
++ const off=s.subscribe({prepare(p){seen=p.ordinary[0];return undefined;},complete(){}});
++ try{install(s,packet([a]));expect(seen).toBe(a);expect(before(s)).toBe(endpoint);expect(Object.isFrozen(payload)).toBe(false);expect(Object.isFrozen(payload.tags)).toBe(false);expect(Object.isFrozen(proof)).toBe(false);expect(Object.isFrozen(endpoint)).toBe(false);expect(a.restoredFields).toBe(restored);payload.tags.push('b');expect(payload.tags.length).toBe(2);}finally{off();s.dispose();}
++});
++it('supported precedence companion: safe frozen removal/add retains restored over selected over proposed endpoint',()=>{
++ const s=new EntityPublicationSource();const restored=Object.freeze({present:true,value:5,requirement:initialRequirement()});const selected=Object.freeze({present:true,value:8,requirement:initialRequirement()});
++ const r:Edit=Object.freeze({subject:1,before:undefined,after:undefined,fields:Object.freeze(['x']),structural:Object.freeze({kind:'remove' as const,subject:1})});
++ const add:Edit=Object.freeze({subject:1,before:undefined,after:{x:11},fields:Object.freeze(['x']),structural:Object.freeze({kind:'add' as const,subject:1}),restoredFields:new Map([['x',restored]])});let calls=0;
++ try{install(s,packet([r,add],{steps:[{ordinal:0,ordinary:[r],physical:[r]},{ordinal:1,ordinary:[add],physical:[add]}],prepareResponsibility:f=>{calls++;expect(f!.proposed(1,'x').value).toBe(11);f!.choose(1,'x',selected);return undefined;}}));expect(calls).toBe(1);expect(before(s)).toBe(restored);expect(s.inspect().negativePresence).toBe(0);}finally{s.dispose();}
++});
++it('mutable source shell still copies a shared upstream descriptor before sealing',()=>{
++ const s=new EntityPublicationSource();const structural={kind:'add' as const,subject:1};const fields=['x'];const a:Edit={subject:1,before:undefined,after:{x:7},fields,structural};
++ try{install(s,packet([a]));expect(a.structural).not.toBe(structural);expect(Object.isFrozen(structural)).toBe(false);expect(Object.isFrozen(fields)).toBe(false);expect(Object.isFrozen(a.structural)).toBe(true);expect(Object.isFrozen(a.fields)).toBe(true);expect(before(s)).toMatchObject({present:true,value:7});}finally{s.dispose();}
++});
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,7 +1,7 @@
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+-import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
++import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
+ import * as lifecycle from './lifecycle';
+ import { currentNativePublicationInputs } from './private';
+ 
+@@ -62,10 +62,20 @@
+       const inputs=[...currentNativePublicationInputs(),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])];
+       const prepared=inspection?undefined:lifecycle.prepareNativeRequirement(owner?[owner]:[],!valid||meta?.origin!==undefined,inputs);
+       const requirement=prepared?.requirement??unavailable();
++      // This source-owned prepared packet has one ordered admitted sequence.
++      // Keep duplicates/tombstones in that sequence; only proposal lookup uses
++      // the last subject occurrence, exactly as the former reverse/find did.
++      // The index belongs to this preparation, never a source or observer cache.
++      // Admission owns stable metadata; reuse point membership directly.
++      // The stepped helper builds exactly one ordered sequence.
++      const ordinaryEdits=entityPublicationOrdinary(packet);
++      const singleton=ordinaryEdits.length===1?ordinaryEdits[0]:undefined;
++      const lastOrdinaryBySubject=singleton?undefined:new Map<number,EntityPublicationEdit>();
++      if(lastOrdinaryBySubject)for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
+       const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
+       const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
+-        const edit=[...entityPublicationOrdinary(packet)].reverse().find(edit=>edit.subject===subject);
++        const edit=singleton?.subject===subject?singleton:lastOrdinaryBySubject?.get(subject);
+         if(!edit)throw new Error('Missing admitted field publication');
+         return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
+       };
+@@ -111,7 +121,7 @@
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+       if(packet.physicalOrder)for(const subject of packet.physicalOrder){physicalPlacements.set(subject,{requirement});writes.push({map:placementViews,key:subject,value:{requirement}});}
+-      for(const edit of entityPublicationOrdinary(packet)){
++      for(const edit of ordinaryEdits){
+         if(edit.structural?.kind==='remove'){
+           removed.add(edit.subject);nextFields.delete(edit.subject);nextViews.delete(edit.subject);
+           nextMembers.set(edit.subject,{present:false,requirement});
+@@ -160,7 +170,7 @@
+       selected.forEdit=edit=>selectedAt.get(edit)??selected;
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+-        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...entityPublicationOrdinary(packet).map(edit=>edit.subject)])]:[subject];
++        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...(singleton?[singleton.subject]:lastOrdinaryBySubject!.keys())])]:[subject];
+         if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+         for(const id of selected){
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+@@ -172,7 +182,9 @@
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+         return lifecycle.combineNativeRequirements(sources);
+       };
+-      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
++      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
++        if(prepared)lifecycle.finalizeNativeRequirement(requirement);
++      }};
+     },
+     complete(){},
+     prepareRetirement(subject){
+--- /dev/null
++++ b/packages/kernel/src/lib/independent-refusal-branches.spec.ts
+@@ -0,0 +1,20 @@
++import {expect,it} from 'vitest';
++import '../index';
++import {EntityPublicationSource,withEntityPointPublicationPreparation,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
++const message='Frozen entity publication edit contains mutable admission metadata';
++const bad=()=>{const fields=['x'];const edit:Edit=Object.freeze({subject:1,before:undefined,after:{x:7},fields});const packet:Packet={owner:1,id:{},meta:undefined,ordinary:[edit],physical:[edit]};return {fields,edit,packet};};
++it('caught refused first point fragment does not register phantom preparation callbacks',()=>{
++ const s=new EntityPublicationSource();const {fields,packet}=bad();let calls=0;let caught:unknown;
++ const off=s.subscribe({prepare(){calls++;return undefined;},complete(){calls++;}});
++ try{withEntityPointPublicationPreparation(()=>{try{s.preparePoint(packet);}catch(error){caught=error;}});expect(caught).toBeInstanceOf(Error);expect((caught as Error).message).toBe(message);expect(calls).toBe(0);expect(s.inspect().rows).toBe(0);expect(Object.isFrozen(fields)).toBe(false);}finally{off();s.dispose();}
++});
++it('uncaught refused deferred fragment leaves borrowed aliases and source facts unchanged',()=>{
++ const s=new EntityPublicationSource();const {fields,packet}=bad();const before=Object.getOwnPropertyDescriptors(fields);let calls=0;
++ const off=s.subscribe({prepare(){calls++;return undefined;},complete(){calls++;}});
++ try{expect(()=>withEntityPointPublicationPreparation(()=>s.preparePoint(packet))).toThrow(message);expect(calls).toBe(0);expect(Object.getOwnPropertyDescriptors(fields)).toEqual(before);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++});
++it('caught rejection followed by a valid same-source fragment prepares only the valid packet',()=>{
++ const s=new EntityPublicationSource();const {packet}=bad();const valid:Edit={subject:2,before:undefined,after:{x:9},fields:['x']};let calls=0;let accepted:Packet|undefined;
++ const off=s.subscribe({prepare(p){calls++;accepted=p;return undefined;},complete(){}});
++ try{withEntityPointPublicationPreparation(()=>{expect(()=>s.preparePoint(packet)).toThrow(message);s.preparePoint({owner:1,id:{},meta:undefined,ordinary:[valid],physical:[valid]});});expect(calls).toBe(1);expect(accepted!.ordinary).toEqual([valid]);expect(accepted!.owner).toBe(1);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++});
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -47,6 +47,56 @@
+   readonly physicalOrder?: readonly number[];
+   readonly ordinaryOrder?: readonly number[];
+ }
++/** Private ownership boundary: metadata is source-owned, row payloads and proof
++ * objects are not. Weak marks avoid reprocessing queued point fragments; they
++ * contain no values, certificates or revision authority and do not retain keys.
++ */
++class AdmissionMetadata {
++  private readonly edits = new WeakSet<EntityPublicationEdit>();
++  private readonly arrays = new WeakSet<readonly EntityPublicationEdit[]>();
++  private readonly packets = new WeakSet<EntityPublicationPacket>();
++  private edit(edit: EntityPublicationEdit): void {
++    if (this.edits.has(edit)) return;
++    // Native producers supply mutable shells. Copy shared metadata before locking
++    // that same edit identity. A frozen shell cannot transfer ownership of
++    // borrowed mutable metadata: require stability without mutating those aliases.
++    if (!Object.isFrozen(edit)) {
++      if (edit.fields && !Object.isFrozen(edit.fields)) Object.defineProperty(edit,'fields',{value:Object.freeze([...edit.fields]),enumerable:true});
++      if (edit.structural) Object.defineProperty(edit,'structural',{value:Object.freeze({...edit.structural}),enumerable:true});
++    } else {
++      if (edit.fields && !Object.isFrozen(edit.fields) ||
++          edit.structural && !Object.isFrozen(edit.structural))
++        throw new Error('Frozen entity publication edit contains mutable admission metadata');
++    }
++    Object.freeze(edit);
++    this.edits.add(edit);
++  }
++  private array(edits: readonly EntityPublicationEdit[]): readonly EntityPublicationEdit[] {
++    if (this.arrays.has(edits)) return edits;
++    for (const edit of edits) this.edit(edit);
++    // These arrays are private source-issued membership, never user row payloads.
++    // Transfer their ownership once instead of duplicating every admitted list.
++    const result=Object.freeze(edits);
++    this.arrays.add(result);
++    return result;
++  }
++  prepare(packet:EntityPublicationPacket):EntityPublicationPacket {
++    if(this.packets.has(packet))return packet;
++    const steps=packet.steps?.map(step=>{
++      if(step.authoredRemoval)this.edit(step.authoredRemoval);
++      const footprint=step.authoredFootprint;
++      return Object.freeze({...step,
++        authoredFootprint:footprint?Object.freeze(footprint.kind==='fields'?{...footprint,fields:Object.freeze([...footprint.fields])}:{...footprint}):undefined,
++        ordinary:this.array(step.ordinary),physical:step.physical?this.array(step.physical):undefined});
++    });
++    const result=Object.freeze({...packet,ordinary:this.array(packet.ordinary),physical:this.array(packet.physical),
++      steps:steps?Object.freeze(steps):undefined,
++      ordinaryOrder:packet.ordinaryOrder?Object.freeze([...packet.ordinaryOrder]):undefined,
++      physicalOrder:packet.physicalOrder?Object.freeze([...packet.physicalOrder]):undefined});
++    this.packets.add(result);
++    return result;
++  }
++}
+ /** Opaque source-issued support; the reducer transports, never interprets, it. */
+ export interface EntityPublicationEvidence {
+   exclusions?():readonly (readonly [number,object])[];
+@@ -81,6 +131,7 @@
+ }
+ /** Native ownership lives with the collection even when there are no recipients. */
+ export class EntityPublicationSource {
++  private readonly admission = new AdmissionMetadata();
+   private native: EntityPublicationParticipant | undefined;
+   private readonly recipients = new Set<EntityPublicationParticipant>();
+   private recipientRevision = 0;
+@@ -151,6 +202,9 @@
+   }
+   preparePoint(packet:EntityPublicationPacket):PreparedPublicationUnit|undefined {
+     if(!pointPreparation)return this.prepare(packet);
++    // Refusal must not enroll a source or leave a phantom empty group behind.
++    // Complete all admission work before publishing deferred bookkeeping.
++    packet=this.admission.prepare(packet);
+     let group=pointPreparation.get(this);
+     if(!group){
+       const source=this;
+@@ -166,6 +220,7 @@
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
+     const retirementRevision = this.retirementRevision;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
++    packet=this.admission.prepare(packet);
+     const native = this.nativeParticipant();
+     const nativeUnit = native?.prepare(packet);
+     const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();
+--- a/packages/kernel/src/lib/occurrence-successor.spec.ts
++++ b/packages/kernel/src/lib/occurrence-successor.spec.ts
+@@ -9,7 +9,7 @@
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+ const asLink=(source:object,sent:unknown[])=>link(source as never,{set:(v:unknown)=>{sent.push(v);}} as never) as Experimental;
+ 
+-for(const kind of ['scalar','empty','collection','mixed'] as const)it(`first omission enrolls clean ${kind} ancestry`,async()=>{
++for(const kind of ['scalar','empty','collection','mixed'] as const)for(const outcome of ['confirm','rollback'] as const)it(`first omission ${kind}: undeclared child waits then delivers after ${outcome}`,async()=>{
+  const tree=signalTree({branch:{rows:entityMap<{id:string;x:number},string>(),x:0},other:0},{enhancers:[transactions()]});
+  const foreign=signalTree({z:0},{enhancers:[transactions()]});
+  if(kind!=='empty')tree.$.branch.rows.addOne({id:'a',x:0});await flush();
+@@ -20,6 +20,10 @@
+   c.declare({kind:'dependent',owners:[q]},()=>kind==='scalar'?tree.$.branch.x(7):kind==='empty'?tree.$.branch.rows.addOne({id:'a',x:7}):tree.$.branch.rows.updateOne('a',{x:7}));
+   await flush();expect(sent).toEqual([]);
+   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await flush();expect(sent).toEqual([{other:1}]);
++  // A root declaration does not grant its undeclared child permission.
++  expect(nestedSent).toEqual([]);
++  q[outcome]();await flush();
++  expect(sent).toEqual([{other:1}]);
+   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:undefined]);
+  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy();}
+ });
+--- /dev/null
++++ b/packages/kernel/src/lib/packet-admission-r1.spec.ts
+@@ -0,0 +1,46 @@
++import {expect,it} from 'vitest';
++import '../index';
++import {EntityPublicationSource,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
++import {installTerminalRecord} from './internals/intrinsic-mutation';
++const edit=(x:number):Edit=>({subject:1,before:undefined,after:{x},fields:['x']});
++const packet=(a:Edit):Packet=>({owner:1,id:{},meta:undefined,ordinary:[a],physical:[a]});
++const install=(s:EntityPublicationSource,p:Packet)=>{const u=s.prepare(p)!;u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);};
++for(const phase of ['prepare','finalize'] as const)it(`admitted arrays refuse escaping mutation during ${phase}`,()=>{
++ const s=new EntityPublicationSource();const installed=new Map();let invoked=0;
++ const off=s.subscribe({prepare(p){const mutate=()=>{invoked++;(p.ordinary as Edit[]).push(edit(99));};if(phase==='prepare')mutate();return {record:{writes:[],adds:[]},completion:{},finalize:phase==='finalize'?mutate:undefined};},complete(){}});
++ try{expect(()=>install(s,{...packet(edit(7)),prepareResponsibility:()=>({writes:[{map:installed,key:1,value:7}],adds:[]})})).toThrow(TypeError);expect(invoked).toBe(1);expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++});
++it('temporary mutation cannot create different recipient and native admission',()=>{
++ const s=new EntityPublicationSource();const a=edit(7);let first:Packet|undefined,second:Packet|undefined;let proposed:unknown;
++ const off1=s.subscribe({prepare(p){first=p;expect(Reflect.set(p.ordinary,'0',edit(99))).toBe(false);expect(Reflect.set(a,'subject',99)).toBe(false);return {record:{writes:[],adds:[]},completion:{},finalize(){expect(Reflect.set(p.ordinary,'0',a)).toBe(false);}};},complete(){}});
++ const off2=s.subscribe({prepare(p){second=p;expect(p.ordinary).toEqual([a]);return undefined;},complete(){}});
++ try{install(s,{...packet(a),prepareResponsibility:f=>{proposed=f!.proposed(1,'x').value;return undefined;}});expect(first).toBe(second);expect(proposed).toBe(7);expect(s.inspect().rows).toBe(1);}finally{off1();off2();s.dispose();}
++});
++it('preserves edit identity and mutable row payloads without freezing shared input metadata',()=>{
++ const s=new EntityPublicationSource();const row={x:7};const fields=['x'];const structural={kind:'add' as const,subject:1};const a:Edit={subject:1,before:undefined,after:row,fields,structural};let received:Packet|undefined;
++ const off=s.subscribe({prepare(p){received=p;return undefined;},complete(){}});
++ try{install(s,packet(a));expect(received!.ordinary[0]).toBe(a);expect(a.after).toBe(row);expect(Object.isFrozen(row)).toBe(false);row.x=8;expect(row.x).toBe(8);expect(Object.isFrozen(fields)).toBe(false);expect(Object.isFrozen(structural)).toBe(false);fields.push('y');expect(a.fields).toEqual(['x']);expect(Reflect.set(a.structural!,'kind','remove')).toBe(false);}finally{off();s.dispose();}
++});
++it('external alias to transferred private membership is also stable',()=>{
++ const s=new EntityPublicationSource();const a=edit(7),edits=[a];let seen:Packet|undefined;
++ const off=s.subscribe({prepare(p){seen=p;return {record:{writes:[],adds:[]},completion:{},finalize(){expect(()=>edits.push(edit(99))).toThrow(TypeError);}};},complete(){}});
++ try{install(s,{...packet(a),ordinary:edits});expect(edits.length).toBe(1);expect(seen!.ordinary).toEqual([a]);expect(s.inspect().rows).toBe(1);}finally{off();s.dispose();}
++});
++it('caught metadata mutation keeps exact structural and step admission',()=>{
++ const s=new EntityPublicationSource();const a:Edit={...edit(7),structural:{kind:'add',subject:1}};let reached=false;
++ const off=s.subscribe({prepare(p){expect(Reflect.set(p.steps!,'0',{ordinal:99,ordinary:[]})).toBe(false);expect(Reflect.set(p.steps![0],'ordinal',99)).toBe(false);expect(Reflect.set(a.structural!,'kind','remove')).toBe(false);reached=true;return undefined;},complete(){}});
++ try{install(s,{...packet(a),steps:[{ordinal:0,ordinary:[a],physical:[a]}]});expect(reached).toBe(true);expect(s.inspect().presence).toBe(1);}finally{off();s.dispose();}
++});
++it('public caller rows and nested payload arrays remain mutable after publication',async()=>{
++ const {signalTree,entityMap}=await import('../index');
++ const t=signalTree({rows:entityMap<{id:string;x:number;tags:string[]},string>()});
++ const tags=['a'],row={id:'a',x:1,tags},rows=[row];
++ try{t.$.rows.setAll(rows);expect(t.$.rows.byIdOrFail('a').x()).toBe(1);expect(Object.isFrozen(rows)).toBe(false);expect(Object.isFrozen(row)).toBe(false);expect(Object.isFrozen(tags)).toBe(false);row.x=9;tags.push('b');rows.push({id:'b',x:2,tags:[]});expect(tags).toEqual(['a','b']);expect(rows.length).toBe(2);}finally{t.destroy();}
++});
++it('held support remains unknown after retirement and refused membership mutation',async()=>{
++ const {initialRequirement,nativeProof}=await import('./experimental-publication/lifecycle');
++ const s=new EntityPublicationSource();const requirement=initialRequirement();requirement.proof={owners:[],unknown:true,invalid:false};
++ const a:Edit={...edit(7),restoredFields:new Map([['x',{present:true,value:7,requirement}]])};const edits=[a];let support:(()=>object)|undefined;
++ const off=s.subscribe({prepare(_p,native){support=(native as {support:()=>object}).support;return undefined;},complete(){}});
++ try{install(s,{...packet(a),ordinary:edits});s.retire(1);expect(Reflect.set(edits,'length',0)).toBe(false);expect(nativeProof(support!() as typeof requirement).unknown).toBe(true);expect(Object.isFrozen(requirement)).toBe(false);}finally{off();s.dispose();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/packet-index-adversarial.spec.ts
+@@ -0,0 +1,126 @@
++import {expect,it} from 'vitest';
++import '../index';
++import {EntityPublicationSource,withEntityPointPublicationPreparation,entityPublicationOrdinary,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
++import {installTerminalRecord,type PreparedPublicationUnit} from './internals/intrinsic-mutation';
++import type {NativeFieldEndpoint} from './internals/native-field-selection';
++import {initialRequirement,nativeProof,type NativeRequirement} from './experimental-publication/lifecycle';
++const edit=(subject:number,x:number|undefined):Edit=>Object.freeze({subject,before:undefined,after:x===undefined?undefined:Object.freeze({x}),fields:Object.freeze(['x'])});
++const removal=(subject:number):Edit=>Object.freeze({...edit(subject,undefined),structural:Object.freeze({kind:'remove' as const,subject})});
++const packet=(ordinary:readonly Edit[],extra:Partial<Packet>={}):Packet=>Object.freeze({owner:1,id:{},meta:undefined,ordinary:Object.freeze([...ordinary]),physical:Object.freeze([...ordinary]),...extra});
++const install=(s:EntityPublicationSource,p:Packet)=>{const u=s.prepare(p);if(!u)throw Error('missing native preparation');u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);return u;};
++const before=(s:EntityPublicationSource,id=1):NativeFieldEndpoint=>{let result:NativeFieldEndpoint|undefined;install(s,packet([],{prepareResponsibility:selection=>{result=selection!.before(id,'x');return undefined;}}));if(!result)throw Error('missing endpoint');return result;};
++
++it('ordered steps override fallback edits, duplicate subject uses last edit, responsibility installs atomically',()=>{
++ const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();const a=edit(1,7),b=edit(2,3),c=edit(1,11);let calls=0;
++ try{const p=packet([edit(1,99)],{physical:[a,b,c],steps:Object.freeze([{ordinal:0,ordinary:[a,b],physical:[a,b]},{ordinal:1,ordinary:[c],physical:[c]}]),prepareResponsibility:selection=>{calls++;expect(selection!.proposed(1,'x').value).toBe(11);expect(selection!.proposed(2,'x').value).toBe(3);expect(selection!.before(1,'x').present).toBe(false);expect(s.inspect().rows).toBe(0);return {writes:[{map:installed,key:'responsibility',value:11}],adds:[]};}});
++ const u=s.prepare(p)!;expect(calls).toBe(1);expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);expect(installed.get('responsibility')).toBe(11);expect(before(s).value).toBe(11);expect(before(s,2).value).toBe(3);
++ }finally{s.dispose();}
++});
++
++for(const duplicate of [false,true])it(`authored removal preserves last absent endpoint, duplicate=${duplicate}`,()=>{
++ const s=new EntityPublicationSource();const a=edit(1,7),r=removal(1);let proposed:NativeFieldEndpoint|undefined;
++ try{const p=packet([a],{physical:[a,r],steps:[{ordinal:0,ordinary:[a],physical:[a]},{ordinal:1,ordinary:duplicate?[r]:[],authoredRemoval:r,physical:[r]}],prepareResponsibility:selection=>{proposed=selection!.proposed(1,'x');return undefined;}});
++ expect(entityPublicationOrdinary(p)).toEqual([a,r]);install(s,p);expect(proposed).toMatchObject({present:false,value:undefined});expect(s.inspect().negativePresence).toBe(1);expect(s.inspect().rows).toBe(0);
++ }finally{s.dispose();}
++});
++
++it('remove followed by restored same subject preserves final endpoint and per-edit restoredFields precedence',()=>{
++ const s=new EntityPublicationSource();const r=removal(1);const restored=Object.freeze({present:true,value:5,requirement:initialRequirement()});const selected=Object.freeze({present:true,value:8,requirement:initialRequirement()});
++ const add:Edit=Object.freeze({...edit(1,11),structural:{kind:'add',subject:1},restoredFields:new Map([['x',restored]])});
++ try{install(s,packet([r,add],{steps:[{ordinal:0,ordinary:[r],physical:[r]},{ordinal:1,ordinary:[add],physical:[add]}],prepareResponsibility:selection=>{expect(selection!.proposed(1,'x').value).toBe(11);selection!.choose(1,'x',selected);return undefined;}}));expect(before(s)).toBe(restored);expect(s.inspect().negativePresence).toBe(0);
++ }finally{s.dispose();}
++});
++
++it('selection overrides proposal when no restored endpoint, including absent field',()=>{
++ const s=new EntityPublicationSource();const endpoint=Object.freeze({present:false,value:undefined,requirement:initialRequirement()});
++ try{install(s,packet([edit(1,7)],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x').value).toBe(7);selection!.choose(1,'x',endpoint);return undefined;}}));expect(before(s)).toBe(endpoint);}finally{s.dispose();}
++});
++
++it('separate source and packet invocations never reuse a subject lookup',()=>{
++ const a=new EntityPublicationSource(),b=new EntityPublicationSource();try{install(a,packet([edit(1,7)]));install(b,packet([edit(1,99)]));install(a,packet([edit(1,11)]));expect(before(a).value).toBe(11);expect(before(b).value).toBe(99);}finally{a.dispose();b.dispose();}
++});
++
++it('throwing responsibility leaves no source or staged responsibility installation',()=>{
++ const s=new EntityPublicationSource();try{install(s,packet([edit(1,2)]));const prior=s.evidence()!.field(1,'x','ordinary');expect(()=>s.prepare(packet([edit(1,7)],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x').value).toBe(7);throw Error('responsibility failed');}}))).toThrow('responsibility failed');expect(s.evidence()!.field(1,'x','ordinary')).toBe(prior);expect(before(s).value).toBe(2);}finally{s.dispose();}
++});
++
++it('responsibility reentry commits newer source and refuses outer preparation',()=>{
++ const s=new EntityPublicationSource();try{install(s,packet([edit(1,2)]));expect(()=>s.prepare(packet([edit(1,7)],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x').value).toBe(7);install(s,packet([edit(1,99)]));return undefined;}}))).toThrow('source changed during preparation');expect(before(s).value).toBe(99);}finally{s.dispose();}
++});
++
++it('payload getter reentry before proposal returns cannot install stale outer packet',()=>{
++ const s=new EntityPublicationSource();let fired=false;const after={get x(){if(!fired){fired=true;install(s,packet([edit(1,99)]));}return 7;}};
++ try{expect(()=>s.prepare(packet([{...edit(1,7),after}]))).toThrow('source changed during preparation');expect(fired).toBe(true);expect(before(s).value).toBe(99);}finally{s.dispose();}
++});
++
++it('recipient prepares fail atomically after responsibility, preserving previous source facts',()=>{
++ const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();let calls=0;let off=()=>{};
++ try{install(s,packet([edit(1,2)]));const prior=s.evidence()!.field(1,'x','ordinary');off=s.subscribe({prepare(){throw Error('recipient failed');},complete(){throw Error('not completed');}});
++ expect(()=>s.prepare(packet([edit(1,7)],{prepareResponsibility:selection=>{calls++;expect(selection!.proposed(1,'x').value).toBe(7);return {writes:[{map:installed,key:1,value:7}],adds:[]};}}))).toThrow('recipient failed');expect(calls).toBe(1);expect(installed.size).toBe(0);expect(s.evidence()!.field(1,'x','ordinary')).toBe(prior);
++ }finally{off();s.dispose();}
++});
++
++it('empty steps override a nonempty ordinary fallback',()=>{
++ const s=new EntityPublicationSource();try{expect(()=>s.prepare(packet([edit(1,7)],{steps:[],prepareResponsibility:selection=>{selection!.proposed(1,'x');return undefined;}}))).toThrow('Missing admitted field publication');expect(s.inspect().rows).toBe(0);}finally{s.dispose();}
++});
++
++it('array order wins over repeated/nonmonotonic ordinals and final partial edit still wins for omitted field',()=>{
++ const s=new EntityPublicationSource();const a=edit(1,7),b:Edit={subject:1,before:{x:7},after:{y:11},fields:['y']};
++ try{install(s,packet([a,b],{steps:[{ordinal:9,ordinary:[a],physical:[a]},{ordinal:0,ordinary:[a],physical:[a]},{ordinal:0,ordinary:[b],physical:[b]}],prepareResponsibility:selection=>{expect(selection!.proposed(1,'x')).toMatchObject({present:false,value:undefined});expect(selection!.proposed(1,'y')).toMatchObject({present:true,value:11});return undefined;}}));expect(before(s)).toMatchObject({present:false,value:undefined});}finally{s.dispose();}
++});
++
++it('rekey-last remains the last proposal instead of the last field-bearing edit',()=>{
++ const s=new EntityPublicationSource();const a=edit(1,7),r:Edit={...edit(1,undefined),fields:[],structural:{kind:'rekey',subject:1,beforeKey:'a',afterKey:'b'}};
++ try{install(s,packet([a,r],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x')).toMatchObject({present:false,value:undefined});return undefined;}}));expect(before(s)).toMatchObject({present:false,value:undefined});}finally{s.dispose();}
++});
++
++it('forEdit retains original identities and distinct restored support for duplicate-subject steps',()=>{
++ const s=new EntityPublicationSource();const first=initialRequirement(),last=initialRequirement();const a:Edit={...edit(1,7),restoredFields:new Map([['x',{present:true,value:7,requirement:first}]])};const b:Edit={...edit(1,11),restoredFields:new Map([['x',{present:true,value:11,requirement:last}]])};let calls=0;
++ const off=s.subscribe({prepare(p,native){calls++;expect(p.steps![0].ordinary[0]).toBe(a);const facts=(native as {facts:import('./internals/entity-publication').EntityPublicationEvidence}).facts;expect(facts.forEdit!(a).field(1,'x','ordinary')).toBe(first);expect(facts.forEdit!(b).field(1,'x','ordinary')).toBe(last);return undefined;},complete(){}});
++ try{install(s,packet([a,b],{steps:[{ordinal:0,ordinary:[a],physical:[a]},{ordinal:1,ordinary:[b],physical:[b]}]}));expect(calls).toBe(1);}finally{off();s.dispose();}
++});
++
++for(const mutation of ['append','subject','kind'] as const)it(`private admission mutation refuses before installation: ${mutation}`,()=>{
++ const s=new EntityPublicationSource();const a:Edit={...edit(1,7),structural:{kind:'add',subject:1}};const edits:Edit[]=[a];const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:selection=>{
++  expect(selection!.proposed(1,'x').value).toBe(7);
++  if(mutation==='append')edits.push(edit(1,11));
++  else if(mutation==='subject')Reflect.set(a,'subject',2);
++  else Reflect.set(a.structural!,'kind','remove');
++  return undefined;
++ }};
++ try{expect(()=>s.prepare(p)).toThrow('admission structure changed');expect(s.inspect().rows).toBe(0);expect(s.inspect().presence).toBe(0);}finally{s.dispose();}
++});
++
++it('later private recipient mutation refuses at finalize, before prepared responsibility installs',()=>{
++ const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();const a=edit(1,7);const edits=[a];const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:1,value:7}],adds:[]})};
++ const off=s.subscribe({prepare(){edits.push(edit(1,11));return undefined;},complete(){}});
++ try{const u=s.prepare(p)!;expect(()=>u.finalize!()).toThrow('admission structure changed');expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++});
++
++for(const separate of [false,true])it(`authored removal dedup is same-step only, separate=${separate}`,()=>{
++ const s=new EntityPublicationSource();const first:Edit={...edit(1,9),structural:{kind:'remove',subject:1}},last=removal(1);let value:unknown='unread';
++ const steps=separate?[{ordinal:0,ordinary:[first],physical:[first]},{ordinal:0,ordinary:[],physical:[last],authoredRemoval:last}]:[{ordinal:0,ordinary:[first],physical:[first],authoredRemoval:last}];
++ try{install(s,packet([first],{steps,prepareResponsibility:selection=>{value=selection!.proposed(1,'x').value;return undefined;}}));expect(value).toBe(separate?undefined:9);expect(s.inspect().negativePresence).toBe(1);}finally{s.dispose();}
++});
++
++for(const fields of [null,[]] as const)it(`present undefined remains distinct from absent, fields=${String(fields)}`,()=>{
++ const s=new EntityPublicationSource();const a:Edit={subject:1,before:undefined,after:{x:undefined},fields};let seen=false;
++ try{install(s,packet([a],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x')).toMatchObject({present:true,value:undefined});expect(selection!.proposed(1,'missing')).toMatchObject({present:false,value:undefined});seen=true;return undefined;}}));expect(seen).toBe(true);expect(s.inspect().fields).toBe(fields===null?1:0);}finally{s.dispose();}
++});
++
++it('held support uses captured admitted subjects after source retirement and later private array mutation',()=>{
++ const s=new EntityPublicationSource();const requirement=initialRequirement();requirement.proof={owners:[],unknown:true,invalid:false};
++ const a:Edit={...edit(1,7),restoredFields:new Map([['x',{present:true,value:7,requirement}]])};const edits=[a];let support:(()=>object)|undefined;
++ const off=s.subscribe({prepare(_p,native){support=(native as {support:()=>object}).support;return undefined;},complete(){}});
++ try{install(s,{owner:1,id:{},meta:undefined,ordinary:edits,physical:[a]});s.retire(1);edits.length=0;expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);}finally{off();s.dispose();}
++});
++
++it('deferred point aggregation indexes final packet once, including repeated ordinals',()=>{
++ const s=new EntityPublicationSource();let first:PreparedPublicationUnit|undefined,second:PreparedPublicationUnit|undefined;let calls=0;
++ const a=edit(1,7),b=edit(1,11);
++ try{withEntityPointPublicationPreparation(()=>{
++  first=s.preparePoint(packet([a],{steps:[{ordinal:0,ordinary:[a],physical:[a]}],prepareResponsibility:selection=>{calls++;expect(selection!.proposed(1,'x').value).toBe(11);return undefined;}}));
++  second=s.preparePoint(packet([b],{steps:[{ordinal:0,ordinary:[b],physical:[b]}]}));
++ });expect(calls).toBe(1);expect(s.inspect().rows).toBe(0);first!.finalize?.();second!.finalize?.();installTerminalRecord(first!.record);installTerminalRecord(second!.record);s.complete(first!.completion);s.complete(second!.completion);expect(before(s).value).toBe(11);
++ }finally{s.dispose();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/packet-index-review.spec.ts
+@@ -0,0 +1,31 @@
++import {expect,it} from 'vitest';
++import '../index';
++import {EntityPublicationSource,entityPublicationOrdinary,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
++import {installTerminalRecord} from './internals/intrinsic-mutation';
++const edit=(x:number):Edit=>({subject:1,before:undefined,after:{x},fields:['x']});
++it('recipient finalizer admission mutation must refuse before installation',()=>{
++ const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();
++ const packet:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})};
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){edits.push(edit(99));}};},complete(){}});
++ try{const unit=source.prepare(packet)!;expect(()=>{unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);}).toThrow('admission structure changed');expect(installed.size).toBe(0);}finally{off();source.dispose();}
++});
++it('recipient finalizer mutation diagnostic proves accepted stale native endpoint',()=>{
++ const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){edits.push(edit(99));}};},complete(){}});
++ try{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})})!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);expect(edits.map(e=>e.after)).toEqual([{x:7},{x:99}]);expect(installed.get('accepted')).toBe(7);off();let observed:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{observed=s!.before(1,'x').value;return undefined;}});expect(observed).toBe(7);}finally{off();source.dispose();}
++});
++
++it('duplicate step and edit identities preserve reverse-find oracle and restored endpoint priority',()=>{
++ const source=new EntityPublicationSource();const restored={present:true,value:23,requirement:source.evidence()!.field(1,'x','ordinary')};
++ const a=edit(7);const b:Edit={...edit(11),restoredFields:new Map([['x',restored]])};const step={ordinal:0,ordinary:[a,b,a],physical:[a,b,a]};
++ const packet:Packet={owner:1,id:{},meta:undefined,ordinary:[],physical:[a,b,a,b],steps:[step,step,{ordinal:0,ordinary:[b],physical:[b]}],prepareResponsibility:selection=>{
++  const reference=[...entityPublicationOrdinary(packet)].reverse().find(e=>e.subject===1)!;
++  expect(selection!.proposed(1,'x').value).toBe((reference.after as {x:number}).x);expect(reference).toBe(b);return undefined;
++ }};
++ try{const unit=source.prepare(packet)!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);let observed:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{observed=s!.before(1,'x');return undefined;}});expect(observed).toBe(restored);}finally{source.dispose();}
++});
++it('later recipient finalizer source reentry refuses outer installation and retains newer facts',()=>{
++ const source=new EntityPublicationSource();let entered=false;const install=(value:number)=>{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:[edit(value)],physical:[]})!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);};
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){if(!entered){entered=true;install(99);}}};},complete(){}});
++ try{expect(()=>install(7)).toThrow('source changed during finalization');off();let value:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{value=s!.before(1,'x').value;return undefined;}});expect(value).toBe(99);}finally{off();source.dispose();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/point-admission-followup.spec.ts
+@@ -0,0 +1,16 @@
++import {expect,it,vi} from 'vitest';
++import '../index';
++import {EntityPublicationSource,withEntityPointPublicationPreparation,type EntityPublicationPacket as Packet,type EntityPublicationEdit as Edit} from './internals/entity-publication';
++import {installTerminalRecord,type PreparedPublicationUnit} from './internals/intrinsic-mutation';
++const packet=(edit:Edit):Packet=>({owner:1,id:{},meta:undefined,ordinary:[edit],physical:[edit]});
++const good=(subject:number,x:number):Edit=>({subject,before:undefined,after:{x},fields:['x']});
++const bad=()=>packet(Object.freeze(good(9,99)));
++const finish=(s:EntityPublicationSource,u:PreparedPublicationUnit)=>{u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);};
++it('refused-only scope never aggregates an empty source and a later scope still installs useful work',()=>{
++ const s=new EntityPublicationSource(),prepare=vi.spyOn(s,'prepare');let prepares=0,completions=0;const off=s.subscribe({prepare(){prepares++;return {record:{writes:[],adds:[]},completion:{}};},complete(){completions++;}});
++ try{withEntityPointPublicationPreparation(()=>{expect(()=>s.preparePoint(bad())).toThrow('mutable admission metadata');});expect(prepare).not.toHaveBeenCalled();expect(prepares).toBe(0);expect(completions).toBe(0);let unit:PreparedPublicationUnit|undefined;withEntityPointPublicationPreparation(()=>{unit=s.preparePoint(packet(good(1,7)));});expect(prepare).toHaveBeenCalledTimes(1);expect(prepares).toBe(1);expect(s.inspect().rows).toBe(0);finish(s,unit!);expect(completions).toBe(1);expect(s.inspect().rows).toBe(1);}finally{prepare.mockRestore();off();s.dispose();}
++});
++it('caught refusal between valid fragments preserves the real group and completes it once',()=>{
++ const s=new EntityPublicationSource();let prepares=0,completions=0;let accepted:Packet|undefined;const a=good(1,7),b=good(2,11);const off=s.subscribe({prepare(p){prepares++;accepted=p;return {record:{writes:[],adds:[]},completion:{}};},complete(){completions++;}});
++ try{let first:PreparedPublicationUnit|undefined,second:PreparedPublicationUnit|undefined;withEntityPointPublicationPreparation(()=>{first=s.preparePoint(packet(a));expect(()=>s.preparePoint(bad())).toThrow('mutable admission metadata');second=s.preparePoint(packet(b));});expect(first).toBe(second);expect(prepares).toBe(1);expect(accepted!.ordinary).toEqual([a,b]);finish(s,first!);finish(s,second!);expect(completions).toBe(1);expect(s.inspect().rows).toBe(2);let values:unknown[]=[];s.prepare({...packet(good(3,0)),ordinary:[],physical:[],prepareResponsibility:f=>{values=[f!.before(1,'x').value,f!.before(2,'x').value];return undefined;}});expect(values).toEqual([7,11]);}finally{off();s.dispose();}
++});

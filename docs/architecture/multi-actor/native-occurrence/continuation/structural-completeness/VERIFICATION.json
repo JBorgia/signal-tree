@@ -1,0 +1,14 @@
+{
+  "predecessorUnchanged": true,
+  "predecessorFiles": 2945,
+  "changed": [
+    "packages/kernel/src/lib/independent-public-handoff.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/structural-completeness.spec.ts"
+  ],
+  "specDiagnosticsEqualAfterRootNormalization": true,
+  "baselineSpecErrors": 202,
+  "successorSpecErrors": 202,
+  "originalSequenceFixtureUnchanged": true,
+  "publicHandoffFixtureIdenticalToReview": true
+}

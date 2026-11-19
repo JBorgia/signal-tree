@@ -1,0 +1,19 @@
+{
+  "predecessorSourceFilesVerified": 2971,
+  "predecessorFreezeUnchanged": true,
+  "inheritedTestsUnchanged": true,
+  "independentFixtureExact": true,
+  "runtimeChanges": {
+    "packages/kernel/src/lib/internals/entity-publication.ts": "ef8ce6469fceef0867b16b91d47acf2c98d88ab7d40ea7d9392f99665aa923e1"
+  },
+  "artifacts": {
+    "SOURCE-SHA256.json": "542125745ddaad67aead344961bdfb408e43c6447938f6834413038a90ad413d",
+    "runtime.patch": "af3692c9d1678661223f49d4f8d109dd5b07c45a9db9bdeded1c319ce18b368e",
+    "tests.patch": "3847f07f3c4e692e1f0d40875d2c6fd89be76ec231ae96e5b0be9a45ddcee6d4",
+    "focused-first.log": "413ce72108f32ea215a5c383387705621c3fd52b3a267c8379e1163d79bd5eb1",
+    "targeted.log": "6a74d3cb8cdd8d09f6e956c145410e5f8064844a1007cc364718d598719c0700",
+    "point.log": "e45af35aa28dd29d7ce978a7144a54ab14f0cf7c9831ec49ac61b12286ff640f",
+    "source-types.log": "2e09b52d14311ade1cd63b9d20f4ef0db333c67c2aa3ef3e1e0b8597fd30f896",
+    "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  }
+}

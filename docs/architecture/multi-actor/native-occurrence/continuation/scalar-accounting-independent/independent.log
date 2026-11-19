@@ -1,0 +1,35 @@
+
+> nx run kernel:test scalar-accounting-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-accounting-independent.spec.ts --maxWorkers=1
+
+(node:3015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:3022) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-instrumentation-independent/candidate/packages/kernel
+
+(node:3029) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  20:41:05
+   Duration  970ms (transform 86ms, setup 0ms, import 111ms, tests 3ms, environment 469ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

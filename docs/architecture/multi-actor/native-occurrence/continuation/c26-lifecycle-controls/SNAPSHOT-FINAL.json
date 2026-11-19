@@ -1,0 +1,30 @@
+{
+  "status": "C25/C26 five cases pass; unchanged C26 spec-type checker passes; no source or test corrections",
+  "files": {
+    "run-bounded.py": "53a1ee65aebf9185a0c2f295bee2f71d3d4eb8748df6e85762d97b5987a723a0",
+    "SOURCE-IDENTITY.json": "de4f01440993e3db260f6a52c4a9a5e02e22f6afb76994f9bf89bac8e729f0c0",
+    "REPORT.md": "0ace83e4abec2ae6fe8b5b3176af0ea3b318237d82cac12d56c57fef1d50b185",
+    "prepare-copies.py": "916edf6a56869609ff195e9660b213a812b814ad998de6ae7f58921794a6a5d8",
+    "C26-MANIFEST.json": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+    "SNAPSHOT.json": "681d9bf907298a32a289ef1c2c17afc5a00ac0a92757f348d4d3018329116de5",
+    "C25-MANIFEST.json": "9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02",
+    "PLAN.md": "e14b79b0de2bb395b32c903b27c3ac8198a75db6c61d3272f50bdd3924d78381",
+    "TESTS.patch": "69f3051ef81dc0ca32de8a633c7e114c7c9dfb64980bc160a8388c5d49b8f2b0",
+    "packet/packages/kernel/src/lib/scalar-horizon-lifecycle-controls.spec.ts": "fc0f5d3503b3dbc97825b3372eb9d52c42f41b6032dc3a330803aaff03c16b51",
+    "C25-preserved/first.log": "2152717282bea2b735b64c713191b4c778ce15db2c1c4e804e9f4eecc7fd76e3",
+    "C25-preserved/ROOTS-DERIVED.jsonl": "88a396b8fabb73b3dab3451079f3604438b2746888d4df1487f989510ada35c4",
+    "runs/spec-types-first/REPORT-BEFORE-SPEC-CHECK.md": "6716b98dc197a25da48ab7ecff15d9cd06ec3346bff46c4c51b2125d66e3fb92",
+    "runs/spec-types-first/RESULT.json": "09b0607e2f2aa39ed88a53ba629be68078cd0d3b93b30547c17bc04e5f77f983",
+    "runs/spec-types-first/first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "runs/spec-types-first/SOURCE-BEFORE.json": "ac299cf696d32e2e3d6ef4ef3710d2a1fdcc4bec52b19901ee1b6b34c9549b3d",
+    "runs/spec-types-first/COMMAND.json": "4254ca5de34e95db08ff44f41c08854daeef2f6a9d333ddfa1505feaa43434cc",
+    "runs/C25/COMMAND.json": "8a5f176b11367b524cd49af25d00c19717c439c14de274997c7b3c7cd788e19d",
+    "runs/C25/PROCESS.json": "7c44978270335b12109da58fa697fdd7a3fc407bf8b99eedc4c7d582cec7589b",
+    "runs/C25/RESULT.json": "25a4bd84eba6e1ce2ce856d7bb0fe4c371a0ff2764f055d75b937364c8827d29",
+    "runs/C25/first.log": "1b89958d7094acdd706ec344d3586b149960a7a76cdd3999536e488c0e974a16",
+    "runs/C26/COMMAND.json": "952fbaa321893b1b4375454ebe915398391fd3d0beca7eee9228be4166563248",
+    "runs/C26/PROCESS.json": "5a17139e6bb2c53b85797647380dab9aec2eb80682fa459b74687e8031ea48c5",
+    "runs/C26/RESULT.json": "25a4bd84eba6e1ce2ce856d7bb0fe4c371a0ff2764f055d75b937364c8827d29",
+    "runs/C26/first.log": "4c21f04ec4cf61361fa4c6197f378e76bf63c4336b18b6e4516fb7575f4701b0"
+  }
+}

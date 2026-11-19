@@ -1,0 +1,8 @@
+1284:   }
+1285:   // One independently contained delivery per lifetime: a callback from one
+1286:   // row cannot starve a later row after the complete frame is installed.
+1287:   const livePointPlans = withEntityPointPublicationPreparation(()=>[...liveRows].flatMap(([collection, rows]) =>
+1288:     [...rows.values()].map(row=>collection.__preparePointValues!([row],undefined,publicationPhase))
+1289:   ));
+1290:   const preparedSubjectScalarEffects = scalarEffects.filter((effect) =>
+1291:     isPreparedSubjectScalarEffect(effect, preparedContext)

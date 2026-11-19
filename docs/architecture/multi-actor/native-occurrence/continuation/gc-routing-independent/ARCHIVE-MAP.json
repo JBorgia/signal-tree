@@ -1,0 +1,50 @@
+[
+  {
+    "source": "matrix-check.mjs",
+    "archive": "matrix-check.mjs",
+    "sourceSha256": "69c4dd26c97bcba68c406bb23de685a1ac5a2399e31d776757f5cb49ed3bbc35",
+    "archiveSha256": "69c4dd26c97bcba68c406bb23de685a1ac5a2399e31d776757f5cb49ed3bbc35"
+  },
+  {
+    "source": "FIRST-VERIFIER-ERROR.txt",
+    "archive": "FIRST-VERIFIER-ERROR.txt",
+    "sourceSha256": "01854d31cd6f15227eb5fd7ea1326055cb96ec044984be609114b924a4654915",
+    "archiveSha256": "01854d31cd6f15227eb5fd7ea1326055cb96ec044984be609114b924a4654915"
+  },
+  {
+    "source": "FIRST-VERIFIER.py",
+    "archive": "FIRST-VERIFIER.py",
+    "sourceSha256": "0405d95d00314fa97a74ec4f84fddff7b48fb0bcee756c98794f005b552508dd",
+    "archiveSha256": "0405d95d00314fa97a74ec4f84fddff7b48fb0bcee756c98794f005b552508dd"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "e5879102338e8c6e5f1112a2faf6136a91648eaf651111f1c0e49d217c9f0f36",
+    "archiveSha256": "e5879102338e8c6e5f1112a2faf6136a91648eaf651111f1c0e49d217c9f0f36"
+  },
+  {
+    "source": "MATRIX-REPLAY.json",
+    "archive": "MATRIX-REPLAY.json",
+    "sourceSha256": "e5627900f6c370bd69a9e67c0fc44c5d00402a3888a8a594e1589cff5b963c70",
+    "archiveSha256": "e5627900f6c370bd69a9e67c0fc44c5d00402a3888a8a594e1589cff5b963c70"
+  },
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "1873ee2c8b37d37413bb9d6a2a72e4c0c4f46cc47f737decbf90a2c59d087f3f",
+    "archiveSha256": "1873ee2c8b37d37413bb9d6a2a72e4c0c4f46cc47f737decbf90a2c59d087f3f"
+  },
+  {
+    "source": "verify.py",
+    "archive": "verify.py",
+    "sourceSha256": "3ffa3b72c422e0797ffd1e63848e107e188b004bd87c91f272970861bfdb6064",
+    "archiveSha256": "3ffa3b72c422e0797ffd1e63848e107e188b004bd87c91f272970861bfdb6064"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "9aab3b64ea21d030ae190dea86834d78e7d3bbed509f20b170207e1d8b20c914",
+    "archiveSha256": "9aab3b64ea21d030ae190dea86834d78e7d3bbed509f20b170207e1d8b20c914"
+  }
+]

@@ -1,0 +1,54 @@
+{
+  "inspectionState": {
+    "value": {
+      "x": 0,
+      "y": 0,
+      "z": 99
+    },
+    "ordinaryBaseline": true,
+    "physicalDistinct": true
+  },
+  "rollbackState": {
+    "value": {
+      "x": 0,
+      "y": 0,
+      "z": 99
+    },
+    "ordinaryBaseline": true,
+    "physicalInspection": true,
+    "deliveries": [
+      [
+        {
+          "id": "a",
+          "x": 0,
+          "y": 0,
+          "z": 7
+        }
+      ]
+    ]
+  },
+  "adoptionState": {
+    "value": {
+      "x": 0,
+      "y": 0,
+      "z": 99
+    },
+    "ordinaryChanged": true
+  },
+  "rejectionState": {
+    "value": {
+      "x": 0,
+      "y": 0,
+      "z": 7
+    },
+    "ordinaryBaseline": true,
+    "delivery": [
+      {
+        "id": "a",
+        "x": 0,
+        "y": 0,
+        "z": 7
+      }
+    ]
+  }
+}

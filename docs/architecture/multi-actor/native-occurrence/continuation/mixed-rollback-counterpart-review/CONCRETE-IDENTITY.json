@@ -1,0 +1,5 @@
+{
+  "baselineEntriesVerifiedUnchanged": 3066,
+  "reviewedSpecSHA256": "65c7a333439613627a7f94b0836bc6f48e61232e88f0d4e1a2c7fdba4903bb5f",
+  "reviewedSpec": "/private/tmp/st-mixed-rollback-composition-counterpart/candidate/packages/kernel/src/lib/whole-mixed-promises.spec.ts"
+}

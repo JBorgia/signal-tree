@@ -1,0 +1,36 @@
+
+> nx run kernel:test src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs
+
+> node tools/run-core-vitest.mjs src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern="^v16 restoration of turns larger than the argument limit releases the claims of a truncated turn that cleared more rows than the argument limit$" --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs
+
+(node:48869) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:48878) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-large-qualification/screen-candidate/packages/kernel
+
+(node:48893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts (2 tests | 1 skipped) 281ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  11:10:20
+   Duration  7.61s (transform 2.72s, setup 0ms, import 3.25s, tests 281ms, environment 3.61s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      10.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     10.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    10.0s

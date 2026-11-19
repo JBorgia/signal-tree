@@ -1,0 +1,44 @@
+
+> nx run angular:test absent-collection.spec.ts parent-snapshot-currentness.spec.ts parent-freshness-focused.spec.ts parent-freshness-entity.spec.ts --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular absent-collection.spec.ts parent-snapshot-currentness.spec.ts parent-freshness-focused.spec.ts parent-freshness-entity.spec.ts --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:29910) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29949) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-effective-presence-successor/candidate/packages/angular
+
+(node:29958) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30062) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  26 passed (26)
+   Start at  10:29:13
+   Duration  6.50s (transform 1.27s, setup 1.27s, import 2.29s, tests 317ms, environment 1.72s)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      7.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    7.9s

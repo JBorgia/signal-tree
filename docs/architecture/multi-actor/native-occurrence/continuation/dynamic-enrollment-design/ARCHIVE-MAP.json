@@ -1,0 +1,12 @@
+{
+  "READ-SOURCE-SHA256.json": {
+    "sha256": "76fd4f8bfd5e68fdfa53c6fd40b7e75f1d9ab333bbdaaae8da1740b3c3efc9d3",
+    "archive": "READ-SOURCE-SHA256.json",
+    "archiveSha256": "76fd4f8bfd5e68fdfa53c6fd40b7e75f1d9ab333bbdaaae8da1740b3c3efc9d3"
+  },
+  "REVIEW.md": {
+    "sha256": "ef0952e2c321d237fe1edb7c27e122bcdddf934e4cf427b5415c487d795fa994",
+    "archive": "REVIEW.md",
+    "archiveSha256": "ef0952e2c321d237fe1edb7c27e122bcdddf934e4cf427b5415c487d795fa994"
+  }
+}

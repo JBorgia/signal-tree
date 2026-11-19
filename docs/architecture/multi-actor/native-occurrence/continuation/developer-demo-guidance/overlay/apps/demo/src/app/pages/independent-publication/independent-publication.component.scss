@@ -1,0 +1,106 @@
+.page-header {
+  margin-bottom: var(--layout-section-gap);
+  padding-bottom: var(--layout-panel-inset);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+.page-eyebrow {
+  color: var(--color-primary-600);
+  font-weight: 700;
+}
+h1 {
+  color: var(--color-neutral-900);
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1.2;
+}
+h2,
+h3 {
+  color: var(--color-neutral-900);
+}
+p,
+li {
+  color: var(--color-neutral-700);
+  line-height: 1.7;
+}
+.page-lede {
+  max-width: 760px;
+  font-size: 1.1rem;
+}
+section {
+  margin-bottom: var(--layout-section-gap);
+}
+.instructions {
+  padding-left: var(--space-6);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+}
+button {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-primary-600);
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-600);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+  &:disabled {
+    background: var(--color-neutral-100);
+    color: var(--color-neutral-600);
+    border-color: var(--color-neutral-300);
+    cursor: default;
+  }
+}
+button:focus-visible,
+pre:focus-visible {
+  outline: 3px solid var(--color-primary-600);
+  outline-offset: 3px;
+}
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+.state-card,
+.boundary {
+  padding: var(--space-6);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+}
+.state-card {
+  overflow-wrap: anywhere;
+  h3 {
+    margin-top: 0;
+  }
+}
+.boundary {
+  background: var(--color-primary-50);
+}
+dt {
+  color: var(--color-neutral-600);
+  margin-top: var(--space-3);
+}
+dd {
+  margin: var(--space-2) 0;
+  font-weight: 600;
+}
+code {
+  font-family: var(--font-mono);
+}
+.code-example {
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-neutral-900);
+  color: var(--color-neutral-100);
+  overflow-x: auto;
+  line-height: 1.65;
+}
+.aside {
+  font-size: 0.95rem;
+}
+@media (max-width: 800px) {
+  .state-grid {
+    grid-template-columns: 1fr;
+  }
+}

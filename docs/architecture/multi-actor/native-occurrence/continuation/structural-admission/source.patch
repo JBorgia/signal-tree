@@ -1,0 +1,182 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -663,6 +663,49 @@
+       order: subjects.map(({ subject }) => subject),
+       orderFrontier: structuralStore.activeOrderFrontier(),
+     };
++  }
++
++  /** Validate semantic endpoints against the effective ordinary view, before
++   * physical address substitution. This stage has no install or callbacks. */
++  function validateOrdinaryStructure(
++    effects: readonly import('./internals/causal-runtime/causal-types').ReversalEffect[]
++  ): boolean {
++    const base = ordinaryTopology.preparePlacement(structuralStore.preparePlacement());
++    type Presence = { present: false } | { present: true; key: K };
++    const subjects = new Map<number, Presence>();
++    const keys = new Map<K, number | undefined>();
++    const read = (subject: number): Presence => subjects.get(subject) ?? base.read(subject);
++    const atKey = (key: K): number | undefined => {
++      if (keys.has(key)) return keys.get(key);
++      const subject = ordinaryTopology.atKey(key) ?? structuralStore.subjectIdForKey(key);
++      if (subject === undefined) return undefined;
++      const state = read(subject);
++      // A physical candidate can occupy an inspection-only address. Recheck
++      // its effective ordinary key; sparse exceptions alone are not a view.
++      return state.present && state.key === key ? subject : undefined;
++    };
++    const write = (subject: number, next: Presence): void => {
++      const prior = read(subject);
++      if (prior.present) keys.set(prior.key, undefined);
++      subjects.set(subject, next);
++      if (next.present) keys.set(next.key, subject);
++    };
++    for (const effect of effects) {
++      if (!effect.structural || typeof effect.subjectId !== 'number') continue;
++      const subject = effect.subjectId, prior = read(subject);
++      if (effect.structural === 'remove') {
++        // Existing removal semantics resolve by lifetime, not recorded key.
++        if (!prior.present) return false;
++        write(subject, { present: false });
++      } else if (effect.structural === 'rekey') {
++        if (!prior.present || prior.key !== effect.before || atKey(effect.after as K) !== undefined) return false;
++        write(subject, { present: true, key: effect.after as K });
++      } else {
++        if (prior.present || atKey(effect.after as K) !== undefined) return false;
++        write(subject, { present: true, key: effect.after as K });
++      }
++    }
++    return true;
+   }
+ 
+   function prepareOrdinaryRealization(
+@@ -5149,6 +5192,10 @@
+     enumerable: false,
+     configurable: true,
+   });
++  Object.defineProperty(api, '__validateOrdinaryStructure', {
++    value: validateOrdinaryStructure,
++    enumerable: false,
++  });
+   Object.defineProperty(api, '__prepareOrdinaryRealization', {
+     value: prepareOrdinaryRealization,
+     enumerable: false,
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -52,6 +52,7 @@
+ const TREE_REALIZATION_PORT = Symbol.for('SignalTree:TreeRealizationPort');
+ 
+ type CollectionNode = {
++  __validateOrdinaryStructure?(effects: readonly ReversalEffect[]): boolean;
+   __prepareOrdinaryRealization?(
+     effects: readonly ReversalEffect[],
+     physicalAfter?: ReadonlyMap<number, unknown>,
+@@ -478,26 +479,55 @@
+     getPhysicalCommitClock(options.tree) ??
+     getPhysicalCommitClock(options.tree.$);
+   const structuralOwnerPaths = indexStructuralOwnerPaths(options.tree.$);
++  // The exact returned array is an invocation-local admitted operation, not a
++  // reusable current-key rewrite. Legacy unlowered callers retain validation.
++  const admissions = new WeakMap<readonly ReversalEffect[], {
++    valid: boolean; revision: number | undefined; consumed: boolean;
++  }>();
++  const admissionCurrent = (effects: readonly ReversalEffect[]): boolean => {
++    const admission = admissions.get(effects);
++    return !admission || (admission.valid && !admission.consumed &&
++      admission.revision === physicalCommitClock?.revision());
++  };
+ 
+   return {
+     prepareSelectedUnit(effects) {
+       return prepareSelectedOperation(options.tree, effects, structuralOwnerPaths);
+     },
+     prepareOrdinaryEffects(effects) {
+-      const byOwner = new Map(effects.map((effect) => [effect.owner, effect]));
+-      return prepareOrdinaryRealization(effects, (owner, subject) => {
++      const revision = physicalCommitClock?.revision();
++      const groups = new Map<PositionId, ReversalEffect[]>();
++      for (const effect of effects) {
++        if (!effect.structural || typeof effect.subjectId !== 'number') continue;
++        let group = groups.get(effect.owner);
++        if (!group) groups.set(effect.owner, group = []);
++        group.push(effect);
++      }
++      let valid = true;
++      for (const [owner, group] of groups) {
++        const node = resolveCollectionNode(options.tree, options.descriptors.get(owner), structuralOwnerPaths, group[0]);
++        // Original add backing/restore evidence is checked before a physical
++        // transfer can replace that add. No absent binding grants permission.
++        if (!node?.__validateOrdinaryStructure ||
++          group.some(effect => effect.structural === 'add' &&
++            (!node.__restoreOne || !getStructuralAddEffect(options.descriptors.get(owner), effect))) ||
++          !node.__validateOrdinaryStructure(group)) {
++          valid = false;
++          break;
++        }
++      }
++      const byOwner = new Map(effects.map(effect => [effect.owner, effect]));
++      // Failed semantic admission is returned for the existing typed refusal
++      // path; it must not be lowered or partially installed.
++      const physical = valid ? prepareOrdinaryRealization(effects, (owner, subject) => {
+         const effect = byOwner.get(owner);
+-        return effect
+-          ? resolveCollectionNode(
+-              options.tree,
+-              options.descriptors.get(owner),
+-              structuralOwnerPaths,
+-              effect
+-            )?.__findKeyBySubjectId?.(subject)
+-          : undefined;
+-      }).physical;
++        return effect ? resolveCollectionNode(options.tree, options.descriptors.get(owner), structuralOwnerPaths, effect)?.__findKeyBySubjectId?.(subject) : undefined;
++      }).physical : Object.freeze([...effects]);
++      admissions.set(physical, { valid: valid && revision === physicalCommitClock?.revision(), revision, consumed: false });
++      return physical;
+     },
+     validateEffects(effects) {
++      if (!admissionCurrent(effects)) return { kind: 'structural-drift' };
+       const preparedContext = buildPreparedRealizationContext(
+         options.tree,
+         options.descriptors,
+@@ -525,6 +555,13 @@
+       return undefined;
+     },
+     applyAtomically(effects) {
++      const admission = admissions.get(effects);
++      if (admission) {
++        if (!admissionCurrent(effects) || !buildPreparedRealizationContext(
++          options.tree, options.descriptors, structuralOwnerPaths, scalarSlotRuntime, effects
++        )) throw new Error('Ordinary structural admission refused at structural-drift');
++        admission.consumed = true;
++      }
+       const memberTargets = new Map<
+         number,
+         { present: boolean; value: unknown; turn?: number }
+@@ -562,7 +599,7 @@
+       const apply = () => {
+         // Prepare the remaining frame before any member is installed. All member
+         // values and presence are installed before any effect is published.
+-        const heterogeneousFrame = valueEffects.length
++        const heterogeneousFrame = valueEffects.length || ordinaryRealization(effects)?.ordinary.some(effect => !!effect.structural)
+           ? planHeterogeneousFrame(
+               options.tree,
+               options.descriptors,
+@@ -617,6 +654,8 @@
+             perEffect = valueEffects.filter((effect) => !framed.has(effect));
+           }
+         }
++        if (admission && admission.revision !== physicalCommitClock?.revision())
++          throw new Error('Ordinary structural admission revision is stale');
+         members?.install();
+         // A membership-only frame has no value frame to advance the shared
+         // physical clock. Publish its installed presence under a new revision.
+@@ -1015,8 +1054,7 @@
+   | { commit(): void; install(): void; invalidate(): void; publish(): void }
+   | undefined {
+   if (
+-    effects.length === 0 ||
+-    !effects.some(
++    !(ordinaryEffects ?? effects).some(
+       (effect) =>
+         effect.structural === 'rekey' ||
+         effect.structural === 'add' ||

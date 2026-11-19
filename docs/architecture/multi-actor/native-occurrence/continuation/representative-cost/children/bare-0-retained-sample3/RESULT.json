@@ -1,0 +1,21 @@
+{
+  "id": "bare-0-retained-sample3",
+  "ordinal": 10,
+  "profile": "bare",
+  "size": 0,
+  "arm": "retained",
+  "label": "sample3",
+  "exit": 0,
+  "pid": 69885,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.6881639999337494,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1064960,
+  "minimumObservedHostFreePercentage": 49.0,
+  "attempts": 1
+}

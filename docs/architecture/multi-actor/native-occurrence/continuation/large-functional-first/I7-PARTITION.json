@@ -1,0 +1,52 @@
+{
+  "candidateManifest": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+  "smallPartition": {
+    "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "pattern": "^setAll removal neighbour search work",
+    "selectedPassed": 9,
+    "receipt": "/private/tmp/st-v16-integration-evidence/runs/i4-neighbour-search/RESULT.json",
+    "doNotRepeatForI7": true
+  },
+  "largePartition": [
+    {
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "sourceSha256": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+      "name": "entity batches larger than the argument limit > setAll, replace and clear with membership observed",
+      "screen2048": "selected-case-pass",
+      "original130000": "selected-case-pass",
+      "originalSelectedPass": true,
+      "originalReceipt": "/private/tmp/st-large-qualification/runs/original-membership/RESULT.json",
+      "doNotRepeatForI7": true
+    },
+    {
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "sourceSha256": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+      "name": "entity batches larger than the argument limit > undo and redo of a setAll that replaced every row",
+      "screen2048": "selected-case-pass",
+      "original130000": "aggregate-owned-rss-over2GiB",
+      "originalSelectedPass": false,
+      "originalReceipt": "/private/tmp/st-large-qualification/runs/original-replacement-undo-redo/RESULT.json",
+      "doNotRepeatForI7": false
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "sourceSha256": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c",
+      "name": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit",
+      "screen2048": "selected-case-pass",
+      "original130000": "not run",
+      "originalSelectedPass": false,
+      "originalReceipt": null,
+      "doNotRepeatForI7": false
+    },
+    {
+      "file": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "sourceSha256": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c",
+      "name": "v16 restoration of turns larger than the argument limit > releases the claims of a truncated turn that cleared more rows than the argument limit",
+      "screen2048": "selected-case-pass",
+      "original130000": "not run",
+      "originalSelectedPass": false,
+      "originalReceipt": null,
+      "doNotRepeatForI7": false
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+
+> nx run kernel:test enrollment-trace-review.spec.ts --testNamePattern=native ancestor updater cannot publish pending sibling --maxWorkers=1
+
+> node tools/run-core-vitest.mjs enrollment-trace-review.spec.ts --testNamePattern="native ancestor updater cannot publish pending sibling" --maxWorkers=1
+
+(node:41245) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41252) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-enrollment-isolation-trace/candidate/packages/kernel
+
+(node:41259) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/enrollment-trace-review.spec.ts (52 tests | 1 failed | 51 skipped) 17ms
+   × native ancestor updater cannot publish pending sibling input through a descendant relationship 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/enrollment-trace-review.spec.ts > native ancestor updater cannot publish pending sibling input through a descendant relationship
+Error: Declaration invalid: contradiction; writes may remain
+ ❯ runDeclaration src/lib/experimental-publication/lifecycle.ts:315:32
+    313|   try{result=work();}catch(error){thrown=true;primary=error;}
+    314|   if(result!==null&&(typeof result==='object'||typeof result==='functi…
+    315|   if(frameInvalid(frame))throw new SignalTreePublicationError(stage,'c…
+       |                                ^
+    316|   if(thrown)throw primary;
+    317|   return receipt;
+ ❯ Module.<anonymous> src/lib/enrollment-trace-review.spec.ts:17:195
+ ❯ Module.declare src/lib/experimental-publication/private.ts:413:142
+ ❯ Object.declare src/lib/link.ts:1158:16
+ ❯ src/lib/aggregate-native-input-independent.spec.ts:14:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 51 skipped (52)
+   Start at  17:17:46
+   Duration  943ms (transform 516ms, setup 0ms, import 619ms, tests 17ms, environment 200ms)
+
+Warning: command "node tools/run-core-vitest.mjs enrollment-trace-review.spec.ts --testNamePattern="native ancestor updater cannot publish pending sibling" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

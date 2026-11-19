@@ -1,0 +1,35 @@
+
+> nx run kernel:test plain-branch-membership.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs plain-branch-membership.spec.ts --maxWorkers=1
+
+(node:62129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62142) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-r3-independent/candidate/packages/kernel
+
+(node:62149) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  21:23:51
+   Duration  505ms (transform 238ms, setup 0ms, import 288ms, tests 12ms, environment 137ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      893ms
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     885ms (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    885ms

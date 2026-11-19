@@ -1,0 +1,31 @@
+✔ same segment keeps first baseline and latest after selection; inverse restores q as D (0.995584ms)
+✔ distinct segments cannot capture-compose; compensation keeps both field effects (0.130916ms)
+✔ equal no-effect retains selection; declaration cannot discard destination obligation (0.049041ms)
+✔ omitted superseded effect produces no inverse selection (0.049625ms)
+✔ continuous selected occupancy transfers first endpoint across segments (0.076209ms)
+✔ discontinuous structural endpoints remain separate; no omitted bridge invented (0.045875ms)
+✔ remove/add cancellation retains synthetic field baseline and latest authored selection (0.102291ms)
+✔ ordinary add lowers to physical rekey without substituting ordinary support (0.07175ms)
+✔ history references survive supersession/held output and release exactly (0.078958ms)
+✔ join staged order, mixed fields, and exclusion support; never adopt extra source row (0.204958ms)
+✔ same-value changed support is selected only with staged permission; peer stays peer (0.07875ms)
+✔ hidden/restored old lifetime may retain peer; same key new lifetime cannot alias it (0.07025ms)
+✔ held exact completion rejects changed source frontier; immutable captured map still renders (0.088667ms)
+✔ rebind equal native field values do not invent synthetic ownership from different support (0.046625ms)
+✔ q7 -> r11 -> r7 normalizes away: retain native q selection, rejectr has no inverse (0.055208ms)
+✔ q7 -> r11 -> r13 retains admitted endpoint then selected inverse restores q (0.027541ms)
+✔ selective omitted field keeps later confirmed selection; another selected slot may restore (0.030667ms)
+✔ observed later-confirmed refusal preserves all field support without an inverse (0.025334ms)
+✔ delimiter collision in occurrence/dimension retains distinct values and support (0.411166ms)
+✔ opaque same-string occurrence tokens and numeric/string identities cannot alias (0.10275ms)
+✔ rebind field tokens preserve tuple boundaries and canonicalize only exact identity (0.086917ms)
+✔ render __proto__ as own enumerable data without changing prototype (0.055333ms)
+✔ absent own rebind field does not read inherited getter (0.051708ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38.22775

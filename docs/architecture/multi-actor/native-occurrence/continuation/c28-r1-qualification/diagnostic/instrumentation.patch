@@ -1,0 +1,35 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -130,7 +130,7 @@
+  return own;
+ }
+ registerPublicationSnapshots((node,value)=>{snapshotViews.set(value,Object.freeze(suppliedViews(node,value)));});
+-function nativeInputs(node:object,supplied?:unknown,currentSource=false):lifecycle.NativeInput[]{
++function nativeInputsOriginal(node:object,supplied?:unknown,currentSource=false):lifecycle.NativeInput[]{
+  const entity=getEntityPublicationBinding(node);
+  if(entity){const captured=entity.source.captureInput(entity.subject,entity.field) as {native?:readonly lifecycle.NativeInput[]}|undefined;return [...(captured?.native??[])];}
+  const views=suppliedViews(node,supplied,currentSource);
+@@ -602,3 +602,13 @@
+  return selectedReceipt(channel);
+ }
+ 
++
++// Qualification-only observations, disabled except during explicit capture.
++let __captureEnabled=false;
++let __captures:{node:object;supplied:unknown;inputs:readonly lifecycle.NativeInput[]}[]=[];
++function nativeInputs(node:object,supplied?:unknown,currentSource=false):lifecycle.NativeInput[]{const inputs=nativeInputsOriginal(node,supplied,currentSource);if(__captureEnabled)__captures.push({node,supplied,inputs});return inputs;}
++export function __historyBeginCapture(){__captures=[];__captureEnabled=true;}
++export function __historyEndCapture(){const result=__captures;__captures=[];__captureEnabled=false;return result;}
++export function __historyRoots(node:object){return {endpoint:nativeValues.get(node),view:nativeViews.get(node),bindings:[...bindings.values()]};}
++export function __historySnapshot(value:object){return snapshotViews.get(value);}
++export function __historyFactRoot(value:object){return [factRequirements.get(value as Fact),proofs.get(value as Fact),ownProofs.get(value as Fact),noopPredecessors.get(value as Fact)];}
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -526,3 +526,7 @@
+  refresh(op);return selected;
+ }
+ 
++
++export function __historyWeakRoots(value:object){return [finalizedRetirements.get(value as NativeRequirement),requirementListeners.get(value as NativeRequirement),ownerTransitionObservers.get(value as OwnerCell)];}
++export function __historyOperations(){return [...connections.values()].flatMap(connection=>[...connection.ops.values()]);}
++export function __c26NormalizationState(r:NativeRequirement){return {enrolled:normalizingScalars.has(r),listeners:requirementListeners.get(r)?.size??0};}

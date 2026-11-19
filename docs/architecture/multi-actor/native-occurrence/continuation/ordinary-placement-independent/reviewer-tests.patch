@@ -1,0 +1,55 @@
+diff --git a/private/tmp/st-ordinary-placement-independent-review/candidate/packages/kernel/src/lib/placement-independent-review.spec.ts b/private/tmp/st-ordinary-placement-independent-review/candidate/packages/kernel/src/lib/placement-independent-review.spec.ts
+new file mode 100644
+index 00000000..919a9963
+--- /dev/null
++++ b/private/tmp/st-ordinary-placement-independent-review/candidate/packages/kernel/src/lib/placement-independent-review.spec.ts
+@@ -0,0 +1,49 @@
++import { expect, it } from 'vitest';
++import { EntityPlacementStage } from './physical/entity-placement-stage';
++import { resolveOrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
++import { createEntityEgressProjection } from './internals/entity-egress-projection';
++import type { EntityPublicationPacket } from './internals/entity-publication';
++
++it('independent: three restored lifetimes replay final source adjacency across request permutations',()=>{
++  let seed=1759, count=0;
++  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed;};
++  for(const permutation of [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]) for(let n=0;n<512;n++) {
++    const p=new EntityPlacementStage<number>(id=>id===4?{present:true,key:4,afterSubject:5}:id===5?{present:true,key:5,beforeSubject:4}:{present:false},4,5);
++    const requests=permutation.map(subject=>{const choices=[undefined,...[1,2,3,4,5,99].filter(id=>id!==subject)];return {subject,beforeSubject:choices[random()%choices.length],afterSubject:choices[random()%choices.length]};});
++    for(const v of requests)p.insert(v.subject,v.subject,v.beforeSubject,v.afterSubject);
++    const final=resolveOrdinaryRestorationPlacement(p,new Map(requests.map(v=>[v.subject,v])));
++    const rows=[3,4,2,5,1].map(id=>({subjectId:id,key:id,row:{id,n:id*10}}));
++    const projection=createEntityEgressProjection(rows);projection.relocate(final);
++    expect(projection.value()).toEqual(p.snapshot().map(id=>({id,n:id*10})));
++    expect(new Set(p.snapshot()).size).toBe(5);count++;
++  }
++  expect(count).toBe(3072);
++});
++
++it('independent: placement cannot admit inspection-only or replace same-key eligible lifetime',()=>{
++ const a={id:'a',n:1},c={id:'c',n:3};
++ const p=createEntityEgressProjection([{subjectId:1,key:'a',row:a},{subjectId:3,key:'c',row:c}]);
++ p.apply(1,undefined,{kind:'remove',subject:1,key:'a',value:a},true);
++ p.apply(8,{id:'a',n:99},{kind:'add',subject:8,key:'a',value:{id:'a',n:99},afterSubject:3},true);
++ p.relocate([{subject:8,afterSubject:3},{subject:99,afterSubject:1},{subject:1,afterSubject:3}]);
++ expect(p.value()).toEqual([a,c]);expect(p.value()[0]).toBe(a);
++});
++
++it('independent: packet preparation remains detached and explicit order wins over final placement',()=>{
++ const p=createEntityEgressProjection([1,2,3].map(id=>({subjectId:id,key:id,row:{id}})));
++ const packet:EntityPublicationPacket={id:{},owner:1,meta:undefined,physical:[],ordinary:[],ordinaryPlacements:[{subject:3,afterSubject:1}],ordinaryOrder:[2,1,3]};
++ const prepared=p.prepare(packet);
++ expect(prepared.value).toEqual([{id:2},{id:1},{id:3}]);
++ expect(p.value()).toEqual([{id:1},{id:2},{id:3}]);
++ for(const write of prepared.record.writes)write.map.set(write.key,write.value);
++ expect(p.value()).toEqual(prepared.value);
++});
++
++it('independent: throwing placement evidence during preparation does not install draft order',()=>{
++ const p=createEntityEgressProjection([1,2,3].map(id=>({subjectId:id,key:id,row:{id}})));
++ const failure=new Error('placement evidence failure');
++ const packet:EntityPublicationPacket={id:{},owner:1,meta:undefined,physical:[],ordinary:[],ordinaryPlacements:[{subject:3,afterSubject:1}]};
++ expect(()=>p.prepare(packet,{member:()=>({}),field:()=>({}),keyMapping:()=>({}),placement:()=>{throw failure;}})).toThrow(failure);
++ expect(p.value()).toEqual([{id:1},{id:2},{id:3}]);expect(p.support().size).toBe(0);
++ const retry=p.prepare(packet);expect(retry.value).toEqual([{id:3},{id:1},{id:2}]);
++});

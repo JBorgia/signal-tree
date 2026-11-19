@@ -1,0 +1,37 @@
+{
+  "manifestSha256": "def6910829632965f5b05409864721f568834af11962274573a662c9b1c7ce19",
+  "files": 3049,
+  "baselineSha256": "dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148",
+  "patchSha256": "72311a5041e28774171029c30145727a193d164cb1235008a57ba599297670f0",
+  "changed": [
+    "packages/kernel/project.json",
+    "packages/kernel/vitest.config.ts",
+    "packages/kernel/vitest.retention.config.ts",
+    "tools/verify-gates.mjs",
+    "tsconfig.typecheck-specs.json",
+    "vitest.config.ts"
+  ],
+  "removedAfterArchiving": [
+    "packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts",
+    "packages/kernel/src/lib/native-netzero-diagnostic.spec.ts"
+  ],
+  "added": [
+    "tools/check-forwarding-retention.mjs",
+    "tools/experiments/native-publication-diagnostics/README.md",
+    "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts",
+    "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts",
+    "tools/experiments/native-publication-diagnostics/replay.config.ts",
+    "tools/experiments/native-publication-diagnostics/run.mjs"
+  ],
+  "runtimeChanges": 0,
+  "assertionChanges": 0,
+  "budgetChanges": 0,
+  "registry": {
+    "before": 84,
+    "after": 85,
+    "added": [
+      "forwarding-retention-gc"
+    ]
+  },
+  "qualification": "all requested bounded checks passed; both mutants detected and restored; unrelated reported failures unresolved"
+}

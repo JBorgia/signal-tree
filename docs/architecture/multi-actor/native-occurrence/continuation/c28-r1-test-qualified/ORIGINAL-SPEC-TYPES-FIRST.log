@@ -1,0 +1,16 @@
+check-spec-types: 3 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/cached-current-input.spec.ts: 2 error(s), baseline allows 0
+  packages/kernel/src/lib/current-capture-r1.spec.ts: 2 error(s), baseline allows 0
+  packages/kernel/src/lib/opaque-current-input.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/cached-current-input.spec.ts(56,11): error TS2783: 'name' is specified more than once, so this usage will be overwritten.
+packages/kernel/src/lib/cached-current-input.spec.ts(56,29): error TS2783: 'message' is specified more than once, so this usage will be overwritten.
+packages/kernel/src/lib/current-capture-r1.spec.ts(16,61): error TS2322: Type '(v: { x: number; }) => { x: number; }' is not assignable to type '{ x: number; }'.
+packages/kernel/src/lib/current-capture-r1.spec.ts(35,61): error TS2322: Type '(v: { input: { x: number; }; }) => { input: { x: number; }; }' is not assignable to type '{ input: { x: number; }; }'.
+packages/kernel/src/lib/opaque-current-input.spec.ts(6,7): error TS2783: 'message' is specified more than once, so this usage will be overwritten.

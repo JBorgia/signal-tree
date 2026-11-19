@@ -1,0 +1,18 @@
+{
+  "status": "frozen-experiment-not-startup-fix",
+  "baseManifestSHA256": "9f14f5a476482cca596528aaed18cbf6be17122f73261e0fa047be40b641e94c",
+  "manifestSHA256": "0d7bbae7520acb3bf02d3bd54fb49c021acc3afc0cde1f0a95452fc8562dbf09",
+  "patchSHA256": "83ce0db7fd40cb4faa3cd78c81f6065bbb2c20c53d2f88c804a035395240be2e",
+  "onlyEditedPath": ".nxignore",
+  "projects": 10,
+  "inferredTestTargetOccurrences": 1574,
+  "targetDefinitionsEqual": true,
+  "archiveInferredProjects": 0,
+  "removedRootStaticEdges": [
+    "react",
+    "solid",
+    "vue"
+  ],
+  "sameArchiveWarningCount": 5,
+  "promotion": "hold pending graph/cache review; actual plugin scan unresolved"
+}

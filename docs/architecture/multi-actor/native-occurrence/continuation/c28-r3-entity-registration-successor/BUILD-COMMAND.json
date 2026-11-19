@@ -1,0 +1,20 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-entity-registration-successor/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "run-many",
+    "-t",
+    "build",
+    "--projects=kernel,angular,react,vue,solid",
+    "--parallel=1",
+    "--skip-nx-cache",
+    "--output-style=stream",
+    "--nxBail"
+  ],
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "noOutputWatchdogSeconds": 180,
+  "manifestSha256": "b0e09d16858ce67143ed08b3b2d159831ab96ddcb1d989a1d50d5ce880d04b2d"
+}

@@ -1,0 +1,47 @@
+1625:   const structuralUnits=[...structuralGroups].map(([node,operations])=>node.__prepareStructuralUnit!(operations,publicationPhase));
+1626: 
+1627:   if(!outerPhase)publicationPhase.seal();
+1628:   if(physicalCommitClock&&physicalCommitClock.revision()!==basePhysicalRevision)throw new Error('Joint preparation reentered installation');
+1629:   let scalarCommitResult:
+1630:     | ReturnType<NonNullable<typeof scalarFrame>['commit']>
+1631:     | undefined;
+1632:   const install = (): void => {
+1633:     if (
+1634:       physicalCommitClock &&
+1635:       physicalCommitClock.revision() !== basePhysicalRevision
+1636:     ) {
+1637:       throw new Error('Heterogeneous realization base revision is stale.');
+1638:     }
+1639: 
+1640:     if(!outerPhase)publicationPhase.validate();
+1641:     scalarCommitResult = installScalarFrame?.();
+1642: 
+1643:     for (const unit of structuralUnits) unit.install();
+1644: 
+1645:     for (const plan of livePointPlans) plan.install();
+1646:     for (const plan of ordinaryPlans.values()) plan.install();
+1647:     physicalCommitClock?.advance();
+1648:   };
+1649:   const invalidate = (): void => {
+1650:     // All these lifetimes are already installed. A delivery failure cannot
+1651:     // abandon the remaining invalidations, including a mixed scalar frame.
+1652:     let failed = false;
+1653:     let firstError: unknown;
+1654:     const run = (fn: () => void): void => {
+1655:       try {
+1656:         fn();
+1657:       } catch (error) {
+1658:         if (!failed) {
+1659:           failed = true;
+1660:           firstError = error;
+1661:         }
+1662:       }
+1663:     };
+1664:     for (const unit of structuralUnits) run(() => unit.invalidate());
+1665:     for (const plan of livePointPlans) run(() => plan.invalidate());
+1666:     if (scalarCommitResult && scalarSlotRuntime) {
+1667:       run(() => scalarSlotRuntime.publishPrepared({...scalarCommitResult!,publication:undefined}));
+1668:     }
+1669:     if (failed) throw firstError;
+1670:   };
+1671:   const complete=():void=>{

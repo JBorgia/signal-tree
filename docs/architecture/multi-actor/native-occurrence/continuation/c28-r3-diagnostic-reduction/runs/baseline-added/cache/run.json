@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel entity-diagnostic-folding --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T14:42:06.284Z",
+    "endTime": "2026-11-03T14:42:07.657Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "7900665296905521637",
+      "startTime": "2026-11-03T14:42:06.310Z",
+      "endTime": "2026-11-03T14:42:07.656Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

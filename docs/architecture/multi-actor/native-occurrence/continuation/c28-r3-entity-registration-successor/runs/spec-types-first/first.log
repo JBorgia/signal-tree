@@ -1,0 +1,21 @@
+
+Running 1 gates
+
+  · spec-types           FAIL (exit 1) ✗  spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test
+
+check-spec-types: 2 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/entity-registration-lifecycle.spec.ts: 1 error(s), baseline allows 0
+  packages/kernel/src/lib/entity-registration-original.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/entity-registration-lifecycle.spec.ts(3,43): error TS7016: Could not find a declaration file for module '/private/tmp/st-c28-r3-entity-registration-successor/controls/lifecycle.mjs'. '/private/tmp/st-c28-r3-entity-registration-successor/controls/lifecycle.mjs' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-registration-original.spec.ts(3,29): error TS7016: Could not find a declaration file for module '/private/tmp/st-c28-r3-entity-registration-successor/controls/cases.mjs'. '/private/tmp/st-c28-r3-entity-registration-successor/controls/cases.mjs' implicitly has an 'any' type.
+
+
+──────────────────────────────────────────────────────────────────────────────
+0/1 passed, 1 failed, 0 known-red.

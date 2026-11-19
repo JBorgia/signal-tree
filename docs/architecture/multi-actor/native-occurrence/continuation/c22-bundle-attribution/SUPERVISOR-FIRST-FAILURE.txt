@@ -1,0 +1,1 @@
+Original supervisor failed immediately after Popen: PermissionError Operation not permitted /bin/ps. Adopt existing PID26908 only; no second build. Exit inferred from Nx success receipt + observed exit, not waitpid.

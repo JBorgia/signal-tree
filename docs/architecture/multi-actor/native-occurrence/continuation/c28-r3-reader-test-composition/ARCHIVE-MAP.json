@@ -1,0 +1,68 @@
+[
+  {
+    "source": "first.log",
+    "archive": "first.log",
+    "sourceSha256": "9d451a2dfccfd0666dbec6e878a1d9b52aa4531ec5404f2d5b6a655ae1f7294a",
+    "archiveSha256": "9d451a2dfccfd0666dbec6e878a1d9b52aa4531ec5404f2d5b6a655ae1f7294a"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "4c38b93694efa074e2f2999e78e1527e716aa6063c3f02b597be4e67ded93f03",
+    "archiveSha256": "4c38b93694efa074e2f2999e78e1527e716aa6063c3f02b597be4e67ded93f03"
+  },
+  {
+    "source": "FIRST-FAILURE.md",
+    "archive": "FIRST-FAILURE.md",
+    "sourceSha256": "8e415a9901e1232eff0c0cfb72525129df02e988c8f20fb9942d140dc6e01ab5",
+    "archiveSha256": "8e415a9901e1232eff0c0cfb72525129df02e988c8f20fb9942d140dc6e01ab5"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "8ed50f8787f9effe33d813e1b1bf5f4413786910ef75c9c98b58af85b8c6c7fc",
+    "archiveSha256": "8ed50f8787f9effe33d813e1b1bf5f4413786910ef75c9c98b58af85b8c6c7fc"
+  },
+  {
+    "source": "COMMAND.json",
+    "archive": "COMMAND.json",
+    "sourceSha256": "2027da687d786edaf14d887ee37aaddc17f6f170cb712446150510a0691334e5",
+    "archiveSha256": "2027da687d786edaf14d887ee37aaddc17f6f170cb712446150510a0691334e5"
+  },
+  {
+    "source": "composition.patch",
+    "archive": "composition.patch",
+    "sourceSha256": "0ac75fde82c253b8837361f1593c100c6940b3c8f98949569a406f2c986db32a",
+    "archiveSha256": "0ac75fde82c253b8837361f1593c100c6940b3c8f98949569a406f2c986db32a"
+  },
+  {
+    "source": "repeat.log",
+    "archive": "repeat.log",
+    "sourceSha256": "8abf77e194f38550e4e139864d4836d052f36173f2a88ec9bb09d0d11ed980ef",
+    "archiveSha256": "8abf77e194f38550e4e139864d4836d052f36173f2a88ec9bb09d0d11ed980ef"
+  },
+  {
+    "source": "MANIFEST.json",
+    "archive": "MANIFEST.json.gz",
+    "sourceSha256": "0af649ba10c55e784d95ae323dcde8322ba018e465110c2a70a36ea2d4cb3949",
+    "archiveSha256": "4d49135f4467e041888d73f11e3558c8305e554cd3eb7eeff4c3111954c36985"
+  },
+  {
+    "source": "EXIT",
+    "archive": "EXIT",
+    "sourceSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "archiveSha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+  },
+  {
+    "source": "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "archive": "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "sourceSha256": "94c4ada74689878a35f0cd647a51a9882c42a4c768ba017dacbb8af1ce5c5e4b",
+    "archiveSha256": "94c4ada74689878a35f0cd647a51a9882c42a4c768ba017dacbb8af1ce5c5e4b"
+  },
+  {
+    "source": "packages/kernel/src/lib/preparation-reader-comparison.spec.ts",
+    "archive": "packages/kernel/src/lib/preparation-reader-comparison.spec.ts",
+    "sourceSha256": "506d86e9bf328ef05c7e2ba2b4ab15d9655457bc20893570db5dab541b06bc85",
+    "archiveSha256": "506d86e9bf328ef05c7e2ba2b4ab15d9655457bc20893570db5dab541b06bc85"
+  }
+]

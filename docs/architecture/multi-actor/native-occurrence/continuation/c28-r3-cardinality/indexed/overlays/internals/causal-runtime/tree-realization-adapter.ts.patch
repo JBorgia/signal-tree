@@ -1,0 +1,61 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import { tally as ct, size as cs, check as cc } from '../../cardinality-diagnostic'; // CARDINALITY-ONLY
+ import {withScalarSelections} from '../native-scalar-selection';
+ import { PublicationPreparation } from '../publication-preparation';
+ import { completeScalarFrame } from '../tree-scalar-slot-runtime';
+@@ -1586,10 +1587,9 @@
+           .filter(({ effect }) => !realizationPlacement(effect))
+           .map(({ effect }) => effect),
+       ].filter((effect) => effect.owner === owner);
+-      ordinaryPlans.set(
+-        owner,
+-        node.__prepareOrdinaryRealization(group, undefined, physicalGroup,undefined,undefined,publicationPhase)
+-      );
++      const countedPlan = node.__prepareOrdinaryRealization(group, undefined, physicalGroup,undefined,undefined,publicationPhase);
++      cs("adapter.planChanges",countedPlan.changes.length);
++      ordinaryPlans.set(owner,countedPlan);
+     }
+   }
+   // The prepared ordinary plan is stable for this unit. Index once rather than
+@@ -1598,29 +1598,32 @@
+   for (const [owner, plan] of ordinaryPlans) {
+     const subjects = new Map<number, CommittedEntityMutation[]>();
+     for (const change of plan.changes) {
++      ct("adapter.groupVisits");
+       // Match the previous strict-equality filter even for malformed NaN IDs.
+-      if (change.subject !== change.subject) continue;
++      if (change.subject !== change.subject) {ct("adapter.nanSkipped");continue;}
++      ct("adapter.groupReferences");
+       const group = subjects.get(change.subject);
+       if (group) group.push(change);
+-      else subjects.set(change.subject, [change]);
++      else {ct("adapter.groups");subjects.set(change.subject, [change]);}
+     }
+     dispositionByOwner.set(owner, subjects);
+   }
+   const publicationMeta = (effect: ReversalEffect): WriteMetadata => {
++    ct("adapter.metaCalls");
+     const meta: WriteMetadata = {
+       ...(getActiveWriteContext() ?? {}),
+       intent: 'system',
+       participation: 'realized',
+     };
+     const plan = ordinaryPlans.get(effect.owner);
+-    if (!plan) return meta;
++    if (!plan) {ct("adapter.noPlan");return meta;}
+     const subjects = dispositionByOwner.get(effect.owner)!;
+     // Preserve the old per-call array identity; metadata consumers never share
+     // a mutable grouping array, and same-lifetime edit order stays unchanged.
+-    return withSelectedEntityDisposition(meta,
+-      typeof effect.subjectId === 'number'
+-        ? subjects.get(effect.subjectId)?.slice() ?? []
+-        : []);
++    const selected=typeof effect.subjectId === 'number'
++        ? subjects.get(effect.subjectId)?.slice() ?? [] : [];
++    cs('adapter.selected',selected.length);cc(selected.length<=plan.changes.length);
++    return withSelectedEntityDisposition(meta,selected);
+ 
+   };
+ 

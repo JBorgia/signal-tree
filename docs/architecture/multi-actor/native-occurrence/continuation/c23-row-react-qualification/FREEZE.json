@@ -1,0 +1,13 @@
+{
+  "candidateManifestSha256": "2f2ed3778e0dd2b5a24c372d48349accaf3ab647e240c8d87ab432524ce699fe",
+  "patchSha256": "76ce8628185577348fa8f72e2ac8970b95e2b670519a64ad58292e69fa44cbde",
+  "baselineUnchanged": true,
+  "onlyAddedSpecs": [
+    "packages/kernel/src/lib/direct-row-declaration-qualification.spec.ts",
+    "packages/react/src/branch-declaration-qualification.spec.tsx"
+  ],
+  "kernel": "5 pass / 1 fail",
+  "react": "3 pass / 3 fail",
+  "noRuntimeChanges": true,
+  "expansionStopped": true
+}

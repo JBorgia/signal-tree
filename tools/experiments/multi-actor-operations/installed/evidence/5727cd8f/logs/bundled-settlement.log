@@ -1,0 +1,13 @@
+{
+  "sourceHead": "5727cd8fcf701128358674411400c019b137a5e4",
+  "results": [
+    {
+      "name": "older overlap refuses without losing authority; newest-first retry settles both",
+      "outcome": "PASS"
+    },
+    {
+      "name": "post-install removal observer error is terminal, not a retryable refusal",
+      "outcome": "PASS"
+    }
+  ]
+}

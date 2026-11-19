@@ -1,0 +1,141 @@
+
+> nx run react:test --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+> pnpm exec tsc --noEmit -p packages/react/tsconfig.spec.json && npx vitest run --config packages/react/vitest.config.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+(node:90696) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:90718) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90763) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-c28-r3-composed-qualification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-c28-r3-composed-qualification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24)
+[90m    ... 3 lines matching cause stack trace ...[39m
+    at async Promise.all (index 2)
+    at async resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at async _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/[4mvite[24m/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at async createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at async createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/[4mvitest[24m/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: [32m'EXTENDS_RESOLVE'[39m,
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-c28-r3-composed-qualification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+  [90m    at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)[39m
+  [90m    at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)[39m
+  [90m    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)[39m
+  [90m    at require.resolve (node:internal/modules/helpers:171:31)[39m
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/tsconfck@3.1.6_typescript@6.0.3/node_modules/[4mtsconfck[24m/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at async configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/[4m.pnpm[24m/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/[4mvite-tsconfig-paths[24m/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: [32m'MODULE_NOT_FOUND'[39m,
+    requireStack: [
+      [32m'/private/tmp/st-c28-r3-composed-qualification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+    ]
+  },
+  tsconfigFile: [32m'/private/tmp/st-c28-r3-composed-qualification/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'[39m
+}
+
+ RUN  v4.1.9 /private/tmp/st-c28-r3-composed-qualification/candidate/packages/react
+
+(node:90770) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/absent-collection.spec.tsx (12 tests) 91ms
+(node:90776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/transaction-realization.spec.tsx (26 tests) 107ms
+(node:90779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole unowned / confirm
+DECLARATION-QUALIFICATION {"case":"React branch/false/confirm","sent":[{"x":7,"y":0}],"receipt":{"state":"started","basis":"declared"},"physical":{"x":99,"y":0},"notifications":1}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole unowned / rollback
+DECLARATION-QUALIFICATION {"case":"React branch/false/rollback","sent":[{"x":7,"y":0}],"receipt":{"state":"started","basis":"declared"},"physical":{"x":99,"y":0},"notifications":1}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole actual-owner / confirm
+DECLARATION-QUALIFICATION {"case":"React branch/true/confirm","sent":[{"x":7,"y":0}],"receipt":{"state":"no-write"},"physical":{"x":99,"y":0},"notifications":1}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch equal whole actual-owner / rollback
+DECLARATION-QUALIFICATION {"case":"React branch/true/rollback","sent":[{"x":0,"y":0}],"receipt":{"state":"no-write"},"physical":{"x":99,"y":0},"notifications":2}
+
+stdout | src/branch-declaration-qualification.spec.tsx > React branch no-write receipt retains older pending work until disposal
+DECLARATION-QUALIFICATION {"case":"React branch/no-write-dispose","sent":[],"receipt":{"state":"no-write"}}
+
+ ✓ src/branch-declaration-qualification.spec.tsx (7 tests) 39ms
+(node:90780) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/equal-owner-facade-controls.spec.tsx (8 tests) 56ms
+(node:90782) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/pending-turn-realization.spec.tsx (4 tests) 79ms
+(node:90787) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/use-signal-tree.spec.tsx (7 tests) 45ms
+(node:90788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/parent-freshness-counterparts.spec.tsx (3 tests) 49ms
+(node:90794) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/absent-path-write.spec.tsx (8 tests) 126ms
+(node:90797) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/opaque-leaf-restoration.spec.tsx (6 tests) 48ms
+(node:90802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/whole-value-new-keys.spec.tsx (3 tests) 75ms
+(node:90813) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/declared-publication-composition.spec.tsx (3 tests) 40ms
+(node:90822) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/selected-callback-facade.spec.tsx (3 tests) 56ms
+(node:90827) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/designated-collection-omission.spec.tsx (6 tests) 92ms
+(node:90831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/plain-member-absence-observation.spec.tsx (3 tests) 30ms
+(node:90838) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-native-obligation-composition.spec.tsx (3 tests) 60ms
+(node:90843) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/ownership.spec.tsx (2 tests) 40ms
+(node:90857) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/scalar-frame-publication.spec.tsx (2 tests) 28ms
+(node:90903) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-native-address.spec.tsx (2 tests) 34ms
+(node:90916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/joint-native-frontier.spec.tsx (1 test) 55ms
+
+ Test Files  19 passed (19)
+      Tests  109 passed (109)
+   Start at  22:12:28
+   Duration  21.95s (transform 1.04s, setup 0ms, import 6.74s, tests 1.15s, environment 11.59s)
+
+
+
+
+ NX   Successfully ran target test for project react
+
+
+  Run duration:      27.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     27.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        react:test    27.2s

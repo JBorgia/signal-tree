@@ -1,0 +1,357 @@
+{
+  "total": 13800,
+  "perWrite": {
+    "69": 200
+  },
+  "sameSiteOperationHistogram": true,
+  "modules": {
+    "lib/entity-signal.ts": 2600,
+    "lib/physical/entity-value-store.ts": 200,
+    "lib/internals/utilities/deep-equal.ts": 800,
+    "lib/internals/entity-publication.ts": 2800,
+    "lib/experimental-publication/lifecycle.ts": 0,
+    "lib/experimental-publication/entity.ts": 4600,
+    "lib/internals/intrinsic-mutation.ts": 1200,
+    "lib/experimental-publication/private.ts": 1000,
+    "lib/internals/location-runtime.ts": 600
+  },
+  "operations": {
+    "Object.keys": 1200,
+    "Array.Symbol(Symbol.iterator)": 6000,
+    "Array.push": 1200,
+    "Array.map": 1600,
+    "Array.slice": 200,
+    "Array.some": 0,
+    "Map.Symbol(Symbol.iterator)": 2000,
+    "Array.filter": 1200,
+    "Set.Symbol(Symbol.iterator)": 400,
+    "Array.every": 0
+  },
+  "sites": [
+    {
+      "site": "lib/internals/intrinsic-mutation.ts:20:25",
+      "operation": "Array.filter",
+      "visits": 1200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:76:16",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 800
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:64:123",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 600
+    },
+    {
+      "site": "lib/internals/utilities/deep-equal.ts:228:24",
+      "operation": "Object.keys",
+      "visits": 400
+    },
+    {
+      "site": "lib/internals/utilities/deep-equal.ts:229:24",
+      "operation": "Object.keys",
+      "visits": 400
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:149:108",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:162:29",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:148:126",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:196:66",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 400
+    },
+    {
+      "site": "lib/entity-signal.ts:2408:16",
+      "operation": "Object.keys",
+      "visits": 200
+    },
+    {
+      "site": "lib/physical/entity-value-store.ts:70:18",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:1190:16",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:1288:17",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:1300:16",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:1300:16",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:1362:32",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2600:28",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2538:66",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2601:119",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2562:411",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2562:464",
+      "operation": "Array.slice",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:85:31",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:89:126",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:140:20",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:30:16",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:152:17",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:161:19",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:167:17",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:183:19",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:197:19",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:208:27",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:208:18",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:208:22",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:208:70",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:209:27",
+      "operation": "Map.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:209:18",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:209:22",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/entity.ts:209:69",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:234:37",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:248:62",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:248:62",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:253:20",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/private.ts:113:76",
+      "operation": "Array.push",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/private.ts:127:50",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/private.ts:127:13",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/private.ts:127:13",
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/private.ts:127:80",
+      "operation": "Array.map",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/location-runtime.ts:404:18",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/location-runtime.ts:422:32",
+      "operation": "Set.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/location-runtime.ts:386:20",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2625:17",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/internals/entity-publication.ts:270:16",
+      "operation": "Array.Symbol(Symbol.iterator)",
+      "visits": 200
+    },
+    {
+      "site": "lib/entity-signal.ts:2426:20",
+      "operation": "Object.keys",
+      "visits": 200
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:158:34",
+      "operation": "Array.map",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:159:38",
+      "operation": "Array.map",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:171:44",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:174:59",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:174:90",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:175:18",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:175:49",
+      "operation": "Array.some",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:206:50",
+      "operation": "Array.filter",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:154:70",
+      "operation": "Array.filter",
+      "visits": 0
+    },
+    {
+      "site": "lib/internals/intrinsic-mutation.ts:321:30",
+      "operation": "Array.map",
+      "visits": 0
+    },
+    {
+      "site": "lib/internals/location-runtime.ts:393:44",
+      "operation": "Array.push",
+      "visits": 0
+    },
+    {
+      "site": "lib/experimental-publication/lifecycle.ts:122:123",
+      "operation": "Array.every",
+      "visits": 0
+    }
+  ]
+}

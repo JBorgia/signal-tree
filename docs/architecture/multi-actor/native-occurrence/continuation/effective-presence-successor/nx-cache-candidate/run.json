@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test angular --skip-nx-cache effective-presence- --maxWorkers=1",
+    "startTime": "2026-11-02T17:32:07.829Z",
+    "endTime": "2026-11-02T17:32:12.063Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "angular:test",
+      "target": "test",
+      "projectName": "angular",
+      "hash": "2649111568117203047",
+      "startTime": "2026-11-02T17:32:07.880Z",
+      "endTime": "2026-11-02T17:32:12.062Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

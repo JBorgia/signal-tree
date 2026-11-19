@@ -1,0 +1,10 @@
+{
+  "INPUTS.json": "7276e4419c451dbae584565b5bc1c092023119bad08aadeb8c9b14f021eb4bf2",
+  "TEST-PLAN.md": "74eae0a00231f925aaf29ed75f042212bdd21cb31b2832597c347c46b2d69314",
+  "preserved-inputs/specs/neutral-branch.spec.ts": "d56984d2ee43e62f0df684b5bbc547fbaf40f2be897a5daeb84b49d92f26deec",
+  "preserved-inputs/specs/row-receipt-counterpart.spec.ts": "9d470d18266a43bbc5bda5748646b8e9cc109395abdded0b886fdb4794bf5730",
+  "preserved-inputs/st-mixed-rollback-test-premise-review/EQUAL-WHOLE-AUTHORITY.md": "7b115e635b2aafd2beba0d3eed35a6244e37a0763ff5ca1615773cfcf5518e60",
+  "preserved-inputs/react/first.log": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996",
+  "preserved-inputs/kernel/first.log": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0",
+  "preserved-inputs/src/branch-declaration-qualification.spec.tsx": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461"
+}

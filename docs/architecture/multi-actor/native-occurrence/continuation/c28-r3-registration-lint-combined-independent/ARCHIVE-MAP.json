@@ -1,0 +1,32 @@
+[
+  {
+    "source": "FINAL-CHECK-IDENTITY.json",
+    "archive": "FINAL-CHECK-IDENTITY.json",
+    "sourceSha256": "6bd7c93457b825696ff7ab2f4dd6c586d51476954ac880c4a65b3d5390002228",
+    "archiveSha256": "6bd7c93457b825696ff7ab2f4dd6c586d51476954ac880c4a65b3d5390002228"
+  },
+  {
+    "source": "PROVISIONAL-IDENTITY.json",
+    "archive": "PROVISIONAL-IDENTITY.json",
+    "sourceSha256": "3cee9aaa34e4b475a6e6d7446221f7b0fd6f994961abbb5b0f581e9b5b6181ba",
+    "archiveSha256": "3cee9aaa34e4b475a6e6d7446221f7b0fd6f994961abbb5b0f581e9b5b6181ba"
+  },
+  {
+    "source": "FINAL-REVIEW.md",
+    "archive": "FINAL-REVIEW.md",
+    "sourceSha256": "7fdd48e00d8e921fed1fdbb7dba97e313bb00364e600b15974d9ed17232290c9",
+    "archiveSha256": "7fdd48e00d8e921fed1fdbb7dba97e313bb00364e600b15974d9ed17232290c9"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "0c61d6e1561d2e4709fa2efb54d6de3c8c27e285cd8d34fa14525cd80c0a4590",
+    "archiveSha256": "0c61d6e1561d2e4709fa2efb54d6de3c8c27e285cd8d34fa14525cd80c0a4590"
+  },
+  {
+    "source": "FREEZE-CONFIRMATION.json",
+    "archive": "FREEZE-CONFIRMATION.json",
+    "sourceSha256": "f5806a57b26e7286130e343fa49a4df60a4e728ba3f803b8595fc29cb293c280",
+    "archiveSha256": "f5806a57b26e7286130e343fa49a4df60a4e728ba3f803b8595fc29cb293c280"
+  }
+]

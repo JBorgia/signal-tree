@@ -1,0 +1,1 @@
+An attempted post-assembly setup ran before asynchronous composition finished, so node_modules and the runner were absent. It exited before changes or tests. Composition then completed with one incoming test file, zero conflicts; setup resumed only after successful completion.

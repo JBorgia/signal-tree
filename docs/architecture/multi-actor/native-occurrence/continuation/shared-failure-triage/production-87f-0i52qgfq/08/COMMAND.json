@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "entity-granular-reactivity.spec.ts",
+    "--testNamePattern=entityMap \u2014 collection queries are lazily derived \\(13\\.5\\.0\\) a single-entity update does not rebuild the collection",
+    "--reporter=verbose",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate",
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "fullName": "entityMap \u2014 collection queries are lazily derived (13.5.0) a single-entity update does not rebuild the collection",
+    "duplicateOrdinal": 1
+  },
+  "fixtureSha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+  "environment": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "ST_OBSERVATIONS": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/08/observations/native.jsonl",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/08/observations/prepared",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/08/observations/public"
+  },
+  "filterNote": "Equivalent full-name regex; literal whitespace and hyphens need no escape. No fixture or timeout changes."
+}

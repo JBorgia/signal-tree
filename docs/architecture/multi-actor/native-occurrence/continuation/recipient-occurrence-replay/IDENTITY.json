@@ -1,0 +1,6 @@
+{
+  "manifestSHA256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "allEntriesVerified": 3065,
+  "sourceChanges": [],
+  "diagnosticOnlyRedirect": "Exact legacy recipient-traces.jsonl append redirected to own scratch via NODE_OPTIONS; no test/runtime edits."
+}

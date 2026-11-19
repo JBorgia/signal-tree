@@ -1,0 +1,53 @@
+{"at": "2026-11-03T18:10:08.021505+00:00", "elapsedSeconds": 0.0019203750416636467, "ownedRssBytes": 147456, "hostFreePercentage": 40.0, "ownedPids": [48784]}
+{"at": "2026-11-03T18:10:08.678872+00:00", "elapsedSeconds": 0.6494526250753552, "ownedRssBytes": 183107584, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:09.394102+00:00", "elapsedSeconds": 1.305798792047426, "ownedRssBytes": 196526080, "hostFreePercentage": 41.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:10.014317+00:00", "elapsedSeconds": 2.013949792017229, "ownedRssBytes": 213811200, "hostFreePercentage": 41.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:10.654006+00:00", "elapsedSeconds": 2.6426635830430314, "ownedRssBytes": 192118784, "hostFreePercentage": 41.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:11.287881+00:00", "elapsedSeconds": 3.2759180420544, "ownedRssBytes": 207077376, "hostFreePercentage": 42.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:11.985034+00:00", "elapsedSeconds": 3.9228262919932604, "ownedRssBytes": 194641920, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:12.686275+00:00", "elapsedSeconds": 4.633692042087205, "ownedRssBytes": 200015872, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:13.468740+00:00", "elapsedSeconds": 5.38417166704312, "ownedRssBytes": 196722688, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:14.228062+00:00", "elapsedSeconds": 6.116835875087418, "ownedRssBytes": 195330048, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:14.888299+00:00", "elapsedSeconds": 6.871693000080995, "ownedRssBytes": 198574080, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:15.539857+00:00", "elapsedSeconds": 7.515525000053458, "ownedRssBytes": 202719232, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:16.203868+00:00", "elapsedSeconds": 8.161757417023182, "ownedRssBytes": 232472576, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:16.856379+00:00", "elapsedSeconds": 8.842028917046264, "ownedRssBytes": 236453888, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:17.532601+00:00", "elapsedSeconds": 9.488490333082154, "ownedRssBytes": 259817472, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:18.218641+00:00", "elapsedSeconds": 10.162228250061162, "ownedRssBytes": 367706112, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792, 48852, 48869, 48870]}
+{"at": "2026-11-03T18:10:18.935255+00:00", "elapsedSeconds": 10.890927750035189, "ownedRssBytes": 541032448, "hostFreePercentage": 42.0, "ownedPids": [48784, 48792, 48852, 48869, 48878]}
+{"at": "2026-11-03T18:10:19.631743+00:00", "elapsedSeconds": 11.564522583037615, "ownedRssBytes": 525746176, "hostFreePercentage": 41.0, "ownedPids": [48784, 48792, 48852, 48869, 48878]}
+{"at": "2026-11-03T18:10:20.450658+00:00", "elapsedSeconds": 12.26602850004565, "ownedRssBytes": 543981568, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:21.128553+00:00", "elapsedSeconds": 13.074469750048593, "ownedRssBytes": 511983616, "hostFreePercentage": 38.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:21.858562+00:00", "elapsedSeconds": 13.751395000028424, "ownedRssBytes": 488259584, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:22.515030+00:00", "elapsedSeconds": 14.48939991707448, "ownedRssBytes": 492781568, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:23.149518+00:00", "elapsedSeconds": 15.143580500036478, "ownedRssBytes": 500056064, "hostFreePercentage": 41.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:23.828827+00:00", "elapsedSeconds": 15.772679000045173, "ownedRssBytes": 496402432, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:24.667491+00:00", "elapsedSeconds": 16.459026167052798, "ownedRssBytes": 532529152, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:25.375176+00:00", "elapsedSeconds": 17.30100020801183, "ownedRssBytes": 542359552, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:26.047554+00:00", "elapsedSeconds": 17.99918962502852, "ownedRssBytes": 549617664, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:26.767312+00:00", "elapsedSeconds": 18.671753208036534, "ownedRssBytes": 506134528, "hostFreePercentage": 38.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:27.501930+00:00", "elapsedSeconds": 19.387112833093852, "ownedRssBytes": 498614272, "hostFreePercentage": 38.0, "ownedPids": [48784, 48792, 48852, 48869, 48878, 48892, 48893]}
+{"at": "2026-11-03T18:10:28.188883+00:00", "elapsedSeconds": 20.18480054207612, "ownedRssBytes": 125845504, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:28.923663+00:00", "elapsedSeconds": 20.82238425000105, "ownedRssBytes": 126189568, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:29.617143+00:00", "elapsedSeconds": 21.551483583054505, "ownedRssBytes": 126353408, "hostFreePercentage": 40.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:30.367543+00:00", "elapsedSeconds": 22.324390458059497, "ownedRssBytes": 126861312, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:31.099338+00:00", "elapsedSeconds": 22.99033845809754, "ownedRssBytes": 127369216, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:31.797511+00:00", "elapsedSeconds": 23.731071792077273, "ownedRssBytes": 127451136, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:32.577549+00:00", "elapsedSeconds": 24.42529712500982, "ownedRssBytes": 127582208, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:33.258352+00:00", "elapsedSeconds": 25.20990666700527, "ownedRssBytes": 127811584, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:33.964604+00:00", "elapsedSeconds": 25.881200917065144, "ownedRssBytes": 127893504, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:34.621492+00:00", "elapsedSeconds": 26.58606654207688, "ownedRssBytes": 127156224, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:35.299728+00:00", "elapsedSeconds": 27.25611062499229, "ownedRssBytes": 127221760, "hostFreePercentage": 39.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:35.963993+00:00", "elapsedSeconds": 27.929548750049435, "ownedRssBytes": 127352832, "hostFreePercentage": 42.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:36.607421+00:00", "elapsedSeconds": 28.585294708027504, "ownedRssBytes": 127418368, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:37.300221+00:00", "elapsedSeconds": 29.24362191709224, "ownedRssBytes": 127533056, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:37.982082+00:00", "elapsedSeconds": 29.95922933309339, "ownedRssBytes": 127401984, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:38.667181+00:00", "elapsedSeconds": 30.61353295808658, "ownedRssBytes": 126976000, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:39.338440+00:00", "elapsedSeconds": 31.312881000107154, "ownedRssBytes": 126861312, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:39.992670+00:00", "elapsedSeconds": 31.96963529207278, "ownedRssBytes": 126894080, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:40.641863+00:00", "elapsedSeconds": 32.623229457996786, "ownedRssBytes": 126926848, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:41.303839+00:00", "elapsedSeconds": 33.27407191705424, "ownedRssBytes": 126992384, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:41.955559+00:00", "elapsedSeconds": 33.94367504201364, "ownedRssBytes": 122109952, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:42.629456+00:00", "elapsedSeconds": 34.58445316704456, "ownedRssBytes": 106102784, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:43.287190+00:00", "elapsedSeconds": 35.25168745801784, "ownedRssBytes": 106135552, "hostFreePercentage": 44.0, "ownedPids": [48784, 48792]}
+{"at": "2026-11-03T18:10:44.013166+00:00", "elapsedSeconds": 35.91018470807467, "ownedRssBytes": 105627648, "hostFreePercentage": 43.0, "ownedPids": [48784, 48792]}

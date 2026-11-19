@@ -1,0 +1,91 @@
+
+> nx run kernel:test ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts structural-admission-controls.spec.ts structural-completeness.spec.ts independent-public-handoff.spec.ts tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts transactions.spec.ts entity-realization-handoff.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts structural-admission-controls.spec.ts structural-completeness.spec.ts independent-public-handoff.spec.ts tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts transactions.spec.ts entity-realization-handoff.spec.ts --maxWorkers=1
+
+(node:80098) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80105) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-ordinary-placement-successor/candidate/packages/kernel
+
+(node:80118) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80144) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80150) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80155) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80160) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/ordinary-restoration-placement.spec.ts (12 tests | 1 failed) 17ms
+   × final adjacency replay agrees for finite anchor combinations without changing values 4ms
+(node:80175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80176) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80185) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80193) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80195) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/ordinary-restoration-placement.spec.ts > final adjacency replay agrees for finite anchor combinations without changing values
+AssertionError: expected [ 2, 3, 4, 1 ] to deeply equal [ 1, 2, 3, 4 ]
+
+- Expected
++ Received
+
+  [
+-   1,
+    2,
+    3,
+    4,
++   1,
+  ]
+
+ ❯ src/lib/ordinary-restoration-placement.spec.ts:114:68
+    112|       projection.reorder([3,4],false,true);
+    113|       projection.relocate(final);
+    114|       expect(projection.value().map(row=>(row as {id:number}).id)).toE…
+       |                                                                    ^
+    115|       cases++;
+    116|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 11 passed (12)
+      Tests  1 failed | 144 passed (145)
+   Start at  17:28:11
+   Duration  5.51s (transform 746ms, setup 0ms, import 1.53s, tests 1.29s, environment 1.81s)
+
+Warning: command "node tools/run-core-vitest.mjs ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts structural-admission-controls.spec.ts structural-completeness.spec.ts independent-public-handoff.spec.ts tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts transactions.spec.ts entity-realization-handoff.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.9s

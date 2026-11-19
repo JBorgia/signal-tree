@@ -1,0 +1,3 @@
+# Private sequence discriminator
+
+C1 runtime unchanged. Preserve original historical eight-case source. New separate fixture supplies complete original ordinary membership facts for removal (source subject/lifetime, original key and payload from this fixture), preserving all eight original useful outcomes. Also assert actual ordinary absence rather than only changed support identity. No runtime repair, old assertion rewrite, public API or acceptance claim. This asks whether three original failures are wholly incomplete recipes; exact private numeric/string path may still expose a separate preparation limitation.

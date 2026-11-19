@@ -1,0 +1,307 @@
+--- 87f/packages/kernel/src/enhancers/restoration/restoration.ts
++++ c47b/packages/kernel/src/enhancers/restoration/restoration.ts
+@@ -1,4 +1,14 @@
+-import { completeOrderCapture, type OrderBoundaryEvidence } from './order-boundary-evidence';
++import { ordinaryEntityEntries } from '../../lib/internals/ordinary-entity-entries';
++import {
++  entityValueTransition,
++  getEntityOrdinaryChanges,
++  withoutEntityOrdinaryChanges,
++  ordinaryEntityEntry,
++} from '../../lib/internals/entity-value-transition';
++import {
++  completeOrderCapture,
++  type OrderBoundaryEvidence,
++} from './order-boundary-evidence';
+ import { placeFieldReversalsWhileRowsExist } from '../../lib/internals/causal-runtime/pending-rollback';
+ import { publishingExposedOnly } from '../../lib/internals/exposed-publication';
+ import {
+@@ -623,7 +633,8 @@
+           order.beforeSubjects,
+           order.afterSubjects,
+           order.beforeFrontier,
+-          order.afterFrontier
++          order.afterFrontier,
++          order.ordinaryEndpoints
+         )
+       )
+       .filter((delta) => delta.participants.length > 0);
+@@ -971,7 +982,8 @@
+           order.beforeSubjects,
+           order.afterSubjects,
+           order.beforeFrontier,
+-          order.afterFrontier
++          order.afterFrontier,
++          order.ordinaryEndpoints
+         )
+       )
+       .filter((delta) => delta.participants.length > 0);
+@@ -3077,6 +3089,34 @@
+             orderDeltas,
+             orderEndpoints,
+           });
++          target = {
++            ...target,
++            collections: new Map(
++              [...target.collections].map(([owner, collection]) => [
++                owner,
++                {
++                  ...collection,
++                  admittedEffects: appliedEffects.filter(
++                    (effect) => effect.owner === owner
++                  ),
++                  admittedOrder: (() => {
++                    const ordinary = orderDeltas.find(
++                      (delta) => delta.owner === owner
++                    )?.ordinaryEndpoints;
++                    return (
++                      orderEndpoints.get(owner) === 'before'
++                        ? ordinary?.before
++                        : ordinary?.after
++                    )?.filter(
++                      (subject) =>
++                        ordinary?.domain === undefined ||
++                        ordinary.domain.includes(subject)
++                    );
++                  })(),
++                },
++              ])
++            ),
++          };
+         } catch (failure) {
+           if (failure instanceof CollectionOrderConflict)
+             throw orderRefusal(failure.owner, failure.reason, failure.message);
+@@ -3254,11 +3294,20 @@
+       })();
+ 
+       if (hiddenRefusal) throw restorationRefusal(hiddenRefusal);
++      // Carry selected ordinary authority through the same private lowering as
++      // transaction compensation. Validate and install this exact paired array;
++      // physical revival alone must not leave ordinary membership absent.
++      // Existing external/hidden refusals retain precedence over preparation.
++      const preparedEffects =
++        !externalConflict && !usesDeclarativeTarget
++          ? realizationPort.prepareOrdinaryEffects?.(appliedEffects) ??
++            appliedEffects
++          : appliedEffects;
+       const refusal =
+         externalConflict ??
+         (usesDeclarativeTarget
+           ? undefined
+-          : realizationPort.validateEffects(appliedEffects));
++          : realizationPort.validateEffects(preparedEffects));
+       if (refusal) {
+         if (refusal.kind === 'value-drift') {
+           // RESTORE-P0 P0-C. An undo either reverses the authored operation or
+@@ -3312,7 +3361,7 @@
+         withWriteContext(
+           { origin: 'restoration', ownerId: replayOwnerId },
+           () => {
+-            realizationPort.applyAtomically(appliedEffects);
++            realizationPort.applyAtomically(preparedEffects);
+           }
+         );
+       } catch (error) {
+@@ -3749,7 +3798,10 @@
+     // safe must not execute user observers or advance any history boundary.
+     const readQueuedExternalAuthority = (): void => {
+       const ownerId = getPositionRegistry(tree.$)?.id;
+-      for (const entry of getPathNotifier()?.readPending() ?? []) {
++      for (const rawEntry of (getPathNotifier()?.readPending() ?? []).flatMap(
++        ordinaryEntityEntries
++      )) {
++        const entry = rawEntry;
+         const meta = entry.meta;
+         if (
+           (entry.ownerId ?? meta?.ownerId) !== ownerId ||
+@@ -3913,7 +3965,11 @@
+         )
+       );
+       const collectionOrders = Array.from(bucket.collectionOrders.values()).map(
+-        (order) => completeOrderCapture(order, bucket.orderBoundaries.get(order.owner) ?? [])
++        (order) =>
++          completeOrderCapture(
++            order,
++            bucket.orderBoundaries.get(order.owner) ?? []
++          )
+       );
+       const descriptorInputs = [...bucket.descriptorInputs];
+       const designated = bucket.designated;
+@@ -4167,6 +4223,27 @@
+       subjectIds?: number[],
+       positionIds?: number[]
+     ): void => {
++      if (getEntityOrdinaryChanges(meta) !== undefined) {
++        for (const entry of ordinaryEntityEntries({
++          path,
++          newValue: next,
++          oldValue: prev,
++          meta,
++          subjectIds,
++        })) {
++          captureEffects(
++            effectMap,
++            entry.path,
++            entry.newValue,
++            entry.oldValue,
++            entry.meta,
++            ownerPath,
++            entry.subjectIds,
++            positionIds
++          );
++        }
++        return;
++      }
+       const membership = plainBranchMembershipEffects(meta);
+       if (membership) {
+         for (const effect of membership)
+@@ -4367,6 +4444,28 @@
+         afterSubjects: [...capture.afterSubjects],
+         beforeFrontier: existing?.beforeFrontier ?? capture.beforeFrontier,
+         afterFrontier: capture.afterFrontier,
++        ordinaryEndpoints:
++          capture.ordinaryEndpoints && (!existing || existing.ordinaryEndpoints)
++            ? Object.freeze({
++                beforeToken:
++                  existing?.ordinaryEndpoints?.beforeToken ??
++                  capture.ordinaryEndpoints.beforeToken,
++                afterToken: capture.ordinaryEndpoints.afterToken,
++                before:
++                  existing?.ordinaryEndpoints?.before ??
++                  capture.ordinaryEndpoints.before,
++                after: capture.ordinaryEndpoints.after,
++                domain: Object.freeze([
++                  ...new Set([
++                    ...(existing?.ordinaryEndpoints?.domain ??
++                      capture.ordinaryEndpoints.domain ??
++                      capture.ordinaryEndpoints.before),
++                    ...(capture.ordinaryEndpoints.domain ??
++                      capture.ordinaryEndpoints.after),
++                  ]),
++                ]),
++              })
++            : undefined,
+       });
+       bucket.ownerPaths.add(capture.ownerPath);
+       bucket.positionIds.add(capture.owner);
+@@ -4537,7 +4636,7 @@
+               capture.ownerPath,
+               change.after,
+               change.before,
+-              capture.meta,
++              withoutEntityOrdinaryChanges(capture.meta),
+               capture.ownerPath,
+               [change.subject],
+               [capture.owner]
+@@ -4550,7 +4649,8 @@
+       const releaseEnqueued =
+         ownerId === undefined
+           ? undefined
+-          : getPathNotifier()?.observeEnqueue(ownerId, (entry) => {
++          : getPathNotifier()?.observeEnqueue(ownerId, (rawEntry) => {
++              const entry = ordinaryEntityEntry(rawEntry);
+               const transactionId = pendingFootprintTransaction(entry.meta);
+               if (transactionId === undefined) return;
+               const scratch: PendingEffectMap = new Map();
+@@ -4684,26 +4784,48 @@
+     let unsubscribeOrderBoundaries: (() => void) | undefined;
+     const releaseCapture = getMutationCaptureRuntime(tree)?.activateCapture();
+     try {
+-      unsubscribeOrderBoundaries = getMutationCaptureRuntime(tree)?.subscribeStructuralBoundary?.((capture) => {
+-        if (!capture.structuralFrontier || !capture.structuralRecords ||
+-            capture.meta?.origin === 'restoration' ||
+-            isCompensationWrite(capture.meta) || isInspectionWrite(capture.meta)) return;
++      unsubscribeOrderBoundaries = getMutationCaptureRuntime(
++        tree
++      )?.subscribeStructuralBoundary?.((capture) => {
++        if (
++          (!capture.topologyUnit &&
++            (!capture.structuralFrontier || !capture.structuralRecords)) ||
++          capture.meta?.origin === 'restoration' ||
++          isCompensationWrite(capture.meta) ||
++          isInspectionWrite(capture.meta)
++        )
++          return;
+         const evidence: OrderBoundaryEvidence = {
+-          ...capture.structuralFrontier,
+-          records: capture.structuralRecords,
++          before:
++            capture.topologyUnit?.physical.before ??
++            capture.structuralFrontier!.before,
++          after:
++            capture.topologyUnit?.physical.after ??
++            capture.structuralFrontier!.after,
++          records: capture.structuralRecords ?? [],
++          physical: capture.topologyUnit?.physical,
++          ordinary: capture.topologyUnit?.ordinary,
+         };
+         const retain = (bucket: CaptureBucket): void => {
+           let records = bucket.orderBoundaries.get(capture.owner);
+-          if (!records) bucket.orderBoundaries.set(capture.owner, records = []);
++          if (!records)
++            bucket.orderBoundaries.set(capture.owner, (records = []));
+           records.push(evidence);
+         };
+         const transactionId = resolveTransactionId(capture.meta);
+-        if (getWriteParticipation(capture.meta) === 'realized' || transactionId === undefined) {
++        if (
++          getWriteParticipation(capture.meta) === 'realized' ||
++          transactionId === undefined
++        ) {
+           const historical = getHistoricalCapture();
+           if (historical) retain(historical);
+         }
+         if (getWriteParticipation(capture.meta) === 'realized') return;
+-        retain(transactionId === undefined ? pendingCapture : getTransactionBucket(transactionId));
++        retain(
++          transactionId === undefined
++            ? pendingCapture
++            : getTransactionBucket(transactionId)
++        );
+       });
+       unsubscribeCollectionOrders =
+         getMutationCaptureRuntime(tree)?.subscribeCollectionOrder?.(
+@@ -4751,7 +4873,7 @@
+           unsubscribeNotifications?.();
+           unsubscribeNotifications = notifier.subscribe(
+             '**',
+-            (
++            function receiveOrdinaryNotification(
+               next,
+               prev,
+               path,
+@@ -4760,7 +4882,33 @@
+               subjectIds,
+               positionIds,
+               meta
+-            ) => {
++            ) {
++              if (getEntityOrdinaryChanges(meta) !== undefined) {
++                for (const entry of ordinaryEntityEntries({
++                  path,
++                  newValue: next,
++                  oldValue: prev,
++                  meta,
++                  subjectIds,
++                })) {
++                  receiveOrdinaryNotification(
++                    entry.newValue,
++                    entry.oldValue,
++                    entry.path,
++                    ownerPath,
++                    origin,
++                    entry.subjectIds,
++                    positionIds,
++                    entry.meta
++                  );
++                }
++                return;
++              }
++              const transition = entityValueTransition(meta);
++              if (transition) {
++                next = transition.ordinaryAfter;
++                prev = transition.ordinaryBefore;
++              }
+               if (origin === 'restoration') {
+                 return;
+               }

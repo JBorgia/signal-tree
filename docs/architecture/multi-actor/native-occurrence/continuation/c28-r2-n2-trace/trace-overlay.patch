@@ -1,0 +1,41 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -182,6 +182,7 @@
+    // Keep derived/branch/entity input evidence on the established admission path.
+    const exact=!!restoration||!admitted&&literal&&retained.owner!==undefined;
+    const relevance=exact?undefined:lifecycle.currentRelevance(predecessor.requirement as lifecycle.NativeRequirement,admitted?undefined:retained.requirement as lifecycle.NativeRequirement,prepared.requirement);
++   lifecycle.__trace({kind:'admission',address:getNodeAddress(node),admitted,exact,retainedIsPredecessor:retained===predecessor,predecessorReady:lifecycle.nativeRequirementReady(predecessor.requirement as lifecycle.NativeRequirement),retainedReady:lifecycle.nativeRequirementReady(retained.requirement as lifecycle.NativeRequirement),mask:lifecycle.__traceCells(relevance??[]),predecessor:lifecycle.__traceProof(lifecycle.nativeProof(predecessor.requirement as lifecycle.NativeRequirement)),retained:lifecycle.__traceProof(lifecycle.nativeProof(retained.requirement as lifecycle.NativeRequirement)),invocation:lifecycle.__traceProof(lifecycle.nativeProof(prepared.requirement)),inputs:prepared.requirement.inputs.map(i=>({captured:lifecycle.__traceCells(i.owners),ready:lifecycle.nativeRequirementReady(i.requirement),proof:lifecycle.__traceProof(lifecycle.nativeProof(i.requirement))})),protected:prepared.requirement.frames.map(f=>lifecycle.__traceCells(f.protectedOwners))});
+    const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted&&!relevance?.size?prepared.requirement:lifecycle.combineScalarNativeRequirements(admitted?[prepared.requirement]:[retained.requirement as lifecycle.NativeRequirement,prepared.requirement],relevance);
+    const endpoint=requirement===retained.requirement?retained:Object.freeze({...retained,requirement});
+    const view=mutation.changed||mutation.physicalChanged||!existingView||existingView.requirement!==requirement?{requirement}:existingView;
+@@ -347,6 +348,7 @@
+   proofs.set(unit.fact,lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0));
+   const prior=unit.previous&&proofs.get(unit.previous);
+   const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior&&lifecycle.currentObligations(prior,unit.relevance),lifecycle.currentObligations(effective,unit.relevance));
++  lifecycle.__trace({kind:'compare',relative:unit.relative,revision:unit.fact.revision,previousRevision:unit.previous?.revision,effectivePreviousRevision:effectivePredecessor(unit.previous)?.revision,changed:unit.changed,clean:unit.fact.clean,previousClean:unit.previous?.clean??false,noop,mask:lifecycle.__traceCells(unit.relevance??[]),prior:lifecycle.__traceProof(prior),effective:lifecycle.__traceProof(effective),projectedPrior:lifecycle.__traceProof(prior&&lifecycle.currentObligations(prior,unit.relevance)),projectedEffective:lifecycle.__traceProof(lifecycle.currentObligations(effective,unit.relevance))});
+   if(noop){
+    lifecycle.noWrite(channel,unit.fact);
+    const predecessor=effectivePredecessor(unit.previous);noopPredecessors.set(unit.fact,predecessor);
+@@ -386,6 +388,7 @@
+   recipientDomain:scopes.some(scope=>scope.recipientDomainUnknown),
+  };
+  const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin||uncertainty.uncapturedUpdaterInput||uncertainty.recipientDomain);
++ lifecycle.__trace({kind:'recipient-admission',field:field?b.fields.get(field)?.relative:undefined,previousRevision:previous?.revision,effectivePreviousRevision:effectivePredecessor(previous)?.revision,previousProof:lifecycle.__traceProof(previous&&proofs.get(previous)),previousRequirementReady:previous&&factRequirements.get(previous)?lifecycle.nativeRequirementReady(factRequirements.get(previous)!):null,previousIsPending:!!previous&&[...b.pending].some(u=>u.fact===previous),previousUnitNative:previous?[...b.pending].filter(u=>u.fact===previous).map(u=>u.native?{ready:lifecycle.nativeRequirementReady(u.native),proof:lifecycle.__traceProof(lifecycle.nativeProof(u.native))}:null):[]});
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);scalarFacts.add(fact);mutation.publicationPredecessors?.set(channel,fact);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+  const relevance=(nativeUnit as {relevance?:lifecycle.CurrentRelevance}|undefined)?.relevance;
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -546,3 +546,12 @@
+ export function __historyWeakRoots(value:object){return [finalizedRetirements.get(value as NativeRequirement),requirementListeners.get(value as NativeRequirement),ownerTransitionObservers.get(value as OwnerCell)];}
+ export function __historyOperations(){return [...connections.values()].flatMap(connection=>[...connection.ops.values()]);}
+ export function __c26NormalizationState(r:NativeRequirement){return {enrolled:normalizingScalars.has(r),listeners:requirementListeners.get(r)?.size??0};}
++
++// N2 trace only.
++
++let __traceEnabled=false;let __traceEvents:unknown[]=[];
++export function __traceStart(){__traceEnabled=true;__traceEvents=[];}
++export function __traceTake(){const events=__traceEvents;__traceEvents=[];return events;}
++export function __trace(event:unknown){if(__traceEnabled)__traceEvents.push(event);}
++export function __traceCells(cells:Iterable<OwnerCell>){return [...cells].map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}));}
++export function __traceProof(proof:Readonly<Proof>|undefined){return proof&&{roles:Object.fromEntries((['owners','destination','input','validation','possible'] as const).map(role=>[role,__traceCells(proof[role]??[])])),unknown:proof.unknown,invalid:proof.invalid,unavailableInput:!!proof.unavailableInput,historicalWindow:!!proof.historicalWindow,terminalRejectedRoles:proof.terminalRejectedRoles??0};}

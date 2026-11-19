@@ -1,0 +1,9 @@
+{
+  "typescript": "6.0.3",
+  "config": "/private/tmp/st-test-routing-successor/candidate/tsconfig.typecheck-specs.json",
+  "files": [
+    "/private/tmp/st-test-routing-successor/candidate/tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts",
+    "/private/tmp/st-test-routing-successor/candidate/tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts"
+  ],
+  "scope": "These exact two archived files are inputs to the passing spec-types command."
+}

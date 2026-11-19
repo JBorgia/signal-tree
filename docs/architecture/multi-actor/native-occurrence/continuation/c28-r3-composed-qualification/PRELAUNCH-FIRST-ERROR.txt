@@ -1,0 +1,1 @@
+Initial sandboxed full-run.py stopped before launching any suite: PermissionError [Errno 1] Operation not permitted: /bin/ps. Required census intentionally fails closed. Escalated rerun permitted owned process observation; no test repeat.

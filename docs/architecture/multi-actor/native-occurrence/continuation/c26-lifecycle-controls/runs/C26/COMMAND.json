@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "scalar-horizon-lifecycle-controls",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c26-lifecycle-controls/c26-copy",
+  "versions": {
+    "node": "v24.15.0",
+    "pnpm": "10.17.0"
+  },
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c26-lifecycle-controls/runs/C26/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c26-lifecycle-controls/runs/C26/nx-data",
+    "TMPDIR": "/private/tmp/st-c26-lifecycle-controls/runs/C26/tmp"
+  },
+  "launchTimeoutSeconds": 180
+}

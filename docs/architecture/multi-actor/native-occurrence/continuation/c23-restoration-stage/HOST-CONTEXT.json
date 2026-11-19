@@ -1,0 +1,11 @@
+{
+  "source": "Main user observation during current diagnostic; not independently measured",
+  "recordedAtEpoch": 1793655789.7108202,
+  "physicalGiB": 32,
+  "swapUsedMB": 23271.5,
+  "swapTotalMB": 24576,
+  "compressorPages": 830947,
+  "pageKiB": 16,
+  "causalAttribution": null,
+  "constraint": "current bounded diagnostic only; no further large workload or retry"
+}

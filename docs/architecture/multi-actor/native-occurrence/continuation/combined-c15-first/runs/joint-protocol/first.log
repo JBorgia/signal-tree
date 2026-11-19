@@ -1,0 +1,75 @@
+
+> nx run kernel:test scalar-frame-publication native-admission-handoff aggregate-input-evidence publication-retirement-boundaries singleton-row-reuse packet-index-review --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-frame-publication native-admission-handoff aggregate-input-evidence publication-retirement-boundaries singleton-row-reuse packet-index-review --maxWorkers=1
+
+(node:70353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c15/candidate/packages/kernel
+
+(node:70367) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (26 tests | 1 failed) 88ms
+   × sibling prepared records retain changed contribution when final sibling is equal 5ms
+(node:70374) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70378) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70379) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70380) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > sibling prepared records retain changed contribution when final sibling is equal
+AssertionError: expected undefined to deeply equal { a: 1, b: +0 }
+
+- Expected:
+{
+  "a": 1,
+  "b": 0,
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:391:25
+    389|     await flush();
+    390|     expect(tree.$()).toEqual({ a: 1, b: 0 });
+    391|     expect(sent.at(-1)).toEqual({ a: 1, b: 0 });
+       |                         ^
+    392|   } finally {
+    393|     c.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 51 passed (52)
+   Start at  11:20:08
+   Duration  5.25s (transform 1.03s, setup 0ms, import 1.94s, tests 286ms, environment 2.19s)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-frame-publication native-admission-handoff aggregate-input-evidence publication-retirement-boundaries singleton-row-reuse packet-index-review --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    6.2s

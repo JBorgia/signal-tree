@@ -1,0 +1,17 @@
+{
+  "manifestSha256": "d3b6da2906ae9cef72e5623b35eb6de3dee73d64b12f5c9bd408352aa627e73b",
+  "entries": 2941,
+  "originalUnchanged": true,
+  "copyUnchanged": true,
+  "predecessorRuntimeChanges": [
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/selected-write-operation.ts"
+  ],
+  "successProbeUnchanged": true,
+  "versions": {
+    "nx": "23.1.0",
+    "vitest": "4.1.9",
+    "typescript": "6.0.3"
+  }
+}

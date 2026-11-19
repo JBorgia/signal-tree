@@ -1,0 +1,172 @@
+[
+  {
+    "path": "packages/kernel/src/enhancers/transactions/semantics-current.spec.ts",
+    "line": 67,
+    "text": "    if (process.env['SEMANTICS_REPORT'])"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/semantics-current.spec.ts",
+    "line": 68,
+    "text": "      writeFileSync(process.env['SEMANTICS_REPORT'], report, 'utf8');"
+  },
+  {
+    "path": "packages/kernel/src/lib/approved-current-obligation.spec.ts",
+    "line": 7,
+    "text": " const output=process.env['ST_TWO_HISTORY_OUTPUT'];if(!output)throw Error('Observation output required');"
+  },
+  {
+    "path": "packages/kernel/src/lib/benchmarks.spec.ts",
+    "line": 25,
+    "text": "const RUN_TIMING = process.env['ST_PERF'] === '1';"
+  },
+  {
+    "path": "packages/kernel/src/lib/cached-current-input.spec.ts",
+    "line": 60,
+    "text": "    const sink = process.env.ST_CACHED_INPUT_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "line": 33,
+    "text": "  const counts=structure(captured);const output=process.env['ST_EQUAL_OWNER_TRACE'];if(!output)throw Error('Research diagnostic requires ST_EQUAL_OWNER_TRACE');appendFileSync(output,JSON.stringify({route,n,inheritedQ,captured:'before extra probe declaration',...counts})+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+    "line": 10,
+    "text": "const log=(v:unknown)=>appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/independent.jsonl',JSON.stringify(v)+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+    "line": 12,
+    "text": "  appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/terminal.jsonl',JSON.stringify({kind,outcome,immediate,terminal:childSent,root:rootSent})+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "line": 13,
+    "text": "  writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order.json',JSON.stringify({pending,after,error:String(error),confirmError:String(confirmError)},null,2));"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "line": 25,
+    "text": " try{q.rollback();const data=packets.map(p=>({physical:p.physical,ordinary:p.ordinary,steps:p.steps}));writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/packet-${order}.json`,JSON.stringify(data,null,2));"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "line": 36,
+    "text": " const data={calls,after,sameSupport,afterAdoptionReject:row()};writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/absence-${mode}.json`,JSON.stringify(data,null,2));"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+    "line": 11,
+    "text": "const record=(name:string,data:unknown)=>{const dir=process.env['ST_PREPARED_REVIEW_OUTPUT'];if(!dir)throw new Error('fresh output directory required');writeFileSync(`${dir}/${name}.json`,JSON.stringify(data,null,2));};"
+  },
+  {
+    "path": "packages/kernel/src/lib/independent-scalar-publication.spec.ts",
+    "line": 34,
+    "text": "  if(process.env['ST_PREPARED_REVIEW_OUTPUT'])writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],`sibling-window-${openerFirst}.json`),JSON.stringify({owner,observations},null,2)+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/opaque-current-input.spec.ts",
+    "line": 8,
+    "text": "  if (process.env.ST_OPAQUE_INPUT_OUTPUT) appendFileSync(process.env.ST_OPAQUE_INPUT_OUTPUT, JSON.stringify(value) + '\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts",
+    "line": 71,
+    "text": "    if(process.env['ST_PREPARED_REVIEW_OUTPUT']) writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],'placement-work.json'),JSON.stringify({sizes:[32,1024],stageReads:counts})+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts",
+    "line": 133,
+    "text": "  if(process.env['ST_PREPARED_REVIEW_OUTPUT'])writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],'recipient-placement-work.json'),JSON.stringify(measurements)+'\\n');"
+  },
+  {
+    "path": "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts",
+    "line": 67,
+    "text": "      const out = process.env.ST_PACKET_PAIR_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/packet-physical-pair-work.spec.ts",
+    "line": 52,
+    "text": "      const output = process.env.ST_PACKET_PAIR_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
+    "line": 13,
+    "text": "function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}"
+  },
+  {
+    "path": "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts",
+    "line": 20,
+    "text": "function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}"
+  },
+  {
+    "path": "packages/kernel/src/lib/point-result-allocation.spec.ts",
+    "line": 24,
+    "text": " const output=process.env.ST_POINT_ALLOCATION_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts",
+    "line": 134,
+    "text": "      const output = process.env.ST_MEMBERSHIP_REPLAY_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "line": 24,
+    "text": "const RUN_TIMING = process.env['ST_PERF'] === '1';"
+  },
+  {
+    "path": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "line": 26,
+    "text": "const OUTPUT_FILE = process.env['ST_PERF_OUTPUT_FILE'];"
+  },
+  {
+    "path": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "line": 21,
+    "text": "  const directory=process.env['ST_PUBLIC_DIAGNOSTIC_OUTPUT'];if(!directory)throw new Error('unique evidence output directory required');"
+  },
+  {
+    "path": "packages/kernel/src/lib/public-sibling-current-obligation.spec.ts",
+    "line": 54,
+    "text": "      const sink = process.env.ST_PUBLIC_SIBLING_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/publication-retirement-acceptance.spec.ts",
+    "line": 47,
+    "text": " if(process.env['ST_RETIREMENT_FAULT']==='naive-retire')b.source.retire(b.subject!);"
+  },
+  {
+    "path": "packages/kernel/src/lib/singleton-row-allocation.spec.ts",
+    "line": 22,
+    "text": " const output=process.env.ST_SINGLETON_ALLOCATION_OUTPUT;"
+  },
+  {
+    "path": "packages/kernel/src/lib/whole-bounded-qualification.spec.ts",
+    "line": 9,
+    "text": "const traces:unknown[]=[];afterAll(()=>writeFileSync(process.env.TMPDIR+'/whole-qualification.json',JSON.stringify(traces,null,2)));"
+  },
+  {
+    "path": "packages/kernel/src/lib/whole-getter-controls.spec.ts",
+    "line": 9,
+    "text": "afterAll(()=>{writeFileSync(process.env.TMPDIR+'/whole-getters.json',JSON.stringify(results,null,2));});"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/derived.spec.ts",
+    "line": 939,
+    "text": "  describe.runIf(process.env['ST_PERF'] === '1')("
+  },
+  {
+    "path": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
+    "line": 5,
+    "text": "const RUN_TIMING = process.env['ST_PERF'] === '1';"
+  },
+  {
+    "path": "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+    "line": 13,
+    "text": "function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}"
+  },
+  {
+    "path": "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
+    "line": 21,
+    "text": "function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}"
+  }
+]

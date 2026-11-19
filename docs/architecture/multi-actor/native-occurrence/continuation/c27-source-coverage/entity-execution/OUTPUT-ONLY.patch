@@ -1,0 +1,41 @@
+--- a/packages/kernel/src/lib/entity-declaration-useful-lifecycle.spec.ts
++++ b/packages/kernel/src/lib/entity-declaration-useful-lifecycle.spec.ts
+@@ -1,5 +1,11 @@
++import { appendFileSync } from 'node:fs';
+ import { expect, it } from 'vitest';
+ import { entityMap, link, signalTree, transactions, type PublicationReceipt } from '../index';
++
++const record = (name: string, value: unknown): void => {
++  const output = process.env['ST_ENTITY_DECLARATION_OUTPUT'];
++  if (output) appendFileSync(output, JSON.stringify({ name, value }) + '\n');
++};
+ 
+ const drain = async () => { for (let i = 0; i < 120; i++) await Promise.resolve(); };
+ type Row = { id: string; n: number };
+@@ -30,7 +36,7 @@
+     expect(row()).toEqual({ id: 'a', n: 0 });
+     expect(sent).toEqual([{ id: 'a', n: 0 }]);
+     const terminal = receipt.read();
+-    console.info('ROW-RECEIPT-OBSERVATION', JSON.stringify({ initial, afterRollback: terminal, sent }));
++    record('ROW-RECEIPT-OBSERVATION', { initial, afterRollback: terminal, sent });
+     expect(Object.isFrozen(terminal)).toBe(true);
+     // Only the existing terminal/sticky state-machine category is checked here.
+     // Exact rollback receipt disposition remains separately adjudicable; payload
+@@ -54,7 +60,7 @@
+     expect(replacement.n()).toBe(100); expect(receipt.read()).toEqual(terminal);
+     expect(sent).toEqual([{ id: 'a', n: 0 }]);
+   } finally {
+-    console.info('ROW-RECEIPT-FINAL', JSON.stringify({ status: receipt?.read(), sent }));
++    record('ROW-RECEIPT-FINAL', { status: receipt?.read(), sent });
+     release(); connection.dispose(); tree.destroy();
+   }
+ });
+@@ -74,7 +80,7 @@
+     expect(foreign.$.q()).toBe(0);
+     expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 1 }]);
+     expect(sent).toEqual([[{ id: 'a', n: 1 }]]);
+-    console.info('COLLECTION-UNKNOWN-RECEIPT', JSON.stringify(receipt.read()));
++    record('COLLECTION-UNKNOWN-RECEIPT', receipt.read());
+     await drain(); expect(sent).toEqual([[{ id: 'a', n: 1 }]]);
+     connection.dispose();
+     tree.$.rows.removeOne('a'); tree.$.rows.addOne({ id: 'a', n: 9 }); await drain();

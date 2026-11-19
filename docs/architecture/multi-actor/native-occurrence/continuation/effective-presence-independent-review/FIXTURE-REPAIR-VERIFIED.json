@@ -1,0 +1,22 @@
+{
+  "packages/angular/src/lib/effective-presence-install-reentry.spec.ts": {
+    "identical": true,
+    "sha256": "8ef104d0486bae74575076072224dccbde5e4ed9b16d99504fbefadb8aae61bc"
+  },
+  "packages/angular/src/lib/effective-presence-successor.spec.ts": {
+    "identical": true,
+    "sha256": "8921f47e1e25a4d33bcc641084e1d48065fc45cb98a9e69d27388f4f7d76a8c9"
+  },
+  "packages/kernel/src/lib/effective-presence-install-reentry.spec.ts": {
+    "identical": true,
+    "sha256": "ef7969a5b2d3ce766fdb8015d1832f4f85c87a86aa0cae87f253d8f29f0f9c3c"
+  },
+  "packages/kernel/src/lib/effective-presence-reentry.spec.ts": {
+    "identical": true,
+    "sha256": "12920eb521c2bd01187e52e100a262d2b6b1863499ee680210b05c3f8a53a3bc"
+  },
+  "packages/kernel/src/lib/effective-presence-successor.spec.ts": {
+    "identical": true,
+    "sha256": "f0f911e26d16f422c1c58e6a49522c2012c1a5438f02c17a9bb3675e0d6e82a7"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "node",
+    "../../node_modules/vitest/vitest.mjs",
+    "list",
+    "--config",
+    "vitest.retention.config.ts",
+    "--filesOnly",
+    "--json"
+  ],
+  "cwd": "/private/tmp/st-c21-held-gc/candidate/packages/kernel",
+  "node": "24.15.0",
+  "noOutputDeadlineSeconds": 180
+}

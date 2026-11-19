@@ -1,0 +1,1298 @@
+[
+  {
+    "source": "ownership.py",
+    "archive": "ownership.py",
+    "sourceSha256": "1d73883dca029f279ed0456065f0fc26a265c42e4e5b0ce98c9a1edf9780ffe1",
+    "archiveSha256": "1d73883dca029f279ed0456065f0fc26a265c42e4e5b0ce98c9a1edf9780ffe1"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "ab04dc2da50d069d9f3287e80a230928892c4fe132b9c3cd0b77c6c75b05abd9",
+    "archiveSha256": "ab04dc2da50d069d9f3287e80a230928892c4fe132b9c3cd0b77c6c75b05abd9"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "018409984f998c2b9fcdafe80eba110e1fd79ea19c0ebf03d491e5f66b1ce4e6",
+    "archiveSha256": "018409984f998c2b9fcdafe80eba110e1fd79ea19c0ebf03d491e5f66b1ce4e6"
+  },
+  {
+    "source": "INSTRUMENTATION.patch",
+    "archive": "INSTRUMENTATION.patch",
+    "sourceSha256": "98db3a1012fb6d96a14eb02d061d6fbd9435e1b6555f91faa84572b7ae8d027a",
+    "archiveSha256": "98db3a1012fb6d96a14eb02d061d6fbd9435e1b6555f91faa84572b7ae8d027a"
+  },
+  {
+    "source": "instrument.mjs",
+    "archive": "instrument.mjs",
+    "sourceSha256": "48d1cf0f72cfee3525cdeff94d014b83ba0deb7cbf25b87fb5d4ee62e4365b56",
+    "archiveSha256": "48d1cf0f72cfee3525cdeff94d014b83ba0deb7cbf25b87fb5d4ee62e4365b56"
+  },
+  {
+    "source": "private.uninstrumented.ts",
+    "archive": "private.uninstrumented.ts",
+    "sourceSha256": "e149c3a27faba6092ea16f9ef9d785f1598529e8446da8fa38df6e82c3b439dd",
+    "archiveSha256": "e149c3a27faba6092ea16f9ef9d785f1598529e8446da8fa38df6e82c3b439dd"
+  },
+  {
+    "source": "capture.mjs",
+    "archive": "capture.mjs",
+    "sourceSha256": "f94d859e7a47ef4db7bb98bc36076c97799891fb3f5cb65db04d1dbd23ef9238",
+    "archiveSha256": "f94d859e7a47ef4db7bb98bc36076c97799891fb3f5cb65db04d1dbd23ef9238"
+  },
+  {
+    "source": "CAPTURE.json",
+    "archive": "CAPTURE.json",
+    "sourceSha256": "f734b443665af32aa47abd4607eaa461fb9bef7168803ad2802e6c652aa3d4e5",
+    "archiveSha256": "f734b443665af32aa47abd4607eaa461fb9bef7168803ad2802e6c652aa3d4e5"
+  },
+  {
+    "source": "FIRST-RUN-COUNTS.json",
+    "archive": "FIRST-RUN-COUNTS.json",
+    "sourceSha256": "787ca72244af0955051daff727c52c5d20843c18c08ca2c05a884f01c75be43c",
+    "archiveSha256": "787ca72244af0955051daff727c52c5d20843c18c08ca2c05a884f01c75be43c"
+  },
+  {
+    "source": "lifecycle.uninstrumented.ts",
+    "archive": "lifecycle.uninstrumented.ts",
+    "sourceSha256": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8",
+    "archiveSha256": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8"
+  },
+  {
+    "source": "vitest.config.mjs",
+    "archive": "vitest.config.mjs",
+    "sourceSha256": "eb42ea4d88d2ba6ac1300f97b465ac3bb960677a3a6aaf5899a3bc6cf1ca873d",
+    "archiveSha256": "eb42ea4d88d2ba6ac1300f97b465ac3bb960677a3a6aaf5899a3bc6cf1ca873d"
+  },
+  {
+    "source": "EVIDENCE-HASHES.json",
+    "archive": "EVIDENCE-HASHES.json",
+    "sourceSha256": "21a979e4506a5a04b3356f224494ccc4a0b23a631ea1cac7e91cabc4f53804c3",
+    "archiveSha256": "21a979e4506a5a04b3356f224494ccc4a0b23a631ea1cac7e91cabc4f53804c3"
+  },
+  {
+    "source": "COUNTS.jsonl",
+    "archive": "COUNTS.jsonl",
+    "sourceSha256": "40590e0eb4ef3409fb81e0b207573b0002771ea4e37557b70d92c7a75a4ef4f3",
+    "archiveSha256": "40590e0eb4ef3409fb81e0b207573b0002771ea4e37557b70d92c7a75a4ef4f3"
+  },
+  {
+    "source": "specs/retention.spec.ts",
+    "archive": "specs/retention.spec.ts",
+    "sourceSha256": "896912b2d96e83b510f7640f83109f4de15ec62ea35ad1dc1e8732d271f9f62f",
+    "archiveSha256": "896912b2d96e83b510f7640f83109f4de15ec62ea35ad1dc1e8732d271f9f62f"
+  },
+  {
+    "source": "source/packages/kernel/src/adapter.ts",
+    "archive": "source/packages/kernel/src/adapter.ts",
+    "sourceSha256": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+    "archiveSha256": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910"
+  },
+  {
+    "source": "source/packages/kernel/src/index.ts",
+    "archive": "source/packages/kernel/src/index.ts",
+    "sourceSha256": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388",
+    "archiveSha256": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388"
+  },
+  {
+    "source": "source/packages/kernel/src/internals.ts",
+    "archive": "source/packages/kernel/src/internals.ts",
+    "sourceSha256": "5159bf3abb731138f0068ecff0d4d9089f7bb6a95acf63d58ae0f7d9a9e93600",
+    "archiveSha256": "5159bf3abb731138f0068ecff0d4d9089f7bb6a95acf63d58ae0f7d9a9e93600"
+  },
+  {
+    "source": "source/packages/kernel/src/transaction-realization-contract.ts",
+    "archive": "source/packages/kernel/src/transaction-realization-contract.ts",
+    "sourceSha256": "426ec0d10a4ea0cfc8d7a871dfa0f5ffb46b09610ade5e4b2cae2e7da5898e90",
+    "archiveSha256": "426ec0d10a4ea0cfc8d7a871dfa0f5ffb46b09610ade5e4b2cae2e7da5898e90"
+  },
+  {
+    "source": "source/packages/kernel/src/reactive-test-realization.ts",
+    "archive": "source/packages/kernel/src/reactive-test-realization.ts",
+    "sourceSha256": "90e78553ebc8818f9ff3c68cf196bb1f8bde73ca2997352fd0f1a20390a0041e",
+    "archiveSha256": "90e78553ebc8818f9ff3c68cf196bb1f8bde73ca2997352fd0f1a20390a0041e"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/types.ts",
+    "archive": "source/packages/kernel/src/enhancers/types.ts",
+    "sourceSha256": "6b68fb0711779954270e841bd7a5598439c8add7f39e1d9dd06aac46d53b3de9",
+    "archiveSha256": "6b68fb0711779954270e841bd7a5598439c8add7f39e1d9dd06aac46d53b3de9"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/index.ts",
+    "archive": "source/packages/kernel/src/enhancers/index.ts",
+    "sourceSha256": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f",
+    "archiveSha256": "b3f2d8805cd540733e58950d1673e8f6b7ebe850f8589d3067680b2c2b94768f"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/restoration/restoration.ts",
+    "archive": "source/packages/kernel/src/enhancers/restoration/restoration.ts.gz",
+    "sourceSha256": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+    "archiveSha256": "1563b3a751c094b77faeda39d7c7eb903cff705ecb73d215c41b3ab7079fc8ad"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/restoration/restoration.types.ts",
+    "archive": "source/packages/kernel/src/enhancers/restoration/restoration.types.ts",
+    "sourceSha256": "dda98031aea52d900e765cb8c0e0c4e716f6c192b5ccbd5f88c2ae32f3a67f22",
+    "archiveSha256": "dda98031aea52d900e765cb8c0e0c4e716f6c192b5ccbd5f88c2ae32f3a67f22"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts",
+    "archive": "source/packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts",
+    "sourceSha256": "100d9028bb73442b9d6280dfda9d6c2cb4d07f3ba6d3151b3b2098b72697f004",
+    "archiveSha256": "100d9028bb73442b9d6280dfda9d6c2cb4d07f3ba6d3151b3b2098b72697f004"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/restoration/index.ts",
+    "archive": "source/packages/kernel/src/enhancers/restoration/index.ts",
+    "sourceSha256": "903a6630a799ba64504092acaabe5a463bc4f043c70c51e605ced7f12244bf01",
+    "archiveSha256": "903a6630a799ba64504092acaabe5a463bc4f043c70c51e605ced7f12244bf01"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/typing/helpers-types.ts",
+    "archive": "source/packages/kernel/src/enhancers/typing/helpers-types.ts",
+    "sourceSha256": "e4f5edd69078332c101e78b0e97e1300c5a281e299a8feaf026aa9800dfa5417",
+    "archiveSha256": "e4f5edd69078332c101e78b0e97e1300c5a281e299a8feaf026aa9800dfa5417"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/confirmed-destroy.gc.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/confirmed-destroy.gc.ts",
+    "sourceSha256": "954f37351935dd1fd57b19f568e0c6d80d1f01275ce5a911fcf9d993d00e5ea8",
+    "archiveSha256": "954f37351935dd1fd57b19f568e0c6d80d1f01275ce5a911fcf9d993d00e5ea8"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-composition-domain.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-composition-domain.ts",
+    "sourceSha256": "022e51ca9bf4eb641fdad92f8ac157c50ee6beaadee2ce966193532dbf25c5f0",
+    "archiveSha256": "022e51ca9bf4eb641fdad92f8ac157c50ee6beaadee2ce966193532dbf25c5f0"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-composition-adapter.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-composition-adapter.ts",
+    "sourceSha256": "ec94de004be09daefb2f3552a33ab4c3cf7b70ebbcd1e13442b337d465d5a9c5",
+    "archiveSha256": "ec94de004be09daefb2f3552a33ab4c3cf7b70ebbcd1e13442b337d465d5a9c5"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-authority.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-authority.ts",
+    "sourceSha256": "6c0e348eccd14bee974d896e635a4d5bd8add94e3c3203c783ff417596896386",
+    "archiveSha256": "6c0e348eccd14bee974d896e635a4d5bd8add94e3c3203c783ff417596896386"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-supplemental.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-supplemental.ts",
+    "sourceSha256": "5459e2ebe639a3d3258a8e67ee87f7ce756e589e242074483abc76b0d89895d6",
+    "archiveSha256": "5459e2ebe639a3d3258a8e67ee87f7ce756e589e242074483abc76b0d89895d6"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-current-adapter.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-current-adapter.ts",
+    "sourceSha256": "7838c1309e36f92f82c3819b00b42991f91fbd9565ad9902f2f46d22422925c7",
+    "archiveSha256": "7838c1309e36f92f82c3819b00b42991f91fbd9565ad9902f2f46d22422925c7"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/occupancy-composition.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/occupancy-composition.ts",
+    "sourceSha256": "921c83c65cf73836dbb4411686e18163f7f178052abcccedeaf71333bf4762ce",
+    "archiveSha256": "921c83c65cf73836dbb4411686e18163f7f178052abcccedeaf71333bf4762ce"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-structural.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-structural.ts",
+    "sourceSha256": "0cd3ab1983ba635f5d3ab32fb0b0f9c4c25a98403c7e4f93c3908afd8da32cef",
+    "archiveSha256": "0cd3ab1983ba635f5d3ab32fb0b0f9c4c25a98403c7e4f93c3908afd8da32cef"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/transactions.ts.gz",
+    "sourceSha256": "030f259dd5cfe14b6c8456c19e33ebd1c7015b4bd0b65613bb01d4a326ac53b6",
+    "archiveSha256": "41c97f7082aad742f24ac6634bde9a23220efc511c295a6654233f7462dcf75d"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-structural-adapter.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-structural-adapter.ts",
+    "sourceSha256": "44cc370bb23a618ff2a383cbfc863e6ed26a0baad6aca0f1275064ec5d95f909",
+    "archiveSha256": "44cc370bb23a618ff2a383cbfc863e6ed26a0baad6aca0f1275064ec5d95f909"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-composition.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-composition.ts",
+    "sourceSha256": "b8f6a59127edc6ca901613056f4c6cf99a35b64c0ffa49f7f5af730fa21f7028",
+    "archiveSha256": "b8f6a59127edc6ca901613056f4c6cf99a35b64c0ffa49f7f5af730fa21f7028"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-structural-domain.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-structural-domain.ts",
+    "sourceSha256": "1dd36d92b6658230b7331a4be3fd73f3a5c1b04ea2bc064fcec4e4dd4af381c8",
+    "archiveSha256": "1dd36d92b6658230b7331a4be3fd73f3a5c1b04ea2bc064fcec4e4dd4af381c8"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/semantics-contract.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/semantics-contract.ts",
+    "sourceSha256": "d94c8e8d26d9ed46a3a88d133482f780ad74186fc65407e1310b72d292a8bb96",
+    "archiveSha256": "d94c8e8d26d9ed46a3a88d133482f780ad74186fc65407e1310b72d292a8bb96"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/transactions/transactions.types.ts",
+    "archive": "source/packages/kernel/src/enhancers/transactions/transactions.types.ts",
+    "sourceSha256": "54da27b77edd640d19bc134a53966b999db869efc79fd65995f35e0e28d3de14",
+    "archiveSha256": "54da27b77edd640d19bc134a53966b999db869efc79fd65995f35e0e28d3de14"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/devtools/devtools.ts",
+    "archive": "source/packages/kernel/src/enhancers/devtools/devtools.ts",
+    "sourceSha256": "a70ae3062de88cd4cbd6c817271309f7aaacaa560a9cf14b11389c185392a48e",
+    "archiveSha256": "a70ae3062de88cd4cbd6c817271309f7aaacaa560a9cf14b11389c185392a48e"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/devtools/devtools-impl.ts",
+    "archive": "source/packages/kernel/src/enhancers/devtools/devtools-impl.ts",
+    "sourceSha256": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9",
+    "archiveSha256": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/devtools/devtools.types.ts",
+    "archive": "source/packages/kernel/src/enhancers/devtools/devtools.types.ts",
+    "sourceSha256": "344b92939e2f5ec4d89bd7544776b8437a92e82c35cc64f61c25d5b96bf4e2da",
+    "archiveSha256": "344b92939e2f5ec4d89bd7544776b8437a92e82c35cc64f61c25d5b96bf4e2da"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/devtools/index.ts",
+    "archive": "source/packages/kernel/src/enhancers/devtools/index.ts",
+    "sourceSha256": "75c24fc275c555c0c208239e379658aa12c907f9fa652ec56458c1f4aa6f26f4",
+    "archiveSha256": "75c24fc275c555c0c208239e379658aa12c907f9fa652ec56458c1f4aa6f26f4"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/batching/batching.types.ts",
+    "archive": "source/packages/kernel/src/enhancers/batching/batching.types.ts",
+    "sourceSha256": "db08da0e28d98f6cd917fc09988ed448bddccfc3d719544fa909fc39832293fc",
+    "archiveSha256": "db08da0e28d98f6cd917fc09988ed448bddccfc3d719544fa909fc39832293fc"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/batching/index.ts",
+    "archive": "source/packages/kernel/src/enhancers/batching/index.ts",
+    "sourceSha256": "0310b53c29db6307c20f489d3068d8b8b373fb3715f006c2bf5bae82f677951d",
+    "archiveSha256": "0310b53c29db6307c20f489d3068d8b8b373fb3715f006c2bf5bae82f677951d"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/batching/batching.ts",
+    "archive": "source/packages/kernel/src/enhancers/batching/batching.ts",
+    "sourceSha256": "0e674d16c26114ea2959364c0e277229e708dad8456755c6d765e18d253f42f3",
+    "archiveSha256": "0e674d16c26114ea2959364c0e277229e708dad8456755c6d765e18d253f42f3"
+  },
+  {
+    "source": "source/packages/kernel/src/enhancers/test-helpers/types-equals.ts",
+    "archive": "source/packages/kernel/src/enhancers/test-helpers/types-equals.ts",
+    "sourceSha256": "b3ea91a18a124bfa6d263633d5781432fa56b53a070e9dc583347284dd27de87",
+    "archiveSha256": "b3ea91a18a124bfa6d263633d5781432fa56b53a070e9dc583347284dd27de87"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/external.ts",
+    "archive": "source/packages/kernel/src/lib/external.ts",
+    "sourceSha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704",
+    "archiveSha256": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/path-notifier.ts",
+    "archive": "source/packages/kernel/src/lib/path-notifier.ts",
+    "sourceSha256": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde",
+    "archiveSha256": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/write-participation.ts",
+    "archive": "source/packages/kernel/src/lib/write-participation.ts",
+    "sourceSha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e",
+    "archiveSha256": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/utils.ts",
+    "archive": "source/packages/kernel/src/lib/utils.ts",
+    "sourceSha256": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232",
+    "archiveSha256": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/readonly-readers.ts",
+    "archive": "source/packages/kernel/src/lib/readonly-readers.ts",
+    "sourceSha256": "d7eb297fc9cf0093829f55afe1e15de88c311977395a1cbc8aa9d773faada4c0",
+    "archiveSha256": "d7eb297fc9cf0093829f55afe1e15de88c311977395a1cbc8aa9d773faada4c0"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/signal-tree.ts",
+    "archive": "source/packages/kernel/src/lib/signal-tree.ts.gz",
+    "sourceSha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "archiveSha256": "a59c76c625e1778d52847ca04467d967f5e6b90c6198decd7b94662b754b0f13"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/undoable.ts",
+    "archive": "source/packages/kernel/src/lib/undoable.ts",
+    "sourceSha256": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db",
+    "archiveSha256": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/types.ts",
+    "archive": "source/packages/kernel/src/lib/types.ts",
+    "sourceSha256": "f4b10a8d051bc8f2a766c426c61897d5bf4f5c50349a8989deea6fd282b36b33",
+    "archiveSha256": "f4b10a8d051bc8f2a766c426c61897d5bf4f5c50349a8989deea6fd282b36b33"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/write-context.ts",
+    "archive": "source/packages/kernel/src/lib/write-context.ts",
+    "sourceSha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+    "archiveSha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/node-accessor.ts",
+    "archive": "source/packages/kernel/src/lib/node-accessor.ts",
+    "sourceSha256": "a46b3199b85cc63876e085ee1907094c73337f3486fdb14a1c5cad071fcc9498",
+    "archiveSha256": "a46b3199b85cc63876e085ee1907094c73337f3486fdb14a1c5cad071fcc9498"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/constants.ts",
+    "archive": "source/packages/kernel/src/lib/constants.ts",
+    "sourceSha256": "0198acd1d2d8325d846b80cadefdf53db12df2d7843fd6bb41b47fd0fb93da00",
+    "archiveSha256": "0198acd1d2d8325d846b80cadefdf53db12df2d7843fd6bb41b47fd0fb93da00"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/leaf.ts",
+    "archive": "source/packages/kernel/src/lib/leaf.ts",
+    "sourceSha256": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e",
+    "archiveSha256": "c2a8c94a23b8adab93e21961b3835fc99a4e39af559de1d7d177a699e7e1d30e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/readonly.ts",
+    "archive": "source/packages/kernel/src/lib/readonly.ts",
+    "sourceSha256": "fa280db2ab5bc3a91e21021944108d829efa35723e20adb22ddf7748c311d8ec",
+    "archiveSha256": "fa280db2ab5bc3a91e21021944108d829efa35723e20adb22ddf7748c311d8ec"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/mutation-types.ts",
+    "archive": "source/packages/kernel/src/lib/mutation-types.ts",
+    "sourceSha256": "25a8674c9bb7a60b9af7f3d339592b4ab558625cb478d417aa571e0be6396a6d",
+    "archiveSha256": "25a8674c9bb7a60b9af7f3d339592b4ab558625cb478d417aa571e0be6396a6d"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/enhancer-types.ts",
+    "archive": "source/packages/kernel/src/lib/enhancer-types.ts",
+    "sourceSha256": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0",
+    "archiveSha256": "7583d38293a9853af8bfb3e534f3bd4bb1361d75eb0cfb1b6a5b8802ad7cf8d0"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/link.ts",
+    "archive": "source/packages/kernel/src/lib/link.ts",
+    "sourceSha256": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65",
+    "archiveSha256": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/entity-signal.ts",
+    "archive": "source/packages/kernel/src/lib/entity-signal.ts.gz",
+    "sourceSha256": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "archiveSha256": "0f06b1cb645a53dbda979ced78b4f0ee0c759756f3a4c28b7d458decf7c72a75"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/markers/entity-map.ts",
+    "archive": "source/packages/kernel/src/lib/markers/entity-map.ts",
+    "sourceSha256": "de4db2c626f8175e0f0e7f69560e68441cc217c50b69c90aec02b7bae8216f88",
+    "archiveSha256": "de4db2c626f8175e0f0e7f69560e68441cc217c50b69c90aec02b7bae8216f88"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/markers/index.ts",
+    "archive": "source/packages/kernel/src/lib/markers/index.ts",
+    "sourceSha256": "c3e0beb19045ac69d6066982473819da1674fa85c8dfc8ee3ea7f6f68d957469",
+    "archiveSha256": "c3e0beb19045ac69d6066982473819da1674fa85c8dfc8ee3ea7f6f68d957469"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/private.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/private.ts",
+    "sourceSha256": "ee609eea42d1c596764f679f72ce6c00a9e50ead0e60e6717f9bbfb6650c2526",
+    "archiveSha256": "ee609eea42d1c596764f679f72ce6c00a9e50ead0e60e6717f9bbfb6650c2526"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/projection.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/projection.ts",
+    "sourceSha256": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3",
+    "archiveSha256": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts",
+    "sourceSha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+    "archiveSha256": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/entity.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/entity.ts",
+    "sourceSha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+    "archiveSha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "sourceSha256": "67dda100104c3d5dd6fcc009deb87335596167331bb77191fba9cf0275c6ea56",
+    "archiveSha256": "67dda100104c3d5dd6fcc009deb87335596167331bb77191fba9cf0275c6ea56"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/experimental-publication/proof-retirement.ts",
+    "archive": "source/packages/kernel/src/lib/experimental-publication/proof-retirement.ts",
+    "sourceSha256": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4",
+    "archiveSha256": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/ordinary-restoration-placement.ts",
+    "archive": "source/packages/kernel/src/lib/physical/ordinary-restoration-placement.ts",
+    "sourceSha256": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0",
+    "archiveSha256": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/entity-handle-resolution.ts",
+    "archive": "source/packages/kernel/src/lib/physical/entity-handle-resolution.ts",
+    "sourceSha256": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005",
+    "archiveSha256": "8ac798d660e0050bc864c6c09b199ccd0f3c069ebd7abf07d311d74529931005"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/ordinary-key-evidence.ts",
+    "archive": "source/packages/kernel/src/lib/physical/ordinary-key-evidence.ts",
+    "sourceSha256": "55506941297e26fa1cc40728edb40509c4d6823fd1af9ac07fb33faa56b2a3f2",
+    "archiveSha256": "55506941297e26fa1cc40728edb40509c4d6823fd1af9ac07fb33faa56b2a3f2"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/prepare-entity-target.ts",
+    "archive": "source/packages/kernel/src/lib/physical/prepare-entity-target.ts",
+    "sourceSha256": "d0d52d5f0a54f902e72826358896cbead8a282a9bbba2490bff8b1efee1407db",
+    "archiveSha256": "d0d52d5f0a54f902e72826358896cbead8a282a9bbba2490bff8b1efee1407db"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+    "archive": "source/packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+    "sourceSha256": "d66cfb6b8476877c44c64532a3d62328ac8b184d1fd3ea4053f00a849d09144b",
+    "archiveSha256": "d66cfb6b8476877c44c64532a3d62328ac8b184d1fd3ea4053f00a849d09144b"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/prepared-placement-visibility.ts",
+    "archive": "source/packages/kernel/src/lib/physical/prepared-placement-visibility.ts",
+    "sourceSha256": "9fad616ecfedf8152958e76df0388dc4e3bf703d30974c8a818fb821e0112c28",
+    "archiveSha256": "9fad616ecfedf8152958e76df0388dc4e3bf703d30974c8a818fb821e0112c28"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/entity-placement-stage.ts",
+    "archive": "source/packages/kernel/src/lib/physical/entity-placement-stage.ts",
+    "sourceSha256": "350e86c0a987bd86629d359a56488e49b062a6e3ad47869db7367f377f200e48",
+    "archiveSha256": "350e86c0a987bd86629d359a56488e49b062a6e3ad47869db7367f377f200e48"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/entity-value-store.ts",
+    "archive": "source/packages/kernel/src/lib/physical/entity-value-store.ts",
+    "sourceSha256": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+    "archiveSha256": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/prepare-structural-target.ts",
+    "archive": "source/packages/kernel/src/lib/physical/prepare-structural-target.ts",
+    "sourceSha256": "33642f4fdef5306d2768e21871daa4318e7b281b709909708c3cb4c1ec1340fb",
+    "archiveSha256": "33642f4fdef5306d2768e21871daa4318e7b281b709909708c3cb4c1ec1340fb"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+    "archive": "source/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+    "sourceSha256": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c",
+    "archiveSha256": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/structural-store.ts",
+    "archive": "source/packages/kernel/src/lib/physical/structural-store.ts",
+    "sourceSha256": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353",
+    "archiveSha256": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/subject-record-target.ts",
+    "archive": "source/packages/kernel/src/lib/physical/subject-record-target.ts",
+    "sourceSha256": "4166342a4764e4f31c93c2cc1dcccb073b994fd1003ad3f14d28712866f38234",
+    "archiveSha256": "4166342a4764e4f31c93c2cc1dcccb073b994fd1003ad3f14d28712866f38234"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "archive": "source/packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "sourceSha256": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f",
+    "archiveSha256": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/physical-value-pool.ts",
+    "archive": "source/packages/kernel/src/lib/physical/physical-value-pool.ts",
+    "sourceSha256": "4527e8e1450d4391cb83fce6284cd9ca0fac2ab8a97e88f7fa9c7f186923e26e",
+    "archiveSha256": "4527e8e1450d4391cb83fce6284cd9ca0fac2ab8a97e88f7fa9c7f186923e26e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/physical/checked-value-carrier.ts",
+    "archive": "source/packages/kernel/src/lib/physical/checked-value-carrier.ts",
+    "sourceSha256": "499039582ceac3a021c4f0dbcf96a9cdf47aa78e885710c265b754c44e43fffe",
+    "archiveSha256": "499039582ceac3a021c4f0dbcf96a9cdf47aa78e885710c265b754c44e43fffe"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/state-location-view.ts",
+    "archive": "source/packages/kernel/src/lib/internals/state-location-view.ts",
+    "sourceSha256": "9d9b2ff8e63152d3db746c09adfad9a41b5d790ea6853f0fc3873b51812f8594",
+    "archiveSha256": "9d9b2ff8e63152d3db746c09adfad9a41b5d790ea6853f0fc3873b51812f8594"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "archive": "source/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "sourceSha256": "a1c792e9f16b73524cb4ed117c27131e91d79ed5f2b64c16484c0f9d0230fab0",
+    "archiveSha256": "a1c792e9f16b73524cb4ed117c27131e91d79ed5f2b64c16484c0f9d0230fab0"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-value-transition.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-value-transition.ts",
+    "sourceSha256": "3592cb9441dff5538b69f8cadddffdb95940b164bd2cb94d8841d69527cdbd84",
+    "archiveSha256": "3592cb9441dff5538b69f8cadddffdb95940b164bd2cb94d8841d69527cdbd84"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/canonical-snapshot.ts",
+    "archive": "source/packages/kernel/src/lib/internals/canonical-snapshot.ts",
+    "sourceSha256": "51b8ca59737c3b3c082a12926925b526fcb2182bb345a15eb189320209741d50",
+    "archiveSha256": "51b8ca59737c3b3c082a12926925b526fcb2182bb345a15eb189320209741d50"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/acquire-projection.ts",
+    "archive": "source/packages/kernel/src/lib/internals/acquire-projection.ts",
+    "sourceSha256": "32889434fc010a81108241ba1238e4bbab0b99faffd3729d296e6e704b9c2577",
+    "archiveSha256": "32889434fc010a81108241ba1238e4bbab0b99faffd3729d296e6e704b9c2577"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/merge-derived.ts",
+    "archive": "source/packages/kernel/src/lib/internals/merge-derived.ts",
+    "sourceSha256": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968",
+    "archiveSha256": "a4bd3d4bbc0d4d5739d6c728cac4585d2eed9384274f4c2095b4ff7b14f59968"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/restoration-source.ts",
+    "archive": "source/packages/kernel/src/lib/internals/restoration-source.ts",
+    "sourceSha256": "9d14e6393b381289a7dab186b1b4ef60da5b8c993135d9f0437145cdc659d600",
+    "archiveSha256": "9d14e6393b381289a7dab186b1b4ef60da5b8c993135d9f0437145cdc659d600"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/subject-restoration-claims.ts",
+    "archive": "source/packages/kernel/src/lib/internals/subject-restoration-claims.ts",
+    "sourceSha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf",
+    "archiveSha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-projection-seed.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-projection-seed.ts",
+    "sourceSha256": "044549e0abf060cfee14c26a13e013d22f2a4fbe6ad4db37206247d88d7eecd6",
+    "archiveSha256": "044549e0abf060cfee14c26a13e013d22f2a4fbe6ad4db37206247d88d7eecd6"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/physical-commit-clock.ts",
+    "archive": "source/packages/kernel/src/lib/internals/physical-commit-clock.ts",
+    "sourceSha256": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e",
+    "archiveSha256": "44466c7b0b6bdde4d7a24b7d324c575a8cf782c5b60c2b85bf08c9c12442119e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/owned-metadata.ts",
+    "archive": "source/packages/kernel/src/lib/internals/owned-metadata.ts",
+    "sourceSha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376",
+    "archiveSha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/construction-accessor.ts",
+    "archive": "source/packages/kernel/src/lib/internals/construction-accessor.ts",
+    "sourceSha256": "9397959549b2ff1ddd4c323f0fd44310595679eed3c1451048c95045d721a3d6",
+    "archiveSha256": "9397959549b2ff1ddd4c323f0fd44310595679eed3c1451048c95045d721a3d6"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/native-field-selection.ts",
+    "archive": "source/packages/kernel/src/lib/internals/native-field-selection.ts",
+    "sourceSha256": "29d02197f19a11912ff6967ac770e17c28f56c7e7776e8df06deeafee07413a6",
+    "archiveSha256": "29d02197f19a11912ff6967ac770e17c28f56c7e7776e8df06deeafee07413a6"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/position-registry.ts",
+    "archive": "source/packages/kernel/src/lib/internals/position-registry.ts",
+    "sourceSha256": "205a6893bee3c03ae3d100848a2faa3e9f42fc8f42f4aaefc344ee9bbd5059eb",
+    "archiveSha256": "205a6893bee3c03ae3d100848a2faa3e9f42fc8f42f4aaefc344ee9bbd5059eb"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/owner-invalidation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/owner-invalidation.ts",
+    "sourceSha256": "5c69c9022656eb21baeb4f242d81d399db82a8867a595266e1a3d4ff419eb627",
+    "archiveSha256": "5c69c9022656eb21baeb4f242d81d399db82a8867a595266e1a3d4ff419eb627"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-publication.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-publication.ts",
+    "sourceSha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "archiveSha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/snapshot-authority.ts",
+    "archive": "source/packages/kernel/src/lib/internals/snapshot-authority.ts",
+    "sourceSha256": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354",
+    "archiveSha256": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/transaction-lifecycle-source.ts",
+    "archive": "source/packages/kernel/src/lib/internals/transaction-lifecycle-source.ts",
+    "sourceSha256": "63283ef073b6fa156b90c5e9cf8c78c3fdfc6153bf25e36c4813030d3d6c25c7",
+    "archiveSha256": "63283ef073b6fa156b90c5e9cf8c78c3fdfc6153bf25e36c4813030d3d6c25c7"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/owned-mutation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/owned-mutation.ts",
+    "sourceSha256": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3",
+    "archiveSha256": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "archive": "source/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "sourceSha256": "8716481749be0ee620ffb956226d98643ddbb1893b8f2904513509305a973515",
+    "archiveSha256": "8716481749be0ee620ffb956226d98643ddbb1893b8f2904513509305a973515"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/production-substrate-stats.prod.ts",
+    "archive": "source/packages/kernel/src/lib/internals/production-substrate-stats.prod.ts",
+    "sourceSha256": "a699ff478865f9c75905662dd8642f9d9deb8d262b634ee08aecc4673c193f2b",
+    "archiveSha256": "a699ff478865f9c75905662dd8642f9d9deb8d262b634ee08aecc4673c193f2b"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/publication-preparation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/publication-preparation.ts",
+    "sourceSha256": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587",
+    "archiveSha256": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/location-runtime.ts",
+    "archive": "source/packages/kernel/src/lib/internals/location-runtime.ts",
+    "sourceSha256": "6ddfc1602f4f99e76d2796882304cff856c32d0d35d6a130c275547b141794f3",
+    "archiveSha256": "6ddfc1602f4f99e76d2796882304cff856c32d0d35d6a130c275547b141794f3"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/runtime-tree-plan.ts",
+    "archive": "source/packages/kernel/src/lib/internals/runtime-tree-plan.ts",
+    "sourceSha256": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272",
+    "archiveSha256": "e407dd6b87df6b8cb9ea674f5c93321c9f38447740cd782a4ca32ebf4e160272"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "sourceSha256": "b5e5e6009112701abe83f93582c78c1d5b362f08163b059f34894f236b319e13",
+    "archiveSha256": "b5e5e6009112701abe83f93582c78c1d5b362f08163b059f34894f236b319e13"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/provenance-spike.ts",
+    "archive": "source/packages/kernel/src/lib/internals/provenance-spike.ts",
+    "sourceSha256": "4189890746ebb2471c4847568a4d6669e4476d8f5d2cd1a6c428119eb02342d6",
+    "archiveSha256": "4189890746ebb2471c4847568a4d6669e4476d8f5d2cd1a6c428119eb02342d6"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/selected-write-operation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/selected-write-operation.ts",
+    "sourceSha256": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111",
+    "archiveSha256": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/prepared-entity-structure.ts",
+    "archive": "source/packages/kernel/src/lib/internals/prepared-entity-structure.ts",
+    "sourceSha256": "eb3e9e920fbb16c2171f64057fb44a96049118b9ff555224a01c32ab116b4d3a",
+    "archiveSha256": "eb3e9e920fbb16c2171f64057fb44a96049118b9ff555224a01c32ab116b4d3a"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/native-scalar-selection.ts",
+    "archive": "source/packages/kernel/src/lib/internals/native-scalar-selection.ts",
+    "sourceSha256": "6305398621b29edf5836eebf325eb8c5a6da58dc2c16ba4b7ea4c4ad2c1a891c",
+    "archiveSha256": "6305398621b29edf5836eebf325eb8c5a6da58dc2c16ba4b7ea4c4ad2c1a891c"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "archive": "source/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "sourceSha256": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270",
+    "archiveSha256": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/enhancer-requirements.ts",
+    "archive": "source/packages/kernel/src/lib/internals/enhancer-requirements.ts",
+    "sourceSha256": "45bcb474fa1d27db0b8d64c4b4af4bea984550d0dd7e55f691c60940c3adce29",
+    "archiveSha256": "45bcb474fa1d27db0b8d64c4b4af4bea984550d0dd7e55f691c60940c3adce29"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/construction-allocation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/construction-allocation.ts",
+    "sourceSha256": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c",
+    "archiveSha256": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/restoration-reader.ts",
+    "archive": "source/packages/kernel/src/lib/internals/restoration-reader.ts",
+    "sourceSha256": "ba4af76b2a2d085be018df9ab89465bc7cfafa17a03132afbf059b91bfb49622",
+    "archiveSha256": "ba4af76b2a2d085be018df9ab89465bc7cfafa17a03132afbf059b91bfb49622"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-membership-source.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-membership-source.ts",
+    "sourceSha256": "0c1df9a0ec396539566f82a671b2a643631e148a4e0a5cddd21fcd4b77080aa2",
+    "archiveSha256": "0c1df9a0ec396539566f82a671b2a643631e148a4e0a5cddd21fcd4b77080aa2"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/node-shape.ts",
+    "archive": "source/packages/kernel/src/lib/internals/node-shape.ts",
+    "sourceSha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+    "archiveSha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/member-membership.ts",
+    "archive": "source/packages/kernel/src/lib/internals/member-membership.ts",
+    "sourceSha256": "b15765f0b0dbb5a8f5f37aecd9eef87ef450e95df919e8ee1cfc5da004c68ff7",
+    "archiveSha256": "b15765f0b0dbb5a8f5f37aecd9eef87ef450e95df919e8ee1cfc5da004c68ff7"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-membership-view.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-membership-view.ts",
+    "sourceSha256": "a93b5aefbdd10fc06997f3f8f5dc64daa28ab7400291ea720c01053a9cb64993",
+    "archiveSha256": "a93b5aefbdd10fc06997f3f8f5dc64daa28ab7400291ea720c01053a9cb64993"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/materialize-markers.ts",
+    "archive": "source/packages/kernel/src/lib/internals/materialize-markers.ts",
+    "sourceSha256": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381",
+    "archiveSha256": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/confirmed-turn-view.ts",
+    "archive": "source/packages/kernel/src/lib/internals/confirmed-turn-view.ts",
+    "sourceSha256": "599105c91e2b589460ebdfce6b213c8702453039b15b6a247c8ac6f0b6fe7e83",
+    "archiveSha256": "599105c91e2b589460ebdfce6b213c8702453039b15b6a247c8ac6f0b6fe7e83"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/production-substrate-stats.ts",
+    "archive": "source/packages/kernel/src/lib/internals/production-substrate-stats.ts",
+    "sourceSha256": "de67f70c33be1fd2082d961c4d636ec1e4b6409495ff1c6895ab2b56349d857f",
+    "archiveSha256": "de67f70c33be1fd2082d961c4d636ec1e4b6409495ff1c6895ab2b56349d857f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/tooling-tree.ts",
+    "archive": "source/packages/kernel/src/lib/internals/tooling-tree.ts",
+    "sourceSha256": "b17506f18363295042bec57ae2e7879919b05ef981fbc2bc1cb57726b22a1314",
+    "archiveSha256": "b17506f18363295042bec57ae2e7879919b05ef981fbc2bc1cb57726b22a1314"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/visit-tree.ts",
+    "archive": "source/packages/kernel/src/lib/internals/visit-tree.ts",
+    "sourceSha256": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078",
+    "archiveSha256": "1c542d5082a0b4acb2f627eb70e88fcfabd4f49acb2b120d43d90f25b6199078"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/write-observation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/write-observation.ts",
+    "sourceSha256": "a35d2471c4b1a912351b55b6205faabd97c8d7056bfc28c4b4da9893654b878e",
+    "archiveSha256": "a35d2471c4b1a912351b55b6205faabd97c8d7056bfc28c4b4da9893654b878e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "archive": "source/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "sourceSha256": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+    "archiveSha256": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "sourceSha256": "afca4b3f0d6c5baed8c82ea310662891895d1e9dcdfb6727d6c64d80f1a87140",
+    "archiveSha256": "afca4b3f0d6c5baed8c82ea310662891895d1e9dcdfb6727d6c64d80f1a87140"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "archive": "source/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "sourceSha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "archiveSha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+    "archive": "source/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+    "sourceSha256": "e78e31933f34e842bf355249c404a11d02750700eddeaf09737f7c2bbde880ba",
+    "archiveSha256": "e78e31933f34e842bf355249c404a11d02750700eddeaf09737f7c2bbde880ba"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/observation-adapter.ts",
+    "archive": "source/packages/kernel/src/lib/internals/observation-adapter.ts",
+    "sourceSha256": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574",
+    "archiveSha256": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/link-state-source.ts",
+    "archive": "source/packages/kernel/src/lib/internals/link-state-source.ts",
+    "sourceSha256": "a2655a67f8af24b4811cefedf32d17bdc3eb792bac1b972e65371c5ac2c4df60",
+    "archiveSha256": "a2655a67f8af24b4811cefedf32d17bdc3eb792bac1b972e65371c5ac2c4df60"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+    "archive": "source/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+    "sourceSha256": "ca270fc464492372cbd43b1c0c753d6e9a55a04ba69f8972dc13f18f9d49b5c3",
+    "archiveSha256": "ca270fc464492372cbd43b1c0c753d6e9a55a04ba69f8972dc13f18f9d49b5c3"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/derived-types.ts",
+    "archive": "source/packages/kernel/src/lib/internals/derived-types.ts",
+    "sourceSha256": "e1f7a67e8daf1f68007d213054ddd7b44a4691697d3789b189349b1df2230eb3",
+    "archiveSha256": "e1f7a67e8daf1f68007d213054ddd7b44a4691697d3789b189349b1df2230eb3"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/cell-runtime.ts",
+    "archive": "source/packages/kernel/src/lib/internals/cell-runtime.ts",
+    "sourceSha256": "d7e852f6938b70e2b03864f85e2598cd4263d00b0544102f919c3d972f28848b",
+    "archiveSha256": "d7e852f6938b70e2b03864f85e2598cd4263d00b0544102f919c3d972f28848b"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/write-observation-scope.ts",
+    "archive": "source/packages/kernel/src/lib/internals/write-observation-scope.ts",
+    "sourceSha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406",
+    "archiveSha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/subject-reclamation-sink.ts",
+    "archive": "source/packages/kernel/src/lib/internals/subject-reclamation-sink.ts",
+    "sourceSha256": "84f269cd29df0dbcd7c0e3ca198ba0f1386ea18292b304528a6f4dd7fb745345",
+    "archiveSha256": "84f269cd29df0dbcd7c0e3ca198ba0f1386ea18292b304528a6f4dd7fb745345"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/snapshot-installation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/snapshot-installation.ts",
+    "sourceSha256": "02ffc94a1b4150bb108a5ed4bd01e3bfd36bbef86af2c1bf96552d7e41f67a7b",
+    "archiveSha256": "02ffc94a1b4150bb108a5ed4bd01e3bfd36bbef86af2c1bf96552d7e41f67a7b"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/observation-substrate.ts",
+    "archive": "source/packages/kernel/src/lib/internals/observation-substrate.ts",
+    "sourceSha256": "75bdd60bc568aff5460af61616a6896fb0e16c9c0ed6ee0f0150e88d4f150dab",
+    "archiveSha256": "75bdd60bc568aff5460af61616a6896fb0e16c9c0ed6ee0f0150e88d4f150dab"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/root-source.ts",
+    "archive": "source/packages/kernel/src/lib/internals/root-source.ts",
+    "sourceSha256": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2",
+    "archiveSha256": "96ce05e9464bb874f09c6e418b0cf68ebe36e8d3995bcab30e2d9fa4fbc279c2"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "archive": "source/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "sourceSha256": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+    "archiveSha256": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/owner-invalidation-port.ts",
+    "archive": "source/packages/kernel/src/lib/internals/owner-invalidation-port.ts",
+    "sourceSha256": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7",
+    "archiveSha256": "8e1a2ace8ffc3640649449944e99905ee239fec53c9e375bd011556d30c315f7"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/native-occurrence.ts",
+    "archive": "source/packages/kernel/src/lib/internals/native-occurrence.ts",
+    "sourceSha256": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+    "archiveSha256": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/tree-capabilities.ts",
+    "archive": "source/packages/kernel/src/lib/internals/tree-capabilities.ts",
+    "sourceSha256": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9",
+    "archiveSha256": "e11c6e045c7e88e19458ee841936a3e3afe50de74b17cf9279c3e2e5fc37e9d9"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/path-observation-port.ts",
+    "archive": "source/packages/kernel/src/lib/internals/path-observation-port.ts",
+    "sourceSha256": "096b86e4630bfeffaee645ab48870c8cc185911f601f8444113f5e457f2805ce",
+    "archiveSha256": "096b86e4630bfeffaee645ab48870c8cc185911f601f8444113f5e457f2805ce"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/selected-entity-disposition.ts",
+    "archive": "source/packages/kernel/src/lib/internals/selected-entity-disposition.ts",
+    "sourceSha256": "5c475f94b1300471a861c317e1ba2f97bd02eb36fc53daa6ad274d024352f82f",
+    "archiveSha256": "5c475f94b1300471a861c317e1ba2f97bd02eb36fc53daa6ad274d024352f82f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/physical-rows.ts",
+    "archive": "source/packages/kernel/src/lib/internals/physical-rows.ts",
+    "sourceSha256": "b5ba4a48f620b2776edad5bdec2aa21c5c4044e683ebcf6673f29432c77dc48b",
+    "archiveSha256": "b5ba4a48f620b2776edad5bdec2aa21c5c4044e683ebcf6673f29432c77dc48b"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/exposed-publication.ts",
+    "archive": "source/packages/kernel/src/lib/internals/exposed-publication.ts",
+    "sourceSha256": "1edaeed30249341f57170df22c21fb9921a4c0b9ddf53327098d5e50daa1ca5f",
+    "archiveSha256": "1edaeed30249341f57170df22c21fb9921a4c0b9ddf53327098d5e50daa1ca5f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/commit-consequence.ts",
+    "archive": "source/packages/kernel/src/lib/internals/commit-consequence.ts",
+    "sourceSha256": "bfe4abc380b25859d3964dd08e714f199abe6bda881c27fe1165f2ac5f86e523",
+    "archiveSha256": "bfe4abc380b25859d3964dd08e714f199abe6bda881c27fe1165f2ac5f86e523"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/construction-branch.ts",
+    "archive": "source/packages/kernel/src/lib/internals/construction-branch.ts",
+    "sourceSha256": "22a1ad1a73e6f8bdc6cf9ff29ba91fbda767df2c415343eaa7b3e2497ade8282",
+    "archiveSha256": "22a1ad1a73e6f8bdc6cf9ff29ba91fbda767df2c415343eaa7b3e2497ade8282"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/native-location-realization.ts",
+    "archive": "source/packages/kernel/src/lib/internals/native-location-realization.ts",
+    "sourceSha256": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680",
+    "archiveSha256": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+    "archive": "source/packages/kernel/src/lib/internals/transaction-lifecycle-view.ts",
+    "sourceSha256": "20d7cc34a54f0b6546ae93c01375b3687d4c5c6b45b0a72962ab8829b2062cdb",
+    "archiveSha256": "20d7cc34a54f0b6546ae93c01375b3687d4c5c6b45b0a72962ab8829b2062cdb"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/link-state-view.ts",
+    "archive": "source/packages/kernel/src/lib/internals/link-state-view.ts",
+    "sourceSha256": "94fb805f8723bea7f74d66101cb43178513f3e4a196e6e3fc5c52fee983d1dfc",
+    "archiveSha256": "94fb805f8723bea7f74d66101cb43178513f3e4a196e6e3fc5c52fee983d1dfc"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/error-reporter.ts",
+    "archive": "source/packages/kernel/src/lib/internals/error-reporter.ts",
+    "sourceSha256": "042d4b3def7842348ca633c631fd758fcbfe68d7756b9dbac71f48f521a8d95f",
+    "archiveSha256": "042d4b3def7842348ca633c631fd758fcbfe68d7756b9dbac71f48f521a8d95f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/cell-identity.ts",
+    "archive": "source/packages/kernel/src/lib/internals/cell-identity.ts",
+    "sourceSha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492",
+    "archiveSha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "archive": "source/packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "sourceSha256": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f",
+    "archiveSha256": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/entity-membership-inventory.ts",
+    "archive": "source/packages/kernel/src/lib/internals/entity-membership-inventory.ts",
+    "sourceSha256": "82c306630ab0b1be88111a21bda76ed769c275240030e9f8e90bf1d9862bcf3e",
+    "archiveSha256": "82c306630ab0b1be88111a21bda76ed769c275240030e9f8e90bf1d9862bcf3e"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/scalar-publication-coverage.ts",
+    "archive": "source/packages/kernel/src/lib/internals/scalar-publication-coverage.ts",
+    "sourceSha256": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83",
+    "archiveSha256": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/source-mutation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/source-mutation.ts",
+    "sourceSha256": "bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518",
+    "archiveSha256": "bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/utilities/get-changes.ts",
+    "archive": "source/packages/kernel/src/lib/internals/utilities/get-changes.ts",
+    "sourceSha256": "33eb6af992af9f44089bbca066b4200bbb5263ff40eb15c805548dfed882f072",
+    "archiveSha256": "33eb6af992af9f44089bbca066b4200bbb5263ff40eb15c805548dfed882f072"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+    "archive": "source/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+    "sourceSha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635",
+    "archiveSha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/utilities/deep-equal.ts",
+    "archive": "source/packages/kernel/src/lib/internals/utilities/deep-equal.ts",
+    "sourceSha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+    "archiveSha256": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/utilities/is-built-in-object.ts",
+    "archive": "source/packages/kernel/src/lib/internals/utilities/is-built-in-object.ts",
+    "sourceSha256": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111",
+    "archiveSha256": "6690b24d9e52fe23c1d01d296826b44aa4c79b457ada685307697012d9846111"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/utilities/append-all.ts",
+    "archive": "source/packages/kernel/src/lib/internals/utilities/append-all.ts",
+    "sourceSha256": "26576cf769d69c5d9090262bd51657cc7710d98e928ceb6e36653b389dae14b5",
+    "archiveSha256": "26576cf769d69c5d9090262bd51657cc7710d98e928ceb6e36653b389dae14b5"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/reapply-planner.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/reapply-planner.ts",
+    "sourceSha256": "c2bce5f13538367bbeaa6bfe9e3d10466b130a48486ed88edf7da517d7e0b7e1",
+    "archiveSha256": "c2bce5f13538367bbeaa6bfe9e3d10466b130a48486ed88edf7da517d7e0b7e1"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/scoped-value-addressing.ts",
+    "sourceSha256": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456",
+    "archiveSha256": "1505a2da26081d0f282e034277cc6ada8abca342f19e13a2f369cb3402132456"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "sourceSha256": "cbeb44226cb42a1e8b35afa6111fee96de5f0c907f4d55e84b68e9875ce728a9",
+    "archiveSha256": "cbeb44226cb42a1e8b35afa6111fee96de5f0c907f4d55e84b68e9875ce728a9"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+    "sourceSha256": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252",
+    "archiveSha256": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.ts",
+    "sourceSha256": "3a0c8e0599cbab6e2de326a57c22b2ee6cf0b0adba828b87de6514d1b4292db8",
+    "archiveSha256": "3a0c8e0599cbab6e2de326a57c22b2ee6cf0b0adba828b87de6514d1b4292db8"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/effect-applier.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/effect-applier.ts",
+    "sourceSha256": "34a1c9e04dc0358a0148676ed0e1a956da3b10526ce11a43f4bef64197636668",
+    "archiveSha256": "34a1c9e04dc0358a0148676ed0e1a956da3b10526ce11a43f4bef64197636668"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.ts",
+    "sourceSha256": "b467cf124611110d3a15323c824c67d002bb33023772909e3679d3d11205f1bb",
+    "archiveSha256": "b467cf124611110d3a15323c824c67d002bb33023772909e3679d3d11205f1bb"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/transient-rows.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/transient-rows.ts",
+    "sourceSha256": "434971128a52abda9365b7581aaf49a00536dcd719640db7815e732ff0cb94be",
+    "archiveSha256": "434971128a52abda9365b7581aaf49a00536dcd719640db7815e732ff0cb94be"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/transaction-lifecycle.ts",
+    "sourceSha256": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2",
+    "archiveSha256": "2beca18cdf035ee8227c5026f401d61161cf6a1460276ce632966ae0e94cedd2"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/redo-assessment.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/redo-assessment.ts",
+    "sourceSha256": "98af0be4d73c0184d6601286d0a6768e4373674b7e83f866f1ea0d6e1ab22262",
+    "archiveSha256": "98af0be4d73c0184d6601286d0a6768e4373674b7e83f866f1ea0d6e1ab22262"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.ts",
+    "sourceSha256": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8",
+    "archiveSha256": "d4b0314fdb72f518740ab3db6c90dc011d42abe94a4e3f17d995d3ac538dd5c8"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/causal-types.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/causal-types.ts",
+    "sourceSha256": "d1d0448d87c77e04fb1e4927db92fb5272c9fbdabf76a4b276a08754d36ff24d",
+    "archiveSha256": "d1d0448d87c77e04fb1e4927db92fb5272c9fbdabf76a4b276a08754d36ff24d"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/reclamation-eligibility.ts",
+    "sourceSha256": "43e81a2de56f3553f1638c0fce4a9e838b4c8a8ff46ad2b28dc60b5ea0512fc2",
+    "archiveSha256": "43e81a2de56f3553f1638c0fce4a9e838b4c8a8ff46ad2b28dc60b5ea0512fc2"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.ts",
+    "sourceSha256": "d9485a6e9c0ddef68b0a6edce9e4f8875b2938e6d915562e35c283f9203351fd",
+    "archiveSha256": "d9485a6e9c0ddef68b0a6edce9e4f8875b2938e6d915562e35c283f9203351fd"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/realization-context.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/realization-context.ts",
+    "sourceSha256": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da",
+    "archiveSha256": "6ec5b9efd721421f6766d7ceaa81c3e7441cb59c93b36b3ca3a924a9855229da"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.ts",
+    "sourceSha256": "8523c70b8db48311cb33121f960416e4ad34102a7f2162853806ade61eaed04f",
+    "archiveSha256": "8523c70b8db48311cb33121f960416e4ad34102a7f2162853806ade61eaed04f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/reversal-planner.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/reversal-planner.ts",
+    "sourceSha256": "b340aa5c6fce6db0018bef67d8b9254c4a9be5854cbe602fbde4fab8323cdd19",
+    "archiveSha256": "b340aa5c6fce6db0018bef67d8b9254c4a9be5854cbe602fbde4fab8323cdd19"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/turn-store.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/turn-store.ts",
+    "sourceSha256": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f",
+    "archiveSha256": "49520bc9420ebd430b982edf9a0a21f4a8ca889539a54b5198d205a9bd8f667f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.ts",
+    "sourceSha256": "00ae2f651ea7e676b9d2cf8cf925745922fb5c4f8ad09d214d9d17eee1594b78",
+    "archiveSha256": "00ae2f651ea7e676b9d2cf8cf925745922fb5c4f8ad09d214d9d17eee1594b78"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/authority-assessment.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/authority-assessment.ts",
+    "sourceSha256": "5cc610f81f401c7138ebd69adb0ffdd508c6a897b5792caa7b5feff70676a0d0",
+    "archiveSha256": "5cc610f81f401c7138ebd69adb0ffdd508c6a897b5792caa7b5feff70676a0d0"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts",
+    "sourceSha256": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c",
+    "archiveSha256": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts.gz",
+    "sourceSha256": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+    "archiveSha256": "a7686013daaae9c1e211f9bacc18b58b27f0e7a18cc314ef50bb6e579dbe4d0f"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/transaction-capture-bridge.ts",
+    "sourceSha256": "233960af81fd9248a31c5678e6ae762009b97c30e9c1800f4ece43b9f6bfa931",
+    "archiveSha256": "233960af81fd9248a31c5678e6ae762009b97c30e9c1800f4ece43b9f6bfa931"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "archive": "source/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "sourceSha256": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d",
+    "archiveSha256": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/internals/diagnostics/diagnostic-journal.ts",
+    "archive": "source/packages/kernel/src/lib/internals/diagnostics/diagnostic-journal.ts",
+    "sourceSha256": "fb285fb01e1616b0e0feab20a49d8f0100b9424a0f6335f072f6a547b5a1730d",
+    "archiveSha256": "fb285fb01e1616b0e0feab20a49d8f0100b9424a0f6335f072f6a547b5a1730d"
+  },
+  {
+    "source": "source/packages/kernel/src/lib/audit/audit.ts",
+    "archive": "source/packages/kernel/src/lib/audit/audit.ts",
+    "sourceSha256": "7723acc97ab475103d9c0e3963ca373005732433e28b050021976942011f0385",
+    "archiveSha256": "7723acc97ab475103d9c0e3963ca373005732433e28b050021976942011f0385"
+  },
+  {
+    "source": "runs/neutral/OWNERSHIP.json",
+    "archive": "runs/neutral/OWNERSHIP.json",
+    "sourceSha256": "d24e7c6f3dac795b840e6aabaa91a07947d8c5430692b77fcbfb079447a59516",
+    "archiveSha256": "d24e7c6f3dac795b840e6aabaa91a07947d8c5430692b77fcbfb079447a59516"
+  },
+  {
+    "source": "runs/neutral/RESULT.json",
+    "archive": "runs/neutral/RESULT.json",
+    "sourceSha256": "22afd1bc1902389c5ad0db443011fce0ce6d7abe27063132b5a0892f36039984",
+    "archiveSha256": "22afd1bc1902389c5ad0db443011fce0ce6d7abe27063132b5a0892f36039984"
+  },
+  {
+    "source": "runs/neutral/first.log",
+    "archive": "runs/neutral/first.log",
+    "sourceSha256": "96a204c50d4b4e10ad43c7208dd4564bd765ce2d1957c34f26af0b1abcf12136",
+    "archiveSha256": "96a204c50d4b4e10ad43c7208dd4564bd765ce2d1957c34f26af0b1abcf12136"
+  },
+  {
+    "source": "runs/neutral/MANUAL-STOP.txt",
+    "archive": "runs/neutral/MANUAL-STOP.txt",
+    "sourceSha256": "8f9a92cb9d88389427c1f6f243b1387842d3c9701bd6c5b61289a0c2322bcfee",
+    "archiveSha256": "8f9a92cb9d88389427c1f6f243b1387842d3c9701bd6c5b61289a0c2322bcfee"
+  },
+  {
+    "source": "runs/neutral/COMMAND.json",
+    "archive": "runs/neutral/COMMAND.json",
+    "sourceSha256": "9fdb97d3ba925ac67670123f3ea29bbe25b9050ceb4198c971bb10940cdaf710",
+    "archiveSha256": "9fdb97d3ba925ac67670123f3ea29bbe25b9050ceb4198c971bb10940cdaf710"
+  },
+  {
+    "source": "runs/neutral/SIGNALS.json",
+    "archive": "runs/neutral/SIGNALS.json",
+    "sourceSha256": "8e8ebd767eecfe5184226308763ec870e81d78aa067e39d6eab552e68bb88895",
+    "archiveSha256": "8e8ebd767eecfe5184226308763ec870e81d78aa067e39d6eab552e68bb88895"
+  },
+  {
+    "source": "runs/neutral/ownership.jsonl",
+    "archive": "runs/neutral/ownership.jsonl.gz",
+    "sourceSha256": "e8b0587febdb0138539b7e416fbd525a23ce97913b2bb9922485ef11c5777c0b",
+    "archiveSha256": "17aa5a0543b12e0f13e09a70d106464568610ecd9f3a78b5598b70cf60ebbe74"
+  },
+  {
+    "source": "runs/neutral/data/eslint-2654242865465226088.hash",
+    "archive": "runs/neutral/data/eslint-2654242865465226088.hash",
+    "sourceSha256": "c79962e7b2762107ea2ff38d291ba04a926f7c1f286f22df4e0600608fb347cb",
+    "archiveSha256": "c79962e7b2762107ea2ff38d291ba04a926f7c1f286f22df4e0600608fb347cb"
+  },
+  {
+    "source": "runs/neutral/data/source-maps.json",
+    "archive": "runs/neutral/data/source-maps.json.gz",
+    "sourceSha256": "9e4a139dc31f695deeb45080978cf741b5084ae544e9752e7cc4dc354bafee85",
+    "archiveSha256": "0c49f54607a9d502bf41735e6ae163b70ab13307015e0db3ba8d0125a9a756a9"
+  },
+  {
+    "source": "runs/neutral/data/playwright-5186013267177752385.hash",
+    "archive": "runs/neutral/data/playwright-5186013267177752385.hash",
+    "sourceSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2",
+    "archiveSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2"
+  },
+  {
+    "source": "runs/neutral/data/vite-7556005483977466535.hash",
+    "archive": "runs/neutral/data/vite-7556005483977466535.hash",
+    "sourceSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9",
+    "archiveSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9"
+  },
+  {
+    "source": "runs/neutral/data/file-map.json",
+    "archive": "runs/neutral/data/file-map.json.gz",
+    "sourceSha256": "921e18caeefd0a3e1632dba37274eab5640e833729b735f9157dd46693806b10",
+    "archiveSha256": "26995b20de737f7d2f6656a2540b834d7a28ab481a57e28ace16ff466e8b74c1"
+  },
+  {
+    "source": "runs/neutral/data/lockfile-nodes.hash",
+    "archive": "runs/neutral/data/lockfile-nodes.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "runs/neutral/data/parsed-lock-file.nodes.json",
+    "archive": "runs/neutral/data/parsed-lock-file.nodes.json.gz",
+    "sourceSha256": "62c90f7a638dc748d016fa76093e0ee64f80c39a537fa208f007549d361d9dc6",
+    "archiveSha256": "6017597251949c522723a73b5b5ece9379e4a1fc280ee27fc4d91b5ca71b7614"
+  },
+  {
+    "source": "runs/neutral/data/project-graph.lock",
+    "archive": "runs/neutral/data/project-graph.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "runs/neutral/data/project-graph.json",
+    "archive": "runs/neutral/data/project-graph.json.gz",
+    "sourceSha256": "f147b336889bc90f4f3bbd854451eb620535350106a3a66c7676bdab70aea0c5",
+    "archiveSha256": "19eef8a54231856888327722e16d79c6701f2e3d25cc10c5d1d6ecd921b7f165"
+  },
+  {
+    "source": "runs/neutral/data/parsed-lock-file.dependencies.json",
+    "archive": "runs/neutral/data/parsed-lock-file.dependencies.json.gz",
+    "sourceSha256": "c1be78a6f49124f0bb445f8b50c3a7ecb973b2635c443f6662e9e805bc28c00e",
+    "archiveSha256": "b601457c77417fc19193617f627f2a7985413123598d3996bd415a80ea11c3c9"
+  },
+  {
+    "source": "runs/neutral/data/rollup-14273536953574808233.hash",
+    "archive": "runs/neutral/data/rollup-14273536953574808233.hash",
+    "sourceSha256": "aeeb2ed637fe008a3f767f9e4a532dd2508b035a2d7eb7a6ef70a8f095878e78",
+    "archiveSha256": "aeeb2ed637fe008a3f767f9e4a532dd2508b035a2d7eb7a6ef70a8f095878e78"
+  },
+  {
+    "source": "runs/neutral/data/lockfile-dependencies.hash",
+    "archive": "runs/neutral/data/lockfile-dependencies.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "runs/neutral/data/nx_files.nxt",
+    "archive": "runs/neutral/data/nx_files.nxt.gz",
+    "sourceSha256": "3222353c801352966caab1fde595065d6d4d9e94aa9913e523e032c8a0895918",
+    "archiveSha256": "da1a79d392dcaad286077793b26eeb9c9208e8a8a76d99f537b9d51c0778724f"
+  },
+  {
+    "source": "runs/neutral/data/vitest-7333614714660744029.hash",
+    "archive": "runs/neutral/data/vitest-7333614714660744029.hash.gz",
+    "sourceSha256": "a524f41bfdc7707bdab67aa64d2afa94a86d0922f31b20665452bb9af5c758e5",
+    "archiveSha256": "190cd59cd2371276b85f8cd1fb2fcae8d649e4457898ef9ede0e5a7e3ae9c85c"
+  }
+]

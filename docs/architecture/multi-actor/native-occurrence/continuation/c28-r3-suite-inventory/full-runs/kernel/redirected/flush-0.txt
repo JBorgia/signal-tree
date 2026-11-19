@@ -1,0 +1,6 @@
+case 1  A delivered=NO  C turns=0
+case 2  complete=YES  origin=external participation=realized ownerId=2
+case 3  writes=3 groupingFact=NO transactionIds=[null]
+case 4  authoredFrames=1 realizedFrames=1 succession=9600->10200
+case 6  rowFrame=YES participation=realized
+case 7  delivered=["a","b","c"]

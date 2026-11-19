@@ -1,0 +1,14 @@
+{
+  "base": "/private/tmp/st-native-combined-c8/candidate",
+  "manifestSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+  "verifiedFiles": 3031,
+  "dependencySource": "/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/node_modules",
+  "copyCommand": [
+    "cp",
+    "-cR",
+    "/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/node_modules",
+    "/private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules"
+  ],
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+  "policy": "Only new c8-proof directory written; no installs, runtime edits or tests"
+}

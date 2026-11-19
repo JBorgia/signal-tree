@@ -1,0 +1,18 @@
+{
+  "ordinal": 46,
+  "id": "confirm-1000-retained-sample3",
+  "profile": "confirm",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample3",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--expose-gc",
+    "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+    "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+    "confirm",
+    "1000"
+  ],
+  "cwd": "/private/tmp/st-v16-representative-cost/harness",
+  "childTimeoutSeconds": 180
+}

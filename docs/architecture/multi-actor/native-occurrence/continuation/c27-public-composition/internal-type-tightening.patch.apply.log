@@ -1,0 +1,3 @@
+Checking patch packages/kernel/src/lib/experimental-publication/lifecycle.ts...
+Hunk #3 succeeded at 277 (offset 50 lines).
+Applied patch packages/kernel/src/lib/experimental-publication/lifecycle.ts cleanly.

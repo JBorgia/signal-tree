@@ -1,0 +1,21 @@
+{
+  "predecessorManifest": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+  "predecessorFilesVerified": 2934,
+  "successorManifest": "d3b6da2906ae9cef72e5623b35eb6de3dee73d64b12f5c9bd408352aa627e73b",
+  "changedPredecessorPaths": [
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/selected-write-operation.ts"
+  ],
+  "addedHarnessAndTestPaths": [
+    "packages/kernel/src/lib/selected-forwarding-cleanup.spec.ts",
+    "packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "packages/kernel/src/lib/forwarding-retention-probe.spec.ts",
+    "packages/kernel/retention-probe.config.ts",
+    "packages/kernel/forwarding-retention.config.ts",
+    "tools/held-continuation-probe/project.json",
+    "tools/lib/heap-quiescence.d.mts"
+  ],
+  "allPredecessorTestsUnchanged": true,
+  "originalGcProbeUnchanged": true
+}

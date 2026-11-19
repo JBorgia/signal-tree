@@ -1,0 +1,19 @@
+{
+  "kind": "scalar",
+  "history": "foreign-confirmed",
+  "calls": 1,
+  "before": {
+    "state": "conservative",
+    "reason": "unknown"
+  },
+  "beforeSettlement": [
+    7
+  ],
+  "after": {
+    "state": "started",
+    "basis": "surviving"
+  },
+  "sent": [
+    7
+  ]
+}

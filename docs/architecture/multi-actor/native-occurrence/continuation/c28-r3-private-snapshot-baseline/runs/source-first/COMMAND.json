@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.typecheck-all.json"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-private-snapshot-baseline/candidate",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/source-first/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/source-first/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/source-first/data",
+    "ST_SNAPSHOT_OUTPUT": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/source-first/observations.jsonl"
+  }
+}

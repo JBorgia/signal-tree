@@ -1,0 +1,96 @@
+[
+  {
+    "id": "@signal-tree/angular@16.0.0-dev",
+    "name": "@signal-tree/angular",
+    "version": "16.0.0-dev",
+    "size": 17183,
+    "unpackedSize": 47608,
+    "shasum": "63fba4e628000bfd60339bfd56bf348a807dc63b",
+    "integrity": "sha512-n2Kx3ernZF4kaZmx4AyFnl1ohWQrP6yRy43b3aKmhNaQ+4D2AxMv4sikRZSmVOxAXicZyWAQpmkR0r9XyNvGZw==",
+    "filename": "signal-tree-angular-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 7233,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 671,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/construction-input.js",
+        "size": 1015,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/define-store.js",
+        "size": 718,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/observation-adapter.js",
+        "size": 1575,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/to-writable-signal.js",
+        "size": 1059,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 942,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 1631,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/carrier.d.ts",
+        "size": 435,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/construction-input.d.ts",
+        "size": 517,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/define-store.d.ts",
+        "size": 4720,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/observation-adapter.d.ts",
+        "size": 204,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/to-writable-signal.d.ts",
+        "size": 2957,
+        "mode": 420
+      }
+    ],
+    "entryCount": 16,
+    "bundled": []
+  }
+]

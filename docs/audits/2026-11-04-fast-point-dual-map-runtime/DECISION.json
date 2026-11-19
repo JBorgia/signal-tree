@@ -1,0 +1,37 @@
+{
+  "scope": "FAST-POINT-DUAL-MAP-0 bounded necessary endpoint screen",
+  "outcome": "NECESSARY_ENDPOINT_SCREEN_PASS_OVERALL_RUNTIME_COST_HOLD",
+  "originalPointBound": 2000,
+  "originalPointResult": 1800,
+  "required": {
+    "point": {
+      "metric": "sync_cpu_ms",
+      "direction": "selected-lower",
+      "beforeMedian": 69.354,
+      "afterMedian": 31.47
+    },
+    "heap-populated": {
+      "metric": "live_minus_baseline_bytes",
+      "direction": "selected-lower",
+      "beforeMedian": 17757224,
+      "afterMedian": 17725080
+    }
+  },
+  "otherDimensions": {
+    "pointDrain": "selected-higher",
+    "pointTotalCPU": "unresolved",
+    "pendingIncrementalHeap": "selected-higher",
+    "construction": "unresolved"
+  },
+  "costIntegrity": {
+    "sourceMismatches": [],
+    "inputMismatches": [],
+    "completedChildren": 48,
+    "validChildren": 48,
+    "failedProfiles": [],
+    "globalStop": null,
+    "finishedAt": "2026-11-04T16:11:04.340182+00:00"
+  },
+  "adopted": false,
+  "rule": "Both pinned endpoints pass; no compensation for other regression/unresolved release cost. Broader correctness qualification may proceed. No release/adoption from this screen. No cost retry or B pooling."
+}

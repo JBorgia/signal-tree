@@ -1,0 +1,16 @@
+{
+  "status": "frozen-for-independent-mapping-review",
+  "manifestSHA256": "8ba966d5959cff736206db11dfacc4fe74d7f58aa508e5644061c43ca90bd775",
+  "baselineManifestSHA256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "baselineEntriesUnchanged": 3065,
+  "patchSHA256": "5df48b8788b33563148058083d1a114a1d2f2f6e4944063f982b35a5b92ba275",
+  "addedSpecSHA256": "f403ea1d3e618a90c13cf0a4d0b6f81fdb849680875e7a8bcccc5e540738124d",
+  "runtimeChanges": [],
+  "results": {
+    "positive": 12,
+    "originalCounterweights": 13,
+    "originalHoldCasesFilteredInCounterweightRun": 12,
+    "specTypes": "pass"
+  },
+  "independentReview": "pending Main"
+}

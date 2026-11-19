@@ -1,0 +1,94 @@
+
+> nx run kernel:test occurrence-successor.spec.ts publication-enrollment-invariance.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs occurrence-successor.spec.ts publication-enrollment-invariance.spec.ts --maxWorkers=1
+
+(node:27501) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-enrollment-independent/candidate/packages/kernel
+
+(node:27516) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occurrence-successor.spec.ts (12 tests | 4 failed) 67ms
+   × first omission enrolls clean scalar ancestry 33ms
+   × first omission enrolls clean empty ancestry 4ms
+   × first omission enrolls clean collection ancestry 4ms
+   × first omission enrolls clean mixed ancestry 3ms
+(node:27529) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean scalar ancestry
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean mixed ancestry
+AssertionError: expected [] to deeply equal [ undefined ]
+
+- Expected
++ Received
+
+- [
+-   undefined,
+- ]
++ []
+
+ ❯ src/lib/occurrence-successor.spec.ts:23:22
+     21|   await flush();expect(sent).toEqual([]);
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:u…
+       |                      ^
+     24|  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy()…
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean empty ancestry
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean collection ancestry
+AssertionError: expected [] to deeply equal [ [] ]
+
+- Expected
++ Received
+
+- [
+-   [],
+- ]
++ []
+
+ ❯ src/lib/occurrence-successor.spec.ts:23:22
+     21|   await flush();expect(sent).toEqual([]);
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:u…
+       |                      ^
+     24|  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy()…
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  4 failed | 24 passed (28)
+   Start at  20:11:40
+   Duration  2.59s (transform 853ms, setup 0ms, import 1.36s, tests 160ms, environment 758ms)
+
+Warning: command "node tools/run-core-vitest.mjs occurrence-successor.spec.ts publication-enrollment-invariance.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.2s

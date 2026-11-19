@@ -1,0 +1,9 @@
+# Exact composed artifact qualification
+
+Authority: user-requested artifact qualification, not release or activation. Input manifest2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd,3102 files verified and copied. No earlier artifact reuse. Canonical five-package Nx run-many build, parallel1, skip cache, streamed output, nxBail.180s no-output owned-group watchdog. Stop artifact expansion on real build/source failure; preserve first raw output and source before/after. No post-build source/declaration repairs, version or ceiling changes.
+
+After successful builds: inventory/hash artifacts; canonical publication finalization only as prescribed by prepare-publish-artifacts, record generated metadata changes; built barrels, manifest/installability, declaration docs, package hygiene/exports and tarball coverage. Strict packed consumer checks under bundler/node16 with skipLibCheck false, plus additive existing approved declare surface consumer fixture across five facades. Angular production AOT consumer and relevant production demo build/route checks follow; preserve any first failure and do not conflate source, emitted, packed and installed identities. Fresh unchanged bundle-budget measurement records costs without CPU claims. No full kernel/framework suites (Plato owns those), mutation self-test campaign or release-only benchmarks. All stage commands/results/limits recorded; no publication authority.
+
+Read build/declaration contracts, review contract, release controller and validation guide; executable gate registry and release-plan remain command/package authorities. Recheck source/artifact hashes after each consuming stage. Task-local npm cache/temp; network escalation only if required. Browser/dependency limitations reported, not patched around.
+
+Installed prepare-publish-artifacts.mjs performs verification only; builds own all finalization. No metadata rewriting will be performed.

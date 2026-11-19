@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "entity-handle-resolution",
+    "structural-store.spec",
+    "tree-realization-adapter.spec",
+    "--testNamePattern=resolves an acquired handle|does not resolve an acquired handle|keeps keyed lookup address-based|does not let a whole structural reset|resolves acquired handles through rekey|realizes fresh add followed by rekey|realizes same-key replacement|retains held subject facades|restores each removed subject|reactivates the exact held row|refuses a stale heterogeneous|validates the full effect set",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-private-snapshot-baseline/candidate",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/originals-first/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/originals-first/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/originals-first/data",
+    "ST_SNAPSHOT_OUTPUT": "/private/tmp/st-c28-r3-private-snapshot-baseline/runs/originals-first/observations.jsonl"
+  }
+}

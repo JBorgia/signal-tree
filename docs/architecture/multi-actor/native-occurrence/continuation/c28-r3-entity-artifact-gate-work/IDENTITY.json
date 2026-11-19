@@ -1,0 +1,51 @@
+{
+  "createdUtc": "2026-11-03T15:01:35.506157+00:00",
+  "candidate": "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor",
+  "sourceBaseManifest": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84",
+  "successorManifest": "26193d775b3e3f9c0ecc859de029dc20a1a591638730846ac0413bc1e89b6c1e",
+  "trackedFiles": 3122,
+  "baselineCommit": "782ab986da58a47003e7606174eefcbdfb9c08d6",
+  "branch": "codex/entity-registration-artifact-gate",
+  "patch": "/private/tmp/st-c28-r3-entity-artifact-gate-work/tooling.patch",
+  "patchSha256": "e3a2db6c7191887f01d237d2eadcfc9722ecfa59ecc05223ca84a8d634df6d2e",
+  "existingFilesChanged": [
+    "tools/experiments/entity-registration/README.md",
+    "tools/verify-gates.mjs"
+  ],
+  "newFiles": [
+    "tools/fixtures/entity-registration-consumer/package-lock.json",
+    "tools/fixtures/entity-registration-consumer/package.json",
+    "tools/verify-entity-registration-artifacts.mjs"
+  ],
+  "frozenSourceRechecked": 3119,
+  "runtimeAndSharedFixturesUnchanged": true,
+  "frozenTarballsRechecked": 5,
+  "diagnosticCandidate": "not read or modified; composition owned by Main",
+  "independentReview": "assigned by Main before composition; no review approval claimed",
+  "acceptedSelftestEvidence": "/private/tmp/st-c28-r3-entity-artifact-gate-work/evidence/registration-mutation.json",
+  "classifierBlindnessEvidence": "/private/tmp/st-c28-r3-entity-artifact-gate-work/evidence/classifier-blindness.json",
+  "qualification": {
+    "setup": "passed",
+    "coldInstalls": 2,
+    "externalRecords": 32,
+    "directPeerIntegritiesMatchPnpm": true,
+    "tarballIntegrityMatch": true,
+    "manualProbes": "both modes both consumers passed",
+    "negative": {
+      "exit": 1,
+      "classification": "setup-failure",
+      "semanticMutationKill": false
+    },
+    "graphControls": "passed both consumers",
+    "sourceIsolation": "all bundle inputs inside disposable consumers",
+    "listedInstalledArtifactHashes": "matched",
+    "sourceManifest": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84"
+  },
+  "extraChecks": {
+    "seal": "sha256-47d2cda5e7664deefabbb1f514ff8d6d3b74900b35d877def46f55bb6809199f",
+    "sealedGate": "passed",
+    "wrongSeal": "rejected",
+    "emptyCache": "setup failure before any runtime/mutation",
+    "emptyCacheEvidence": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0ubW4B"
+  }
+}

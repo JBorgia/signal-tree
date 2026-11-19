@@ -1,0 +1,82 @@
+980 relative link(s) across 200 live surface(s); 910 resolve.
+
+❌ 70 broken link(s):
+
+   docs/audits/2026-11-03-progress-and-workflow/RELEASE-CURRENT.md.before.txt
+      :8  ->  docs/architecture/multi-actor/native-occurrence/continuation/C28-STATUS.md
+      :37  ->  docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-entity-artifact-gate-f1/MAIN-DISPOSITION.md
+      :40  ->  docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-preparation-reader-review/REVIEW.md
+      :46  ->  docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-reader-test-composition/REPORT.md
+      :50  ->  docs/architecture/multi-actor/native-occurrence/continuation/c28-r3-reader-memory/R1/REPORT.md
+      :62  ->  docs/architecture/multi-actor/native-occurrence/continuation/C27-STATUS.md
+      :72  ->  docs/architecture/multi-actor/PLAN.md
+      :90  ->  docs/architecture/multi-actor/IMPLEMENTATION.md
+      :97  ->  docs/architecture/multi-actor/framework-current-read/DECISION.md
+      :103  ->  AGENTS.md
+      :103  ->  docs/support-policy.md
+      :109  ->  .github/VALIDATION_GUIDE.md
+      :109  ->  RELEASE_PROCESS.md
+      :115  ->  RELEASE-1.0.md
+      :115  ->  TODO.md
+      :116  ->  docs/architecture/SIGNALTREE-15-CONTEXT.md
+      :119  ->  docs/contributor-contracts.md
+      :135  ->  docs/architecture/multi-actor/native-occurrence/FINAL-DISPOSITION.md
+      :135  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :190  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :220  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :221  ->  docs/architecture/multi-actor/native-occurrence/continuation/AUTHORSHIP-GUIDANCE.md
+      :228  ->  docs/architecture/multi-actor/native-occurrence/continuation/combined-c22/RESULTS.md
+      :241  ->  docs/architecture/multi-actor/native-occurrence/continuation/c21-portable-source/README.md
+      :277  ->  docs/architecture/multi-actor/native-occurrence/continuation/c22-bundle-attribution/REVIEW.md
+      :328  ->  docs/architecture/multi-actor/native-occurrence/continuation/c23-public-packed-proof/REVIEW.md
+      :354  ->  docs/architecture/multi-actor/native-occurrence/continuation/c24-equal-owner-premise/implementation-review/REVIEW-FROZEN.md
+      :355  ->  docs/architecture/multi-actor/native-occurrence/continuation/c24-equal-owner-prototype/REPORT.md
+      :356  ->  docs/architecture/multi-actor/native-occurrence/continuation/c24-receipt-replay/REPORT.md
+      :357  ->  docs/architecture/multi-actor/native-occurrence/continuation/c24-bounded-representation-review/REVIEW.md
+      :381  ->  docs/architecture/multi-actor/native-occurrence/continuation/c25-equal-owner/REPORT.md
+      :382  ->  docs/architecture/multi-actor/native-occurrence/continuation/c25-derived-interpretation/REVIEW.md
+      :385  ->  docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-write-audit/REVIEW.md
+      :388  ->  docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-premise-review/REVIEW.md
+      :399  ->  docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-retirement-discriminator/REVIEW.md
+      :404  ->  docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-retirement-equivalence/REVIEW.md
+      :405  ->  docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-design/DESIGN.md
+      :412  ->  docs/architecture/multi-actor/native-occurrence/continuation/finalized-role-horizon-audit/REVIEW.md
+      :432  ->  docs/architecture/multi-actor/native-occurrence/continuation/c26-independent-review/REVIEW.md
+      :433  ->  docs/architecture/multi-actor/native-occurrence/continuation/c26-scalar-finalized-role/REPORT.md
+      :435  ->  docs/architecture/multi-actor/native-occurrence/continuation/c26-lifecycle-controls/REPORT.md
+      :440  ->  docs/architecture/multi-actor/native-occurrence/continuation/c26-finite-followup/REPORT.md
+   docs/audits/2026-11-03-progress-and-workflow/TODO.md.before.txt
+      :51  ->  docs/architecture/multi-actor/native-occurrence/continuation/C28-STATUS.md
+      :61  ->  docs/architecture/multi-actor/native-occurrence/continuation/C27-STATUS.md
+      :104  ->  docs/architecture/multi-actor/PLAN.md
+      :120  ->  docs/architecture/multi-actor/native-occurrence/continuation/README.md
+      :137  ->  docs/audits/2026-09-23-remediation.md
+      :281  ->  packages/kernel/src/lib/link-production-path.spec.ts
+      :298  ->  packages/kernel/src/enhancers/restoration/p0c-row-divergence.spec.ts
+      :459  ->  docs/research/attribution-pull-0/README.md
+      :2250  ->  docs/research/retired-subject-slope-stability-0.md
+      :2627  ->  docs/research/studio-value-0/README.md
+      :2849  ->  docs/research/state-consequence-value-0/README.md
+      :2872  ->  docs/research/attribution-pull-0/frames.html
+      :3018  ->  docs/architecture/history-priority-hierarchy.md
+      :3879  ->  RELEASE-1.0.md
+      :3891  ->  docs/audits/2026-08/14.0.0-what-actually-happened.md
+      :3941  ->  docs/audits/2026-08/undo-business-and-ux-cases.md
+      :3975  ->  docs/architecture/history-the-greenfield-target.md
+      :3980  ->  docs/research/2026-08-history-greenfield-spike.md
+      :4263  ->  docs/research/2026-08-history-greenfield-spike.md
+      :4301  ->  docs/architecture/history-the-native-shape.md
+      :4339  ->  docs/audits/2026-08/14.0.0-what-actually-happened.md
+      :4379  ->  docs/rfcs/0012-history-scoped-marker-capture.md
+      :4428  ->  docs/audits/2026-08/api-naming-audit.md
+      :4526  ->  docs/audits/2026-08/undo-business-and-ux-cases.md
+      :4528  ->  docs/audits/2026-08/time-travel-use-case-audit.md
+      :4784  ->  docs/rfcs/0008-post-13.3-open-items.md
+      :4907  ->  docs/architecture/causal-runtime-contract.md
+      :4945  ->  docs/guides/composition-recipes.md
+
+   Fix the path, or delete the link. If the target is a file that was
+   deliberately removed, say so in prose instead of linking to it —
+   docs/architecture/schema-enhancer-plan.md does that for a deleted
+   spike artifact.
+

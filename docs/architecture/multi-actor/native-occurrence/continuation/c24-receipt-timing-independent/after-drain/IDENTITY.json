@@ -1,0 +1,8 @@
+{
+  "source": "/private/tmp/st-c24-receipt-replay/candidate/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+  "sourceSha256": "3edbc0c8329605ea30f62e7be72c921d144fa840fb40b2054e51f75d9bc6f1e5",
+  "log": "/private/tmp/st-c24-receipt-replay/runs/kernel-timing/first.log",
+  "logSha256": "ee3c5be961eb77720ae6be368ca60790b89648df665385cef3b829613669bcad",
+  "observationSha256": "c973ce59558c13d3d3954bbb21aa59669715221e214f96ed143d44c61c4f6601",
+  "observationExecuted": false
+}

@@ -1,0 +1,420 @@
+--- a/packages/kernel/src/lib/equal-owner-admission.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-admission.spec.ts
+@@ -0,0 +1,69 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++type Receipt={read():Readonly<{state:string}>};
++type Declared=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly unknown[]},work:()=>unknown):Receipt};
++const drain=async()=>{for(let n=0;n<120;n++)await Promise.resolve();};
++for(const route of ['leaf','whole'] as const)for(const outcome of ['confirm','rollback'] as const){
++ it(`preserves actual owner through equal ${route}, then ${outcome}`,async()=>{
++  const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const sent:unknown[]=[];
++  const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;let off=()=>{};
++  try{
++   const p=t.transact(()=>t.$.pair.x(7));await drain();expect(sent).toEqual([]);const before=p.inspect();let notices=0;off=t.$.pair.x.subscribe(()=>notices++);
++   c.declare({kind:'independent'},()=>route==='leaf'?t.$.pair.x(7):t.$.pair({x:7,y:0}));await drain();
++   expect(sent).toEqual([]);expect(p.inspect()).toEqual(before);expect(notices).toBe(0);expect(t.$.pair.x()).toBe(7);
++   p[outcome]();await drain();const value=outcome==='confirm'?7:0;
++   expect(t.$.pair()).toEqual({x:value,y:0});expect(sent).toEqual([{x:value,y:0}]);await c.settled();
++  }finally{off();c.dispose();t.destroy();}
++ });
++ it(`refreshes unowned possible support through equal ${route}, foreign ${outcome}`,async()=>{
++  const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({z:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++  const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;
++  try{
++   const p=other.transact(()=>other.$.z(7));t.$.pair.x(7);await drain();expect(sent).toEqual([]);const before=p.inspect();
++   c.declare({kind:'independent'},()=>route==='leaf'?t.$.pair.x(7):t.$.pair({x:7,y:0}));await drain();
++   expect(sent).toEqual([{x:7,y:0}]);expect(p.inspect()).toEqual(before);await c.settled();
++   p[outcome]();await drain();expect(sent).toEqual([{x:7,y:0}]);expect(t.$.pair.x()).toBe(7);
++  }finally{c.dispose();t.destroy();other.destroy();}
++ });
++}
++for(const route of ['leaf','whole'] as const)it(`preserves inherited input obligation on equal owned ${route}`,async()=>{
++ const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({z:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;
++ try{
++  const q=other.transact(()=>other.$.z(7));let p!:ReturnType<typeof t.transact>;
++  c.declare({kind:'dependent',owners:[q]},()=>{p=t.transact(()=>t.$.pair.x(other.$.z()));});await drain();expect(sent).toEqual([]);
++  c.declare({kind:'independent'},()=>route==='leaf'?t.$.pair.x(7):t.$.pair({x:7,y:0}));await drain();expect(sent).toEqual([]);
++  p.confirm();await drain();expect(sent).toEqual([]);expect(t.$.pair.x()).toBe(7);
++  q.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();other.destroy();}
++});
++it('equal declaration inside unrelated transaction does not acquire destination ownership',async()=>{
++ const t=signalTree({pair:{x:0,y:0},z:0},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;
++ try{
++  const q=other.transact(()=>other.$.q(1));t.$.pair.x(7);await drain();expect(sent).toEqual([]);
++  const p=t.transact(()=>{t.$.z(1);c.declare({kind:'independent'},()=>t.$.pair.x(7));});await drain();
++  expect(sent).toEqual([{x:7,y:0}]);expect(t.$.z()).toBe(1);expect(other.$.q()).toBe(1);
++  p.rollback();await drain();expect(t.$.pair.x()).toBe(7);expect(t.$.z()).toBe(0);expect(sent).toEqual([{x:7,y:0}]);
++  q.rollback();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();other.destroy();}
++});
++it('net-zero destination does not inherit a surviving sibling transaction claim',async()=>{
++ const t=signalTree({pair:{x:0,y:0},z:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;
++ try{
++  const p=t.transact(()=>{t.$.z(1);t.$.pair.x(7);t.$.pair.x(0);});await drain();expect(t.$.pair.x()).toBe(0);expect(sent).toEqual([]);
++  c.declare({kind:'independent'},()=>t.$.pair.x(0));await drain();expect(sent).toEqual([{x:0,y:0}]);expect(t.$.z()).toBe(1);
++  p.rollback();await drain();expect(t.$.z()).toBe(0);expect(t.$.pair.x()).toBe(0);expect(sent).toEqual([{x:0,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();}
++});
++it('newer net-zero write leaves the older destination owner intact',async()=>{
++ const t=signalTree({pair:{x:0,y:0},z:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;
++ try{
++  const p=t.transact(()=>t.$.pair.x(7));const q=t.transact(()=>{t.$.z(1);t.$.pair.x(9);t.$.pair.x(7);});await drain();expect(sent).toEqual([]);
++  q.confirm();await drain();expect(sent).toEqual([]);
++  c.declare({kind:'independent'},()=>t.$.pair.x(7));await drain();expect(sent).toEqual([]);
++  p.rollback();await drain();expect(t.$.pair.x()).toBe(0);expect(t.$.z()).toBe(1);expect(sent).toEqual([{x:0,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();}
++});
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -1,3 +1,5 @@
++import {prepareScalarSelection,restoredScalarSelection} from '../internals/native-scalar-selection';
++import type {NativeFieldEndpoint} from '../internals/native-field-selection';
+ import { stampScalarNotification } from '../internals/scalar-publication-coverage';
+ import { RecipientOccurrences, type OccurrenceHandle } from './recipient-occurrence';
+ import type { EntityContributorEdit } from '../internals/entity-egress-projection';
+@@ -90,7 +92,7 @@
+ const branchInputs:BranchInput[]=[];
+ // One current requirement per native value identity, independent of subscribers.
+ // No payload/history is retained; weak keys release facts with their native source.
+-const nativeValues=new WeakMap<object,lifecycle.NativeRequirement>();
++const nativeValues=new WeakMap<object,NativeFieldEndpoint>();
+ const nativeMembers=new WeakMap<object,lifecycle.NativeRequirement>();
+ const nativeNegativeDomains=new WeakMap<object,Map<object,lifecycle.NativeRequirement>>();
+ // A physical view identity holds only its support, never a second copy of values.
+@@ -136,20 +138,30 @@
+  return {known:cell?[cell]:[],unknown:meta?.origin!==undefined||(id!==undefined&&(!cell||meta?.transactionOwner!==lifecycle.ownerToken(owner!)))};
+ }
+ registerNativePublicationFactory(node=>{
+- const initial=lifecycle.initialRequirement();nativeValues.set(node,initial);nativeViews.set(node,{requirement:initial});
++ const initial=lifecycle.initialRequirement();nativeValues.set(node,{present:true,value:undefined,requirement:initial});nativeViews.set(node,{requirement:initial});
+  return {
+   captureInput:()=>({native:Object.freeze(nativeInputs(node))}),
+   prepare:(mutation,input)=>{
+    if(getActiveWriteContext()?.participation==='inspection'){
+     return {record:{writes:mutation.changed?[{map:nativeViews,key:node,value:{requirement:unavailableInput()}}]:[],adds:[]},completion:{}};
+    }
+-   if(!mutation.changed&&!lifecycle.isValidating()&&!branchInputs.length)return;
+-   const authored=nativeAuthorship(node);
++   if(!mutation.changed&&!lifecycle.isValidating()&&!branchInputs.length&&!restoredScalarSelection(node))return;
++   const predecessor=nativeValues.get(node)!;
++   const existingView=nativeViews.get(node), physicalRequirement=existingView?.requirement;
++   const authored=mutation.changed?nativeAuthorship(node):{known:[],unknown:false};
+    const consumed=mutation.intent==='derive'?(input as {native?:readonly lifecycle.NativeInput[]}|undefined)?.native??[]:[];
+-   const prepared=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])]);
+-   const existingView=nativeViews.get(node);
+-   const view=mutation.changed||!existingView?{requirement:prepared.requirement}:existingView;
+-   return {record:combineTerminalRecords(prepared.record,{writes:[{map:nativeValues,key:node,value:prepared.requirement},{map:nativeViews,key:node,value:view},...(!mutation.changed&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:prepared.requirement}]:[])],adds:[]})!,completion:{requirement:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement)};
++   let prepared=lifecycle.prepareNativeRequirement(authored.known,authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])]);
++   const proposed:NativeFieldEndpoint=Object.freeze({present:true,value:mutation.after,requirement:prepared.requirement});
++   const restoration=restoredScalarSelection(node);
++   const selection=restoration?{endpoint:restoration}:prepareScalarSelection(getPositionRegistry(node),node,mutation,predecessor,proposed);
++   const retained=selection?.endpoint??(!mutation.changed&&predecessor.owner!==undefined?predecessor:proposed);
++   // Selection is not consumption. Keep every role of the selected predecessor.
++   const admitted=retained.requirement===prepared.requirement;
++   if(!admitted)prepared=lifecycle.prepareNativeRequirement([],authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])]);
++   const requirement=restoration?restoration.requirement as lifecycle.NativeRequirement:admitted?prepared.requirement:lifecycle.combineNativeRequirements([retained.requirement as lifecycle.NativeRequirement,prepared.requirement]);
++   const endpoint=admitted?retained:Object.freeze({...retained,requirement});
++   const view=mutation.changed||!existingView?{requirement}:existingView;
++   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view},...(!mutation.changed&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:requirement}]:[])],adds:[]})!,completion:{requirement:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
+   },
+   complete:(completion)=>{lifecycle.deliverNativeRequirementReady((completion as {requirement?:lifecycle.NativeRequirement}).requirement);},
+  };
+@@ -441,7 +453,7 @@
+     if(isWritableLocation(candidate)){
+      const address=getNodeAddress(candidate),relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)throw Error('Enrolled field has no relative address');
+      binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);
+-     const requirement=nativeValues.get(candidate)??lifecycle.initialRequirement(),fact=nativeFact(requirement);
++     const requirement=(nativeValues.get(candidate)?.requirement as lifecycle.NativeRequirement|undefined)??lifecycle.initialRequirement(),fact=nativeFact(requirement);
+      binding.fieldFacts.set(candidate,fact);binding.completedFields.set(candidate,fact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;
+      installFact(binding,candidate,'value',fact,requirement);
+      const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;
+@@ -452,7 +464,7 @@
+     }
+    };visit(source);
+   }else{
+-   const requirement=nativeValues.get(source)??lifecycle.initialRequirement(),fact=nativeFact(requirement);binding.valueFact=fact;binding.completedValueFact=fact;installFact(binding,source,'value',fact,requirement);
++   const requirement=(nativeValues.get(source)?.requirement as lifecycle.NativeRequirement|undefined)??lifecycle.initialRequirement(),fact=nativeFact(requirement);binding.valueFact=fact;binding.completedValueFact=fact;installFact(binding,source,'value',fact,requirement);
+    binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));
+   }
+  }
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -9,6 +9,7 @@
+   registerIntrinsicMutationSource,
+   combineTerminalRecords,
+   type PreparedPublicationUnit,
++  type TerminalRecordPlan,
+ } from './intrinsic-mutation';
+ import { reportContainedObserverError } from './error-reporter';
+ import {
+@@ -227,6 +228,7 @@
+           ? kernel.readRecordSlot<T>(slotIndex)
+           : undefined;
+       let unit: PreparedPublicationUnit | undefined;
++      let terminal: TerminalRecordPlan | undefined;
+       const preparePublication = (
+         changed: boolean,
+         retained: T = before as T
+@@ -236,6 +238,7 @@
+           before: before as T,
+           after: changed ? value : retained,
+           changed,
++          preparedTerminal:terminal,
+         });
+         return unit?.record;
+       };
+@@ -246,7 +249,7 @@
+           value,
+           () =>
+             combineTerminalRecords(
+-              mutationSource.prepareTerminal?.({
++              terminal = mutationSource.prepareTerminal?.({
+                 intent: 'replace',
+                 before: before as T,
+                 after: value,
+@@ -299,6 +302,7 @@
+       const before = kernel.readRecordSlot<T>(slotIndex);
+       const next = update(dormant ? (undefined as T) : current);
+       let unit: PreparedPublicationUnit | undefined;
++      let terminal: TerminalRecordPlan | undefined;
+       const preparePublication = (
+         changed: boolean,
+         retained: T = before as T
+@@ -309,6 +313,7 @@
+             before,
+             after: changed ? next : retained,
+             changed,
++            preparedTerminal:terminal,
+           },
+           publicationInput
+         );
+@@ -321,7 +326,7 @@
+           next,
+           () =>
+             combineTerminalRecords(
+-              mutationSource.prepareTerminal?.({
++              terminal = mutationSource.prepareTerminal?.({
+                 intent: 'derive',
+                 before,
+                 after: next,
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,7 +1,7 @@
+ import { markSnapshotInstalled } from './snapshot-installation';
+ import { PublicationPreparation } from './publication-preparation';
+ import {getActiveWriteContext} from '../write-context';
+-import { prepareScalarSourcePublication, completeScalarSourcePublication, installTerminalRecord } from './intrinsic-mutation';
++import { prepareScalarSourcePublication, prepareScalarSourceTerminal, combineTerminalRecords, completeScalarSourcePublication, installTerminalRecord } from './intrinsic-mutation';
+ import type { PreparedPublicationUnit, TerminalRecordPlan } from './intrinsic-mutation';
+ import type { PositionId } from '../mutation-types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+@@ -222,7 +222,10 @@
+       if(keep!==has || keep&&!Object.is(inspectionBaseline.get(slotIndex),before))shadowPlans.push({slotIndex,keep,value:before});
+       const source = publicationSources[slotIndex];
+       if (source) {
+-        const unit = prepareScalarSourcePublication(source, {intent:'replace', before, after:equal ? before : nextValue, changed:!equal, publicationPredecessors, deferPublicationFinalization:true});
++        const mutation = {intent:'replace' as const, before, after:equal ? before : nextValue, changed:!equal, publicationPredecessors, deferPublicationFinalization:true};
++        const terminal = !equal ? prepareScalarSourceTerminal(source,mutation) : undefined;
++        const publication = prepareScalarSourcePublication(source,{...mutation,preparedTerminal:terminal});
++        const unit = publication ? {...publication,record:combineTerminalRecords(terminal,publication.record)!} : terminal ? {record:terminal,completion:{}} : undefined;
+         if (unit) { units.push(unit); coverage.set(slotIndex, unit.coveredRecipients ?? []); }
+       }
+     }
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -478,14 +478,15 @@
+         const publicationComplete = mutationSource2.completePublication;
+         const before = observer || publicationPrepare ? read(true) : undefined;
+         let unit: PreparedPublicationUnit | undefined;
++        let terminal: TerminalRecordPlan | undefined;
+         const preparePublication = (changed: boolean, retained: T = before as T) => {
+-          unit = publicationPrepare?.({intent:'replace',before:before as T,after:changed ? next : retained,changed});
++          unit = publicationPrepare?.({intent:'replace',before:before as T,after:changed ? next : retained,changed,preparedTerminal:terminal});
+           return unit?.record;
+         };
+         let failed = false;
+         try {
+           const result = write(next, 'replace', () => combineTerminalRecords(
+-            mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}),
++            terminal = mutationSource2.prepareTerminal?.({intent:'replace',before:before as T,after:next,changed:true}),
+             preparePublication(true)
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+@@ -513,14 +514,15 @@
+         const before = mutationSource2.observer || publicationPrepare ? read(true) : current;
+         const next = update(current);
+         let unit: PreparedPublicationUnit | undefined;
++        let terminal: TerminalRecordPlan | undefined;
+         const preparePublication = (changed: boolean, retained: T = before as T) => {
+-          unit = publicationPrepare?.({intent:'derive',before,after:changed ? next : retained,changed}, publicationInput);
++          unit = publicationPrepare?.({intent:'derive',before,after:changed ? next : retained,changed,preparedTerminal:terminal}, publicationInput);
+           return unit?.record;
+         };
+         let failed = false;
+         try {
+           const result = write(next, 'derive', () => combineTerminalRecords(
+-            mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}),
++            terminal = mutationSource2.prepareTerminal?.({intent:'derive',before,after:next,changed:true}),
+             preparePublication(true)
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+--- a/packages/kernel/src/lib/internals/native-scalar-selection.ts
++++ b/packages/kernel/src/lib/internals/native-scalar-selection.ts
+@@ -0,0 +1,11 @@
++import type { NativeFieldEndpoint } from './native-field-selection';
++import type { IntrinsicMutation, TerminalRecordPlan } from './intrinsic-mutation';
++export type ScalarSelection = { endpoint:NativeFieldEndpoint; record?:TerminalRecordPlan };
++type Selector=(node:object,mutation:IntrinsicMutation<unknown>,before:NativeFieldEndpoint,proposed:NativeFieldEndpoint)=>ScalarSelection|undefined;
++const selectors=new WeakMap<object,Selector>();
++export function registerScalarSelection(registry:object,select:Selector):()=>void { selectors.set(registry,select);return ()=>{if(selectors.get(registry)===select)selectors.delete(registry);}; }
++export function prepareScalarSelection(registry:object|undefined,node:object,mutation:IntrinsicMutation<unknown>,before:NativeFieldEndpoint,proposed:NativeFieldEndpoint):ScalarSelection|undefined{return registry?selectors.get(registry)?.(node,mutation,before,proposed):undefined;}
++// Scoped selected compensation facts, not an ownership ledger.
++let restored:ReadonlyMap<object,NativeFieldEndpoint>|undefined;
++export function withScalarSelections<T>(selections:ReadonlyMap<object,NativeFieldEndpoint>,work:()=>T):T{const previous=restored;restored=selections;try{return work();}finally{restored=previous;}}
++export function restoredScalarSelection(node:object):NativeFieldEndpoint|undefined{return restored?.get(node);}
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -1,4 +1,5 @@
+ export interface TerminalRecordPlan {
++  readonly scalarAdmission?: { readonly effect:object; readonly operationEffect:object };
+   readonly deletes?: readonly { readonly map: { delete(key: unknown): unknown }; readonly key: unknown }[];
+   readonly writes: readonly { readonly map: { set(key: unknown, value: unknown): unknown }; readonly key: unknown; readonly value: unknown }[];
+   readonly adds: readonly { readonly set: { add(value: unknown): unknown }; readonly value: unknown }[];
+@@ -67,6 +68,7 @@
+ 
+ type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+ export interface IntrinsicMutation<T> {
++  readonly preparedTerminal?: TerminalRecordPlan;
+   readonly intent: 'replace' | 'derive';
+   /** Operation-local predecessor chain for sibling plans prepared before installation. */
+   readonly publicationPredecessors?: Map<object, object | undefined>;
+@@ -334,7 +336,7 @@
+     }
+     // Every private unit finalizes after all callback-capable preparation.
+     let sealed=false;
+-    const validate=()=>{if(source.publicationPreparer!==publicationPreparer)throw new Error('Scalar publication enrollment changed before installation');};
++    const validate=()=>{nativeUnit?.validate?.();if(source.publicationPreparer!==publicationPreparer)throw new Error('Scalar publication enrollment changed before installation');};
+     const finalize=()=>{if(sealed)return;sealed=true;validate();for(const seal of finalizers)seal();validate();};
+     if(!mutation.deferPublicationFinalization)finalize();
+     const record = combineTerminalRecords(...plans);
+@@ -432,3 +434,6 @@
+ export function completeScalarSourcePublication(unit: PreparedPublicationUnit): void {
+   completePublication(unit.completion);
+ }
++
++/** Shared frame path uses the same prepared scalar recorder as direct leaves. */
++export function prepareScalarSourceTerminal(node:object,mutation:IntrinsicMutation<unknown>):TerminalRecordPlan|undefined{return SOURCES.get(node)?.terminalPreparer?.(mutation);}
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import {withScalarSelections} from '../native-scalar-selection';
+ import { PublicationPreparation } from '../publication-preparation';
+ import { completeScalarFrame } from '../tree-scalar-slot-runtime';
+ import type { EntityStructureOperation, PreparedEntityStructure } from '../prepared-entity-structure';
+@@ -811,6 +812,11 @@
+  if (!prepare) return undefined;
+  return {operation,prepare:()=>prepare.call(port, operation.effects)};
+ }
++function prepareWithScalarSelections<T>(slots:NonNullable<ReturnType<typeof getTreeScalarSlotRuntime>>,effects:readonly ReversalEffect[],work:()=>T):T {
++ const selections=new Map<object,import('../native-field-selection').NativeFieldEndpoint>();
++ for(const effect of effects){if(effect.subjectId!==undefined)continue;const endpoint=fieldEndpoints(effect)?.after;const leaf=slots.resolveScalarLeaf(effect.owner);if(endpoint&&leaf)selections.set(leaf,endpoint);}
++ return withScalarSelections(selections,work);
++}
+ function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[],owners:StructuralOwnerIndex):{install():void;publish(options?:{deferCompletion?:boolean}):void;complete():void} {
+  const descriptors=getTreeRealizationDescriptors(tree.$);
+  const slots=getTreeScalarSlotRuntime(tree.$)??getTreeScalarSlotRuntime(tree);
+@@ -833,7 +839,7 @@
+    const groups=new Map<object,SelectedRowIntent[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
+    const plans=[...groups.values()].map(group=>group[0]!.prepare(group,publicationPhase));
+    if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
+-   const installScalars=frame.prepareCommit({advanceRevision:false,publish:false,publicationPhase});
++   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>frame.prepareCommit!({advanceRevision:false,publish:false,publicationPhase}));
+    publicationPhase.seal();
+    if(clock.revision()!==revision)throw new Error('Selected operation preparation reentered installation');
+    active=false;edits.length=0;groups.clear();let installed=false;let scalarResult:ReturnType<typeof installScalars>|undefined;
+@@ -1816,7 +1822,7 @@
+     frame.set(slotIndex, effect.after);
+   }
+ 
+-  const install = frame.prepareCommit?.({publish:false,publicationPhase:outerPhase});
++  const install = prepareWithScalarSelections(scalarSlotRuntime,effects,()=>frame.prepareCommit?.({publish:false,publicationPhase:outerPhase}));
+   if (!install) throw new Error('Scalar realization preparation unavailable');
+   return {
+     commit(detachedCompletions): void {
+@@ -1998,6 +2004,7 @@
+   const invoke = (target:object,value:unknown,body:()=>void):void => {
+     const endpoint=fieldEndpoints(effect)?.after;
+     if(!endpoint){body();return;}
++    if(effect.subjectId===undefined){withScalarSelections(new Map([[target,endpoint]]),body);return;}
+     const binding=getEntityPublicationBinding(target),path=effect.subjectFieldSegments;
+     if(!binding||binding.subject!==effect.subjectId||path?.length!==1||binding.field!==undefined&&binding.field!==path[0])
+       throw new Error('Inverse endpoint does not match resolved source field');
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,4 @@
++import {registerScalarSelection} from '../../lib/internals/native-scalar-selection';
+ import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+ import {
+@@ -2853,7 +2854,6 @@
+     const recorded = resolveTransactionId(meta);
+     if (
+       recorded !== undefined &&
+-      subjectIds?.length &&
+       installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0])
+     )
+       return;
+@@ -2869,6 +2869,31 @@
+       resolvedPositionIds
+     );
+   };
++
++  const releaseScalarSelection=lifecycleRegistry?registerScalarSelection(lifecycleRegistry,(node,mutation,before,proposed)=>{
++    const meta=getActiveWriteContext(),position=getOwnedPositionIds(node)?.[0];
++    if(!mutation.changed)return {endpoint:before.owner!==undefined?before:proposed};
++    if(isRestoring||meta?.origin==='restoration'||isInspectionWrite(meta)||getWriteParticipation(meta)==='realized'||meta?.transactionOwner!==transactionOwnerToken)return;
++    const id=resolveTransactionId(meta);
++    if(id===undefined||position===undefined)return;
++    const slots=getTreeScalarSlotRuntime(tree)??getTreeScalarSlotRuntime(tree.$);
++    if(slots?.resolveScalarSlot(position)===undefined)return;
++    const bucket=getTransactionBucket(id);
++    const path=lifecycleRegistry.addressFor(position)?.join('.')??'';
++    const key=effectKey({kind:'set',position,path,ownerPath:path,before:mutation.before,after:mutation.after});
++    const old=bucket.effects.get(key);
++    const prior=old&&fieldEndpoints(old)?.before;
++    const first=prior??Object.freeze({...before,value:mutation.before});
++    const after=Object.freeze({...proposed,owner:id});
++    const pair={before:first,after};
++    const endpoint=Object.is(old?.kind==='set'?old.before:mutation.before,mutation.after)?first:after;
++    const admission=mutation.preparedTerminal?.scalarAdmission;
++    if(!admission)throw new Error('Scalar selection requires prepared admission');
++    // These are this attempt's detached effect objects, not installed bucket state.
++    bindFieldEndpoints(admission.effect,pair);
++    bindFieldEndpoints(admission.operationEffect,{before,after});
++    return {endpoint};
++  }):undefined;
+ 
+   const recordConfirmedBucket = (
+     bucket: CaptureBucket
+@@ -4285,6 +4310,7 @@
+                   value: windowWriteSeq,
+                 });
+             return {
++              scalarAdmission:{effect:combined,operationEffect:operation.effects[0]!},
+               writes,
+               adds: [
+                 { set: operation.owners, value: position },
+@@ -5155,6 +5181,7 @@
+   if (typeof tree.registerCleanup === 'function') {
+     tree.registerCleanup(() => {
+       destroyed = true;
++      releaseScalarSelection?.();
+       research.unregister(lifecycleRegistry?.id);
+       lifecycleViews.clear();
+       lifecycleScopes.clear();

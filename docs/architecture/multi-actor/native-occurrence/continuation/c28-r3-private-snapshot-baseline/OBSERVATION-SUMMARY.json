@@ -1,0 +1,84 @@
+[
+  {
+    "case": "1-factories",
+    "phases": {
+      "replacement-undo": {
+        "createDerived": 4,
+        "snapshotFactory": 4,
+        "hasCollectionKeyFactory": 0,
+        "tokenReads": 31,
+        "snapshotReads": 24,
+        "jointReads": 4,
+        "preparePointRealizationReads": 0
+      },
+      "replacement-redo": {
+        "createDerived": 4,
+        "snapshotFactory": 4,
+        "hasCollectionKeyFactory": 0,
+        "tokenReads": 31,
+        "snapshotReads": 24,
+        "jointReads": 4,
+        "preparePointRealizationReads": 0
+      }
+    }
+  },
+  {
+    "case": "2-factories",
+    "phases": {
+      "calibration-cold": {
+        "createDerived": 2,
+        "snapshotFactory": 0,
+        "hasCollectionKeyFactory": 0,
+        "tokenReads": 1,
+        "snapshotReads": 0,
+        "jointReads": 0,
+        "preparePointRealizationReads": 0
+      },
+      "point-undo": {
+        "createDerived": 0,
+        "snapshotFactory": 0,
+        "hasCollectionKeyFactory": 0,
+        "tokenReads": 6,
+        "snapshotReads": 0,
+        "jointReads": 0,
+        "preparePointRealizationReads": 0
+      }
+    }
+  },
+  {
+    "case": "3-factories",
+    "phases": {
+      "mixed-undo": {
+        "createDerived": 2,
+        "snapshotFactory": 0,
+        "hasCollectionKeyFactory": 0,
+        "tokenReads": 10,
+        "snapshotReads": 3,
+        "jointReads": 3,
+        "preparePointRealizationReads": 0
+      }
+    }
+  },
+  {
+    "case": "4-factories",
+    "phases": {}
+  },
+  {
+    "case": "5-factories",
+    "phases": {
+      "clone-undo": {
+        "createDerived": 0,
+        "snapshotFactory": 0,
+        "hasCollectionKeyFactory": 0,
+        "tokenReads": 5,
+        "snapshotReads": 0,
+        "jointReads": 0,
+        "preparePointRealizationReads": 0
+      }
+    }
+  },
+  {
+    "case": "6-factories",
+    "phases": {}
+  }
+]

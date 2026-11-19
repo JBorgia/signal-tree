@@ -1,0 +1,82 @@
+{
+  "@signal-tree/angular": {
+    "installedPath": "/private/tmp/st-c23-public-packed-proof/consumer/node_modules/@signal-tree/angular",
+    "symlink": false,
+    "packedFiles": 16,
+    "mismatch": [],
+    "exports": {
+      ".": {
+        "types": "./src/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "@signal-tree/kernel": {
+    "installedPath": "/private/tmp/st-c23-public-packed-proof/consumer/node_modules/@signal-tree/kernel",
+    "symlink": false,
+    "packedFiles": 134,
+    "mismatch": [],
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json",
+      "./adapter": {
+        "types": "./dist/adapter.d.ts",
+        "import": "./dist/adapter.js",
+        "default": "./dist/adapter.js"
+      },
+      "./internals": {
+        "types": "./dist/internals.d.ts",
+        "import": "./dist/internals.js",
+        "default": "./dist/internals.js"
+      }
+    }
+  },
+  "@signal-tree/react": {
+    "installedPath": "/private/tmp/st-c23-public-packed-proof/consumer/node_modules/@signal-tree/react",
+    "symlink": false,
+    "packedFiles": 9,
+    "mismatch": [],
+    "exports": {
+      ".": {
+        "types": "./src/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "@signal-tree/solid": {
+    "installedPath": "/private/tmp/st-c23-public-packed-proof/consumer/node_modules/@signal-tree/solid",
+    "symlink": false,
+    "packedFiles": 12,
+    "mismatch": [],
+    "exports": {
+      ".": {
+        "types": "./src/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "@signal-tree/vue": {
+    "installedPath": "/private/tmp/st-c23-public-packed-proof/consumer/node_modules/@signal-tree/vue",
+    "symlink": false,
+    "packedFiles": 12,
+    "mismatch": [],
+    "exports": {
+      ".": {
+        "types": "./src/index.d.ts",
+        "import": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
+  }
+}

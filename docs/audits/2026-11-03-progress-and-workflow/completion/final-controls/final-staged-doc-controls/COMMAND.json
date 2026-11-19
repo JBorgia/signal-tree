@@ -1,0 +1,25 @@
+{
+  "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+  "argv": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=source-controls,doc-links,doc-links:self"
+  ],
+  "env": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/opt/homebrew/opt/openjdk@17/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS:/Users/jonathanborgia/.foundry/bin",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-v16-takeover-evidence/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-v16-takeover-evidence/nx-data",
+    "TMPDIR": "/private/tmp/st-v16-takeover-evidence/runs/final-staged-doc-controls/tmp",
+    "npm_config_cache": "/private/tmp/st-v16-takeover-evidence/npm-cache"
+  },
+  "sourceManifestSha256": "011d9c855b07b63a08e29fe6fb09b99f934e6b078a8dec020f8ce94ed9eaf400",
+  "sourceManifestFile": "/private/tmp/st-v16-takeover-evidence/manifests/011d9c855b07b63a08e29fe6fb09b99f934e6b078a8dec020f8ce94ed9eaf400.json",
+  "absoluteTimeoutSeconds": 900,
+  "noLogProgressTimeoutSeconds": 900,
+  "processCensusTimeoutSeconds": 30,
+  "startedAt": "2026-11-03T23:06:39.620548+00:00"
+}

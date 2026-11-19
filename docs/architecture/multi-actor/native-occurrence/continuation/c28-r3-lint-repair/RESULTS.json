@@ -1,0 +1,57 @@
+{
+  "precedence-corrected": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "candidate-precedence-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "kernel-controls": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "angular-controls": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "react-controls": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "vue-controls": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "solid-controls": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "source-types": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "public-types": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "spec-types": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "affected-lint": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  }
+}

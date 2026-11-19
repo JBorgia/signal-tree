@@ -1,0 +1,22 @@
+{
+  "nx/dist/src/executors/run-commands/running-tasks.js": {
+    "actual": "8ece918804f4694fb43a1d6b7ee7b0dd9c3629a319db9d8bab654c6c9e70e864",
+    "fullRunStore": "8ece918804f4694fb43a1d6b7ee7b0dd9c3629a319db9d8bab654c6c9e70e864",
+    "equal": true
+  },
+  "vitest/dist/chunks/defaults.9aQKnqFk.js": {
+    "actual": "e500ba917d0d320a037b4ad92ae691462b50a939e21b1f98d0073c45d55466ab",
+    "fullRunStore": "e500ba917d0d320a037b4ad92ae691462b50a939e21b1f98d0073c45d55466ab",
+    "equal": true
+  },
+  "vitest/dist/chunks/coverage.DM_a_rWm.js": {
+    "actual": "e509f3cc1bd81ae6426265253fa926cbde02be5cebfe35b1df422017bffdca31",
+    "fullRunStore": "e509f3cc1bd81ae6426265253fa926cbde02be5cebfe35b1df422017bffdca31",
+    "equal": true
+  },
+  "vitest/dist/chunks/cli-api.24X8XwN1.js": {
+    "actual": "02f2ab29d67228334503688a0168fa08ddb42949aa447fbcd7541d06919a4f7d",
+    "fullRunStore": "02f2ab29d67228334503688a0168fa08ddb42949aa447fbcd7541d06919a4f7d",
+    "equal": true
+  }
+}

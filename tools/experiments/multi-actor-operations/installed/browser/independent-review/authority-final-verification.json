@@ -1,0 +1,266 @@
+{
+  "authority-replay-ezJSFK": {
+    "versions": {
+      "node": "v24.15.0",
+      "angular": "22.0.7",
+      "typescript": "6.0.3",
+      "playwright": "1.56.1"
+    },
+    "chromium": "141.0.7390.37",
+    "passed": 12,
+    "total": 12,
+    "source": {
+      "app.ts": "e208e0254919feeebe95384b21aa5302baf1937de495e13dbc03f04129d51c8a",
+      "main.ts": "24d29c03d422d958d5da5aa20f9d2740c14b223264048685413cdd3d65b847af",
+      "review-fixture.d.mts": "9774e3d955500dc3d464d2114589785fba67db85879c844652fca969213b87aa"
+    },
+    "siteSha256": "60b5176c8dc1ae45fdb12cc1fddf3725815f56d6d468572e5a118d451d2ef749",
+    "runtimeCompilerInputs": [],
+    "commands": [
+      {
+        "name": "pack-tslib",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-core",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-compiler",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+compiler@22.0.7/node_modules/@angular/compiler",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-common",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+common@22.0.7_@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2__rxjs@7.8.2/node_modules/@angular/common",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-platform-browser",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+platform-browser@22.0.7_@angular+common@22.0.7_@angular+core@22.0.7_@angular+c_5694b40bc6992c4bf86a468dddfca8c7/node_modules/@angular/platform-browser",
+        "exit": 0
+      },
+      {
+        "name": "pack-rxjs",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs",
+        "exit": 0
+      },
+      {
+        "name": "install",
+        "command": "npm",
+        "args": [
+          "install",
+          "--offline",
+          "--ignore-scripts",
+          "--no-audit",
+          "--no-fund",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/angular-common-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/angular-compiler-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/angular-core-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/angular-platform-browser-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/rxjs-7.8.2.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/signal-tree-angular-16.0.0-dev.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/signal-tree-kernel-16.0.0-dev.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/packs/tslib-2.8.1.tgz"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/consumer",
+        "exit": 0
+      },
+      {
+        "name": "aot",
+        "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "args": [
+          "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+compiler-cli@22.0.7_@angular+compiler@22.0.7_typescript@6.0.3/node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+          "-p",
+          "tsconfig.json"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-replay-ezJSFK/consumer",
+        "exit": 0
+      }
+    ],
+    "pageErrors": [],
+    "consoleErrors": "not collected by author checks"
+  },
+  "authority-extra-1f0OgT": {
+    "versions": {
+      "node": "v24.15.0",
+      "angular": "22.0.7",
+      "typescript": "6.0.3",
+      "playwright": "1.56.1"
+    },
+    "chromium": "141.0.7390.37",
+    "passed": 5,
+    "total": 5,
+    "source": {
+      "app.ts": "e208e0254919feeebe95384b21aa5302baf1937de495e13dbc03f04129d51c8a",
+      "main.ts": "24d29c03d422d958d5da5aa20f9d2740c14b223264048685413cdd3d65b847af",
+      "review-fixture.d.mts": "9774e3d955500dc3d464d2114589785fba67db85879c844652fca969213b87aa"
+    },
+    "siteSha256": "35b26c3cda16f2fe8fad8b64312334173678eacd2343f33e92aac103e7f5176c",
+    "runtimeCompilerInputs": [],
+    "commands": [
+      {
+        "name": "pack-tslib",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-core",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-compiler",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+compiler@22.0.7/node_modules/@angular/compiler",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-common",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+common@22.0.7_@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2__rxjs@7.8.2/node_modules/@angular/common",
+        "exit": 0
+      },
+      {
+        "name": "pack-@angular-platform-browser",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+platform-browser@22.0.7_@angular+common@22.0.7_@angular+core@22.0.7_@angular+c_5694b40bc6992c4bf86a468dddfca8c7/node_modules/@angular/platform-browser",
+        "exit": 0
+      },
+      {
+        "name": "pack-rxjs",
+        "command": "npm",
+        "args": [
+          "pack",
+          "--ignore-scripts",
+          "--json",
+          "--pack-destination",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs",
+        "exit": 0
+      },
+      {
+        "name": "install",
+        "command": "npm",
+        "args": [
+          "install",
+          "--offline",
+          "--ignore-scripts",
+          "--no-audit",
+          "--no-fund",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/angular-common-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/angular-compiler-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/angular-core-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/angular-platform-browser-22.0.7.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/rxjs-7.8.2.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/signal-tree-angular-16.0.0-dev.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/signal-tree-kernel-16.0.0-dev.tgz",
+          "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/packs/tslib-2.8.1.tgz"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/consumer",
+        "exit": 0
+      },
+      {
+        "name": "aot",
+        "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "args": [
+          "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+compiler-cli@22.0.7_@angular+compiler@22.0.7_typescript@6.0.3/node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+          "-p",
+          "tsconfig.json"
+        ],
+        "cwd": "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/authority-extra-1f0OgT/consumer",
+        "exit": 0
+      }
+    ],
+    "pageErrors": [],
+    "consoleErrors": []
+  }
+}

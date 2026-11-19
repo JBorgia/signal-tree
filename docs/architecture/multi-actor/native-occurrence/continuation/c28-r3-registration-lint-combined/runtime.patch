@@ -1,0 +1,211 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1493,7 +1493,6 @@
+   let unsubscribeNotifications: (() => void) | null = null;
+   let unsubscribeEnqueue: (() => void) | null = null;
+   let unsubscribeReset: (() => void) | null = null;
+-  let unsubscribePairedBoundaries: (() => void) | undefined;
+   let unsubscribeCollectionOrders: (() => void) | null = null;
+   let restoreLeafInterceptors: (() => void) | null = null;
+   let scalarAttachmentFailed=false;
+@@ -3043,7 +3042,7 @@
+       });
+     return { writes, adds: [] };
+   };
+-  unsubscribePairedBoundaries = getMutationCaptureRuntime(
++  const unsubscribePairedBoundaries = getMutationCaptureRuntime(
+     tree
+   )?.subscribeStructuralWitness?.((capture) => {
+     const unit = capture.topologyUnit;
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,7 +1,7 @@
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+-import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
++import { entityPublicationOrdinary, currentEntityPublicationInputs, type EntityPublicationParticipant, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
+ import * as lifecycle from './lifecycle';
+ import { currentNativePublicationInputs } from './private';
+ 
+@@ -57,7 +57,7 @@
+ }
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+-registerEntityPublicationFactory(() => {
++export const createEntityPublicationParticipant: () => EntityPublicationParticipant = () => {
+   const fields=new Map<number,Map<string,NativeFieldEndpoint>>();
+   const members=new Map<number,Member>();
+   const placements=new Map<number,Requirement>();
+@@ -296,4 +296,4 @@
+     },
+     retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);retirements++;},
+   };
+-});
++};
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -50,12 +50,18 @@
+ 
+   publish(result: ScalarSlotCommitResult): void {
+     let failed = false;
++    let first: unknown;
+     try { this.invalidate(result); }
+-    catch (error) { failed = true; throw error; }
++    catch (error) { failed = true; first = error; }
+     finally {
+       try { completeScalarFrame(result); }
+-      catch (error) { if (!failed) throw error; reportFrameError({error,operation:'notify:subscriber'}); }
+-    }
++      catch (error) {
++        if (!failed) { failed = true; first = error; }
++        else reportFrameError({error,operation:'notify:subscriber'});
++      }
++    }
++    // Completion must run even when the primary thrown value is undefined.
++    if (failed) throw first;
+   }
+ 
+   private invalidate(result: ScalarSlotCommitResult): void {
+@@ -244,6 +250,7 @@
+         return unit?.record;
+       };
+       let failed = false;
++      let first: unknown;
+       try {
+         const resultCommit = kernel.commitRecorded(
+           slotIndex,
+@@ -277,20 +284,21 @@
+         if (mutation) observer?.(mutation);
+       } catch (error) {
+         failed = true;
+-        throw error;
++        first = error;
+       } finally {
+         if (unit && publicationComplete) {
+           try {
+             publicationComplete(unit.completion);
+           } catch (error) {
+-            if (!failed) throw error;
+-            reportContainedObserverError({
++            if (!failed) { failed = true; first = error; }
++            else reportContainedObserverError({
+               error,
+               operation: 'notify:subscriber',
+             });
+           }
+         }
+       }
++      if (failed) throw first;
+     },
+     derive: (update) => {
+       const observer = mutationSource.observer,
+@@ -322,6 +330,7 @@
+         return unit?.record;
+       };
+       let failed = false;
++      let first: unknown;
+       try {
+         const resultCommit = kernel.commitRecorded(
+           slotIndex,
+@@ -357,20 +366,21 @@
+         observer?.(mutation);
+       } catch (error) {
+         failed = true;
+-        throw error;
++        first = error;
+       } finally {
+         if (unit && publicationComplete) {
+           try {
+             publicationComplete(unit.completion);
+           } catch (error) {
+-            if (!failed) throw error;
+-            reportContainedObserverError({
++            if (!failed) { failed = true; first = error; }
++            else reportContainedObserverError({
+               error,
+               operation: 'notify:subscriber',
+             });
+           }
+         }
+       }
++      if (failed) throw first;
+     },
+   };
+   registerWritableLocationBinding(binding);
+@@ -412,7 +422,7 @@
+           publication.bind(slot,prepared.token);
+           if(positionId!==undefined)leafByPositionId.set(positionId,prepared.leaf as Location<unknown>);
+           prepared.attach(kernel,publication,slot,liveness);
+-        },()=>{},()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
++        },()=>{ /* No cancellation work is registered for this scalar allocation. */ },()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
+         return prepared.leaf;
+       }
+       const slotIndex = kernel.createSlot(initialValue, equal, positionId);
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -1114,7 +1114,7 @@
+         throw new Error('Plain branch target location changed before installation');
+     }
+   };
+-  phase.add(() => {}, validateMembers);
++  phase.add(() => { /* Membership validation needs no separate finalization work. */ }, validateMembers);
+   const frame = runtime.beginFrame();
+   for (const [slot, value] of values) frame.set(slot, value.after);
+   const installFrame =
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -56,12 +56,18 @@
+ 
+   publish(result: ScalarSlotCommitResult): void {
+     let failed = false;
++    let first: unknown;
+     try { this.invalidate(result); }
+-    catch (error) { failed = true; throw error; }
++    catch (error) { failed = true; first = error; }
+     finally {
+       try { completeScalarFrame(result); }
+-      catch (error) { if (!failed) throw error; reportFrameError({error,operation:'notify:subscriber'}); }
+-    }
++      catch (error) {
++        if (!failed) { failed = true; first = error; }
++        else reportFrameError({error,operation:'notify:subscriber'});
++      }
++    }
++    // Completion must run even when the primary thrown value is undefined.
++    if (failed) throw first;
+   }
+ 
+   private invalidate(result: ScalarSlotCommitResult): void {
+@@ -224,7 +230,7 @@
+           publication.bind(slot,prepared.binding as WritableLocationBinding<unknown>);
+           if(positionId!==undefined)leafByPositionId.set(positionId,prepared.leaf as Location<unknown>);
+           prepared.attach(kernel,publication,slot,liveness);
+-        },()=>{},()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
++        },()=>{ /* No cancellation work is registered for this scalar allocation. */ },()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});
+         return prepared.leaf;
+       }
+       const slotIndex = kernel.createSlot(initialValue, equal, positionId);
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,7 +1,7 @@
+ import type { PublicationDeclaration, PublicationReceipt } from './publication-declaration';
+ import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
+-import './experimental-publication/entity';
+-import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
++import { createEntityPublicationParticipant } from './experimental-publication/entity';
++import { registerEntityPublicationFactory, entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+ import { entityValueTransition } from './internals/entity-value-transition';
+ import type { NativeRequirement } from './experimental-publication/lifecycle';
+ import { combineTerminalRecords } from './internals/intrinsic-mutation';
+@@ -59,6 +59,10 @@
+ import type { NodeAccessor } from './node-accessor';
+ import type { ConstructionOf } from './internals/construction-accessor';
+ import type { ResolveLeafDefinitions } from './types';
++
++// Consume the factory at module initialization, before application writes.
++// Participant state remains lazy and source-owned; Link calls do not register.
++registerEntityPublicationFactory(createEntityPublicationParticipant);
+ 
+ /** Physical topology and eligible semantic facts have distinct existing carriers. */
+ function applyCollectionNotification(

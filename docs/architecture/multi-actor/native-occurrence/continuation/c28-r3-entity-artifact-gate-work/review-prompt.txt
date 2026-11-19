@@ -1,0 +1,1684 @@
+Independent read-only review of a tooling-only automatic packaging regression gate. Budget: zero tool calls (raw code supplied), maximum 6 minutes; stop after actionable findings and verdict. Do not modify any file or perform side effects. On HTTP 403 use another source, never retry the same fetch or bypass a bot check; no network needed here.
+Scope: prevent built factory-registration stripping. Frozen runtime base manifest 89058c7a; no runtime/source fixture changes allowed. Reviewer must assess isolation and freshness, exact 20-case replay and no-Link graph, pinned peers/integrities and setup-vs-semantic-failure classification, mutation proof validity, registry integration. Do not demand a broad framework. Report concrete bugs with file/line and failure scenario, not style. Implementation has not been integrated. Treat test claims as untrusted; reason from supplied code. New tool, peer-only npm lock, two registry entries, README only. Setup may fetch dependencies, runtime workloads local.
+
+FILE tools/verify-entity-registration-artifacts.mjs
+1: #!/usr/bin/env node
+2: /** Public installed/bundled replay of the source-owned 8+6+6 entity cases.
+3:  * Consumes canonical dist; freshness belongs to verify-gates' build/seal path.
+4:  * Setup may fetch locked peers. No builds, source aliases or private activation.
+5:  * --self-test removes registration only in a disposable package copy.
+6:  */
+7: import assert from 'node:assert/strict';
+8: import { createHash } from 'node:crypto';
+9: import { spawnSync } from 'node:child_process';
+10: import {
+11:   closeSync,
+12:   openSync,
+13:   cpSync,
+14:   copyFileSync,
+15:   existsSync,
+16:   lstatSync,
+17:   mkdirSync,
+18:   mkdtempSync,
+19:   readFileSync,
+20:   readdirSync,
+21:   realpathSync,
+22:   writeFileSync,
+23: } from 'node:fs';
+24: import { createRequire } from 'node:module';
+25: import { tmpdir } from 'node:os';
+26: import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
+27: import { fileURLToPath } from 'node:url';
+28: import { assertReleasePlan } from '../scripts/release-plan.mjs';
+29: import { buildIntegrity } from '../scripts/publish-artifact-integrity.mjs';
+30: 
+31: const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+32: const PEERS = 'tools/fixtures/entity-registration-consumer';
+33: const SHARED = 'packages/kernel/tests/entity-registration';
+34: const PROBES = 'tools/experiments/entity-registration';
+35: const names = {
+36:   consumer: [
+37:     'field independent useful9',
+38:     'row independent useful9',
+39:     'collection independent useful9',
+40:     'field independent foreign window',
+41:     'collection independent foreign window',
+42:     'field dependent foreign input',
+43:     'row dependent foreign input',
+44:     'collection dependent foreign input',
+45:   ],
+46:   'lifecycle-consumer': [
+47:     'pre-Link pending field confirm',
+48:     'pre-Link pending field rollback',
+49:     'pre-Link pending collection confirm',
+50:     'pre-Link pending collection rollback',
+51:     'late collection multiple Links confirm',
+52:     'late collection multiple Links rollback',
+53:   ],
+54:   'receipt-consumer': [
+55:     'field changed receipt / independent',
+56:     'field changed receipt / dependent',
+57:     'row changed receipt / independent',
+58:     'row changed receipt / dependent',
+59:     'collection changed receipt / independent',
+60:     'collection changed receipt / dependent',
+61:   ],
+62: };
+63: // Deliberately narrow semantic witnesses. Other errors fail the gate, but cannot
+64: // prove the registration mutation was detected. These are unchanged fixture assertions.
+65: const witnesses = new Set([
+66:   'independent useful9 must deliver exactly once',
+67:   'premature dependent publication while foreign owner pending',
+68:   'confirmation must yield exact useful9 once',
+69:   'must hold while actual owner pending',
+70:   'useful terminal output exactly once',
+71:   'changed write must not return no-write',
+72:   'changed write must not settle as no-write',
+73:   'dependent receipt held before confirm',
+74: ]);
+75: const fixtureFiles = [
+76:   ...['cases.mjs', 'lifecycle.mjs', 'receipt-cases.ts'].map(
+77:     (f) => `${SHARED}/${f}`
+78:   ),
+79:   ...[...Object.keys(names), 'no-link', 'facade-imports'].map(
+80:     (f) => `${PROBES}/${f}.mjs`
+81:   ),
+82: ];
+83: const hash = (bytes) => createHash('sha256').update(bytes).digest('hex');
+84: const sri = (bytes) =>
+85:   'sha512-' + createHash('sha512').update(bytes).digest('base64');
+86: const json = (path) => JSON.parse(readFileSync(path, 'utf8'));
+87: const save = (path, value) =>
+88:   writeFileSync(path, JSON.stringify(value, null, 2) + '\n');
+89: const within = (parent, child) => {
+90:   const r = relative(parent, child);
+91:   return (
+92:     r === '' || (!isAbsolute(r) && r !== '..' && !r.startsWith('..' + sep))
+93:   );
+94: };
+95: function files(root) {
+96:   const result = {};
+97:   function visit(path, rel) {
+98:     const stat = lstatSync(path);
+99:     assert(!stat.isSymbolicLink(), `symlink in package: ${path}`);
+100:     if (stat.isDirectory()) {
+101:       for (const name of readdirSync(path).sort())
+102:         visit(join(path, name), rel ? `${rel}/${name}` : name);
+103:     } else {
+104:       assert(stat.isFile(), `special file in package: ${path}`);
+105:       result[rel] = hash(readFileSync(path));
+106:     }
+107:   }
+108:   visit(root, '');
+109:   return result;
+110: }
+111: function externalGraph(lock) {
+112:   assert.equal(lock.lockfileVersion, 3);
+113:   return Object.fromEntries(
+114:     Object.entries(lock.packages)
+115:       .filter(([p]) => p && !p.startsWith('node_modules/@signal-tree/'))
+116:       .map(([p, v]) => {
+117:         assert(
+118:           !v.link &&
+119:             /^https:\/\//.test(v.resolved) &&
+120:             /^sha512-/.test(v.integrity),
+121:           `unlocked peer: ${p}`
+122:         );
+123:         assert(/^\d+\.\d+\.\d+/.test(v.version), `non-concrete peer: ${p}`);
+124:         return [
+125:           p,
+126:           { version: v.version, resolved: v.resolved, integrity: v.integrity },
+127:         ];
+128:       })
+129:   );
+130: }
+131: function classify(entry, run) {
+132:   // A process failure or incomplete report is infrastructure unless a precise
+133:   // assertion witness below identifies an executed behavioral failure.
+134:   if (run.error || run.signal || ![0, 1].includes(run.status))
+135:     return { kind: 'infrastructure', entry };
+136:   let records;
+137:   try {
+138:     records = run.stdout
+139:       .trim()
+140:       .split('\n')
+141:       .filter(Boolean)
+142:       .map((line) => JSON.parse(line));
+143:   } catch {
+144:     return { kind: 'infrastructure', entry };
+145:   }
+146:   const expected = names[entry];
+147:   if (entry === 'receipt-consumer' && run.status === 1) {
+148:     const error = /^Error: (.+)$/m.exec(run.stderr)?.[1];
+149:     const prefix = records.every(
+150:       (r, i) => r.name === expected[i] && r.pass === true
+151:     );
+152:     if (prefix && records.length < expected.length && witnesses.has(error)) {
+153:       return {
+154:         kind: 'behavior',
+155:         entry,
+156:         failures: [{ name: expected[records.length], message: error }],
+157:       };
+158:     }
+159:     return { kind: 'infrastructure', entry };
+160:   }
+161:   const summary = records.pop();
+162:   if (
+163:     records.length !== expected.length ||
+164:     records.some(
+165:       (r, i) => r.name !== expected[i] || typeof r.pass !== 'boolean'
+166:     ) ||
+167:     summary?.total !== expected.length ||
+168:     summary?.passed !== records.filter((r) => r.pass).length
+169:   ) {
+170:     return { kind: 'infrastructure', entry };
+171:   }
+172:   const failures = records.filter((r) => !r.pass);
+173:   if (!failures.length && run.status === 0)
+174:     return { kind: 'pass', entry, total: records.length };
+175:   if (
+176:     run.status === 1 &&
+177:     failures.length &&
+178:     failures.every(
+179:       (r) =>
+180:         r.phase !== 'setup' &&
+181:         r.error?.name === 'Error' &&
+182:         witnesses.has(r.error?.message)
+183:     )
+184:   ) {
+185:     return {
+186:       kind: 'behavior',
+187:       entry,
+188:       failures: failures.map((r) => ({
+189:         name: r.name,
+190:         message: r.error.message,
+191:       })),
+192:     };
+193:   }
+194:   return { kind: 'infrastructure', entry };
+195: }
+196: function behavioralFailures(results) {
+197:   return results.filter((result) => result.kind === 'behavior');
+198: }
+199: function checkNoLink(run) {
+200:   assert.equal(run.status, 0, 'no-Link process failed');
+201:   assert(!run.error && !run.signal, 'no-Link process interrupted');
+202:   assert.deepEqual(JSON.parse(run.stdout.trim()), {
+203:     scope: 'separate production no-Link entity transactions',
+204:     confirmed: 7,
+205:     rolledBack: 7,
+206:     passed: true,
+207:   });
+208: }
+209: function parserTests() {
+210:   for (const [entry, expected] of Object.entries(names)) {
+211:     const records = expected.map((name) => ({ name, pass: true }));
+212:     const output = (rows) => ({
+213:       status: 0,
+214:       stdout: [...rows, { passed: rows.length, total: rows.length }]
+215:         .map((r) => JSON.stringify(r))
+216:         .join('\n'),
+217:       stderr: '',
+218:     });
+219:     assert.equal(classify(entry, output(records)).kind, 'pass');
+220:     for (const rows of [
+221:       [],
+222:       records.slice(1),
+223:       [...records, records[0]],
+224:       records.map((r) => ({ ...r, name: 'wrong' })),
+225:     ]) {
+226:       assert.equal(classify(entry, output(rows)).kind, 'infrastructure');
+227:     }
+228:     assert.equal(
+229:       classify(entry, { ...output(records), signal: 'SIGTERM' }).kind,
+230:       'infrastructure'
+231:     );
+232:     assert.equal(
+233:       classify(entry, {
+234:         ...output(records),
+235:         status: 1,
+236:         stderr: 'Error: unknown',
+237:       }).kind,
+238:       'infrastructure'
+239:     );
+240:     const wrongTotal = output(records);
+241:     wrongTotal.stdout = wrongTotal.stdout.replace(
+242:       `"total":${records.length}`,
+243:       '"total":0'
+244:     );
+245:     assert.equal(classify(entry, wrongTotal).kind, 'infrastructure');
+246:   }
+247:   assert.equal(
+248:     classify('receipt-consumer', {
+249:       status: 1,
+250:       stdout: '',
+251:       stderr: 'npm error ENOTFOUND',
+252:     }).kind,
+253:     'infrastructure'
+254:   );
+255:   assert.throws(() => checkNoLink({ status: 0, stdout: '{}' }));
+256: }
+257: 
+258: const work = realpathSync(mkdtempSync(join(tmpdir(), 'st-entity-artifact-')));
+259: console.log(`Entity artifact evidence: ${work}`);
+260: const report = {
+261:   work,
+262:   freshness: 'prebuilt artifacts; caller owns build provenance',
+263:   runs: [],
+264:   arms: [],
+265: };
+266: const env = { ...process.env };
+267: delete env.NODE_PATH;
+268: delete env.NODE_OPTIONS;
+269: let serial = 0;
+270: function command(label, argv, cwd, mustPass = true) {
+271:   const stem = `${String(++serial).padStart(3, '0')}-${label}`;
+272:   // File-backed descriptors preserve full Node uncaught-error diagnostics for
+273:   // one-line minified bundles; pipe shutdown can truncate them before Error:.
+274:   const stdout = join(work, stem + '.stdout');
+275:   const stderr = join(work, stem + '.stderr');
+276:   const out = openSync(stdout, 'wx');
+277:   const err = openSync(stderr, 'wx');
+278:   let r;
+279:   try {
+280:     r = spawnSync(argv[0], argv.slice(1), {
+281:       cwd,
+282:       env,
+283:       stdio: ['ignore', out, err],
+284:       timeout: 180000,
+285:     });
+286:   } finally {
+287:     closeSync(out);
+288:     closeSync(err);
+289:   }
+290:   r.stdout = readFileSync(stdout, 'utf8');
+291:   r.stderr = readFileSync(stderr, 'utf8');
+292:   const record = {
+293:     label,
+294:     argv,
+295:     cwd,
+296:     status: r.status,
+297:     signal: r.signal,
+298:     error: r.error?.message,
+299:   };
+300:   report.runs.push(record);
+301:   save(join(work, stem + '.json'), record);
+302:   if (r.status !== 0 || r.error || r.signal) {
+303:     if (!existsSync(join(work, 'first-failure.json')))
+304:       save(join(work, 'first-failure.json'), record);
+305:     if (mustPass)
+306:       throw new Error(`${label} failed during setup/control (see ${stem})`);
+307:   }
+308:   return { ...r, stdout: r.stdout || '', stderr: r.stderr || '' };
+309: }
+310: function pack(packages, source, label) {
+311:   const dir = join(work, label);
+312:   mkdirSync(dir);
+313:   return packages.map((name) => {
+314:     const stage = join(source, name);
+315:     const metadata = json(join(stage, 'package.json'));
+316:     assert.equal(metadata.name, `@signal-tree/${name}`);
+317:     const output = JSON.parse(
+318:       command(
+319:         `pack-${label}-${name}`,
+320:         [
+321:           'npm',
+322:           'pack',
+323:           '--ignore-scripts',
+324:           '--json',
+325:           '--pack-destination',
+326:           dir,
+327:         ],
+328:         stage
+329:       ).stdout
+330:     );
+331:     assert.equal(output.length, 1);
+332:     assert.equal(output[0].name, metadata.name);
+333:     assert.equal(output[0].version, metadata.version);
+334:     const tarball = join(dir, output[0].filename);
+335:     const extracted = join(dir, name);
+336:     mkdirSync(extracted);
+337:     command(
+338:       `extract-${label}-${name}`,
+339:       ['tar', '-xzf', tarball, '-C', extracted],
+340:       ROOT
+341:     );
+342:     const packed = files(join(extracted, 'package'));
+343:     const built = files(stage);
+344:     for (const [path, digest] of Object.entries(packed))
+345:       assert.equal(digest, built[path], `packed bytes differ: ${name}/${path}`);
+346:     return {
+347:       name,
+348:       version: metadata.version,
+349:       tarball,
+350:       integrity: sri(readFileSync(tarball)),
+351:       files: packed,
+352:       extracted: join(extracted, 'package'),
+353:     };
+354:   });
+355: }
+356: function graph(consumer, entry, mutant) {
+357:   const meta = json(join(consumer, entry + '.metafile.json'));
+358:   for (const input of Object.keys(meta.inputs)) {
+359:     assert(
+360:       within(consumer, realpathSync(resolve(ROOT, input))),
+361:       `bundle escaped consumer: ${input}`
+362:     );
+363:   }
+364:   const contributed = Object.values(meta.outputs).flatMap((o) =>
+365:     Object.entries(o.inputs)
+366:       .filter(([, v]) => v.bytesInOutput > 0)
+367:       .map(([p]) => p.replaceAll('\\', '/'))
+368:   );
+369:   const modules = ['lib/link.js', 'lib/experimental-publication/entity.js'];
+370:   const retained = modules.map((mod) =>
+371:     contributed.some((p) => p.endsWith(`/@signal-tree/kernel/dist/${mod}`))
+372:   );
+373:   if (entry === 'no-link')
+374:     assert.deepEqual(
+375:       retained,
+376:       [false, false],
+377:       'no-Link retains registration modules'
+378:     );
+379:   else if (!mutant)
+380:     assert.deepEqual(
+381:       retained,
+382:       [true, true],
+383:       'Link/factory absent from production workload'
+384:     );
+385:   return {
+386:     entry,
+387:     retained,
+388:     bundleSha256: hash(readFileSync(join(consumer, entry + '.production.mjs'))),
+389:   };
+390: }
+391: function replay(tarballs, label, mutant = false) {
+392:   const consumer = join(work, label);
+393:   mkdirSync(consumer);
+394:   for (const f of ['package.json', 'package-lock.json'])
+395:     copyFileSync(join(ROOT, PEERS, f), join(consumer, f));
+396:   const peerLock = json(join(consumer, 'package-lock.json'));
+397:   const peerManifest = json(join(consumer, 'package.json'));
+398:   assert.deepEqual(
+399:     peerLock.packages[''].dependencies,
+400:     peerManifest.dependencies
+401:   );
+402:   for (const [name, version] of Object.entries(peerManifest.dependencies)) {
+403:     assert.equal(
+404:       peerLock.packages[`node_modules/${name}`].version,
+405:       version,
+406:       `non-exact peer ${name}`
+407:     );
+408:   }
+409:   const expectedPeers = externalGraph(peerLock);
+410:   command(
+411:     `${label}-ci`,
+412:     ['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'],
+413:     consumer
+414:   );
+415:   command(
+416:     `${label}-install`,
+417:     [
+418:       'npm',
+419:       'install',
+420:       '--save-exact',
+421:       '--ignore-scripts',
+422:       '--no-audit',
+423:       '--no-fund',
+424:       '--package-lock=true',
+425:       ...tarballs.map((t) => t.tarball),
+426:     ],
+427:     consumer
+428:   );
+429:   const lock = json(join(consumer, 'package-lock.json'));
+430:   assert.deepEqual(
+431:     externalGraph(lock),
+432:     expectedPeers,
+433:     'external dependency graph changed'
+434:   );
+435:   const req = createRequire(join(consumer, 'package.json'));
+436:   for (const t of tarballs) {
+437:     const installed = join(consumer, 'node_modules/@signal-tree', t.name);
+438:     assert.deepEqual(
+439:       files(installed),
+440:       t.files,
+441:       `installed bytes mismatch: ${t.name}`
+442:     );
+443:     const metadata = json(join(installed, 'package.json'));
+444:     assert.equal(metadata.name, `@signal-tree/${t.name}`);
+445:     assert.equal(metadata.version, t.version);
+446:     assert.equal(
+447:       lock.packages[`node_modules/@signal-tree/${t.name}`].integrity,
+448:       t.integrity
+449:     );
+450:     assert(
+451:       within(installed, realpathSync(req.resolve(metadata.name))),
+452:       'public root resolves elsewhere'
+453:     );
+454:     const fromFacade = createRequire(join(installed, 'package.json'));
+455:     assert.equal(
+456:       realpathSync(fromFacade.resolve('@signal-tree/kernel')),
+457:       realpathSync(req.resolve('@signal-tree/kernel')),
+458:       'duplicate kernel'
+459:     );
+460:   }
+461:   for (const f of fixtureFiles)
+462:     copyFileSync(join(ROOT, f), join(consumer, f.split('/').at(-1)));
+463:   const arm = {
+464:     label,
+465:     consumer,
+466:     peerLockSha256: hash(readFileSync(join(ROOT, PEERS, 'package-lock.json'))),
+467:     installedLockSha256: hash(
+468:       readFileSync(join(consumer, 'package-lock.json'))
+469:     ),
+470:     tarballs,
+471:     modes: {},
+472:     graphs: [],
+473:   };
+474:   report.arms.push(arm);
+475:   try {
+476:     const facade = command(
+477:       `${label}-facades`,
+478:       [process.execPath, 'facade-imports.mjs'],
+479:       consumer
+480:     );
+481:     assert(
+482:       facade.stdout.includes(
+483:         'five facade imports share Link/error; private factory absent from public barrel'
+484:       )
+485:     );
+486:     command(
+487:       `${label}-bundle`,
+488:       [process.execPath, join(ROOT, PROBES, 'build-consumers.mjs'), consumer],
+489:       ROOT
+490:     );
+491:     for (const entry of [...Object.keys(names), 'no-link'])
+492:       arm.graphs.push(graph(consumer, entry, mutant));
+493:     for (const mode of ['installed', 'production']) {
+494:       const suffix = mode === 'installed' ? '.mjs' : '.production.mjs';
+495:       const results = Object.keys(names).map((entry) =>
+496:         classify(
+497:           entry,
+498:           command(
+499:             `${label}-${mode}-${entry}`,
+500:             [process.execPath, entry + suffix],
+501:             consumer,
+502:             false
+503:           )
+504:         )
+505:       );
+506:       arm.modes[mode] = results;
+507:       checkNoLink(
+508:         command(
+509:           `${label}-${mode}-no-link`,
+510:           [process.execPath, 'no-link' + suffix],
+511:           consumer,
+512:           false
+513:         )
+514:       );
+515:       assert(
+516:         !results.some((r) => r.kind === 'infrastructure'),
+517:         `${label}/${mode}: incomplete or unrecognized runtime failure`
+518:       );
+519:       if (mutant)
+520:         assert(
+521:           behavioralFailures(results).length > 0,
+522:           `${label}/${mode}: registration mutant survived behavioral detection`
+523:         );
+524:       else
+525:         assert(
+526:           results.every((r) => r.kind === 'pass'),
+527:           `${label}/${mode}: behavioral regression`
+528:         );
+529:     }
+530:   } finally {
+531:     for (const t of tarballs) {
+532:       assert.equal(
+533:         sri(readFileSync(t.tarball)),
+534:         t.integrity,
+535:         'tarball changed'
+536:       );
+537:       assert.deepEqual(
+538:         files(join(consumer, 'node_modules/@signal-tree', t.name)),
+539:         t.files,
+540:         'installed package changed'
+541:       );
+542:     }
+543:   }
+544:   return arm;
+545: }
+546: 
+547: let before;
+548: let packages;
+549: const inputPaths = [
+550:   ...fixtureFiles,
+551:   `${PROBES}/build-consumers.mjs`,
+552:   `${PEERS}/package.json`,
+553:   `${PEERS}/package-lock.json`,
+554:   'tools/verify-entity-registration-artifacts.mjs',
+555:   'tools/verify-gates.mjs',
+556:   'pnpm-lock.yaml',
+557:   'package.json',
+558:   '.nvmrc',
+559: ];
+560: const inputHashes = () =>
+561:   Object.fromEntries(
+562:     inputPaths.map((p) => [p, hash(readFileSync(join(ROOT, p)))])
+563:   );
+564: try {
+565:   assert(
+566:     process.argv.slice(2).every((a) => a === '--self-test'),
+567:     'only --self-test is supported'
+568:   );
+569:   assert.equal(
+570:     process.versions.node,
+571:     readFileSync(join(ROOT, '.nvmrc'), 'utf8').trim(),
+572:     'use pinned Node'
+573:   );
+574:   assert(
+575:     !env.NX_WORKSPACE_ROOT_PATH || resolve(env.NX_WORKSPACE_ROOT_PATH) === ROOT,
+576:     'Nx root points elsewhere'
+577:   );
+578:   packages = assertReleasePlan(ROOT);
+579:   before = { integrity: buildIntegrity(ROOT, packages), inputs: inputHashes() };
+580:   report.before = before;
+581:   report.node = process.version;
+582:   report.npm = command('npm-version', ['npm', '--version'], ROOT).stdout.trim();
+583:   command(
+584:     'verify-artifacts',
+585:     [
+586:       process.execPath,
+587:       'scripts/prepare-publish-artifacts.mjs',
+588:       '--verify-only',
+589:     ],
+590:     ROOT
+591:   );
+592:   const clean = pack(packages, join(ROOT, 'dist/packages'), 'clean-tarballs');
+593:   replay(clean, 'baseline');
+594:   if (process.argv.includes('--self-test')) {
+595:     parserTests();
+596:     const stage = join(work, 'mutation-stage');
+597:     mkdirSync(stage);
+598:     for (const t of clean)
+599:       cpSync(t.extracted, join(stage, t.name), { recursive: true });
+600:     const target = join(stage, 'kernel/dist/lib/link.js');
+601:     const original = readFileSync(target, 'utf8');
+602:     const anchor =
+603:       'registerEntityPublicationFactory(createEntityPublicationParticipant);';
+604:     assert.equal(
+605:       original.split(anchor).length,
+606:       2,
+607:       'registration mutation requires exactly one anchor'
+608:     );
+609:     writeFileSync(target, original.replace(anchor, 'void 0;'));
+610:     report.mutation = {
+611:       file: 'kernel/dist/lib/link.js',
+612:       anchor,
+613:       before: hash(original),
+614:       after: hash(readFileSync(target)),
+615:     };
+616:     replay(pack(packages, stage, 'mutant-tarballs'), 'mutant', true);
+617:     replay(clean, 'recovery');
+618:   }
+619:   report.passed = true;
+620: } catch (error) {
+621:   report.passed = false;
+622:   report.error = error.stack;
+623:   process.exitCode = 1;
+624: } finally {
+625:   if (before) {
+626:     try {
+627:       assert.equal(
+628:         buildIntegrity(ROOT, packages),
+629:         before.integrity,
+630:         'canonical artifacts changed'
+631:       );
+632:       assert.deepEqual(inputHashes(), before.inputs, 'gate inputs changed');
+633:       report.inputsUnchanged = true;
+634:     } catch (error) {
+635:       report.passed = false;
+636:       report.integrityError = error.stack;
+637:       process.exitCode = 1;
+638:     }
+639:   }
+640:   save(join(work, 'result.json'), report);
+641: }
+642: if (report.passed)
+643:   console.log(
+644:     'PASS: installed + production 8+6+6, no-Link graph/control' +
+645:       (process.argv.includes('--self-test')
+646:         ? '; registration mutation rejected; recovery passed'
+647:         : '')
+648:   );
+649: else
+650:   console.error(
+651:     `FAIL: ${report.error || report.integrityError}\nEvidence: ${work}`
+652:   );
+
+FILE tools/fixtures/entity-registration-consumer/package.json
+1: {
+2:   "name": "entity-registration-consumer",
+3:   "version": "0.0.0",
+4:   "private": true,
+5:   "type": "module",
+6:   "dependencies": {
+7:     "@angular/core": "22.0.7",
+8:     "rxjs": "7.8.2",
+9:     "react": "19.2.8",
+10:     "@types/react": "19.2.18",
+11:     "vue": "3.5.42",
+12:     "solid-js": "1.9.15",
+13:     "tslib": "2.8.1",
+14:     "typescript": "6.0.3"
+15:   }
+16: }
+
+FILE tools/fixtures/entity-registration-consumer/package-lock.json
+1: {
+2:   "name": "entity-registration-consumer",
+3:   "version": "0.0.0",
+4:   "lockfileVersion": 3,
+5:   "requires": true,
+6:   "packages": {
+7:     "": {
+8:       "name": "entity-registration-consumer",
+9:       "version": "0.0.0",
+10:       "dependencies": {
+11:         "@angular/core": "22.0.7",
+12:         "@types/react": "19.2.18",
+13:         "react": "19.2.8",
+14:         "rxjs": "7.8.2",
+15:         "solid-js": "1.9.15",
+16:         "tslib": "2.8.1",
+17:         "typescript": "6.0.3",
+18:         "vue": "3.5.42"
+19:       }
+20:     },
+21:     "node_modules/@angular/core": {
+22:       "version": "22.0.7",
+23:       "resolved": "https://registry.npmjs.org/@angular/core/-/core-22.0.7.tgz",
+24:       "integrity": "sha512-A5xKJx5wuuZfeJhShyZvbgicYtT3Jpw/5wJd1cfrcKU+i63CagRIg9jSktTW/e+2hxG1tIQrfKQUGeclmsAUUA==",
+25:       "license": "MIT",
+26:       "dependencies": {
+27:         "tslib": "^2.3.0"
+28:       },
+29:       "engines": {
+30:         "node": "^22.22.3 || ^24.15.0 || >=26.0.0"
+31:       },
+32:       "peerDependencies": {
+33:         "@angular/compiler": "22.0.7",
+34:         "rxjs": "^6.5.3 || ^7.4.0",
+35:         "zone.js": "~0.15.0 || ~0.16.0"
+36:       },
+37:       "peerDependenciesMeta": {
+38:         "@angular/compiler": {
+39:           "optional": true
+40:         },
+41:         "zone.js": {
+42:           "optional": true
+43:         }
+44:       }
+45:     },
+46:     "node_modules/@babel/helper-string-parser": {
+47:       "version": "7.29.11",
+48:       "resolved": "https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.11.tgz",
+49:       "integrity": "sha512-snZbO7MEDOof+hvNa97EjEY7qD7h2kwvQr5AJC3ZhQudKW5dnej6k3kP9NQV88hJwaS8vDqRLFo9rivLEhle2g==",
+50:       "license": "MIT",
+51:       "engines": {
+52:         "node": ">=6.9.0"
+53:       }
+54:     },
+55:     "node_modules/@babel/helper-validator-identifier": {
+56:       "version": "7.29.7",
+57:       "resolved": "https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz",
+58:       "integrity": "sha512-qehxGkRj55h/ff8EMaJ+cYhyaKlHIxqYDn682wQD7RNp9UujOQsHog2uS0r2vzr4pW+sXf90NeeayjcNaX3fFg==",
+59:       "license": "MIT",
+60:       "engines": {
+61:         "node": ">=6.9.0"
+62:       }
+63:     },
+64:     "node_modules/@babel/parser": {
+65:       "version": "7.29.12",
+66:       "resolved": "https://registry.npmjs.org/@babel/parser/-/parser-7.29.12.tgz",
+67:       "integrity": "sha512-WJ7JBp/Q4+z/ImydtI7jS6NVco5++632ExBemSX+Ysb+G1lCwQ5BVo3SY+jGGOcZXI4ZccbZSUSJLNBW6eEpJg==",
+68:       "license": "MIT",
+69:       "dependencies": {
+70:         "@babel/types": "^7.29.11"
+71:       },
+72:       "bin": {
+73:         "parser": "bin/babel-parser.js"
+74:       },
+75:       "engines": {
+76:         "node": ">=6.0.0"
+77:       }
+78:     },
+79:     "node_modules/@babel/types": {
+80:       "version": "7.29.11",
+81:       "resolved": "https://registry.npmjs.org/@babel/types/-/types-7.29.11.tgz",
+82:       "integrity": "sha512-WCsemW40Cpc6gouC1SrY6PBaZ+oLRlEVY9XBvZBI7il/HyUrb2nJ505wE1MHEFyDZNnrWDEuy4jL50WVHfTTSQ==",
+83:       "license": "MIT",
+84:       "dependencies": {
+85:         "@babel/helper-string-parser": "^7.29.11",
+86:         "@babel/helper-validator-identifier": "^7.29.7"
+87:       },
+88:       "engines": {
+89:         "node": ">=6.9.0"
+90:       }
+91:     },
+92:     "node_modules/@jridgewell/sourcemap-codec": {
+93:       "version": "1.6.0",
+94:       "resolved": "https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz",
+95:       "integrity": "sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==",
+96:       "license": "MIT"
+97:     },
+98:     "node_modules/@types/react": {
+99:       "version": "19.2.18",
+100:       "resolved": "https://registry.npmjs.org/@types/react/-/react-19.2.18.tgz",
+101:       "integrity": "sha512-AnzbBERsrLKtk2XSfTbYRLjQPdy116Sty4q+T+Bp3IC4l6jNBvreVPAHmpq9qhXQM7CXZPjLVmGMw9sy+hxQ3w==",
+102:       "license": "MIT",
+103:       "dependencies": {
+104:         "csstype": "^3.2.2"
+105:       }
+106:     },
+107:     "node_modules/@vue/compiler-core": {
+108:       "version": "3.5.42",
+109:       "resolved": "https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.5.42.tgz",
+110:       "integrity": "sha512-2Ye1ilMtKXxl8qZUrQ5j0CdgenFp/HFQmta6rfRyfEsTG69L6Wk+tWuNoHYHMx9E8tF2Slvdg1FuwDvAXdy1LQ==",
+111:       "license": "MIT",
+112:       "dependencies": {
+113:         "@babel/parser": "^7.29.8",
+114:         "@vue/shared": "3.5.42",
+115:         "entities": "^7.0.1",
+116:         "estree-walker": "^2.0.2",
+117:         "source-map-js": "^1.2.1"
+118:       }
+119:     },
+120:     "node_modules/@vue/compiler-dom": {
+121:       "version": "3.5.42",
+122:       "resolved": "https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.5.42.tgz",
+123:       "integrity": "sha512-qbhQZEFmycr+ni/qyuccS4sucNN7VAbDfbkvNxWOX2VfgFm90MNs3/UhRNKoPMEIVn0F8gdlYjLPvqxHwHeQOA==",
+124:       "license": "MIT",
+125:       "dependencies": {
+126:         "@vue/compiler-core": "3.5.42",
+127:         "@vue/shared": "3.5.42"
+128:       }
+129:     },
+130:     "node_modules/@vue/compiler-sfc": {
+131:       "version": "3.5.42",
+132:       "resolved": "https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.5.42.tgz",
+133:       "integrity": "sha512-fkCAFB4okcAANGMThboWnScp/gzWjU0ZSkVnjTIiplmMDq2uq0tIB3j+xVu4rhv5rvOgBySCysudmbMd6xRRqw==",
+134:       "license": "MIT",
+135:       "dependencies": {
+136:         "@babel/parser": "^7.29.8",
+137:         "@vue/compiler-core": "3.5.42",
+138:         "@vue/compiler-dom": "3.5.42",
+139:         "@vue/compiler-ssr": "3.5.42",
+140:         "@vue/shared": "3.5.42",
+141:         "estree-walker": "^2.0.2",
+142:         "magic-string": "^0.30.21",
+143:         "postcss": "^8.5.19",
+144:         "source-map-js": "^1.2.1"
+145:       }
+146:     },
+147:     "node_modules/@vue/compiler-ssr": {
+148:       "version": "3.5.42",
+149:       "resolved": "https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.5.42.tgz",
+150:       "integrity": "sha512-xmLk3wLkbizPAiLyomjgFFosf2ys9b5Ghb+oh/k2tnvipNz8OFrQOiTcWCzyK7MpBp9KkyGtfvgfLUivbmuGYA==",
+151:       "license": "MIT",
+152:       "dependencies": {
+153:         "@vue/compiler-dom": "3.5.42",
+154:         "@vue/shared": "3.5.42"
+155:       }
+156:     },
+157:     "node_modules/@vue/reactivity": {
+158:       "version": "3.5.42",
+159:       "resolved": "https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.5.42.tgz",
+160:       "integrity": "sha512-TzNNfKpb7hDxbQltwAut8VDQA5YP+BuRlxntHUuRjyKwlMvmAPbs3unhCvieijifY6vFfVBwsS7wG/C7uq+bEQ==",
+161:       "license": "MIT",
+162:       "dependencies": {
+163:         "@vue/shared": "3.5.42"
+164:       }
+165:     },
+166:     "node_modules/@vue/runtime-core": {
+167:       "version": "3.5.42",
+168:       "resolved": "https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.42.tgz",
+169:       "integrity": "sha512-9uACtuHs7vJGkm5Bp3xu4xRDLFTIYy5DgxpToVjqGIAhAEKwQfsaLvKINhM6nFVp6bZPRFGdDqd1g52MqKsotA==",
+170:       "license": "MIT",
+171:       "dependencies": {
+172:         "@vue/reactivity": "3.5.42",
+173:         "@vue/shared": "3.5.42"
+174:       }
+175:     },
+176:     "node_modules/@vue/runtime-dom": {
+177:       "version": "3.5.42",
+178:       "resolved": "https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.5.42.tgz",
+179:       "integrity": "sha512-rsCmhiWLaRxGltLwhlCWyYkFn7WAbKRh0q17eZ1A6Dq6eqc2ACQ61IIryxz0LrsvCzHSilLA9JHovVwM8CNE2g==",
+180:       "license": "MIT",
+181:       "dependencies": {
+182:         "@vue/reactivity": "3.5.42",
+183:         "@vue/runtime-core": "3.5.42",
+184:         "@vue/shared": "3.5.42",
+185:         "csstype": "^3.2.3"
+186:       }
+187:     },
+188:     "node_modules/@vue/server-renderer": {
+189:       "version": "3.5.42",
+190:       "resolved": "https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.5.42.tgz",
+191:       "integrity": "sha512-2++5dUyYS4gvo7xQXSECUDhB7TS0aOl5SeVfC5qSq1Jgfhjvegw1zqhwTIR3imZ+QYPJQw9gfcFvXGAjGZ7ajQ==",
+192:       "license": "MIT",
+193:       "dependencies": {
+194:         "@vue/compiler-ssr": "3.5.42",
+195:         "@vue/runtime-dom": "3.5.42",
+196:         "@vue/shared": "3.5.42"
+197:       }
+198:     },
+199:     "node_modules/@vue/shared": {
+200:       "version": "3.5.42",
+201:       "resolved": "https://registry.npmjs.org/@vue/shared/-/shared-3.5.42.tgz",
+202:       "integrity": "sha512-2rPxex1jQf4jvl9MOHl6YaXCPcrNqz/FstMOEh3QWY+/OME9nQTvl9WYeCwhW7AFjaR0SnngZGlp/wkR6rkI6g==",
+203:       "license": "MIT"
+204:     },
+205:     "node_modules/csstype": {
+206:       "version": "3.2.3",
+207:       "resolved": "https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz",
+208:       "integrity": "sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==",
+209:       "license": "MIT"
+210:     },
+211:     "node_modules/entities": {
+212:       "version": "7.0.1",
+213:       "resolved": "https://registry.npmjs.org/entities/-/entities-7.0.1.tgz",
+214:       "integrity": "sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==",
+215:       "license": "BSD-2-Clause",
+216:       "engines": {
+217:         "node": ">=0.12"
+218:       },
+219:       "funding": {
+220:         "url": "https://github.com/fb55/entities?sponsor=1"
+221:       }
+222:     },
+223:     "node_modules/estree-walker": {
+224:       "version": "2.0.2",
+225:       "resolved": "https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz",
+226:       "integrity": "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==",
+227:       "license": "MIT"
+228:     },
+229:     "node_modules/magic-string": {
+230:       "version": "0.30.21",
+231:       "resolved": "https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz",
+232:       "integrity": "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==",
+233:       "license": "MIT",
+234:       "dependencies": {
+235:         "@jridgewell/sourcemap-codec": "^1.5.5"
+236:       }
+237:     },
+238:     "node_modules/nanoid": {
+239:       "version": "3.3.20",
+240:       "resolved": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz",
+241:       "integrity": "sha512-uKdg2G3GNCKQn9byYOpxbGqrT2fGO5KRt5J/8b3pok8rT6qxGWF6hxMyJiEYtAf+FVyYuD9hRaDqX5uPFYJ4ZQ==",
+242:       "funding": [
+243:         {
+244:           "type": "github",
+245:           "url": "https://github.com/sponsors/ai"
+246:         }
+247:       ],
+248:       "license": "MIT",
+249:       "bin": {
+250:         "nanoid": "bin/nanoid.cjs"
+251:       },
+252:       "engines": {
+253:         "node": "^10 || ^12 || ^13.7 || ^14 || >=15.0.1"
+254:       }
+255:     },
+256:     "node_modules/picocolors": {
+257:       "version": "1.1.1",
+258:       "resolved": "https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz",
+259:       "integrity": "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==",
+260:       "license": "ISC"
+261:     },
+262:     "node_modules/postcss": {
+263:       "version": "8.5.32",
+264:       "resolved": "https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz",
+265:       "integrity": "sha512-LJlKCCAUFKOuZxipUdYw1NzIITEsPcgyOG9LkvRJvuKj/bRzbuRY0ARXvL0pWGpsZvn8jku+LMep2eU0seHp8g==",
+266:       "funding": [
+267:         {
+268:           "type": "opencollective",
+269:           "url": "https://opencollective.com/postcss/"
+270:         },
+271:         {
+272:           "type": "tidelift",
+273:           "url": "https://tidelift.com/funding/github/npm/postcss"
+274:         },
+275:         {
+276:           "type": "github",
+277:           "url": "https://github.com/sponsors/ai"
+278:         }
+279:       ],
+280:       "license": "MIT",
+281:       "dependencies": {
+282:         "nanoid": "^3.3.20",
+283:         "picocolors": "^1.1.1",
+284:         "source-map-js": "^1.2.2"
+285:       },
+286:       "engines": {
+287:         "node": "^10 || ^12 || >=14"
+288:       }
+289:     },
+290:     "node_modules/react": {
+291:       "version": "19.2.8",
+292:       "resolved": "https://registry.npmjs.org/react/-/react-19.2.8.tgz",
+293:       "integrity": "sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==",
+294:       "license": "MIT",
+295:       "engines": {
+296:         "node": ">=0.10.0"
+297:       }
+298:     },
+299:     "node_modules/rxjs": {
+300:       "version": "7.8.2",
+301:       "resolved": "https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz",
+302:       "integrity": "sha512-dhKf903U/PQZY6boNNtAGdWbG85WAbjT/1xYoZIC7FAY0yWapOBQVsVrDl58W86//e1VpMNBtRV4MaXfdMySFA==",
+303:       "license": "Apache-2.0",
+304:       "dependencies": {
+305:         "tslib": "^2.1.0"
+306:       }
+307:     },
+308:     "node_modules/seroval": {
+309:       "version": "1.5.6",
+310:       "resolved": "https://registry.npmjs.org/seroval/-/seroval-1.5.6.tgz",
+311:       "integrity": "sha512-rVQVWjjSvlINzaQPZH5JFqsqEsIWdTxY3iJZCnTL/5gQbXIRooVZKI60tVCkOVfzcRPejboxO2t0P89dg5mQaA==",
+312:       "license": "MIT",
+313:       "engines": {
+314:         "node": ">=10"
+315:       }
+316:     },
+317:     "node_modules/seroval-plugins": {
+318:       "version": "1.5.6",
+319:       "resolved": "https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.5.6.tgz",
+320:       "integrity": "sha512-HXuLAX2pu/UByPpaeo/TaMfvMIi+1QqIoPJYCcAtU8QkVNwgR6MPlGuCQTErV1JwraaMbYaWVIBX7mppzGLATQ==",
+321:       "license": "MIT",
+322:       "engines": {
+323:         "node": ">=10"
+324:       },
+325:       "peerDependencies": {
+326:         "seroval": "^1.0"
+327:       }
+328:     },
+329:     "node_modules/solid-js": {
+330:       "version": "1.9.15",
+331:       "resolved": "https://registry.npmjs.org/solid-js/-/solid-js-1.9.15.tgz",
+332:       "integrity": "sha512-EeiY2xfpZJqPLjXspVEKjAII4yv8NyG//NxZ3IpOFHdUNnnTyL0uJOeS9LWGvA7cFCz5y94cjFwYlmw5Luncsg==",
+333:       "license": "MIT",
+334:       "dependencies": {
+335:         "csstype": "^3.1.0",
+336:         "seroval": "~1.5.4",
+337:         "seroval-plugins": "~1.5.4"
+338:       }
+339:     },
+340:     "node_modules/source-map-js": {
+341:       "version": "1.2.2",
+342:       "resolved": "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz",
+343:       "integrity": "sha512-KGj/8Y43x35aZVDtt+J4mK1hoLGHULMYfSkODJNQjNDC3oW1PqPoxMwo0pLUsWM/UEGzON/NxeHywEfNXNP3Vw==",
+344:       "license": "BSD-3-Clause",
+345:       "engines": {
+346:         "node": ">=0.10.0"
+347:       }
+348:     },
+349:     "node_modules/tslib": {
+350:       "version": "2.8.1",
+351:       "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz",
+352:       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==",
+353:       "license": "0BSD"
+354:     },
+355:     "node_modules/typescript": {
+356:       "version": "6.0.3",
+357:       "resolved": "https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz",
+358:       "integrity": "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==",
+359:       "license": "Apache-2.0",
+360:       "bin": {
+361:         "tsc": "bin/tsc",
+362:         "tsserver": "bin/tsserver"
+363:       },
+364:       "engines": {
+365:         "node": ">=14.17"
+366:       }
+367:     },
+368:     "node_modules/vue": {
+369:       "version": "3.5.42",
+370:       "resolved": "https://registry.npmjs.org/vue/-/vue-3.5.42.tgz",
+371:       "integrity": "sha512-4RyHQTbQvOPs3MfvUO1Sg0YRrKNnA0mAVtvpd12Tg1fKDN7OHBUl1IqSn8zGJjK9nI3NkNp8cgTpVrSZC5TTcA==",
+372:       "license": "MIT",
+373:       "dependencies": {
+374:         "@vue/compiler-dom": "3.5.42",
+375:         "@vue/compiler-sfc": "3.5.42",
+376:         "@vue/runtime-dom": "3.5.42",
+377:         "@vue/server-renderer": "3.5.42",
+378:         "@vue/shared": "3.5.42"
+379:       },
+380:       "peerDependencies": {
+381:         "typescript": "*"
+382:       },
+383:       "peerDependenciesMeta": {
+384:         "typescript": {
+385:           "optional": true
+386:         }
+387:       }
+388:     }
+389:   }
+390: }
+
+FILE scripts/publish-artifact-integrity.mjs
+1: import { createHash } from 'node:crypto';
+2: import { lstatSync, readdirSync, readFileSync } from 'node:fs';
+3: import { join } from 'node:path';
+4: 
+5: // Shared by the publisher and gate runner. Include names, bytes and executable
+6: // bits; links and special files cannot supply sealed artifact evidence.
+7: export function buildIntegrity(root, packages) {
+8:   const entries = [];
+9:   const visit = (path, relative) => {
+10:     const stat = lstatSync(path);
+11:     if (stat.isDirectory()) {
+12:       entries.push([relative, 'directory']);
+13:       for (const name of readdirSync(path).sort())
+14:         visit(join(path, name), `${relative}/${name}`);
+15:     } else if (stat.isFile()) {
+16:       entries.push([
+17:         relative,
+18:         'file',
+19:         stat.mode & 0o111,
+20:         createHash('sha256').update(readFileSync(path)).digest('hex'),
+21:       ]);
+22:     } else {
+23:       throw new Error(`Unsupported build artifact: ${relative}`);
+24:     }
+25:   };
+26:   for (const name of packages)
+27:     visit(join(root, 'dist', 'packages', name), name);
+28:   return `sha256-${createHash('sha256')
+29:     .update(JSON.stringify(entries))
+30:     .digest('hex')}`;
+31: }
+
+FILE tools/experiments/entity-registration/build-consumers.mjs
+1: import { build } from 'esbuild';
+2: import { writeFileSync } from 'node:fs';
+3: import { resolve } from 'node:path';
+4: const supplied = process.argv[2];
+5: if (!supplied) throw new Error('Pass the isolated consumer directory containing freshly installed package tarballs.');
+6: const root = resolve(supplied);
+7: for (const name of ['consumer', 'lifecycle-consumer', 'receipt-consumer', 'no-link']) {
+8:   const result = await build({ bundle: true, minify: true, format: 'esm', platform: 'browser', treeShaking: true,
+9:     define: { ngDevMode: 'false', 'process.env.NODE_ENV': '"production"' }, external: ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'],
+10:     metafile: true, logLevel: 'info', entryPoints: [root + '/' + name + '.mjs'], outfile: root + '/' + name + '.production.mjs' });
+11:   writeFileSync(root + '/' + name + '.metafile.json', JSON.stringify(result.metafile, null, 2));
+12: }
+
+FILE tools/experiments/entity-registration/consumer.mjs
+1: import * as api from '@signal-tree/kernel';
+2: import {cases,runCase} from './cases.mjs';
+3: const results=[];
+4: for(const test of cases){const result=await runCase(api,test);results.push(result);console.log(JSON.stringify(result));}
+5: console.log(JSON.stringify({summary:true,passed:results.filter(x=>x.pass).length,total:results.length}));
+6: if(results.some(x=>!x.pass))process.exitCode=1;
+
+FILE tools/experiments/entity-registration/lifecycle-consumer.mjs
+1: import * as api from '@signal-tree/kernel';
+2: import {lifecycleCases,runLifecycle} from './lifecycle.mjs';
+3: const results=[];for(const test of lifecycleCases){const result=await runLifecycle(api,test);results.push(result);console.log(JSON.stringify(result));}console.log(JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length}));if(results.some(r=>!r.pass))process.exitCode=1;
+
+FILE tools/experiments/entity-registration/receipt-consumer.mjs
+1: import * as api from '@signal-tree/kernel';
+2: import {receiptCases,runReceiptCase} from './receipt-cases.ts';
+3: for(const test of receiptCases){await runReceiptCase(api,test);console.log(JSON.stringify({name:test.name,pass:true}));}
+4: console.log(JSON.stringify({passed:receiptCases.length,total:receiptCases.length}));
+
+FILE tools/experiments/entity-registration/no-link.mjs
+1: import {signalTree,entityMap,transactions} from '@signal-tree/kernel';
+2: const check=(v,m)=>{if(!v)throw Error(m);};
+3: const t=signalTree({rows:entityMap()},{enhancers:[transactions()]});
+4: try{
+5:  t.$.rows.setAll([{id:'r',x:0}]);const row=t.$.rows.byIdOrFail('r');
+6:  const first=t.transact(()=>row.x(7));check(row.x()===7,'pending7');check(first.inspect().changes.length>0,'first actual inspection contribution');
+7:  first.confirm();check(row.x()===7,'confirmed7');
+8:  const second=t.transact(()=>row.x(9));check(row.x()===9,'pending9');check(second.inspect().changes.length>0,'second actual inspection contribution');
+9:  second.rollback();check(row.x()===7,'rollback7');check(JSON.stringify(t.$.rows.all())===JSON.stringify([{id:'r',x:7}]),'whole collection rollback7');
+10:  console.log(JSON.stringify({scope:'separate production no-Link entity transactions',confirmed:7,rolledBack:7,passed:true}));
+11: }finally{t.destroy();}
+
+FILE tools/experiments/entity-registration/facade-imports.mjs
+1: import * as k from '@signal-tree/kernel';
+2: for(const name of ['angular','react','vue','solid']){const a=await import('@signal-tree/'+name);if(a.link!==k.link)throw Error(name+' duplicate Link');if(a.SignalTreePublicationError!==k.SignalTreePublicationError)throw Error(name+' duplicate error');}if('createEntityPublicationParticipant' in k)throw Error('private factory leaked publicly');console.log('five facade imports share Link/error; private factory absent from public barrel');
+
+FILE packages/kernel/tests/entity-registration/cases.mjs
+1: const flush = async () => { for (let i=0;i<60;i++) await Promise.resolve(); };
+2: const copy = value => JSON.parse(JSON.stringify(value));
+3: export const cases = [
+4:  {name:'field independent useful9',kind:'field',foreign:false,dependent:false},
+5:  {name:'row independent useful9',kind:'row',foreign:false,dependent:false},
+6:  {name:'collection independent useful9',kind:'collection',foreign:false,dependent:false},
+7:  {name:'field independent foreign window',kind:'field',foreign:true,dependent:false},
+8:  {name:'collection independent foreign window',kind:'collection',foreign:true,dependent:false},
+9:  {name:'field dependent foreign input',kind:'field',foreign:true,dependent:true},
+10:  {name:'row dependent foreign input',kind:'row',foreign:true,dependent:true},
+11:  {name:'collection dependent foreign input',kind:'collection',foreign:true,dependent:true},
+12: ];
+13: export async function runCase(api, test) {
+14:  const observation={name:test.name,route:test.kind,sent:[],phase:'setup'};
+15:  const check=(condition,message)=>{if(!condition)throw Error(message);};
+16:  let tree,q,connection,owner,confirmed=false;
+17:  try {
+18:   tree=api.signalTree({rows:api.entityMap()});
+19:   tree.$.rows.setAll([{id:'r',x:0}]);
+20:   q=api.signalTree({x:0},{enhancers:[api.transactions()]});
+21:   const row=tree.$.rows.byIdOrFail('r');
+22:   const source=test.kind==='field'?row.x:test.kind==='row'?row:tree.$.rows;
+23:   const expected=test.kind==='field'?9:test.kind==='row'?{id:'r',x:9}:[{id:'r',x:9}];
+24:   connection=api.link(source,{set:value=>{observation.sent.push(copy(value));}});
+25:   await flush();observation.sent.length=0;
+26:   if(test.foreign)owner=q.transact(()=>q.$.x(7));
+27:   const before=owner?copy(owner.inspect()):undefined;
+28:   observation.phase='declare';
+29:   const receipt=connection.declare(test.dependent?{kind:'dependent',owners:[owner]}:{kind:'independent'},()=>{
+30:    const value=test.dependent?q.$.x()+2:9;
+31:    if(test.kind==='field')row.x(value);
+32:    else if(test.kind==='row')row({id:'r',x:value});
+33:    else tree.$.rows.setAll([{id:'r',x:value}]);
+34:   });
+35:   observation.receiptAtReturn=copy(receipt.read());
+36:   observation.phase='pre-confirm';await flush();
+37:   observation.receiptBeforeConfirm=copy(receipt.read());observation.sentBeforeConfirm=copy(observation.sent);
+38:   check(row.x()===9,'physical field must be9');
+39:   if(owner){check(q.$.x()===7,'foreign value changed');check(JSON.stringify(owner.inspect())===JSON.stringify(before),'foreign inspection changed');}
+40:   if(test.dependent)check(observation.sent.length===0,'premature dependent publication while foreign owner pending');
+41:   else check(JSON.stringify(observation.sent)===JSON.stringify([expected]),'independent useful9 must deliver exactly once');
+42:   observation.phase='confirm';if(owner){owner.confirm();confirmed=true;}
+43:   await flush();observation.receiptAfterConfirm=copy(receipt.read());
+44:   check(JSON.stringify(observation.sent)===JSON.stringify([expected]),'confirmation must yield exact useful9 once');
+45:   let settled=false;const completion=connection.settled().then(()=>{settled=true;});await flush();
+46:   check(settled,'settled must resolve after useful delivery');await completion;
+47:   await flush();check(observation.sent.length===1,'duplicate delivery');
+48:   check(row.x()===9,'terminal physical state changed');
+49:   observation.settled=true;observation.phase='complete';observation.pass=true;
+50:  } catch(error) {observation.pass=false;observation.error={name:error?.name,message:error?.message,code:error?.code,stage:error?.stage,reason:error?.reason};}
+51:  finally {connection?.dispose();if(owner&&!confirmed){try{owner.confirm();}catch{}}tree?.destroy();q?.destroy();}
+52:  return observation;
+53: }
+
+FILE packages/kernel/tests/entity-registration/lifecycle.mjs
+1: const flush=async()=>{for(let i=0;i<60;i++)await Promise.resolve();};
+2: const copy=v=>JSON.parse(JSON.stringify(v));
+3: const check=(v,m)=>{if(!v)throw Error(m);};
+4: export const lifecycleCases=[];
+5: for(const kind of ['field','collection'])for(const terminal of ['confirm','rollback'])lifecycleCases.push({name:`pre-Link pending ${kind} ${terminal}`,kind,terminal,late:false});
+6: for(const terminal of ['confirm','rollback'])lifecycleCases.push({name:`late collection multiple Links ${terminal}`,kind:'collection',terminal,late:true});
+7: export async function runLifecycle(api,test){
+8:  const r={name:test.name,sent:[],second:[],third:[],phase:'setup'};let tree,pending,settled=false;const links=[];
+9:  try{
+10:   // API module has already evaluated; none of these trees/collections existed then.
+11:   tree=api.signalTree({rows:api.entityMap()},{enhancers:[api.transactions()]});
+12:   tree.$.rows.setAll([{id:'r',x:0}]);await flush();const row=tree.$.rows.byIdOrFail('r');
+13:   if(test.late){
+14:    links.push(api.link(tree.$.rows,{set:v=>r.sent.push(copy(v))}));
+15:    links.push(api.link(row,{set:v=>r.second.push(copy(v))}));
+16:    links.push(api.link(row.x,{set:v=>r.third.push(copy(v))}));
+17:    await flush();r.sent.length=0;r.second.length=0;r.third.length=0;
+18:   }
+19:   pending=tree.transact(()=>row.x(7));const inspection=copy(pending.inspect());
+20:   if(!test.late)links.push(api.link(test.kind==='field'?row.x:tree.$.rows,{set:v=>r.sent.push(copy(v))}));
+21:   r.phase='pending';await flush();check(r.sent.length===0&&r.second.length===0&&r.third.length===0,'must hold while actual owner pending');
+22:   check(row.x()===7,'pending physical7');check(JSON.stringify(pending.inspect())===JSON.stringify(inspection),'Link enrollment changed pending inspection');
+23:   r.phase=test.terminal;pending[test.terminal]();settled=true;await flush();let x=test.terminal==='confirm'?7:0;
+24:   if(!test.late&&test.terminal==='confirm'){
+25:    // Enrollment adopts current value; confirmation alone is not an initial send.
+26:    check(r.sent.length===0,'confirmation of adopted baseline is not a new value write');
+27:    links[0].declare({kind:'independent'},()=>row.x(9));await flush();x=9;
+28:   }
+29:   const expected=test.kind==='field'?x:[{id:'r',x}];
+30:   check(JSON.stringify(r.sent)===JSON.stringify([expected]),'useful terminal output exactly once');
+31:   if(test.late)check(JSON.stringify(r.second)===JSON.stringify([{id:'r',x}]),'second Link useful terminal output exactly once');
+32:   if(test.late)check(JSON.stringify(r.third)===JSON.stringify([x]),'field Link useful terminal output exactly once');
+33:   check(row.x()===x,'terminal physical state');
+34:   for(const link of links){let done=false;const promise=link.settled().then(()=>{done=true;});await flush();check(done,'settled resolves');await promise;}
+35:   await flush();check(r.sent.length===1&&(!test.late||r.second.length===1&&r.third.length===1),'no duplicate terminal output');r.pass=true;r.phase='complete';
+36:  }catch(error){r.pass=false;r.error={name:error?.name,message:error?.message};}
+37:  finally{for(const link of links)link.dispose();if(pending&&!settled){try{pending.confirm();}catch{}}tree?.destroy();}
+38:  return r;
+39: }
+
+FILE packages/kernel/tests/entity-registration/receipt-cases.ts
+1: import type * as Kernel from '../../src/index';
+2: export const receiptCases = ['field', 'row', 'collection'].flatMap(kind =>
+3:   [false, true].map(dependent => ({ kind, dependent, name: `${kind} changed receipt / ${dependent ? 'dependent' : 'independent'}` }))
+4: );
+5: const drain = async () => { for (let i = 0; i < 60; i++) await Promise.resolve(); };
+6: const check = (value: boolean, message: string) => { if (!value) throw new Error(message); };
+7: const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+8: export async function runReceiptCase(api: typeof Kernel, test: typeof receiptCases[number]): Promise<void> {
+9:   const tree = api.signalTree({ rows: api.entityMap<{ id: string; x: number }>() });
+10:   const foreign = api.signalTree({ x: 0 }, { enhancers: [api.transactions()] });
+11:   tree.$.rows.setAll([{ id: 'r', x: 0 }]);
+12:   const row = tree.$.rows.byIdOrFail('r');
+13:   const sent: unknown[] = [];
+14:   const target = { set: (value: unknown) => { sent.push(JSON.parse(JSON.stringify(value))); } };
+15:   const relation = test.kind === 'field' ? api.link(row.x, target)
+16:     : test.kind === 'row' ? api.link(row, target) : api.link(tree.$.rows, target);
+17:   let ownerSettled = false;
+18:   let owner: ReturnType<typeof foreign.transact> | undefined;
+19:   const expected = (x: number) => test.kind === 'field' ? x : test.kind === 'row' ? { id: 'r', x } : [{ id: 'r', x }];
+20:   const write = (x: number) => {
+21:     if (test.kind === 'field') row.x(x);
+22:     else if (test.kind === 'row') row({ id: 'r', x });
+23:     else tree.$.rows.setAll([{ id: 'r', x }]);
+24:   };
+25:   try {
+26:     await drain(); sent.length = 0;
+27:     owner = foreign.transact(() => foreign.$.x(7));
+28:     const inspection = JSON.stringify(owner.inspect());
+29:     const receipt = relation.declare(test.dependent ? { kind: 'dependent', owners: [owner] } : { kind: 'independent' },
+30:       () => write(test.dependent ? foreign.$.x() + 2 : 9));
+31:     check(row.x() === 9, 'actual changed physical9');
+32:     check(receipt.read().state !== 'no-write', 'changed write must not return no-write');
+33:     check(JSON.stringify(owner.inspect()) === inspection && foreign.$.x() === 7, 'foreign ownership unchanged');
+34:     await drain();
+35:     check(receipt.read().state !== 'no-write', 'changed write must not settle as no-write');
+36:     if (test.dependent) {
+37:       check(same(receipt.read(), { state: 'held', reason: 'pending-dependency' }), 'dependent receipt held before confirm');
+38:       check(sent.length === 0, 'dependent has no early transport');
+39:       let settled = false; const wait = relation.settled().then(() => { settled = true; });
+40:       await drain(); check(!settled, 'dependent settled remains pending');
+41:       owner.confirm(); ownerSettled = true; await drain(); await wait;
+42:       check(settled, 'dependent settles after confirmation');
+43:     } else {
+44:       check(same(sent, [expected(9)]), 'independent useful9 while foreign pending');
+45:       owner.confirm(); ownerSettled = true; await drain();
+46:     }
+47:     check(same(sent, [expected(9)]), 'exact useful9 once');
+48:     check(receipt.read().state === 'started', 'useful transport terminal receipt');
+49:     const earlier = JSON.stringify(receipt.read());
+50:     const next = relation.declare({ kind: 'independent' }, () => write(11));
+51:     await drain(); await relation.settled();
+52:     check(next.read().state !== 'no-write', 'second actual changed write');
+53:     check(same(sent, [expected(9), expected(11)]), 'two exact useful transports');
+54:     check(JSON.stringify(receipt.read()) === earlier, 'earlier receipt stays terminal after newer write');
+55:     relation.dispose(); await drain();
+56:     check(JSON.stringify(receipt.read()) === earlier, 'earlier terminal receipt survives disposal');
+57:     check(same(sent, [expected(9), expected(11)]), 'no duplicate after settlement/disposal');
+58:   } finally { relation.dispose(); if (!ownerSettled) owner?.confirm(); tree.destroy(); foreign.destroy(); }
+59: }
+
+REGISTRY AND README DIFF
+diff --git a/tools/experiments/entity-registration/README.md b/tools/experiments/entity-registration/README.md
+index 0e0c52e..c679dec 100644
+--- a/tools/experiments/entity-registration/README.md
++++ b/tools/experiments/entity-registration/README.md
+@@ -6,4 +6,4 @@ Source wrappers under packages/kernel/src/lib/entity-registration-*.spec.ts use
+ 
+ Artifact replay: build canonical packages through Nx, prepare package artifacts, npm pack/install all five fresh tarballs plus pinned peers into a new isolated consumer. Copy cases.mjs, lifecycle.mjs, receipt-cases.ts from packages/kernel/tests/entity-registration and the four consumer entry files plus facade-imports.mjs into that directory. Under pinned Node24 run consumer.mjs (8), lifecycle-consumer.mjs (6), receipt-consumer.mjs (6), no-link.mjs and facade-imports.mjs. Then from the repository run `node tools/experiments/entity-registration/build-consumers.mjs /absolute/isolated/consumer`; run all four resulting *.production.mjs programs. Retain commands/logs, source/tarball/installed hashes and metafiles. No aliases to source, sideEffects overrides or private activation.
+ 
+-Do not execute staged consumers without installing fresh tarballs. These scripts are manual bounded artifact regression checks, not newly registered automatic release gates. The namespace harness retains optional enhancers and is not a minimal size workload. Genuinely late FIRST registration is unqualified; pre-Link pending controls assume module evaluation already happened. Current cost/large/budget failures are not waived by these cases.
++Do not execute staged consumers without installing fresh tarballs. The permanent `entity-registration-artifacts` gate reuses these exact fixtures against isolated installed packages and minified production bundles. Run `node tools/verify-gates.mjs --only=entity-registration-artifacts,entity-registration-artifacts:self` to build and verify; add `--self-test` to prove the companion detects classifier blindness. The gate's own `--self-test` removes the built registration call only in a disposable package copy, requires behavioral failures in both modes, and reruns clean recovery. Setup fetches peers pinned by `tools/fixtures/entity-registration-consumer/package-lock.json`; it does not require an npm cache warmed by pnpm. Dependency/setup failures never count as mutation evidence. Evidence directories and first failures are retained under the system temp directory. Direct invocation consumes prebuilt artifacts and does not establish source freshness. The no-Link production graph must exclude Link and the entity factory. These focused gates do not confer release sign-off. The namespace harness retains optional enhancers and is not a minimal size workload. Genuinely late FIRST registration is unqualified; pre-Link pending controls assume module evaluation already happened. Current cost/large/budget failures are not waived by these cases.
+diff --git a/tools/verify-gates.mjs b/tools/verify-gates.mjs
+index 3a22ac3..fc0a2fc 100644
+--- a/tools/verify-gates.mjs
++++ b/tools/verify-gates.mjs
+@@ -1484,6 +1484,25 @@ const GATES = [
+       replace: '"files": [\n    "this-entry-matches-nothing/**/*",',
+     },
+   },
++  {
++    name: 'entity-registration-artifacts',
++    covers: 'packed and production-bundled entity registration: original 8 + lifecycle 6 + receipt 6, with selective no-Link control',
++    cmd: ['node', 'tools/verify-entity-registration-artifacts.mjs'],
++    needsBuild: true,
++    provenBy: 'entity-registration-artifacts:self',
++  },
++  {
++    name: 'entity-registration-artifacts:self',
++    covers: 'missing built factory registration causes behavioral failures; clean recovery and no-Link isolation survive',
++    cmd: ['node', 'tools/verify-entity-registration-artifacts.mjs', '--self-test'],
++    needsBuild: true,
++    slow: true,
++    mutation: {
++      file: 'tools/verify-entity-registration-artifacts.mjs',
++      find: "  return results.filter((result) => result.kind === 'behavior');",
++      replace: '  return [];',
++    },
++  },
+   {
+     name: 'framework-facade-closure',
+     covers:
+
+EXISTING REGISTRY BUILD/MUTATION MECHANISM
+function buildOnceIfNeeded() {
+  if (!selected.some((g) => g.needsBuild)) return;
+  const names = selected.filter((g) => g.needsBuild).length;
+  console.log(`\n· building packages — ${names} gate(s) read dist/`);
+  try {
+    execFileSync(
+      'npx',
+      ['nx', 'run-many', '-t', 'build', `--projects=${BUILD_PROJECTS}`],
+      { cwd: ROOT, stdio: 'pipe', env: process.env }
+    );
+  } catch (err) {
+    console.error(
+      `\n❌ Build failed. ${names} gate(s) read dist/, so running them now ` +
+        `would report on stale or missing output.\n\n` +
+        String(err.stdout ?? err.message).slice(-2000)
+    );
+    process.exit(1);
+  }
+}
+
+// The publisher has already built and sealed these artifacts. Explicitly skip
+// the wrapper's cached rebuild, and require every gate to preserve the seal.
+// Mutation proofs run separately, without this mode, before the final rebuild.
+const artifactArgs = process.argv.filter(
+  (arg) =>
+    arg === '--artifact-integrity' || arg.startsWith('--artifact-integrity=')
+);
+const artifactIntegrity = artifactArgs[0]?.slice(
+  '--artifact-integrity='.length
+);
+if (
+  artifactArgs.length > 1 ||
+  (artifactArgs.length &&
+    (!/^sha256-[a-f0-9]{64}$/.test(artifactIntegrity) || has('--self-test')))
+) {
+  throw new Error(
+    'Artifact integrity requires one SHA256 seal and non-mutation gates'
+  );
+}
+function assertArtifacts(label) {
+  if (
+    artifactIntegrity &&
+    buildIntegrity(ROOT, RELEASE_PACKAGES) !== artifactIntegrity
+  )
+    throw new Error(`Release artifacts changed ${label}`);
+}
+if (artifactIntegrity) assertArtifacts('before gates');
+else buildOnceIfNeeded();
+
+function run(gate) {
+  try {
+    const output = execFileSync(gate.cmd[0], gate.cmd.slice(1), {
+      cwd: ROOT,
+      stdio: 'pipe',
+      encoding: 'utf8',
+      // A gate may need its own environment — `retention-gc` needs
+      // --expose-gc to reach vitest's forked workers, which a `node --expose-gc`
+      // command line would NOT do.
+      env: gate.env ? { ...process.env, ...gate.env } : process.env,
+    });
+    return { code: 0, output };
+  } catch (err) {
+    return {
+      code: err.status ?? 1,
+      output: `${err.stdout ?? ''}${err.stderr ?? ''}`,
+    };
+  }
+}
+
+const hash = (s) => createHash('sha256').update(s).digest('hex');
+
+/** Apply, run, restore. Restoration is verified, not assumed. */
+function withMutation(mutation, fn) {
+  const path = join(ROOT, mutation.file);
+  if (!existsSync(path))
+    throw new Error(`mutation target missing: ${mutation.file}`);
+  const original = readFileSync(path, 'utf8');
+  const before = hash(original);
+
+  let mutated;
+  if (mutation.generate) {
+    // For mutations that cannot be written as a literal — the bundle-budget one
+    // needs INCOMPRESSIBLE bytes, since a repeated string gzips to nothing and
+    // would leave the budget unmoved, i.e. an inert mutation masquerading as a
+    // blind gate.
+    mutated = mutation.generate(original);
+  } else if (mutation.append) {
+    mutated = original + mutation.append;
+  } else {
+    if (!original.includes(mutation.find)) {
+      throw new Error(
+        `mutation anchor not found in ${mutation.file} — the gate's target moved, ` +
+          `so this self-test has been silently testing nothing. Fix the anchor.`
+      );
+    }
+    mutated = original.replace(mutation.find, mutation.replace);
+  }
+  if (mutated === original)
+    throw new Error(`mutation was a no-op in ${mutation.file}`);
+
+  try {
+    writeFileSync(path, mutated);
+    return fn();
+  } finally {
+    writeFileSync(path, original);
+    if (hash(readFileSync(path, 'utf8')) !== before) {
+      console.error(
+        `\n  FATAL: could not restore ${mutation.file}. Tree is dirty.`
+      );
+      process.exit(2);
+    }
+    // Restoring the SOURCE is not enough when the gate rebuilt from it.
+    //
+    // `check-bundle-budget.mjs` builds before it measures, so mutating a source
+    // file makes it write the mutation INTO `dist/` — and the hash check above
+    // only ever looked at the file it wrote. dist stayed poisoned: after one
+    // self-test run, `size-report.mjs` measured the bare tree at 13.69KB
+    // against a true 5.79KB, because 8KB of mutation payload was still sitting
+    // in the built artifact.
+    //
+    // That is the ORIGINAL stale-dist bug wearing new clothes — dist no longer
+    // matching source, with nothing noticing — reintroduced by the fix for it.
+    // A mutation harness has to restore DERIVED artifacts too, not just the
+    // files it edited. Only gates marked `writesDist` rebuild mutated source;
+    // rebuilding after every package-source mutation exhausts Node's heap.
+    if (mutation.writesDist) {
+      try {
+        execFileSync(
+          'npx',
+          [
+            'nx',
+            'run-many',
+            '-t',
+            'build',
+            `--projects=${BUILD_PROJECTS}`,
+            '--parallel=1',
+            '--skip-nx-cache',
+            '--output-style=static',
+          ],
+          {
+            cwd: ROOT,
+            stdio: 'pipe',
+            maxBuffer: 10 * 1024 * 1024,
+            env: {
+              ...process.env,
+              NX_DAEMON: 'false',
+              NX_ISOLATE_PLUGINS: 'false',
+            },
+          }
+        );
+      } catch (err) {
+        console.error(
+          `\n  FATAL: restored ${mutation.file} but could not rebuild dist/. ` +
+            `Built output still contains the mutation — run \`npm run build\`.\n\n` +
+            String(err.stderr ?? err.stdout ?? err.message).slice(-2000)
+        );
+        process.exit(2);
+      }
+    }
+  }
+}
+
+const results = [];
+
+/**
+ * How many things a gate covers RIGHT NOW, or null when it cannot say.
+ *
+ * Only a gate declaring a `coverageProbe` can answer, and the answer must be a
+ * clean non-negative integer on stdout. Anything else — no probe, a non-zero
+ * exit, unparseable output — returns null, which the caller treats as "cannot
+ * claim vacuity" and reports BLIND. Fail closed: the point of the self-test is
+ * that a gate cannot quietly stop covering things, so a probe that EXCUSES a
+ * gate must be harder to satisfy than the gate itself.
+ */
+function coverageOf(gate) {
+  if (!gate.coverageProbe) return null;
+  try {
+    const out = execFileSync(
+      gate.coverageProbe[0],
+      gate.coverageProbe.slice(1),
+      { cwd: ROOT, stdio: 'pipe', encoding: 'utf8', env: process.env }
+    );
+    const n = Number(String(out).trim());
+    return Number.isInteger(n) && n >= 0 ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+if (has('--self-test')) {
+  console.log(
+    `\nGate self-test — each gate must FAIL against its own mutation\n`
+  );
+  for (const gate of selected) {
+    if (!gate.mutation) {
+      if (gate.provenBy) {
+        // Not unproven — proven INDIRECTLY, by a companion gate that mutates the
+        // checker itself. Counted as proven so the summary is not pessimistic,
+        // and named so the link is visible rather than assumed.
+        results.push({ gate, state: 'proven-by' });
+        console.log(
+          `  · ${gate.name.padEnd(20)} proven via ${gate.provenBy} ✓`
+        );
+        continue;
+      }
+      results.push({ gate, state: 'unproven' });
+      console.log(
+        `  ~ ${gate.name.padEnd(20)} UNPROVEN — no mutation and no provenBy; ` +
+          `this gate proves nothing about itself`
+      );
+      continue;
+    }
+    process.stdout.write(
+      `  · ${gate.name.padEnd(20)} mutating ${gate.mutation.file} ... `
+    );
+    let result;
+    try {
+      result = withMutation(gate.mutation, () =>
+        run(gate.mutationCmd ? { ...gate, cmd: gate.mutationCmd } : gate)
+      );
+    } catch (err) {
+      results.push({ gate, state: 'error' });
+      console.log(`ERROR\n      ${err.message}`);
+      continue;
+    }
+    if (result.code !== 0) {
+      results.push({ gate, state: 'proven' });
+      console.log(`caught it (exit ${result.code}) ✓`);
+    } else {
+      // VACUOUS, not blind. The gate has nothing to check on this tree, so no
+      // mutation of its target could have been caught. That is a true report
+      // about this release, not a defect in the gate — and it is NOT silent: it
+      // is named here and counted separately in the summary.
+      results.push({
+        gate,
+        state: coverageOf(gate) === 0 ? 'vacuous' : 'blind',
+      });
+      if (results[results.length - 1].state === 'vacuous') {
+        console.log(
+          `\n      VACUOUS: nothing to cover on this tree, so nothing to catch.\n` +
+            `      It covers: ${gate.covers}\n` +
+            `      Its own coverage probe reports 0.`
+        );
+      } else {
+        console.log(
+          `\n      BLIND: the gate passed while its own target was broken.\n` +
+            `      It covers: ${gate.covers}`
+        );
+      }
+    }
+  }
+} else {
+  console.log(`\nRunning ${selected.length} gates\n`);
+  for (const gate of selected) {
+    process.stdout.write(`  · ${gate.name.padEnd(20)} `);
+    assertArtifacts(`before ${gate.name}`);
+    const result = run(gate);
+    assertArtifacts(`after ${gate.name}`);
+    const ok = result.code === 0;
+    results.push({
+      gate,
+      state: ok ? 'pass' : gate.knownFailing ? 'known' : 'fail',
+    });
+    console.log(
+      ok
+        ? `pass ✓  (${gate.covers})`
+        : gate.knownFailing
+        ? `RED, known ✗  ${gate.knownFailing}`
+        : `FAIL (exit ${result.code}) ✗  ${gate.covers}`
+    );
+    if (!ok && result.output.trim()) {
+      const diagnostic = result.output.trim();
+      console.log(
+        `\n${diagnostic.slice(Math.max(0, diagnostic.length - 100000))}\n`
+      );
+    }
+  }
+}
+
+// ── Summary: what was covered, not merely that it passed ────────────────────
+const count = (s) => results.filter((r) => r.state === s).length;
+console.log(`\n${'─'.repeat(78)}`);
+
+if (has('--self-test')) {
+  const proven = count('proven') + count('proven-by');
+  console.log(
+    `${proven}/${selected.length} gates PROVEN able to fail ` +
+      `(${count('proven-by')} indirectly, via a companion self-test gate). ` +
+      `${count('unproven')} unproven, ${count('vacuous')} vacuous, ` +
+      `${count('blind')} blind, ${count('error')} errored.`
+  );
+  for (const r of results.filter((r) => r.state === 'unproven')) {
+    console.log(
+      `  unproven: ${r.gate.name} — add a \`mutation\`, or a \`provenBy\` ` +
+        `naming the companion self-test gate that mutates its checker`
+    );
+  }
+  // Listed every time, never folded into the pass count. A vacuous gate is not
+  // a passing gate — it is one that had nothing to say about this release, and
+  // the reader is entitled to know which before reading a green self-test as
+  // evidence the release was checked.
+  for (const r of results.filter((r) => r.state === 'vacuous')) {
+    console.log(
+      `  vacuous:  ${r.gate.name} — covered nothing on this tree, so proved nothing`
+    );
+  }
+  for (const r of results.filter((r) => r.state === 'blind')) {
+    console.log(`  BLIND:    ${r.gate.name} — passed while broken`);
+  }
+  // `unproven` counts as failure. A gate reaches that state only by declaring
+  // neither a `mutation` nor a `provenBy` — it is always an omission, never a
+  // documented exemption, because nothing in this file grants one. Leaving it
+  // out of `bad` is what let RC2 report 1 unproven at exit 0.
+  const bad = count('unproven') + count('blind') + count('error');
+  process.exit(bad > 0 ? 1 : 0);
+} else {
+  console.log(
+    `${count('pass')}/${selected.length} passed, ` +
+      `${count('fail')} failed, ${count('known')} known-red.`
+  );
+  if (has('--fast')) {
+    const heldBack = GATES.filter((g) => g.releaseOnly).map((g) => g.name);
+    if (!has('--release') && heldBack.length) {
+      console.log(
+        `  release-only (run with --release): ${heldBack.join(', ')}`
+      );
+    }
+    const skipped = GATES.filter((g) => g.slow).map((g) => g.name);
+    console.log(
+      `  --fast SKIPPED: ${skipped.join(', ')} — this run did not cover them.`
+    );
+  }
+  process.exit(count('fail') > 0 ? 1 : 0);
+}

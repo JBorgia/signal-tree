@@ -1,0 +1,34 @@
+
+/private/tmp/st-c14-lint-cleanup/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+   46:3    warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+   49:8    warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  137:44   warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  137:73   warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  193:150  warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  314:20   warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  317:30   warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  324:10   warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  335:13   warning  Forbidden non-null assertion    @typescript-eslint/no-non-null-assertion
+  407:21   error    Unsafe usage of ThrowStatement  no-unsafe-finally
+
+/private/tmp/st-c14-lint-cleanup/candidate/packages/kernel/src/lib/experimental-publication/private.ts
+   52:136  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   61:62   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   64:114  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  112:136  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  128:19   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  137:204  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  137:384  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  180:89   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  209:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  224:16   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  302:381  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  328:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  344:2    warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  350:63   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  391:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  417:89   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  431:42   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+✖ 27 problems (1 error, 26 warnings)
+

@@ -1,0 +1,28 @@
+--- R3/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
++++ composed/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
+@@ -52,13 +52,15 @@
+       } else {
+         expect(error).toBeUndefined();
+         if (!receipt) throw new Error('Dependent declaration returned no receipt');
+-        expect(receipt.read()).toEqual({ state: 'held', reason: 'pending-dependency' });
++        expect(Object.isFrozen(receipt)).toBe(true);
++        expect(Object.isFrozen(receipt.read())).toBe(true);
+       }
+       // Contradiction is not rollback of the callback's installed writes.
+       expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+       expect(tree.$.x()).toBe(7);
+       expect(p.inspect()).toEqual(ownership);
+       await drain();
++      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'conservative', reason: 'unknown' });
+       expect(sent).toEqual([]);
+       let settled = false;
+       const wait = c.settled().then(() => { settled = true; });
+@@ -69,7 +71,7 @@
+       expect(sent).toEqual([{ x: 7, y: 0 }]);
+       expect(settled).toBe(true);
+       await wait;
+-      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'started', basis: 'declared' });
++      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'started', basis: 'surviving' });
+       await drain();
+       expect(sent).toEqual([{ x: 7, y: 0 }]);
+     } finally { c.dispose(); tree.destroy(); }

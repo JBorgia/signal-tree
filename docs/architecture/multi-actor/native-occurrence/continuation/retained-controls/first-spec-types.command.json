@@ -1,0 +1,8 @@
+{
+  "cwd": "/private/tmp/st-retained-source-controls/candidate",
+  "command": [
+    "node",
+    "tools/check-spec-types.mjs"
+  ],
+  "exit": 1
+}

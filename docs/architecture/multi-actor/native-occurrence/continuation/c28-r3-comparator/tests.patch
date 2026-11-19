@@ -1,0 +1,152 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/public-sibling-current-obligation.spec.ts
+@@ -0,0 +1,85 @@
++import { appendFileSync } from 'node:fs';
++import { expect, it } from 'vitest';
++import { link, signalTree, transactions, type PublicationReceipt } from '../index';
++
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++
++for (const mode of ['collapse', 'meaningful'] as const) {
++  it(`public whole update retains correct sibling work: ${mode}`, async () => {
++    const tree = signalTree({ pair: { x: 0, y: 0 }, q: 0 }, { enhancers: [transactions()] });
++    const sent: { x: number; y: number }[] = [];
++    const c = link(tree.$.pair, { set: value => { sent.push(value); } });
++    const fresh: PublicationReceipt[] = [];
++    const rows: { n: number; calls: number; receipt: ReturnType<PublicationReceipt['read']>; old: ReturnType<PublicationReceipt['read']>; sent: { x: number; y: number }[]; ownerUnchanged: boolean; settled: boolean }[] = [];
++    let off = () => { /* Subscribe only after initial ownership is established. */ };
++    try {
++      const p = tree.transact(() => tree.$.pair.x(7));
++      const a = tree.transact(() => tree.$.q(1));
++      let historyCalls = 0;
++      const earlier = c.declare({ kind: 'dependent', owners: [p, a] }, () => {
++        tree.$(current => { historyCalls++; return { ...current, pair: { ...current.pair } }; });
++      });
++      a.confirm(); await drain();
++      const saved = tree.$.pair();
++      const historicalRead = earlier.read();
++      const historicalReadValue = { ...historicalRead };
++      const ownerBefore = p.inspect();
++      let notices = 0, settled = false;
++      off = tree.$.pair.x.subscribe(() => { notices++; });
++      const waiting = c.settled().then(() => { settled = true; });
++      for (let n = 1; n <= 2; n++) {
++        const q = tree.transact(() => tree.$.q(n + 1));
++        q.confirm(); await drain();
++        let calls = 0;
++        const receipt = c.declare({ kind: 'dependent', owners: [p, q] }, () => {
++          tree.$(current => {
++            calls++;
++            expect(current.q).toBe(n + 1);
++            // Existing source layout x,y: changed x and equal y in the meaningful
++            // n2 arm. No claim that this observes private preparation order.
++            return { ...current, pair: { x: mode === 'meaningful' && n === 2 ? 9 : current.pair.x, y: current.pair.y } };
++          });
++        });
++        fresh.push(receipt); await drain();
++        rows.push({ n, calls, receipt: receipt.read(), old: earlier.read(), sent: [...sent],
++          ownerUnchanged: JSON.stringify(p.inspect()) === JSON.stringify(ownerBefore), settled });
++      }
++      p.confirm(); await drain(); await waiting; await c.settled(); await drain();
++      const expected = { x: mode === 'meaningful' ? 9 : 7, y: 0 };
++      const final = [...sent], finalFresh = fresh.map(receipt => receipt.read());
++      const finalOld = earlier.read();
++      c.dispose(); tree.$.pair.x(99); await drain();
++      const sink = process.env.ST_PUBLIC_SIBLING_OUTPUT;
++      if (sink) appendFileSync(sink, JSON.stringify({ mode, historyCalls, rows, notices,
++        saved, final, finalFresh, finalOld, afterDispose: sent, settled }) + '\n');
++
++      expect(historyCalls).toBe(1);
++      expect(rows.map(row => row.calls)).toEqual([1, 1]);
++      expect(rows.map(row => row.sent)).toEqual([[], []]);
++      expect(rows.map(row => row.settled)).toEqual([false, false]);
++      // A changed independent value can supersede old ownership; the meaningful
++      // arm's hold follows its explicit dependency on p, not historical location.
++      if (mode === 'collapse') expect(rows.map(row => row.ownerUnchanged)).toEqual([true, true]);
++      expect(saved).toEqual({ x: 7, y: 0 });
++      expect(historicalRead).toEqual(historicalReadValue);
++      expect(Object.isFrozen(historicalRead)).toBe(true);
++      expect(final).toEqual([expected]); expect(sent).toEqual([expected]);
++      expect(settled).toBe(true);
++      // Notices include the post-disposal local x99 write.
++      expect(notices).toBe(mode === 'meaningful' ? 2 : 1);
++      if (mode === 'collapse') {
++        expect(rows.map(row => row.receipt)).toEqual([{ state: 'no-write' }, { state: 'no-write' }]);
++        expect(rows.map(row => row.old.state)).not.toContain('superseded');
++        expect(finalFresh).toEqual([{ state: 'no-write' }, { state: 'no-write' }]);
++        expect(finalOld).toEqual({ state: 'started', basis: 'surviving' });
++      } else {
++        expect(rows[1].receipt.state).not.toBe('no-write');
++        expect(finalFresh[1].state).toBe('started');
++      }
++      expect(fresh.map(receipt => receipt.read())).toEqual(finalFresh);
++      expect(earlier.read()).toEqual(finalOld);
++    } finally { off(); c.dispose(); tree.destroy(); }
++  });
++}
+--- /dev/null
++++ b/packages/kernel/src/lib/comparator-lifecycle-r3.spec.ts
+@@ -0,0 +1,61 @@
++import {expect,it} from 'vitest';
++import * as l from './experimental-publication/lifecycle';
++import {installTerminalRecord} from './internals/intrinsic-mutation';
++let serial=920000;
++function source(){const owner=++serial;l.registerOwnerSource(owner,{});return {owner,open(id:number){l.ownerTransition(owner,{kind:'opened',transactionId:id});return l.ownerCell(owner,id)!;},end(id:number,kind:string){l.ownerTransition(owner,{kind,transactionId:id});},dispose(){l.abandonOwnerSource(owner);}};}
++const proof=(cell:l.OwnerCell):l.Proof=>({owners:[cell],input:[cell],validation:[cell],unknown:false,invalid:false});
++const admission=()=>l.comparisonAdmission(l.comparisonCutoff(),l.initialRequirement());
++it('exact first confirmation is immutable across repeat, retirement and source disposal',async()=>{
++ const s=source();try{
++  const cell=s.open(1);s.end(1,'confirmed');const before=admission();
++  s.end(1,'confirmed');expect(l.comparisonObligations(proof(cell),before).owners).toEqual([]);
++  expect(()=>s.end(1,'rolled-back')).toThrow('Terminal publication dependency outcome reversed');
++  expect(cell.outcome).toBe('confirmed');await Promise.resolve();s.end(1,'confirmed');s.dispose();
++  expect(l.comparisonObligations(proof(cell),before).owners).toEqual([]);
++  // The same numeric source/transaction ID is a different exact cell.
++  l.registerOwnerSource(s.owner,{});const replacement=s.open(1);s.end(1,'confirmed');
++  expect(replacement).not.toBe(cell);expect(l.comparisonObligations(proof(replacement),before).owners).toEqual([replacement]);
++ }finally{s.dispose();}
++});
++it('post-cutoff confirmation and captured-pending input remain relevant',()=>{
++ const s=source();try{
++  const cell=s.open(1),before=admission(),raw=l.initialRequirement();
++  raw.inputs=[{requirement:l.initialRequirement(),owners:[cell]}];s.end(1,'confirmed');
++  const captured=l.comparisonAdmission(l.comparisonCutoff(),raw);
++  raw.inputs=[];expect(Object.isFrozen(captured)).toBe(true);expect(Object.isFrozen(captured.protectedOwners)).toBe(true);
++  expect(l.comparisonObligations(proof(cell),before).owners).toEqual([cell]);
++  expect(l.comparisonObligations(proof(cell),captured).owners).toEqual([cell]);
++  expect(l.comparisonObligations(proof(cell),admission()).owners).toEqual([]);
++ }finally{s.dispose();}
++});
++it('all non-I/V roles and flags survive; issued proof is not changed',()=>{
++ const s=source();try{
++  const cell=s.open(1);s.end(1,'confirmed');const descriptor=admission();
++  for(const extra of [{destination:[cell]},{possible:[cell]}]){
++   const p={...proof(cell),...extra};expect(l.comparisonObligations(p,descriptor).owners).toEqual([cell]);
++  }
++  const unclassified={owners:[cell],unknown:false,invalid:false};expect(l.comparisonObligations(unclassified,descriptor).owners).toEqual([cell]);
++  const p=Object.freeze({...proof(cell),unknown:true,invalid:true,unavailableInput:true,historicalWindow:true,terminalRejectedRoles:15});
++  const reduced=l.comparisonObligations(p,descriptor);expect(reduced).toEqual({...p,owners:[],input:[],validation:[]});expect(p.owners).toEqual([cell]);expect(p.input).toEqual([cell]);
++ }finally{s.dispose();}
++});
++it('rollback, abandonment, unavailable pending and unstamped confirmed cells never qualify',()=>{
++ const s=source();try{
++  const rolled=s.open(1),abandoned=s.open(2),pending=s.open(3);s.end(1,'rolled-back');s.end(2,'abandoned');s.dispose();
++  const synthetic:l.OwnerCell={owner:0,id:0,outcome:'confirmed',dependents:new Set()};
++  for(const cell of [rolled,abandoned,pending,synthetic])expect(l.comparisonObligations(proof(cell),admission()).owners).toEqual([cell]);
++ }finally{s.dispose();}
++});
++it('operand completion requires activation and aggregate completion, not owner settlement',()=>{
++ const s=source(),channel={},revision={};l.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
++ try{
++  const pending=s.open(1),prepared=l.prepareNativeRequirement([pending],false,[]),raw=prepared.requirement;
++  const plan=l.prepareRevision(channel,revision,[pending],{},[],raw,true,raw);
++  installTerminalRecord(prepared.record);l.finalizeNativeRequirement(raw);installTerminalRecord(plan);plan.finalize?.();
++  expect(l.comparisonRevisionReady(channel,revision)).toBe(false);
++  l.completeScalarNativeRequirement(raw,raw);expect(l.nativeRequirementReady(raw)).toBe(true);
++  expect(l.comparisonRevisionReady(channel,revision)).toBe(false);
++  l.projectRevision(channel,revision,l.nativeProof(raw),false);
++  expect(pending.outcome).toBe('pending');expect(l.comparisonRevisionReady(channel,revision)).toBe(true);
++ }finally{l.disposeConnection(channel);s.dispose();}
++});

@@ -1,0 +1,67 @@
+file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994
+      if (!["succeeded", "failed", "rejected"].includes(op.status)) throw new Error("Cannot dispose unresolved operations");
+                                                                          ^
+
+Error: Cannot dispose unresolved operations
+    at OperationCoordinator.dispose (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994:75)
+    at file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12201:16
+    at async check (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12120:3)
+    at async file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12175:1
+
+Node.js v24.15.0
+node:internal/errors:985
+  const err = new Error(message);
+              ^
+
+Error: Command failed: /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs
+file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994
+      if (!["succeeded", "failed", "rejected"].includes(op.status)) throw new Error("Cannot dispose unresolved operations");
+                                                                          ^
+
+Error: Cannot dispose unresolved operations
+    at OperationCoordinator.dispose (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994:75)
+    at file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12201:16
+    at async check (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12120:3)
+    at async file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12175:1
+
+Node.js v24.15.0
+
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at file:///Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/native-probe/run.mjs:26:24
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5) {
+  status: 1,
+  signal: null,
+  output: [
+    null,
+    '',
+    'file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994\n' +
+      '      if (!["succeeded", "failed", "rejected"].includes(op.status)) throw new Error("Cannot dispose unresolved operations");\n' +
+      '                                                                          ^\n' +
+      '\n' +
+      'Error: Cannot dispose unresolved operations\n' +
+      '    at OperationCoordinator.dispose (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994:75)\n' +
+      '    at file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12201:16\n' +
+      '    at async check (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12120:3)\n' +
+      '    at async file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12175:1\n' +
+      '\n' +
+      'Node.js v24.15.0\n'
+  ],
+  pid: 76416,
+  stdout: '',
+  stderr: 'file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994\n' +
+    '      if (!["succeeded", "failed", "rejected"].includes(op.status)) throw new Error("Cannot dispose unresolved operations");\n' +
+    '                                                                          ^\n' +
+    '\n' +
+    'Error: Cannot dispose unresolved operations\n' +
+    '    at OperationCoordinator.dispose (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:11994:75)\n' +
+    '    at file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12201:16\n' +
+    '    at async check (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12120:3)\n' +
+    '    at async file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-operation-review-ua7Nw8/probe.mjs:12175:1\n' +
+    '\n' +
+    'Node.js v24.15.0\n'
+}
+
+Node.js v24.15.0

@@ -1,0 +1,8 @@
+{
+  "sourceManifestSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+  "promotionManifestSha256": "644a34793cda8a7e98e83a8b5c6037217ae3771c32b8a3e09027fc5e32bd009a",
+  "promotionPatchSha256": "67b69b6bd0c6e4753b123c8e6d16c11d0f3eed835001ae7b8fec467c987480c3",
+  "optionalOutputPatchSha256": "44ad85a2083ee0effde28f04e26be00f263030e08953a2cbe740406261b569da",
+  "runtimeEdits": false,
+  "status": "six-file promotion payload validated without ST_PREPARED_REVIEW_OUTPUT"
+}

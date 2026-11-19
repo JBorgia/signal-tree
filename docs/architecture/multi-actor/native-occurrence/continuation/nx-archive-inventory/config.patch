@@ -1,0 +1,6 @@
+--- a/.nxignore
++++ b/.nxignore
+@@ -1 +1,3 @@
+ .angular
++# Archived audit evidence is not an Nx project source.
++/docs/audits/

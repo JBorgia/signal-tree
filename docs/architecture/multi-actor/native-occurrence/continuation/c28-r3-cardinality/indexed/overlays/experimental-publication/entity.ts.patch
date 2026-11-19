@@ -1,0 +1,44 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,3 +1,4 @@
++import { tally as ct, size as cs, check as cc } from '../cardinality-diagnostic'; // CARDINALITY-ONLY
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+@@ -97,6 +98,7 @@
+     captureInput(subject,field){return {native:Object.freeze([...new Set(physicalViews(subject,field).map(view=>view.requirement))].map(lifecycle.captureNativeInput))};},
+     inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size,negativePresence:[...members.values()].filter(member=>!member.present).length,placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size,negativeVisible:[...visible.values()].filter(view=>view.present===false).length,placementViews:placementViews.size,mappings:mappings.size,mappingViews:mappingViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
+     prepare(packet){
++      ct("native.prepare");
+       const inspection=packet.meta?.participation==='inspection';
+       const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
+       const owner=typeof id==='number'?lifecycle.ownerCell(packet.owner,id):undefined;
+@@ -145,8 +147,8 @@
+       }
+       const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+       const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+-      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+-      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
++      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row){cs("native.rowFieldsCopy",fields.get(id)?.size??0);nextFields.set(id,row=new Map(fields.get(id)));}return row;};
++      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row){cs("native.rowViewsCopy",views.get(id)?.size??0);nextViews.set(id,row=new Map(views.get(id)));}return row;};
+       // Physical support is distinct from ordinary eligibility. Inspection
+       // changes only the physical certificate, including negative membership.
+       for(const edit of packet.physical){
+@@ -159,6 +161,7 @@
+         const row=rowViews(edit.subject);
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+         for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
++        cs("native.physicalAtCopy",row.size);
+         physicalAt.set(edit,new Map(row));
+         if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+@@ -193,6 +196,9 @@
+         }
+         // A singleton's prepared ordinary row is its final version. Later units
+         // clone installed rows; multi-edit units still need per-edit snapshots.
++        ct(singleton?"native.singletonReuse":"native.multiCopy");
++        if(!singleton)cs("native.ordinaryRowCopy",row.size);
++        cs("native.selectedPhysicalCopy",(physical&&physicalAt.get(physical)||view).size);
+         const ordinaryRow=singleton?row:new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
+         for(const key of keys)physicalRow.set(key,{requirement:row.get(key)!.requirement as Requirement,present:own(physical?.after??edit.after,key)});
+         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);

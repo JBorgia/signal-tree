@@ -1,0 +1,79 @@
+
+> nx run kernel:test independent-refusal-branches.spec.ts independent-packet-producers.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-refusal-branches.spec.ts independent-packet-producers.spec.ts --maxWorkers=1
+
+(node:25364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25371) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-admission-refusal-independent/candidate/packages/kernel
+
+(node:25378) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-packet-producers.spec.ts (7 tests | 1 failed) 35ms
+   × ownership limit: a separately frozen private shell freezes its shared descriptor in place 2ms
+(node:25391) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-refusal-branches.spec.ts (2 tests | 1 failed) 6ms
+   × caught refused first point fragment does not register phantom preparation callbacks 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-packet-producers.spec.ts > ownership limit: a separately frozen private shell freezes its shared descriptor in place
+Error: Frozen entity publication edit contains mutable admission metadata
+ ❯ AdmissionMetadata.edit src/lib/internals/entity-publication.ts:67:15
+     65|       if (edit.fields && !Object.isFrozen(edit.fields) ||
+     66|           edit.structural && !Object.isFrozen(edit.structural))
+     67|         throw new Error('Frozen entity publication edit contains mutab…
+       |               ^
+     68|     }
+     69|     Object.freeze(edit);
+ ❯ AdmissionMetadata.array src/lib/internals/entity-publication.ts:74:36
+ ❯ AdmissionMetadata.prepare src/lib/internals/entity-publication.ts:90:57
+ ❯ EntityPublicationSource.prepare src/lib/internals/entity-publication.ts:218:27
+ ❯ src/lib/independent-packet-producers.spec.ts:54:61
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/independent-refusal-branches.spec.ts > caught refused first point fragment does not register phantom preparation callbacks
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ src/lib/independent-refusal-branches.spec.ts:9:206
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 7 passed (9)
+   Start at  20:11:25
+   Duration  1.21s (transform 496ms, setup 0ms, import 667ms, tests 41ms, environment 342ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-refusal-branches.spec.ts independent-packet-producers.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

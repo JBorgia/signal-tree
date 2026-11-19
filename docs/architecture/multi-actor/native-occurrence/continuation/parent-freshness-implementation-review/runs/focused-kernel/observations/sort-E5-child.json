@@ -1,0 +1,215 @@
+{
+  "facade": "kernel",
+  "seam": "sort",
+  "scenario": "E5-child",
+  "callsBeforeDemand": 0,
+  "calls": 8,
+  "afterWrite": true,
+  "sentinelReached": false,
+  "nested": {
+    "name": "nested-child",
+    "kind": "return",
+    "value": {
+      "n": 1
+    },
+    "callsBefore": 1,
+    "callsAfter": 1
+  },
+  "events": [
+    {
+      "name": "action-enter",
+      "calls": 1
+    },
+    {
+      "name": "write-returned",
+      "calls": 1,
+      "child": 1
+    },
+    {
+      "name": "nested-child",
+      "kind": "return",
+      "value": {
+        "n": 1
+      },
+      "callsBefore": 1,
+      "callsAfter": 1
+    },
+    {
+      "name": "first-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 0,
+      "callsAfter": 1
+    },
+    {
+      "name": "immediate-root-1",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 1
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 1,
+      "callsAfter": 3
+    },
+    {
+      "name": "immediate-root-2",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 1
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "installed-child",
+      "kind": "return",
+      "value": 1,
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "recovery-write",
+      "kind": "return",
+      "value": null,
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "post-write-root-1",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 9
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 4,
+              "n": 4
+            }
+          ]
+        }
+      },
+      "callsBefore": 3,
+      "callsAfter": 8
+    },
+    {
+      "name": "post-write-root-2",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 9
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 4,
+              "n": 4
+            }
+          ]
+        }
+      },
+      "callsBefore": 8,
+      "callsAfter": 8
+    },
+    {
+      "name": "post-write-all",
+      "kind": "return",
+      "value": [
+        {
+          "id": 3,
+          "n": 0
+        },
+        {
+          "id": 2,
+          "n": 1
+        },
+        {
+          "id": 1,
+          "n": 2
+        },
+        {
+          "id": 4,
+          "n": 4
+        }
+      ],
+      "callsBefore": 8,
+      "callsAfter": 8
+    }
+  ]
+}

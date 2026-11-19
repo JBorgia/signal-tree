@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel entity-predicate-churn entity-wrong-method-guard entity-diagnostic-folding --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T14:42:47.552Z",
+    "endTime": "2026-11-03T14:42:50.227Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "10190665600425980510",
+      "startTime": "2026-11-03T14:42:47.584Z",
+      "endTime": "2026-11-03T14:42:50.226Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

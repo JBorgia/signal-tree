@@ -1,0 +1,405 @@
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildViteTargets (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:113:29)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:63:44
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+(node:14757) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-r3-r2-four-file-differential/r3/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+> nx run kernel:test src/enhancers/transactions/transaction-safety.spec.ts src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts src/lib/whole-value-new-keys.spec.ts src/lib/entity-granular-reactivity.spec.ts --maxWorkers=1 --reporter=default --reporter=json --outputFile=/private/tmp/st-r3-r2-four-file-differential/r3/RESULTS.json
+
+> node tools/run-core-vitest.mjs src/enhancers/transactions/transaction-safety.spec.ts src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts src/lib/whole-value-new-keys.spec.ts src/lib/entity-granular-reactivity.spec.ts --maxWorkers=1 --reporter=default --reporter=json --outputFile=/private/tmp/st-r3-r2-four-file-differential/r3/RESULTS.json
+
+(node:14803) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14811) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-r3-r2-four-file-differential/r3/candidate/packages/kernel
+
+(node:14818) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts (43 tests | 1 failed) 1847ms
+     ✓ applies scalar leaf effects without transaction recapture 9ms
+     ✓ preserves subject identity and owned positions across structural rekey 14ms
+     ✓ characterizes entity field PositionIds as shared collection coverage, not exact field identity 1ms
+     ✓ validates a subject descriptor added after adapter creation with zero tree visits 2ms
+     ✓ resolves the same semantic subject target after a rekey performed after adapter creation with zero tree visits 1ms
+     ✓ resolves a restored semantic subject target after adapter creation with zero tree visits 17ms
+     ✓ refuses same-key structural work when that key is now occupied by a different subject 2ms
+     ✓ resolves scalar realization by stable PositionId after a physical rekey 3ms
+     ✓ commits mixed realization rekey and scalar publication coherently without relying on notifier batching 4ms
+     ✓ realizes structural remove and add from owner-level producer metadata 5ms
+     ✓ prepares and realizes a retained-subject structural restore from removal metadata alone 2ms
+     ✓ realizes a same-turn restore plus separate subject scalar under one shared physical revision 5ms
+     ✓ keeps restore planning side-effect free when current source preparation fails 8ms
+     ✓ realizes same-turn restore then rekey against prepared subject state 2ms
+     ✓ keeps restore-rekey planning side-effect free when a later stale subject scalar fails 2ms
+     ✓ refuses prepared restore-rekey when the destination key remains occupied 13ms
+     ✓ realizes remove-restore-rekey when prepared vacancy overrides live occupancy 3ms
+     ✓ keeps prepared vacancy side-effect free when a later scalar effect refuses 3ms
+     ✓ keeps competing prepared restores side-effect free when earlier prepared occupancy blocks a later rekey 4ms
+     ✓ realizes remove-restore-rekey-scalar as one coherent prepared topology turn 3ms
+     ✓ refuses rekey when a later prepared restore re-occupies the vacated destination 2ms
+     ✓ realizes same-subject remove then restore at a new key 2ms
+     ✓ realizes fresh add plus later scalar without physically creating the subject during preparation 1ms
+     ✓ does not consume a planned fresh subject id when later realization validation refuses 1ms
+     ✓ consumes a committed fresh subject id exactly once and advances the next ordinary allocation 1ms
+     ✓ treats fresh add at a historical key as a new subject lifetime 3ms
+     ✓ realizes fresh add followed by rekey and scalar against prepared future topology 2ms
+     ✓ realizes same-key replacement as remove old subject then fresh add new subject 2ms
+     ✓ retains held subject facades across same-key fresh replacement until the old subject is restored elsewhere 2ms
+     ✓ validates known scalar positions with zero tree visits across 10 to 100k positions  1690ms
+     ✓ refuses unknown positions without a traversal fallback 1ms
+     ✓ restores each removed subject from its own structural payload on one collection owner 3ms
+     ✓ reactivates the exact held row and field when restoring the same tombstoned subject 1ms
+     ✓ still emits canonical notifier traffic during realization, proving non-authoring is a broader seam than the adapter 1ms
+     ✓ keeps scalar realization causally silent between authored writes 3ms
+     ✓ keeps structural realization causally silent while preserving subject identity 2ms
+     ✓ restores authored capture after a realization write throws 1ms
+     × keeps outer transaction authorship active across an inner realization write 16ms
+     ✓ atomicity spike: pre-commit scalar staging failure leaves state and notifications unchanged 2ms
+     ✓ stales an open scalar frame after a structural rekey before commit 2ms
+     ✓ refuses a stale heterogeneous realization before any prepared structural mutation applies 5ms
+     ✓ commits a root-scalar and structural realization under one shared physical revision 2ms
+     ✓ validates the full effect set before any mutation and refuses structural drift without partial application 1ms
+(node:14823) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/whole-value-new-keys.spec.ts (26 tests | 3 failed) 129ms
+     ✓ installs new scalar, undefined, array and nested keys after a primed snapshot 21ms
+     ✓ tracks new membership for transaction inspection and rollback 24ms
+     ✓ undoes and redoes creation with stable held identity 13ms
+     ✓ keeps a pre-existing Link observing newly supplied descendants 9ms
+     ✓ preserves internal applyState unknown-key ignore 1ms
+     ✓ preparation failure in a nested new child leaves the complete write untouched 2ms
+     × retains newly installed membership responsibility after a failed rollback 12ms
+     ✓ installs inherited-name keys as own state while rejecting prototype pollution 2ms
+     ✓ captures creation of name despite callable metadata 3ms
+     ✓ captures creation of length despite callable metadata 2ms
+     ✓ captures creation of constructor despite callable metadata 2ms
+     ✓ captures creation of toString despite callable metadata 3ms
+     ✓ keeps the identity of a member created by a nested updater 3ms
+     × refuses removal of a created branch with a confirmed descendant dependency 2ms
+     ✓ does useful rollback with unrelated later truth and exact callback error identity 3ms
+     ✓ does not expose construction marker definitions from a new ordinary subtree 1ms
+     ✓ repeated preparation failures retain no unpublished scalar payloads 2ms
+     ✓ application equality failure retains no uninstalled prepared payloads 2ms
+     ✓ validates opaque construction diagnostics before registering sibling slots 1ms
+     × preserves reentrant installed handles when outer private preparation throws 2ms
+     ✓ aborts installed new membership when a later existing value throws 3ms
+     ✓ aborts the seeded-key control when a later existing value throws 4ms
+     ✓ preserves entry order during equality and coherence after grouped delivery 3ms
+     ✓ exposes usable recovery for an installed member when automatic abort refuses 4ms
+     ✓ delivers completed partial membership to Link when a later value throws 3ms
+     ✓ does not acquire absent descendants through reads 1ms
+(node:15012) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/transaction-safety.spec.ts (23 tests | 1 failed) 199ms
+     ✓ does not confuse a literal dotted entity field with a nested field 49ms
+     ✓ failed structural rollback retains authority and can retry after conflict removal 35ms
+     ✓ older overlapping rollback refuses atomically; newer-first rollback remains possible 6ms
+     ✓ preserves same-tick ordinary write 1ms
+     ✓ preserves same-tick ordinary write with ABA 15ms
+     ✓ preserves same-tick external write 2ms
+     ✓ preserves same-tick external write with ABA 2ms
+     ✓ rejecting older after newer confirmation preserves the newer fields 2ms
+     ✓ disjoint pending transactions settle independently 2ms
+     ✓ held handle cannot mutate destroyed tree 4ms
+     ✓ throw undefined is still a thrown callback 2ms
+     ✓ reads queued ABA evidence without callbacks and retains it across retry and flush 3ms
+     ✓ queued evidence for an older pending does not become later evidence for a new pending 3ms
+     ✓ does not confuse transaction ids with turn ids 3ms
+     ✓ refused plan keeps scoped and tree-held durable work closed (delivered) 14ms
+     ✓ refused plan keeps scoped and tree-held durable work closed (queued) 3ms
+     ✓ observer throw after physical compensation retires the pending exactly once 3ms
+     ✓ synchronous notifier throw after a mixed installation is not a validation refusal 6ms
+     ✓ callback refusal retains pending ownership and durable hold until terminal destruction 6ms
+     ✓ retains external ABA written inside a failed callback (batching=true) 10ms
+     × retains external ABA written inside a failed callback (batching=false) 20ms
+   ✓ retains queued third-party evidence even when a later pending blocks the first attempt 3ms
+   ✓ opening an unrelated pending cannot erase queued ABA evidence for an older one 4ms
+(node:15015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-granular-reactivity.spec.ts (10 tests | 1 failed) 1813ms
+     ✓ publishes a field and collection projection as one coherent state 19ms
+     ✓ removal releases the entity: held reference reads undefined, byId absent 4ms
+     ✓ re-add after removal works through a fresh byId 4ms
+     × a single-entity update does not rebuild the collection 1030ms
+     ✓ repeated collection reads between writes are cached  740ms
+     ✓ map() stays a snapshot, not a live view 1ms
+     ✓ does not let a held node revive when the same key is reused by a new subject 3ms
+     ✓ a held FIELD reference also stays absent across key reuse by a new subject 3ms
+     ✓ resolves internal acquired handles by subject, not by reused key address 4ms
+     ✓ keeps acquired handles isolated when setAll reuses a tombstoned key 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-granular-reactivity.spec.ts > entityMap — collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection
+AssertionError: expected 13000 to be less than 2000
+ ❯ src/lib/entity-granular-reactivity.spec.ts:215:19
+    213|     const small = updates(2000);
+    214|     expect(updates(20000)).toBe(small);
+    215|     expect(small).toBeLessThan(2000);
+       |                   ^
+    216|     // Control: the counter sees a copy, so equality is not vacuous. T…
+    217|     // entries iterated and two copied, then three mapped.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > retains newly installed membership responsibility after a failed rollback
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > refuses removal of a created branch with a confirmed descendant dependency
+Error: Scalar selection requires prepared admission
+ ❯ src/enhancers/transactions/transactions.ts:2891:25
+    2889|     const endpoint=Object.is(old?.kind==='set'?old.before:mutation.bef…
+    2890|     const admission=mutation.preparedTerminal?.scalarAdmission;
+    2891|     if(!admission)throw new Error('Scalar selection requires prepared …
+       |                         ^
+    2892|     // These are this attempt's detached effect objects, not installed…
+    2893|     bindFieldEndpoints(admission.effect,pair);
+ ❯ prepareScalarSelection src/lib/internals/native-scalar-selection.ts:7:263
+ ❯ Object.prepare src/lib/experimental-publication/private.ts:180:55
+ ❯ publicationPreparer src/lib/internals/intrinsic-mutation.ts:329:32
+ ❯ preparePublication src/lib/internals/location-runtime.ts:483:18
+ ❯ src/lib/internals/location-runtime.ts:490:13
+ ❯ Object.commitRecorded src/lib/internals/tree-scalar-slot-runtime.ts:337:34
+ ❯ src/lib/internals/tree-scalar-leaf-runtime.ts:164:35
+ ❯ Object.replace src/lib/internals/location-runtime.ts:488:26
+ ❯ node.n src/lib/internals/location-runtime.ts:461:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/lib/whole-value-new-keys.spec.ts > owner-authorized whole-value new keys > preserves reentrant installed handles when outer private preparation throws
+Error: Scalar selection requires prepared admission
+ ❯ src/enhancers/transactions/transactions.ts:2891:25
+    2889|     const endpoint=Object.is(old?.kind==='set'?old.before:mutation.bef…
+    2890|     const admission=mutation.preparedTerminal?.scalarAdmission;
+    2891|     if(!admission)throw new Error('Scalar selection requires prepared …
+       |                         ^
+    2892|     // These are this attempt's detached effect objects, not installed…
+    2893|     bindFieldEndpoints(admission.effect,pair);
+ ❯ prepareScalarSelection src/lib/internals/native-scalar-selection.ts:7:263
+ ❯ Object.prepare src/lib/experimental-publication/private.ts:180:55
+ ❯ publicationPreparer src/lib/internals/intrinsic-mutation.ts:329:32
+ ❯ preparePublication src/lib/internals/location-runtime.ts:483:18
+ ❯ src/lib/internals/location-runtime.ts:490:13
+ ❯ Object.commitRecorded src/lib/internals/tree-scalar-slot-runtime.ts:337:34
+ ❯ src/lib/internals/tree-scalar-leaf-runtime.ts:164:35
+ ❯ Object.replace src/lib/internals/location-runtime.ts:488:26
+ ❯ node.saved0 src/lib/internals/location-runtime.ts:461:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/enhancers/transactions/transaction-safety.spec.ts > callback failure cannot reverse other authority > retains external ABA written inside a failed callback (batching=false)
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/enhancers/transactions/transaction-safety.spec.ts:361:25
+    359|           })
+    360|         ).toThrow();
+    361|         expect(t.$.x()).toBe(1);
+       |                         ^
+    362|         expect(peekInternalTransactionRuntime(t)?.getPendingTurnCount(…
+    363|           1
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps outer transaction authorship active across an inner realization write
+AssertionError: expected '' to be 'B' // Object.is equality
+
+- Expected
++ Received
+
+- B
+
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:3924:29
+    3922|
+    3923|     expect(tree.$.left()).toBe('');
+    3924|     expect(tree.$.middle()).toBe('B');
+       |                             ^
+    3925|     expect(tree.$.right()).toBe('');
+    3926|     expect(tree.__transactions.getPendingTurnCount()).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  6 failed | 96 passed (102)
+   Start at  21:21:13
+   Duration  12.72s (transform 1.29s, setup 0ms, import 2.37s, tests 3.99s, environment 4.68s)
+
+JSON report written to /private/tmp/st-r3-r2-four-file-differential/r3/RESULTS.json
+Warning: command "node tools/run-core-vitest.mjs src/enhancers/transactions/transaction-safety.spec.ts src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts src/lib/whole-value-new-keys.spec.ts src/lib/entity-granular-reactivity.spec.ts --maxWorkers=1 --reporter=default --reporter=json --outputFile=/private/tmp/st-r3-r2-four-file-differential/r3/RESULTS.json" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      13.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     13.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    13.9s

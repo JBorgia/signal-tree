@@ -1,0 +1,9 @@
+{
+  "recordedAt": "2026-11-03T18:07:41.136331+00:00",
+  "appliesBefore": "first screen test; zero test invocations in this protocol so far",
+  "change": "Full manifest hashes stay before launch and after child exit; remove full hashing inside live telemetry loop to avoid delaying resource checks. No thresholds, source, test bodies or timeouts changed.",
+  "initialGraph": "exit0; complete within180s including final hashes, no survivors; initial controller and preregistration retained",
+  "runSha256": "78ae216f317ef02a9ea1089755a2739ee3a34b08244df0337a31cfd8effbfc54",
+  "initialRunSha256": "c670d540b3e47c232efdc7f0f267c520266d2e67c841aac1002e80dce4273f33",
+  "livePoll": "0.5s sleep plus telemetry command latency, no source hashing during live loop"
+}

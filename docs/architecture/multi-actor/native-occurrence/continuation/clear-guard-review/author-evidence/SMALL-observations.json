@@ -1,0 +1,110 @@
+[
+  {
+    "n": 3,
+    "name": "transactions",
+    "total": 7,
+    "sites": [
+      {
+        "key": "    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+        "calls": 3,
+        "visits": 7,
+        "lengths": [
+          3,
+          3,
+          3
+        ],
+        "stack": "Error: find site\n    at Array.find (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/clear-find-attribution.spec.ts:16:41)\n    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)\n    at orderPhysicalPlacements (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:3003:19)\n    at planHeterogeneousFrame (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1310:28)\n    at preparePointRealization (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:903:27)\n    at Object.applyAtomically (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3838:35)\n    at rollbackPendingTurnAt (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts:91:16)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3815:20\n    at withWriteContext (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/write-context.ts:65:12)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3763:9"
+      }
+    ]
+  },
+  {
+    "n": 3,
+    "name": "transactions-restoration",
+    "total": 7,
+    "sites": [
+      {
+        "key": "    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+        "calls": 3,
+        "visits": 7,
+        "lengths": [
+          3,
+          3,
+          3
+        ],
+        "stack": "Error: find site\n    at Array.find (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/clear-find-attribution.spec.ts:16:41)\n    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)\n    at orderPhysicalPlacements (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:3003:19)\n    at planHeterogeneousFrame (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1310:28)\n    at preparePointRealization (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:903:27)\n    at Object.applyAtomically (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3838:35)\n    at rollbackPendingTurnAt (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts:91:16)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3815:20\n    at withWriteContext (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/write-context.ts:65:12)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3763:9"
+      }
+    ]
+  },
+  {
+    "n": 3,
+    "name": "restoration-transactions",
+    "total": 7,
+    "sites": [
+      {
+        "key": "    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+        "calls": 3,
+        "visits": 7,
+        "lengths": [
+          3,
+          3,
+          3
+        ],
+        "stack": "Error: find site\n    at Array.find (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/clear-find-attribution.spec.ts:16:41)\n    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)\n    at orderPhysicalPlacements (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:3003:19)\n    at planHeterogeneousFrame (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1310:28)\n    at preparePointRealization (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:903:27)\n    at Object.applyAtomically (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3838:35)\n    at rollbackPendingTurnAt (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts:91:16)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3815:20\n    at withWriteContext (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/write-context.ts:65:12)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3763:9"
+      }
+    ]
+  },
+  {
+    "n": 8,
+    "name": "transactions",
+    "total": 17,
+    "sites": [
+      {
+        "key": "    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+        "calls": 3,
+        "visits": 17,
+        "lengths": [
+          8,
+          8,
+          8
+        ],
+        "stack": "Error: find site\n    at Array.find (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/clear-find-attribution.spec.ts:16:41)\n    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)\n    at orderPhysicalPlacements (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:3003:19)\n    at planHeterogeneousFrame (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1310:28)\n    at preparePointRealization (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:903:27)\n    at Object.applyAtomically (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3838:35)\n    at rollbackPendingTurnAt (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts:91:16)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3815:20\n    at withWriteContext (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/write-context.ts:65:12)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3763:9"
+      }
+    ]
+  },
+  {
+    "n": 8,
+    "name": "transactions-restoration",
+    "total": 17,
+    "sites": [
+      {
+        "key": "    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+        "calls": 3,
+        "visits": 17,
+        "lengths": [
+          8,
+          8,
+          8
+        ],
+        "stack": "Error: find site\n    at Array.find (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/clear-find-attribution.spec.ts:16:41)\n    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)\n    at orderPhysicalPlacements (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:3003:19)\n    at planHeterogeneousFrame (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1310:28)\n    at preparePointRealization (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:903:27)\n    at Object.applyAtomically (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3838:35)\n    at rollbackPendingTurnAt (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts:91:16)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3815:20\n    at withWriteContext (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/write-context.ts:65:12)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3763:9"
+      }
+    ]
+  },
+  {
+    "n": 8,
+    "name": "restoration-transactions",
+    "total": 17,
+    "sites": [
+      {
+        "key": "    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+        "calls": 3,
+        "visits": 17,
+        "lengths": [
+          8,
+          8,
+          8
+        ],
+        "stack": "Error: find site\n    at Array.find (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/clear-find-attribution.spec.ts:16:41)\n    at orderRestoresForPlacement (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)\n    at orderPhysicalPlacements (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:3003:19)\n    at planHeterogeneousFrame (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1310:28)\n    at preparePointRealization (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:903:27)\n    at Object.applyAtomically (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3838:35)\n    at rollbackPendingTurnAt (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts:91:16)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3815:20\n    at withWriteContext (/private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/lib/write-context.ts:65:12)\n    at /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:3763:9"
+      }
+    ]
+  }
+]

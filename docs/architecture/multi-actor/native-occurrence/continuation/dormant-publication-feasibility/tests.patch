@@ -1,0 +1,96 @@
+diff --git a/packages/kernel/src/lib/dormant-feasibility-discriminator.spec.ts b/packages/kernel/src/lib/dormant-feasibility-discriminator.spec.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/kernel/src/lib/dormant-feasibility-discriminator.spec.ts
+@@ -0,0 +1,43 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,entityMap,transactions,link} from '../index';
++import {getPathNotifier} from './path-notifier';
++type Receipt={read():Readonly<{state:string;reason?:string;basis?:string}>};
++type Connection=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):Receipt};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++for(const kind of ['scalar','entity'] as const)for(const history of ['clean','foreign-pending','foreign-confirmed'] as const)
++it(`late enrollment preserves ${kind}/${history} source distinction`,async()=>{
++ const source=signalTree({x:0,rows:entityMap<{id:string;n:number},string>()});
++ const owner=signalTree({z:0},{enhancers:[transactions()]});
++ const late=signalTree({z:0},{enhancers:[transactions()]});
++ const target=signalTree({y:0});const sent:number[]=[];
++ let passive:ReturnType<typeof link>|undefined;let c:Connection|undefined;
++ try{
++  source.$.rows.addOne({id:'a',n:0});
++  const write=(n:number)=>{if(kind==='scalar')source.$.x(n);else source.$.rows.updateOne('a',{n});};
++  write(1);write(2); // Same clean prefix; source has no enhancer or Link.
++  const p=history==='clean'?undefined:owner.transact(()=>owner.$.z(1));
++  write(7);await flush();
++  if(history==='foreign-confirmed'){p!.confirm();await flush();}
++  // Relationship baseline adoption must not rewrite the source's provenance.
++  passive=link(kind==='scalar'?source.$.x:source.$.rows,{set:()=>{}});
++  c=link(target.$.y,{set:v=>{sent.push(v);}}) as Connection;
++  const q=late.transact(()=>late.$.z(9));const pendingQ=q.inspect();let calls=0;
++  const receipt=c.declare({kind:'independent'},()=>source.updateAndReport(input=>{
++   calls++;const snapshot=input as unknown as {x:number;rows:{all:{id:string;n:number}[]}};
++   target.$.y(kind==='scalar'?snapshot.x:snapshot.rows.all[0].n);return {};
++  }));
++  const before=receipt.read();await flush();const beforeSettlement=[...sent];
++  expect(calls).toBe(1);expect(target.$.y()).toBe(7);expect(q.inspect()).toEqual(pendingQ);
++  if(history==='clean'){
++   expect(before.state).not.toBe('conservative');expect(sent).toEqual([7]);expect(receipt.read()).toMatchObject({state:'started',basis:'declared'});
++  }else{
++   expect(before).toMatchObject({state:'conservative',reason:'unknown'});
++   if(history==='foreign-pending'){expect(sent).toEqual([]);p!.confirm();await flush();}
++   expect(sent).toEqual([7]);expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});
++  }
++  writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`${kind}-${history}.json`),JSON.stringify({kind,history,calls,before,beforeSettlement,after:receipt.read(),sent},null,2));
++  await c.settled();q.confirm();await flush();
++ }finally{c?.dispose();passive?.dispose();source.destroy();target.destroy();owner.destroy();late.destroy();}
++});
+diff --git a/packages/kernel/src/lib/dormant-input-discriminator.spec.ts b/packages/kernel/src/lib/dormant-input-discriminator.spec.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/kernel/src/lib/dormant-input-discriminator.spec.ts
+@@ -0,0 +1,43 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,entityMap,transactions,link} from '../index';
++import {getPathNotifier} from './path-notifier';
++type Receipt={read():Readonly<{state:string;reason?:string;basis?:string}>};
++type Connection=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):Receipt};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++for(const kind of ['scalar','entity'] as const)for(const history of ['clean','foreign-pending','foreign-confirmed'] as const)
++it(`first native input preserves ${kind}/${history} without source Link`,async()=>{
++ const source=signalTree({x:0,rows:entityMap<{id:string;n:number},string>()});
++ const owner=signalTree({z:0},{enhancers:[transactions()]});
++ const late=signalTree({z:0},{enhancers:[transactions()]});
++ const target=signalTree({y:0});const sent:number[]=[];
++ let passive:ReturnType<typeof link>|undefined;let c:Connection|undefined;
++ try{
++  source.$.rows.addOne({id:'a',n:0});
++  const write=(n:number)=>{if(kind==='scalar')source.$.x(n);else source.$.rows.updateOne('a',{n});};
++  write(1);write(2); // Same clean prefix; source has no enhancer or Link.
++  const p=history==='clean'?undefined:owner.transact(()=>owner.$.z(1));
++  write(7);await flush();
++  if(history==='foreign-confirmed'){p!.confirm();await flush();}
++  // Relationship baseline adoption must not rewrite the source's provenance.
++  // No source Link: first provenance demand is native input capture after q opens.
++  c=link(target.$.y,{set:v=>{sent.push(v);}}) as Connection;
++  const q=late.transact(()=>late.$.z(9));const pendingQ=q.inspect();let calls=0;
++  const receipt=c.declare({kind:'independent'},()=>source.updateAndReport(input=>{
++   calls++;const snapshot=input as unknown as {x:number;rows:{all:{id:string;n:number}[]}};
++   target.$.y(kind==='scalar'?snapshot.x:snapshot.rows.all[0].n);return {};
++  }));
++  const before=receipt.read();await flush();const beforeSettlement=[...sent];
++  expect(calls).toBe(1);expect(target.$.y()).toBe(7);expect(q.inspect()).toEqual(pendingQ);
++  if(history==='clean'){
++   expect(before.state).not.toBe('conservative');expect(sent).toEqual([7]);expect(receipt.read()).toMatchObject({state:'started',basis:'declared'});
++  }else{
++   expect(before).toMatchObject({state:'conservative',reason:'unknown'});
++   if(history==='foreign-pending'){expect(sent).toEqual([]);p!.confirm();await flush();}
++   expect(sent).toEqual([7]);expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});
++  }
++  writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`${kind}-${history}.json`),JSON.stringify({kind,history,calls,before,beforeSettlement,after:receipt.read(),sent},null,2));
++  await c.settled();q.confirm();await flush();
++ }finally{c?.dispose();passive?.dispose();source.destroy();target.destroy();owner.destroy();late.destroy();}
++});

@@ -1,0 +1,71 @@
+{
+  "createdUtc": "2026-11-03T15:18:47.036450+00:00",
+  "candidate": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+  "baseManifest": "42280bba7bc92b75ae3f252742de5b7f78e4cce0b61c1d935212d7e438f2baf1",
+  "compositionSourceManifest": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+  "sourceFiles": 3124,
+  "diagnosticRuntimeManifest": "b4d66da31a7927e0d255add68c424b50a99b8ece3a21a594f6ef2ecb57c982e6",
+  "sameDiagnosticRuntime": true,
+  "packageFilesUnchanged": 1111,
+  "sourceAndArtifactFixturesUnchanged": 14,
+  "correctedPaths": [
+    "tools/experiments/entity-registration/README.md",
+    "tools/verify-entity-registration-artifacts.mjs",
+    "tools/verify-gates.mjs"
+  ],
+  "fullToolingPathsRelativeToDiagnostic": [
+    "tools/experiments/entity-registration/README.md",
+    "tools/fixtures/entity-registration-consumer/package-lock.json",
+    "tools/fixtures/entity-registration-consumer/package.json",
+    "tools/verify-entity-registration-artifacts.mjs",
+    "tools/verify-gates.mjs"
+  ],
+  "peerFixtureBytesUnchanged": true,
+  "preservedIdentities": [
+    {
+      "root": "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor",
+      "manifest": "26193d775b3e3f9c0ecc859de029dc20a1a591638730846ac0413bc1e89b6c1e",
+      "files": 3122,
+      "verifiedBefore": true,
+      "verifiedAfter": true
+    },
+    {
+      "root": "/private/tmp/st-c28-r3-diagnostic-gate-composition/candidate",
+      "manifest": "42280bba7bc92b75ae3f252742de5b7f78e4cce0b61c1d935212d7e438f2baf1",
+      "files": 3124,
+      "verifiedBefore": true,
+      "verifiedAfter": true
+    }
+  ],
+  "patches": [
+    {
+      "patch": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/F1-correction.patch",
+      "sha256": "c2f78333eed4547bd72eb5c81af19478764560b9364eeac7741bb04a2c7285c0",
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/st-c28-r3-entity-artifact-gate-f1/F1-correction.patch"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-diagnostic-gate-composition/candidate",
+      "exit": 0
+    },
+    {
+      "patch": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/full-tooling.patch",
+      "sha256": "a25c15af4659d7bf06e19d251a7c3d4a34a950e913f7946b818060ca657ae8f0",
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/st-c28-r3-entity-artifact-gate-f1/full-tooling.patch"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-diagnostic-reduction/candidate",
+      "exit": 0
+    }
+  ],
+  "toolRestoredHash": "a73bd9e58aeccee5cb5969432326b9de0e1b4025fc8f897b99ec61787732c828",
+  "toolHashNow": "a73bd9e58aeccee5cb5969432326b9de0e1b4025fc8f897b99ec61787732c828",
+  "independentReview": "underway with Main; no acceptance claimed",
+  "npmQualification": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/NPM-QUALIFICATION.json",
+  "rootEdits": false
+}

@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test angular scalar-frame-publication whole-value-new-keys entity-native-obligation-composition --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:30:59.867Z",
+    "endTime": "2026-11-03T05:31:03.629Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "angular:test",
+      "target": "test",
+      "projectName": "angular",
+      "hash": "11502237949275490632",
+      "startTime": "2026-11-03T05:30:59.891Z",
+      "endTime": "2026-11-03T05:31:03.629Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

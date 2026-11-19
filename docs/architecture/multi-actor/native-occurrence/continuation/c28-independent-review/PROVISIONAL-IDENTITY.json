@@ -1,0 +1,12 @@
+{
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": "5092a2070639e8c3805810997a33ab56dd51b2f400d57f1af6254520e8952a30",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "8e3586ff65602c8e85eff2a7ce2621c1f396fcbf5ed8de5f73c8f422e995b796",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354",
+    "packages/kernel/src/lib/internals/snapshot-installation.ts": "02ffc94a1b4150bb108a5ed4bd01e3bfd36bbef86af2c1bf96552d7e41f67a7b",
+    "packages/kernel/src/lib/signal-tree.ts": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "packages/kernel/src/lib/utils.ts": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232"
+  },
+  "changedDuringCapture": []
+}

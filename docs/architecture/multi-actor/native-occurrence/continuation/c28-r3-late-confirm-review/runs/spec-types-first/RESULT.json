@@ -1,0 +1,8 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "changedManifestFiles": [],
+  "overlayUnchanged": {
+    "packages/kernel/src/lib/late-confirm-comparison-observation.spec.ts": true
+  }
+}

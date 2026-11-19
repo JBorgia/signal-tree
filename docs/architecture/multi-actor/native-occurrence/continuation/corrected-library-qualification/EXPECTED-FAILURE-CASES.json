@@ -1,0 +1,27 @@
+[
+  {
+    "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/open-key-reachability.spec.ts",
+    "title": "a promised arbitrary descendant is a usable location",
+    "sourceSha256": "41bd97ea177fda143caa58eadb443c8d48b510d972dbfacf71ff37a4d6610c0f"
+  },
+  {
+    "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "title": "4. transaction rolls back \u2014 effects become rolled-back, not committed",
+    "sourceSha256": "b9e257e980ce1a59fa4c0643c8fa964dd10565a5c804d3fbd515e9c1e197d3db"
+  },
+  {
+    "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "title": "6. committed effect + later rolled-back transaction => partial",
+    "sourceSha256": "b9e257e980ce1a59fa4c0643c8fa964dd10565a5c804d3fbd515e9c1e197d3db"
+  },
+  {
+    "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "title": "10. SUB-PREDICTION A: one transaction may contain two provenance scopes",
+    "sourceSha256": "b9e257e980ce1a59fa4c0643c8fa964dd10565a5c804d3fbd515e9c1e197d3db"
+  },
+  {
+    "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "title": "12. a reversal names its cause and does not implicate the other scope",
+    "sourceSha256": "b9e257e980ce1a59fa4c0643c8fa964dd10565a5c804d3fbd515e9c1e197d3db"
+  }
+]

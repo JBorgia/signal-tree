@@ -1,0 +1,158 @@
+
+> nx run kernel:test --testFile=entity-egress-footprint.spec.ts branch-omission-correctness.spec.ts link-commit-ordering.spec.ts link-commit-boundary-carrier.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=entity-egress-footprint.spec.ts branch-omission-correctness.spec.ts link-commit-ordering.spec.ts link-commit-boundary-carrier.spec.ts --maxWorkers=1
+
+(node:85202) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-oracle-alignment/candidate/packages/kernel
+
+(node:85250) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/branch-omission-correctness.spec.ts (35 tests | 2 failed) 212ms
+     × same-turn removal and reintroduction ends absent at Link 12ms
+     × an omission does not carry an unchanged inspection-only sibling to Link 4ms
+(node:85269) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/link-commit-ordering.spec.ts (7 tests | 1 failed) 92ms
+     × one tree open transaction does not block another tree publication 8ms
+(node:85754) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-egress-footprint.spec.ts (15 tests | 1 failed) 83ms
+     × identical row replacement and identity updater preserve no-op admission 6ms
+(node:85772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/link-commit-boundary-carrier.spec.ts (5 tests | 1 failed) 42ms
+     × a FOREIGN tree's open transaction neither absorbs nor delays this tree's write 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
++   "age": 8,
+    "name": "Ada",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:255:33
+    253|         await nextTask();
+    254|         await relation.settled();
+    255|         expect(received.at(-1)).toStrictEqual(
+       |                                 ^
+    256|           end === 'present' ? { name: 'Ada', age: undefined } : { name…
+    257|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > an omission does not carry an unchanged inspection-only sibling to Link
+AssertionError: expected { name: 'Inspected' } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
+-   "name": "Ada",
++   "name": "Inspected",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:309:31
+    307|       await relation.settled();
+    308|       expect(tree.$.profile()).toStrictEqual({ name: 'Inspected' });
+    309|       expect(received.at(-1)).toStrictEqual({ name: 'Ada' });
+       |                               ^
+    310|     } finally {
+    311|       relation.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/entity-egress-footprint.spec.ts > entity egress preserves authored field footprints > identical row replacement and identity updater preserve no-op admission
+AssertionError: expected [ [ { id: 'r', x: 99, y: +0 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "r",
++       "x": 99,
++       "y": 0,
++     },
++   ],
++ ]
+
+ ❯ src/lib/entity-egress-footprint.spec.ts:216:20
+    214|       await flush();
+    215|       await connection.settled();
+    216|       expect(sent).toEqual([]);
+       |                    ^
+    217|     } finally {
+    218|       connection.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > a FOREIGN tree's open transaction neither absorbs nor delays this tree's write
+AssertionError: expected undefined to be 'MINE' // Object.is equality
+
+- Expected:
+"MINE"
+
++ Received:
+undefined
+
+ ❯ src/lib/link-commit-boundary-carrier.spec.ts:164:44
+    162|     await flush();
+    163|
+    164|     expect(durable(mine.writes).at(-1)?.a).toBe('MINE');
+       |                                            ^
+    165|     expect(theirs.writes).toEqual([]); // and theirs is still held
+    166|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/lib/link-commit-ordering.spec.ts > public Link publication respects the commit boundary > one tree open transaction does not block another tree publication
+AssertionError: expected 0 to be greater than 0
+ ❯ src/lib/link-commit-ordering.spec.ts:167:35
+    165|     // unaffected by the first tree's pending transaction.
+    166|     expect(recBlocked.writes).toEqual([]);
+    167|     expect(recFree.writes.length).toBeGreaterThan(0);
+       |                                   ^
+    168|     expect(recFree.writes[recFree.writes.length - 1]).toMatchObject({
+    169|       a: 'free1',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  5 failed | 57 passed (62)
+   Start at  17:00:31
+   Duration  12.45s (transform 3.01s, setup 0ms, import 4.88s, tests 430ms, environment 5.61s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=entity-egress-footprint.spec.ts branch-omission-correctness.spec.ts link-commit-ordering.spec.ts link-commit-boundary-carrier.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      13.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     13.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    13.9s

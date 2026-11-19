@@ -1,0 +1,6 @@
+{
+  "caseDeadline": true,
+  "startupDeadline": true,
+  "onlyOwnedGroupsSignalled": true,
+  "syntheticOnly": true
+}

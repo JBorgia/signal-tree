@@ -1,0 +1,1 @@
+{"confirmThrew":false,"pending":0,"calls":1,"reportedErrors":1,"limit":"These public observer failures do not escape confirm; no native success/confirm-throw case established."}

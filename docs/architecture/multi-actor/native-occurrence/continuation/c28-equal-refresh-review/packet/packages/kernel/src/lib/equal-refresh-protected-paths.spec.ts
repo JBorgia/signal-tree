@@ -1,0 +1,84 @@
+import { expect, it } from 'vitest';
+import { link, signalTree, transactions } from '../index';
+import { withWriteContext } from './write-context';
+const drain = async () => { for (let i = 0; i < 120; i++) await Promise.resolve(); };
+
+for (const timing of ['confirmed-before', 'confirmed-inside'] as const) {
+  it(`equal target still validates the newly consumed input: ${timing}`, async () => {
+    const source = signalTree({ q: 0 }, { enhancers: [transactions()] });
+    const target = signalTree({ x: 0 });
+    const late = signalTree({ z: 0 }, { enhancers: [transactions()] });
+    const sent: number[] = [];
+    const c = link(target.$.x, { set: value => { sent.push(value); } });
+    try {
+      const first = c.declare({ kind: 'independent' }, () => target.$.x(7));
+      await drain(); await c.settled(); expect(sent).toEqual([7]);
+      const oldStatus = first.read(); expect(oldStatus).toEqual({ state: 'started', basis: 'declared' });
+      const q = source.transact(() => source.$.q(7));
+      if (timing === 'confirmed-before') { q.confirm(); await drain(); }
+      let calls = 0;
+      let error: unknown;
+      try {
+        c.declare({ kind: 'independent' }, () => {
+          // A real source input capture, with NO source write on return. Thus a
+          // second source admission cannot accidentally supply the contradiction.
+          source.updateAndReport(current => {
+            calls++; expect(current.q).toBe(7);
+            if (timing === 'confirmed-inside') q.confirm();
+            target.$.x(current.q);
+            return {};
+          });
+        });
+      } catch (caught) { error = caught; }
+      expect(calls).toBe(1); expect(target.$.x()).toBe(7);
+      if (timing === 'confirmed-inside') {
+        expect(error).toMatchObject({
+          code: 'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',
+          stage: 'after-callback', reason: 'contradiction',
+        });
+      } else expect(error).toBeUndefined();
+      await drain(); expect(sent).toEqual([7]); expect(first.read()).toEqual(oldStatus);
+      expect(Object.isFrozen(oldStatus)).toBe(true);
+      const pending = late.transact(() => late.$.z(9)); const ownership = pending.inspect();
+      c.declare({ kind: 'independent' }, () => target.$.x(8));
+      await drain(); await c.settled();
+      expect(sent).toEqual([7, 8]); expect(target.$.x()).toBe(8);
+      expect(pending.inspect()).toEqual(ownership);
+      pending.rollback(); await drain(); expect(sent).toEqual([7, 8]);
+      expect(first.read()).toEqual(oldStatus);
+    } finally { c.dispose(); source.destroy(); target.destroy(); late.destroy(); }
+  });
+}
+
+for (const route of ['leaf', 'whole'] as const) {
+  it(`equal physical inspection value still receives real declared ordinary adoption: ${route}`, async () => {
+    const tree = signalTree({ pair: { x: 0, y: 0 } });
+    const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
+    const sent: { x: number; y: number }[] = [];
+    const c = link(tree.$.pair, { set: value => { sent.push(value); } });
+    let off = () => { /* Subscription begins after private inspection setup. */ };
+    try {
+      // Established private inspection ingress only; subsequent authoring,
+      // reads, owner inspection, transport and cleanup use public operations.
+      withWriteContext({ participation: 'inspection' }, () => tree.$.pair.x(7));
+      await drain(); expect(tree.$.pair()).toEqual({ x: 7, y: 0 }); expect(sent).toEqual([]);
+      const q = foreign.transact(() => foreign.$.q(1)); const ownership = q.inspect();
+      let notices = 0, calls = 0;
+      off = tree.$.pair.x.subscribe(() => { notices++; });
+      c.declare({ kind: 'independent' }, () => {
+        calls++;
+        if (route === 'leaf') tree.$.pair.x(7);
+        else tree.$.pair({ x: 7, y: 0 });
+      });
+      await drain(); await c.settled();
+      expect(calls).toBe(1); expect(notices).toBe(0);
+      expect(sent).toEqual([{ x: 7, y: 0 }]); expect(q.inspect()).toEqual(ownership);
+      q.rollback(); await drain();
+      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+      expect(sent).toEqual([{ x: 7, y: 0 }]);
+      c.declare({ kind: 'independent' }, () => tree.$.pair.y(2));
+      await drain(); await c.settled();
+      expect(sent).toEqual([{ x: 7, y: 0 }, { x: 7, y: 2 }]); expect(notices).toBe(0);
+    } finally { off(); c.dispose(); tree.destroy(); foreign.destroy(); }
+  });
+}

@@ -1,0 +1,57 @@
+--- a/packages/kernel/src/lib/restoration-paired-work.spec.ts
++++ b/packages/kernel/src/lib/restoration-paired-work.spec.ts
+@@ -9,6 +9,9 @@
+ const drain = async () => {
+   for (let i = 0; i < 12; i++) await Promise.resolve();
+ };
++// Leaving the temporal view reads RestorationManager.currentIndex once.
++// This fixture acquires no restoration reader, so it has no reader lifecycle read.
++const TEMPORAL_MANAGER_READS = 1;
+ for (const count of [3, 32, 256]) {
+   it(`paired restoration installs ${count} physical rows once`, async () => {
+     const tree = signalTree(
+@@ -33,7 +36,9 @@
+         resetProductionSubstrateStatsForTesting(stats);
+         tree.jumpTo(1);
+         expect(stats.structuralSubjectTombstones).toBe(count);
+-        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(12 * count);
++        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
++          12 * count + TEMPORAL_MANAGER_READS
++        );
+         expect(tree.$.rows.all()).toEqual([]);
+       } finally {
+         clearProductionSubstrateStatsForTesting();
+--- a/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
+@@ -24,6 +24,11 @@
+   for (let i = 0; i < 12; i++) await Promise.resolve();
+ };
+ const LARGE = 130_000;
++// The acquired restoration reader checks tree.destroyed once per operation,
++// even without subscribers. Redo also leaves the temporal view and reads
++// RestorationManager.currentIndex once. These constants are separate from row work.
++const READER_LIFECYCLE_READS = 1;
++const TEMPORAL_MANAGER_READS = 1;
+ 
+ describe('v16 restoration of turns larger than the argument limit', () => {
+   // The two restoration cases below use one large clear() turn rather than a
+@@ -60,7 +65,9 @@
+       try {
+         tree.jumpTo(0);
+         expect(stats.valueStoreWrites).toBe(LARGE);
+-        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(3 * LARGE);
++        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
++          3 * LARGE + READER_LIFECYCLE_READS
++        );
+         const ids = tree.$.rows.ids();
+         expect(ids.length).toBe(LARGE);
+         expect(ids[0]).toBe(0);
+@@ -70,7 +77,7 @@
+         tree.jumpTo(1);
+         expect(stats.structuralSubjectTombstones).toBe(LARGE);
+         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
+-          12 * LARGE
++          12 * LARGE + TEMPORAL_MANAGER_READS + READER_LIFECYCLE_READS
+         );
+         expect(tree.$.rows.count()).toBe(0);
+       } finally {

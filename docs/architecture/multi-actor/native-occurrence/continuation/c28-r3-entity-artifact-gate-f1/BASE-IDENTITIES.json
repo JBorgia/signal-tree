@@ -1,0 +1,16 @@
+[
+  {
+    "root": "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor",
+    "manifest": "26193d775b3e3f9c0ecc859de029dc20a1a591638730846ac0413bc1e89b6c1e",
+    "files": 3122,
+    "verifiedBefore": true,
+    "verifiedAfter": true
+  },
+  {
+    "root": "/private/tmp/st-c28-r3-diagnostic-gate-composition/candidate",
+    "manifest": "42280bba7bc92b75ae3f252742de5b7f78e4cce0b61c1d935212d7e438f2baf1",
+    "files": 3124,
+    "verifiedBefore": true,
+    "verifiedAfter": true
+  }
+]

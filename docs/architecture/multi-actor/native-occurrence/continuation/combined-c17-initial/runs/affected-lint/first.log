@@ -1,0 +1,36 @@
+
+/private/tmp/st-native-combined-c17/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+   46:3    warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   49:8    warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  137:44   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  137:73   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  193:150  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  320:20   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  323:30   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  330:10   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  341:13   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-native-combined-c17/candidate/packages/kernel/src/lib/experimental-publication/private.ts
+   52:136  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   61:62   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   64:114  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  112:136  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  128:19   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  137:204  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  137:384  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  180:89   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  209:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  224:16   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  302:381  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  328:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  344:2    warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  350:63   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  391:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  417:89   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  431:42   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-native-combined-c17/candidate/packages/kernel/src/lib/recipient-window-independent.spec.ts
+  33:179  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+✖ 27 problems (1 error, 26 warnings)
+

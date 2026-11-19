@@ -1,0 +1,59 @@
+{
+  "inputs": [
+    "/private/tmp/st-native-combined-c16/SNAPSHOT-C16.json",
+    "/private/tmp/st-c17-value-work-correction/SNAPSHOT-VALUE-WORK.json",
+    "/private/tmp/st-equal-whole-c16-qualification/SNAPSHOT-QUALIFICATION.json"
+  ],
+  "changes": [
+    {
+      "path": "packages/kernel/src/lib/entity-signal.ts",
+      "base": "d88a717430732d76e7a3c6cfcba3211a707ae9adee1b7731f4b5fd9ed176cd22",
+      "left": "d88a717430732d76e7a3c6cfcba3211a707ae9adee1b7731f4b5fd9ed176cd22",
+      "right": "c9be851220b1408c95ae801a1351b0586a5f3ea4b319046fd9fcd842a72dac6b",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/native-authored-footprint.spec.ts",
+      "base": "930fe011c978ca82ed406b662e31a0916265c446e6d97e01403984f616710183",
+      "left": "930fe011c978ca82ed406b662e31a0916265c446e6d97e01403984f616710183",
+      "right": "f557e7bdb5ba3fdec3d1edae79cbce50b3a3694930687887786b955b41f3526c",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/whole-bounded-qualification.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "08dc8947d1a5574b14e1ad9ec6eb095b8637a266746581093ddd63e659998db3",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/whole-getter-controls.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "c13477f73723c6c34aae2f0efa1000a143155ef9f39c3fbe6cc1f2a627705932",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/whole-late-getter.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "c167e0dc7bbdf11dcacc3e8706839bca8f67c58bacf57258ba254c605ccd7f9d",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/whole-mixed-trace.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "88776d52e058cf176bfd1b524b6f93d4001874216b9a0a56236318684fc491a6",
+      "method": "incoming"
+    },
+    {
+      "path": "packages/kernel/src/lib/whole-unowned-publication-authorized.spec.ts",
+      "base": null,
+      "left": null,
+      "right": "7025a024c85722832cc863df8b718265ad2de55bed610255e72bdfbc8469d2e9",
+      "method": "incoming"
+    }
+  ],
+  "conflicts": []
+}

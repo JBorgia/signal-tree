@@ -1,0 +1,72 @@
+
+> nx run kernel:test membership-input-contract.spec.ts link-async-settlement.spec.ts link-commit-boundary-carrier.spec.ts entity-membership-link-restoration.spec.ts link-collection-0.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs membership-input-contract.spec.ts link-async-settlement.spec.ts link-commit-boundary-carrier.spec.ts entity-membership-link-restoration.spec.ts link-collection-0.spec.ts --maxWorkers=1
+
+(node:88911) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-collection-egress-successor/candidate/packages/kernel
+
+(node:88931) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88937) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:88954) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/link-commit-boundary-carrier.spec.ts (5 tests | 1 failed) 31ms
+     × a FOREIGN tree's open transaction neither absorbs nor delays this tree's write 4ms
+(node:88966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > a FOREIGN tree's open transaction neither absorbs nor delays this tree's write
+AssertionError: expected undefined to be 'MINE' // Object.is equality
+
+- Expected:
+"MINE"
+
++ Received:
+undefined
+
+ ❯ src/lib/link-commit-boundary-carrier.spec.ts:164:44
+    162|     await flush();
+    163|
+    164|     expect(durable(mine.writes).at(-1)?.a).toBe('MINE');
+       |                                            ^
+    165|     expect(theirs.writes).toEqual([]); // and theirs is still held
+    166|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 88 passed (89)
+   Start at  17:01:51
+   Duration  3.30s (transform 733ms, setup 0ms, import 1.30s, tests 329ms, environment 1.13s)
+
+Warning: command "node tools/run-core-vitest.mjs membership-input-contract.spec.ts link-async-settlement.spec.ts link-commit-boundary-carrier.spec.ts entity-membership-link-restoration.spec.ts link-collection-0.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.8s

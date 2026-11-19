@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts --testNamePattern=refuses a stale heterogeneous realization before any prepared structural mutation applies --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:33:59.116Z",
+    "endTime": "2026-11-03T04:34:02.573Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "13992731500554390031",
+      "startTime": "2026-11-03T04:33:59.229Z",
+      "endTime": "2026-11-03T04:34:02.571Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+--- a/packages/react/src/equal-owner-facade-controls.spec.tsx
++++ b/packages/react/src/equal-owner-facade-controls.spec.tsx
+@@ -85,9 +85,8 @@
+       expect(readOwner()).toBe(owned ? 0 : 7);
+       if (owned) {
+         expect(sent).toEqual([]);
+-        expect(['held', 'conservative']).toContain(admission.state);
+-        if (admission.state === 'held') expect(admission.reason).toBe('pending-dependency');
+-        else expect(['invalid-declaration', 'unknown', 'rejected-dependency']).toContain(admission.reason);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
+       } else {
+         expect(sent).toEqual([expected(shape, 7)]);
+         expect(admission).toEqual({ state: 'started', basis: 'declared' });
+@@ -108,10 +107,9 @@
+       expect(settled).toBe(true);
+       await wait;
+       const terminalState = receipt.read();
+-      if (owned && terminal === 'rollback') {
+-        // A rollback replacement may supersede the original held operation.
+-        // Exact surviving payload/settlement above remains mandatory.
+-        expect(['started', 'superseded']).toContain(terminalState.state);
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
+       } else {
+         expect(terminalState.state).toBe('started');
+       }
+--- a/packages/solid/src/lib/equal-owner-facade-controls.spec.ts
++++ b/packages/solid/src/lib/equal-owner-facade-controls.spec.ts
+@@ -85,9 +85,8 @@
+       expect(readOwner()).toBe(owned ? 0 : 7);
+       if (owned) {
+         expect(sent).toEqual([]);
+-        expect(['held', 'conservative']).toContain(admission.state);
+-        if (admission.state === 'held') expect(admission.reason).toBe('pending-dependency');
+-        else expect(['invalid-declaration', 'unknown', 'rejected-dependency']).toContain(admission.reason);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
+       } else {
+         expect(sent).toEqual([expected(shape, 7)]);
+         expect(admission).toEqual({ state: 'started', basis: 'declared' });
+@@ -108,10 +107,9 @@
+       expect(settled).toBe(true);
+       await wait;
+       const terminalState = receipt.read();
+-      if (owned && terminal === 'rollback') {
+-        // A rollback replacement may supersede the original held operation.
+-        // Exact surviving payload/settlement above remains mandatory.
+-        expect(['started', 'superseded']).toContain(terminalState.state);
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
+       } else {
+         expect(terminalState.state).toBe('started');
+       }
+--- a/packages/angular/src/lib/equal-owner-facade-controls.spec.ts
++++ b/packages/angular/src/lib/equal-owner-facade-controls.spec.ts
+@@ -85,9 +85,8 @@
+       expect(readOwner()).toBe(owned ? 0 : 7);
+       if (owned) {
+         expect(sent).toEqual([]);
+-        expect(['held', 'conservative']).toContain(admission.state);
+-        if (admission.state === 'held') expect(admission.reason).toBe('pending-dependency');
+-        else expect(['invalid-declaration', 'unknown', 'rejected-dependency']).toContain(admission.reason);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
+       } else {
+         expect(sent).toEqual([expected(shape, 7)]);
+         expect(admission).toEqual({ state: 'started', basis: 'declared' });
+@@ -108,10 +107,9 @@
+       expect(settled).toBe(true);
+       await wait;
+       const terminalState = receipt.read();
+-      if (owned && terminal === 'rollback') {
+-        // A rollback replacement may supersede the original held operation.
+-        // Exact surviving payload/settlement above remains mandatory.
+-        expect(['started', 'superseded']).toContain(terminalState.state);
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
+       } else {
+         expect(terminalState.state).toBe('started');
+       }
+--- a/packages/vue/src/lib/equal-owner-facade-controls.spec.ts
++++ b/packages/vue/src/lib/equal-owner-facade-controls.spec.ts
+@@ -85,9 +85,8 @@
+       expect(readOwner()).toBe(owned ? 0 : 7);
+       if (owned) {
+         expect(sent).toEqual([]);
+-        expect(['held', 'conservative']).toContain(admission.state);
+-        if (admission.state === 'held') expect(admission.reason).toBe('pending-dependency');
+-        else expect(['invalid-declaration', 'unknown', 'rejected-dependency']).toContain(admission.reason);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
+       } else {
+         expect(sent).toEqual([expected(shape, 7)]);
+         expect(admission).toEqual({ state: 'started', basis: 'declared' });
+@@ -108,10 +107,9 @@
+       expect(settled).toBe(true);
+       await wait;
+       const terminalState = receipt.read();
+-      if (owned && terminal === 'rollback') {
+-        // A rollback replacement may supersede the original held operation.
+-        // Exact surviving payload/settlement above remains mandatory.
+-        expect(['started', 'superseded']).toContain(terminalState.state);
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
+       } else {
+         expect(terminalState.state).toBe('started');
+       }
+--- a/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
+@@ -128,7 +128,7 @@
+     expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+     expect(p.inspect()).toEqual(ownership);
+     expect(sent).toEqual([{ x: 1, y: 0 }]);
+-    expect(['held', 'conservative']).toContain(held.read().state);
++    expect(held.read()).toEqual({ state: 'no-write' });
+     let settled = false;
+     const wait = c.settled().then(() => { settled = true; });
+     releaseFirst();
+@@ -136,15 +136,17 @@
+     expect(settled).toBe(false);
+     expect(p.inspect()).toEqual(ownership);
+     expect(sent).toEqual([{ x: 1, y: 0 }]);
+-    expect(['held', 'conservative']).toContain(held.read().state);
++    expect(held.read()).toEqual({ state: 'no-write' });
+     p.confirm();
+     await drain();
+     expect(sent).toEqual([{ x: 1, y: 0 }, { x: 7, y: 0 }]);
+     expect(settled).toBe(true);
+     await wait;
+-    expect(held.read().state).toBe('started');
++    expect(held.read()).toEqual({ state: 'no-write' });
+     await drain();
+     expect(sent).toEqual([{ x: 1, y: 0 }, { x: 7, y: 0 }]);
++    c.dispose();
++    expect(held.read()).toEqual({ state: 'no-write' });
+   } finally { releaseFirst(); c.dispose(); tree.destroy(); }
+ });
+ 

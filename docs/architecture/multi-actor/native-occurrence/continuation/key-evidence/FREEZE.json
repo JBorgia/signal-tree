@@ -1,0 +1,8 @@
+{
+  "sourceManifestSha256": "8d21743cefbc8f114def732c8f6ec465678c9fc7d1bfd4bf8d71d83c15f707e1",
+  "runtimePatchSha256": "f1c1d7f26d8a8a255daa1f810a3303876596f088a0e5017b7409b72fc6192f76",
+  "testsPatchSha256": "259320a41f561f6f8055b5be5e7655a37dcc98420ce7cf308b48372a622fed7a",
+  "predecessorManifestSha256": "45f6d1d91c7a51bd51a1d715d2fe7514b5b2158e846bf7a97439c265ba9b4574",
+  "candidate": "/private/tmp/st-key-evidence-successor/candidate",
+  "qualification": "focused only; independent review pending"
+}

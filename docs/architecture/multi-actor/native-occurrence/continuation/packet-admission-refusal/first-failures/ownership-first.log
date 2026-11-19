@@ -1,0 +1,59 @@
+
+> nx run kernel:test admission-ownership-audit.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs admission-ownership-audit.spec.ts --maxWorkers=1
+
+(node:70601) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70608) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-r1-cost-feasibility/traced/packages/kernel
+
+(node:70615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/admission-ownership-audit.spec.ts (2 tests | 1 failed) 6ms
+   × shared structural alias remains mutable with frozen shell=true 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/admission-ownership-audit.spec.ts > shared structural alias remains mutable with frozen shell=true
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/admission-ownership-audit.spec.ts:9:490
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  19:55:18
+   Duration  1.44s (transform 765ms, setup 0ms, import 918ms, tests 6ms, environment 373ms)
+
+Warning: command "node tools/run-core-vitest.mjs admission-ownership-audit.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

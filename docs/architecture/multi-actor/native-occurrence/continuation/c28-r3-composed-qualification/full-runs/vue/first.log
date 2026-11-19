@@ -1,0 +1,180 @@
+
+> nx run vue:test --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+(node:90959) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:91030) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c28-r3-composed-qualification/candidate/packages/vue
+
+(node:91078) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/absent-collection.spec.ts > absent collection — Vue sync effects (v16 8e) > a sync effect that throws on one collection does not starve the next
+[Vue warn]: Unhandled error during execution of watcher callback
+
+ ✓ src/lib/absent-collection.spec.ts (16 tests) 71ms
+(node:91082) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-projection-publication.spec.ts (13 tests) 75ms
+(node:91083) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/settlement-publication.spec.ts (10 tests) 28ms
+(node:91085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-selection-lifetime.spec.ts (9 tests) 46ms
+(node:91086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/prepared-selection-publication.spec.ts (8 tests) 54ms
+(node:91087) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+retained-native-metadata true
+
+ ✓ src/lib/selected-callback-facade.spec.ts (6 tests) 32ms
+(node:91088) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/vue-observation.spec.ts (13 tests) 29ms
+(node:91093) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/current-read-capability.spec.ts > current-read native-only first dependency recovers with native publication error timing
+current-read-publication-counts {
+  mode: 'native',
+  escaped: true,
+  failedPublicationCalls: 1,
+  recoveredPublicationCalls: 1,
+  deliveries: [ 'value', 'value' ]
+}
+current-read-publication-counts {
+  mode: 'current',
+  escaped: true,
+  failedPublicationCalls: 1,
+  recoveredPublicationCalls: 1,
+  deliveries: [ 'value', 'value' ]
+}
+
+ ✓ src/lib/current-read-capability.spec.ts (4 tests) 4ms
+(node:91095) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/equal-owner-facade-controls.spec.ts (8 tests) 32ms
+(node:91098) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/absent-path-write.spec.ts (13 tests) 39ms
+(node:91099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/parent-freshness-counterparts.spec.ts (3 tests) 16ms
+(node:91100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/tooling-admission.spec.ts (2 tests) 28ms
+(node:91102) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration.spec.ts (9 tests) 32ms
+(node:91104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/transaction-realization.spec.ts (26 tests) 69ms
+(node:91106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/declared-publication-composition.spec.ts (3 tests) 27ms
+(node:91107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/plain-member-absence-observation.spec.ts (15 tests) 17ms
+(node:91109) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-value-new-keys.spec.ts (3 tests) 20ms
+(node:91112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/construction-input.spec.ts (15 tests) 19ms
+(node:91113) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/designated-collection-omission.spec.ts (6 tests) 32ms
+(node:91114) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration-v16-controls.spec.ts (6 tests) 24ms
+(node:91115) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-direct-probe.spec.ts (8 tests) 17ms
+(node:91116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-native-obligation-composition.spec.ts (3 tests) 25ms
+(node:91120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/ownership.spec.ts (3 tests) 6ms
+(node:91121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/terminal-carriers.spec.ts (2 tests) 8ms
+(node:91122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-active-id-preparation.spec.ts > public callback discriminator sees restored library selection before choosing newer C
+selection-public-vue {"callbacks":[{"activeId":"A","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1}],"final":{"activeId":"C","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1},"seen":[{"activeId":"A","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1},{"activeId":"X","ids":["X","C","D"],"all":[{"id":"A","n":1},{"id":"C","n":3},{"id":"D","n":4}],"directA":null},{"activeId":"C","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1}]}
+
+ ✓ src/lib/selected-active-id-preparation.spec.ts (1 test) 22ms
+(node:91123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/audit-observation-lifecycle.spec.ts > audited native observation lifecycle > completes cleanup once even when a destruction watcher throws
+[Vue warn]: Unhandled error during execution of watcher callback
+
+ ✓ src/lib/audit-observation-lifecycle.spec.ts (3 tests) 10ms
+(node:91124) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-rich-publication.spec.ts (1 test) 57ms
+(node:91135) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/joint-direct-independent.spec.ts > direct update completion coherent; throws=false
+{"writer":"update","throws":false,"seen":[[2,2,[{"id":1,"n":2}]]],"after":[2,2,[{"id":1,"n":2}]],"caught":false}
+
+stdout | src/lib/joint-direct-independent.spec.ts > direct update completion coherent; throws=true
+{"writer":"update","throws":true,"seen":[[2,2,[{"id":1,"n":2}]]],"after":[2,2,[{"id":1,"n":2}]],"caught":true}
+
+stdout | src/lib/joint-direct-independent.spec.ts > direct replace completion coherent; throws=false
+{"writer":"replace","throws":false,"seen":[[2,2,[{"id":1,"n":2}]]],"after":[2,2,[{"id":1,"n":2}]],"caught":false}
+
+stdout | src/lib/joint-direct-independent.spec.ts > direct replace completion coherent; throws=true
+{"writer":"replace","throws":true,"seen":[[2,2,[{"id":1,"n":2}]]],"after":[2,2,[{"id":1,"n":2}]],"caught":true}
+
+ ✓ src/lib/joint-direct-independent.spec.ts (5 tests) 29ms
+(node:91136) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/scalar-frame-publication.spec.ts (2 tests) 27ms
+(node:91139) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/audit-native-tooling.spec.ts (2 tests) 22ms
+(node:91140) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-native-frontier.spec.ts (1 test) 36ms
+(node:91143) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-native-address.spec.ts (2 tests) 160ms
+(node:91146) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-rollback-frontier.spec.ts (1 test) 32ms
+(node:91151) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/batching-dynamic-field.spec.ts (1 test) 25ms
+
+ Test Files  34 passed (34)
+      Tests  223 passed (223)
+   Start at  22:13:03
+   Duration  10.18s (transform 1.01s, setup 0ms, import 5.84s, tests 1.17s, environment 2ms)
+
+
+
+
+ NX   Successfully ran target test for project vue
+
+
+  Run duration:      17.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     17.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        vue:test    17.6s

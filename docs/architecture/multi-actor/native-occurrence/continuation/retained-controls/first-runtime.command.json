@@ -1,0 +1,15 @@
+{
+  "cwd": "/private/tmp/st-retained-source-controls/candidate",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "retained-source-public-controls.spec.ts",
+    "--reporter=json",
+    "--outputFile=/private/tmp/st-retained-source-controls/first-runtime.json"
+  ],
+  "exit": 1
+}

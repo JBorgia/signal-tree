@@ -1,0 +1,432 @@
+[
+  {
+    "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+    "line": 4804,
+    "column": 13,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "            capture.structuralFrontier!.before,",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+    "line": 4807,
+    "column": 13,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "            capture.structuralFrontier!.after,",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "line": 3046,
+    "column": 3,
+    "level": "error",
+    "message": "'unsubscribePairedBoundaries' is never reassigned. Use 'const' instead",
+    "rule": "prefer-const",
+    "sourceLine": "  unsubscribePairedBoundaries = getMutationCaptureRuntime(",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "line": 3446,
+    "column": 81,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "      if(point?.complete&&completion?.deliveries)completion.deliveries.push(()=>point.complete!());",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "line": 4379,
+    "column": 64,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "              scalarAdmission:{effect:combined,operationEffect:operation.effects[0]!},",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "line": 28,
+    "column": 14,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": " let off=()=>{};",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 840,
+    "column": 48,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "   const plans=[...groups.values()].map(group=>group[0]!.prepare(group,publicationPhase));",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 842,
+    "column": 77,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>frame.prepareCommit!({advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'}));",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 850,
+    "column": 97,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "       try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared({...scalarResult!,publication:undefined}));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1029,
+    "column": 46,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "      row.edits.push({ kind: 'field', field: path[0]!, present, value: after, selection:fieldEndpoints(effect)?.after });",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1285,
+    "column": 46,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "      row.edits.push({ kind: 'field', field: path[0]!, present, value, selection:fieldEndpoints(effect)?.after });",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1294,
+    "column": 33,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "    [...rows.values()].map(row=>collection.__preparePointValues!([row],undefined,publicationPhase))",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1617,
+    "column": 22,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "    const subjects = dispositionByOwner.get(effect.owner)!;",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1636,
+    "column": 92,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "    if(effect.structural==='remove')group.push({kind:'remove',subject:effect.subjectId,key:removeKeysByEffect.get(effect as ReversalEffect & {structural:'remove';subjectId:number})!});",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1648,
+    "column": 72,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "  const structuralUnits=[...structuralGroups].map(([node,operations])=>node.__prepareStructuralUnit!(operations,publicationPhase));",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 1690,
+    "column": 55,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "      run(() => scalarSlotRuntime.publishPrepared({...scalarCommitResult!,publication:undefined}));",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 2028,
+    "column": 68,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "    const selection = Object.freeze({source:binding.source,subject:binding.subject!,field:path[0]!,endpoint,preparation});",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "line": 2028,
+    "column": 91,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "    const selection = Object.freeze({source:binding.source,subject:binding.subject!,field:path[0]!,endpoint,preparation});",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "line": 349,
+    "column": 22,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion,coveredRecipients,finalize,validate };",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "line": 393,
+    "column": 24,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "      return { record: combineTerminalRecords(...units.map(unit => unit.record),",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "line": 256,
+    "column": 32,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "      ? runtimesByRegistry.get(getPositionRegistry(node)!)",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "line": 57,
+    "column": 36,
+    "level": "error",
+    "message": "Unsafe usage of ThrowStatement",
+    "rule": "no-unsafe-finally",
+    "sourceLine": "      catch (error) { if (!failed) throw error; reportFrameError({error,operation:'notify:subscriber'}); }",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "line": 286,
+    "column": 26,
+    "level": "error",
+    "message": "Unsafe usage of ThrowStatement",
+    "rule": "no-unsafe-finally",
+    "sourceLine": "            if (!failed) throw error;",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "line": 366,
+    "column": 26,
+    "level": "error",
+    "message": "Unsafe usage of ThrowStatement",
+    "rule": "no-unsafe-finally",
+    "sourceLine": "            if (!failed) throw error;",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "line": 415,
+    "column": 15,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "        },()=>{},()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "line": 1117,
+    "column": 19,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  phase.add(() => {}, validateMembers);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "line": 63,
+    "column": 36,
+    "level": "error",
+    "message": "Unsafe usage of ThrowStatement",
+    "rule": "no-unsafe-finally",
+    "sourceLine": "      catch (error) { if (!failed) throw error; reportFrameError({error,operation:'notify:subscriber'}); }",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "line": 227,
+    "column": 15,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "        },()=>{},()=>{if(detached.revision()!==0)throw new Error('Detached member changed during preparation');});",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "line": 230,
+    "column": 59,
+    "level": "warning",
+    "message": "Forbidden non-null assertion",
+    "rule": "@typescript-eslint/no-non-null-assertion",
+    "sourceLine": "        const unit = publication ? {...publication,record:combineTerminalRecords(terminal,publication.record)!} : terminal ? {record:terminal,completion:{}} : undefined;",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "line": 59,
+    "column": 43,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  expect(()=>interceptLeafSignals(t.$,()=>{}, {scalarResponsibility:runtime,beforePublication:()=>{}})).toThrow('Terminal preparation already owned');",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "line": 59,
+    "column": 99,
+    "level": "error",
+    "message": "Unexpected empty method 'beforePublication'",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  expect(()=>interceptLeafSignals(t.$,()=>{}, {scalarResponsibility:runtime,beforePublication:()=>{}})).toThrow('Terminal preparation already owned');",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "line": 77,
+    "column": 12,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": " a.add(()=>{},offA);b.add(()=>{},offB);",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "line": 77,
+    "column": 31,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": " a.add(()=>{},offA);b.add(()=>{},offB);",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 21,
+    "column": 48,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": " let receipt:Receipt|undefined;let release=()=>{};let notifications=0;",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 32,
+    "column": 120,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  const initialStatus=receipt.read();let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(!owned);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 40,
+    "column": 18,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  await step(()=>{});expect(receipt.read()).toEqual(terminalStatus);expect(sent).toEqual([value(final)]);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 49,
+    "column": 52,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  const receipt=c.declare({kind:'independent'},()=>{});expect(receipt.read()).toEqual({state:'no-write'});expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(receipt.read())).toBe(true);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 53,
+    "column": 40,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  expect(calls).toBe(0);await step(()=>{});expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 62,
+    "column": 85,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(false);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 63,
+    "column": 30,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  c.dispose();await step(()=>{});expect(settled).toBe(true);await wait;expect(receipt.read()).toEqual({state:'no-write'});expect(pending.inspect()).toEqual(before);expect(source.x()).toBe(7);",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 77,
+    "column": 85,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(false);",
+    "identicalLinePresentInR3": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 78,
+    "column": 30,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  c.dispose();await step(()=>{});await wait;expect(settled).toBe(true);expect(receipt.read()).toEqual({state:'disposed'});expect(Object.isFrozen(receipt.read())).toBe(true);",
+    "identicalLinePresentInR3": false
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "line": 81,
+    "column": 87,
+    "level": "error",
+    "message": "Unexpected empty arrow function",
+    "rule": "@typescript-eslint/no-empty-function",
+    "sourceLine": "  await step(()=>tree.$.pair.x(9));expect(hook.result.current).toBe(9);await step(()=>{});expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});",
+    "identicalLinePresentInR3": false
+  }
+]

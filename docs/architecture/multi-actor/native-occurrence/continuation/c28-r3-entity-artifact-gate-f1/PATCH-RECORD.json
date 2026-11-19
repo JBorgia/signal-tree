@@ -1,0 +1,26 @@
+[
+  {
+    "patch": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/F1-correction.patch",
+    "sha256": "c2f78333eed4547bd72eb5c81af19478764560b9364eeac7741bb04a2c7285c0",
+    "argv": [
+      "git",
+      "apply",
+      "--check",
+      "/private/tmp/st-c28-r3-entity-artifact-gate-f1/F1-correction.patch"
+    ],
+    "cwd": "/private/tmp/st-c28-r3-diagnostic-gate-composition/candidate",
+    "exit": 0
+  },
+  {
+    "patch": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/full-tooling.patch",
+    "sha256": "a25c15af4659d7bf06e19d251a7c3d4a34a950e913f7946b818060ca657ae8f0",
+    "argv": [
+      "git",
+      "apply",
+      "--check",
+      "/private/tmp/st-c28-r3-entity-artifact-gate-f1/full-tooling.patch"
+    ],
+    "cwd": "/private/tmp/st-c28-r3-diagnostic-reduction/candidate",
+    "exit": 0
+  }
+]

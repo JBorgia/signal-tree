@@ -1,0 +1,17 @@
+{
+  "added": [
+    "packages/angular/src/lib/current-read-capability.spec.ts",
+    "packages/angular/src/lib/current-read-capability.typing.spec.ts",
+    "packages/angular/src/lib/selected-active-id-preparation.spec.ts",
+    "packages/angular/src/lib/selected-callback-facade.spec.ts",
+    "packages/kernel/src/lib/current-read-capability.spec.ts",
+    "packages/kernel/src/lib/selected-callback-facade.spec.ts",
+    "packages/react/src/selected-callback-facade.spec.tsx",
+    "packages/solid/src/lib/selected-callback-facade.spec.ts",
+    "packages/vue/src/lib/current-read-capability.spec.ts",
+    "packages/vue/src/lib/current-read-capability.typing.spec.ts",
+    "packages/vue/src/lib/selected-active-id-preparation.spec.ts",
+    "packages/vue/src/lib/selected-callback-facade.spec.ts"
+  ],
+  "differingExistingNotOverwritten": []
+}

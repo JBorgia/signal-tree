@@ -1,0 +1,17 @@
+{
+  "package.json": {
+    "retained": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    "working": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    "equal": true
+  },
+  "pnpm-lock.yaml": {
+    "retained": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+    "working": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+    "equal": true
+  },
+  ".nvmrc": {
+    "retained": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "working": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "equal": true
+  }
+}

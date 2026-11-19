@@ -1,0 +1,44 @@
+{
+  "angular20": {
+    "status": "peer-install-pass; candidate-not-installed-or-qualified",
+    "lockSha256": "73a4fc46e1d01481ddbd1eff21bc5f706c3cfcd59c03ccc44a4c63379ba89b8d",
+    "direct": {
+      "typescript": "5.8.2",
+      "tslib": "2.8.1",
+      "@angular/core": "20.0.0",
+      "@angular/common": "20.0.0",
+      "@angular/compiler": "20.0.0",
+      "@angular/compiler-cli": "20.0.0",
+      "@angular/platform-browser": "20.0.0",
+      "rxjs": "7.8.2"
+    }
+  },
+  "angular21": {
+    "status": "peer-install-pass; candidate-not-installed-or-qualified",
+    "lockSha256": "b9e4782848b7b45b5f3ea561fdd18d0ed335d20e3f94c005cb9a7cb8cb522463",
+    "direct": {
+      "typescript": "5.9.3",
+      "tslib": "2.8.1",
+      "@angular/core": "21.0.0",
+      "@angular/common": "21.0.0",
+      "@angular/compiler": "21.0.0",
+      "@angular/compiler-cli": "21.0.0",
+      "@angular/platform-browser": "21.0.0",
+      "rxjs": "7.8.2"
+    }
+  },
+  "vue350": {
+    "status": "peer-install-pass; candidate-not-installed-or-qualified",
+    "lockSha256": "2b7e36f85af2e1f305a822d873904a3247be8d83cb0e33e41a0ae9d25e68ed55",
+    "direct": {
+      "typescript": "5.9.3",
+      "tslib": "2.8.1",
+      "vue": "3.5.0"
+    }
+  },
+  "sourceInspectionOnly": {
+    "packages/angular/src/lib/selected-callback-facade.spec.ts": "f5483e0cf15e6b073c137ef50f5b51cb140c57b56b83803d1c793377e369b98e",
+    "packages/vue/src/lib/selected-callback-facade.spec.ts": "92e198d5db1772e5ec6fad15130f643cb2ce21485e748c58641c6e5c9dc2cd78",
+    "proof-evidence/SOURCE-IDENTITY.json": "10a5d0a4548e7e2da88328d072e0b6b3878633298bd356aee8849ab973614d72"
+  }
+}

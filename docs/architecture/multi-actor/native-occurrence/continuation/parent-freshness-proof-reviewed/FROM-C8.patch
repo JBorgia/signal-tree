@@ -1,0 +1,918 @@
+--- /dev/null
++++ b/packages/angular/src/lib/bounded-reentry-baseline.spec.ts
+@@ -0,0 +1,54 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,entityMap} from '../index';
++import {registerMarkerProcessor} from '../../../kernel/src/lib/internals/materialize-markers';
++const KIND=Symbol('bounded-baseline-reentry');
++type Marker={ [KIND]:true; read:()=>unknown };
++registerMarkerProcessor((x:unknown):x is Marker=>typeof x==='object'&&x!==null&&KIND in x,m=>({read:m.read}),{snapshot:n=>n.read()});
++type Case='E1'|'E3'|'E4'|'E5-child'|'E5-self';
++for(const seam of ['marker','sort'] as const)for(const scenario of ['E1','E3','E4','E5-child','E5-self'] as const)it(`${seam} ${scenario}: finite C7a characterization`,()=>{
++ const sentinel=Error('original callback sentinel');const tripwire=Error('callback tripwire');
++ const events:unknown[]=[];let calls=0;let action:(()=>void)|undefined;let sentinelReached=false;let nested:unknown;let afterWrite=false;
++ const capture=(name:string,run:()=>unknown)=>{
++  const start=calls;
++  try {const value=run();const copied=value===undefined?null:JSON.parse(JSON.stringify(value));const r={name,kind:'return',value:copied,callsBefore:start,callsAfter:calls};events.push(r);return r;}
++  catch(error){const r={name,kind:'throw',sameSentinel:error===sentinel,sameTripwire:error===tripwire,error:error instanceof Error?{name:error.name,message:error.message,stack:error.stack}:String(error),callsBefore:start,callsAfter:calls};events.push(r);return r;}
++ };
++ const callback=()=>{calls++;if(calls>40)throw tripwire;const run=action;action=undefined;if(run)run();};
++ const t=seam==='marker'
++  ?signalTree({child:{n:0},probe:{[KIND]:true,read:()=>{callback();return 'marker-output';}} as Marker})
++  :signalTree({child:{n:0},rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{callback();return a.n-b.n;}})});
++ const setChild=(n:number)=>{t.$.child.n.set(n);};
++ const rows=seam==='sort'?(t.$ as unknown as {rows:{addMany(v:{id:number;n:number}[]):void;addOne(v:{id:number;n:number}):void;all():{id:number;n:number}[]}}).rows:undefined;
++ try{
++  if(rows)rows.addMany([{id:1,n:2},{id:2,n:1}]);
++  const callsBeforeDemand=calls;
++  action=()=>{
++   events.push({name:'action-enter',calls});
++   if(scenario!=='E1'){
++    setChild(1);
++    if(rows)rows.addOne({id:3,n:0});
++    afterWrite=true;events.push({name:'write-returned',calls,child:t.$.child.n()});
++   }
++   if(scenario==='E5-child')nested=capture('nested-child',()=>t.$.child());
++   if(scenario==='E5-self')nested=capture('nested-root',()=>t.$());
++   if(scenario==='E1'||scenario==='E3'){sentinelReached=true;throw sentinel;}
++  };
++  const first=capture('first-root',()=>t.$());
++  action=undefined;
++  capture('immediate-root-1',()=>t.$());
++  capture('immediate-root-2',()=>t.$());
++  capture('installed-child',()=>t.$.child.n());
++  capture('recovery-write',()=>{setChild(9);if(rows)rows.addOne({id:4,n:4});});
++  capture('post-write-root-1',()=>t.$());
++  capture('post-write-root-2',()=>t.$());
++  if(rows)capture('post-write-all',()=>rows.all());
++  const report={facade:'angular',seam,scenario,callsBeforeDemand,calls,afterWrite,sentinelReached,nested,events};
++  writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`${seam}-${scenario}.json`),JSON.stringify(report,null,2));
++  expect(calls).toBeGreaterThan(callsBeforeDemand);
++  expect(events.some(e=>(e as {name?:string}).name==='action-enter')).toBe(true);
++  expect(calls).toBeLessThanOrEqual(40);
++  if(sentinelReached){expect(first.kind).toBe('throw');expect('sameSentinel'in first&&first.sameSentinel).toBe(true);}
++ }finally{t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/bounded-reentry-targeted.spec.ts
+@@ -0,0 +1,37 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,entityMap} from '../index';
++import {registerMarkerProcessor} from '../../../kernel/src/lib/internals/materialize-markers';
++const KIND=Symbol('targeted-reentry');type M={[KIND]:true;read:()=>unknown};
++registerMarkerProcessor((x:unknown):x is M=>typeof x==='object'&&x!==null&&KIND in x,m=>({read:m.read}),{snapshot:n=>n.read()});
++function recorder(calls:()=>number,sentinel:Error){const events:unknown[]=[];return {events,take(name:string,run:()=>unknown){const before=calls();try{const v=run();const r={name,kind:'return',value:v===undefined?null:JSON.parse(JSON.stringify(v)),before,after:calls()};events.push(r);return r;}catch(e){const r={name,kind:'throw',sameSentinel:e===sentinel,error:e instanceof Error?{name:e.name,message:e.message,stack:e.stack}:String(e),before,after:calls()};events.push(r);return r;}}};}
++function save(name:string,events:unknown){writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,name+'.json'),JSON.stringify(events,null,2));}
++it('sort E1 isolated sibling then collection recovery trigger',()=>{
++ const sentinel=Error('sort sentinel');let calls=0;let armed=true;
++ const r=recorder(()=>calls,sentinel);
++ const t=signalTree({child:{n:0},rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{calls++;if(armed)throw sentinel;return a.n-b.n;}})});
++ const rows=t.$.rows;
++ try{rows.addMany([{id:1,n:2},{id:2,n:1}]);const first=r.take('first-root',()=>t.$());armed=false;
++ r.take('immediate-root',()=>t.$());r.take('sibling-write',()=>{t.$.child.n.set(1);});r.take('after-sibling-root',()=>t.$());
++ r.take('collection-write',()=>rows.addOne({id:3,n:3}));r.take('after-collection-root',()=>t.$());r.take('repeat-root',()=>t.$());
++ save('sort-E1-isolated',{facade:'angular',calls,events:r.events});expect(first.kind).toBe('throw');expect('sameSentinel'in first&&first.sameSentinel).toBe(true);expect(calls).toBeGreaterThan(1);
++ }finally{t.destroy();}
++});
++
++for(const scenario of ['E3','E4','E5-child','E5-self'] as const)it(`warmed marker ${scenario}`,()=>{
++ let calls=0;let action:(()=>void)|undefined;let written=false;let reached=false;const sentinel=Error('warm marker sentinel');const r=recorder(()=>calls,sentinel);
++ const t=signalTree({child:{n:0},probe:{[KIND]:true,read:()=>{calls++;if(calls>30)throw Error('tripwire');const a=action;action=undefined;a?.();return 'marker-output';}} as M});
++ try{
++ r.take('warm-root',()=>t.$());
++ action=()=>{t.$.child.n.set(1);written=true;if(scenario==='E5-child')r.take('nested-child',()=>t.$.child());if(scenario==='E5-self')r.take('nested-root',()=>t.$());if(scenario==='E3'){reached=true;throw sentinel;}};
++ const first=r.take('action-root',()=>t.$());action=undefined;r.take('immediate-root',()=>t.$());r.take('installed-child',()=>t.$.child.n());r.take('later-write',()=>t.$.child.n.set(9));r.take('after-write-root',()=>t.$());
++ save('warm-marker-'+scenario,{facade:'angular',calls,written,reached,events:r.events});expect(written).toBe(true);if(reached)expect('sameSentinel'in first&&first.sameSentinel).toBe(true);expect(calls).toBeLessThanOrEqual(30);
++ }finally{t.destroy();}
++});
++for(const nested of ['child','self'] as const)it(`sort read-only nested ${nested}`,()=>{
++ let calls=0;let action:(()=>void)|undefined;const sentinel=Error('unused');const r=recorder(()=>calls,sentinel);
++ const t=signalTree({child:{n:0},rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{calls++;if(calls>30)throw Error('tripwire');const run=action;action=undefined;run?.();return a.n-b.n;}})});
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);action=()=>r.take('nested-'+nested,()=>nested==='child'?t.$.child():t.$());r.take('first-root',()=>t.$());r.take('immediate-root',()=>t.$());r.take('collection-write',()=>t.$.rows.addOne({id:3,n:3}));r.take('post-write-root',()=>t.$());
++ save('sort-readonly-'+nested,{facade:'angular',calls,events:r.events});expect(calls).toBeGreaterThan(0);expect(r.events.some(e=>(e as {name:string}).name==='nested-'+nested)).toBe(true);
++ }finally{t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-freshness-callbacks.spec.ts
+@@ -0,0 +1,19 @@
++import {expect,it} from 'vitest';import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,entityMap,transactions} from '../index';
++import {getEntityPublicationBinding} from '../../../kernel/src/lib/internals/entity-publication';
++import {getLocationRuntime} from '../../../kernel/src/lib/internals/location-runtime';
++import {computed} from '@angular/core';
++for(const fail of [false,true])it(`sorted collection completion and later dependency; fail=${fail}`,()=>{
++ let comparisons=0;let armedError=false;const sentinel=Error('sorted original');
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{comparisons++;if(armedError)throw sentinel;return a.n-b.n;}}),other:{n:7}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ const events:unknown[]=[];const take=(name:string,fn:()=>unknown)=>{const start=comparisons;try{const value=fn();const r={name,kind:'return',value:value===undefined?null:JSON.parse(JSON.stringify(value)),start,end:comparisons};events.push(r);return r;}catch(e){const r={name,kind:'throw',sameSentinel:e===sentinel,message:e instanceof Error?e.message:String(e),start,end:comparisons};events.push(r);return r;}};
++ let calls=0;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const heldAll=t.$.rows.all;let derivedRuns=0;const derived=computed(()=>{derivedRuns++;return t.$();});take('warm-root',()=>derived());
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;armedError=fail;take('completion-held-all',()=>heldAll());take('completion-root',()=>t.$());take('completion-derived',()=>derived());armedError=false;}});
++ take('add',()=>t.$.rows.addOne({id:3,n:0}));off();off=undefined;
++ take('post-root',()=>t.$());take('post-derived',()=>derived());take('repeat-root',()=>t.$());take('repeat-all',()=>heldAll());
++ take('next-collection-write',()=>t.$.rows.addOne({id:4,n:4}));take('next-derived',()=>derived());
++ writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`sorted-${fail}.json`),JSON.stringify({calls,comparisons,derivedRuns,events},null,2));expect(calls).toBe(1);expect(comparisons).toBeGreaterThan(0);
++ if(fail){const e=events.find(e=>(e as {name:string}).name==='completion-held-all') as {sameSentinel?:boolean};expect(e.sameSentinel).toBe(true);}
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-freshness-entity.spec.ts
+@@ -0,0 +1,12 @@
++import {it,expect} from 'vitest';import {signalTree,entityMap,transactions} from '../index';
++import {getLocationRuntime} from '../../../kernel/src/lib/internals/location-runtime';import {getEntityPublicationBinding} from '../../../kernel/src/lib/internals/entity-publication';
++import {computed} from '@angular/core';
++for(const sorted of [false,true])it(`entity wrapper early identity and subsequent dependencies sorted=${sorted}`,()=>{
++ let comparisons=0;const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:sorted?(a,b)=>{comparisons++;return a.n-b.n;}:undefined}),other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const old=t.$();let runs=0;const held=computed(()=>{runs++;return t.$();});held();let early:unknown;let inside:unknown;let calls=0;
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;early=t.$();inside=held();expect(t.$()).toBe(early);}});
++ lr.runInvalidationGroup(()=>{t.$.rows.addOne({id:3,n:0});});off();off=undefined;
++ expect(calls).toBe(1);expect(inside).toBe(old);expect(early).toBeDefined();expect((early as unknown as {rows:{all:{id:number}[]}}).rows.all.map(x=>x.id)).toEqual(sorted?[3,2,1]:[1,2,3]);expect(t.$()).toBe(early);expect(held()).toBe(early);
++ const prior=runs;t.$.rows.addOne({id:4,n:4});expect(held().rows.all).toHaveLength(4);expect(runs).toBeGreaterThan(prior);const stable=t.$();const comparisonCount=comparisons;for(let i=0;i<20;i++)expect(t.$()).toBe(stable);expect(comparisons).toBe(comparisonCount);
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-freshness-focused.spec.ts
+@@ -0,0 +1,55 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,transactions} from '../index';
++import {getTreeScalarSlotRuntime} from '../../../kernel/src/lib/internals/tree-scalar-slot-port';
++import {getOwnedPositionIds} from '../../../kernel/src/lib/internals/owned-metadata';
++import {completeScalarFrame} from '../../../kernel/src/lib/internals/tree-scalar-slot-runtime';
++import {bindLocationRuntime,getLocationRuntime,replaceLocation,deriveLocation} from '../../../kernel/src/lib/internals/location-runtime';
++import {observeIntrinsicMutations,preparePublicationMutations,registerMembershipPublication} from '../../../kernel/src/lib/internals/intrinsic-mutation';
++import {markTreeStore} from '../../../kernel/src/lib/internals/snapshot-authority';
++import {materializeNode} from '../../../kernel/src/lib/utils';
++import {computed} from '@angular/core';
++function write(leaf:unknown,value:number){if(typeof leaf!=='function'||!('set'in leaf)||typeof leaf.set!=='function')throw Error('missing native leaf');(leaf as unknown as {set(v:number):void}).set(value);}
++function save(name:string,data:unknown){writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,name+'.json'),JSON.stringify(data,null,2));}
++it('prepared slot completion discriminates current snapshot from undelivered native mirror and derived',()=>{
++ const t=signalTree({box:{n:1},sibling:{n:8}},{enhancers:[transactions()]});const rt=getTreeScalarSlotRuntime(t.$)!;const lr=getLocationRuntime(t.$)!;
++ let runs=0;const observed=computed(()=>{runs++;return t.$.box();});const before=observed();const sibling=t.$.sibling();let delivered=0;let during:unknown;let mirror:unknown;let cached:unknown;let direct:unknown;let root:unknown;
++ const off=preparePublicationMutations(t.$.box.n,()=>({record:{writes:[],adds:[]},completion:{}}),()=>{delivered++;during=t.$.box();mirror=t.$.box.n();cached=observed();direct=t.$.box();root=t.$();});expect(off).toBeTypeOf('function');
++ try{const id=getOwnedPositionIds(t.$.box.n)![0]!;const slot=rt.resolveScalarSlot(id)!;const frame=rt.beginFrame();frame.set(slot,2);const install=frame.prepareCommit!({publish:false});const installed=install();completeScalarFrame(installed);
++ save('terminal-window',{delivered,during,mirror,cached,direct,root,runs});expect(delivered).toBe(1);expect(during).toEqual({n:2});expect(direct).toBe(during);expect(root).toEqual({box:{n:2},sibling:{n:8}});expect(t.$.sibling()).toBe(sibling);expect(mirror).toBe(1);expect(cached).toBe(before);
++ rt.publishPrepared(installed);expect(observed()).toEqual({n:2});expect(t.$.box()).toBe(during);expect(runs).toBeGreaterThan(1);
++ write(t.$.box.n,3);expect(observed()).toEqual({n:3});write(t.$.box.n, t.$.box.n()+1);expect(observed()).toEqual({n:4});
++ }finally{off!();t.destroy();}
++});
++it('new child dependencies survive early current read then normal delivery',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>,other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let runs=0;const held=computed(()=>{runs++;return t.$();});held();let early:unknown;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===t.$.rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;early=t.$();});
++ try{t.$.rows({a:{n:1}});expect(calls).toBe(1);expect(held()).toBe(early);const n=runs;write((t.$.rows.a as unknown as {n: unknown}).n,2);expect(held().rows).toEqual({a:{n:2}});expect(runs).toBeGreaterThan(n);const m=runs;write(t.$.other.n,3);expect(held().other).toEqual({n:3});expect(runs).toBeGreaterThan(m);}finally{off();t.destroy();}
++});
++it('held dormant descendants recover on equal-value reactivation without sibling invalidation',()=>{
++ const t=signalTree({rows:{a:{deep:{n:1}},b:{deep:{n:2}}}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;const a=t.$.rows.a;const deep=a.deep;deep();const held=computed(()=>t.$.rows());held();
++ try{t.$.rows({b:{deep:{n:2}}} as {a:{deep:{n:number}};b:{deep:{n:number}}});expect(held()).toEqual({b:{deep:{n:2}}});expect(deep()).toBeUndefined();write(deep.n,1);expect(held()).toEqual({a:{deep:{n:1}},b:{deep:{n:2}}});expect(deep()).toEqual({n:1});write(deep.n,3);expect(held().a.deep.n).toBe(3);}finally{t.destroy();}
++});
++it('supported symbol store child shares ancestry before grouped slot delivery',()=>{
++ const key=Symbol('child');const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ // Existing supported unwrap/materialize plain-store form; no symbol write API invented.
++ const store:{[key]:typeof t.$.box}={[key]:t.$.box};markTreeStore(store);bindLocationRuntime(store,lr);const read=()=>materializeNode<{[key]:{n:number}}>(store);const old=read();
++ try{const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);const result=frame.commit({publish:false});expect(read()[key]).toEqual({n:2});expect(read()).not.toBe(old);const now=read();rt.publishPrepared(result);expect(read()).toBe(now);write(t.$.box.n,3);expect(read()[key].n).toBe(3);}finally{t.destroy();}
++});
++it('no-op and discarded preparation preserve output; temporary delivery builds are measured',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let builds=0;const create=lr.createDerived.bind(lr);const spy=vi.spyOn(lr,'createDerived').mockImplementation(<T>(fn:()=>T)=>create(()=>{builds++;return fn();}));
++ try{const before=t.$.box();const count=builds;write(t.$.box.n,1);expect(t.$.box()).toBe(before);const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const canceled=rt.beginFrame();canceled.set(slot,2);canceled.discard();expect(t.$.box()).toBe(before);expect(builds).toBe(count);
++ const frame=rt.beginFrame();frame.set(slot,3);const result=frame.commit({publish:false});const current=t.$.box();expect(current).toEqual({n:3});const earlyBuilds=builds;for(let i=0;i<20;i++)expect(t.$.box()).toBe(current);expect(builds).toBe(earlyBuilds);rt.publishPrepared(result);expect(t.$.box()).toBe(current);save('builder-work',{initialTrackedBuilds:count,beforeDelivery:earlyBuilds,afterDelivery:builds,limit:'tracked derived callback executions only; direct fallback builds not counted'});expect(builds).toBeGreaterThan(count);
++ }finally{spy.mockRestore();t.destroy();}
++});
++
++it('refused prepared slot leaves physical value and snapshot identity unchanged',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const before=t.$();const sentinel=Error('prepare refused');const rt=getTreeScalarSlotRuntime(t.$)!;
++ const off=preparePublicationMutations(t.$.box.n,()=>{throw sentinel;},()=>{throw Error('must not complete');});expect(off).toBeTypeOf('function');
++ try{const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);expect(()=>frame.prepareCommit!({publish:false})).toThrow(sentinel);expect(t.$()).toBe(before);expect(t.$.box.n()).toBe(1);}finally{off!();t.destroy();}
++});
++it('direct replace and derive capture read installed backing before native publication',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});t.$.box();const seen:unknown[]=[];
++ const off=observeIntrinsicMutations(t.$.box.n,()=>{seen.push({parent:t.$.box(),mirror:t.$.box.n()});},true);expect(off).toBeTypeOf('function');
++ try{t.$.box.n.set(2);t.$.box.n.update(n=>n+1);save('direct-capture',seen);expect(seen).toEqual([{parent:{n:2},mirror:1},{parent:{n:3},mirror:2}]);expect(t.$.box()).toEqual({n:3});}finally{off!();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-freshness-grouped.spec.ts
+@@ -0,0 +1,19 @@
++import {expect,it} from 'vitest';import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,entityMap,transactions} from '../index';
++import {getEntityPublicationBinding} from '../../../kernel/src/lib/internals/entity-publication';
++import {getLocationRuntime} from '../../../kernel/src/lib/internals/location-runtime';
++import {computed} from '@angular/core';
++for(const fail of [false,true])it(`grouped sorted collection completion and later dependency; fail=${fail}`,()=>{
++ let comparisons=0;let armedError=false;const sentinel=Error('sorted original');
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{comparisons++;if(armedError)throw sentinel;return a.n-b.n;}}),other:{n:7}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ const events:unknown[]=[];const take=(name:string,fn:()=>unknown)=>{const start=comparisons;try{const value=fn();const r={name,kind:'return',value:value===undefined?null:JSON.parse(JSON.stringify(value)),start,end:comparisons};events.push(r);return r;}catch(e){const r={name,kind:'throw',sameSentinel:e===sentinel,message:e instanceof Error?e.message:String(e),start,end:comparisons};events.push(r);return r;}};
++ let calls=0;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const heldAll=t.$.rows.all;let derivedRuns=0;const derived=computed(()=>{derivedRuns++;return t.$();});take('warm-root',()=>derived());
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;armedError=fail;take('completion-held-all',()=>heldAll());take('completion-root',()=>t.$());take('completion-derived',()=>derived());armedError=false;}});
++ take('add',()=>lr.runInvalidationGroup(()=>{t.$.rows.addOne({id:3,n:0});}));off();off=undefined;
++ take('post-root',()=>t.$());take('post-derived',()=>derived());take('repeat-root',()=>t.$());take('repeat-all',()=>heldAll());
++ take('next-collection-write',()=>t.$.rows.addOne({id:4,n:4}));take('next-derived',()=>derived());
++ writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`sorted-${fail}.json`),JSON.stringify({calls,comparisons,derivedRuns,events},null,2));expect(calls).toBe(1);expect(comparisons).toBeGreaterThan(0);
++ if(fail){const e=events.find(e=>(e as {name:string}).name==='completion-held-all') as {sameSentinel?:boolean};expect(e.sameSentinel).toBe(true);}
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-snapshot-currentness.spec.ts
+@@ -0,0 +1,50 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,link,transactions} from '../index';
++import {computed,isSignal} from '@angular/core';
++import {registerMembershipPublication} from '../../../kernel/src/lib/internals/intrinsic-mutation';
++import {materializeMember,ordinaryBranch,registerMarkerProcessor} from '../../../kernel/src/lib/internals/materialize-markers';
++import {getLocationRuntime} from '../../../kernel/src/lib/internals/location-runtime';
++
++type Image=Record<string,{n:number}>;
++type Cell={():number;set(value:number):void;update(fn:(n:number)=>number):void;};
++type Child={():{n:number};n:Cell};
++type Rows={():Image;(value:Image):void;[key:string]:unknown};
++const KIND=Symbol('parent-currentness-keyed');type Marker={[KIND]:true;seed:Image};
++registerMarkerProcessor((v:unknown):v is Marker=>typeof v==='object'&&v!==null&&KIND in v,(m:Marker)=>ordinaryBranch(m.seed,{keyedLookup:true}));
++function setup(keyed:boolean){
++ const t=signalTree({rows:keyed?({[KIND]:true,seed:{}} as Marker):({} as Image),sibling:{n:20}},{enhancers:[transactions()]});
++ const rows=t.$.rows as unknown as Rows;return{t,rows};
++}
++function child(rows:Rows,key:string):Child{const x=rows[key];if(typeof x!=='function'||!('n'in x)||typeof x.n!=='function')throw Error('missing actual installed child');return x as Child;}
++function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
++for(const keyed of [false,true])it(`fresh read-derived completion retains a and nested b: ${keyed?'keyed':'ordinary'}`,()=>{
++ const {t,rows}=setup(keyed);const l=link(rows,{set:()=>{}});const sentinel=Error('completion sentinel');let calls=0;let seen:unknown;let physical:unknown;let held:Child|undefined;let supplied:unknown;
++ rows();
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'&&e.ordinary?.before.present===false?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;seen=rows();held=child(rows,'a');physical=held.n();const next={...rows(),b:{n:2}};supplied=next;rows(next);throw sentinel;});
++ try{
++  expect(()=>keyed?materializeMember(rows,'a',{n:1}):rows({a:{n:1}})).toThrow(sentinel);
++  off();const after=rows();record(`angular-${keyed?'keyed':'ordinary'}`,{calls,seen,physical,supplied,after});
++  expect(calls).toBe(1);expect(physical).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect.soft(supplied).toEqual({a:{n:1},b:{n:2}});expect.soft(after).toEqual({a:{n:1},b:{n:2}});expect(child(rows,'a')).toBe(held);
++ held!.n.set(3);child(rows,'b').n.update(n=>n+2);
++  expect(rows()).toEqual({a:{n:3},b:{n:4}});
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('fresh ancestor and sibling identity during completion; no repeated-read churn',()=>{
++ const {t,rows}=setup(false);const rootBefore=t.$();const sibling=t.$.sibling();let seen:unknown;let rootDuring:{rows:unknown;sibling:{n:number}}|undefined;let first:Image|undefined;let repeat=false;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;first=rows();seen=first;rootDuring=t.$();repeat=Array.from({length:100},()=>rows()).every(v=>v===first);});
++ try{rows({a:{n:1}});expect(calls).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect(rootDuring?.rows).toEqual({a:{n:1}});expect(rootDuring).not.toBe(rootBefore);expect(rootDuring?.sibling).toBe(sibling);expect(repeat).toBe(true);expect(rows()).toBe(first);expect(t.$()).toBe(rootDuring);}
++ finally{off();t.destroy();}
++});
++
++it('ordinary unchanged reads and unrelated writes preserve memo identities',()=>{
++ const {t,rows}=setup(false);try{rows({a:{n:1}});const first=rows();const root=t.$();for(let i=0;i<100;i++){expect(rows()).toBe(first);expect(t.$()).toBe(root);} t.$.sibling.n.set(21);expect(rows()).toBe(first);expect(t.$().sibling).toEqual({n:21});}finally{t.destroy();}
++});
++
++it('warmed Angular computed preserves notification timing while direct held reader is current',()=>{
++ const {t,rows}=setup(false);const direct=rows;let runs=0;const cached=computed(()=>{runs++;return rows();});const before=cached();const initialRuns=runs;let insideNative:unknown;let insideDirect:unknown;let insideRuns=0;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;insideNative=cached();insideRuns=runs;insideDirect=direct();});
++ try{rows({a:{n:1}});const current=cached();record('angular-native-timing',{calls,insideNative,insideDirect,insideRuns,initialRuns,after:current,runs});expect(calls).toBe(1);expect(isSignal(child(rows,'a').n)).toBe(true);expect(insideNative).toBe(before);expect(insideRuns).toBe(initialRuns);expect(current).toEqual({a:{n:1}});expect(runs).toBeGreaterThan(initialRuns);expect(insideDirect).toEqual({a:{n:1}});}finally{off();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/bounded-reentry-baseline.spec.ts
+@@ -0,0 +1,54 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,entityMap} from '../index';
++import {registerMarkerProcessor} from './internals/materialize-markers';
++const KIND=Symbol('bounded-baseline-reentry');
++type Marker={ [KIND]:true; read:()=>unknown };
++registerMarkerProcessor((x:unknown):x is Marker=>typeof x==='object'&&x!==null&&KIND in x,m=>({read:m.read}),{snapshot:n=>n.read()});
++type Case='E1'|'E3'|'E4'|'E5-child'|'E5-self';
++for(const seam of ['marker','sort'] as const)for(const scenario of ['E1','E3','E4','E5-child','E5-self'] as const)it(`${seam} ${scenario}: finite C7a characterization`,()=>{
++ const sentinel=Error('original callback sentinel');const tripwire=Error('callback tripwire');
++ const events:unknown[]=[];let calls=0;let action:(()=>void)|undefined;let sentinelReached=false;let nested:unknown;let afterWrite=false;
++ const capture=(name:string,run:()=>unknown)=>{
++  const start=calls;
++  try {const value=run();const copied=value===undefined?null:JSON.parse(JSON.stringify(value));const r={name,kind:'return',value:copied,callsBefore:start,callsAfter:calls};events.push(r);return r;}
++  catch(error){const r={name,kind:'throw',sameSentinel:error===sentinel,sameTripwire:error===tripwire,error:error instanceof Error?{name:error.name,message:error.message,stack:error.stack}:String(error),callsBefore:start,callsAfter:calls};events.push(r);return r;}
++ };
++ const callback=()=>{calls++;if(calls>40)throw tripwire;const run=action;action=undefined;if(run)run();};
++ const t=seam==='marker'
++  ?signalTree({child:{n:0},probe:{[KIND]:true,read:()=>{callback();return 'marker-output';}} as Marker})
++  :signalTree({child:{n:0},rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{callback();return a.n-b.n;}})});
++ const setChild=(n:number)=>{t.$.child.n(n);};
++ const rows=seam==='sort'?(t.$ as unknown as {rows:{addMany(v:{id:number;n:number}[]):void;addOne(v:{id:number;n:number}):void;all():{id:number;n:number}[]}}).rows:undefined;
++ try{
++  if(rows)rows.addMany([{id:1,n:2},{id:2,n:1}]);
++  const callsBeforeDemand=calls;
++  action=()=>{
++   events.push({name:'action-enter',calls});
++   if(scenario!=='E1'){
++    setChild(1);
++    if(rows)rows.addOne({id:3,n:0});
++    afterWrite=true;events.push({name:'write-returned',calls,child:t.$.child.n()});
++   }
++   if(scenario==='E5-child')nested=capture('nested-child',()=>t.$.child());
++   if(scenario==='E5-self')nested=capture('nested-root',()=>t.$());
++   if(scenario==='E1'||scenario==='E3'){sentinelReached=true;throw sentinel;}
++  };
++  const first=capture('first-root',()=>t.$());
++  action=undefined;
++  capture('immediate-root-1',()=>t.$());
++  capture('immediate-root-2',()=>t.$());
++  capture('installed-child',()=>t.$.child.n());
++  capture('recovery-write',()=>{setChild(9);if(rows)rows.addOne({id:4,n:4});});
++  capture('post-write-root-1',()=>t.$());
++  capture('post-write-root-2',()=>t.$());
++  if(rows)capture('post-write-all',()=>rows.all());
++  const report={facade:'kernel',seam,scenario,callsBeforeDemand,calls,afterWrite,sentinelReached,nested,events};
++  writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`${seam}-${scenario}.json`),JSON.stringify(report,null,2));
++  expect(calls).toBeGreaterThan(callsBeforeDemand);
++  expect(events.some(e=>(e as {name?:string}).name==='action-enter')).toBe(true);
++  expect(calls).toBeLessThanOrEqual(40);
++  if(sentinelReached){expect(first.kind).toBe('throw');expect('sameSentinel'in first&&first.sameSentinel).toBe(true);}
++ }finally{t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/bounded-reentry-targeted.spec.ts
+@@ -0,0 +1,19 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,entityMap} from '../index';
++import {registerMarkerProcessor} from './internals/materialize-markers';
++const KIND=Symbol('targeted-reentry');type M={[KIND]:true;read:()=>unknown};
++registerMarkerProcessor((x:unknown):x is M=>typeof x==='object'&&x!==null&&KIND in x,m=>({read:m.read}),{snapshot:n=>n.read()});
++function recorder(calls:()=>number,sentinel:Error){const events:unknown[]=[];return {events,take(name:string,run:()=>unknown){const before=calls();try{const v=run();const r={name,kind:'return',value:v===undefined?null:JSON.parse(JSON.stringify(v)),before,after:calls()};events.push(r);return r;}catch(e){const r={name,kind:'throw',sameSentinel:e===sentinel,error:e instanceof Error?{name:e.name,message:e.message,stack:e.stack}:String(e),before,after:calls()};events.push(r);return r;}}};}
++function save(name:string,events:unknown){writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,name+'.json'),JSON.stringify(events,null,2));}
++it('sort E1 isolated sibling then collection recovery trigger',()=>{
++ const sentinel=Error('sort sentinel');let calls=0;let armed=true;
++ const r=recorder(()=>calls,sentinel);
++ const t=signalTree({child:{n:0},rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{calls++;if(armed)throw sentinel;return a.n-b.n;}})});
++ const rows=t.$.rows;
++ try{rows.addMany([{id:1,n:2},{id:2,n:1}]);const first=r.take('first-root',()=>t.$());armed=false;
++ r.take('immediate-root',()=>t.$());r.take('sibling-write',()=>{t.$.child.n(1);});r.take('after-sibling-root',()=>t.$());
++ r.take('collection-write',()=>rows.addOne({id:3,n:3}));r.take('after-collection-root',()=>t.$());r.take('repeat-root',()=>t.$());
++ save('sort-E1-isolated',{facade:'kernel',calls,events:r.events});expect(first.kind).toBe('throw');expect('sameSentinel'in first&&first.sameSentinel).toBe(true);expect(calls).toBeGreaterThan(1);
++ }finally{t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/construction-completion-snapshot-review.spec.ts
+@@ -0,0 +1,11 @@
++import {it,expect} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,transactions,link} from '../index';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++it('diagnostic: ordinary completion read versus installed child before nested whole assignment',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>},{enhancers:[transactions()]});const l=link(t.$.rows,{set:()=>{}});const error=Error('completion');let observed:unknown;let physical:unknown;let payload:unknown;let delivered=false;
++ const off=registerMembershipPublication(edit=>edit.branch===t.$.rows&&edit.key==='a'&&edit.ordinary?.before.present===false?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{delivered=true;observed=t.$.rows();const a=t.$.rows.a;if(typeof a!=='function'||!('n' in a)||typeof a.n!=='function')throw Error('missing installed child');physical=a.n();const next={...t.$.rows(),b:{n:2}};payload=next;t.$.rows(next);throw error;});
++ try{expect(()=>t.$.rows({a:{n:1}})).toThrow(error);expect(delivered).toBe(true);writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,'completion-snapshot.json'),JSON.stringify({observed,physical,payload,after:t.$.rows()},null,2));}
++ finally{off();l.dispose();t.destroy();}
++});
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './internals/snapshot-installation';
+ import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { PublicationPreparation } from './internals/publication-preparation';
+ import { reportContainedObserverError } from './internals/error-reporter';
+@@ -435,6 +436,11 @@
+ 
+   // Source-owned install epoch makes library readers current before notifications.
+   let installedReadRevision=0;
++  let snapshotIdentity: object | undefined;
++  const advanceInstalledRead = (): void => {
++    installedReadRevision++;
++    if (snapshotIdentity) markSnapshotInstalled(snapshotIdentity);
++  };
+   const createVersionedProjection = <TValue>(
+     compute: () => TValue
+   ): ReadableCell<TValue> => {
+@@ -672,7 +678,7 @@
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
+         if(publication.unit) installTerminalRecord(publication.unit.record);
+-        installedReadRevision++;
++        advanceInstalledRead();
+       },
+       invalidate(): void {
+         let failed = false;
+@@ -1052,7 +1058,7 @@
+           if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+         installPlacement();
+         if(publication.unit)installTerminalRecord(publication.unit.record);
+-        installedReadRevision++;
++        advanceInstalledRead();
+         if(!publicationPhase)complete();
+       },
+     };
+@@ -1583,7 +1589,7 @@
+         const result = frame.commit(
+           observe ? () => observe(ordinaryPlan.changes, delivery => observations.push(delivery)) : undefined,
+           responsibility, structuralFrontier, valueTransitions,
+-          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); installedReadRevision++; installed = true; }
++          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); advanceInstalledRead(); installed = true; }
+         );
+         if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
+         // Capture installed facts inside their actual bulk unit. Delivery belongs
+@@ -2535,7 +2541,7 @@
+     ordinaryPlan.install();
+     if (plan) installTerminalRecord(plan);
+     if(publication.unit) installTerminalRecord(publication.unit.record);
+-    installedReadRevision++;
++    advanceInstalledRead();
+     const observations:Array<()=>void>=[];
+     capture?.(ordinaryPlan.changes,delivery=>observations.push(delivery));
+     physicalCommitClock?.advance();
+@@ -5586,6 +5592,7 @@
+   });
+   // The materializer stamps the returned collection identity, not its raw
+   // proxy target. Source enrollment must retain that same identity.
++  snapshotIdentity = proxy;
+   defineEntityPublicationBinding(proxy as object, { source: entityPublication });
+   return proxy;
+ }
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './snapshot-installation';
+ import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation,type SelectedOutcome} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+@@ -489,6 +490,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
++          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+           if (observer) observer({intent:'replace',before:before as T,after:changed ? next : before as T,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+@@ -523,6 +525,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
++          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+           mutationSource2.observer?.({intent:'derive',before,after:changed ? next : before,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+--- a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ b/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -25,6 +25,7 @@
+ import type { TreeCapability } from '../types';
+ import {
+   bindSnapshotParent,
++  markSnapshotInstalled,
+   markSnapshotVolatile,
+   materializeSnapshotNode,
+   publishMembershipChange,
+@@ -855,6 +856,7 @@
+   // Under a branch that has been omitted before, so an omission above it is
+   // visible to the new member too (`isAbsentMember`).
+   linkAddedMember(branch as object, key, child);
++  markSnapshotInstalled(branch);
+   // Claim only the child that actually installed; abandoned plans own no live observer.
+   inheritObservationForAddedMember(branch, child);
+ 
+--- a/packages/kernel/src/lib/internals/member-membership.ts
++++ b/packages/kernel/src/lib/internals/member-membership.ts
+@@ -28,7 +28,7 @@
+ import { getOwnedPositionIds } from './owned-metadata';
+ import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+ import { capturePathReAddIfObserved } from './path-observation-port';
+-import { publishMembershipChange } from './snapshot-authority';
++import { markSnapshotInstalled, publishMembershipChange } from './snapshot-authority';
+ import {
+   getTreeScalarSlotRuntime,
+   type MemberAbsence,
+@@ -996,6 +996,20 @@
+       if (ordinaryDivergences.get(runtime)) runtime.enableAbsence?.(ABSENCE);
+       else if (!omittedMembers.get(runtime)) runtime.disableAbsence?.();
+     }
++    if (changed) {
++      markSnapshotInstalled(parent);
++      // A held descendant can have a cached value even without a demanded parent.
++      const mark = (node: unknown): void => {
++        if (!isNodeAccessor(node)) return;
++        markSnapshotInstalled(node);
++        for (const key of Reflect.ownKeys(node)) {
++          if (key === 'caller' || key === 'arguments') continue;
++          const descriptor = Object.getOwnPropertyDescriptor(node, key);
++          if (descriptor && 'value' in descriptor) mark(descriptor.value);
++        }
++      };
++      mark(child);
++    }
+     return changed;
+   } catch (error) {
+     failed = true;
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -1,3 +1,4 @@
++import { bindSnapshotInstalledReader, markSnapshotInstalled } from './snapshot-installation';
+ import {consumeSelected} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+@@ -104,6 +105,7 @@
+       throw new Error('Expected a native writable cell realization');
+ 
+     const location = markTreeCell(realized.cell as unknown as Location<T>);
++    bindSnapshotInstalledReader(location, read);
+     const mutationSource1 = observable
+       ? registerIntrinsicMutationSource<T>(location as object)
+       : unobservableMutationSource<T>();
+@@ -114,6 +116,7 @@
+         const observer = mutationSource1.observer;
+         const before = observer ? realized.peek() : undefined;
+         const changed = write(next, 'replace');
++        if (changed) markSnapshotInstalled(location);
+         if (observer) {
+           observer({
+             intent: 'replace',
+@@ -128,6 +131,7 @@
+         const before = realized.peek();
+         const next = update(before);
+         const changed = write(next, 'derive');
++        if (changed) markSnapshotInstalled(location);
+         const observer = mutationSource1.observer;
+         if (observer) {
+           observer({
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,4 @@
++import { bindSnapshotInstalledReader } from './snapshot-installation';
+ import type {ConstructionAllocation} from './construction-allocation';
+ import { PublicationPreparation } from './publication-preparation';
+ import { completeScalarFrame } from './tree-scalar-slot-runtime';
+@@ -166,6 +167,7 @@
+   publication.bind(slotIndex, realized.token);
+   const leaf = markTreeCell(native as unknown as Location<T>);
+   holder.leaf = leaf;
++  bindSnapshotInstalledReader(leaf, () => liveness.absence?.isAbsent(leaf) ? undefined : kernel.readSlot<T>(slotIndex));
+   const mutationSource = registerIntrinsicMutationSource<T>(leaf as object);
+ 
+   // `reAdd` re-adds and announces an absent leaf's path, and says whether it
+--- a/packages/kernel/src/lib/internals/snapshot-authority.ts
++++ b/packages/kernel/src/lib/internals/snapshot-authority.ts
+@@ -1,3 +1,5 @@
++import { MATERIALIZED, SNAPSHOT_PARENT, type MaterializedSnapshot } from './snapshot-installation';
++export { bindSnapshotParent, markSnapshotInstalled, readSnapshotTerminal } from './snapshot-installation';
+ import type { Location, ReadableCell } from './cell-runtime';
+ import { isNodeAccessor, snapshotNodeKey } from './node-shape';
+ import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+@@ -10,12 +12,6 @@
+ 
+ declare const ngDevMode: boolean | undefined;
+ 
+-interface MaterializedSnapshot<T> {
+-  observe: ReadableCell<T>;
+-}
+-
+-const MATERIALIZED = new WeakMap<object, MaterializedSnapshot<unknown>>();
+-const SNAPSHOT_PARENT = new WeakMap<object, WeakRef<object>>();
+ const TREE_STORES = new WeakSet<object>();
+ const VOLATILE_SNAPSHOTS = new WeakSet<object>();
+ const MEMBERSHIP_REVISION = new WeakMap<object, Location<number>>();
+@@ -25,13 +21,6 @@
+ 
+ export function isSnapshotNode(node: object): boolean {
+   return TREE_STORES.has(node) || isNodeAccessor(node);
+-}
+-
+-export function bindSnapshotParent(node: object, parent: object): void {
+-  SNAPSHOT_PARENT.set(
+-    snapshotNodeKey(node),
+-    new WeakRef(snapshotNodeKey(parent))
+-  );
+ }
+ 
+ export function markSnapshotVolatile(node: object): void {
+@@ -84,17 +73,57 @@
+ 
+   if (!snapshot) {
+     const membershipRevision = membershipRevisionFor(key, locations);
++    // Register before the first evaluation, including a cold reentrant build.
++    let observe: ReadableCell<T> | undefined;
++    const record: MaterializedSnapshot<T> = {
++      generation: 0,
++      get observe() { return observe ??= locations.createDerived(read); },
++    };
+     const read = () => {
++      if (record.attempt) record.attempt.built = true;
++      const generation = record.generation;
++      const previousCache = record.cache;
+       membershipRevision();
+       const built = build();
+       if (typeof ngDevMode === 'undefined' || ngDevMode) {
+         if (built !== null && typeof built === 'object') Object.freeze(built);
+       }
++      // Never cache an output spanning an installation, nor retry its callback.
++      if (generation !== record.generation) return built;
++      if (record.cache?.generation === generation &&
++          (record.cache.pendingObservation || record.cache !== previousCache)) {
++        record.cache.pendingObservation = false;
++        return record.cache.value;
++      }
++      // An ordinary runtime invalidation can come from a foreign/custom source
++      // without an install hook. Only an early current-read winner is reusable.
++      record.cache = { generation, value: built, pendingObservation: false };
+       return built;
+     };
+-    snapshot = { observe: locations.createDerived(read) };
+-    MATERIALIZED.set(key, snapshot as MaterializedSnapshot<unknown>);
++    MATERIALIZED.set(key, record as MaterializedSnapshot<unknown>);
++    snapshot = record;
+   }
+ 
+-  return snapshot.observe();
++  const previous = snapshot.attempt;
++  const receipt = { built: false };
++  snapshot.attempt = receipt;
++  try {
++    const observed = snapshot.observe();
++    if (receipt.built) return observed;
++    if (snapshot.cache?.generation === snapshot.generation) return snapshot.cache.value;
++    // Observe was cached by the runtime: read installed truth without publishing.
++    // Use the same tracked builder; a later real observe pass still collects all
++    // dependencies and may allocate a temporary output before reusing this one.
++    const generation = snapshot.generation;
++    const built = build();
++    if (typeof ngDevMode === 'undefined' || ngDevMode) {
++      if (built !== null && typeof built === 'object') Object.freeze(built);
++    }
++    if (generation !== snapshot.generation) return built;
++    if (snapshot.cache?.generation === generation) return snapshot.cache.value;
++    snapshot.cache = { generation, value: built, pendingObservation: true };
++    return built;
++  } finally {
++    snapshot.attempt = previous;
++  }
+ }
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/snapshot-installation.ts
+@@ -0,0 +1,41 @@
++import type { ReadableCell } from './cell-runtime';
++import { snapshotNodeKey } from './node-shape';
++
++// Existing snapshot authority state, isolated from realization initialization.
++export interface MaterializedSnapshot<T> {
++  observe: ReadableCell<T>;
++  generation: number;
++  cache?: { generation: number; value: T; pendingObservation: boolean };
++  attempt?: { built: boolean };
++}
++
++export const MATERIALIZED = new WeakMap<object, MaterializedSnapshot<unknown>>();
++export const SNAPSHOT_PARENT = new WeakMap<object, WeakRef<object>>();
++
++export function bindSnapshotParent(node: object, parent: object): void {
++  SNAPSHOT_PARENT.set(
++    snapshotNodeKey(node),
++    new WeakRef(snapshotNodeKey(parent))
++  );
++}
++
++// Source readers do not publish native mirrors. Keys and ancestry remain weak.
++const INSTALLED_READERS = new WeakMap<object, () => unknown>();
++export function bindSnapshotInstalledReader(node: object, read: () => unknown): void {
++  INSTALLED_READERS.set(node, read);
++}
++export function readSnapshotTerminal<T>(node: ReadableCell<T>, parent: object): T {
++  bindSnapshotParent(node as object, parent);
++  const observed = node();
++  const installed = INSTALLED_READERS.get(node as object);
++  return installed ? installed() as T : observed;
++}
++export function markSnapshotInstalled(node: object): void {
++  let current: object | undefined = snapshotNodeKey(node);
++  while (current) {
++    const snapshot = MATERIALIZED.get(current);
++    if (snapshot) snapshot.generation++;
++    current = SNAPSHOT_PARENT.get(current)?.deref();
++  }
++}
++
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './snapshot-installation';
+ import { PublicationPreparation } from './publication-preparation';
+ import {getActiveWriteContext} from '../write-context';
+ import { prepareScalarSourcePublication, completeScalarSourcePublication, installTerminalRecord } from './intrinsic-mutation';
+@@ -258,6 +259,10 @@
+       for(const p of shadowPlans){if(p.keep)inspectionBaseline.set(p.slotIndex,p.value);else inspectionBaseline.delete(p.slotIndex);}
+       for (const unit of units) installTerminalRecord(unit.record);
+       const revision=(changed.length||shadowPlans.length)&&options?.advanceRevision!==false?advanceRevision():getCommittedRevision();
++      for (const {slotIndex} of changed) {
++        const source = publicationSources[slotIndex];
++        if (source) markSnapshotInstalled(source);
++      }
+       return {revision,changedSlots:changed.map(x=>x.slotIndex),...(publication ? {publication} : {})};
+     };
+   };
+@@ -339,6 +344,8 @@
+         installTerminalRecord(plan);
+       }
+       advanceRevision();
++      const source = publicationSources[slotIndex];
++      if (!equal && source) markSnapshotInstalled(source);
+       return {changed:semanticChanged,physicalChanged:!equal};
+     },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-freshness-callbacks.spec.ts
+@@ -0,0 +1,19 @@
++import {expect,it} from 'vitest';import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,entityMap,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getLocationRuntime} from './internals/location-runtime';
++
++for(const fail of [false,true])it(`sorted collection completion and later dependency; fail=${fail}`,()=>{
++ let comparisons=0;let armedError=false;const sentinel=Error('sorted original');
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{comparisons++;if(armedError)throw sentinel;return a.n-b.n;}}),other:{n:7}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ const events:unknown[]=[];const take=(name:string,fn:()=>unknown)=>{const start=comparisons;try{const value=fn();const r={name,kind:'return',value:value===undefined?null:JSON.parse(JSON.stringify(value)),start,end:comparisons};events.push(r);return r;}catch(e){const r={name,kind:'throw',sameSentinel:e===sentinel,message:e instanceof Error?e.message:String(e),start,end:comparisons};events.push(r);return r;}};
++ let calls=0;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const heldAll=t.$.rows.all;let derivedRuns=0;const derived=lr.createDerived(()=>{derivedRuns++;return t.$();});take('warm-root',()=>derived());
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;armedError=fail;take('completion-held-all',()=>heldAll());take('completion-root',()=>t.$());take('completion-derived',()=>derived());armedError=false;}});
++ take('add',()=>t.$.rows.addOne({id:3,n:0}));off();off=undefined;
++ take('post-root',()=>t.$());take('post-derived',()=>derived());take('repeat-root',()=>t.$());take('repeat-all',()=>heldAll());
++ take('next-collection-write',()=>t.$.rows.addOne({id:4,n:4}));take('next-derived',()=>derived());
++ writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`sorted-${fail}.json`),JSON.stringify({calls,comparisons,derivedRuns,events},null,2));expect(calls).toBe(1);expect(comparisons).toBeGreaterThan(0);
++ if(fail){const e=events.find(e=>(e as {name:string}).name==='completion-held-all') as {sameSentinel?:boolean};expect(e.sameSentinel).toBe(true);}
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-freshness-entity.spec.ts
+@@ -0,0 +1,12 @@
++import {it,expect} from 'vitest';import {signalTree,entityMap,transactions} from '../index';
++import {getLocationRuntime} from './internals/location-runtime';import {getEntityPublicationBinding} from './internals/entity-publication';
++
++for(const sorted of [false,true])it(`entity wrapper early identity and subsequent dependencies sorted=${sorted}`,()=>{
++ let comparisons=0;const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:sorted?(a,b)=>{comparisons++;return a.n-b.n;}:undefined}),other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const old=t.$();let runs=0;const held=lr.createDerived(()=>{runs++;return t.$();});held();let early:unknown;let inside:unknown;let calls=0;
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;early=t.$();inside=held();expect(t.$()).toBe(early);}});
++ lr.runInvalidationGroup(()=>{t.$.rows.addOne({id:3,n:0});});off();off=undefined;
++ expect(calls).toBe(1);expect(inside).toBe(old);expect(early).toBeDefined();expect((early as unknown as {rows:{all:{id:number}[]}}).rows.all.map(x=>x.id)).toEqual(sorted?[3,2,1]:[1,2,3]);expect(t.$()).toBe(early);expect(held()).toBe(early);
++ const prior=runs;t.$.rows.addOne({id:4,n:4});expect(held().rows.all).toHaveLength(4);expect(runs).toBeGreaterThan(prior);const stable=t.$();const comparisonCount=comparisons;for(let i=0;i<20;i++)expect(t.$()).toBe(stable);expect(comparisons).toBe(comparisonCount);
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-freshness-focused.spec.ts
+@@ -0,0 +1,55 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,transactions} from '../index';
++import {getTreeScalarSlotRuntime} from './internals/tree-scalar-slot-port';
++import {getOwnedPositionIds} from './internals/owned-metadata';
++import {completeScalarFrame} from './internals/tree-scalar-slot-runtime';
++import {bindLocationRuntime,getLocationRuntime,replaceLocation,deriveLocation} from './internals/location-runtime';
++import {observeIntrinsicMutations,preparePublicationMutations,registerMembershipPublication} from './internals/intrinsic-mutation';
++import {markTreeStore} from './internals/snapshot-authority';
++import {materializeNode} from './utils';
++
++function write(leaf:unknown,value:number){if(typeof leaf!=='function')throw Error('missing leaf');(leaf as (v:number)=>void)(value);}
++function save(name:string,data:unknown){writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,name+'.json'),JSON.stringify(data,null,2));}
++it('prepared slot completion discriminates current snapshot from undelivered native mirror and derived',()=>{
++ const t=signalTree({box:{n:1},sibling:{n:8}},{enhancers:[transactions()]});const rt=getTreeScalarSlotRuntime(t.$)!;const lr=getLocationRuntime(t.$)!;
++ let runs=0;const observed=lr.createDerived(()=>{runs++;return t.$.box();});const before=observed();const sibling=t.$.sibling();let delivered=0;let during:unknown;let mirror:unknown;let cached:unknown;let direct:unknown;let root:unknown;
++ const off=preparePublicationMutations(t.$.box.n,()=>({record:{writes:[],adds:[]},completion:{}}),()=>{delivered++;during=t.$.box();mirror=t.$.box.n();cached=observed();direct=t.$.box();root=t.$();});expect(off).toBeTypeOf('function');
++ try{const id=getOwnedPositionIds(t.$.box.n)![0]!;const slot=rt.resolveScalarSlot(id)!;const frame=rt.beginFrame();frame.set(slot,2);const install=frame.prepareCommit!({publish:false});const installed=install();completeScalarFrame(installed);
++ save('terminal-window',{delivered,during,mirror,cached,direct,root,runs});expect(delivered).toBe(1);expect(during).toEqual({n:2});expect(direct).toBe(during);expect(root).toEqual({box:{n:2},sibling:{n:8}});expect(t.$.sibling()).toBe(sibling);expect(mirror).toBe(2);
++ rt.publishPrepared(installed);expect(observed()).toEqual({n:2});expect(t.$.box()).toBe(during);expect(runs).toBeGreaterThan(1);
++ write(t.$.box.n,3);expect(observed()).toEqual({n:3});write(t.$.box.n, t.$.box.n()+1);expect(observed()).toEqual({n:4});
++ }finally{off!();t.destroy();}
++});
++it('new child dependencies survive early current read then normal delivery',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>,other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let runs=0;const held=lr.createDerived(()=>{runs++;return t.$();});held();let early:unknown;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===t.$.rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;early=t.$();});
++ try{t.$.rows({a:{n:1}});expect(calls).toBe(1);expect(held()).toBe(early);const n=runs;write((t.$.rows.a as unknown as {n: unknown}).n,2);expect(held().rows).toEqual({a:{n:2}});expect(runs).toBeGreaterThan(n);const m=runs;write(t.$.other.n,3);expect(held().other).toEqual({n:3});expect(runs).toBeGreaterThan(m);}finally{off();t.destroy();}
++});
++it('held dormant descendants recover on equal-value reactivation without sibling invalidation',()=>{
++ const t=signalTree({rows:{a:{deep:{n:1}},b:{deep:{n:2}}}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;const a=t.$.rows.a;const deep=a.deep;deep();const held=lr.createDerived(()=>t.$.rows());held();
++ try{t.$.rows({b:{deep:{n:2}}} as {a:{deep:{n:number}};b:{deep:{n:number}}});expect(held()).toEqual({b:{deep:{n:2}}});expect(deep()).toBeUndefined();write(deep.n,1);expect(held()).toEqual({a:{deep:{n:1}},b:{deep:{n:2}}});expect(deep()).toEqual({n:1});write(deep.n,3);expect(held().a.deep.n).toBe(3);}finally{t.destroy();}
++});
++it('supported symbol store child shares ancestry before grouped slot delivery',()=>{
++ const key=Symbol('child');const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ // Existing supported unwrap/materialize plain-store form; no symbol write API invented.
++ const store:{[key]:typeof t.$.box}={[key]:t.$.box};markTreeStore(store);bindLocationRuntime(store,lr);const read=()=>materializeNode<{[key]:{n:number}}>(store);const old=read();
++ try{const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);const result=frame.commit({publish:false});expect(read()[key]).toEqual({n:2});expect(read()).not.toBe(old);const now=read();rt.publishPrepared(result);expect(read()).toBe(now);write(t.$.box.n,3);expect(read()[key].n).toBe(3);}finally{t.destroy();}
++});
++it('no-op and discarded preparation preserve output; temporary delivery builds are measured',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let builds=0;const create=lr.createDerived.bind(lr);const spy=vi.spyOn(lr,'createDerived').mockImplementation(<T>(fn:()=>T)=>create(()=>{builds++;return fn();}));
++ try{const before=t.$.box();const count=builds;write(t.$.box.n,1);expect(t.$.box()).toBe(before);const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const canceled=rt.beginFrame();canceled.set(slot,2);canceled.discard();expect(t.$.box()).toBe(before);expect(builds).toBe(count);
++ const frame=rt.beginFrame();frame.set(slot,3);const result=frame.commit({publish:false});const current=t.$.box();expect(current).toEqual({n:3});const earlyBuilds=builds;for(let i=0;i<20;i++)expect(t.$.box()).toBe(current);expect(builds).toBe(earlyBuilds);rt.publishPrepared(result);expect(t.$.box()).toBe(current);save('builder-work',{initialTrackedBuilds:count,beforeDelivery:earlyBuilds,afterDelivery:builds,limit:'tracked derived callback executions only; direct fallback builds not counted'});expect(builds).toBeGreaterThan(count);
++ }finally{spy.mockRestore();t.destroy();}
++});
++
++it('refused prepared slot leaves physical value and snapshot identity unchanged',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const before=t.$();const sentinel=Error('prepare refused');const rt=getTreeScalarSlotRuntime(t.$)!;
++ const off=preparePublicationMutations(t.$.box.n,()=>{throw sentinel;},()=>{throw Error('must not complete');});expect(off).toBeTypeOf('function');
++ try{const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);expect(()=>frame.prepareCommit!({publish:false})).toThrow(sentinel);expect(t.$()).toBe(before);expect(t.$.box.n()).toBe(1);}finally{off!();t.destroy();}
++});
++it('direct replace and derive capture read installed backing before native publication',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});t.$.box();const seen:unknown[]=[];
++ const off=observeIntrinsicMutations(t.$.box.n,()=>{seen.push({parent:t.$.box(),mirror:t.$.box.n()});},false);expect(off).toBeTypeOf('function');
++ try{t.$.box.n(2);t.$.box.n(n=>n+1);save('direct-capture',seen);expect(seen).toEqual([{parent:{n:2},mirror:2},{parent:{n:3},mirror:3}]);expect(t.$.box()).toEqual({n:3});}finally{off!();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-freshness-grouped.spec.ts
+@@ -0,0 +1,19 @@
++import {expect,it} from 'vitest';import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,entityMap,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getLocationRuntime} from './internals/location-runtime';
++
++for(const fail of [false,true])it(`grouped sorted collection completion and later dependency; fail=${fail}`,()=>{
++ let comparisons=0;let armedError=false;const sentinel=Error('sorted original');
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:(a,b)=>{comparisons++;if(armedError)throw sentinel;return a.n-b.n;}}),other:{n:7}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ const events:unknown[]=[];const take=(name:string,fn:()=>unknown)=>{const start=comparisons;try{const value=fn();const r={name,kind:'return',value:value===undefined?null:JSON.parse(JSON.stringify(value)),start,end:comparisons};events.push(r);return r;}catch(e){const r={name,kind:'throw',sameSentinel:e===sentinel,message:e instanceof Error?e.message:String(e),start,end:comparisons};events.push(r);return r;}};
++ let calls=0;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const heldAll=t.$.rows.all;let derivedRuns=0;const derived=lr.createDerived(()=>{derivedRuns++;return t.$();});take('warm-root',()=>derived());
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;armedError=fail;take('completion-held-all',()=>heldAll());take('completion-root',()=>t.$());take('completion-derived',()=>derived());armedError=false;}});
++ take('add',()=>lr.runInvalidationGroup(()=>{t.$.rows.addOne({id:3,n:0});}));off();off=undefined;
++ take('post-root',()=>t.$());take('post-derived',()=>derived());take('repeat-root',()=>t.$());take('repeat-all',()=>heldAll());
++ take('next-collection-write',()=>t.$.rows.addOne({id:4,n:4}));take('next-derived',()=>derived());
++ writeFileSync(join(process.env.ST_PREPARED_REVIEW_OUTPUT!,`sorted-${fail}.json`),JSON.stringify({calls,comparisons,derivedRuns,events},null,2));expect(calls).toBe(1);expect(comparisons).toBeGreaterThan(0);
++ if(fail){const e=events.find(e=>(e as {name:string}).name==='completion-held-all') as {sameSentinel?:boolean};expect(e.sameSentinel).toBe(true);}
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-snapshot-currentness.spec.ts
+@@ -0,0 +1,49 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,link,transactions} from '../index';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++import {materializeMember,ordinaryBranch,registerMarkerProcessor} from './internals/materialize-markers';
++import {getLocationRuntime} from './internals/location-runtime';
++
++type Image=Record<string,{n:number}>;
++type Cell={():number;(value:number):void;};
++type Child={():{n:number};n:Cell};
++type Rows={():Image;(value:Image):void;[key:string]:unknown};
++const KIND=Symbol('parent-currentness-keyed');type Marker={[KIND]:true;seed:Image};
++registerMarkerProcessor((v:unknown):v is Marker=>typeof v==='object'&&v!==null&&KIND in v,(m:Marker)=>ordinaryBranch(m.seed,{keyedLookup:true}));
++function setup(keyed:boolean){
++ const t=signalTree({rows:keyed?({[KIND]:true,seed:{}} as Marker):({} as Image),sibling:{n:20}},{enhancers:[transactions()]});
++ const rows=t.$.rows as unknown as Rows;return{t,rows};
++}
++function child(rows:Rows,key:string):Child{const x=rows[key];if(typeof x!=='function'||!('n'in x)||typeof x.n!=='function')throw Error('missing actual installed child');return x as Child;}
++function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
++for(const keyed of [false,true])it(`fresh read-derived completion retains a and nested b: ${keyed?'keyed':'ordinary'}`,()=>{
++ const {t,rows}=setup(keyed);const l=link(rows,{set:()=>{}});const sentinel=Error('completion sentinel');let calls=0;let seen:unknown;let physical:unknown;let held:Child|undefined;let supplied:unknown;
++ rows();
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'&&e.ordinary?.before.present===false?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;seen=rows();held=child(rows,'a');physical=held.n();const next={...rows(),b:{n:2}};supplied=next;rows(next);throw sentinel;});
++ try{
++  expect(()=>keyed?materializeMember(rows,'a',{n:1}):rows({a:{n:1}})).toThrow(sentinel);
++  off();const after=rows();record(`kernel-${keyed?'keyed':'ordinary'}`,{calls,seen,physical,supplied,after});
++  expect(calls).toBe(1);expect(physical).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect.soft(supplied).toEqual({a:{n:1},b:{n:2}});expect.soft(after).toEqual({a:{n:1},b:{n:2}});expect(child(rows,'a')).toBe(held);
++ held!.n(3);child(rows,'b').n(4);
++  expect(rows()).toEqual({a:{n:3},b:{n:4}});
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('fresh ancestor and sibling identity during completion; no repeated-read churn',()=>{
++ const {t,rows}=setup(false);const rootBefore=t.$();const sibling=t.$.sibling();let seen:unknown;let rootDuring:{rows:unknown;sibling:{n:number}}|undefined;let first:Image|undefined;let repeat=false;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;first=rows();seen=first;rootDuring=t.$();repeat=Array.from({length:100},()=>rows()).every(v=>v===first);});
++ try{rows({a:{n:1}});expect(calls).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect(rootDuring?.rows).toEqual({a:{n:1}});expect(rootDuring).not.toBe(rootBefore);expect(rootDuring?.sibling).toBe(sibling);expect(repeat).toBe(true);expect(rows()).toBe(first);expect(t.$()).toBe(rootDuring);}
++ finally{off();t.destroy();}
++});
++
++it('ordinary unchanged reads and unrelated writes preserve memo identities',()=>{
++ const {t,rows}=setup(false);try{rows({a:{n:1}});const first=rows();const root=t.$();for(let i=0;i<100;i++){expect(rows()).toBe(first);expect(t.$()).toBe(root);} t.$.sibling.n(21);expect(rows()).toBe(first);expect(t.$().sibling).toEqual({n:21});}finally{t.destroy();}
++});
++
++it('no observer or snapshot demand performs no derived output work; counter has positive calibration',()=>{
++ const {t,rows}=setup(false);const runtime=getLocationRuntime(rows);if(!runtime)throw Error('missing actual location runtime');const original=runtime.createDerived.bind(runtime);let computations=0;
++ const spy=vi.spyOn(runtime,'createDerived').mockImplementation(<T>(compute:()=>T)=>original(()=>{computations++;return compute();}));
++ try{rows({a:{n:1}});child(rows,'a').n(7);expect(computations).toBe(0);expect(rows()).toEqual({a:{n:7}});expect(computations).toBeGreaterThan(0);const count=computations;const first=rows();for(let i=0;i<100;i++)expect(rows()).toBe(first);expect(computations).toBe(count);}finally{spy.mockRestore();t.destroy();}
++});
+--- a/packages/kernel/src/lib/utils.ts
++++ b/packages/kernel/src/lib/utils.ts
+@@ -10,6 +10,7 @@
+ } from './internals/location-runtime';
+ import {
+   bindSnapshotParent,
++  readSnapshotTerminal,
+   isSnapshotNode,
+   materializeSnapshotNode,
+ } from './internals/snapshot-authority';
+@@ -456,7 +457,7 @@
+         ? unwrapBranchForWriteCapture(value)
+         : value();
+     } else if (isReactiveStateValue(value)) {
+-      result[key] = (value as ReadableCell<unknown>)();
++      result[key] = readSnapshotTerminal(value as ReadableCell<unknown>, node);
+     } else if (
+       typeof value === 'object' &&
+       value !== null &&
+@@ -525,6 +526,7 @@
+     }
+ 
+     if (isNodeAccessor(value)) {
++      bindSnapshotParent(value as object, node);
+       // Take the child's materialisation AS IS. Calling `unwrap()` on it again
+       // deep-copied a plain object that was already plain — pure waste, and it
+       // destroyed the structural sharing the memo exists to produce: every
+@@ -534,9 +536,9 @@
+         ? unwrapBranchForWriteCapture(value)
+         : value();
+     } else if (isReactiveStateValue(value)) {
+-      (result as Record<symbol, unknown>)[sym] = (
+-        value as ReadableCell<unknown>
+-      )();
++      (result as Record<symbol, unknown>)[sym] = readSnapshotTerminal(
++        value as ReadableCell<unknown>, node
++      );
+     } else if (
+       typeof value === 'object' &&
+       value !== null &&

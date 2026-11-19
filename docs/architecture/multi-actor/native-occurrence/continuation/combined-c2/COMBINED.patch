@@ -1,0 +1,249 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
+ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+@@ -972,7 +973,8 @@
+     changes: readonly CommittedEntityMutation[],
+     physical = structuralStore.preparePlacement(),
+     authoredOrder?: readonly number[],
+-    authoredDomain?: readonly number[]
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
+   ) {
+     const placement = ordinaryTopology.preparePlacement(
+       structuralStore.preparePlacement()
+@@ -1085,7 +1087,8 @@
+           ): number | undefined => {
+             visibility ??= createPreparedPlacementVisibility(
+               physical,
+-              (id) => placement.read(id).present
++              (id) => placement.read(id).present,
++              physicalEntries
+             );
+             return visibility.resolve(
+               subject,
+@@ -1339,6 +1342,8 @@
+       }
+     }
+     const physicalPlacement = frame.preparePlacement();
++    // Capture after all placement edits; both consumers use this exact stage.
++    const physicalEntries = physicalPlacement.capturePatch();
+     for (let index = 0; index < changes.length; index++) {
+       const change = changes[index];
+       if (change.structuralRecord?.kind !== 'add') continue;
+@@ -1357,7 +1362,8 @@
+       changes,
+       physicalPlacement,
+       frame.ordinaryOrder,
+-      frame.orderEndpoints?.before
++      frame.orderEndpoints?.before,
++      physicalEntries
+     );
+     const valueResultsByStep = frame.mutations.map((mutation) => {
+       if (mutation.kind !== 'replace-value') return undefined;
+@@ -1388,7 +1394,7 @@
+           }
+         : undefined;
+     const physicalInterval =
+-      ordinaryTopology.prepareInterval(physicalPlacement);
++      ordinaryTopology.prepareInterval(physicalPlacement, physicalEntries);
+     const physicalBeforeToken = structuralStore.activeOrderFrontier();
+     const topologyUnit = Object.freeze({
+       id: Object.freeze({}),
+--- a/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
++++ b/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
+@@ -1,5 +1,8 @@
+ import type { TopologyViewInterval } from '../internals/mutation-capture-runtime';
+-import { EntityPlacementStage } from './entity-placement-stage';
++import {
++  EntityPlacementStage,
++  type PreparedPlacementEntries,
++} from './entity-placement-stage';
+ import type { StructuralEffect } from '../mutation-types';
+ 
+ export type OrdinaryEntityPresence<K extends string | number, E> =
+@@ -71,8 +74,11 @@
+       { interval }
+     );
+   }
+-  prepareInterval(stage: EntityPlacementStage<K>): TopologyViewInterval {
+-    const pairs = [...stage.patch].flatMap(([subject, after]) => {
++  prepareInterval(
++    stage: EntityPlacementStage<K>,
++    entries?: PreparedPlacementEntries<K>
++  ): TopologyViewInterval {
++    const pairs = (entries ?? [...stage.patch]).flatMap(([subject, after]) => {
+       const before = stage.base(subject);
+       const equal =
+         before.present === after.present &&
+@@ -87,7 +93,10 @@
+             Object.freeze({
+               subject,
+               before: Object.freeze({ ...before }),
+-              after: Object.freeze({ ...after }),
++              after:
++                entries && Object.isFrozen(after)
++                  ? after
++                  : Object.freeze({ ...after }),
+             }),
+           ];
+     });
+--- a/packages/kernel/src/lib/physical/entity-placement-stage.ts
++++ b/packages/kernel/src/lib/physical/entity-placement-stage.ts
+@@ -2,6 +2,11 @@
+ export type EntityPlacement<K> =
+   | { present: false }
+   | { present: true; key: K; beforeSubject?: number; afterSubject?: number };
++export type PreparedPlacementEntries<K> = readonly (readonly [
++  number,
++  Readonly<EntityPlacement<K>>
++])[];
++
+ export class EntityPlacementStage<K> {
+   readonly patch = new Map<number, EntityPlacement<K>>();
+   constructor(
+@@ -9,6 +14,16 @@
+     public head: number | undefined,
+     public tail: number | undefined
+   ) {}
++  /** One immutable enumeration of a completed preparation, not a stored index. */
++  capturePatch(): PreparedPlacementEntries<K> {
++    const entries: Array<readonly [number, Readonly<EntityPlacement<K>>]> = [];
++    // Map iteration creates this tuple; it is not the Map's stored row.
++    for (const entry of this.patch) {
++      entry[1] = Object.freeze({ ...entry[1] });
++      entries.push(Object.freeze(entry));
++    }
++    return Object.freeze(entries);
++  }
+   read(subject: number): EntityPlacement<K> {
+     return this.patch.get(subject) ?? this.base(subject);
+   }
+--- /dev/null
++++ b/packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts
+@@ -0,0 +1,22 @@
++import { expect, it } from 'vitest';
++import { EntityPlacementStage } from './entity-placement-stage';
++import { EntityOrdinaryTopology } from './entity-ordinary-topology';
++it('reuses only an explicitly supplied immutable after-row and never freezes the live row', () => {
++  const stage = new EntityPlacementStage<string>(() => ({present:false}), undefined, undefined);
++  stage.insert(1, 'a');
++  const live=stage.patch.get(1)!;
++  const entries=stage.capturePatch();
++  expect(entries[0][1]).not.toBe(live);
++  expect(Object.isFrozen(live)).toBe(false);
++  const topology=new EntityOrdinaryTopology<string>();
++  const shared=topology.prepareInterval(stage,entries);
++  expect(shared.pairs[0].after).toBe(entries[0][1]);
++  const mutableEntries=[...stage.patch];
++  const defensive=topology.prepareInterval(stage,mutableEntries);
++  expect(defensive.pairs[0].after).not.toBe(live);
++  const ordinary=topology.prepareInterval(stage);
++  expect(ordinary.pairs[0].after).not.toBe(live);
++  stage.rekey(1,'b');
++  expect(shared.pairs[0].after).toEqual({present:true,key:'a',beforeSubject:undefined,afterSubject:undefined});
++  expect(defensive.pairs[0].after).toEqual(shared.pairs[0].after);
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts
+@@ -0,0 +1,61 @@
++import { expect, it } from 'vitest';
++import { EntityPlacementStage } from './entity-placement-stage';
++import { EntityOrdinaryTopology } from './entity-ordinary-topology';
++import { createPreparedPlacementVisibility } from './prepared-placement-visibility';
++
++it('shares the completed placement order while keeping its captured records immutable', () => {
++  const stage = new EntityPlacementStage<string>(
++    () => ({ present: false }),
++    undefined,
++    undefined
++  );
++  stage.insert(1, 'a');
++  stage.insert(2, 'b');
++  const early = stage.capturePatch();
++  // Final preparation can change adjacency after an earlier key-index scan.
++  stage.insert(3, 'c', undefined, 1);
++  const final = stage.capturePatch();
++  const interval = new EntityOrdinaryTopology<string>().prepareInterval(
++    stage,
++    final
++  );
++  const visibility = createPreparedPlacementVisibility(
++    stage,
++    () => true,
++    final
++  );
++  expect(visibility.resolve(3, 'after')).toBe(3);
++  visibility.setVisible(3, false);
++  expect(visibility.resolve(3, 'after')).toBe(1);
++  expect(final.find(([id]) => id === 1)?.[1]).toEqual({
++    present: true,
++    key: 'a',
++    beforeSubject: 3,
++    afterSubject: 2,
++  });
++  expect(early.find(([id]) => id === 1)?.[1]).toEqual({
++    present: true,
++    key: 'a',
++    beforeSubject: undefined,
++    afterSubject: 2,
++  });
++  expect(Object.isFrozen(final)).toBe(true);
++  for (const entry of final) {
++    expect(Object.isFrozen(entry)).toBe(true);
++    expect(Object.isFrozen(entry[1])).toBe(true);
++  }
++  stage.remove(1);
++  // Retained interval/entries cannot be rewritten by a subsequent preparation.
++  expect(interval.pairs.find((pair) => pair.subject === 1)?.after).toEqual({
++    present: true,
++    key: 'a',
++    beforeSubject: 3,
++    afterSubject: 2,
++  });
++  expect(final.find(([id]) => id === 1)?.[1]).toEqual({
++    present: true,
++    key: 'a',
++    beforeSubject: 3,
++    afterSubject: 2,
++  });
++});
+--- a/packages/kernel/src/lib/physical/prepared-placement-visibility.ts
++++ b/packages/kernel/src/lib/physical/prepared-placement-visibility.ts
+@@ -1,10 +1,14 @@
+-import type { EntityPlacementStage } from './entity-placement-stage';
++import type {
++  EntityPlacementStage,
++  PreparedPlacementEntries,
++} from './entity-placement-stage';
+ type Direction = 'before' | 'after';
+ type Run = { ids: number[]; size: number; counts: number[] };
+ /** Transient query index over one fixed physical preparation, never state authority. */
+ export function createPreparedPlacementVisibility<K>(
+   physical: EntityPlacementStage<K>,
+-  isVisible: (subject: number) => boolean
++  isVisible: (subject: number) => boolean,
++  entries?: PreparedPlacementEntries<K>
+ ) {
+   const overrides = new Map<number, boolean>();
+   const positions = new Map<number, { run: Run; at: number }>();
+@@ -14,11 +18,13 @@
+     if (built) return;
+     built = true;
+     const present = new Map(
+-      [...physical.patch].filter(
++      (entries ?? [...physical.patch]).filter(
+         (
+           entry
+-        ): entry is [number, Extract<(typeof entry)[1], { present: true }>] =>
+-          entry[1].present
++        ): entry is readonly [
++          number,
++          Extract<(typeof entry)[1], { present: true }>
++        ] => entry[1].present
+       )
+     );
+     const visited = new Set<number>();

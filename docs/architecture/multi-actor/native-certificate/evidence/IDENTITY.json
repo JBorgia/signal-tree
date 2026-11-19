@@ -1,0 +1,20 @@
+{
+  "baseline": "87ddcfdedcb5d91e700d812bd6cbee2f77038510",
+  "scratch": "/private/tmp/st-projection-certificate-successor",
+  "sourceManifestSha256": "51554d3192ae20bcf2e3a39cfa0e1daf2d22d2a883f963fea9b7108b343cf7f3",
+  "runtimePatchSha256": "9d3ea485789f9b9c8aac08b9f502e94c341f0217159934a6c2bbbab01acaa3e0",
+  "sourcePatchSha256": "2c6a45790d634f8d5d9ebc2291eb5293193068e97abd905c910536b33caf6002",
+  "changedFiles": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/native-certificate-successor.spec.ts"
+  ],
+  "unchangedOriginalFixtures": {
+    "packages/kernel/src/lib/core-independent-review.spec.ts": "a784b59acac28fb58c22f661b53e7e02f10854ba9b2e1478147502a2fd14a512",
+    "packages/kernel/src/lib/collection-contributor-core.spec.ts": "b6520ced389a5d28c22c1503f2420e77c854d0102012efd71cd1dc68fe238edf",
+    "packages/kernel/src/lib/publication-terminal-consumer-independent.spec.ts": "fd719835e389f508cde80c44d432e5a82274d8b168bef57b4d3d6cb0b3e64483"
+  },
+  "status": "frozen after covered ancestor-omission recurrence; not accepted"
+}

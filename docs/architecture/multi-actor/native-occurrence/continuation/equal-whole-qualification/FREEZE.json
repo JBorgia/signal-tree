@@ -1,0 +1,49 @@
+{
+  "runtimeUnchanged": true,
+  "sourceFrozen": true,
+  "baseCandidateManifestSha256": "8ed29ecbbd0cb8cefcecff4bda5cb6351dd9e59ed7590fb571d412cc0a182d0b",
+  "qualificationManifestSha256": "a95b716f10c7dc43efc0f60d13a31a947695affff153b376ba6232c6835a28e3",
+  "newTestFiles": [
+    "packages/kernel/src/lib/whole-bounded-qualification.spec.ts",
+    "packages/kernel/src/lib/whole-mixed-trace.spec.ts"
+  ],
+  "mainSixAndOriginalFailuresUnchanged": true,
+  "results": {
+    "runs/qualification-first/RESULT.json": {
+      "exit": 1,
+      "elapsedSeconds": 13.037267250008881,
+      "source_unchanged": true
+    },
+    "runs/retained-root-original/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 7.671485000057146,
+      "source_unchanged": true
+    },
+    "runs/presence-fixed-fixture/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 11.34762304101605,
+      "source_unchanged": true
+    },
+    "runs/mixed-attribution/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 11.531277125002816,
+      "source_unchanged": true
+    },
+    "runs/terminal-characterization-frozen/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 5.382785625057295,
+      "source_unchanged": true
+    },
+    "runs/spec-types-fixed-fixture/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 22.01640279102139,
+      "source_unchanged": true
+    },
+    "runs/spec-types/RESULT.json": {
+      "exit": 1,
+      "elapsedSeconds": 24.511074542067945,
+      "source_unchanged": true
+    }
+  },
+  "auditPassed": true
+}

@@ -1,0 +1,15 @@
+{
+  "number": 6,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+    "fullName": "entityMap missing-id guard (dev mode) warns when entities have no id and no selectId",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 2 skipped (3)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 2.2058539390563965
+}

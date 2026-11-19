@@ -1,0 +1,3 @@
+First launcher attempt preceded completion of verified scratch copying and failed before spawning any test subprocess:
+FileNotFoundError: /private/tmp/st-c19-bounded-history-counts/EXPECTED-SITES.json
+No test or workload ran. This attempt is preserved. Retry uses a new run directory only after setup completion.

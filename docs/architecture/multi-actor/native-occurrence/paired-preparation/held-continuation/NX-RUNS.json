@@ -1,0 +1,16 @@
+[
+  {
+    "arm": "drop-proceed",
+    "exit": 1,
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  }
+]

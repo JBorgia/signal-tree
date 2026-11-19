@@ -1,0 +1,47 @@
+[
+  {
+    "path": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "sha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "sha256": "d1ebb43f942137ddfeb4d51a3f219f8e4f2fa8da468d1ce8dc17728054ce8731",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/publication-enrollment-adjudicated.spec.ts",
+    "sha256": "43d91b8f25b3d0b347e545ac2d1d744d8c8e8145979df7e1f612355d45233e5b",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/recipient-source-permission.spec.ts",
+    "sha256": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/recipient-window-independent.spec.ts",
+    "sha256": "886c2626b1a5f0892a4610577d798039795133b1103ddfe3a5af2c065c741dae",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "sha256": "06cf63fe0338d8e3e94e0d10ff3f04d59468cd8b029798c4d430d013fc6d8d34",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "sha256": "cb2219188fb4587d2777c05ae7a9bb0a74538bb4ef68149db3f126e5282d219f",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "sha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac",
+    "byteIdenticalToC23": true
+  },
+  {
+    "path": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "sha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "byteIdenticalToC23": true
+  }
+]

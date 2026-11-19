@@ -1,0 +1,28 @@
+{
+  "esbuild": "0.25.12",
+  "options": {
+    "absWorkingDir": "/private/tmp/st-c28-r3-late-first-link-review",
+    "entryPoints": [
+      "initial.mjs"
+    ],
+    "outdir": "split",
+    "bundle": true,
+    "splitting": true,
+    "format": "esm",
+    "platform": "browser",
+    "minify": false,
+    "treeShaking": true,
+    "define": {
+      "ngDevMode": "false",
+      "process.env.NODE_ENV": "\"production\""
+    },
+    "external": [
+      "@angular/*",
+      "rxjs",
+      "rxjs/*",
+      "tslib"
+    ],
+    "metafile": true,
+    "logLevel": "info"
+  }
+}

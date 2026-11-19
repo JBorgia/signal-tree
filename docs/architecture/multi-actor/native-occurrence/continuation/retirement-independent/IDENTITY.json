@@ -1,0 +1,11 @@
+{
+  "frozen": {
+    "files": 2945,
+    "mismatches": []
+  },
+  "isolated": {
+    "files": 2945,
+    "mismatches": []
+  },
+  "addedIndependentTestSha256": "026b1aae162beb349dc58b877daf71103144cf799774576cd40b43183b2dcd24"
+}

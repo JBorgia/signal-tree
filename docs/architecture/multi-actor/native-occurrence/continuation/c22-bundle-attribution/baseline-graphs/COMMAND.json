@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "node",
+    "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/baseline-graphs/gate.mjs"
+  ],
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution",
+  "exit": 1,
+  "correction": "Earlier diagnostic CORE relocation failed before any bundle emitted; preserved original arm directory. No package rebuild."
+}

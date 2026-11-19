@@ -1,0 +1,192 @@
+[
+  {
+    "file": "caught-drop-proceed.json",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStable": true,
+    "releasedStable": true,
+    "errors": []
+  },
+  {
+    "file": "caught-hold-proceed.json",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStable": true,
+    "releasedStable": true,
+    "errors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  {
+    "file": "skip-drop-proceed.json",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStable": true,
+    "releasedStable": true,
+    "errors": []
+  },
+  {
+    "file": "skip-hold-proceed.json",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStable": true,
+    "releasedStable": true,
+    "errors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  {
+    "file": "success-drop-proceed.json",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStable": true,
+    "releasedStable": true,
+    "errors": null
+  },
+  {
+    "file": "success-hold-proceed.json",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStable": true,
+    "releasedStable": true,
+    "errors": "Error: Selected continuation cannot replay"
+  }
+]

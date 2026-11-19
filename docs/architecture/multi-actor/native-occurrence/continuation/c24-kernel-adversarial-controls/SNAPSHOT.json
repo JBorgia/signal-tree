@@ -1,0 +1,9 @@
+{
+  "EXPECTATIONS.md": "e36491efdb0c0567312df72024aea0aabef19b250f41c16ac91d2be3218973e9",
+  "COMMANDS.md": "cdf563aff941b4437ad2bcfceaeb3a852a28f0e957c3d7c8d6d5275c6436c5f7",
+  "ASSUMPTIONS.md": "90c0016c0f1e6ae25c03f394084d4df7ace7676dcee74567bfe8313f0b594ec2",
+  "INPUTS.json": "7a9090eafb331e32f57c5dbaa94dbc354d99b4cbc74da0cb8d73e3aa67e3f50b",
+  "FREEZE.json": "14931ca98d4d4535de18ce6dd5f798022347062316e19f4f0b73afdb0f58927b",
+  "TESTS.patch": "02e3091c05a580214ac19c17807ba5f7e563d5c20031792c91a5af9abe6cb3f0",
+  "files/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts": "8ebefaa05d0a47499c971b78295875a9d503db812db297689f71d69d45ead0fa"
+}

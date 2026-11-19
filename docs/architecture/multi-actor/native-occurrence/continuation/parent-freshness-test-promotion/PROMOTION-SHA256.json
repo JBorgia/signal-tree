@@ -1,0 +1,8 @@
+{
+  "packages/angular/src/lib/parent-freshness-entity.spec.ts": "6237c55ebbcf910b70bb43c266d4ffbfdf410241093b615ddaa5195a1fec36d4",
+  "packages/angular/src/lib/parent-freshness-focused.spec.ts": "af32a888645ffde5cfeb47758109bbb22fe20dd10cef17e6d01dd5529e4b3794",
+  "packages/angular/src/lib/parent-snapshot-currentness.spec.ts": "db3835be6a83b6f2191eb2c5c68bf3895b749b7f1a582e8a3b85d6364cdd93ec",
+  "packages/kernel/src/lib/parent-freshness-entity.spec.ts": "7e224cb7c28f9b2f6878a30a1c9c33d60a726717573892e4c513cac0f8a85bc3",
+  "packages/kernel/src/lib/parent-freshness-focused.spec.ts": "c31ab537a83917af1211f5ae863d4847f393032f480c50296fddc20ab9d6ba72",
+  "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts": "93273e3668f2e1ef1d78fbc4c93a415e16949e0f273f5eb0f033cb809d6200d4"
+}

@@ -1,0 +1,765 @@
+[
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (transactions first) > reads it absent and empty; a row-naming write refuses",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (transactions first) > a tap inside transact reads the collection as it is (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (transactions first) > rollback of a re-adding write makes it absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (restoration first) > reads it absent and empty; a row-naming write refuses",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (restoration first) > a tap inside transact reads the collection as it is (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-collection.spec.tsx",
+    "name": "absent collection \u2014 React (restoration first) > rollback of a re-adding write makes it absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 1 speculative publication \u2014 proposed values reach the native carrier before settlement",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 2 accept publication \u2014 the committed value stays visible through the SAME held reference",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 3 reject publication \u2014 the restored value republishes through the SAME held reference",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4 coherent mixed publication \u2014 accept exposes no torn scalar/structural frame",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4b coherent mixed publication \u2014 reject exposes no torn frame either",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4c coherent value settlement \u2014 own collection reads agree in native observers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4d owned projection settlement \u2014 add, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4d owned projection settlement \u2014 add, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4d owned projection settlement \u2014 remove, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4d owned projection settlement \u2014 remove, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4d owned projection settlement \u2014 field, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4d owned projection settlement \u2014 field, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 initial absence, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 initial absence, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 same lifetime restoration, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 same lifetime restoration, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 new lifetime at reused key, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 new lifetime at reused key, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selection while absent, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selection while absent, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selected rekey, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selected rekey, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 unrelated writes and disposal, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 4e selection lifetime projections \u2014 unrelated writes and disposal, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 5 lifetime preservation \u2014 a held reference never retargets to a reused business key",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/transaction-realization.spec.tsx",
+    "name": "@signal-tree/react \u2014 pending realization conformance > 5b lifetime preservation holds when the rename happens inside a pending",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch equal whole unowned / confirm",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch equal whole unowned / rollback",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch equal whole actual-owner / confirm",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch equal whole actual-owner / rollback",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch no-write receipt and declaration after disposal",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React branch no-write receipt retains older pending work until disposal",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "name": "React genuinely authored dependent branch receipt disposes while native UI stays current",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'leaf' / actual-owned=true / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'leaf' / actual-owned=true / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'leaf' / actual-owned=false / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'leaf' / actual-owned=false / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'whole' / actual-owned=true / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'whole' / actual-owned=true / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'whole' / actual-owned=false / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "name": "react equal 'whole' / actual-owned=false / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/pending-turn-realization.spec.tsx",
+    "name": "REACT-PENDING-TURN-REALIZATION-0 / control A \u2014 plain write > a held consumer updates normally when no turn is open",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/pending-turn-realization.spec.tsx",
+    "name": "REACT-PENDING-TURN-REALIZATION-0 / control B \u2014 pending transact > the SAME held consumer observes the speculative value BEFORE confirm",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/pending-turn-realization.spec.tsx",
+    "name": "REACT-PENDING-TURN-REALIZATION-0 / control C \u2014 consequences stay gated > UI sees the speculative value while durable consequences do NOT run",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/pending-turn-realization.spec.tsx",
+    "name": "REACT-PENDING-TURN-REALIZATION-0 / control D \u2014 rollback > the same held consumer observes 0 -> 7 -> 0",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > observes a selected canonical location without materializing the root",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > expresses whole-root observation through the root projection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > switches owner and selector without retaining the previous observation",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > uses the latest selector when props change without an owner mutation",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > reads canonical state during server rendering",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > cleans up StrictMode registrations at unmount",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/use-signal-tree.spec.tsx",
+    "name": "useSignalTree > surfaces React snapshot instability for an allocating selector",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/parent-freshness-counterparts.spec.tsx",
+    "name": "installed parent freshness and retained native dependencies (false / false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/parent-freshness-counterparts.spec.tsx",
+    "name": "installed parent freshness and retained native dependencies (false / true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/parent-freshness-counterparts.spec.tsx",
+    "name": "installed parent freshness and retained native dependencies (true / true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (transactions first) > selectors read absent; a held leaf write re-adds only its path",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (transactions first) > a held branch write re-adds with its whole value; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (transactions first) > undo of a designated omission brings back every selector below it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (transactions first) > rollback of a re-adding write makes the branch absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (restoration first) > selectors read absent; a held leaf write re-adds only its path",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (restoration first) > a held branch write re-adds with its whole value; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (restoration first) > undo of a designated omission brings back every selector below it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/absent-path-write.spec.tsx",
+    "name": "absent-path writes \u2014 React (restoration first) > rollback of a re-adding write makes the branch absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "name": "registered terminals \u2014 React (transactions first) > undo and redo replace object and Date terminals as one value",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "name": "registered terminals \u2014 React (transactions first) > external undefined refuses the whole undo and nothing changes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "name": "registered terminals \u2014 React (transactions first) > undo re-adds an ordinarily omitted terminal with its pre-image",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "name": "registered terminals \u2014 React (restoration first) > undo and redo replace object and Date terminals as one value",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "name": "registered terminals \u2014 React (restoration first) > external undefined refuses the whole undo and nothing changes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "name": "registered terminals \u2014 React (restoration first) > undo re-adds an ordinarily omitted terminal with its pre-image",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/whole-value-new-keys.spec.tsx",
+    "name": "publishes newly supplied ordinary keys through the React facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/whole-value-new-keys.spec.tsx",
+    "name": "keeps failed transaction observations coherent (seeded=false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/whole-value-new-keys.spec.tsx",
+    "name": "keeps failed transaction observations coherent (seeded=true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/declared-publication-composition.spec.tsx",
+    "name": "declared scalar independence progresses while two owners remain open; dependency waits",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/declared-publication-composition.spec.tsx",
+    "name": "declared entity inspection adoption publishes ordinary authority through the facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/declared-publication-composition.spec.tsx",
+    "name": "confirmed scalar input permits declared progress through the facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/selected-callback-facade.spec.tsx",
+    "name": "realizes fresh tap reads and preserves later callback writes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/selected-callback-facade.spec.tsx",
+    "name": "preserves a callback selection followed by rekey",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/selected-callback-facade.spec.tsx",
+    "name": "preserves a callback selection followed by clear",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/designated-collection-omission.spec.tsx",
+    "name": "designated collection omission \u2014 React (transactions first) > undo, redo and jumpTo restore the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/designated-collection-omission.spec.tsx",
+    "name": "designated collection omission \u2014 React (transactions first) > rollback restores the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/designated-collection-omission.spec.tsx",
+    "name": "designated collection omission \u2014 React (transactions first) > a row-naming write to the omitted collection refuses; undo still restores it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/designated-collection-omission.spec.tsx",
+    "name": "designated collection omission \u2014 React (restoration first) > undo, redo and jumpTo restore the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/designated-collection-omission.spec.tsx",
+    "name": "designated collection omission \u2014 React (restoration first) > rollback restores the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/designated-collection-omission.spec.tsx",
+    "name": "designated collection omission \u2014 React (restoration first) > a row-naming write to the omitted collection refuses; undo still restores it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/plain-member-absence-observation.spec.tsx",
+    "name": "plain-member absence observation \u2014 React (no enhancers) > a membership-only removal and re-add reach direct, derived and branch selectors",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/plain-member-absence-observation.spec.tsx",
+    "name": "plain-member absence observation \u2014 React (position-topology capability) > a membership-only removal and re-add reach direct, derived and branch selectors",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/plain-member-absence-observation.spec.tsx",
+    "name": "plain-member absence observation \u2014 React (transactions()) > a membership-only removal and re-add reach direct, derived and branch selectors",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/entity-native-obligation-composition.spec.tsx",
+    "name": "entity input ownership through facade, mode=pending-independent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/entity-native-obligation-composition.spec.tsx",
+    "name": "entity input ownership through facade, mode=pending-dependent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/entity-native-obligation-composition.spec.tsx",
+    "name": "entity input ownership through facade, mode=confirmed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/ownership.spec.tsx",
+    "name": "external tree ownership > keeps a shared owner live when a StrictMode borrower unmounts",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/ownership.spec.tsx",
+    "name": "external tree ownership > isolates request owners and releases one without destroying another",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/scalar-frame-publication.spec.tsx",
+    "name": "scalar frame rejected branch adoption preserves ordinary payload (react)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/scalar-frame-publication.spec.tsx",
+    "name": "same-turn scalar membership omission does not replay stale covered age (react)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/link-native-address.spec.tsx",
+    "name": "react native entity Link address > bare omission and later authored value progress",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/lib/link-native-address.spec.tsx",
+    "name": "react native entity Link address > enhanced omission and later authored value progress",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/joint-native-frontier.spec.tsx",
+    "name": "React external-store selection observes the complete mixed inverse and newer source completion",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  }
+]

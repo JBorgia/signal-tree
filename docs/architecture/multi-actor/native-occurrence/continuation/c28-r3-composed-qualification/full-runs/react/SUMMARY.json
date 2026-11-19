@@ -1,0 +1,24 @@
+{
+  "project": "react",
+  "run": "react",
+  "counts": {
+    "passed": 109
+  },
+  "discoveredFiles": 19,
+  "selectedFiles": 19,
+  "startedFiles": 19,
+  "completedFiles": 19,
+  "missingCompletion": [],
+  "unexpectedModules": [],
+  "runEndSeen": true,
+  "result": {
+    "project": "react",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 32.40667879197281,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  "failures": []
+}

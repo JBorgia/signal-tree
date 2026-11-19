@@ -1,0 +1,21 @@
+{
+  "id": "bare-0-retained-aa1",
+  "ordinal": 2,
+  "profile": "bare",
+  "size": 0,
+  "arm": "retained",
+  "label": "aa1",
+  "exit": 0,
+  "pid": 69740,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.8300275419605896,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1032192,
+  "minimumObservedHostFreePercentage": 44.0,
+  "attempts": 1
+}

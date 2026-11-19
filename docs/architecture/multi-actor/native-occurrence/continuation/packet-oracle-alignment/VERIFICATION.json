@@ -1,0 +1,19 @@
+{
+  "baseManifestSha256": "542125745ddaad67aead344961bdfb408e43c6447938f6834413038a90ad413d",
+  "baseAuthorFilesUnchanged": 2973,
+  "candidateChangedFiles": [
+    "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+    "packages/kernel/src/lib/packet-index-review.spec.ts"
+  ],
+  "runtimeUnchanged": true,
+  "structuralSequenceUnchanged": true,
+  "costGateUnchanged": true,
+  "originals": {
+    "packet-index-adversarial.spec.ts": "81bef9e230c9964dbbbf251691208a979856ae567fc1eb70780e725b2797e895",
+    "structural-admission-sequence.spec.ts": "e6154fc6e1159571839a93edc4dac3ed8f29cb81ad04fbecf312e220ec568a72",
+    "packet-index-review.spec.ts": "a2bd1b818cbffeecbe40a8d0f3369ebbde1efdb2676fa6fd6e01aab5224ffd81",
+    "focused-first.log": "413ce72108f32ea215a5c383387705621c3fd52b3a267c8379e1163d79bd5eb1",
+    "point.log": "e45af35aa28dd29d7ce978a7144a54ab14f0cf7c9831ec49ac61b12286ff640f",
+    "entity-granular-reactivity.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872"
+  }
+}

@@ -1,0 +1,42 @@
+
+> nx run angular:test construction-resource-cleanup.spec.ts construction-factory-review.spec.ts construction-retention-review.spec.ts shared-construction --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular construction-resource-cleanup.spec.ts construction-factory-review.spec.ts construction-retention-review.spec.ts shared-construction --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:39764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-shared-construction-independent/candidate/packages/angular
+
+(node:39822) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39825) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  3 passed (3)
+      Tests  7 passed (7)
+   Start at  20:57:40
+   Duration  2.17s (transform 491ms, setup 409ms, import 693ms, tests 370ms, environment 459ms)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      2.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    2.8s

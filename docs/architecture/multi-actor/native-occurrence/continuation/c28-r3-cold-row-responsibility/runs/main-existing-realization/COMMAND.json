@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "tree-realization-adapter.spec.ts",
+    "hidden-collection-nesting.spec.ts",
+    "ordinary-restoration-placement.spec.ts",
+    "entity-membership-link-restoration.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-cold-row-responsibility/candidate",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-existing-realization/tmp",
+    "ST_READER_CANDIDATE": "1",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-existing-realization/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-existing-realization/data",
+    "ST_COLD_OUTPUT": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-existing-realization/observations.jsonl",
+    "ST_SNAPSHOT_OUTPUT": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-existing-realization/observations.jsonl"
+  }
+}

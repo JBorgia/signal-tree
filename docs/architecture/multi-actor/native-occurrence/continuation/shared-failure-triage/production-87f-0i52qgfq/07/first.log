@@ -1,0 +1,44 @@
+
+> nx run kernel:test audit-entity-boundaries.spec.ts --testNamePattern=audit entity boundaries row and field links retain ownership, enhanced=false --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs audit-entity-boundaries.spec.ts --testNamePattern="audit entity boundaries row and field links retain ownership, enhanced=false" --reporter=verbose --maxWorkers=1
+
+(node:38721) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:38736) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > root replacement preserves partial reorder, bare array=false
+ ↓ src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > root replacement preserves partial reorder, bare array=true
+ ↓ src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > root replacement keeps custom keys and changed rows in incoming order
+ ↓ src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > setAll reorder reaches a collection link
+ ✓ src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > row and field links retain ownership, enhanced=false 10ms
+ ↓ src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > row and field links retain ownership, enhanced=true
+ ↓ src/lib/audit-entity-boundaries.spec.ts > entity link ownership controls > retained field follows rekey, then retires instead of following key reuse
+ ↓ src/lib/audit-entity-boundaries.spec.ts > entity link ownership controls > bare field ignores another row, collection, and tree
+ ↓ src/lib/audit-entity-boundaries.spec.ts > entity link ownership controls > reorder after an unflushed add preserves complete outbound order
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 8 skipped (9)
+   Start at  16:40:42
+   Duration  975ms (transform 510ms, setup 0ms, import 616ms, tests 10ms, environment 213ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

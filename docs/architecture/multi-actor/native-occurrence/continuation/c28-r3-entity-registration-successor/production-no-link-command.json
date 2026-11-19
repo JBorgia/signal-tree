@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "/private/tmp/st-c28-r3-entity-registration-successor/consumer/no-link.production.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-registration-successor/candidate",
+  "noProgressSeconds": 180
+}

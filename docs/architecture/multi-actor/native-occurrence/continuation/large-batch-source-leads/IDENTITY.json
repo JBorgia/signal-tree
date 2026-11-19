@@ -1,0 +1,19 @@
+{
+  "manifestSHA256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "verifiedSourceFiles": {
+    "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "packages/kernel/src/lib/signal-tree.ts": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+    "packages/kernel/src/lib/path-notifier.ts": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde",
+    "packages/kernel/src/lib/physical/structural-store.ts": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353",
+    "packages/kernel/src/lib/internals/entity-membership-view.ts": "a93b5aefbdd10fc06997f3f8f5dc64daa28ab7400291ea720c01053a9cb64993",
+    "packages/kernel/src/lib/internals/entity-membership-inventory.ts": "82c306630ab0b1be88111a21bda76ed769c275240030e9f8e90bf1d9862bcf3e",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "packages/kernel/src/lib/internals/materialize-markers.ts": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5",
+    "packages/kernel/src/lib/internals/observation-adapter.ts": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574",
+    "packages/kernel/src/lib/internals/owner-invalidation.ts": "5c69c9022656eb21baeb4f242d81d399db82a8867a595266e1a3d4ff419eb627",
+    "packages/kernel/src/lib/entity-large-batches.spec.ts": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db"
+  },
+  "execution": "none; source-only",
+  "sampleSHA256": "c62142ac8d282c18002c1fe49836e56d42e9293edaf6766255b6bd4ff881199b"
+}

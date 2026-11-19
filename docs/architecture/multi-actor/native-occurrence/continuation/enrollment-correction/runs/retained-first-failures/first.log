@@ -1,0 +1,242 @@
+
+> nx run kernel:test native-certificate-successor.spec.ts recipient-window-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-certificate-successor.spec.ts recipient-window-independent.spec.ts --maxWorkers=1
+
+(node:65223) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65232) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-enrollment-correction/candidate/packages/kernel
+
+(node:65241) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/recipient-window-independent.spec.ts (9 tests | 8 failed) 50ms
+   × recipient window branch confirm: useful terminal wake excludes later owner 26ms
+   × recipient window branch rollback: useful terminal wake excludes later owner 5ms
+   × recipient window root confirm: useful terminal wake excludes later owner 2ms
+   × recipient window root rollback: useful terminal wake excludes later owner 4ms
+   × recipient window confirm: remaining captured owner still holds 2ms
+   × recipient window rollback: remaining captured owner still holds 5ms
+   × recipient window disposal releases waiter without changing qualified receipt or later sending 2ms
+   × recipient window includes owner opened by a later callback-capable preparer 1ms
+(node:65242) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 3 failed) 51ms
+   × composite readiness follows parent finalization without a recipient operation 8ms
+   × enrollment retains parent invalidation for scalar support 23ms
+   × omission then restored retained collection selects matching payload and support 14ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/native-certificate-successor.spec.ts:23:55
+     21|    throw sentinel;
+     22|   })).toThrow(sentinel);
+     23|   expect(lifecycle.nativeRequirementReady(composite)).toBe(true);expec…
+       |                                                       ^
+     24|  }finally{lifecycle.disposeConnection(channel);}
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for scalar support
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/native-certificate-successor.spec.ts:45:88
+     43|    throw new Error('parent invalid');
+     44|   })).toThrow('parent invalid');
+     45|   child!.declare({kind:'independent'},()=>tree.$.pair.y(8));await flus…
+       |                                                                                        ^
+     46|   q.confirm();await flush();expect(sent).toEqual([membership?{y:8}:{x:…
+     47|  }finally{child?.dispose();parent.dispose();tree.destroy();foreign.des…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window branch confirm: useful terminal wake excludes later owner
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window branch rollback: useful terminal wake excludes later owner
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/recipient-window-independent.spec.ts:17:134
+     15|   const receipt=a.declare({kind:'independent'},()=>{if(mode==='branch'…
+     16|   const q=late.transact(()=>late.$.z(9));const inspection=q.inspect();…
+     17|   await flush();expect(sent).toEqual([shape]);expect(receipt.read()).t…
+       |                                                                                                                                      ^
+     18|   p[outcome]();await flush();expect(other).toEqual([shape]);expect(set…
+     19|  }finally{a.dispose();b.dispose();tree.destroy();o.destroy();late.dest…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window root confirm: useful terminal wake excludes later owner
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window root rollback: useful terminal wake excludes later owner
+AssertionError: expected [ { pair: { x: 1, y: +0 } } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "pair": {
++       "x": 1,
++       "y": 0,
++     },
++   },
++ ]
+
+ ❯ src/lib/recipient-window-independent.spec.ts:17:134
+     15|   const receipt=a.declare({kind:'independent'},()=>{if(mode==='branch'…
+     16|   const q=late.transact(()=>late.$.z(9));const inspection=q.inspect();…
+     17|   await flush();expect(sent).toEqual([shape]);expect(receipt.read()).t…
+       |                                                                                                                                      ^
+     18|   p[outcome]();await flush();expect(other).toEqual([shape]);expect(set…
+     19|  }finally{a.dispose();b.dispose();tree.destroy();o.destroy();late.dest…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window confirm: remaining captured owner still holds
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window rollback: remaining captured owner still holds
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/recipient-window-independent.spec.ts:26:98
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window disposal releases waiter without changing qualified receipt or later sending
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/recipient-window-independent.spec.ts:31:147
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  src/lib/recipient-window-independent.spec.ts > recipient window includes owner opened by a later callback-capable preparer
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/recipient-window-independent.spec.ts:45:207
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  11 failed | 3 passed (14)
+   Start at  11:11:39
+   Duration  2.45s (transform 953ms, setup 0ms, import 1.26s, tests 100ms, environment 768ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-certificate-successor.spec.ts recipient-window-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.3s

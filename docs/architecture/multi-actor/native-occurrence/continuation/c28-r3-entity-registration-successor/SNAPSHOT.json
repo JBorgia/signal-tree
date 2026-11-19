@@ -1,0 +1,9 @@
+{
+  "frozen": true,
+  "manifestSha256": "b0e09d16858ce67143ed08b3b2d159831ab96ddcb1d989a1d50d5ce880d04b2d",
+  "runtimePatchSha256": "2daa5b09c2b98e817b270522ec798705fdba91b3e7289a02cd7fc43ce128f6b1",
+  "runtimeChanged": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/link.ts"
+  ]
+}

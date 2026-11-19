@@ -1,0 +1,7 @@
+{
+  "commit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "archiveSha256": "f68758a1fda1ccb3198098f97d1f0c4b254ce2def039c602d291b2deb72595ad",
+  "sourceFiles": 2517,
+  "nodeModules": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "command": "git archive 87f6831fa60cafe87508f0ace84b7638698ca3b0"
+}

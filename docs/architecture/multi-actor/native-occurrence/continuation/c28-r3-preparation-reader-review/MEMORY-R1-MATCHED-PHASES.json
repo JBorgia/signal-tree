@@ -1,0 +1,632 @@
+[
+  {
+    "size": 128,
+    "phases": [
+      {
+        "index": 0,
+        "stage": "membership:before-create",
+        "baselineHeapUsed": 44213336,
+        "readerHeapUsed": 38942720,
+        "readerMinusBaseline": -5270616,
+        "baselineDelta": 0,
+        "readerDelta": 0,
+        "readerMinusBaselineDelta": 0
+      },
+      {
+        "index": 1,
+        "stage": "membership:after-create",
+        "baselineHeapUsed": 44360816,
+        "readerHeapUsed": 39095016,
+        "readerMinusBaseline": -5265800,
+        "baselineDelta": 147480,
+        "readerDelta": 152296,
+        "readerMinusBaselineDelta": 4816
+      },
+      {
+        "index": 2,
+        "stage": "membership:before-seed",
+        "baselineHeapUsed": 44492072,
+        "readerHeapUsed": 39227408,
+        "readerMinusBaseline": -5264664,
+        "baselineDelta": 278736,
+        "readerDelta": 284688,
+        "readerMinusBaselineDelta": 5952
+      },
+      {
+        "index": 3,
+        "stage": "membership:after-seed",
+        "baselineHeapUsed": 47037072,
+        "readerHeapUsed": 41746136,
+        "readerMinusBaseline": -5290936,
+        "baselineDelta": 2823736,
+        "readerDelta": 2803416,
+        "readerMinusBaselineDelta": -20320
+      },
+      {
+        "index": 4,
+        "stage": "membership:before-replace",
+        "baselineHeapUsed": 46556808,
+        "readerHeapUsed": 41289600,
+        "readerMinusBaseline": -5267208,
+        "baselineDelta": 2343472,
+        "readerDelta": 2346880,
+        "readerMinusBaselineDelta": 3408
+      },
+      {
+        "index": 5,
+        "stage": "membership:after-replace",
+        "baselineHeapUsed": 49388176,
+        "readerHeapUsed": 44496120,
+        "readerMinusBaseline": -4892056,
+        "baselineDelta": 5174840,
+        "readerDelta": 5553400,
+        "readerMinusBaselineDelta": 378560
+      },
+      {
+        "index": 6,
+        "stage": "membership:before-clear",
+        "baselineHeapUsed": 49392200,
+        "readerHeapUsed": 44500136,
+        "readerMinusBaseline": -4892064,
+        "baselineDelta": 5178864,
+        "readerDelta": 5557416,
+        "readerMinusBaselineDelta": 378552
+      },
+      {
+        "index": 7,
+        "stage": "membership:after-clear",
+        "baselineHeapUsed": 41898488,
+        "readerHeapUsed": 46687192,
+        "readerMinusBaseline": 4788704,
+        "baselineDelta": -2314848,
+        "readerDelta": 7744472,
+        "readerMinusBaselineDelta": 10059320
+      },
+      {
+        "index": 8,
+        "stage": "membership:after-original-assertions",
+        "baselineHeapUsed": 41235592,
+        "readerHeapUsed": 46033144,
+        "readerMinusBaseline": 4797552,
+        "baselineDelta": -2977744,
+        "readerDelta": 7090424,
+        "readerMinusBaselineDelta": 10068168
+      },
+      {
+        "index": 9,
+        "stage": "membership:before-stop",
+        "baselineHeapUsed": 41240496,
+        "readerHeapUsed": 46038040,
+        "readerMinusBaseline": 4797544,
+        "baselineDelta": -2972840,
+        "readerDelta": 7095320,
+        "readerMinusBaselineDelta": 10068160
+      },
+      {
+        "index": 10,
+        "stage": "membership:after-stop",
+        "baselineHeapUsed": 41251904,
+        "readerHeapUsed": 46049440,
+        "readerMinusBaseline": 4797536,
+        "baselineDelta": -2961432,
+        "readerDelta": 7106720,
+        "readerMinusBaselineDelta": 10068152
+      },
+      {
+        "index": 11,
+        "stage": "membership:before-destroy",
+        "baselineHeapUsed": 41256168,
+        "readerHeapUsed": 46053696,
+        "readerMinusBaseline": 4797528,
+        "baselineDelta": -2957168,
+        "readerDelta": 7110976,
+        "readerMinusBaselineDelta": 10068144
+      },
+      {
+        "index": 12,
+        "stage": "membership:after-destroy",
+        "baselineHeapUsed": 41287584,
+        "readerHeapUsed": 46085104,
+        "readerMinusBaseline": 4797520,
+        "baselineDelta": -2925752,
+        "readerDelta": 7142384,
+        "readerMinusBaselineDelta": 10068136
+      },
+      {
+        "index": 13,
+        "stage": "restoration:before-create",
+        "baselineHeapUsed": 41335520,
+        "readerHeapUsed": 46133032,
+        "readerMinusBaseline": 4797512,
+        "baselineDelta": -2877816,
+        "readerDelta": 7190312,
+        "readerMinusBaselineDelta": 10068128
+      },
+      {
+        "index": 14,
+        "stage": "restoration:after-create",
+        "baselineHeapUsed": 41579640,
+        "readerHeapUsed": 46376720,
+        "readerMinusBaseline": 4797080,
+        "baselineDelta": -2633696,
+        "readerDelta": 7434000,
+        "readerMinusBaselineDelta": 10067696
+      },
+      {
+        "index": 15,
+        "stage": "restoration:before-seed",
+        "baselineHeapUsed": 41583032,
+        "readerHeapUsed": 46380104,
+        "readerMinusBaseline": 4797072,
+        "baselineDelta": -2630304,
+        "readerDelta": 7437384,
+        "readerMinusBaselineDelta": 10067688
+      },
+      {
+        "index": 16,
+        "stage": "restoration:after-seed",
+        "baselineHeapUsed": 43354768,
+        "readerHeapUsed": 48156096,
+        "readerMinusBaseline": 4801328,
+        "baselineDelta": -858568,
+        "readerDelta": 9213376,
+        "readerMinusBaselineDelta": 10071944
+      },
+      {
+        "index": 17,
+        "stage": "restoration:after-original-drain",
+        "baselineHeapUsed": 44045488,
+        "readerHeapUsed": 48842544,
+        "readerMinusBaseline": 4797056,
+        "baselineDelta": -167848,
+        "readerDelta": 9899824,
+        "readerMinusBaselineDelta": 10067672
+      },
+      {
+        "index": 18,
+        "stage": "restoration:before-replace",
+        "baselineHeapUsed": 44048896,
+        "readerHeapUsed": 48845944,
+        "readerMinusBaseline": 4797048,
+        "baselineDelta": -164440,
+        "readerDelta": 9903224,
+        "readerMinusBaselineDelta": 10067664
+      },
+      {
+        "index": 19,
+        "stage": "restoration:after-replace",
+        "baselineHeapUsed": 47407240,
+        "readerHeapUsed": 42280048,
+        "readerMinusBaseline": -5127192,
+        "baselineDelta": 3193904,
+        "readerDelta": 3337328,
+        "readerMinusBaselineDelta": 143424
+      },
+      {
+        "index": 20,
+        "stage": "restoration:after-original-drain",
+        "baselineHeapUsed": 49298960,
+        "readerHeapUsed": 44230328,
+        "readerMinusBaseline": -5068632,
+        "baselineDelta": 5085624,
+        "readerDelta": 5287608,
+        "readerMinusBaselineDelta": 201984
+      },
+      {
+        "index": 21,
+        "stage": "restoration:before-undo",
+        "baselineHeapUsed": 48968480,
+        "readerHeapUsed": 43844632,
+        "readerMinusBaseline": -5123848,
+        "baselineDelta": 4755144,
+        "readerDelta": 4901912,
+        "readerMinusBaselineDelta": 146768
+      },
+      {
+        "index": 22,
+        "stage": "restoration:after-undo",
+        "baselineHeapUsed": 48559712,
+        "readerHeapUsed": 51844536,
+        "readerMinusBaseline": 3284824,
+        "baselineDelta": 4346376,
+        "readerDelta": 12901816,
+        "readerMinusBaselineDelta": 8555440
+      },
+      {
+        "index": 23,
+        "stage": "restoration:after-undo-assertions",
+        "baselineHeapUsed": 48581152,
+        "readerHeapUsed": 51865136,
+        "readerMinusBaseline": 3283984,
+        "baselineDelta": 4367816,
+        "readerDelta": 12922416,
+        "readerMinusBaselineDelta": 8554600
+      },
+      {
+        "index": 24,
+        "stage": "restoration:before-redo",
+        "baselineHeapUsed": 48591928,
+        "readerHeapUsed": 51875904,
+        "readerMinusBaseline": 3283976,
+        "baselineDelta": 4378592,
+        "readerDelta": 12933184,
+        "readerMinusBaselineDelta": 8554592
+      },
+      {
+        "index": 25,
+        "stage": "restoration:after-redo",
+        "baselineHeapUsed": 58949408,
+        "readerHeapUsed": 60106768,
+        "readerMinusBaseline": 1157360,
+        "baselineDelta": 14736072,
+        "readerDelta": 21164048,
+        "readerMinusBaselineDelta": 6427976
+      },
+      {
+        "index": 26,
+        "stage": "restoration:after-redo-assertion",
+        "baselineHeapUsed": 58754832,
+        "readerHeapUsed": 59863520,
+        "readerMinusBaseline": 1108688,
+        "baselineDelta": 14541496,
+        "readerDelta": 20920800,
+        "readerMinusBaselineDelta": 6379304
+      },
+      {
+        "index": 27,
+        "stage": "restoration:before-destroy",
+        "baselineHeapUsed": 58765352,
+        "readerHeapUsed": 59874032,
+        "readerMinusBaseline": 1108680,
+        "baselineDelta": 14552016,
+        "readerDelta": 20931312,
+        "readerMinusBaselineDelta": 6379296
+      },
+      {
+        "index": 28,
+        "stage": "restoration:after-destroy",
+        "baselineHeapUsed": 61182392,
+        "readerHeapUsed": 61986568,
+        "readerMinusBaseline": 804176,
+        "baselineDelta": 16969056,
+        "readerDelta": 23043848,
+        "readerMinusBaselineDelta": 6074792
+      },
+      {
+        "index": 29,
+        "stage": "restoration:after-final-drain",
+        "baselineHeapUsed": 61532256,
+        "readerHeapUsed": 62336416,
+        "readerMinusBaseline": 804160,
+        "baselineDelta": 17318920,
+        "readerDelta": 23393696,
+        "readerMinusBaselineDelta": 6074776
+      }
+    ],
+    "rawReaderLowerCount": 10,
+    "deltaReaderLowerCount": 1,
+    "rawRange": [
+      -5290936,
+      4801328
+    ],
+    "deltaRange": [
+      -20320,
+      10071944
+    ]
+  },
+  {
+    "size": 512,
+    "phases": [
+      {
+        "index": 0,
+        "stage": "membership:before-create",
+        "baselineHeapUsed": 44301256,
+        "readerHeapUsed": 38985736,
+        "readerMinusBaseline": -5315520,
+        "baselineDelta": 0,
+        "readerDelta": 0,
+        "readerMinusBaselineDelta": 0
+      },
+      {
+        "index": 1,
+        "stage": "membership:after-create",
+        "baselineHeapUsed": 44448944,
+        "readerHeapUsed": 39138032,
+        "readerMinusBaseline": -5310912,
+        "baselineDelta": 147688,
+        "readerDelta": 152296,
+        "readerMinusBaselineDelta": 4608
+      },
+      {
+        "index": 2,
+        "stage": "membership:before-seed",
+        "baselineHeapUsed": 44579920,
+        "readerHeapUsed": 39270424,
+        "readerMinusBaseline": -5309496,
+        "baselineDelta": 278664,
+        "readerDelta": 284688,
+        "readerMinusBaselineDelta": 6024
+      },
+      {
+        "index": 3,
+        "stage": "membership:after-seed",
+        "baselineHeapUsed": 42935472,
+        "readerHeapUsed": 46204328,
+        "readerMinusBaseline": 3268856,
+        "baselineDelta": -1365784,
+        "readerDelta": 7218592,
+        "readerMinusBaselineDelta": 8584376
+      },
+      {
+        "index": 4,
+        "stage": "membership:before-replace",
+        "baselineHeapUsed": 42332512,
+        "readerHeapUsed": 46215608,
+        "readerMinusBaseline": 3883096,
+        "baselineDelta": -1968744,
+        "readerDelta": 7229872,
+        "readerMinusBaselineDelta": 9198616
+      },
+      {
+        "index": 5,
+        "stage": "membership:after-replace",
+        "baselineHeapUsed": 55426440,
+        "readerHeapUsed": 50166112,
+        "readerMinusBaseline": -5260328,
+        "baselineDelta": 11125184,
+        "readerDelta": 11180376,
+        "readerMinusBaselineDelta": 55192
+      },
+      {
+        "index": 6,
+        "stage": "membership:before-clear",
+        "baselineHeapUsed": 54603088,
+        "readerHeapUsed": 50169432,
+        "readerMinusBaseline": -4433656,
+        "baselineDelta": 10301832,
+        "readerDelta": 11183696,
+        "readerMinusBaselineDelta": 881864
+      },
+      {
+        "index": 7,
+        "stage": "membership:after-clear",
+        "baselineHeapUsed": 60328648,
+        "readerHeapUsed": 55890392,
+        "readerMinusBaseline": -4438256,
+        "baselineDelta": 16027392,
+        "readerDelta": 16904656,
+        "readerMinusBaselineDelta": 877264
+      },
+      {
+        "index": 8,
+        "stage": "membership:after-original-assertions",
+        "baselineHeapUsed": 60369464,
+        "readerHeapUsed": 55931080,
+        "readerMinusBaseline": -4438384,
+        "baselineDelta": 16068208,
+        "readerDelta": 16945344,
+        "readerMinusBaselineDelta": 877136
+      },
+      {
+        "index": 9,
+        "stage": "membership:before-stop",
+        "baselineHeapUsed": 60374376,
+        "readerHeapUsed": 56224880,
+        "readerMinusBaseline": -4149496,
+        "baselineDelta": 16073120,
+        "readerDelta": 17239144,
+        "readerMinusBaselineDelta": 1166024
+      },
+      {
+        "index": 10,
+        "stage": "membership:after-stop",
+        "baselineHeapUsed": 60385784,
+        "readerHeapUsed": 55947384,
+        "readerMinusBaseline": -4438400,
+        "baselineDelta": 16084528,
+        "readerDelta": 16961648,
+        "readerMinusBaselineDelta": 877120
+      },
+      {
+        "index": 11,
+        "stage": "membership:before-destroy",
+        "baselineHeapUsed": 60390056,
+        "readerHeapUsed": 55951648,
+        "readerMinusBaseline": -4438408,
+        "baselineDelta": 16088800,
+        "readerDelta": 16965912,
+        "readerMinusBaselineDelta": 877112
+      },
+      {
+        "index": 12,
+        "stage": "membership:after-destroy",
+        "baselineHeapUsed": 60473792,
+        "readerHeapUsed": 56035360,
+        "readerMinusBaseline": -4438432,
+        "baselineDelta": 16172536,
+        "readerDelta": 17049624,
+        "readerMinusBaselineDelta": 877088
+      },
+      {
+        "index": 13,
+        "stage": "restoration:before-create",
+        "baselineHeapUsed": 60824160,
+        "readerHeapUsed": 56083288,
+        "readerMinusBaseline": -4740872,
+        "baselineDelta": 16522904,
+        "readerDelta": 17097552,
+        "readerMinusBaselineDelta": 574648
+      },
+      {
+        "index": 14,
+        "stage": "restoration:after-create",
+        "baselineHeapUsed": 60764096,
+        "readerHeapUsed": 56322672,
+        "readerMinusBaseline": -4441424,
+        "baselineDelta": 16462840,
+        "readerDelta": 17336936,
+        "readerMinusBaselineDelta": 874096
+      },
+      {
+        "index": 15,
+        "stage": "restoration:before-seed",
+        "baselineHeapUsed": 60767488,
+        "readerHeapUsed": 56326056,
+        "readerMinusBaseline": -4441432,
+        "baselineDelta": 16466232,
+        "readerDelta": 17340320,
+        "readerMinusBaselineDelta": 874088
+      },
+      {
+        "index": 16,
+        "stage": "restoration:after-seed",
+        "baselineHeapUsed": 67515008,
+        "readerHeapUsed": 63621448,
+        "readerMinusBaseline": -3893560,
+        "baselineDelta": 23213752,
+        "readerDelta": 24635712,
+        "readerMinusBaselineDelta": 1421960
+      },
+      {
+        "index": 17,
+        "stage": "restoration:after-original-drain",
+        "baselineHeapUsed": 45014960,
+        "readerHeapUsed": 65962688,
+        "readerMinusBaseline": 20947728,
+        "baselineDelta": 713704,
+        "readerDelta": 26976952,
+        "readerMinusBaselineDelta": 26263248
+      },
+      {
+        "index": 18,
+        "stage": "restoration:before-replace",
+        "baselineHeapUsed": 45018368,
+        "readerHeapUsed": 65497176,
+        "readerMinusBaseline": 20478808,
+        "baselineDelta": 717112,
+        "readerDelta": 26511440,
+        "readerMinusBaselineDelta": 25794328
+      },
+      {
+        "index": 19,
+        "stage": "restoration:after-replace",
+        "baselineHeapUsed": 58069632,
+        "readerHeapUsed": 50260488,
+        "readerMinusBaseline": -7809144,
+        "baselineDelta": 13768376,
+        "readerDelta": 11274752,
+        "readerMinusBaselineDelta": -2493624
+      },
+      {
+        "index": 20,
+        "stage": "restoration:after-original-drain",
+        "baselineHeapUsed": 63962872,
+        "readerHeapUsed": 56146312,
+        "readerMinusBaseline": -7816560,
+        "baselineDelta": 19661616,
+        "readerDelta": 17160576,
+        "readerMinusBaselineDelta": -2501040
+      },
+      {
+        "index": 21,
+        "stage": "restoration:before-undo",
+        "baselineHeapUsed": 63968488,
+        "readerHeapUsed": 56149744,
+        "readerMinusBaseline": -7818744,
+        "baselineDelta": 19667232,
+        "readerDelta": 17164008,
+        "readerMinusBaselineDelta": -2503224
+      },
+      {
+        "index": 22,
+        "stage": "restoration:after-undo",
+        "baselineHeapUsed": 52573672,
+        "readerHeapUsed": 51541088,
+        "readerMinusBaseline": -1032584,
+        "baselineDelta": 8272416,
+        "readerDelta": 12555352,
+        "readerMinusBaselineDelta": 4282936
+      },
+      {
+        "index": 23,
+        "stage": "restoration:after-undo-assertions",
+        "baselineHeapUsed": 52212048,
+        "readerHeapUsed": 51584232,
+        "readerMinusBaseline": -627816,
+        "baselineDelta": 7910792,
+        "readerDelta": 12598496,
+        "readerMinusBaselineDelta": 4687704
+      },
+      {
+        "index": 24,
+        "stage": "restoration:before-redo",
+        "baselineHeapUsed": 52215472,
+        "readerHeapUsed": 51589544,
+        "readerMinusBaseline": -625928,
+        "baselineDelta": 7914216,
+        "readerDelta": 12603808,
+        "readerMinusBaselineDelta": 4689592
+      },
+      {
+        "index": 25,
+        "stage": "restoration:after-redo",
+        "baselineHeapUsed": 65618128,
+        "readerHeapUsed": 54035112,
+        "readerMinusBaseline": -11583016,
+        "baselineDelta": 21316872,
+        "readerDelta": 15049376,
+        "readerMinusBaselineDelta": -6267496
+      },
+      {
+        "index": 26,
+        "stage": "restoration:after-redo-assertion",
+        "baselineHeapUsed": 65658752,
+        "readerHeapUsed": 54303152,
+        "readerMinusBaseline": -11355600,
+        "baselineDelta": 21357496,
+        "readerDelta": 15317416,
+        "readerMinusBaselineDelta": -6040080
+      },
+      {
+        "index": 27,
+        "stage": "restoration:before-destroy",
+        "baselineHeapUsed": 65660472,
+        "readerHeapUsed": 54078616,
+        "readerMinusBaseline": -11581856,
+        "baselineDelta": 21359216,
+        "readerDelta": 15092880,
+        "readerMinusBaselineDelta": -6266336
+      },
+      {
+        "index": 28,
+        "stage": "restoration:after-destroy",
+        "baselineHeapUsed": 75339528,
+        "readerHeapUsed": 63088704,
+        "readerMinusBaseline": -12250824,
+        "baselineDelta": 31038272,
+        "readerDelta": 24102968,
+        "readerMinusBaselineDelta": -6935304
+      },
+      {
+        "index": 29,
+        "stage": "restoration:after-final-drain",
+        "baselineHeapUsed": 76739632,
+        "readerHeapUsed": 63897176,
+        "readerMinusBaseline": -12842456,
+        "baselineDelta": 32438376,
+        "readerDelta": 24911440,
+        "readerMinusBaselineDelta": -7526936
+      }
+    ],
+    "rawReaderLowerCount": 26,
+    "deltaReaderLowerCount": 8,
+    "rawRange": [
+      -12842456,
+      20947728
+    ],
+    "deltaRange": [
+      -7526936,
+      26263248
+    ]
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "arm": "drop-proceed",
+    "rep": 1,
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--root",
+      "packages/kernel",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  },
+  {
+    "arm": "drop-proceed",
+    "rep": 2,
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--root",
+      "packages/kernel",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  },
+  {
+    "arm": "hold-proceed",
+    "rep": 1,
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--root",
+      "packages/kernel",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  },
+  {
+    "arm": "hold-proceed",
+    "rep": 2,
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--root",
+      "packages/kernel",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  },
+  {
+    "arm": "hold-row",
+    "rep": 1,
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--root",
+      "packages/kernel",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  },
+  {
+    "arm": "hold-row",
+    "rep": 2,
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "--root",
+      "packages/kernel",
+      "--config",
+      "retention-probe.config.ts"
+    ]
+  }
+]

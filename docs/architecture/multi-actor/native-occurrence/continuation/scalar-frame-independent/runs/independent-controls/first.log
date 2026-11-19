@@ -1,0 +1,80 @@
+
+> nx run kernel:test independent-scalar-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-scalar-publication.spec.ts --maxWorkers=1
+
+(node:95933) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-independent/candidate/packages/kernel
+
+(node:95947) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/independent-scalar-publication.spec.ts > invalidation sentinel stays primary, both completions drain and secondary sentinel is reported exactly
+SignalTree: a write subscriber threw while observing 'undefined'; delivery continued. [ST2034] { tag: 'completion' }
+
+ ❯ src/lib/independent-scalar-publication.spec.ts (3 tests | 2 failed) 15ms
+   × final scalar frame window includes callback-opened owner openerFirst=false 12ms
+   × invalidation sentinel stays primary, both completions drain and secondary sentinel is reported exactly 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-scalar-publication.spec.ts > final scalar frame window includes callback-opened owner openerFirst=false
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/independent-scalar-publication.spec.ts:37:55
+     35|   // Both facts are from one frame whose stores installed after the ne…
+     36|   expect(proof[1].possible?.some(o=>o.owner===owner)).toBe(true);
+     37|   expect(proof[0].possible?.some(o=>o.owner===owner)).toBe(true);
+       |                                                       ^
+     38|  } finally {offA?.();offB?.();pending?.rollback();tree.destroy();forei…
+     39| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/independent-scalar-publication.spec.ts > invalidation sentinel stays primary, both completions drain and secondary sentinel is reported exactly
+AssertionError: expected [] to include { tag: 'completion' }
+ ❯ src/lib/independent-scalar-publication.spec.ts:57:48
+     55|   const frame=runtime.beginFrame();frame.set(0,1);frame.set(1,2);
+     56|   let caught:unknown;try{frame.commit();}catch(error){caught=error;}
+     57|   expect(caught).toBe(primary);expect(reports).toContain(secondary);ex…
+       |                                                ^
+     58|  }finally{offA();offB();offError();}
+     59| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  19:31:41
+   Duration  726ms (transform 411ms, setup 0ms, import 489ms, tests 15ms, environment 148ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-scalar-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

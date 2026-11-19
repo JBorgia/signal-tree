@@ -1,0 +1,99 @@
+--- a/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
+@@ -16,6 +16,13 @@
+   installProductionSubstrateStatsForTesting,
+   resetProductionSubstrateStatsForTesting,
+ } from '../../lib/internals/production-substrate-stats';
++
++import { appendFileSync as stageAppend } from 'node:fs';
++import { getHeapStatistics as stageHeap } from 'node:v8';
++function stage(phase: string) {
++  stageAppend(process.env.ST_STAGE_OUTPUT!, JSON.stringify({phase, at: Date.now(), pid: process.pid, memory: process.memoryUsage(), heapLimit: stageHeap().heap_size_limit, node: process.version, execArgv: process.execArgv}) + '\n');
++}
++stage('module-evaluated');
+ 
+ type Row = { id: number; n: number };
+ const rows = (count: number, offset = 0): Row[] =>
+@@ -37,23 +44,39 @@
+   // (retention across jumps; deriveStructuralTargetOrder's per-addition
+   // search), which are not call-argument limits; see PROGRESS.md slice 5.
+   it('jumps across a turn that cleared more rows than the argument limit', async () => {
++    stage('case-body-enter');
++    stage('before-create');
+     const tree = signalTree(
+       { rows: entityMap<Row, number>() },
+       { enhancers: [restoration()] }
+     );
++    stage('after-create');
+     try {
++      stage('before-seed');
+       tree.$.rows.setAll(rows(LARGE));
++      stage('after-seed-before-drain');
+       await flush();
++      stage('after-seed-drain');
++      stage('before-update');
+       undoable(() => tree.$.rows.updateOne(0, { n: -1 }));
++      stage('after-update-before-drain');
+       await flush();
++      stage('after-update-drain');
++      stage('before-clear');
+       undoable(() => tree.$.rows.clear());
++      stage('after-clear-before-drain');
+       await flush();
++      stage('after-clear-drain');
+       // Two entries, through the restoration reader rather than
+       // `getRestorationHistory()`: materializing that one's snapshots for a
+       // 130k-row clear grows faster than linearly (20.6 s here alone; slice
+       // 8c, open item) and is not what this case is about.
++      stage('before-reader');
+       expect(restorationReader(tree)?.snapshot().entries).toHaveLength(2);
++      stage('after-reader');
++      stage('before-index-assertion');
+       expect(tree.getCurrentIndex()).toBe(1);
++      stage('after-index-assertion');
+       // Counted work, not wall-clock time (slice 8c): each jump touches each
+       // row a bounded number of times, so it cannot become the timeout this
+       // case used to hit under load. Measured: jumpTo(0) writes every row
+@@ -61,9 +84,13 @@
+       // tombstones every row once and reads 9 per row. The read bounds (3
+       // and 12 per row) leave room for constant-factor changes while still
+       // failing any per-row growth with the collection's size.
++      stage('before-stats-install');
+       const stats = installProductionSubstrateStatsForTesting();
++      stage('after-stats-install');
+       try {
++        stage('before-undo');
+         tree.jumpTo(0);
++        stage('after-undo-before-assertions');
+         expect(stats.valueStoreWrites).toBe(LARGE);
+         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
+           3 * LARGE + READER_LIFECYCLE_READS
+@@ -73,18 +100,28 @@
+         expect(ids[0]).toBe(0);
+         expect(ids[LARGE - 1]).toBe(LARGE - 1);
+         expect(tree.$.rows.byId(0)?.()?.n).toBe(-1);
++        stage('after-undo-assertions');
+         resetProductionSubstrateStatsForTesting(stats);
++        stage('after-stats-reset');
++        stage('before-redo');
+         tree.jumpTo(1);
++        stage('after-redo-before-assertions');
+         expect(stats.structuralSubjectTombstones).toBe(LARGE);
+         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
+           12 * LARGE + TEMPORAL_MANAGER_READS + READER_LIFECYCLE_READS
+         );
++        stage('before-redo-count-assertion');
+         expect(tree.$.rows.count()).toBe(0);
++        stage('after-redo-assertions');
+       } finally {
++        stage('before-stats-cleanup');
+         clearProductionSubstrateStatsForTesting();
++        stage('after-stats-cleanup');
+       }
+     } finally {
++      stage('before-tree-cleanup');
+       tree.destroy();
++      stage('after-tree-cleanup');
+     }
+   }, 120_000);
+ 

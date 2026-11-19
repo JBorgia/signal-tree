@@ -1,0 +1,260 @@
+[
+  {
+    "scriptId": "786",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "sourceContentSha256": "aabc87c03405ce2e9eabd43dfaa313fa445ea680d077f814024f68f5cb9a299c",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "853",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/undoable.ts",
+    "sourceContentSha256": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "854",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/restoration-eligibility.ts",
+    "sourceContentSha256": "e78e31933f34e842bf355249c404a11d02750700eddeaf09737f7c2bbde880ba",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "879",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "sourceContentSha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "835",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/entity-signal.ts",
+    "sourceContentSha256": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "823",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/path-observation-port.ts",
+    "sourceContentSha256": "096b86e4630bfeffaee645ab48870c8cc185911f601f8444113f5e457f2805ce",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "865",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/path-notifier.ts",
+    "sourceContentSha256": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "866",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/private.ts",
+    "sourceContentSha256": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "814",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/scalar-publication-coverage.ts",
+    "sourceContentSha256": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "871",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/projection.ts",
+    "sourceContentSha256": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "843",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+    "sourceContentSha256": "d66cfb6b8476877c44c64532a3d62328ac8b184d1fd3ea4053f00a849d09144b",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "839",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/prepared-placement-visibility.ts",
+    "sourceContentSha256": "9fad616ecfedf8152958e76df0388dc4e3bf703d30974c8a818fb821e0112c28",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "844",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/entity-placement-stage.ts",
+    "sourceContentSha256": "350e86c0a987bd86629d359a56488e49b062a6e3ad47869db7367f377f200e48",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "796",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/entity-publication.ts",
+    "sourceContentSha256": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "849",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/structural-store.ts",
+    "sourceContentSha256": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "845",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/deep-clone.ts",
+    "sourceContentSha256": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "846",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "sourceContentSha256": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "860",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/enhancers/restoration/restoration.ts",
+    "sourceContentSha256": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "824",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/owned-metadata.ts",
+    "sourceContentSha256": "192ca95912014282eca73f56005df91a565ec048b558dee8c88a02883e86a376",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "811",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "sourceContentSha256": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "861",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+    "sourceContentSha256": "ca270fc464492372cbd43b1c0c753d6e9a55a04ba69f8972dc13f18f9d49b5c3",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "841",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/entity-value-transition.ts",
+    "sourceContentSha256": "3592cb9441dff5538b69f8cadddffdb95940b164bd2cb94d8841d69527cdbd84",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "872",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts",
+    "sourceContentSha256": "3cd7be31fe6a76ef174912c8281f0b22e4e7236888fb63c54a8f90d68b046406",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "878",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/subject-restoration-claims.ts",
+    "sourceContentSha256": "78da09b87c6e0a902b6ed7353a04ddd382fc7c5b8e8c4ed66de8634b87298cbf",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "884",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "sourceContentSha256": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "864",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/exposed-publication.ts",
+    "sourceContentSha256": "1edaeed30249341f57170df22c21fb9921a4c0b9ddf53327098d5e50daa1ca5f",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "810",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/write-context.ts",
+    "sourceContentSha256": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "876",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+    "sourceContentSha256": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "798",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/location-runtime.ts",
+    "sourceContentSha256": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "803",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/observation-adapter.ts",
+    "sourceContentSha256": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "836",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/ordinary-restoration-placement.ts",
+    "sourceContentSha256": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "837",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+    "sourceContentSha256": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "797",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "sourceContentSha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "809",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/member-membership.ts",
+    "sourceContentSha256": "b15765f0b0dbb5a8f5f37aecd9eef87ef450e95df919e8ee1cfc5da004c68ff7",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "869",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "sourceContentSha256": "1fd0ec87c7c10e8f27fd424e48544b44164a5aff548344540a9e83e1f53b187b",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "840",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/selected-entity-disposition.ts",
+    "sourceContentSha256": "5c475f94b1300471a861c317e1ba2f97bd02eb36fc53daa6ad274d024352f82f",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "863",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "sourceContentSha256": "cbeb44226cb42a1e8b35afa6111fee96de5f0c907f4d55e84b68e9875ce728a9",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "881",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "sourceContentSha256": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "842",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts",
+    "sourceContentSha256": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "801",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/cell-identity.ts",
+    "sourceContentSha256": "60a94340b3830b8f9a6efe2ec0b2206b141f64aae7ce46593a1517f9f964c492",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "792",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/position-registry.ts",
+    "sourceContentSha256": "205a6893bee3c03ae3d100848a2faa3e9f42fc8f42f4aaefc344ee9bbd5059eb",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "859",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/utilities/append-all.ts",
+    "sourceContentSha256": "26576cf769d69c5d9090262bd51657cc7710d98e928ceb6e36653b389dae14b5",
+    "matchesCapturedFile": true
+  },
+  {
+    "scriptId": "804",
+    "source": "/private/tmp/st-c28-r3-sampled-allocation/baseline/candidate/packages/kernel/src/lib/internals/production-substrate-stats.ts",
+    "sourceContentSha256": "de67f70c33be1fd2082d961c4d636ec1e4b6409495ff1c6895ab2b56349d857f",
+    "matchesCapturedFile": true
+  }
+]

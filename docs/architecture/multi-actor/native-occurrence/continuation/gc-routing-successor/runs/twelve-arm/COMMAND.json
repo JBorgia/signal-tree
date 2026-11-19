@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "node",
+    "tools/check-forwarding-retention.mjs"
+  ],
+  "cwd": "/private/tmp/st-c21-gc-routing-successor/candidate",
+  "node": "24.15.0",
+  "noOutputDeadlineSeconds": 180
+}

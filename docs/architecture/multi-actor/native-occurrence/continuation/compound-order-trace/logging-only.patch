@@ -1,0 +1,18 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -717,6 +717,7 @@
+     physicalPlacement?: EntityPlacementStage<K>,
+     ordinaryOrder?: readonly number[]
+   ) {
++    console.log("ORDER-TRACE-PREP", JSON.stringify({effects,physicalEffects,ordinaryOrder}));
+     type Presence = OrdinaryEntityPresence<K, E>;
+     const physical = physicalPlacement ?? structuralStore.preparePlacement();
+     if (!physicalPlacement)
+@@ -955,6 +956,7 @@
+         for (const [subject, state] of staged)
+           if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+         installPlacement();
++        console.log("ORDER-TRACE-INSTALL",JSON.stringify({effects,physicalEffects,ordinaryOrder,interval:installPlacement.interval}));
+         if(publication.unit)installTerminalRecord(publication.unit.record);
+         if(publication.unit)entityPublication.complete(publication.unit.completion);
+       },

@@ -1,0 +1,15 @@
+{
+  "started": [
+    "src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts"
+  ],
+  "ended": [
+    "src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts"
+  ],
+  "unexpected": [],
+  "missingStart": [],
+  "missingEnd": [],
+  "duplicateStarts": false,
+  "duplicateEnds": false
+}

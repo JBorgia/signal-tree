@@ -1,0 +1,6 @@
+{
+  "extends": "/private/tmp/st-fixture-types-aj63tgdb/candidate/tsconfig.typecheck-specs.json",
+  "include": [
+    "/private/tmp/st-fixture-types-aj63tgdb/candidate/packages/kernel/src/lib/core-independent-review.spec.ts"
+  ]
+}

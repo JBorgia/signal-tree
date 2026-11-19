@@ -1,0 +1,224 @@
+[
+  {
+    "source": "SOURCE-MANIFEST.json",
+    "archive": "SOURCE-MANIFEST.json.gz",
+    "sourceSha256": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+    "archiveSha256": "43968e092b10e8a420e82fb67332611a5879acbf87c604bb0389302aa5a2a53d"
+  },
+  {
+    "source": "PROVENANCE-ADDENDUM.md",
+    "archive": "PROVENANCE-ADDENDUM.md",
+    "sourceSha256": "8a5811adf1c23e6086b95326ef7a67d2e23bdcf5f3480f70e7f0a1ecf125c6a7",
+    "archiveSha256": "8a5811adf1c23e6086b95326ef7a67d2e23bdcf5f3480f70e7f0a1ecf125c6a7"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "11f2480d08385efc90b35621dc49d86e354c13f5539cb779a3477606234a3ef1",
+    "archiveSha256": "11f2480d08385efc90b35621dc49d86e354c13f5539cb779a3477606234a3ef1"
+  },
+  {
+    "source": "PROVENANCE-RECHECK.json",
+    "archive": "PROVENANCE-RECHECK.json",
+    "sourceSha256": "25d310416ab74b43d77f2cc09b0d95f4735be408a07e5d148264452b6e1745ea",
+    "archiveSha256": "25d310416ab74b43d77f2cc09b0d95f4735be408a07e5d148264452b6e1745ea"
+  },
+  {
+    "source": "LAYER-AUDIT.json",
+    "archive": "LAYER-AUDIT.json",
+    "sourceSha256": "a5317cd908adb199b98174868dac3693065c6c17c50d2fdadd753b2e82e2c2ea",
+    "archiveSha256": "a5317cd908adb199b98174868dac3693065c6c17c50d2fdadd753b2e82e2c2ea"
+  },
+  {
+    "source": "CONSUMER-GUIDANCE-RECHECK.md",
+    "archive": "CONSUMER-GUIDANCE-RECHECK.md",
+    "sourceSha256": "1a25c1a991d1114a10e1311a603e7cf6878d98fdf685bd22f53da109f7120454",
+    "archiveSha256": "1a25c1a991d1114a10e1311a603e7cf6878d98fdf685bd22f53da109f7120454"
+  },
+  {
+    "source": "PRODUCER-EQUALITY.json",
+    "archive": "PRODUCER-EQUALITY.json",
+    "sourceSha256": "a8d22222250494885d304f09af86a090b250c4d88eb544d1eeedecc6878afb43",
+    "archiveSha256": "a8d22222250494885d304f09af86a090b250c4d88eb544d1eeedecc6878afb43"
+  },
+  {
+    "source": "CONSUMER-GUIDANCE-IDENTITY.json",
+    "archive": "CONSUMER-GUIDANCE-IDENTITY.json",
+    "sourceSha256": "792d767f2d9dcf2b9c0f5a29d4d8d441954adea811ad018c1a6e1930a2882b03",
+    "archiveSha256": "792d767f2d9dcf2b9c0f5a29d4d8d441954adea811ad018c1a6e1930a2882b03"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "e3f2fc21faa21cc4116a94876966095eb431fc62912209edbbb739814b492641",
+    "archiveSha256": "e3f2fc21faa21cc4116a94876966095eb431fc62912209edbbb739814b492641"
+  },
+  {
+    "source": "CONSUMER-GUIDANCE-RECHECK-IDENTITY.json",
+    "archive": "CONSUMER-GUIDANCE-RECHECK-IDENTITY.json",
+    "sourceSha256": "51b346f35a1e89ef53b1a9cfa37b5d5be7d744ee20c8b4143cc5aa07eec7e20b",
+    "archiveSha256": "51b346f35a1e89ef53b1a9cfa37b5d5be7d744ee20c8b4143cc5aa07eec7e20b"
+  },
+  {
+    "source": "CONSUMER-GUIDANCE-REVIEW.md",
+    "archive": "CONSUMER-GUIDANCE-REVIEW.md",
+    "sourceSha256": "e48254a25ea69aff07b7ec746c501c33716437fdb522b61366ba3a9d90428981",
+    "archiveSha256": "e48254a25ea69aff07b7ec746c501c33716437fdb522b61366ba3a9d90428981"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "4383593927c764b69a11626044672ab2ccbc49f85c3efffe684432aa11acb9cd",
+    "archiveSha256": "4383593927c764b69a11626044672ab2ccbc49f85c3efffe684432aa11acb9cd"
+  },
+  {
+    "source": "COMPOSITION.json",
+    "archive": "COMPOSITION.json",
+    "sourceSha256": "de1ad00166c7619432d17eb95457d2ebbf03bce75cf7006ed0acacbe318d8b0d",
+    "archiveSha256": "de1ad00166c7619432d17eb95457d2ebbf03bce75cf7006ed0acacbe318d8b0d"
+  },
+  {
+    "source": "CONSUMER-GUIDANCE-FINAL.md",
+    "archive": "CONSUMER-GUIDANCE-FINAL.md",
+    "sourceSha256": "4619e08d1a7110ebbdf8d304af44462369c762688699abeee54db877b7fce16e",
+    "archiveSha256": "4619e08d1a7110ebbdf8d304af44462369c762688699abeee54db877b7fce16e"
+  },
+  {
+    "source": "prepare.py",
+    "archive": "prepare.py",
+    "sourceSha256": "bb9f4c48be3ef6e0f664d66d0bfcb6f39ab9ec37fd5c6d39353045ca9c171e50",
+    "archiveSha256": "bb9f4c48be3ef6e0f664d66d0bfcb6f39ab9ec37fd5c6d39353045ca9c171e50"
+  },
+  {
+    "source": "TESTS.patch",
+    "archive": "TESTS.patch",
+    "sourceSha256": "571675fa6faf71fd145c0c3cf5cb534c2a28a4913ac08248c6e22b605994b539",
+    "archiveSha256": "571675fa6faf71fd145c0c3cf5cb534c2a28a4913ac08248c6e22b605994b539"
+  },
+  {
+    "source": "ingress-first/RESULT.json",
+    "archive": "ingress-first/RESULT.json",
+    "sourceSha256": "9c1affae9919487fe1d9e1162aef920d31e227581212fdb279756e3e1ad965a4",
+    "archiveSha256": "9c1affae9919487fe1d9e1162aef920d31e227581212fdb279756e3e1ad965a4"
+  },
+  {
+    "source": "ingress-first/first.log",
+    "archive": "ingress-first/first.log",
+    "sourceSha256": "56152ad0fd61c79317028ee91b2316dc19063be20d6931a17138838d6684a162",
+    "archiveSha256": "56152ad0fd61c79317028ee91b2316dc19063be20d6931a17138838d6684a162"
+  },
+  {
+    "source": "ingress-first/COMMAND.json",
+    "archive": "ingress-first/COMMAND.json",
+    "sourceSha256": "52c427a76334be34b6a5140ae0036adcbe15fb6ddfe6f2e95561a1f6e0b87135",
+    "archiveSha256": "52c427a76334be34b6a5140ae0036adcbe15fb6ddfe6f2e95561a1f6e0b87135"
+  },
+  {
+    "source": "ingress-first/PROCESS.json",
+    "archive": "ingress-first/PROCESS.json",
+    "sourceSha256": "97dce4a1f249899da0141b240592db1f5de9f6ddb1305480e016782e2623740f",
+    "archiveSha256": "97dce4a1f249899da0141b240592db1f5de9f6ddb1305480e016782e2623740f"
+  },
+  {
+    "source": "ingress-first/cache/run.json",
+    "archive": "ingress-first/cache/run.json",
+    "sourceSha256": "55e881fe6fcc2e54a3ffbd6761ec5a28c9baeda4b53fd2d194e1a3385831f8f8",
+    "archiveSha256": "55e881fe6fcc2e54a3ffbd6761ec5a28c9baeda4b53fd2d194e1a3385831f8f8"
+  },
+  {
+    "source": "ingress-first/data/eslint-2654242865465226088.hash",
+    "archive": "ingress-first/data/eslint-2654242865465226088.hash",
+    "sourceSha256": "9f17eb56a0c4ce293ae2583ef4141120351b83914fde8a3d515c1b4f8187f683",
+    "archiveSha256": "9f17eb56a0c4ce293ae2583ef4141120351b83914fde8a3d515c1b4f8187f683"
+  },
+  {
+    "source": "ingress-first/data/source-maps.json",
+    "archive": "ingress-first/data/source-maps.json.gz",
+    "sourceSha256": "596c21c01a6600eba7437c1782371ff489fc101c1e762e571f8ee2a77bbb4a1c",
+    "archiveSha256": "d7bf6a7386d2c861d6b3225d7a861be6f4324472940b282f9504b2964b5a1693"
+  },
+  {
+    "source": "ingress-first/data/playwright-5186013267177752385.hash",
+    "archive": "ingress-first/data/playwright-5186013267177752385.hash",
+    "sourceSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2",
+    "archiveSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2"
+  },
+  {
+    "source": "ingress-first/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "archive": "ingress-first/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "sourceSha256": "1eaf0b39e668fac26f3e4d84e118589005be2a7c814bc38352b5eb7857c8f03b",
+    "archiveSha256": "1eaf0b39e668fac26f3e4d84e118589005be2a7c814bc38352b5eb7857c8f03b"
+  },
+  {
+    "source": "ingress-first/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "archive": "ingress-first/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "ingress-first/data/vite-7556005483977466535.hash",
+    "archive": "ingress-first/data/vite-7556005483977466535.hash",
+    "sourceSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9",
+    "archiveSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9"
+  },
+  {
+    "source": "ingress-first/data/file-map.json",
+    "archive": "ingress-first/data/file-map.json.gz",
+    "sourceSha256": "33339dc29816bc59805bc586e14146e9cdbf2edf88a3e3abf78d5b6449c9585e",
+    "archiveSha256": "9aec1ac3db50613ed2979afc42efcac7f8ecfb4af502e1b876e476e458907d42"
+  },
+  {
+    "source": "ingress-first/data/lockfile-nodes.hash",
+    "archive": "ingress-first/data/lockfile-nodes.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "ingress-first/data/parsed-lock-file.nodes.json",
+    "archive": "ingress-first/data/parsed-lock-file.nodes.json.gz",
+    "sourceSha256": "62c90f7a638dc748d016fa76093e0ee64f80c39a537fa208f007549d361d9dc6",
+    "archiveSha256": "6017597251949c522723a73b5b5ece9379e4a1fc280ee27fc4d91b5ca71b7614"
+  },
+  {
+    "source": "ingress-first/data/project-graph.lock",
+    "archive": "ingress-first/data/project-graph.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "ingress-first/data/project-graph.json",
+    "archive": "ingress-first/data/project-graph.json.gz",
+    "sourceSha256": "d03d5a879563dbe0505e42eb75b0c44f57f92c9c315f4df0a188d6a6fa976bbe",
+    "archiveSha256": "eb2889f5c7878756066ce747597de97122257d647aaeac89efb8f5621d4818fa"
+  },
+  {
+    "source": "ingress-first/data/parsed-lock-file.dependencies.json",
+    "archive": "ingress-first/data/parsed-lock-file.dependencies.json.gz",
+    "sourceSha256": "c1be78a6f49124f0bb445f8b50c3a7ecb973b2635c443f6662e9e805bc28c00e",
+    "archiveSha256": "b601457c77417fc19193617f627f2a7985413123598d3996bd415a80ea11c3c9"
+  },
+  {
+    "source": "ingress-first/data/rollup-14273536953574808233.hash",
+    "archive": "ingress-first/data/rollup-14273536953574808233.hash",
+    "sourceSha256": "0a07ae11e72bb08657f159a4e3d8cabea3f88c13f937506d409596a0183feb89",
+    "archiveSha256": "0a07ae11e72bb08657f159a4e3d8cabea3f88c13f937506d409596a0183feb89"
+  },
+  {
+    "source": "ingress-first/data/lockfile-dependencies.hash",
+    "archive": "ingress-first/data/lockfile-dependencies.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "ingress-first/data/nx_files.nxt",
+    "archive": "ingress-first/data/nx_files.nxt.gz",
+    "sourceSha256": "25a0722a74581027548f38fcd697dac4888d4c7d1c80cf4fa695115ecb87f62f",
+    "archiveSha256": "2bd8d86077e1dbbda37a3d8fe38a4e81a14df2628b43784b70358a9db178124c"
+  },
+  {
+    "source": "ingress-first/data/vitest-7333614714660744029.hash",
+    "archive": "ingress-first/data/vitest-7333614714660744029.hash.gz",
+    "sourceSha256": "49214f9476206febb3bfd7c1d9bf296381b609312ba3e311e02614e5116a1e58",
+    "archiveSha256": "f36b8abe1b5f29b80740d8e41e691e2b0b9a80ac8101365c520f87cb7e897196"
+  }
+]

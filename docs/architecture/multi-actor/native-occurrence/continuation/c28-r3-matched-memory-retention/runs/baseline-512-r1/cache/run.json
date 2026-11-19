@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-matched-memory-retention/reporter.mjs",
+    "startTime": "2026-11-03T05:08:14.292Z",
+    "endTime": "2026-11-03T05:08:16.988Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "6589611589361368850",
+      "startTime": "2026-11-03T05:08:14.448Z",
+      "endTime": "2026-11-03T05:08:16.984Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

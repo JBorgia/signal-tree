@@ -1,0 +1,52 @@
+
+> nx run kernel:test structural-completeness.spec.ts independent-public-handoff.spec.ts structural-admission-controls.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs structural-completeness.spec.ts independent-public-handoff.spec.ts structural-admission-controls.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:7239) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7246) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-structural-completeness-successor/candidate/packages/kernel
+
+(node:7254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history 19ms
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey external, scalarFirst=true: whole unit, delivery and history 2ms
+ ✓ src/lib/structural-admission-controls.spec.ts > external rekey refusal preserves exact source support and revision, scalarFirst=true 2ms
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history 2ms
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey external, scalarFirst=false: whole unit, delivery and history 1ms
+ ✓ src/lib/structural-admission-controls.spec.ts > external rekey refusal preserves exact source support and revision, scalarFirst=false 1ms
+(node:7257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-completeness.spec.ts > incomplete ordinary removal refuses whole unit scalarFirst=false 13ms
+ ✓ src/lib/structural-completeness.spec.ts > incomplete ordinary removal refuses whole unit scalarFirst=true 2ms
+ ✓ src/lib/structural-completeness.spec.ts > complete removal context installs ordinary absence and cannot replay 3ms
+ ✓ src/lib/structural-completeness.spec.ts > descriptor-resolved add carries captured recipe into ordinary installation 11ms
+ ✓ src/lib/structural-completeness.spec.ts > legacy unlowered subject removal remains supported 2ms
+(node:7259) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/independent-public-handoff.spec.ts > public undo/redo removes numeric destination before restoring rekey; string key remains independent 23ms
+ ✓ src/lib/independent-public-handoff.spec.ts > public rollback removes numeric destination before restoring rekey; string key remains independent 8ms
+
+ Test Files  3 passed (3)
+      Tests  13 passed (13)
+   Start at  17:06:43
+   Duration  1.88s (transform 645ms, setup 0ms, import 960ms, tests 92ms, environment 529ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.4s

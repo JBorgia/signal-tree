@@ -1,0 +1,45 @@
+{
+  "diagnostic": {
+    "checkedKernelNonSpecFiles": 172,
+    "differences": []
+  },
+  "originalReplay": {
+    "checkedKernelNonSpecFiles": 172,
+    "differences": []
+  },
+  "original": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+  "instrumented": "f05c264d3f4b42cd4db4309673da5bf1fa66de666d07704123a3d93b57481167",
+  "replayed": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+  "traces": [
+    {
+      "counted": 14400,
+      "histogramTotal": 14422,
+      "setup": 22,
+      "runtimeModules": {
+        "lib/entity-signal.ts": 3800,
+        "lib/physical/entity-value-store.ts": 200,
+        "lib/internals/utilities/deep-equal.ts": 800,
+        "lib/experimental-publication/entity.ts": 5800,
+        "lib/internals/intrinsic-mutation.ts": 1200,
+        "lib/internals/entity-publication.ts": 1000,
+        "lib/experimental-publication/private.ts": 1000,
+        "lib/internals/location-runtime.ts": 600
+      }
+    },
+    {
+      "counted": 14400,
+      "histogramTotal": 14422,
+      "setup": 22,
+      "runtimeModules": {
+        "lib/entity-signal.ts": 3800,
+        "lib/physical/entity-value-store.ts": 200,
+        "lib/internals/utilities/deep-equal.ts": 800,
+        "lib/experimental-publication/entity.ts": 5800,
+        "lib/internals/intrinsic-mutation.ts": 1200,
+        "lib/internals/entity-publication.ts": 1000,
+        "lib/experimental-publication/private.ts": 1000,
+        "lib/internals/location-runtime.ts": 600
+      }
+    }
+  ]
+}

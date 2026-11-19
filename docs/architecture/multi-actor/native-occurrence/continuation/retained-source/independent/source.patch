@@ -1,0 +1,47 @@
+--- /private/tmp/st-selected-forwarding-cleanup-successor/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ /private/tmp/st-retained-source-successor/independent/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -338,6 +338,12 @@
+ }
+ 
+ export interface TreeRealizationPort {
++  /** Uses this adapter's retained source identities, including hidden collections.
++   * Lifetime validation and public visibility remain the installer's responsibility.
++   */
++  prepareSelectedUnit?(
++    effects: readonly ReversalEffect[]
++  ): { install(): void; publish(): void };
+   prepareOrdinaryEffects?(
+     effects: readonly ReversalEffect[]
+   ): readonly ReversalEffect[];
+@@ -474,6 +480,9 @@
+   const structuralOwnerPaths = indexStructuralOwnerPaths(options.tree.$);
+ 
+   return {
++    prepareSelectedUnit(effects) {
++      return prepareSelectedOperation(options.tree, effects, structuralOwnerPaths);
++    },
+     prepareOrdinaryEffects(effects) {
+       const byOwner = new Map(effects.map((effect) => [effect.owner, effect]));
+       return prepareOrdinaryRealization(effects, (owner, subject) => {
+@@ -709,14 +718,17 @@
+  // Return inapplicable for the entire description; the complete route owns it.
+  if(operation.orderDeltas.length || operation.frontiers.size || operation.structuralRequired)return undefined;
+  if(!effects.some(effect=>!!fieldEndpoints(effect)) || !effects.every(effect=>!effect.structural&&!effect.plainBranchMembership && (typeof effect.subjectId==='number'?effect.subjectFieldSegments?.length===1&&!!fieldEndpoints(effect):effect.subjectFieldSegments===undefined)))return undefined;
+- return {operation,prepare:()=>prepareSelectedOperation(tree,operation.effects)};
+-}
+-function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[]):{install():void;publish():void} {
++ const port = getTreeRealizationPort(tree.$) ?? getTreeRealizationPort(tree);
++ const prepare = port?.prepareSelectedUnit;
++ if (!prepare) return undefined;
++ return {operation,prepare:()=>prepare.call(port, operation.effects)};
++}
++function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[],owners:StructuralOwnerIndex):{install():void;publish():void} {
+  const descriptors=getTreeRealizationDescriptors(tree.$);
+  const slots=getTreeScalarSlotRuntime(tree.$)??getTreeScalarSlotRuntime(tree);
+  const clock=getPhysicalCommitClock(tree.$)??getPhysicalCommitClock(tree);
+  if(!descriptors||!slots||!clock)throw new Error('Selected operation source unavailable');
+- const revision=clock.revision();const owners=indexPointOwnerPaths(tree.$,effects);
++ const revision=clock.revision();
+  const edits:SelectedRowIntent[]=[];const deliveries:Array<()=>void>=[];
+  const scalarEffects:ReversalEffect[]=[];const frame=slots.beginFrame();
+  let active=true;

@@ -1,0 +1,15 @@
+{
+  "authorOwnedRuns": {
+    "inspection-adoption": "absent",
+    "kernel-first": "absent",
+    "kernel-invocation-split": "absent",
+    "kernel-selected-handoff": "absent",
+    "react-first": "absent",
+    "react-invocation-split": "absent",
+    "retention-first": "absent",
+    "retention-recorded": "absent"
+  },
+  "unclaimedExternalRun": {
+    "main-replay": "not inspectable"
+  }
+}

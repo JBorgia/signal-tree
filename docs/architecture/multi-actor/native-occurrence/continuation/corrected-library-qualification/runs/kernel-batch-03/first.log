@@ -1,0 +1,206 @@
+
+> nx run kernel:test /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/current-cutoff-r2.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/current-read-capability.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/current-validation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/declaration-extensibility-e5-fork.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/declaration-finally-precedence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/demarcation-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/derive-footprint.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/derived-not-state.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/descriptor-merge-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/descriptor-role-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/diag-journal-0-inventory.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/dynamic-admission-minimal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/dynamic-member-enrollment.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/dynamic-member-reactivation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/dynamic-vs-entitymap-domain.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e-granularity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e-hooks.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e-membership-reachability.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e-ordering-rekey.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e-subject-identity-audit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e2-precision-null.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e2b-authorship.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e2c-real-causal-path.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e2s-structural-null.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/e2s00-member-access.kernel.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/effective-presence-install-reentry.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/effective-presence-reentry.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/effective-presence-successor.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/egress-0-userland-link.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/egress-1-observation-vs-consequence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/enhancer-metadata-authority.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/enhancer-method-forwarding.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/enhancer-protocol-continuity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-active-prepend-changeid.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-add-many-anchors.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-array-diagnostic.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-bare-array-hydrate.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-bulk-mutations.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-diagnostic-folding.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-egress-footprint-delivery.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-egress-footprint.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-ids-identity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-input-view-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-inspection-egress.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-key-evidence-public.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-lifetime-ledger-null.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-link-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-membership-link-restoration.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-membership-producer.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-membership-view.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-missing-id-guard.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-native-input-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-node-cache.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-obligation-matrix.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-observation-gate.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-occupancy-steps.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-order-carrier.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-own-property-audit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-predicate-churn.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-projection-seed.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-realization-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-registration-lifecycle.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-registration-original.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-registration-receipts.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-replay-tap-boundaries.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-replay-taps.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-restoration-authority.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-restore-diff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-selection-lifetime.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-composition-slice.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-point-recurrence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-rekey-vacancy-recurrence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-structural-inverses.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-structure-faults.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-structure-interceptors.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-structure-slice.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-topology.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-semantic-transition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-set-all-staging.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-signal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-sort-comparer.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-tap-reads.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-update-one-equivalence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-wrong-method-guard.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/equal-owner-admission.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/equal-owner-current-input.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/equal-owner-selection-companion.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/error-reporter.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/fixed-window-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/heterogeneous-atomicity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/hydration-snapshot.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/identity-through-seams-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/incremental-materialization.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-03.json
+
+kernel:  RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+kernel:  ✓ src/lib/entity-signal.spec.ts (61 tests) 80ms
+kernel:  ✓ src/lib/demarcation-0.spec.ts (15 tests) 77ms
+kernel:  ✓ src/lib/egress-0-userland-link.spec.ts (16 tests) 111ms
+kernel:  ✓ src/lib/entity-membership-view.spec.ts (14 tests) 20ms
+kernel:  ✓ src/lib/entity-bulk-mutations.spec.ts (38 tests) 67ms
+kernel:  ✓ src/lib/entity-membership-view-v16-controls.spec.ts (11 tests) 35ms
+kernel: stdout | src/lib/identity-through-seams-0.spec.ts > STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required? > T06a rekey + later field write is INDEPENDENT
+kernel: [trichotomy] T06a rekey+field -> settled; ids=["A"]; name="later"
+kernel: stdout | src/lib/identity-through-seams-0.spec.ts > STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required? > T06b rekey + later add at the VACATED key is DEPENDENT
+kernel: [trichotomy] T06b rekey+occupy -> later-confirmed-dependency; ids=["B","A"]; x=1
+kernel: stdout | src/lib/identity-through-seams-0.spec.ts > STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required? > T07 rekey + later remove is SUPERSEDED
+kernel: [trichotomy] T07  rekey+remove -> settled; ids=[]; x=0
+kernel:  ✓ src/lib/entity-lifetime-ledger-null.spec.ts (11 tests) 67ms
+kernel:  ✓ src/lib/identity-through-seams-0.spec.ts (14 tests) 78ms
+kernel:  ✓ src/lib/e2s00-member-access.kernel.spec.ts (12 tests) 5ms
+kernel:  ✓ src/lib/entity-inspection-egress.spec.ts (16 tests) 69ms
+kernel:  ✓ src/lib/egress-1-observation-vs-consequence.spec.ts (8 tests) 49ms
+kernel:  ❯ src/lib/entity-granular-reactivity.spec.ts (10 tests | 1 failed) 1291ms
+kernel:      ✓ publishes a field and collection projection as one coherent state 12ms
+kernel:      ✓ removal releases the entity: held reference reads undefined, byId absent 3ms
+kernel:      ✓ re-add after removal works through a fresh byId 2ms
+kernel:      × a single-entity update does not rebuild the collection 703ms
+kernel:      ✓ repeated collection reads between writes are cached  566ms
+kernel:      ✓ map() stays a snapshot, not a live view 1ms
+kernel:      ✓ does not let a held node revive when the same key is reused by a new subject 1ms
+kernel:      ✓ a held FIELD reference also stays absent across key reuse by a new subject 1ms
+kernel:      ✓ resolves internal acquired handles by subject, not by reused key address 1ms
+kernel:      ✓ keeps acquired handles isolated when setAll reuses a tombstoned key 1ms
+kernel:  ✓ src/lib/entity-set-all-staging.spec.ts (12 tests) 24ms
+kernel:  ✓ src/lib/incremental-materialization.spec.ts (14 tests) 131ms
+kernel:  ✓ src/lib/heterogeneous-atomicity.spec.ts (4 tests) 60ms
+kernel:  ✓ src/lib/entity-restoration-authority.spec.ts (7 tests) 82ms
+kernel:  ✓ src/lib/equal-owner-public-adversaries.spec.ts (6 tests) 78ms
+kernel: stderr | src/lib/dynamic-member-reactivation.spec.ts
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel:  ✓ src/lib/dynamic-member-reactivation.spec.ts (8 tests) 15ms
+kernel:  ✓ src/lib/descriptor-merge-0.spec.ts (5 tests) 5ms
+kernel:  ✓ src/lib/e2-precision-null.spec.ts (4 tests) 9ms
+kernel:  ✓ src/lib/entity-tap-reads.spec.ts (13 tests) 85ms
+kernel:  ✓ src/lib/fixed-window-independent.spec.ts (10 tests) 74ms
+kernel:  ✓ src/lib/e-hooks.spec.ts (9 tests) 48ms
+kernel:  ✓ src/lib/enhancer-metadata-authority.spec.ts (10 tests) 8ms
+kernel:  ✓ src/lib/diag-journal-0-inventory.spec.ts (7 tests) 36ms
+kernel:  ✓ src/lib/e2c-real-causal-path.spec.ts (5 tests) 85ms
+kernel:  ✓ src/lib/e2s-structural-null.spec.ts (5 tests) 63ms
+kernel:  ✓ src/lib/entity-membership-producer.spec.ts (6 tests) 76ms
+kernel:  ✓ src/lib/entity-active-prepend-changeid.spec.ts (23 tests) 44ms
+kernel:  ✓ src/lib/enhancer-protocol-continuity.spec.ts (8 tests) 13ms
+kernel:  ✓ src/lib/e-ordering-rekey.spec.ts (6 tests) 22ms
+kernel:  ✓ src/lib/derive-footprint.spec.ts (14 tests) 85ms
+kernel:  ✓ src/lib/entity-link-0.spec.ts (4 tests) 44ms
+kernel:  ✓ src/lib/entity-predicate-churn.spec.ts (12 tests) 27ms
+kernel:  ✓ src/lib/descriptor-role-0.spec.ts (4 tests) 3ms
+kernel:  ✓ src/lib/entity-egress-footprint.spec.ts (15 tests) 71ms
+kernel:  ✓ src/lib/enhancer-method-forwarding.spec.ts (21 tests) 19ms
+kernel:  ✓ src/lib/entity-semantic-transition.spec.ts (12 tests) 120ms
+kernel:  ✓ src/lib/entity-update-one-equivalence.spec.ts (11 tests) 89ms
+kernel:  ✓ src/lib/entity-obligation-matrix.spec.ts (13 tests) 97ms
+kernel:  ✓ src/lib/entity-native-input-independent.spec.ts (12 tests) 77ms
+kernel:  ✓ src/lib/e2b-authorship.spec.ts (3 tests) 18ms
+kernel:  ✓ src/lib/effective-presence-successor.spec.ts (7 tests) 54ms
+kernel:  ✓ src/lib/entity-restore-diff.spec.ts (9 tests) 262ms
+kernel:  ✓ src/lib/e-granularity.spec.ts (5 tests) 26ms
+kernel:  ✓ src/lib/entity-replay-taps.spec.ts (49 tests) 328ms
+kernel:  ✓ src/lib/e-subject-identity-audit.spec.ts (6 tests) 34ms
+kernel:  ✓ src/lib/dynamic-member-enrollment.spec.ts (9 tests) 54ms
+kernel:  ✓ src/lib/entity-selection-lifetime.spec.ts (6 tests) 74ms
+kernel:  ✓ src/lib/equal-owner-admission.spec.ts (13 tests) 64ms
+kernel: stdout | src/lib/entity-order-carrier.spec.ts > ORDER CARRIER — beforeSubject/afterSubject are NEIGHBOURS > addOne onto [A,B,C] (appends)
+kernel: ### addOne D
+kernel:     subjects before: [1,2,3]
+kernel:     effects        : [{"kind":"add","subject":4,"key":4,"value":{"id":4,"name":"d"},"beforeSubject":3}]
+kernel:     subjects after : [1,2,3,4]
+kernel:     ids after      : [1,2,3,4]
+kernel: stdout | src/lib/entity-order-carrier.spec.ts > ORDER CARRIER — beforeSubject/afterSubject are NEIGHBOURS > prependOne onto [A,B,C]
+kernel: ### prependOne D
+kernel:     subjects before: [1,2,3]
+kernel:     effects        : [{"kind":"add","subject":4,"key":4,"value":{"id":4,"name":"d"},"afterSubject":1}]
+kernel:     subjects after : [4,1,2,3]
+kernel:     ids after      : [4,1,2,3]
+kernel: stdout | src/lib/entity-order-carrier.spec.ts > ORDER CARRIER — beforeSubject/afterSubject are NEIGHBOURS > remove FIRST — only a successor exists
+kernel: ### removeOne(1) first
+kernel:     subjects before: [1,2,3]
+kernel:     effects        : [{"kind":"remove","subject":1,"key":1,"value":{"id":1,"name":"a"},"afterSubject":2}]
+kernel:     subjects after : [2,3]
+kernel:     ids after      : [2,3]
+kernel: stdout | src/lib/entity-order-carrier.spec.ts > ORDER CARRIER — beforeSubject/afterSubject are NEIGHBOURS > remove MIDDLE — BOTH neighbours are reported
+kernel: ### removeOne(2) middle
+kernel:     subjects before: [1,2,3]
+kernel:     effects        : [{"kind":"remove","subject":2,"key":2,"value":{"id":2,"name":"b"},"beforeSubject":1,"afterSubject":3}]
+kernel:     subjects after : [1,3]
+kernel:     ids after      : [1,3]
+kernel: stdout | src/lib/entity-order-carrier.spec.ts > ORDER CARRIER — beforeSubject/afterSubject are NEIGHBOURS > remove LAST — only a predecessor exists
+kernel: ### removeOne(3) last
+kernel:     subjects before: [1,2,3]
+kernel:     effects        : [{"kind":"remove","subject":3,"key":3,"value":{"id":3,"name":"c"},"beforeSubject":2}]
+kernel:     subjects after : [1,2]
+kernel:     ids after      : [1,2]
+kernel: stdout | src/lib/entity-order-carrier.spec.ts > ORDER CARRIER — beforeSubject/afterSubject are NEIGHBOURS > add into an EMPTY collection — NEITHER neighbour
+kernel: ### addOne into empty
+kernel:     subjects before: []
+kernel:     effects        : [{"kind":"add","subject":1,"key":1,"value":{"id":1,"name":"a"}}]
+kernel:     subjects after : [1]
+kernel:     ids after      : [1]
+kernel:  ✓ src/lib/entity-order-carrier.spec.ts (6 tests) 36ms
+kernel:  ✓ src/lib/current-read-capability.spec.ts (16 tests) 37ms
+kernel:  ✓ src/lib/current-cutoff-r2.spec.ts (4 tests) 45ms
+kernel:  ✓ src/lib/declaration-finally-precedence.spec.ts (16 tests) 28ms
+kernel:  ✓ src/lib/entity-realization-handoff.spec.ts (5 tests) 69ms
+kernel:  ✓ src/lib/entity-own-property-audit.spec.ts (28 tests) 155ms
+kernel:  ✓ src/lib/entity-array-diagnostic.spec.ts (14 tests) 193ms
+kernel:  ✓ src/lib/entity-sort-comparer.spec.ts (6 tests) 37ms
+kernel:  ✓ src/lib/entity-replay-tap-boundaries.spec.ts (8 tests) 102ms
+kernel:  ✓ src/lib/entity-publication-work-lifetime.spec.ts (3 tests) 235ms
+kernel:  ✓ src/lib/entity-semantic-structure-slice.spec.ts (10 tests) 134ms
+kernel:  ✓ src/lib/derived-not-state.spec.ts (9 tests) 30ms
+kernel:  ✓ src/lib/error-reporter.spec.ts (7 tests) 6ms
+kernel:  ✓ src/lib/entity-node-cache.spec.ts (7 tests) 32ms
+kernel: stderr | src/lib/dynamic-vs-entitymap-domain.spec.ts
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel:  ✓ src/lib/dynamic-vs-entitymap-domain.spec.ts (4 tests) 14ms
+kernel:  ✓ src/lib/entity-observation-gate.spec.ts (3 tests) 19ms
+kernel:  ✓ src/lib/entity-bare-array-hydrate.spec.ts (8 tests) 29ms
+kernel:  ✓ src/lib/entity-add-many-anchors.spec.ts (4 tests) 37ms
+kernel:  ✓ src/lib/enhancer-accumulation-survival.spec.ts (7 tests) 24ms
+kernel:  ✓ src/lib/e-membership-reachability.spec.ts (6 tests) 164ms
+kernel:  ✓ src/lib/entity-membership-link-restoration.spec.ts (12 tests) 153ms
+kernel:  ✓ src/lib/equal-owner-current-input.spec.ts (5 tests) 55ms
+kernel:  ✓ src/lib/entity-semantic-composition-slice.spec.ts (5 tests) 82ms
+kernel:  ✓ src/lib/entity-diagnostic-folding.spec.ts (3 tests) 20ms
+kernel:  ✓ src/lib/entity-semantic-topology.spec.ts (3 tests) 63ms
+kernel:  ✓ src/lib/entity-projection-seed.spec.ts (4 tests) 22ms
+kernel:  ✓ src/lib/declaration-extensibility-e5-fork.spec.ts (4 tests) 37ms
+kernel:  ✓ src/lib/entity-egress-footprint-delivery.spec.ts (4 tests) 6ms
+kernel:  ✓ src/lib/entity-key-evidence-public.spec.ts (5 tests) 29ms
+kernel: stderr | src/lib/hydration-snapshot.spec.ts > existing hydration snapshot contract > keeps markers inside an opaque leaf as payload during root reads and writes
+kernel: SignalTree: write at "terminal" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+kernel: stderr | src/lib/hydration-snapshot.spec.ts > existing hydration snapshot contract > accepts canonical collection input at root and branch
+kernel: SignalTree: write at "date" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+kernel:  ✓ src/lib/hydration-snapshot.spec.ts (3 tests) 35ms
+kernel:  ✓ src/lib/entity-semantic-structure-interceptors.spec.ts (4 tests) 62ms
+kernel:  ✓ src/lib/entity-negative-publication-retirement.spec.ts (2 tests) 66ms
+kernel:  ✓ src/lib/entity-semantic-structure-faults.spec.ts (4 tests) 87ms
+kernel:  ✓ src/lib/entity-wrong-method-guard.spec.ts (6 tests) 15ms
+kernel:  ✓ src/lib/effective-presence-install-reentry.spec.ts (6 tests) 50ms
+kernel:  ✓ src/lib/entity-input-view-contract.spec.ts (3 tests) 70ms
+kernel:  ✓ src/lib/current-validation.spec.ts (3 tests) 50ms
+kernel:  ✓ src/lib/entity-semantic-structural-inverses.spec.ts (3 tests) 78ms
+kernel:  ✓ src/lib/effective-presence-reentry.spec.ts (4 tests) 41ms
+kernel:  ✓ src/lib/entity-ids-identity.spec.ts (7 tests) 26ms
+kernel:  ✓ src/lib/entity-occupancy-steps.spec.ts (1 test) 33ms
+kernel:  ✓ src/lib/entity-missing-id-guard.spec.ts (3 tests) 17ms
+kernel:  ✓ src/lib/equal-owner-selection-companion.spec.ts (1 test) 54ms
+kernel:  ✓ src/lib/entity-semantic-point-recurrence.spec.ts (2 tests) 55ms
+kernel:  ✓ src/lib/dynamic-admission-minimal.spec.ts (2 tests) 33ms
+kernel:  ✓ src/lib/entity-semantic-rekey-vacancy-recurrence.spec.ts (1 test) 38ms
+kernel:  ✓ src/lib/entity-registration-lifecycle.spec.ts (6 tests) 79ms
+kernel:  ✓ src/lib/entity-registration-original.spec.ts (8 tests) 99ms
+kernel:  ✓ src/lib/entity-registration-receipts.spec.ts (6 tests) 82ms
+kernel:  ✓ src/lib/entity-large-batches-v16-controls.spec.ts (18 tests) 108892ms
+kernel:      ✓ setAll, replace and clear with a notifier subscriber  11183ms
+kernel:      ✓ rolls back a transaction that replaced every row and reused a key (transactions)  42764ms
+kernel:      ✓ rolls back a transaction that replaced every row and reused a key (transactions, restoration)  52287ms
+kernel:        ✓ replacing every id (1024 rows)  439ms
+kernel:        ✓ replacing every id (1024 rows)  400ms
+kernel:        ✓ replacing every id (1024 rows)  443ms
+kernel: ⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+kernel:  FAIL  src/lib/entity-granular-reactivity.spec.ts > entityMap — collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection
+kernel: AssertionError: expected 13000 to be less than 2000
+kernel:  ❯ src/lib/entity-granular-reactivity.spec.ts:215:19
+kernel:     213|     const small = updates(2000);
+kernel:     214|     expect(updates(20000)).toBe(small);
+kernel:     215|     expect(small).toBeLessThan(2000);
+kernel:        |                   ^
+kernel:     216|     // Control: the counter sees a copy, so equality is not vacuous. T…
+kernel:     217|     // entries iterated and two copied, then three mapped.
+kernel: ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+kernel:  Test Files  1 failed | 99 passed (100)
+kernel:       Tests  1 failed | 921 passed (922)
+kernel:    Start at  12:27:57
+kernel:    Duration  120.17s (transform 5.23s, setup 0ms, import 27.58s, tests 116.31s, environment 70.10s)
+kernel: JSON report written to /private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-03.json
+
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2m 2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2m 2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2m 2s

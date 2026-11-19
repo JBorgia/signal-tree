@@ -1,0 +1,389 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,4 @@
++import {fieldEndpoints,bindFieldEndpoints} from '../../lib/internals/native-field-selection';
+ import {
+   completeOrderCapture,
+   type OrderBoundaryEvidence,
+@@ -1988,6 +1989,8 @@
+     }
+     if (existing) {
+       if (existing.kind === 'set' && effect.kind === 'set') {
++        const oldEndpoints=fieldEndpoints(existing),newEndpoints=fieldEndpoints(effect);
++        const replaceBaseline=!existing.plainBranchMembership&&effect.plainBranchMembership?.before===false;
+         if (identity) identify(existing, identity);
+         if (!composePlainBranchMemberEffect(existing, effect)) {
+           existing.after = effect.after;
+@@ -2001,6 +2004,7 @@
+               after: afterPresent,
+             };
+         }
++        if(newEndpoints)bindFieldEndpoints(existing,{before:replaceBaseline?newEndpoints.before:oldEndpoints?.before??newEndpoints.before,after:newEndpoints.after});
+         existing.mutationIntent = combineScalarMutationIntent(
+           existing.mutationIntent,
+           effect.mutationIntent
+@@ -2463,6 +2467,20 @@
+           }
+         }
+       }
++      if(capture.fieldSelections){
++        for(const change of capture.changes){
++          if(change.structural)continue;
++          const keys=new Set([...Object.keys(change.before??{}),...Object.keys(change.after??{})]);
++          for(const key of keys){
++            const effect=effects.find(effect=>effect.kind==='set'&&effect.subject===change.subject&&effect.subjectFieldSegments?.length===1&&effect.subjectFieldSegments[0]===key);
++            const before=capture.fieldSelections.before(change.subject,key);
++            if(effect){
++              const after=Object.freeze({...capture.fieldSelections.proposed(change.subject,key),owner:id});
++              bindFieldEndpoints(effect,{before,after});capture.fieldSelections.choose(change.subject,key,after);
++            }else if(before.owner!==undefined){capture.fieldSelections.choose(change.subject,key,before);}
++          }
++        }
++      }
+       const revision = ++sourceRevision;
+       const segmentWrites = new Map<
+         string,
+@@ -2603,6 +2621,12 @@
+       }
+       for (const effect of effects)
+         enqueueEffect(scratch, scratch.effects, cloneTurnEffect(effect));
++      if(capture.fieldSelections)for(const effect of scratch.effects.values()){
++        if(effect.kind!=='set'||effect.subject===undefined||effect.subjectFieldSegments?.length!==1)continue;
++        const pair=fieldEndpoints(effect);if(!pair)continue;
++        const noop=plainBranchMemberEffectIsNoop(effect)&&(effect.fieldPresence?.before??true)===(effect.fieldPresence?.after??true);
++        capture.fieldSelections.choose(effect.subject,effect.subjectFieldSegments[0],noop?pair.before:pair.after);
++      }
+       const previous = installedOperations.get(id);
+       const operation: OperationRecord = {
+         sequence: (previous?.sequence ?? -1) + 1,
+@@ -3109,7 +3133,7 @@
+   const toCausalEffect = (effect: TurnEffect): CausalEffect => {
+     switch (effect.kind) {
+       case 'set':
+-        return {
++        return bindFieldEndpoints({
+           owner: effect.position as CausalPositionId,
+           before: effect.before,
+           after: effect.after,
+@@ -3119,7 +3143,7 @@
+           fieldPresence: effect.fieldPresence,
+           path: effect.path,
+           ownerPath: effect.ownerPath,
+-        };
++        },fieldEndpoints(effect));
+       case 'add':
+         return {
+           owner: effect.position as CausalPositionId,
+@@ -3177,7 +3201,8 @@
+ 
+   const toRollbackEffect = (effect: TurnEffect): ReversalEffect => {
+     const causal = toCausalEffect(effect);
+-    return {
++    const pair=fieldEndpoints(effect);
++    return bindFieldEndpoints({
+       ...causal,
+       before: causal.after,
+       after: causal.before,
+@@ -3199,7 +3224,7 @@
+           : causal.structural === 'remove'
+           ? 'add'
+           : causal.structural,
+-    };
++    },pair?{before:pair.after,after:pair.before}:undefined);
+   };
+ 
+   // Capture segmentation preserves admission authority. After disposition,
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -530,6 +530,7 @@
+       const after = deepClone(value) as E;
+       return {
+         subjectId,
++        edits,
+         key: key as K,
+         before,
+         after,
+@@ -544,7 +545,7 @@
+     });
+     const publication=prepareEntityPublication(
+       prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
+-      prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter)})),undefined,undefined,true
++      prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true
+     );
+     return {
+       install(): void {
+@@ -1340,7 +1341,8 @@
+           const row=valueResults.get(subjectId)?.physicalAfter??fresh.get(subjectId)??valueStore.backingForSubject(subjectId);
+           return {subjectId,key:placement.key,row};
+         });
+-      })():undefined
++      })():undefined,
++      {owner:getPositionIds()?.[0] as number,ownerPath:basePath,meta:ambientMeta(),changes:ordinaryPlan.changes,topologyUnit,structuralFrontier}
+     );
+     if(publication.unit){
+       markEntityPublicationFacts(ordinaryPlan.changes,publication.id);
+@@ -1350,16 +1352,7 @@
+     }
+     for(const [subject,transition] of valueResults) valueResults.set(subject,Object.freeze({...transition,publicationUnit:publication.unit?publication.id:undefined}));
+     for(let i=0;i<valueResultsByStep.length;i++){const transition=valueResultsByStep[i];if(transition)valueResultsByStep[i]=Object.freeze({...transition,publicationUnit:publication.unit?publication.id:undefined});}
+-    const responsibility = changes.length
+-      ? mutationCaptureRuntime?.prepareEntityResponsibility?.({
+-          owner: getPositionIds()?.[0] as number,
+-          ownerPath: basePath,
+-          meta: ambientMeta(),
+-          changes: ordinaryPlan.changes,
+-          topologyUnit,
+-          structuralFrontier,
+-        })
+-      : undefined;
++    const responsibility = undefined;
+     if (physicalCommitClock?.revision() !== revision)
+       throw new Error(
+         'Entity frame responsibility preparation reentered installation'
+@@ -2050,9 +2043,9 @@
+     const b=after && typeof after==='object'?after as Record<string,unknown>:{};
+     return Object.freeze([...new Set([...Object.keys(a),...Object.keys(b)])].filter(key=>Object.prototype.hasOwnProperty.call(a,key)!==Object.prototype.hasOwnProperty.call(b,key)||!Object.is(a[key],b[key])));
+   }
+-  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[]) {
++  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture) {
+     const id=Object.freeze({});
+-    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
++    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
+     return {id,unit};
+   }
+   function commitExistingSubjectValue(
+@@ -2090,20 +2083,14 @@
+     const publication = prepareEntityPublication(
+       [{subject:subjectId,before:transition.physicalBefore,after:transition.physicalAfter,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields)}],
+       ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord})),
+-      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}]
++      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}],undefined,{owner:getPositionIds()?.[0] as number,ownerPath:basePath,changes:ordinaryPlan.changes,topologyUnit,meta:ambientMeta()}
+     );
+     const capture = committedEntityObserver(
+       undefined,
+       ordinaryPlan.changes,
+       topologyUnit
+     );
+-    const plan = mutationCaptureRuntime?.prepareEntityResponsibility?.({
+-      owner: getPositionIds()?.[0] as number,
+-      ownerPath: basePath,
+-      changes: ordinaryPlan.changes,
+-      topologyUnit,
+-      meta: ambientMeta(),
+-    });
++    const plan = undefined;
+     if (physicalCommitClock?.revision() !== revision)
+       throw new Error(
+         'Entity responsibility preparation reentered installation'
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,3 +1,4 @@
++import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
+@@ -15,7 +16,7 @@
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+ registerEntityPublicationFactory(() => {
+-  const fields=new Map<number,Map<string,Requirement>>();
++  const fields=new Map<number,Map<string,NativeFieldEndpoint>>();
+   const members=new Map<number,Member>();
+   const placements=new Map<number,Requirement>();
+   const views=new Map<number,Map<string,View>>();
+@@ -24,9 +25,9 @@
+   const mappings=new Map<number,Requirement>();
+   const mappingViews=new Map<number,View>();
+   const missing=unavailable();
+-  const evidence=(ordinaryFields:Lookup<Map<string,Requirement>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
++  const evidence=(ordinaryFields:Lookup<Map<string,NativeFieldEndpoint>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
+     member:(id,view)=>view==='ordinary'?ordinaryMembers.get(id)?.requirement??missing:physicalMembers.get(id)?.requirement??missing,
+-    field:(id,key,view)=>view==='ordinary'?ordinaryFields.get(id)?.get(key)??missing:physicalFields.get(id)?.get(key)?.requirement??missing,
++    field:(id,key,view)=>view==='ordinary'?(ordinaryFields.get(id)?.get(key)?.requirement as Requirement|undefined)??missing:physicalFields.get(id)?.get(key)?.requirement??missing,
+     placement:(id,view)=>view==='ordinary'?ordinaryPlacements.get(id)??missing:physicalPlacements.get(id)?.requirement??missing,
+     keyMapping:(id,view)=>view==='ordinary'?ordinaryMappings.get(id)??missing:physicalMappings.get(id)?.requirement??missing,
+   });
+@@ -61,9 +62,21 @@
+       const inputs=[...currentNativePublicationInputs(),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])];
+       const prepared=inspection?undefined:lifecycle.prepareNativeRequirement(owner?[owner]:[],!valid||meta?.origin!==undefined,inputs);
+       const requirement=prepared?.requirement??unavailable();
++      const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
++      const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
++      const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
++        const edit=[...entityPublicationOrdinary(packet)].reverse().find(edit=>edit.subject===subject);
++        if(!edit)throw new Error('Missing admitted field publication');
++        return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
++      };
++      const selections:NativeFieldSelections={before:beforeField,proposed:proposal,choose(subject,key,value){
++        let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new Map());row.set(key,value);
++      }};
++      const responsibility=packet.prepareResponsibility?.(selections);
++      const chosen=(edit:EntityPublicationEdit,key:string):NativeFieldEndpoint=>edit.restoredFields?.get(key)??selectedFields.get(edit.subject)?.get(key)??proposal(edit.subject,key);
+       const writes:TerminalRecordPlan['writes'][number][]=[];
+       const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+-      const nextFields=new Map<number,Map<string,Requirement>>();
++      const nextFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+       const nextViews=new Map<number,Map<string,View>>();
+       const nextMembers=new Map<number,Member>();
+       const nextPlacements=new Map<number,Requirement>();
+@@ -79,7 +92,7 @@
+       if(!packet.steps)for(const edit of packet.ordinary){const physical=packet.physical.find(value=>value.subject===edit.subject);if(physical)paired.set(edit,physical);}
+       const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+       const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+-      const rowFields=(id:number):Map<string,Requirement>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
++      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+       const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
+       // Physical support is distinct from ordinary eligibility. Inspection
+       // changes only the physical certificate, including negative membership.
+@@ -115,21 +128,23 @@
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+         const physical=paired.get(edit);
+         for(const key of keys){
+-          row.set(key,requirement);
++          const endpoint=chosen(edit,key),fieldRequirement=endpoint.requirement as Requirement;
++          row.set(key,endpoint);
+           const previous=views.get(edit.subject)?.get(key);
+           const same=!!previous&&!!physical&&own(physical.before,key)===own(physical.after,key)&&Object.is(fieldValue(physical.before,key),fieldValue(physical.after,key));
+           if(same){
+             view.set(key,previous);
+-            writes.push({map:{set(_key:unknown,value:unknown){previous.requirement=value as Requirement;}},key:undefined,value:requirement});
+-          }else view.set(key,{requirement,present:own(physical?.after??edit.after,key)});
++            writes.push({map:{set(_key:unknown,value:unknown){previous.requirement=value as Requirement;}},key:undefined,value:fieldRequirement});
++          }else view.set(key,{requirement:fieldRequirement,present:own(physical?.after??edit.after,key)});
+           acquisitions++;
+         }
+         const ordinaryRow=new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
++        for(const key of keys)physicalRow.set(key,{requirement:row.get(key)!.requirement as Requirement,present:own(physical?.after??edit.after,key)});
+         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
+         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
+         selectedAt.set(edit,{
+           member:(id,kind)=>id===edit.subject&&kind==='ordinary'?(member?.requirement??missing):evidence().member(id,kind),
+-          field:(id,key,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryRow.get(key)??missing:physicalRow.get(key)?.requirement??missing):evidence().field(id,key,kind),
++          field:(id,key,kind)=>id===edit.subject?(kind==='ordinary'?(ordinaryRow.get(key)?.requirement as Requirement|undefined)??missing:physicalRow.get(key)?.requirement??missing):evidence().field(id,key,kind),
+           placement:(id,kind)=>id===edit.subject&&kind==='ordinary'?(placement??missing):evidence().placement(id,kind),
+           keyMapping:(id,kind)=>id===edit.subject?(kind==='ordinary'?ordinaryKey:physicalKey):evidence().keyMapping(id,kind),
+         });
+@@ -151,13 +166,13 @@
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+           if(member?.present===false)continue;
+           const row=nextFields.get(id)??fields.get(id);
+-          if(field!==undefined){const value=row?.get(field);if(value)sources.push(value);}
+-          else if(row)sources.push(...row.values());
++          if(field!==undefined){const value=row?.get(field);if(value)sources.push(value.requirement as Requirement);}
++          else if(row)sources.push(...[...row.values()].map(value=>value.requirement as Requirement));
+         }
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+         return lifecycle.combineNativeRequirements(sources);
+       };
+-      return {record:combineTerminalRecords(prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
++      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
+     },
+     complete(){},
+     retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);retirements++;},
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import {fieldEndpoints} from '../native-field-selection';
+ import { withEntityPointPublicationPreparation } from '../entity-publication';
+ import { withSelectedEntityDisposition } from '../selected-entity-disposition';
+ import {
+@@ -855,7 +856,7 @@
+     const present = effect.fieldPresence?.after !== false;
+     if (path.length === 0) row.edits.push({ kind: 'row', value: after });
+     else
+-      row.edits.push({ kind: 'field', field: path[0]!, present, value: after });
++      row.edits.push({ kind: 'field', field: path[0]!, present, value: after, selection:fieldEndpoints(effect)?.after });
+     if (path.length === 0) row.value = deepClone(after);
+     else if (!present) row.value = withoutFieldAtSegments(row.value, path);
+     else assignPreparedSubjectValue(row.value, path, deepClone(after));
+@@ -1106,7 +1107,7 @@
+       row.edits.push({ kind: 'row', value });
+     } else {
+       const present = effect.fieldPresence?.after !== false;
+-      row.edits.push({ kind: 'field', field: path[0]!, present, value });
++      row.edits.push({ kind: 'field', field: path[0]!, present, value, selection:fieldEndpoints(effect)?.after });
+       if (present) assignPreparedSubjectValue(row.value, path, value);
+       else row.value = withoutFieldAtSegments(row.value, path);
+     }
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -5,6 +5,7 @@
+ 
+ /** Source facts prepared with installation, never reconstructed from delivery. */
+ export interface EntityPublicationEdit {
++  readonly restoredFields?: ReadonlyMap<string,import('./native-field-selection').NativeFieldEndpoint>;
+   readonly subject: number;
+   readonly before: unknown;
+   readonly after: unknown;
+@@ -32,6 +33,7 @@
+   });
+ }
+ export interface EntityPublicationPacket {
++  readonly prepareResponsibility?: (fields?:import('./native-field-selection').NativeFieldSelections)=>import('./intrinsic-mutation').TerminalRecordPlan|undefined;
+   readonly owner: number;
+   readonly id: object;
+   readonly inputs?: readonly object[];
+@@ -104,6 +106,7 @@
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
+     const native = this.nativeParticipant();
+     const nativeUnit = native?.prepare(packet);
++    const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();
+     if (native && nativeUnit) parts.push({ participant: native, unit: nativeUnit });
+     for (const participant of [...this.recipients]) {
+       const unit = participant.prepare(packet, nativeUnit?.completion);
+@@ -111,9 +114,9 @@
+     }
+     if(sourceRevision!==this.revisionToken&&recipientRevision===this.recipientRevision)throw new Error("Entity publication source changed during preparation");
+     if (recipientRevision !== this.recipientRevision) throw new Error('Entity publication recipients changed during preparation');
+-    if (!parts.length) return undefined;
++    if (!parts.length && !fallbackRecord) return undefined;
+     return {
+-      record: combineTerminalRecords(...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]})!,
++      record: combineTerminalRecords(fallbackRecord,...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]})!,
+       completion: { parts },
+       finalize: () => { for (const part of parts) part.unit.finalize?.(); },
+     };
+--- a/packages/kernel/src/lib/internals/entity-value-transition.ts
++++ b/packages/kernel/src/lib/internals/entity-value-transition.ts
+@@ -73,6 +73,7 @@
+   | { readonly kind: 'row'; readonly value: unknown }
+   | {
+       readonly kind: 'field';
++      readonly selection?: import('./native-field-selection').NativeFieldEndpoint;
+       readonly field: string;
+       readonly present: boolean;
+       readonly value: unknown;
+--- a/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
++++ b/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+@@ -88,6 +88,7 @@
+   : never;
+ 
+ export type CommittedEntityCapture = {
++  readonly fieldSelections?: import('./native-field-selection').NativeFieldSelections;
+   readonly topologyUnit?: CompletedTopologyUnit;
+   readonly structuralRecords?: readonly StructuralPlacementEvidence[];
+   readonly structuralFrontier?: StructuralFrontierInterval;
+--- a/packages/kernel/src/lib/internals/native-field-selection.ts
++++ b/packages/kernel/src/lib/internals/native-field-selection.ts
+@@ -0,0 +1,21 @@
++/** Private, source-issued ordinary field endpoint; ownership is bound by native admission. */
++export interface NativeFieldEndpoint {
++  readonly present:boolean;
++  readonly value:unknown;
++  readonly requirement:object;
++  readonly owner?:number;
++}
++export interface NativeFieldSelections {
++  before(subject:number,key:string):NativeFieldEndpoint;
++  proposed(subject:number,key:string):NativeFieldEndpoint;
++  choose(subject:number,key:string,endpoint:NativeFieldEndpoint):void;
++}
++const ENDPOINTS=Symbol('native-field-endpoints');
++export interface NativeFieldPair {readonly before:NativeFieldEndpoint;readonly after:NativeFieldEndpoint}
++type Paired = {[ENDPOINTS]?:NativeFieldPair};
++export function fieldEndpoints(effect:object):NativeFieldPair|undefined{return (effect as Paired)[ENDPOINTS];}
++export function bindFieldEndpoints<T extends object>(effect:T,pair:NativeFieldPair|undefined):T {
++  if(pair)(effect as Paired)[ENDPOINTS]=pair;
++  else delete (effect as Paired)[ENDPOINTS];
++  return effect;
++}

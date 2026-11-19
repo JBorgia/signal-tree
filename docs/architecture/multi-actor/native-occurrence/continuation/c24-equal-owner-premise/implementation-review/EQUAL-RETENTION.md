@@ -1,0 +1,17 @@
+# Provisional live-source responsibility retention finding
+
+Source-only finding in the working C24 prototype, not final frozen-candidate acceptance. Captured source copies and SHA256s accompany this note. No execution, candidate mutation, benchmark or GC claim.
+
+With one live source, one pending destination owner p and a fixed value7, each successful independent equal declaration selects its existing owned endpoint. private.ts:158–164 constructs a composite of the previous selected requirement and a fresh current requirement, then stores that composite in nativeValues and the physical view. Thus R(n+1)=combine(R(n), fresh(n+1)). The same ownership marker remains on the copied endpoint. A collapsed recipient no-op does not roll back this nativeValues assignment.
+
+lifecycle.ts:124–126 deduplicates only the immediate component identities. It neither flattens nor removes already-completed components; the new component is a distinct object each call. Its proof getter recursively calls nativeProof. nativeRequirementReady:121–122 recursively visits components; onNativeRequirementReady:129–141 does so for subscription setup/checking as well.
+
+Completion does not remove the chain: finish:351–357 clears inputs/frames/known of horizon requirements, not composite components. Source storage retains the newest composite. Retiring or superseding recipient operations clears their dependencies/views, not nativeValues. Therefore the source-retained requirement graph grows linearly with successful repeated equal declarations while the distinct obligations remain fixed; traversal depth grows linearly too. Repeated full traversals can produce cumulative quadratic work. This is a structural inference, not measured timings or an exact visit count. Confirmation changes owner state; it is not itself source replacement/compaction.
+
+The WeakMap permits collection when its source dies. That does not bound responsibility retained while the source remains alive. Dropping all receipts or disposing a Link is likewise not proof that this source-owned chain disappears.
+
+Prototype requirement: bound retained current responsibility by actual distinct live obligations/unfinished validation, not the number of equal declarations. Simply flattening into an ever-growing array or making traversal iterative fixes neither retained growth nor per-read work. Preserve D/I/V/W, rejected-role/unknown evidence and readiness while reducing settled redundant wrappers. No particular implementation prescribed here; do not collapse an unfinished requirement into a premature proof snapshot.
+
+After freeze, proposed cheap discriminator (not run): repeat64 then256 equal declarations on a fixed live p-owned leaf and whole-branch path, drop returned receipt references, assert unchanged physical values/zero equal-value notifications/no early sends; then confirm/rollback and assert useful exact single surviving delivery and settled completion. In an isolated diagnostic copy, inspect/count the selected source requirement graph and readiness/proof traversal without injecting callbacks or changing decisions. Compare fixed distinct obligations across repetition counts and after completion; record depth/nodes/visits, not timing. A second fixed-q case must preserve q while confirming p; no growing owner set is needed. Public safety/progress assertions and structural counts serve different purposes and must both be reported.
+
+This concern was communicated to the author. Final review must recheck exact freeze; the author may change this working source before then.

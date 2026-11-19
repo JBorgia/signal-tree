@@ -1,0 +1,19 @@
+{
+  "status": "frozen-for-main-review-with-dependency-build-limit",
+  "baselineManifestSHA256": "9f14f5a476482cca596528aaed18cbf6be17122f73261e0fa047be40b641e94c",
+  "manifestSHA256": "11c093b513c2b75d82f9c4ef3c2c71970ebb66aaba722419fe351a046c3c7b88",
+  "patchSHA256": "76ab5435fe551ec17a44911a6840d6c06c25a6b326cabe5308cfd0ad66e73a19",
+  "changedPaths": [
+    "apps/react-reference/vite.config.mts",
+    "packages/react/vitest.config.ts"
+  ],
+  "unchangedBaselineFiles": 3064,
+  "projectContractsAndDependenciesEqual": true,
+  "testTargetOccurrences": 1574,
+  "archivedConfigWarnings": 0,
+  "reactTestsPassed": 94,
+  "referenceTestsPassed": 26,
+  "directReferenceBuild": "pass",
+  "ordinaryDependencyBuild": "interrupted idle react:build after output; not qualified",
+  "aliasAssertions": 7
+}

@@ -1,0 +1,33 @@
+[
+  {
+    "name": "original-gc",
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/private/tmp/st-gc-review-55rahqhd/lifecycle/gc.mjs"
+    ],
+    "exit": 1
+  },
+  {
+    "name": "current-gc",
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--expose-gc",
+      "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/lifecycle/gc.mjs"
+    ],
+    "exit": 0
+  },
+  {
+    "name": "original-27",
+    "command": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "--test",
+      "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/coordinator.test.mjs",
+      "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/review.test.mjs",
+      "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/cleanup.test.mjs",
+      "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/ag-ui.test.mjs",
+      "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/protocol/review.test.mjs"
+    ],
+    "exit": 0
+  }
+]

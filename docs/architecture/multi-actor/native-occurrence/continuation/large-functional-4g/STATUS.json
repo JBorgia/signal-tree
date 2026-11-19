@@ -1,0 +1,59 @@
+{
+  "updatedAt": "2026-11-03T18:26:04.446501+00:00",
+  "candidate": "/private/tmp/st-v16-integration-candidate",
+  "manifest": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+  "results": {
+    "graph-original": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "graph-setup-pass",
+      "workerPids": [],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 292306944,
+      "minimumObservedHostFreePercentage": 37.0
+    },
+    "original-replacement-undo-redo": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        58618
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 2795274240,
+      "minimumObservedHostFreePercentage": 32.0
+    },
+    "original-restoration-jumps": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        59352
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 1711292416,
+      "minimumObservedHostFreePercentage": 32.0
+    },
+    "original-restoration-truncation": {
+      "exit": 0,
+      "qualified": true,
+      "classification": "selected-case-pass",
+      "workerPids": [
+        59649
+      ],
+      "remainingOwned": [],
+      "sourceMismatches": [],
+      "maxObservedOwnedRssBytes": 1904017408,
+      "minimumObservedHostFreePercentage": 33.0
+    }
+  },
+  "stopped": false,
+  "heavySlot": "retained and idle",
+  "scope": "remaining3 original functional cases under newly authorized operational envelope; no cost claim",
+  "phase": "complete: three selected passes",
+  "runningSessions": [],
+  "nextCampaign": "none authorized/queued"
+}

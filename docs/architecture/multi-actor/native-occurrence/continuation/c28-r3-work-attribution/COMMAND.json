@@ -1,0 +1,25 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-work-attribution/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "entity-granular-reactivity.spec.ts",
+    "-t",
+    "a single-entity update does not rebuild the collection",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-work-attribution/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-work-attribution/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-work-attribution/nx-data",
+    "ST_WORK_ATTRIBUTION": "/private/tmp/st-c28-r3-work-attribution/observations.jsonl"
+  }
+}

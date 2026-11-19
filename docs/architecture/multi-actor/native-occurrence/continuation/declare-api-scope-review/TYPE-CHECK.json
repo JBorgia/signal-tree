@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "/Users/jonathanborgia/code/signaltree/node_modules/typescript/bin/tsc",
+    "-p",
+    "/private/tmp/st-c22-declare-api-scope-review/tsconfig.json"
+  ],
+  "exit": 0,
+  "log": "types-first.log",
+  "runtimeExecuted": false,
+  "installedPackageQualification": false
+}

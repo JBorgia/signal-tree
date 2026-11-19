@@ -1,0 +1,158 @@
+{
+  "inputs": {
+    "base": {
+      "manifest": "/private/tmp/st-native-combined-c/SNAPSHOT-C0.json",
+      "sha256": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+      "files": 2974,
+      "mismatches": []
+    },
+    "ours": {
+      "manifest": "/private/tmp/st-native-combined-c5/SNAPSHOT-C5.json",
+      "sha256": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+      "files": 2986,
+      "mismatches": []
+    },
+    "theirs": {
+      "manifest": "/private/tmp/st-shared-construction-successor/SOURCE-SHA256.json",
+      "sha256": "f63ade892aa381b827f1db54986fbb2ca787cb1bde497847104bd0a40bd9dffe",
+      "files": 2982,
+      "mismatches": []
+    }
+  },
+  "files": [
+    {
+      "file": "packages/angular/src/lib/construction-resource-cleanup.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "bcfacd2efc8e54f883d72dd3fa1fb48024a85a18cf0a51756be95ebe9315b9b6",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/angular/src/lib/keyed-construction-cleanup.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "756ed0da7a0217f1d22dfbb7239a2a7465124f9d6643ba0595b56de83a077aa7",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/construction-resource-cleanup.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "496166c0f764d338e13fa17d653143381b15044908498fa3e3731f15c0d7c501",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/dynamic-member-enrollment.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "d6b38b99a81a07b3810acf0948969ad8f95f0592bbc9aed249c646d29d9499eb",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/experimental-publication/private.ts",
+      "base": "eddf7a756dfa0b38a87a40f756341fdb63da4909f59af4aa2775425fe7623644",
+      "ours": "eddf7a756dfa0b38a87a40f756341fdb63da4909f59af4aa2775425fe7623644",
+      "theirs": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "9a210b20dde15faa909a752af33095dc68672d55808f7ab4dd8033403ce83325",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "bedf67e635d8147e13c6752a1271ec7e47f82b26a1dbb149c45ea9bf98f87a60",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/construction-allocation.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+      "base": "3cc8cb86f8bff03abbe088729aab5ac1191cd5a075d3b332b3dc34c4a0df81ee",
+      "ours": "3cc8cb86f8bff03abbe088729aab5ac1191cd5a075d3b332b3dc34c4a0df81ee",
+      "theirs": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/materialize-markers.ts",
+      "base": "226123dd8f7d42c791c773689af5d1f329c63a4079be3bba12ae4a2e00c8f016",
+      "ours": "226123dd8f7d42c791c773689af5d1f329c63a4079be3bba12ae4a2e00c8f016",
+      "theirs": "ef06b600fb9a990b03df9965b2e412bcd780a99d0daf347f314bdd429981a5f6",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/member-membership.ts",
+      "base": "bfad0d5f63050e5c774d0a903783f5472b44a9e74259e94ce5c09ff80262183b",
+      "ours": "bfad0d5f63050e5c774d0a903783f5472b44a9e74259e94ce5c09ff80262183b",
+      "theirs": "dc7cb7c8e61f57ea05784ad751fa395d6c32ed5f23bf43734787e0894b57263e",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/native-occurrence.ts",
+      "base": "421873e7534602a1328dc1d04dd3f09e80f955b66445b1d0b4044316a00773bc",
+      "ours": "421873e7534602a1328dc1d04dd3f09e80f955b66445b1d0b4044316a00773bc",
+      "theirs": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+      "base": "eaa9850c22851a0d8887e9f69060e8724f2b7c6f12d577d847439ee3cfc4ada4",
+      "ours": "eaa9850c22851a0d8887e9f69060e8724f2b7c6f12d577d847439ee3cfc4ada4",
+      "theirs": "76e8d645a8652ab9528cde87547c45623ca73ff146451cc39f2773c14a01bf5e",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/owned-mutation.ts",
+      "base": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+      "ours": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+      "theirs": "fee66b9718415de7466a9e8427f9d37d731715584037b668750a9d72205541ef",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/position-registry.ts",
+      "base": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6",
+      "ours": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6",
+      "theirs": "205a6893bee3c03ae3d100848a2faa3e9f42fc8f42f4aaefc344ee9bbd5059eb",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+      "base": "e900f7ab3d50eb89f5776ade9c653885301bbad298c4853a90d6d06d511983f5",
+      "ours": "e900f7ab3d50eb89f5776ade9c653885301bbad298c4853a90d6d06d511983f5",
+      "theirs": "af7ec0a4ea50235c7cf93831bc154b64cb4b6cf5f82b5ad335916f06ba56012c",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+      "base": "ebff3a34de705f308cb7822d842bdd0afcb3fbb516cd6dd9e89b8f1933d09469",
+      "ours": "ebff3a34de705f308cb7822d842bdd0afcb3fbb516cd6dd9e89b8f1933d09469",
+      "theirs": "f26908891177e9c6cbab9231976f954ea96ce50ae2875c8bb7ada43487c11a9a",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts",
+      "base": null,
+      "ours": null,
+      "theirs": "12ed2c3209d879088aca8731722f29ca9ab503cdeed6621f6cf8375f37f3fd52",
+      "method": "base-equals-ours"
+    },
+    {
+      "file": "packages/kernel/src/lib/signal-tree.ts",
+      "base": "37dc00b8e926b369c05a561a39cef94d3040532d287395dda3737b2006fa53b5",
+      "ours": "37dc00b8e926b369c05a561a39cef94d3040532d287395dda3737b2006fa53b5",
+      "theirs": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "method": "base-equals-ours"
+    }
+  ],
+  "conflicts": []
+}

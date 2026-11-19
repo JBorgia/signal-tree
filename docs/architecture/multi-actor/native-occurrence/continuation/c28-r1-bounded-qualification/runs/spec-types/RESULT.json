@@ -1,0 +1,10 @@
+{
+  "name": "spec-types",
+  "exit": 1,
+  "timeout": false,
+  "elapsedSeconds": 13.27437491598539,
+  "attempts": 1,
+  "sourceMismatches": [],
+  "ownedGroupPresent": false,
+  "manifest": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b"
+}

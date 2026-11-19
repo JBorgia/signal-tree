@@ -1,0 +1,223 @@
+{
+  "manifest": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "layers": [
+    {
+      "path": "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/link-commit-ordering.spec.ts",
+      "kind": "reviewed-test-correction",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+      "kind": "reviewed-bounded-disposition-index",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/dynamic-admission-minimal.spec.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/owned-mutation.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/initializer-attachment-independent.spec.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/initializer-owned-cleanup.spec.ts",
+      "kind": "reviewed-dynamic-admission-and-owned-cleanup",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": false
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": false
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/scalar-admission-metadata.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts",
+      "kind": "reviewed-realization-metadata-three-way-composition",
+      "sourceHashMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/scalar-responsibility-attachment.ts",
+      "kind": "composition-required-exact-mutation-metadata-forwarding",
+      "sourceHashMatches": null
+    }
+  ],
+  "metadataManifest": "0ececc2f73a615ecebe88b0d44113cae7555ba1d19beefc4cc53c4acfa1c1061",
+  "reconstructedMerges": [
+    {
+      "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "importConflictsResolved": 1,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+      "importConflictsResolved": 1,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/scalar-admission-metadata.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+      "importConflictsResolved": 0,
+      "exactMatch": true
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+
+> nx run kernel:test branch-omission-correctness.spec.ts --testNamePattern=whole-value plain-object omission correctness an omission does not carry an unchanged inspection-only sibling to Link --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts --testNamePattern="whole-value plain-object omission correctness an omission does not carry an unchanged inspection-only sibling to Link" --reporter=verbose --maxWorkers=1
+
+(node:38163) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38316) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:38484) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > supplied undefined replaces retained storage after omission (bare)
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > supplied undefined replaces retained storage after omission (causal)
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > observes an omission-only replacement without fabricating an undefined leaf write
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > a branch Link receives the actual complete replacement: omission only
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > a branch Link receives the actual complete replacement: sibling also changes
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > a bare membership event names its retained owner and distinguishes present undefined
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > literal dotted and nested branch owners remain distinct (bare)
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > literal dotted and nested branch owners remain distinct (causal)
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > an empty branch key and literal dotted member use their actual segments
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > Link distinguishes an omitted undefined member from an explicitly present undefined
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends present at Link
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > nested omission reaches the root Link without touching another tree
+ ✓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > an omission does not carry an unchanged inspection-only sibling to Link 10ms
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > inspection-only omission does not hitchhike on a later eligible leaf write
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > a transaction holds omission egress until confirmation
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > explicit rollback restores the optional member: omission only
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > explicit rollback restores the optional member: sibling also changes
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > automatic rollback restores the omitted member and preserves the thrown error
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > undo/redo restores membership as well as values through a value call
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > undo/redo restores membership as well as values through a updater call
+ ↓ src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > undo/redo restores membership as well as values through a root call
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership replay composition > rollback restores the original value after remove and reacquire (8)
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership replay composition > rollback restores the original value after remove and reacquire (undefined)
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership replay composition > undo/redo composes remove and reacquire (8)
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership replay composition > undo/redo composes remove and reacquire (undefined)
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership replay composition > undo restores a present undefined member without inventing a value
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership replay composition > undo restores an omitted branch with a literal set child
+ ↓ src/lib/branch-omission-correctness.spec.ts > rollback retains the original scalar baseline when a later replacement omits it
+ ↓ src/lib/branch-omission-correctness.spec.ts > historical snapshots materialize member presence instead of internal endpoints
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership public history values > confirmed omission exposes raw values and explicit presence (42)
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership public history values > confirmed omission exposes raw values and explicit presence (undefined)
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership public history values > confirmed branch omission contains only the application branch value
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership public history values > confirmed reintroduction contains the current nested application value
+ ↓ src/lib/branch-omission-correctness.spec.ts > plain-branch membership public history values > historical snapshots preserve present undefined across omission and reintroduction
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 34 skipped (35)
+   Start at  16:40:33
+   Duration  1.19s (transform 676ms, setup 0ms, import 839ms, tests 12ms, environment 213ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.8s

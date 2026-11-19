@@ -1,0 +1,14 @@
+{
+  "files": {
+    "001-nx.log": "77ac77876c5ac51fd1a352a6b093ce69fcd7c7195c2bd77016986a3a35c1129d",
+    "FROZEN-SOURCE-SHA256.json": "80a0116269b26af939f775b9a10ff8a79d99b6e9b556a17b05137ab5e3f67502",
+    "NARROW-MECHANISM-CHECK.md": "d9654b2006eb38e25ac64b47c6493e45c66b94e39843c324f34f229b6a7196d5",
+    "PREREGISTERED.md": "be535e54a13ecb2d301f834a903f0099b83e110f0fca701ee3e0d996dd714d9d",
+    "RESULTS.md": "77cfc0c0c8a7b202f9cf0fd333e0a8cfc6292d373a3fe9905f87fdc57337569b",
+    "VERIFICATION.json": "0cf4c663f7d081b725d3ceafc47df7a89fe508981c0895e5a340605b29461d94",
+    "fixture.spec.ts": "80fe4212b8eb9295cbcb2a971f15598f2c75d1605e3bf711597ed0e8d2bac813",
+    "observations.jsonl": "2387434e9a4e0893a10d71ce06e7895d257b4a805fc7954d9b5a57e1a2c028bb",
+    "verify.py": "1b3b37d766ac8201cb83cad358408891cdf1373b8ada3fe4cbdf7ea89dc48359"
+  },
+  "status": "unchanged-source observations and narrow mechanism check request; no runtime repair"
+}

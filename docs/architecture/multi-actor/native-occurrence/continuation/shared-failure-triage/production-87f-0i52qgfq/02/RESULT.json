@@ -1,0 +1,15 @@
+{
+  "number": 2,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "fullName": "opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 19 skipped (20)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 3.5724899768829346
+}

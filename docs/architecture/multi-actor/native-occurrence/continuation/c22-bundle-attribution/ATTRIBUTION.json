@@ -1,0 +1,1742 @@
+{
+  "1": {
+    "baseline": {
+      "gzipBytes": 12660,
+      "minifiedBytes": 37464,
+      "contributions": {
+        "lib/internals/error-reporter.js": 996,
+        "lib/internals/cell-identity.js": 192,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 89,
+        "lib/internals/intrinsic-mutation.js": 1011,
+        "lib/internals/location-runtime.js": 3617,
+        "lib/constants.js": 365,
+        "enhancers/index.js": 1398,
+        "lib/internals/node-shape.js": 282,
+        "lib/internals/owned-metadata.js": 221,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/snapshot-authority.js": 604,
+        "lib/internals/tree-scalar-slot-port.js": 170,
+        "lib/internals/member-membership.js": 3212,
+        "lib/write-context.js": 31,
+        "lib/internals/owned-mutation.js": 1260,
+        "lib/internals/position-registry.js": 940,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 2124,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/mutation-capture-runtime.js": 745,
+        "lib/internals/tree-scalar-slot-runtime.js": 2863,
+        "lib/internals/tree-scalar-leaf-runtime.js": 1537,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/utilities/is-built-in-object.js": 1074,
+        "lib/utils.js": 1388,
+        "lib/internals/merge-derived.js": 580,
+        "lib/enhancer-types.js": 42,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/signal-tree.js": 8939,
+        "index.js": 0,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-bare.js": 121
+      },
+      "experimentalParsed": [],
+      "experimentalRetained": []
+    },
+    "C22": {
+      "gzipBytes": 17951,
+      "minifiedBytes": 53782,
+      "contributions": {
+        "lib/internals/node-shape.js": 282,
+        "lib/internals/position-registry.js": 1210,
+        "lib/internals/construction-allocation.js": 650,
+        "lib/internals/intrinsic-mutation.js": 2858,
+        "lib/internals/entity-publication.js": 227,
+        "lib/internals/native-occurrence.js": 2105,
+        "lib/internals/snapshot-installation.js": 253,
+        "lib/internals/cell-identity.js": 193,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 89,
+        "lib/internals/error-reporter.js": 995,
+        "lib/internals/location-runtime.js": 4697,
+        "lib/constants.js": 365,
+        "enhancers/index.js": 1398,
+        "lib/write-context.js": 30,
+        "lib/internals/publication-preparation.js": 411,
+        "lib/internals/tree-scalar-slot-runtime.js": 4330,
+        "lib/internals/scalar-publication-coverage.js": 125,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/snapshot-authority.js": 1122,
+        "lib/internals/utilities/is-built-in-object.js": 1074,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/owned-metadata.js": 222,
+        "lib/internals/owned-mutation.js": 1335,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 3270,
+        "lib/utils.js": 1417,
+        "lib/internals/tree-scalar-slot-port.js": 171,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/internals/plain-branch-membership.js": 519,
+        "lib/internals/mutation-capture-runtime.js": 1249,
+        "lib/internals/member-membership.js": 6416,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/tree-scalar-leaf-runtime.js": 2357,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/merge-derived.js": 581,
+        "lib/enhancer-types.js": 42,
+        "lib/signal-tree.js": 10005,
+        "index.js": 0,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-bare.js": 121
+      },
+      "experimentalParsed": [
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/recipient-occurrence.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/projection.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/private.js"
+      ],
+      "experimentalRetained": []
+    },
+    "delta": [
+      {
+        "module": "lib/internals/member-membership.js",
+        "baseline": 3212,
+        "C22": 6416,
+        "delta": 3204
+      },
+      {
+        "module": "lib/internals/native-occurrence.js",
+        "baseline": 0,
+        "C22": 2105,
+        "delta": 2105
+      },
+      {
+        "module": "lib/internals/intrinsic-mutation.js",
+        "baseline": 1011,
+        "C22": 2858,
+        "delta": 1847
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-runtime.js",
+        "baseline": 2863,
+        "C22": 4330,
+        "delta": 1467
+      },
+      {
+        "module": "lib/internals/materialize-markers.js",
+        "baseline": 2124,
+        "C22": 3270,
+        "delta": 1146
+      },
+      {
+        "module": "lib/internals/location-runtime.js",
+        "baseline": 3617,
+        "C22": 4697,
+        "delta": 1080
+      },
+      {
+        "module": "lib/signal-tree.js",
+        "baseline": 8939,
+        "C22": 10005,
+        "delta": 1066
+      },
+      {
+        "module": "lib/internals/tree-scalar-leaf-runtime.js",
+        "baseline": 1537,
+        "C22": 2357,
+        "delta": 820
+      },
+      {
+        "module": "lib/internals/construction-allocation.js",
+        "baseline": 0,
+        "C22": 650,
+        "delta": 650
+      },
+      {
+        "module": "lib/internals/plain-branch-membership.js",
+        "baseline": 0,
+        "C22": 519,
+        "delta": 519
+      },
+      {
+        "module": "lib/internals/snapshot-authority.js",
+        "baseline": 604,
+        "C22": 1122,
+        "delta": 518
+      },
+      {
+        "module": "lib/internals/mutation-capture-runtime.js",
+        "baseline": 745,
+        "C22": 1249,
+        "delta": 504
+      },
+      {
+        "module": "lib/internals/publication-preparation.js",
+        "baseline": 0,
+        "C22": 411,
+        "delta": 411
+      },
+      {
+        "module": "lib/internals/position-registry.js",
+        "baseline": 940,
+        "C22": 1210,
+        "delta": 270
+      },
+      {
+        "module": "lib/internals/snapshot-installation.js",
+        "baseline": 0,
+        "C22": 253,
+        "delta": 253
+      },
+      {
+        "module": "lib/internals/entity-publication.js",
+        "baseline": 0,
+        "C22": 227,
+        "delta": 227
+      },
+      {
+        "module": "lib/internals/scalar-publication-coverage.js",
+        "baseline": 0,
+        "C22": 125,
+        "delta": 125
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-bare.js",
+        "baseline": 0,
+        "C22": 121,
+        "delta": 121
+      },
+      {
+        "module": "lib/internals/owned-mutation.js",
+        "baseline": 1260,
+        "C22": 1335,
+        "delta": 75
+      },
+      {
+        "module": "lib/utils.js",
+        "baseline": 1388,
+        "C22": 1417,
+        "delta": 29
+      },
+      {
+        "module": "lib/internals/cell-identity.js",
+        "baseline": 192,
+        "C22": 193,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/owned-metadata.js",
+        "baseline": 221,
+        "C22": 222,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-port.js",
+        "baseline": 170,
+        "C22": 171,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/merge-derived.js",
+        "baseline": 580,
+        "C22": 581,
+        "delta": 1
+      },
+      {
+        "module": "lib/leaf.js",
+        "baseline": 297,
+        "C22": 297,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-adapter.js",
+        "baseline": 89,
+        "C22": 89,
+        "delta": 0
+      },
+      {
+        "module": "lib/constants.js",
+        "baseline": 365,
+        "C22": 365,
+        "delta": 0
+      },
+      {
+        "module": "enhancers/index.js",
+        "baseline": 1398,
+        "C22": 1398,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/node-shape.js",
+        "baseline": 282,
+        "C22": 282,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/owner-invalidation-port.js",
+        "baseline": 97,
+        "C22": 97,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/path-observation-port.js",
+        "baseline": 223,
+        "C22": 223,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/runtime-tree-plan.js",
+        "baseline": 143,
+        "C22": 143,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-substrate.js",
+        "baseline": 190,
+        "C22": 190,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/root-source.js",
+        "baseline": 48,
+        "C22": 48,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/physical-commit-clock.js",
+        "baseline": 213,
+        "C22": 213,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/tree-capabilities.js",
+        "baseline": 934,
+        "C22": 934,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/is-built-in-object.js",
+        "baseline": 1074,
+        "C22": 1074,
+        "delta": 0
+      },
+      {
+        "module": "lib/enhancer-types.js",
+        "baseline": 42,
+        "C22": 42,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/deep-equal.js",
+        "baseline": 1517,
+        "C22": 1517,
+        "delta": 0
+      },
+      {
+        "module": "index.js",
+        "baseline": 0,
+        "C22": 0,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/error-reporter.js",
+        "baseline": 996,
+        "C22": 995,
+        "delta": -1
+      },
+      {
+        "module": "lib/write-context.js",
+        "baseline": 31,
+        "C22": 30,
+        "delta": -1
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-bare.js",
+        "baseline": 121,
+        "C22": 0,
+        "delta": -121
+      }
+    ]
+  },
+  "2": {
+    "baseline": {
+      "gzipBytes": 15094,
+      "minifiedBytes": 44112,
+      "contributions": {
+        "lib/internals/error-reporter.js": 1208,
+        "lib/internals/cell-identity.js": 192,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 89,
+        "lib/internals/intrinsic-mutation.js": 1011,
+        "lib/internals/location-runtime.js": 3617,
+        "lib/constants.js": 399,
+        "enhancers/index.js": 1398,
+        "lib/internals/node-shape.js": 282,
+        "lib/internals/owned-metadata.js": 221,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/snapshot-authority.js": 700,
+        "lib/internals/tree-scalar-slot-port.js": 170,
+        "lib/internals/member-membership.js": 3440,
+        "lib/write-context.js": 31,
+        "lib/internals/owned-mutation.js": 1260,
+        "lib/internals/position-registry.js": 940,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 2839,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/mutation-capture-runtime.js": 745,
+        "lib/internals/tree-scalar-slot-runtime.js": 2863,
+        "lib/internals/tree-scalar-leaf-runtime.js": 1537,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/utilities/is-built-in-object.js": 1074,
+        "lib/utils.js": 1649,
+        "lib/internals/merge-derived.js": 998,
+        "lib/enhancer-types.js": 42,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/signal-tree.js": 13623,
+        "index.js": 0,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-bare.js": 121
+      },
+      "experimentalParsed": [],
+      "experimentalRetained": []
+    },
+    "C22": {
+      "gzipBytes": 20355,
+      "minifiedBytes": 60500,
+      "contributions": {
+        "lib/internals/node-shape.js": 282,
+        "lib/internals/position-registry.js": 1210,
+        "lib/internals/construction-allocation.js": 650,
+        "lib/internals/intrinsic-mutation.js": 2858,
+        "lib/internals/entity-publication.js": 227,
+        "lib/internals/native-occurrence.js": 2105,
+        "lib/internals/snapshot-installation.js": 253,
+        "lib/internals/cell-identity.js": 193,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 89,
+        "lib/internals/error-reporter.js": 1207,
+        "lib/internals/location-runtime.js": 4697,
+        "lib/constants.js": 399,
+        "enhancers/index.js": 1398,
+        "lib/write-context.js": 30,
+        "lib/internals/publication-preparation.js": 411,
+        "lib/internals/tree-scalar-slot-runtime.js": 4330,
+        "lib/internals/scalar-publication-coverage.js": 125,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/snapshot-authority.js": 1284,
+        "lib/internals/utilities/is-built-in-object.js": 1074,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/owned-metadata.js": 222,
+        "lib/internals/owned-mutation.js": 1335,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 3985,
+        "lib/utils.js": 1678,
+        "lib/internals/tree-scalar-slot-port.js": 171,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/internals/plain-branch-membership.js": 519,
+        "lib/internals/mutation-capture-runtime.js": 1249,
+        "lib/internals/member-membership.js": 6648,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/tree-scalar-leaf-runtime.js": 2357,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/merge-derived.js": 999,
+        "lib/enhancer-types.js": 42,
+        "lib/signal-tree.js": 14689,
+        "index.js": 0,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-bare.js": 121
+      },
+      "experimentalParsed": [
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/recipient-occurrence.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/projection.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/private.js"
+      ],
+      "experimentalRetained": []
+    },
+    "delta": [
+      {
+        "module": "lib/internals/member-membership.js",
+        "baseline": 3440,
+        "C22": 6648,
+        "delta": 3208
+      },
+      {
+        "module": "lib/internals/native-occurrence.js",
+        "baseline": 0,
+        "C22": 2105,
+        "delta": 2105
+      },
+      {
+        "module": "lib/internals/intrinsic-mutation.js",
+        "baseline": 1011,
+        "C22": 2858,
+        "delta": 1847
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-runtime.js",
+        "baseline": 2863,
+        "C22": 4330,
+        "delta": 1467
+      },
+      {
+        "module": "lib/internals/materialize-markers.js",
+        "baseline": 2839,
+        "C22": 3985,
+        "delta": 1146
+      },
+      {
+        "module": "lib/internals/location-runtime.js",
+        "baseline": 3617,
+        "C22": 4697,
+        "delta": 1080
+      },
+      {
+        "module": "lib/signal-tree.js",
+        "baseline": 13623,
+        "C22": 14689,
+        "delta": 1066
+      },
+      {
+        "module": "lib/internals/tree-scalar-leaf-runtime.js",
+        "baseline": 1537,
+        "C22": 2357,
+        "delta": 820
+      },
+      {
+        "module": "lib/internals/construction-allocation.js",
+        "baseline": 0,
+        "C22": 650,
+        "delta": 650
+      },
+      {
+        "module": "lib/internals/snapshot-authority.js",
+        "baseline": 700,
+        "C22": 1284,
+        "delta": 584
+      },
+      {
+        "module": "lib/internals/plain-branch-membership.js",
+        "baseline": 0,
+        "C22": 519,
+        "delta": 519
+      },
+      {
+        "module": "lib/internals/mutation-capture-runtime.js",
+        "baseline": 745,
+        "C22": 1249,
+        "delta": 504
+      },
+      {
+        "module": "lib/internals/publication-preparation.js",
+        "baseline": 0,
+        "C22": 411,
+        "delta": 411
+      },
+      {
+        "module": "lib/internals/position-registry.js",
+        "baseline": 940,
+        "C22": 1210,
+        "delta": 270
+      },
+      {
+        "module": "lib/internals/snapshot-installation.js",
+        "baseline": 0,
+        "C22": 253,
+        "delta": 253
+      },
+      {
+        "module": "lib/internals/entity-publication.js",
+        "baseline": 0,
+        "C22": 227,
+        "delta": 227
+      },
+      {
+        "module": "lib/internals/scalar-publication-coverage.js",
+        "baseline": 0,
+        "C22": 125,
+        "delta": 125
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-bare.js",
+        "baseline": 0,
+        "C22": 121,
+        "delta": 121
+      },
+      {
+        "module": "lib/internals/owned-mutation.js",
+        "baseline": 1260,
+        "C22": 1335,
+        "delta": 75
+      },
+      {
+        "module": "lib/utils.js",
+        "baseline": 1649,
+        "C22": 1678,
+        "delta": 29
+      },
+      {
+        "module": "lib/internals/cell-identity.js",
+        "baseline": 192,
+        "C22": 193,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/owned-metadata.js",
+        "baseline": 221,
+        "C22": 222,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-port.js",
+        "baseline": 170,
+        "C22": 171,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/merge-derived.js",
+        "baseline": 998,
+        "C22": 999,
+        "delta": 1
+      },
+      {
+        "module": "lib/leaf.js",
+        "baseline": 297,
+        "C22": 297,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-adapter.js",
+        "baseline": 89,
+        "C22": 89,
+        "delta": 0
+      },
+      {
+        "module": "lib/constants.js",
+        "baseline": 399,
+        "C22": 399,
+        "delta": 0
+      },
+      {
+        "module": "enhancers/index.js",
+        "baseline": 1398,
+        "C22": 1398,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/node-shape.js",
+        "baseline": 282,
+        "C22": 282,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/owner-invalidation-port.js",
+        "baseline": 97,
+        "C22": 97,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/path-observation-port.js",
+        "baseline": 223,
+        "C22": 223,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/runtime-tree-plan.js",
+        "baseline": 143,
+        "C22": 143,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-substrate.js",
+        "baseline": 190,
+        "C22": 190,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/root-source.js",
+        "baseline": 48,
+        "C22": 48,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/physical-commit-clock.js",
+        "baseline": 213,
+        "C22": 213,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/tree-capabilities.js",
+        "baseline": 934,
+        "C22": 934,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/is-built-in-object.js",
+        "baseline": 1074,
+        "C22": 1074,
+        "delta": 0
+      },
+      {
+        "module": "lib/enhancer-types.js",
+        "baseline": 42,
+        "C22": 42,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/deep-equal.js",
+        "baseline": 1517,
+        "C22": 1517,
+        "delta": 0
+      },
+      {
+        "module": "index.js",
+        "baseline": 0,
+        "C22": 0,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/error-reporter.js",
+        "baseline": 1208,
+        "C22": 1207,
+        "delta": -1
+      },
+      {
+        "module": "lib/write-context.js",
+        "baseline": 31,
+        "C22": 30,
+        "delta": -1
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-bare.js",
+        "baseline": 121,
+        "C22": 0,
+        "delta": -121
+      }
+    ]
+  },
+  "3": {
+    "baseline": {
+      "gzipBytes": 26898,
+      "minifiedBytes": 88763,
+      "contributions": {
+        "lib/internals/error-reporter.js": 996,
+        "lib/internals/cell-identity.js": 193,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 90,
+        "lib/internals/intrinsic-mutation.js": 1011,
+        "lib/internals/location-runtime.js": 4228,
+        "lib/constants.js": 365,
+        "enhancers/index.js": 1398,
+        "lib/internals/node-shape.js": 285,
+        "lib/internals/owned-metadata.js": 222,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/snapshot-authority.js": 616,
+        "lib/internals/tree-scalar-slot-port.js": 171,
+        "lib/internals/member-membership.js": 3229,
+        "lib/write-context.js": 31,
+        "lib/internals/owned-mutation.js": 1264,
+        "lib/internals/position-registry.js": 978,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 2621,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/mutation-capture-runtime.js": 745,
+        "lib/internals/tree-scalar-slot-runtime.js": 2863,
+        "lib/internals/tree-scalar-leaf-runtime.js": 1539,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/utilities/is-built-in-object.js": 1075,
+        "lib/utils.js": 1469,
+        "lib/internals/merge-derived.js": 581,
+        "lib/enhancer-types.js": 42,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/signal-tree.js": 9006,
+        "index.js": 0,
+        "lib/internals/entity-projection-seed.js": 235,
+        "lib/internals/entity-membership-source.js": 126,
+        "lib/internals/physical-rows.js": 23,
+        "lib/internals/utilities/deep-clone.js": 1182,
+        "lib/physical/entity-mutation-frame.js": 2578,
+        "lib/physical/entity-handle-resolution.js": 230,
+        "lib/physical/entity-value-store.js": 480,
+        "lib/physical/structural-store.js": 7431,
+        "lib/entity-signal.js": 35877,
+        "lib/markers/entity-map.js": 1783,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js": 137
+      },
+      "experimentalParsed": [],
+      "experimentalRetained": []
+    },
+    "C22": {
+      "gzipBytes": 44366,
+      "minifiedBytes": 147808,
+      "contributions": {
+        "lib/internals/node-shape.js": 287,
+        "lib/internals/position-registry.js": 1215,
+        "lib/internals/construction-allocation.js": 650,
+        "lib/internals/intrinsic-mutation.js": 2862,
+        "lib/internals/entity-publication.js": 5950,
+        "lib/internals/native-occurrence.js": 2115,
+        "lib/internals/snapshot-installation.js": 257,
+        "lib/internals/selected-write-operation.js": 171,
+        "lib/internals/cell-identity.js": 193,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 90,
+        "lib/internals/error-reporter.js": 996,
+        "lib/internals/location-runtime.js": 5505,
+        "lib/constants.js": 365,
+        "enhancers/index.js": 1398,
+        "lib/write-context.js": 31,
+        "lib/internals/publication-preparation.js": 411,
+        "lib/internals/tree-scalar-slot-runtime.js": 4410,
+        "lib/internals/scalar-publication-coverage.js": 125,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/snapshot-authority.js": 1127,
+        "lib/internals/utilities/is-built-in-object.js": 1075,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/owned-metadata.js": 224,
+        "lib/internals/owned-mutation.js": 1338,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 3782,
+        "lib/utils.js": 1504,
+        "lib/internals/tree-scalar-slot-port.js": 172,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/internals/plain-branch-membership.js": 522,
+        "lib/internals/mutation-capture-runtime.js": 1253,
+        "lib/internals/member-membership.js": 6484,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/tree-scalar-leaf-runtime.js": 2359,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/merge-derived.js": 581,
+        "lib/enhancer-types.js": 42,
+        "lib/signal-tree.js": 10085,
+        "index.js": 0,
+        "lib/internals/entity-value-transition.js": 188,
+        "lib/internals/selected-entity-disposition.js": 98,
+        "lib/internals/entity-projection-seed.js": 235,
+        "lib/internals/entity-membership-source.js": 210,
+        "lib/internals/physical-rows.js": 23,
+        "lib/internals/causal-runtime/ordinary-realization.js": 51,
+        "lib/internals/utilities/deep-clone.js": 1182,
+        "lib/physical/order-restores-for-placement.js": 935,
+        "lib/physical/ordinary-restoration-placement.js": 743,
+        "lib/physical/ordinary-key-evidence.js": 232,
+        "lib/physical/prepared-placement-visibility.js": 1498,
+        "lib/physical/entity-placement-stage.js": 1982,
+        "lib/physical/entity-ordinary-topology.js": 1820,
+        "lib/physical/entity-mutation-frame.js": 5322,
+        "lib/physical/entity-handle-resolution.js": 230,
+        "lib/physical/entity-value-store.js": 2561,
+        "lib/physical/structural-store.js": 8286,
+        "lib/entity-signal.js": 59009,
+        "lib/markers/entity-map.js": 1824,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-entities.js": 137
+      },
+      "experimentalParsed": [
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/recipient-occurrence.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/projection.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/private.js"
+      ],
+      "experimentalRetained": []
+    },
+    "delta": [
+      {
+        "module": "lib/entity-signal.js",
+        "baseline": 35877,
+        "C22": 59009,
+        "delta": 23132
+      },
+      {
+        "module": "lib/internals/entity-publication.js",
+        "baseline": 0,
+        "C22": 5950,
+        "delta": 5950
+      },
+      {
+        "module": "lib/internals/member-membership.js",
+        "baseline": 3229,
+        "C22": 6484,
+        "delta": 3255
+      },
+      {
+        "module": "lib/physical/entity-mutation-frame.js",
+        "baseline": 2578,
+        "C22": 5322,
+        "delta": 2744
+      },
+      {
+        "module": "lib/internals/native-occurrence.js",
+        "baseline": 0,
+        "C22": 2115,
+        "delta": 2115
+      },
+      {
+        "module": "lib/physical/entity-value-store.js",
+        "baseline": 480,
+        "C22": 2561,
+        "delta": 2081
+      },
+      {
+        "module": "lib/physical/entity-placement-stage.js",
+        "baseline": 0,
+        "C22": 1982,
+        "delta": 1982
+      },
+      {
+        "module": "lib/internals/intrinsic-mutation.js",
+        "baseline": 1011,
+        "C22": 2862,
+        "delta": 1851
+      },
+      {
+        "module": "lib/physical/entity-ordinary-topology.js",
+        "baseline": 0,
+        "C22": 1820,
+        "delta": 1820
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-runtime.js",
+        "baseline": 2863,
+        "C22": 4410,
+        "delta": 1547
+      },
+      {
+        "module": "lib/physical/prepared-placement-visibility.js",
+        "baseline": 0,
+        "C22": 1498,
+        "delta": 1498
+      },
+      {
+        "module": "lib/internals/location-runtime.js",
+        "baseline": 4228,
+        "C22": 5505,
+        "delta": 1277
+      },
+      {
+        "module": "lib/internals/materialize-markers.js",
+        "baseline": 2621,
+        "C22": 3782,
+        "delta": 1161
+      },
+      {
+        "module": "lib/signal-tree.js",
+        "baseline": 9006,
+        "C22": 10085,
+        "delta": 1079
+      },
+      {
+        "module": "lib/physical/order-restores-for-placement.js",
+        "baseline": 0,
+        "C22": 935,
+        "delta": 935
+      },
+      {
+        "module": "lib/physical/structural-store.js",
+        "baseline": 7431,
+        "C22": 8286,
+        "delta": 855
+      },
+      {
+        "module": "lib/internals/tree-scalar-leaf-runtime.js",
+        "baseline": 1539,
+        "C22": 2359,
+        "delta": 820
+      },
+      {
+        "module": "lib/physical/ordinary-restoration-placement.js",
+        "baseline": 0,
+        "C22": 743,
+        "delta": 743
+      },
+      {
+        "module": "lib/internals/construction-allocation.js",
+        "baseline": 0,
+        "C22": 650,
+        "delta": 650
+      },
+      {
+        "module": "lib/internals/plain-branch-membership.js",
+        "baseline": 0,
+        "C22": 522,
+        "delta": 522
+      },
+      {
+        "module": "lib/internals/snapshot-authority.js",
+        "baseline": 616,
+        "C22": 1127,
+        "delta": 511
+      },
+      {
+        "module": "lib/internals/mutation-capture-runtime.js",
+        "baseline": 745,
+        "C22": 1253,
+        "delta": 508
+      },
+      {
+        "module": "lib/internals/publication-preparation.js",
+        "baseline": 0,
+        "C22": 411,
+        "delta": 411
+      },
+      {
+        "module": "lib/internals/snapshot-installation.js",
+        "baseline": 0,
+        "C22": 257,
+        "delta": 257
+      },
+      {
+        "module": "lib/internals/position-registry.js",
+        "baseline": 978,
+        "C22": 1215,
+        "delta": 237
+      },
+      {
+        "module": "lib/physical/ordinary-key-evidence.js",
+        "baseline": 0,
+        "C22": 232,
+        "delta": 232
+      },
+      {
+        "module": "lib/internals/entity-value-transition.js",
+        "baseline": 0,
+        "C22": 188,
+        "delta": 188
+      },
+      {
+        "module": "lib/internals/selected-write-operation.js",
+        "baseline": 0,
+        "C22": 171,
+        "delta": 171
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-entities.js",
+        "baseline": 0,
+        "C22": 137,
+        "delta": 137
+      },
+      {
+        "module": "lib/internals/scalar-publication-coverage.js",
+        "baseline": 0,
+        "C22": 125,
+        "delta": 125
+      },
+      {
+        "module": "lib/internals/selected-entity-disposition.js",
+        "baseline": 0,
+        "C22": 98,
+        "delta": 98
+      },
+      {
+        "module": "lib/internals/entity-membership-source.js",
+        "baseline": 126,
+        "C22": 210,
+        "delta": 84
+      },
+      {
+        "module": "lib/internals/owned-mutation.js",
+        "baseline": 1264,
+        "C22": 1338,
+        "delta": 74
+      },
+      {
+        "module": "lib/internals/causal-runtime/ordinary-realization.js",
+        "baseline": 0,
+        "C22": 51,
+        "delta": 51
+      },
+      {
+        "module": "lib/markers/entity-map.js",
+        "baseline": 1783,
+        "C22": 1824,
+        "delta": 41
+      },
+      {
+        "module": "lib/utils.js",
+        "baseline": 1469,
+        "C22": 1504,
+        "delta": 35
+      },
+      {
+        "module": "lib/internals/node-shape.js",
+        "baseline": 285,
+        "C22": 287,
+        "delta": 2
+      },
+      {
+        "module": "lib/internals/owned-metadata.js",
+        "baseline": 222,
+        "C22": 224,
+        "delta": 2
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-port.js",
+        "baseline": 171,
+        "C22": 172,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/error-reporter.js",
+        "baseline": 996,
+        "C22": 996,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/cell-identity.js",
+        "baseline": 193,
+        "C22": 193,
+        "delta": 0
+      },
+      {
+        "module": "lib/leaf.js",
+        "baseline": 297,
+        "C22": 297,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-adapter.js",
+        "baseline": 90,
+        "C22": 90,
+        "delta": 0
+      },
+      {
+        "module": "lib/constants.js",
+        "baseline": 365,
+        "C22": 365,
+        "delta": 0
+      },
+      {
+        "module": "enhancers/index.js",
+        "baseline": 1398,
+        "C22": 1398,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/owner-invalidation-port.js",
+        "baseline": 97,
+        "C22": 97,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/path-observation-port.js",
+        "baseline": 223,
+        "C22": 223,
+        "delta": 0
+      },
+      {
+        "module": "lib/write-context.js",
+        "baseline": 31,
+        "C22": 31,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/runtime-tree-plan.js",
+        "baseline": 143,
+        "C22": 143,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-substrate.js",
+        "baseline": 190,
+        "C22": 190,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/root-source.js",
+        "baseline": 48,
+        "C22": 48,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/physical-commit-clock.js",
+        "baseline": 213,
+        "C22": 213,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/tree-capabilities.js",
+        "baseline": 934,
+        "C22": 934,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/is-built-in-object.js",
+        "baseline": 1075,
+        "C22": 1075,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/merge-derived.js",
+        "baseline": 581,
+        "C22": 581,
+        "delta": 0
+      },
+      {
+        "module": "lib/enhancer-types.js",
+        "baseline": 42,
+        "C22": 42,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/deep-equal.js",
+        "baseline": 1517,
+        "C22": 1517,
+        "delta": 0
+      },
+      {
+        "module": "index.js",
+        "baseline": 0,
+        "C22": 0,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/entity-projection-seed.js",
+        "baseline": 235,
+        "C22": 235,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/physical-rows.js",
+        "baseline": 23,
+        "C22": 23,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/deep-clone.js",
+        "baseline": 1182,
+        "C22": 1182,
+        "delta": 0
+      },
+      {
+        "module": "lib/physical/entity-handle-resolution.js",
+        "baseline": 230,
+        "C22": 230,
+        "delta": 0
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js",
+        "baseline": 137,
+        "C22": 0,
+        "delta": -137
+      }
+    ]
+  },
+  "4": {
+    "baseline": {
+      "gzipBytes": 29750,
+      "minifiedBytes": 96732,
+      "contributions": {
+        "lib/internals/error-reporter.js": 1208,
+        "lib/internals/cell-identity.js": 193,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 90,
+        "lib/internals/intrinsic-mutation.js": 1011,
+        "lib/internals/location-runtime.js": 4228,
+        "lib/constants.js": 399,
+        "enhancers/index.js": 1398,
+        "lib/internals/node-shape.js": 285,
+        "lib/internals/owned-metadata.js": 222,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/snapshot-authority.js": 712,
+        "lib/internals/tree-scalar-slot-port.js": 171,
+        "lib/internals/member-membership.js": 3457,
+        "lib/write-context.js": 31,
+        "lib/internals/owned-mutation.js": 1264,
+        "lib/internals/position-registry.js": 978,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 3773,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/mutation-capture-runtime.js": 745,
+        "lib/internals/tree-scalar-slot-runtime.js": 2863,
+        "lib/internals/tree-scalar-leaf-runtime.js": 1539,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/utilities/is-built-in-object.js": 1075,
+        "lib/utils.js": 1730,
+        "lib/internals/merge-derived.js": 999,
+        "lib/enhancer-types.js": 42,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/signal-tree.js": 13690,
+        "index.js": 0,
+        "lib/internals/entity-projection-seed.js": 235,
+        "lib/internals/entity-membership-source.js": 126,
+        "lib/internals/physical-rows.js": 23,
+        "lib/internals/utilities/deep-clone.js": 1182,
+        "lib/physical/entity-mutation-frame.js": 2578,
+        "lib/physical/entity-handle-resolution.js": 230,
+        "lib/physical/entity-value-store.js": 480,
+        "lib/physical/structural-store.js": 7431,
+        "lib/entity-signal.js": 36439,
+        "lib/markers/entity-map.js": 2105,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js": 137
+      },
+      "experimentalParsed": [],
+      "experimentalRetained": []
+    },
+    "C22": {
+      "gzipBytes": 47372,
+      "minifiedBytes": 155854,
+      "contributions": {
+        "lib/internals/node-shape.js": 287,
+        "lib/internals/position-registry.js": 1215,
+        "lib/internals/construction-allocation.js": 650,
+        "lib/internals/intrinsic-mutation.js": 2862,
+        "lib/internals/entity-publication.js": 5950,
+        "lib/internals/native-occurrence.js": 2115,
+        "lib/internals/snapshot-installation.js": 257,
+        "lib/internals/selected-write-operation.js": 171,
+        "lib/internals/cell-identity.js": 193,
+        "lib/leaf.js": 297,
+        "lib/internals/observation-adapter.js": 90,
+        "lib/internals/error-reporter.js": 1208,
+        "lib/internals/location-runtime.js": 5505,
+        "lib/constants.js": 399,
+        "enhancers/index.js": 1398,
+        "lib/write-context.js": 31,
+        "lib/internals/publication-preparation.js": 411,
+        "lib/internals/tree-scalar-slot-runtime.js": 4410,
+        "lib/internals/scalar-publication-coverage.js": 125,
+        "lib/internals/owner-invalidation-port.js": 97,
+        "lib/internals/snapshot-authority.js": 1289,
+        "lib/internals/utilities/is-built-in-object.js": 1075,
+        "lib/internals/path-observation-port.js": 223,
+        "lib/internals/owned-metadata.js": 224,
+        "lib/internals/owned-mutation.js": 1338,
+        "lib/internals/observation-substrate.js": 190,
+        "lib/internals/runtime-tree-plan.js": 143,
+        "lib/internals/materialize-markers.js": 4934,
+        "lib/utils.js": 1765,
+        "lib/internals/tree-scalar-slot-port.js": 172,
+        "lib/internals/utilities/deep-equal.js": 1517,
+        "lib/internals/plain-branch-membership.js": 522,
+        "lib/internals/mutation-capture-runtime.js": 1253,
+        "lib/internals/member-membership.js": 6716,
+        "lib/internals/root-source.js": 48,
+        "lib/internals/tree-scalar-leaf-runtime.js": 2359,
+        "lib/internals/physical-commit-clock.js": 213,
+        "lib/internals/tree-capabilities.js": 934,
+        "lib/internals/merge-derived.js": 999,
+        "lib/enhancer-types.js": 42,
+        "lib/signal-tree.js": 14776,
+        "index.js": 0,
+        "lib/internals/entity-value-transition.js": 188,
+        "lib/internals/selected-entity-disposition.js": 98,
+        "lib/internals/entity-projection-seed.js": 235,
+        "lib/internals/entity-membership-source.js": 210,
+        "lib/internals/physical-rows.js": 23,
+        "lib/internals/causal-runtime/ordinary-realization.js": 51,
+        "lib/internals/utilities/deep-clone.js": 1182,
+        "lib/physical/order-restores-for-placement.js": 935,
+        "lib/physical/ordinary-restoration-placement.js": 743,
+        "lib/physical/ordinary-key-evidence.js": 232,
+        "lib/physical/prepared-placement-visibility.js": 1498,
+        "lib/physical/entity-placement-stage.js": 1982,
+        "lib/physical/entity-ordinary-topology.js": 1820,
+        "lib/physical/entity-mutation-frame.js": 5322,
+        "lib/physical/entity-handle-resolution.js": 230,
+        "lib/physical/entity-value-store.js": 2561,
+        "lib/physical/structural-store.js": 8286,
+        "lib/entity-signal.js": 59571,
+        "lib/markers/entity-map.js": 2146,
+        "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-entities.js": 137
+      },
+      "experimentalParsed": [
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/lifecycle.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/recipient-occurrence.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/projection.js",
+        "../c22-full-build-diagnostic/candidate/dist/packages/kernel/dist/lib/experimental-publication/private.js"
+      ],
+      "experimentalRetained": []
+    },
+    "delta": [
+      {
+        "module": "lib/entity-signal.js",
+        "baseline": 36439,
+        "C22": 59571,
+        "delta": 23132
+      },
+      {
+        "module": "lib/internals/entity-publication.js",
+        "baseline": 0,
+        "C22": 5950,
+        "delta": 5950
+      },
+      {
+        "module": "lib/internals/member-membership.js",
+        "baseline": 3457,
+        "C22": 6716,
+        "delta": 3259
+      },
+      {
+        "module": "lib/physical/entity-mutation-frame.js",
+        "baseline": 2578,
+        "C22": 5322,
+        "delta": 2744
+      },
+      {
+        "module": "lib/internals/native-occurrence.js",
+        "baseline": 0,
+        "C22": 2115,
+        "delta": 2115
+      },
+      {
+        "module": "lib/physical/entity-value-store.js",
+        "baseline": 480,
+        "C22": 2561,
+        "delta": 2081
+      },
+      {
+        "module": "lib/physical/entity-placement-stage.js",
+        "baseline": 0,
+        "C22": 1982,
+        "delta": 1982
+      },
+      {
+        "module": "lib/internals/intrinsic-mutation.js",
+        "baseline": 1011,
+        "C22": 2862,
+        "delta": 1851
+      },
+      {
+        "module": "lib/physical/entity-ordinary-topology.js",
+        "baseline": 0,
+        "C22": 1820,
+        "delta": 1820
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-runtime.js",
+        "baseline": 2863,
+        "C22": 4410,
+        "delta": 1547
+      },
+      {
+        "module": "lib/physical/prepared-placement-visibility.js",
+        "baseline": 0,
+        "C22": 1498,
+        "delta": 1498
+      },
+      {
+        "module": "lib/internals/location-runtime.js",
+        "baseline": 4228,
+        "C22": 5505,
+        "delta": 1277
+      },
+      {
+        "module": "lib/internals/materialize-markers.js",
+        "baseline": 3773,
+        "C22": 4934,
+        "delta": 1161
+      },
+      {
+        "module": "lib/signal-tree.js",
+        "baseline": 13690,
+        "C22": 14776,
+        "delta": 1086
+      },
+      {
+        "module": "lib/physical/order-restores-for-placement.js",
+        "baseline": 0,
+        "C22": 935,
+        "delta": 935
+      },
+      {
+        "module": "lib/physical/structural-store.js",
+        "baseline": 7431,
+        "C22": 8286,
+        "delta": 855
+      },
+      {
+        "module": "lib/internals/tree-scalar-leaf-runtime.js",
+        "baseline": 1539,
+        "C22": 2359,
+        "delta": 820
+      },
+      {
+        "module": "lib/physical/ordinary-restoration-placement.js",
+        "baseline": 0,
+        "C22": 743,
+        "delta": 743
+      },
+      {
+        "module": "lib/internals/construction-allocation.js",
+        "baseline": 0,
+        "C22": 650,
+        "delta": 650
+      },
+      {
+        "module": "lib/internals/snapshot-authority.js",
+        "baseline": 712,
+        "C22": 1289,
+        "delta": 577
+      },
+      {
+        "module": "lib/internals/plain-branch-membership.js",
+        "baseline": 0,
+        "C22": 522,
+        "delta": 522
+      },
+      {
+        "module": "lib/internals/mutation-capture-runtime.js",
+        "baseline": 745,
+        "C22": 1253,
+        "delta": 508
+      },
+      {
+        "module": "lib/internals/publication-preparation.js",
+        "baseline": 0,
+        "C22": 411,
+        "delta": 411
+      },
+      {
+        "module": "lib/internals/snapshot-installation.js",
+        "baseline": 0,
+        "C22": 257,
+        "delta": 257
+      },
+      {
+        "module": "lib/internals/position-registry.js",
+        "baseline": 978,
+        "C22": 1215,
+        "delta": 237
+      },
+      {
+        "module": "lib/physical/ordinary-key-evidence.js",
+        "baseline": 0,
+        "C22": 232,
+        "delta": 232
+      },
+      {
+        "module": "lib/internals/entity-value-transition.js",
+        "baseline": 0,
+        "C22": 188,
+        "delta": 188
+      },
+      {
+        "module": "lib/internals/selected-write-operation.js",
+        "baseline": 0,
+        "C22": 171,
+        "delta": 171
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-5ww1TR/signaltree-entities.js",
+        "baseline": 0,
+        "C22": 137,
+        "delta": 137
+      },
+      {
+        "module": "lib/internals/scalar-publication-coverage.js",
+        "baseline": 0,
+        "C22": 125,
+        "delta": 125
+      },
+      {
+        "module": "lib/internals/selected-entity-disposition.js",
+        "baseline": 0,
+        "C22": 98,
+        "delta": 98
+      },
+      {
+        "module": "lib/internals/entity-membership-source.js",
+        "baseline": 126,
+        "C22": 210,
+        "delta": 84
+      },
+      {
+        "module": "lib/internals/owned-mutation.js",
+        "baseline": 1264,
+        "C22": 1338,
+        "delta": 74
+      },
+      {
+        "module": "lib/internals/causal-runtime/ordinary-realization.js",
+        "baseline": 0,
+        "C22": 51,
+        "delta": 51
+      },
+      {
+        "module": "lib/markers/entity-map.js",
+        "baseline": 2105,
+        "C22": 2146,
+        "delta": 41
+      },
+      {
+        "module": "lib/utils.js",
+        "baseline": 1730,
+        "C22": 1765,
+        "delta": 35
+      },
+      {
+        "module": "lib/internals/node-shape.js",
+        "baseline": 285,
+        "C22": 287,
+        "delta": 2
+      },
+      {
+        "module": "lib/internals/owned-metadata.js",
+        "baseline": 222,
+        "C22": 224,
+        "delta": 2
+      },
+      {
+        "module": "lib/internals/tree-scalar-slot-port.js",
+        "baseline": 171,
+        "C22": 172,
+        "delta": 1
+      },
+      {
+        "module": "lib/internals/error-reporter.js",
+        "baseline": 1208,
+        "C22": 1208,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/cell-identity.js",
+        "baseline": 193,
+        "C22": 193,
+        "delta": 0
+      },
+      {
+        "module": "lib/leaf.js",
+        "baseline": 297,
+        "C22": 297,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-adapter.js",
+        "baseline": 90,
+        "C22": 90,
+        "delta": 0
+      },
+      {
+        "module": "lib/constants.js",
+        "baseline": 399,
+        "C22": 399,
+        "delta": 0
+      },
+      {
+        "module": "enhancers/index.js",
+        "baseline": 1398,
+        "C22": 1398,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/owner-invalidation-port.js",
+        "baseline": 97,
+        "C22": 97,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/path-observation-port.js",
+        "baseline": 223,
+        "C22": 223,
+        "delta": 0
+      },
+      {
+        "module": "lib/write-context.js",
+        "baseline": 31,
+        "C22": 31,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/runtime-tree-plan.js",
+        "baseline": 143,
+        "C22": 143,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/observation-substrate.js",
+        "baseline": 190,
+        "C22": 190,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/root-source.js",
+        "baseline": 48,
+        "C22": 48,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/physical-commit-clock.js",
+        "baseline": 213,
+        "C22": 213,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/tree-capabilities.js",
+        "baseline": 934,
+        "C22": 934,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/is-built-in-object.js",
+        "baseline": 1075,
+        "C22": 1075,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/merge-derived.js",
+        "baseline": 999,
+        "C22": 999,
+        "delta": 0
+      },
+      {
+        "module": "lib/enhancer-types.js",
+        "baseline": 42,
+        "C22": 42,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/deep-equal.js",
+        "baseline": 1517,
+        "C22": 1517,
+        "delta": 0
+      },
+      {
+        "module": "index.js",
+        "baseline": 0,
+        "C22": 0,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/entity-projection-seed.js",
+        "baseline": 235,
+        "C22": 235,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/physical-rows.js",
+        "baseline": 23,
+        "C22": 23,
+        "delta": 0
+      },
+      {
+        "module": "lib/internals/utilities/deep-clone.js",
+        "baseline": 1182,
+        "C22": 1182,
+        "delta": 0
+      },
+      {
+        "module": "lib/physical/entity-handle-resolution.js",
+        "baseline": 230,
+        "C22": 230,
+        "delta": 0
+      },
+      {
+        "module": "../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-8ekrp3/signaltree-entities.js",
+        "baseline": 137,
+        "C22": 0,
+        "delta": -137
+      }
+    ]
+  }
+}

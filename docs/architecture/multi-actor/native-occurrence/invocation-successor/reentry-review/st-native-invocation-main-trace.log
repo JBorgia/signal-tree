@@ -1,0 +1,82 @@
+
+> nx run kernel:test main-invocation-trace.spec.ts
+
+> node tools/run-core-vitest.mjs main-invocation-trace.spec.ts
+
+(node:38532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-invocation-successor/independent-review/replica/packages/kernel
+
+(node:38546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/main-invocation-trace.spec.ts > preclaim projection getter cannot lend inverse authority to a nested setter
+MAIN-ENDPOINT-TRACE {
+  nestedBaseline: true,
+  finalBaseline: false,
+  final: {
+    known: [],
+    unknown: true,
+    inputs: [],
+    frames: [],
+    possible: [],
+    captureWindow: true,
+    proof: {
+      destination: [Array],
+      input: [],
+      validation: [],
+      owners: [Array],
+      possible: [],
+      terminalRejectedRoles: 0,
+      unavailableInput: false,
+      historicalWindow: true,
+      unknown: true,
+      invalid: false
+    }
+  },
+  error: 'undefined'
+}
+
+ ❯ src/lib/main-invocation-trace.spec.ts (3 tests | 1 failed) 21ms
+   × preclaim projection getter cannot lend inverse authority to a nested setter 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/main-invocation-trace.spec.ts > preclaim projection getter cannot lend inverse authority to a nested setter
+AssertionError: expected { known: [], unknown: false, …(5) } not to be { known: [], unknown: false, …(5) } // Object.is equality
+
+Compared values have no visual difference.
+
+ ❯ src/lib/main-invocation-trace.spec.ts:31:325
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  14:07:56
+   Duration  912ms (transform 469ms, setup 0ms, import 556ms, tests 21ms, environment 243ms)
+
+Warning: command "node tools/run-core-vitest.mjs main-invocation-trace.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

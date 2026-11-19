@@ -1,0 +1,16 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,4 +1,3 @@
+-import { getEntityPreparationReader } from '../entity-preparation-reader';
+ import {withScalarSelections} from '../native-scalar-selection';
+ import { PublicationPreparation } from '../publication-preparation';
+ import { completeScalarFrame } from '../tree-scalar-slot-runtime';
+@@ -2316,8 +2315,6 @@
+   collectionNode: CollectionNode,
+   key: string | number
+ ): unknown {
+-  const reader = getEntityPreparationReader(collectionNode);
+-  if (reader !== undefined) return reader(key);
+   const rowNode = collectionNode.byIdOrFail(key);
+   return typeof rowNode === 'function' ? rowNode() : rowNode;
+ }

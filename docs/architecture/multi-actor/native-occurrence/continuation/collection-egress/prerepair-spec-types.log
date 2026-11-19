@@ -1,0 +1,11 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/collection-natural-egress.spec.ts: 2 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/collection-natural-egress.spec.ts(19,15): error TS2345: Argument of type '{ (): { count: number; box: { keep: number; rows: { all: Row[]; }; }; }; (value: { count: number; box: { keep: number; rows: Row[] | { all: Row[]; }; }; }): void; (updater: (current: { count: number; box: { keep: number; rows: { ...; }; }; }) => { ...; }): void; } & NodeConstruction<...> & TreeChildrenOf<...>' is not assignable to parameter of type 'never'.
+packages/kernel/src/lib/collection-natural-egress.spec.ts(19,53): error TS2345: Argument of type '{ (): { keep: number; rows: { all: Row[]; }; }; (value: { keep: number; rows: Row[] | { all: Row[]; }; }): void; (updater: (current: { keep: number; rows: { all: Row[]; }; }) => { keep: number; rows: Row[] | { ...; }; }): void; } & NodeConstruction<...> & TreeChildrenOf<...>' is not assignable to parameter of type 'never'.

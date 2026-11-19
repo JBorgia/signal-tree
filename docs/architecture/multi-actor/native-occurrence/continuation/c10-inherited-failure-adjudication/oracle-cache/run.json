@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel independent-public-readiness.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T17:11:58.951Z",
+    "endTime": "2026-11-02T17:12:03.592Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14238798462981839596",
+      "startTime": "2026-11-02T17:11:59.037Z",
+      "endTime": "2026-11-02T17:12:03.591Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+Unchanged-source observation before model oracle: q7 -> r(11,7), q7 -> r(11,13), q7 -> r(11,13) -> s19 confirmed; then reject r, reject q. Both root/collection, observers off/on. Capture actual native inspect, ordinary/physical proof, publication and errors. No desired-proof settlement assertion. Unique ST_OBSERVATIONS output.

@@ -1,0 +1,34 @@
+
+Running 9 gates
+
+  · exports-importable   pass ✓  (every package export can actually be imported)
+  · package-hygiene      pass ✓  (no junk in any tarball, and every declared entry is present)
+  · angular-aot-consumer pass ✓  (installed tarballs bootstrap in production AOT without a runtime compiler, render repeated writes and release component/root stores with their injectors)
+  · declaration-docs     pass ✓  (a package whose source carries JSDoc ships JSDoc in its shipped .d.ts)
+  · publish-manifests    pass ✓  (the BUILT manifests are installable off this machine — no workspace/file/link protocols, internal ranges admit the versions shipping beside them)
+  · publish-artifacts    pass ✓  (every declared `files` entry of every package resolves in dist)
+  · entity-registration-artifacts pass ✓  (packed and production-bundled entity registration: original 8 + lifecycle 6 + receipt 6, with selective no-Link control)
+  · framework-facade-closure pass ✓  (packed framework facades forward every intended neutral runtime symbol by identity, while consumer declarations compile with skipLibCheck=false under bundler and node16 resolution)
+  · bundle-budget        FAIL (exit 1) ✗  built package sizes stay inside their budgets
+
+target                   prod (ships)      dev (diagnostics)
+──────────────────────────────────────────────────────────────────
+signaltree-bare        ❌ 17.84/12.41KB   ❌ 20.16/14.79KB
+signaltree-entities    ❌ 43.04/26.16KB   ❌ 46.64/28.98KB
+
+❌ Bundle budget exceeded.
+
+  PROD over  — the shipped artifact exceeds its current limit. Compare a
+               fresh baseline with the same toolchain, then inspect the
+               emitted graph. Distinguish optional reachability from
+               required behavior; do not assume an optional-module leak.
+
+  DEV over   — measure the production/development difference and check
+               diagnostic folding (`node tools/check-devmode-foldable.mjs`).
+               A flat production result alone does not justify a higher
+               development limit. Budget changes need measured rationale
+               and owner approval; this result remains failed.
+
+
+──────────────────────────────────────────────────────────────────────────────
+8/9 passed, 1 failed, 0 known-red.

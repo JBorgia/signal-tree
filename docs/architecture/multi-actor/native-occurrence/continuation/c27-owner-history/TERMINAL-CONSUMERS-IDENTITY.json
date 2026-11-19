@@ -1,0 +1,9 @@
+{
+  "experimental-publication/proof-retirement.ts": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4",
+  "experimental-publication/private.ts": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647",
+  "experimental-publication/lifecycle.ts": "f4db202e29469d3de41a69ec01d23cb5eb30f6c3d69cebfa6ef33896f549c823",
+  "experimental-publication/recipient-occurrence.ts": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+  "experimental-publication/entity.ts": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+  "publication-proof-retirement.spec.ts": "42802bc7648ee70fc638a5459b476964dd782ace61e89605e4d3a86410f8f90c",
+  "publication-terminal-consumer-independent.spec.ts": "6ab8aa5e55836f384fbf7a4a83635bc70a9f9dc2b96a0fb0cde195dce8f9b720"
+}

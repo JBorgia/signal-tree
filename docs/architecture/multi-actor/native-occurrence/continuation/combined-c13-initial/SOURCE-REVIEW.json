@@ -1,0 +1,23 @@
+{
+  "runtimeChanges": [],
+  "changes": [
+    "packages/kernel/project.json",
+    "packages/kernel/src/lib/native-certificate-successor.spec.ts",
+    "packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts",
+    "packages/kernel/src/lib/native-netzero-diagnostic.spec.ts",
+    "packages/kernel/src/lib/occupancy-successor-realization.spec.ts",
+    "packages/kernel/vitest.config.ts",
+    "packages/kernel/vitest.retention.config.ts",
+    "tools/check-forwarding-retention.mjs",
+    "tools/experiments/native-publication-diagnostics/README.md",
+    "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts",
+    "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts",
+    "tools/experiments/native-publication-diagnostics/replay.config.ts",
+    "tools/experiments/native-publication-diagnostics/run.mjs",
+    "tools/verify-gates.mjs",
+    "tsconfig.typecheck-specs.json",
+    "vitest.config.ts"
+  ],
+  "manifestEntriesVerified": 3057,
+  "sourceUnchanged": true
+}

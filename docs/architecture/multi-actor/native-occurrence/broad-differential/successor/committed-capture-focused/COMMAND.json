@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "committed-entity-selected-unit.spec.ts",
+    "--reporter=verbose",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-broad-differential/successor/candidate",
+  "fixtureSha256": "2a6a89b3aff4226bdc2a4070db8db648bd222390a296582e35691b9e9f0ce5f9"
+}

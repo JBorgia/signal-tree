@@ -1,0 +1,14 @@
+[
+  {
+    "source": "RESULT.json",
+    "archive": "RESULT.json",
+    "sourceSha256": "0d703f6fb2c7d624cca0307e427901a77499468107624430efd9045aa1d12e7e",
+    "archiveSha256": "0d703f6fb2c7d624cca0307e427901a77499468107624430efd9045aa1d12e7e"
+  },
+  {
+    "source": "verify.cjs",
+    "archive": "verify.cjs",
+    "sourceSha256": "9074d77f4727adf79ae217c6e2d555d8f7d5433d29146cb20a9d14ccdc07ad69",
+    "archiveSha256": "9074d77f4727adf79ae217c6e2d555d8f7d5433d29146cb20a9d14ccdc07ad69"
+  }
+]

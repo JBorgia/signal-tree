@@ -1,0 +1,1 @@
+Frozen four-file test-only overlay independently reviewed and bounded-accepted for composition/replay. Every manifested file verified; runtime/config/ratchet unchanged; originals match. Author raw236pass/spec-types inspected, no independent execution. See REVIEW.md and IDENTITY.json. Other public state/admission/cost failures remain outside this acceptance.

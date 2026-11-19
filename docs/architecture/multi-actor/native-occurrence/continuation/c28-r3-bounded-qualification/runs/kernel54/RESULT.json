@@ -1,0 +1,11 @@
+{
+  "name": "kernel54",
+  "exit": 0,
+  "timeout": false,
+  "elapsedSeconds": 13.75057333393488,
+  "attempts": 1,
+  "sourceMismatches": [],
+  "frozenInputMismatches": [],
+  "ownedGroupPresent": false,
+  "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+}

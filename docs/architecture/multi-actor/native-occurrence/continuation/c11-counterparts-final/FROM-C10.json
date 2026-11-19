@@ -1,0 +1,12 @@
+{
+  "changedOrAdded": [
+    "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "packages/react/src/parent-freshness-counterparts.spec.tsx",
+    "packages/vue/src/lib/parent-freshness-counterparts.spec.ts",
+    "packages/solid/src/lib/parent-freshness-counterparts.spec.ts"
+  ],
+  "removed": [],
+  "allOtherManifestEntriesUnchanged": true,
+  "runtimeIdenticalToC10": true,
+  "scope": "C10 first failures preserved; targeted counterpart composition only"
+}

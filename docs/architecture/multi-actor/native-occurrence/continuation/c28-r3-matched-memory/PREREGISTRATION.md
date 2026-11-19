@@ -1,0 +1,9 @@
+# First matched memory experiment — eight invocations maximum
+
+Only authorized first boundary-sample experiment. Schedule: baseline128,indexed128,indexed512,baseline512,baseline2048,indexed2048,indexed512replicate,baseline512replicate. Fresh Nx/Vitest worker per invocation, sequential; original membership case then original replace-every-row restoration case in same worker, same imports/assertions/timeouts, only LARGE changed. No second instrumentation/profile/GC expansion.
+
+Output-only standalone stage calls plus one final12-microtask drain after restoration destruction. Inverse removal recovers exact original source. Membership case remains synchronous. No intermediate extra tree read, filter wrapper, proof walk or retained object record. Memory rows are boundary samples, not peaks/retained bytes. Runtime arms differ only by prepared index adapter file; source maps pinned in IDENTITY.json.
+
+Stop on first command/assertion/resource failure, timeout, source drift or missing/extra selected cases. No escalation if any boundary heapUsed exceeds512MiB; also stop when net positive boundary heap growth above initial membership-before-create is >64MiB AND >8 times preceding smaller-N same-arm growth (successive N ratio4). These are conservative experimental stop rules, not altered product budgets or proof of bad asymptotic behavior. GC noise can trigger a stop, never a favorable retry. Same-size512 replicate stays distinct. No heap-limit flags. External180s startup/no-progress and360s absolute cap, birth-matched owned cleanup.
+
+Require actual fresh worker PID distinct from every earlier invocation, same heap-size limit, exact two selected tests passing. Other cases in original file are name-filtered, recorded skipped, not claimed tested. Preserve every first outcome, both frozen inputs, per-arm runtime, test-overlay bytes and source identity before/after. No130k, cost/timing ranking, heapdump or production mutation.

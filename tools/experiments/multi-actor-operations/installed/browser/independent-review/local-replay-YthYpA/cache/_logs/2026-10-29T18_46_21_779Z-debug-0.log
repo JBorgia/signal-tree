@@ -1,0 +1,80 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/consumer/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm install /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-common-22.0.7.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-compiler-22.0.7.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-core-22.0.7.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-platform-browser-22.0.7.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/rxjs-7.8.2.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/signal-tree-angular-16.0.0-dev.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/signal-tree-kernel-16.0.0-dev.tgz /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/tslib-2.8.1.tgz
+8 verbose argv "install" "--offline" "--ignore-scripts" "--no-audit" "--no-fund" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-common-22.0.7.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-compiler-22.0.7.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-core-22.0.7.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-platform-browser-22.0.7.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/rxjs-7.8.2.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/signal-tree-angular-16.0.0-dev.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/signal-tree-kernel-16.0.0-dev.tgz" "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/tslib-2.8.1.tgz"
+9 verbose logfile logs-max:10 dir:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/cache/_logs/2026-10-29T18_46_21_779Z-
+10 verbose logfile /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/cache/_logs/2026-10-29T18_46_21_779Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest tslib@file:../packs/tslib-2.8.1.tgz
+15 silly fetch manifest @signal-tree/angular@file:../packs/signal-tree-angular-16.0.0-dev.tgz
+16 silly fetch manifest @angular/core@file:../packs/angular-core-22.0.7.tgz
+17 silly fetch manifest @angular/compiler@file:../packs/angular-compiler-22.0.7.tgz
+18 silly fetch manifest rxjs@file:../packs/rxjs-7.8.2.tgz
+19 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+20 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+21 silly fetch manifest @angular/platform-browser@file:../packs/angular-platform-browser-22.0.7.tgz
+22 silly fetch manifest @angular/animations@22.0.7
+23 silly packumentCache full:https://registry.npmjs.org/@angular%2fanimations cache-miss
+24 silly fetch manifest @angular/common@file:../packs/angular-common-22.0.7.tgz
+25 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+26 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+27 silly fetch manifest @signal-tree/kernel@file:../packs/signal-tree-kernel-16.0.0-dev.tgz
+28 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+29 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+30 silly fetch manifest zone.js@~0.15.0 || ~0.16.0
+31 silly packumentCache full:https://registry.npmjs.org/zone.js cache-miss
+32 silly placeDep ROOT @angular/common@22.0.7 OK for: st-browser-reference@0.0.0 want: file:../packs/angular-common-22.0.7.tgz
+33 silly placeDep ROOT @angular/core@22.0.7 OK for: @angular/common@22.0.7 want: 22.0.7
+34 silly placeDep ROOT rxjs@7.8.2 OK for: @angular/core@22.0.7 want: ^6.5.3 || ^7.4.0
+35 silly placeDep ROOT @angular/compiler@22.0.7 OK for: st-browser-reference@0.0.0 want: file:../packs/angular-compiler-22.0.7.tgz
+36 silly placeDep ROOT @angular/core@22.0.7 REPLACE for: st-browser-reference@0.0.0 want: file:../packs/angular-core-22.0.7.tgz
+37 silly placeDep ROOT @angular/platform-browser@22.0.7 OK for: st-browser-reference@0.0.0 want: file:../packs/angular-platform-browser-22.0.7.tgz
+38 silly placeDep ROOT @signal-tree/angular@16.0.0-dev OK for: st-browser-reference@0.0.0 want: file:../packs/signal-tree-angular-16.0.0-dev.tgz
+39 silly placeDep ROOT tslib@2.8.1 OK for: @signal-tree/angular@16.0.0-dev want: ^2.0.0
+40 silly placeDep ROOT @signal-tree/kernel@16.0.0-dev OK for: st-browser-reference@0.0.0 want: file:../packs/signal-tree-kernel-16.0.0-dev.tgz
+41 silly placeDep ROOT rxjs@7.8.2 REPLACE for: st-browser-reference@0.0.0 want: file:../packs/rxjs-7.8.2.tgz
+42 silly placeDep ROOT tslib@2.8.1 REPLACE for: st-browser-reference@0.0.0 want: file:../packs/tslib-2.8.1.tgz
+43 silly fetch manifest tslib@^2.3.0
+44 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+45 silly fetch manifest tslib@^2.3.0
+46 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+47 silly fetch manifest tslib@^2.1.0
+48 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+49 silly fetch manifest tslib@^2.3.0
+50 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+51 silly fetch manifest tslib@^2.3.0
+52 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+53 silly fetch manifest tslib@^2.3.0
+54 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+55 silly fetch manifest @signal-tree/kernel@16.0.0-dev
+56 silly packumentCache full:https://registry.npmjs.org/@signal-tree%2fkernel cache-miss
+57 silly reify moves {}
+58 http cache tslib@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/tslib-2.8.1.tgz 0ms (cache hit)
+59 http cache @signal-tree/kernel@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/signal-tree-kernel-16.0.0-dev.tgz 0ms (cache hit)
+60 http cache @signal-tree/angular@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/signal-tree-angular-16.0.0-dev.tgz 0ms (cache hit)
+61 http cache rxjs@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/rxjs-7.8.2.tgz 0ms (cache hit)
+62 http cache @angular/platform-browser@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-platform-browser-22.0.7.tgz 0ms (cache hit)
+63 http cache @angular/compiler@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-compiler-22.0.7.tgz 0ms (cache hit)
+64 http cache @angular/core@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-core-22.0.7.tgz 0ms (cache hit)
+65 http cache @angular/common@file:/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/packs/angular-common-22.0.7.tgz 0ms (cache hit)
+66 silly ADD node_modules/tslib
+67 silly ADD node_modules/rxjs
+68 silly ADD node_modules/@signal-tree/kernel
+69 silly ADD node_modules/@signal-tree/angular
+70 silly ADD node_modules/@angular/platform-browser
+71 silly ADD node_modules/@angular/core
+72 silly ADD node_modules/@angular/compiler
+73 silly ADD node_modules/@angular/common
+74 verbose cwd /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/local-replay-YthYpA/consumer
+75 verbose os Darwin 25.2.0
+76 verbose node v24.15.0
+77 verbose npm  v11.12.1
+78 verbose exit 0
+79 info ok

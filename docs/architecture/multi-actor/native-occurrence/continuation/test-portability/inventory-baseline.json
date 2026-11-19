@@ -1,0 +1,192 @@
+[
+  {
+    "file": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
+    "classification": "timing-control",
+    "sha256": "b9e515701d552789b3075611214959c7d2fcb3750453202ec3e39c9d26efd451"
+  },
+  {
+    "file": "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "af32a888645ffde5cfeb47758109bbb22fe20dd10cef17e6d01dd5529e4b3794"
+  },
+  {
+    "file": "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "db3835be6a83b6f2191eb2c5c68bf3895b749b7f1a582e8a3b85d6364cdd93ec"
+  },
+  {
+    "file": "packages/kernel/src/enhancers/batching/batching-semantic-scopes.spec.ts",
+    "classification": "comment-only",
+    "sha256": "1510b901feb22f90a7e9d895599b0f0334ccbbbc33719445878b729435513cc8"
+  },
+  {
+    "file": "packages/kernel/src/enhancers/restoration/restoration-operation-outcome.spec.ts",
+    "classification": "comment-only",
+    "sha256": "5e680678221da89284366488160a241de1b601a9770c8e57d7cdaf27ea32fd73"
+  },
+  {
+    "file": "packages/kernel/src/lib/approved-current-obligation.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "b74ab938c968cd284a27b6c3ce54a16c27ecb6f897d2ec30a820fe619189e0e3"
+  },
+  {
+    "file": "packages/kernel/src/lib/benchmarks.spec.ts",
+    "classification": "timing-control",
+    "sha256": "ae3c137d4e3a5c487b2369cf3818bbb770fbbace29824134e8de31014cb7f41b"
+  },
+  {
+    "file": "packages/kernel/src/lib/cached-current-input.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "bc58ba744daf67402549b409861d698974445c5afa2a0a2f0c7869e22d27c03e"
+  },
+  {
+    "file": "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "94d688f7f2a8197fc156d6878d5c2fbdf2564811fa2630a0a431ac24080df70c"
+  },
+  {
+    "file": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "d179fc14670ff177ac25d90b7acc8f3e301ff481c4cbf20ec0560bc0cb24a6d3"
+  },
+  {
+    "file": "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "classification": "mandatory-hardcoded-diagnostic",
+    "sha256": "3774e6c2fae9cbee474455cd3e4d901a0dff19a9d65d95597a22480432c977f4"
+  },
+  {
+    "file": "packages/kernel/src/lib/forwarding-retention-probe.spec.ts",
+    "classification": "separate-GC-gate-required-controls-and-receipt",
+    "sha256": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838"
+  },
+  {
+    "file": "packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "classification": "separate-GC-gate-required-controls-and-receipt",
+    "sha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362"
+  },
+  {
+    "file": "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "9a210b20dde15faa909a752af33095dc68672d55808f7ab4dd8033403ce83325"
+  },
+  {
+    "file": "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "bedf67e635d8147e13c6752a1271ec7e47f82b26a1dbb149c45ea9bf98f87a60"
+  },
+  {
+    "file": "packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "a4763269937c6d6085745cdef58775e6ee23e3d2ac6b112875bd14f11e1e0941"
+  },
+  {
+    "file": "packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "c990f5125ed89f00f806c7c7cb1698b00059f8992551cac0965c2f2b6694a436"
+  },
+  {
+    "file": "packages/kernel/src/lib/independent-scalar-publication.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "ba492604bc1a4db0346186a9b12d4ac93cad5679bf1c429b07af31391036a073"
+  },
+  {
+    "file": "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+    "classification": "mandatory-hardcoded-diagnostic",
+    "sha256": "7bbf24a92eecec1885ea1067326e551b0e8521d35c8d9e76c76a54cc1aec4b3f"
+  },
+  {
+    "file": "packages/kernel/src/lib/internals/derived.spec.ts",
+    "classification": "timing-control",
+    "sha256": "e855954b5cdfba4578415de73f9fa801bca9452a6b9c712c499204000fb90f43"
+  },
+  {
+    "file": "packages/kernel/src/lib/opaque-current-input.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "ca7c1a869cd6a6b21336299101d1a619cfa879997d690bc514f110aebe585846"
+  },
+  {
+    "file": "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "2457836415fea5590d8f949aeb49c9543f088945810a4abcd315a21bdfa8d664"
+  },
+  {
+    "file": "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "93679a448adf9a5b0cd06f4c3298021c22a96fbcf34255fed6c5b23ad7333e66"
+  },
+  {
+    "file": "packages/kernel/src/lib/packet-physical-pair-work.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "02efb70a00a0377d06b517e10d95a5c8c40d60eb8d741a1a6ff5dabc8a14c110"
+  },
+  {
+    "file": "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "c31ab537a83917af1211f5ae863d4847f393032f480c50296fddc20ab9d6ba72"
+  },
+  {
+    "file": "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "93273e3668f2e1ef1d78fbc4c93a415e16949e0f273f5eb0f033cb809d6200d4"
+  },
+  {
+    "file": "packages/kernel/src/lib/point-result-allocation.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "281196216b92dc418f5236624ce7d631d56c8393f5b950793492b17100930b0b"
+  },
+  {
+    "file": "packages/kernel/src/lib/preparation-reader-comparison.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "3db5026a5719def7aeb4a9ef0ca156c9934a0233757d0fdfeeff62f34e2f33c5"
+  },
+  {
+    "file": "packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "229fdf26cbc654ad7e7367d45e71f7fc656925b16a588065a7ba2578c68793bc"
+  },
+  {
+    "file": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "classification": "timing-control-and-optional-report",
+    "sha256": "c1c2e3a2a141425045b2dcd4b5b9865d4a345c48ebb48c84affa978d9d4d7af8"
+  },
+  {
+    "file": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "classification": "mandatory-env-diagnostic",
+    "sha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd"
+  },
+  {
+    "file": "packages/kernel/src/lib/public-sibling-current-obligation.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "d958561da65d57994db084a0539cf560bb0901cda34f8d5692f601effa64330b"
+  },
+  {
+    "file": "packages/kernel/src/lib/publication-retirement-acceptance.spec.ts",
+    "classification": "intentional-fault-control",
+    "sha256": "f742232adb3217898f09b762276f9fc38a05bd4c790f0bcb0a62f71bd2c76768"
+  },
+  {
+    "file": "packages/kernel/src/lib/recipient-window-review.spec.ts",
+    "classification": "mandatory-hardcoded-diagnostic",
+    "sha256": "f933ed3a4e9b401b08925966648c9a6316444b402d4b78ff5f45c8ae52e3b86d"
+  },
+  {
+    "file": "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+    "classification": "mandatory-hardcoded-diagnostic",
+    "sha256": "413be33da213685a25912806dc0568b6ee82373c5401d237171d358d98459ac4"
+  },
+  {
+    "file": "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+    "classification": "mandatory-hardcoded-diagnostic",
+    "sha256": "d8ba5216cb9a539ef0a8cdbf91a7e955291d5a281fe25502563a0f78fc5be82b"
+  },
+  {
+    "file": "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+    "classification": "mandatory-hardcoded-diagnostic",
+    "sha256": "b26e56e62cf9795df7947082563bf6c6192e68c4a736089386d4632385ee867e"
+  },
+  {
+    "file": "packages/kernel/src/lib/singleton-row-allocation.spec.ts",
+    "classification": "already-optional-diagnostic",
+    "sha256": "5fed02175193cf217ecb6c78666a4ca0ab7fd12773f045ebc61985a764ee9d93"
+  }
+]

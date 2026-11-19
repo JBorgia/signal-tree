@@ -1,0 +1,366 @@
+--- predecessor/packages/kernel/src/enhancers/transactions/transactions.ts
++++ frozen/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -111,6 +111,8 @@
+ import { createRealizationContextSource } from '../../lib/internals/causal-runtime/realization-context';
+ import {
+   createTreeRealizationAdapter,
++  supportsSelectedOperation,
++  prepareSelectedOperation,
+   defineTreeRealizationDescriptors,
+   defineTreeRealizationPort,
+   forgetSubjectsInTreeRealizationDescriptors,
+@@ -3773,6 +3775,12 @@
+             if (effects.length === 0 && orderDeltas.length === 0) {
+               installPreparedCompensation(undefined, frontiers, completion);
+               return { ok: true as const };
++            }
++            if(supportsSelectedOperation(inverseEffects)){
++              if(completion)completion.selected=true;
++              const prepared=prepareSelectedOperation(realizationTree,inverseEffects);
++              installPreparedCompensation(prepared,frontiers,completion);
++              return {ok:true as const};
+             }
+             // Keep the baseline complete-target admission for structural
+             // handoffs/order: per-effect occupancy is not its admissibility test.
+--- predecessor/packages/kernel/src/lib/entity-signal.ts
++++ frozen/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import type {SelectedRowEdit} from './internals/selected-write-operation';
+ import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+ import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
+ import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep } from './internals/entity-publication';
+@@ -512,6 +513,29 @@
+     return new EntityMutationFrame(valueStore, structuralStore);
+   }
+ 
++  function prepareSelectedRows(operations: readonly SelectedRowEdit[]) {
++    const rows = new Map<number,{subjectId:number;key:string|number;value:unknown;edits:EntityRealizationEdit[]}>();
++    const steps: SelectedRowEdit[] = [];
++    for (const operation of operations) {
++      let row=rows.get(operation.subject);
++      if(!row){row={subjectId:operation.subject,key:operation.key,value:operation.before,edits:[]};rows.set(operation.subject,row);}
++      const before=row.value;
++      const after={...(before as object)} as Record<string,unknown>;
++      for(const field of operation.fields){
++        const present=Object.prototype.hasOwnProperty.call(operation.after,field);
++        const value=present?(operation.after as Record<string,unknown>)[field]:undefined;
++        if(present)Object.defineProperty(after,field,{value,enumerable:true,configurable:true,writable:true});else delete after[field];
++        row.edits.push({kind:'field',field,present,value,selection:operation.selections.get(field)});
++      }
++      row.value=after;steps.push({...operation,before,after});
++    }
++    return preparePointValues([...rows.values()],steps);
++  }
++  function stageSelected(id:K, before:E, after:E, fields:readonly string[], selection:ClaimedFieldEndpoint):void {
++    const selections=selectedInverseField(selection,selection.subject,after,id)!;
++    selection.preparation!.stage({source:entityPublication,subject:selection.subject,key:id,before,after,fields,selections,prepare:prepareSelectedRows});
++  }
++
+   /** Existing-lifetime value plans: all reflection precedes physical installation. */
+   function preparePointValues(
+     values: readonly {
+@@ -519,7 +543,8 @@
+       key: string | number;
+       value: unknown;
+       edits: readonly EntityRealizationEdit[];
+-    }[]
++    }[],
++    selectedSteps?: readonly SelectedRowEdit[]
+   ): { install(): void; invalidate(): void; publish(): void } {
+     const prepared = values.map(({ subjectId, key, value, edits }) => {
+       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+@@ -546,11 +571,12 @@
+     });
+     const publication=prepareEntityPublication(
+       prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
+-      prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true
++      selectedSteps?selectedSteps.map(step=>({subject:step.subject,before:step.before,after:step.after,fields:step.fields,restoredFields:step.selections})):prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),ordinary:[{subject:step.subject,before:step.before,after:step.after,fields:step.fields,restoredFields:step.selections}]}))
+     );
++    if(selectedSteps)publication.unit?.finalize?.();
+     return {
+       install(): void {
+-        publication.unit?.finalize?.();
++        if(!selectedSteps)publication.unit?.finalize?.();
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
+         if(publication.unit) installTerminalRecord(publication.unit.record);
+@@ -595,8 +621,12 @@
+               {...row.transition,publicationUnit:publication.unit?publication.id:undefined}
+             )
+           );
+-          if (row.changed) emitTap('onUpdate', row.key, row.after, row.after);
++          if (!selectedSteps && row.changed) emitTap('onUpdate', row.key, row.after, row.after);
+         } catch(error){if(!failed){failed=true;first=error;}}}
++        for(const step of selectedSteps??[])try{
++          const delta:Record<string,unknown>={};for(const field of step.fields)if(Object.prototype.hasOwnProperty.call(step.after,field))Object.defineProperty(delta,field,{value:(step.after as Record<string,unknown>)[field],enumerable:true});
++          emitTap('onUpdate',step.key as K,delta as Partial<E>,step.after as E);
++        }catch(error){if(!failed){failed=true;first=error;}}
+         if(failed)throw first;
+       },
+     };
+@@ -2066,6 +2096,7 @@
+       }
+ 
+       const finalUpdated = { ...entity, ...transformedChanges };
++      if(inverseClaim?.preparation){stageSelected(id,prev,finalUpdated,Object.keys(transformedChanges),inverseClaim);return;}
+       // One value replacement, no structural consequence — commit it directly.
+       // See `commitExistingSubjectValue` for why this is the whole case.
+       const subjectIdForWrite = rememberSubjectId(id);
+@@ -2129,6 +2160,11 @@
+         throw new Error(`Entity with id ${String(id)} has no subject id`);
+       }
+ 
++      if(inverseClaim?.preparation){
++        const materialized={...next};
++        const fields=[...new Set([...(publicationFields(prev,materialized)??[]),inverseClaim.field])];
++        stageSelected(id,prev,materialized,fields,inverseClaim);return;
++      }
+       const mutationIntent =
+         callableIntent ?? getActiveWriteContext()?.mutationIntent;
+       const replacement: PreparedValueReplacement<K, E> = {
+@@ -3918,6 +3954,7 @@
+         }
+ 
+         const finalUpdated = { ...entity, ...transformedChanges };
++
+         const subjectId = structuralStore.subjectIdForKey(id);
+         if (subjectId === undefined) {
+           throw new Error(`Entity with id ${String(id)} has no subject id`);
+--- predecessor/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ frozen/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowEdit} from '../selected-write-operation';
+ import { replaceSelectedLocation } from '../location-runtime';
+ import {fieldEndpoints} from '../native-field-selection';
+ import {getEntityPublicationBinding} from '../entity-publication';
+@@ -695,6 +696,47 @@
+  * The caller retains admission and the encompassing invalidation group.
+  * Undefined means the effects require the existing structural/member planner.
+  */
++/** Bounded source-owned preparation for selected top-level entity fields and scalar slots. */
++export function supportsSelectedOperation(effects:readonly ReversalEffect[]):boolean {
++ return effects.some(effect=>!!fieldEndpoints(effect)) && effects.every(effect=>!effect.structural&&!effect.plainBranchMembership && (typeof effect.subjectId==='number'?effect.subjectFieldSegments?.length===1&&!!fieldEndpoints(effect):effect.subjectFieldSegments===undefined));
++}
++export function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[]):{install():void;publish():void} {
++ const descriptors=getTreeRealizationDescriptors(tree.$);
++ const slots=getTreeScalarSlotRuntime(tree.$)??getTreeScalarSlotRuntime(tree);
++ const clock=getPhysicalCommitClock(tree.$)??getPhysicalCommitClock(tree);
++ if(!descriptors||!slots||!clock)throw new Error('Selected operation source unavailable');
++ const revision=clock.revision();const owners=indexPointOwnerPaths(tree.$,effects);
++ const edits:SelectedRowEdit[]=[];const deliveries:Array<()=>void>=[];
++ const scalarEffects:ReversalEffect[]=[];const frame=slots.beginFrame();
++ let active=true;
++ const preparation:SelectedPreparation={stage(edit){if(!active)throw new Error('Selected preparation closed');edits.push(edit);},defer(delivery){if(!active)throw new Error('Selected preparation closed');deliveries.push(delivery);}};
++ try {
++   for(const effect of effects){
++     if(typeof effect.subjectId!=='number'){
++       const slot=slots.resolveScalarSlot(effect.owner);if(slot===undefined)throw new Error('Selected scalar slot unavailable');
++       frame.set(slot,effect.after);scalarEffects.push(effect);continue;
++     }
++     const count=edits.length;applyEffect(tree,descriptors,owners,slots,effect,preparation);
++     if(edits.length!==count+1)throw new Error('Selected continuation did not prepare exactly one operation');
++   }
++   const groups=new Map<object,SelectedRowEdit[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
++   const plans=[...groups.values()].map(group=>group[0]!.prepare(group));
++   if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
++   const installScalars=frame.prepareCommit({advanceRevision:false,publish:false});
++   if(clock.revision()!==revision)throw new Error('Selected operation preparation reentered installation');
++   active=false;edits.length=0;groups.clear();let installed=false;let scalarResult:ReturnType<typeof installScalars>|undefined;
++   return {
++     install(){if(installed||clock.revision()!==revision)throw new Error('Selected operation revision changed');scalarResult=installScalars();for(const plan of plans)plan.install();clock.advance();installed=true;},
++     publish(){if(!installed||!scalarResult)throw new Error('Selected operation not installed');let failed=false;let first:unknown;const run=(body:()=>void)=>{try{body();}catch(error){if(!failed){failed=true;first=error;}}};
++       try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared(scalarResult!));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);
++         for(const effect of scalarEffects)run(()=>{const descriptor=descriptors.get(effect.owner);const path=resolveNotifyPath(tree,descriptor,owners,effect);if(path)getPathNotifier().notify(path,effect.after,effect.before,descriptor?.ownerPath??path,undefined,[effect.owner],{...getActiveWriteContext(),intent:'system',participation:'realized'});});
++       }finally{deliveries.length=0;plans.length=0;scalarEffects.length=0;}
++       if(failed)throw first;
++     }
++   };
++ } catch(error){active=false;edits.length=0;deliveries.length=0;try{frame.discard();}catch{/* prepareCommit already closed this temporary frame; retain the primary refusal. */}throw error;}
++}
++
+ export function preparePointRealization(
+   tree: ISignalTree<object>,
+   effects: readonly ReversalEffect[]
+@@ -1777,7 +1819,8 @@
+   descriptors: ReadonlyMap<PositionId, TreeRealizationDescriptor>,
+   structuralOwnerPaths: StructuralOwnerIndex,
+   scalarSlotRuntime: ReturnType<typeof getTreeScalarSlotRuntime>,
+-  effect: ReversalEffect
++  effect: ReversalEffect,
++  preparation?:SelectedPreparation
+ ): void {
+   const descriptor = descriptors.get(effect.owner);
+   if (
+@@ -1799,11 +1842,12 @@
+     const binding=getEntityPublicationBinding(target),path=effect.subjectFieldSegments;
+     if(!binding||binding.subject!==effect.subjectId||path?.length!==1||binding.field!==undefined&&binding.field!==path[0])
+       throw new Error('Inverse endpoint does not match resolved source field');
+-    const selection = Object.freeze({source:binding.source,subject:binding.subject!,field:path[0]!,endpoint});
++    const selection = Object.freeze({source:binding.source,subject:binding.subject!,field:path[0]!,endpoint,preparation});
+     if (binding.field !== undefined) replaceSelectedLocation(target as import('../cell-runtime').Location<unknown>, value, selection);
+     else {
+       if (!binding.replaceSelected) throw new Error('Selected row replacement has no private continuation');
+-      binding.replaceSelected(value, selection);
++      const invocation=openSelected(value,selection);
++      try{const request=consumeSelected(invocation);binding.replaceSelected(request.value,request.selection);}finally{closeSelected(invocation);}
+     }
+   };
+ 
+--- predecessor/packages/kernel/src/lib/internals/location-runtime.ts
++++ frozen/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -1,3 +1,4 @@
++import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+ import { markTreeCell } from './cell-identity';
+@@ -49,7 +50,7 @@
+   needsAuthorityAdmission?():boolean;
+   readonly location: Location<T>;
+   replace(value: T): void;
+-  replaceSelected?(value: T, selection: ClaimedFieldEndpoint): void;
++  replaceSelected?(invocation: SelectedInvocation): void;
+   derive(update: (current: T) => T): void;
+ }
+ 
+@@ -91,7 +92,8 @@
+ export function replaceSelectedLocation<T>(location: Location<T>, value: T, selection: ClaimedFieldEndpoint): void {
+   const binding = writableLocationBinding(location);
+   if (!binding.replaceSelected) throw new Error('Selected replacement has no private projection continuation');
+-  binding.replaceSelected(value, selection);
++  const invocation=openSelected(value,selection);
++  try{binding.replaceSelected(invocation);if(invocation.failed)throw invocation.failure;if(invocation.phase==='open')throw new Error('Selected continuation did not prepare');}finally{closeSelected(invocation);}
+ }
+ 
+ export function deriveLocation<T>(
+@@ -137,8 +139,10 @@
+   const previousReplace = binding.replace;
+   const previousDerive = binding.derive;
+   const previousSelected = binding.replaceSelected;
+-  const wrappedSelected = previousSelected ? (value: T, selection: ClaimedFieldEndpoint): void =>
+-    intercept({ intent: 'replace', value }, () => previousSelected(value, selection)) : undefined;
++  const wrappedSelected = previousSelected ? (invocation: SelectedInvocation): void => {
++    if(invocation.phase!=='open'||!invocation.request)throw new Error('Selected continuation is closed');
++    try{intercept({intent:'replace',value:invocation.request.value as T},selectedProceed(invocation,previousSelected));}catch(error){failSelected(invocation,error);throw error;}
++  } : undefined;
+   const wrappedReplace = (value: T): void =>
+     intercept({ intent: 'replace', value }, () => previousReplace(value));
+   const wrappedDerive = (update: (current: T) => T): void =>
+@@ -182,7 +186,7 @@
+       const observer = mutationSource1.observer;
+       const before = observer ? source.peek() : undefined;
+       write(value, 'replace', selection);
+-      if (observer) {
++      const deliver = () => { if (observer) {
+         const after = source.peek();
+         observer({
+           intent: 'replace',
+@@ -190,13 +194,14 @@
+           after,
+           changed: !Object.is(before, after),
+         });
+-      }
++      }};
++      if(selection?.preparation)selection.preparation.defer(deliver);else deliver();
+     };
+   const binding: WritableLocationBinding<T> = {
+     location,
+     notify: () => undefined,
+     replace: value => replace(value),
+-    replaceSelected: replace,
++    replaceSelected: invocation => {const request=consumeSelected(invocation);replace(request.value as T,request.selection);},
+     derive: (update) => {
+       const before = source.peek();
+       withEntityBoundPublicationInput(location as object,()=>write(update(before), 'derive'));
+--- predecessor/packages/kernel/src/lib/internals/native-field-selection.ts
++++ frozen/packages/kernel/src/lib/internals/native-field-selection.ts
+@@ -1,5 +1,3 @@
+-import {getActiveWriteContext,withWriteContext} from '../write-context';
+-import type {WriteMetadata} from '../mutation-types';
+ /** Private, source-issued ordinary field endpoint; ownership is bound by native admission. */
+ export interface NativeFieldEndpoint {
+   readonly present:boolean;
+@@ -29,18 +27,4 @@
+   bindFieldEndpoints(existing,before&&last?{before,after:last.after}:undefined);
+ }
+ 
+-export interface ClaimedFieldEndpoint {readonly source:object;readonly subject:number;readonly field:string;readonly endpoint:NativeFieldEndpoint}
+-const INVOCATION=Symbol('native-inverse-invocation');
+-type Invocation={claim?:ClaimedFieldEndpoint;claimed:boolean;closed:boolean};
+-type InvocationMetadata=WriteMetadata&{[INVOCATION]?:Invocation};
+-export function withFieldEndpointInvocation<T>(binding:{source:object;subject?:number},field:string,endpoint:NativeFieldEndpoint,body:()=>T):T {
+-  if(binding.subject===undefined)throw new Error('Inverse endpoint has no subject lifetime');
+-  const token:Invocation={claim:Object.freeze({source:binding.source,subject:binding.subject,field,endpoint}),claimed:false,closed:false};
+-  const meta:InvocationMetadata={...getActiveWriteContext(),[INVOCATION]:token};
+-  try{return withWriteContext(meta,body);}finally{token.closed=true;token.claim=undefined;}
+-}
+-export function claimFieldEndpointInvocation(source:object,subject:number|undefined,fields:readonly string[]|null=null):ClaimedFieldEndpoint|undefined {
+-  const token=(getActiveWriteContext() as InvocationMetadata|undefined)?.[INVOCATION];
+-  if(!token||token.closed||token.claimed||token.claim?.source!==source||token.claim.subject!==subject||fields!==null&&!fields.includes(token.claim.field))return undefined;
+-  token.claimed=true;return token.claim;
+-}
++export interface ClaimedFieldEndpoint {readonly source:object;readonly subject:number;readonly field:string;readonly endpoint:NativeFieldEndpoint;readonly preparation?:import('./selected-write-operation').SelectedPreparation}
+--- predecessor/packages/kernel/src/lib/internals/native-location-realization.ts
++++ frozen/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -1,3 +1,4 @@
++import {consumeSelected} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+ import { markTreeCell } from './cell-identity';
+@@ -177,7 +178,7 @@
+         const observer = mutationSource2.observer;
+         const before = observer ? realized.peek() : undefined;
+         write(value, 'replace', selection);
+-        if (observer) {
++        const deliver = () => { if (observer) {
+           const after = realized.peek();
+           observer({
+             intent: 'replace',
+@@ -185,13 +186,14 @@
+             after,
+             changed: !Object.is(before, after),
+           });
+-        }
++        }};
++        if(selection?.preparation)selection.preparation.defer(deliver);else deliver();
+       };
+     const binding: WritableLocationBinding<T> = {
+       location,
+       notify: () => undefined,
+       replace: value => replace(value),
+-      replaceSelected: replace,
++      replaceSelected: invocation => {const request=consumeSelected(invocation);replace(request.value as T,request.selection);},
+       derive: (update) => {
+         const before = realized.peek();
+         withEntityBoundPublicationInput(location as object,()=>write(update(before), 'derive'));
+--- predecessor/packages/kernel/src/lib/internals/selected-write-operation.ts
++++ frozen/packages/kernel/src/lib/internals/selected-write-operation.ts
+@@ -0,0 +1,29 @@
++import type {ClaimedFieldEndpoint,NativeFieldEndpoint} from './native-field-selection';
++export interface SelectedRowEdit {
++ readonly source:object; readonly subject:number; readonly key:string|number;
++ readonly before:unknown; readonly after:unknown; readonly fields:readonly string[];
++ readonly selections:ReadonlyMap<string,NativeFieldEndpoint>;
++ readonly prepare:(edits:readonly SelectedRowEdit[])=>SelectedInstallation;
++}
++export interface SelectedInstallation {install():void;invalidate():void;publish():void}
++export interface SelectedPreparation {
++ stage(edit:SelectedRowEdit):void;
++ defer(delivery:()=>void):void;
++}
++export interface SelectedInvocation {
++ phase:'open'|'consumed'|'closed';
++ failed?:boolean;failure?:unknown;
++ request?:{value:unknown;selection:ClaimedFieldEndpoint};
++}
++export function openSelected(value:unknown,selection:ClaimedFieldEndpoint):SelectedInvocation{return {phase:'open',request:{value,selection}};}
++export function closeSelected(invocation:SelectedInvocation):void{invocation.phase='closed';invocation.request=undefined;invocation.failure=undefined;}
++export function failSelected(invocation:SelectedInvocation,error:unknown):void{if(!invocation.failed){invocation.failed=true;invocation.failure=error;}invocation.phase='closed';invocation.request=undefined;}
++export function consumeSelected(invocation:SelectedInvocation):{value:unknown;selection:ClaimedFieldEndpoint}{
++ if(invocation.phase!=='open'||!invocation.request)throw new Error('Selected continuation is closed or consumed');
++ const request=invocation.request;invocation.phase='consumed';invocation.request=undefined;return request;
++}
++/** Closure has no separate value, selection, target or operation reference. */
++export function selectedProceed(invocation:SelectedInvocation,next:(invocation:SelectedInvocation)=>void):()=>void{
++ let forwarded=false;
++ return ()=>{if(forwarded||invocation.phase!=='open')throw new Error('Selected continuation cannot replay');forwarded=true;try{next(invocation);}catch(error){failSelected(invocation,error);throw error;}};
++}

@@ -1,0 +1,7 @@
+
+Running 1 gates
+
+  · spec-types           pass ✓  (spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test)
+
+──────────────────────────────────────────────────────────────────────────────
+1/1 passed, 0 failed, 0 known-red.

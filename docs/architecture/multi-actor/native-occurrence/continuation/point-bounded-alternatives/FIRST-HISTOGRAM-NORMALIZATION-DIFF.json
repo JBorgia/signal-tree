@@ -1,0 +1,14 @@
+{
+  "baselineOnly": {
+    "Array.filter\n    at captureNativeInput (<COPY>/packages/kernel/src/lib/experimental-publication/lifecycle.ts:154:70)\n    at nativeInputs (<COPY>/packages/kernel/src/lib/experimental-publication/private.ts:SOURCE)\n    at Object.captureInput (<COPY>/packages/kernel/src/lib/experimental-publication/private.ts:SOURCE)\n    at Object.source.publicationInputCapture (<COPY>/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (<COPY>/packages/kernel/src/lib/internals/location-runtime.ts:509:50)": [
+      200,
+      0
+    ]
+  },
+  "AOnly": {
+    "Array.filter\n    at Module.captureNativeInput (<COPY>/packages/kernel/src/lib/experimental-publication/lifecycle.ts:154:70)\n    at nativeInputs (<COPY>/packages/kernel/src/lib/experimental-publication/private.ts:SOURCE)\n    at Object.captureInput (<COPY>/packages/kernel/src/lib/experimental-publication/private.ts:SOURCE)\n    at Object.source.publicationInputCapture (<COPY>/packages/kernel/src/lib/internals/intrinsic-mutation.ts:320:21)\n    at Object.derive (<COPY>/packages/kernel/src/lib/internals/location-runtime.ts:509:50)": [
+      200,
+      0
+    ]
+  }
+}

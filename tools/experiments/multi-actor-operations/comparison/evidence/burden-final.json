@@ -1,0 +1,83 @@
+{
+  "command": "node burden.mjs",
+  "interpretation": "Descriptive source inventory, not productivity/performance ranking. Includes types/comments and differing feature breadth. C1 generated JS is excluded to avoid double counting; shared helpers/backend listed separately.",
+  "counts": {
+    "C0": [
+      {
+        "path": "c0.mjs",
+        "bytes": 3540,
+        "physicalLines": 73,
+        "nonblankLines": 71,
+        "sha256": "e56e2739b3b4933356a57d5cdc8abf7815b65ae9f6e338e8bfa0fbc8f6d616f6"
+      }
+    ],
+    "C1": [
+      {
+        "path": "c1.mts",
+        "bytes": 5879,
+        "physicalLines": 102,
+        "nonblankLines": 99,
+        "sha256": "d88fbda79a4c04e4b48ab5cfb55d4bf9b290b9c6338aa93c80814ee055165c4a"
+      }
+    ],
+    "C2": [
+      {
+        "path": "../coordinator.mjs",
+        "bytes": 6143,
+        "physicalLines": 143,
+        "nonblankLines": 131,
+        "sha256": "096140d4460b8b8e51148444bc4e7c6f5bf3f80f4373f6b0586d46ecd1fa539c"
+      }
+    ],
+    "C3": [
+      {
+        "path": "c3.mjs",
+        "bytes": 4997,
+        "physicalLines": 93,
+        "nonblankLines": 91,
+        "sha256": "f6065988335d64114b72577388dbd29ad1d5bfcc615ba00aa1dad9a43469eaad"
+      }
+    ],
+    "sharedAlternatives": [
+      {
+        "path": "data.mjs",
+        "bytes": 1021,
+        "physicalLines": 21,
+        "nonblankLines": 21,
+        "sha256": "46f47350ff7bf623c4b100c96e2eed3c57dcf86c05ccd4b019f8168a7982cd62"
+      },
+      {
+        "path": "reference-server.mjs",
+        "bytes": 2370,
+        "physicalLines": 48,
+        "nonblankLines": 47,
+        "sha256": "3cda8fae17ea9344dce4b06d1b33d97af7388e7efc4baf4ba2777cae9fa85899"
+      }
+    ],
+    "C2Backend": [
+      {
+        "path": "../dispatch-fixture.mjs",
+        "bytes": 2637,
+        "physicalLines": 56,
+        "nonblankLines": 52,
+        "sha256": "3ba8cd1b48cdfd8c0dbc4936ac4ed806421be2a123813363d9fae70ea008dcb6"
+      }
+    ],
+    "commonTests": [
+      {
+        "path": "comparison.test.mjs",
+        "bytes": 7329,
+        "physicalLines": 155,
+        "nonblankLines": 154,
+        "sha256": "7aefea690001424cc6ffcd34991214328ee4bdd8486407d1f86a26cdb51580b3"
+      },
+      {
+        "path": "lifecycle.test.mjs",
+        "bytes": 2984,
+        "physicalLines": 64,
+        "nonblankLines": 63,
+        "sha256": "cf8e36ea3c26be588a5850b367c3426e6d433c0f0023fcf76e7ebe3d9999dafa"
+      }
+    ]
+  }
+}

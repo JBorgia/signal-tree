@@ -1,0 +1,20 @@
+{
+  "base": {
+    "manifest": "/private/tmp/st-native-combined-c/SNAPSHOT-C0.json",
+    "sha256": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+    "files": 2974,
+    "mismatches": []
+  },
+  "ours": {
+    "manifest": "/private/tmp/st-native-combined-c5/SNAPSHOT-C5.json",
+    "sha256": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+    "files": 2986,
+    "mismatches": []
+  },
+  "theirs": {
+    "manifest": "/private/tmp/st-shared-construction-successor/SOURCE-SHA256.json",
+    "sha256": "f63ade892aa381b827f1db54986fbb2ca787cb1bde497847104bd0a40bd9dffe",
+    "files": 2982,
+    "mismatches": []
+  }
+}

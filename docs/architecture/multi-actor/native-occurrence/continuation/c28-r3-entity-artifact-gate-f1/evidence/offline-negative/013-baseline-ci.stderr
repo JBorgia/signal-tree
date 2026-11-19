@@ -1,0 +1,3 @@
+npm error code ENOTCACHED
+npm error request to https://registry.npmjs.org/vue/-/vue-3.5.42.tgz failed: cache mode is 'only-if-cached' but no cached response is available.
+npm error A complete log of this run can be found in: /private/tmp/st-c28-r3-entity-artifact-gate-f1/empty-npm-cache/_logs/2026-11-03T15_12_24_063Z-debug-0.log

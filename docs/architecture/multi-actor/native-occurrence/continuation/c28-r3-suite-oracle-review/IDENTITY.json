@@ -1,0 +1,22 @@
+{
+  "packages/react/src/branch-declaration-qualification.spec.tsx": {
+    "sha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "matchesFrozenManifest": true
+  },
+  "packages/react/src/equal-owner-facade-controls.spec.tsx": {
+    "sha256": "7c7525c6fb3fa73d38a6afe7c5f8da49981bf4da49a417272005d8b4120867d1",
+    "matchesFrozenManifest": true
+  },
+  "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts": {
+    "sha256": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0",
+    "matchesFrozenManifest": true
+  },
+  "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts": {
+    "sha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f",
+    "matchesFrozenManifest": true
+  },
+  "packages/kernel/src/lib/internals/native-scalar-selection.ts": {
+    "sha256": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+    "matchesFrozenManifest": true
+  }
+}

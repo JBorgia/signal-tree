@@ -1,0 +1,150 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -188,14 +188,32 @@
+       if (snapshots[6]) requirements.add(snapshots[6]);
+       if (snapshots[7]) requirements.add(snapshots[7].requirement);
+       const ready = [...requirements].every(lifecycle.nativeRequirementReady);
+-      const neutral = ready && [...requirements].every(requirement => {
++      const waiting = new Set<lifecycle.OwnerCell>();
++      const releasable = (requirement: Requirement): boolean => {
++        // A composite is eligible only when every constituent independently is.
++        if (requirement.components) return requirement.components.every(releasable);
+         const proof = lifecycle.nativeProof(requirement);
+-        return !proof.unknown && !proof.invalid && !proof.unavailableInput && !proof.terminalRejectedRoles &&
+-          proof.owners.length === 0 && (proof.destination?.length ?? 0) === 0 &&
+-          (proof.input?.length ?? 0) === 0 && (proof.validation?.length ?? 0) === 0 &&
+-          (proof.possible?.length ?? 0) === 0;
+-      });
+-      return { ready, neutral,
++        if (proof.invalid || proof.unavailableInput || proof.terminalRejectedRoles ||
++            proof.owners.length || (proof.destination?.length ?? 0) ||
++            (proof.input?.length ?? 0) || (proof.validation?.length ?? 0)) return false;
++        if (!proof.unknown && !(proof.possible?.length ?? 0)) return true;
++        // Do not erase arbitrary unknown input/origin/validation. Only the
++        // source's own window, classified before those facts could be cleared.
++        if (!requirement.retirementOwnWindowOnly || !proof.historicalWindow) return false;
++        for (const cell of proof.possible ?? []) {
++          if (cell.outcome === 'confirmed' || cell.outcome === 'rolled-back') continue;
++          if (!lifecycle.ownerCellCanTransition(cell)) return false;
++          waiting.add(cell);
++        }
++        return true;
++      };
++      const canRelease = ready && [...requirements].every(releasable);
++      const canRetire = canRelease && waiting.size === 0;
++      return { ready, canRetire,
++        onSettlement: canRelease && waiting.size ? (callback: () => void) => {
++          const releases = [...waiting].map(cell => lifecycle.onOwnerCellTransition(cell, callback));
++          return () => { for (const release of releases) release(); };
++        } : undefined,
+         current: () => snapshots[0] === fields.get(subject) && snapshots[1] === members.get(subject) &&
+           snapshots[2] === placements.get(subject) && snapshots[3] === views.get(subject) &&
+           snapshots[4] === visible.get(subject) && snapshots[5] === placementViews.get(subject) &&
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -14,6 +14,36 @@
+ export function pendingOwners():readonly OwnerCell[]{return [...pending];}
+ function wake(channel:object):void{queuedConnections.add(channel);if(wakeQueued)return;wakeQueued=true;queueMicrotask(()=>{wakeQueued=false;const queued=[...queuedConnections];queuedConnections.clear();for(const key of queued){const c=connections.get(key);if(c){for(const op of c.ops.values())refresh(op);c.wake();}}});}
+ function ownerWake(cell:OwnerCell):void{for(const op of cell.dependents)wake(op.channel);}
++// Exact-cell source retirement observers. They are neither recipient operations
++// nor readiness observers, and never execute on the transition stack.
++type OwnerTransitionObserver = { callback?: () => void; queued: boolean };
++const ownerTransitionObservers = new WeakMap<OwnerCell, Set<OwnerTransitionObserver>>();
++function queueOwnerObserver(observer: OwnerTransitionObserver): void {
++ if (observer.queued || !observer.callback) return;
++ observer.queued = true;
++ queueMicrotask(() => { observer.queued = false; observer.callback?.(); });
++}
++function notifyOwnerTransition(cell: OwnerCell): void {
++ for (const observer of ownerTransitionObservers.get(cell) ?? []) queueOwnerObserver(observer);
++}
++/** False for unavailable sources; disappearance never settles the captured cell. */
++export function ownerCellCanTransition(cell: OwnerCell): boolean {
++ return cell.outcome === 'pending' && sources.get(cell.owner)?.cells.get(cell.id) === cell;
++}
++export function onOwnerCellTransition(cell: OwnerCell, callback: () => void): () => void {
++ let observers = ownerTransitionObservers.get(cell);
++ if (!observers) ownerTransitionObservers.set(cell, observers = new Set());
++ const observer: OwnerTransitionObserver = { callback, queued: false };
++ observers.add(observer);
++ // Covers a terminal/disappearance race between assessment and subscription.
++ if (!ownerCellCanTransition(cell)) queueOwnerObserver(observer);
++ return () => {
++  observer.callback = undefined;
++  observers!.delete(observer);
++  if (!observers!.size) ownerTransitionObservers.delete(cell);
++ };
++}
++
+ export function ownerTransition(owner:number,event:{kind:string;transactionId:number}):void{
+  const source=sources.get(owner);if(!source)return;
+  let cell=source.cells.get(event.transactionId);
+@@ -25,12 +55,12 @@
+  cell.outcome=outcome;pending.delete(cell);
+  // Synchronous normal/recovery handle enrollment can still obtain this cell.
+  const retired=cell;queueMicrotask(()=>{if(source.cells.get(retired.id)===retired&&retired.outcome!=='pending')source.cells.delete(retired.id);});
+- ownerWake(cell);
++ ownerWake(cell);notifyOwnerTransition(cell);
+ }
+ export function abandonOwnerSource(owner:number):void{
+  const source=sources.get(owner);if(!source)return;
+  // Unregister storage only. Native lifecycle alone determines terminal outcome.
+- for(const cell of source.cells.values()){pending.delete(cell);ownerWake(cell);}
++ for(const cell of source.cells.values()){pending.delete(cell);ownerWake(cell);notifyOwnerTransition(cell);}
+  source.cells.clear();sources.delete(owner);
+ }
+ export function enroll<T extends object>(handle:T,owner:number|undefined,id:number):T{
+@@ -73,7 +103,10 @@
+ }
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+ export type NativeInput={readonly requirement:NativeRequirement;readonly owners:readonly OwnerCell[];readonly terminalRejectedRoles?:number};
+-export type NativeRequirement={readonly components?:readonly NativeRequirement[];proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
++export type NativeRequirement={
++/** Preparation provenance, never inferred from a compacted unknown bit. */
++readonly retirementOwnWindowOnly?: boolean;
++readonly components?:readonly NativeRequirement[];proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
+ // Readiness is independent of proof presence: composite proofs are live views.
+ const unfinishedRequirements=new WeakSet<NativeRequirement>();
+ const requirementListeners=new WeakMap<NativeRequirement,Set<()=>void>>();
+@@ -141,7 +174,7 @@
+  // Input completeness, not destination ownership, decides whether W applies.
+  const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined)
+   ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);
+- const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
++ const requirement:NativeRequirement={retirementOwnWindowOnly:!unknown&&known.length===0&&inputs.length===0&&active.length===0,known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+  unfinishedRequirements.add(requirement);
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -58,9 +58,12 @@
+ }
+ export interface EntityRetirementPlan {
+   readonly ready: boolean;
+-  readonly neutral: boolean;
++  /** Source facts may be neutral or have only a discharged own window. */
++  readonly canRetire: boolean;
+   current(): boolean;
+   onReady(callback: () => void): () => void;
++  /** Only exact live cells whose settlement could make this snapshot releasable. */
++  onSettlement?(callback: () => void): () => void;
+ }
+ type RetirementRequest = { eligible: () => boolean; release?: () => void; queued: boolean };
+ export interface EntityPublicationParticipant {
+@@ -120,9 +123,13 @@
+         request.release = plan.onReady(() => this.scheduleRetirement(subject, request));
+         return;
+       }
+-      // No owner-settlement subscription is implied by requirement readiness.
+-      // A ready non-neutral record remains source evidence; drop only the request.
+-      if (!plan.neutral) { this.cancelRetirement(subject); return; }
++      // Readiness and owner settlement are separate lifetimes. A permanently
++      // ineligible proof remains evidence, without retaining a dead request.
++      if (!plan.canRetire) {
++        if (plan.onSettlement) request.release = plan.onSettlement(() => this.scheduleRetirement(subject, request));
++        else this.cancelRetirement(subject);
++        return;
++      }
+       if (!request.eligible() || revision !== this.revisionToken || !plan.current()) {
+         this.cancelRetirement(subject); return;
+       }

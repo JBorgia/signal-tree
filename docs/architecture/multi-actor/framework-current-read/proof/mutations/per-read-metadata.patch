@@ -1,0 +1,10 @@
+--- a/packages/angular/src/lib/observation-adapter.ts
++++ b/packages/angular/src/lib/observation-adapter.ts
+@@ -36,6 +36,7 @@
+     } finally { computing = false; }
+   });
+   return new Proxy(source, {
++    get: (_target, key) => Reflect.get(computed(readCurrent), key),
+     apply() {
+       const previous = active;
+       const frame = { evaluated: false };

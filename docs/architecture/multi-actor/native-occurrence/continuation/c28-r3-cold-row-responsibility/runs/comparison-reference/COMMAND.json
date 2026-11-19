@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "preparation-reader-comparison",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-cold-row-responsibility/baseline",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/comparison-reference/tmp",
+    "ST_READER_CANDIDATE": "0",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/comparison-reference/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/comparison-reference/data",
+    "ST_COLD_OUTPUT": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/comparison-reference/observations.jsonl",
+    "ST_SNAPSHOT_OUTPUT": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/comparison-reference/observations.jsonl"
+  }
+}

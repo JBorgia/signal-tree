@@ -1,0 +1,17 @@
+--- a/packages/kernel/src/lib/physical/order-restores-for-placement.ts
++++ b/packages/kernel/src/lib/physical/order-restores-for-placement.ts
+@@ -71,11 +71,9 @@
+       partialHead += 1;
+     }
+     const next =
+-      fullHead < full.length
+-        ? full[fullHead++]
+-        : partialHead < partial.length
+-        ? partial[partialHead++]
+-        : restores.find(
++      restores.find(effect => !placed.has(effect) && waiting.get(effect) === 0)
++        ?? restores.find(effect => !placed.has(effect) && hasLiveAnchor.has(effect))
++        ?? restores.find(
+             (effect) =>
+               !placed.has(effect) &&
+               !isWaitingOn(effect, anchorsOf(effect)?.beforeSubject)

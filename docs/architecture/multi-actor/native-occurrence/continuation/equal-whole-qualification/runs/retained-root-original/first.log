@@ -1,0 +1,35 @@
+
+> nx run kernel:test native-certificate-successor.spec.ts --testNamePattern=omission then restored retained collection --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-certificate-successor.spec.ts --testNamePattern="omission then restored retained collection" --maxWorkers=1
+
+(node:95169) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95176) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-equal-whole-c16-qualification/candidate/packages/kernel
+
+(node:95261) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 4 skipped (5)
+   Start at  12:01:13
+   Duration  2.38s (transform 1.20s, setup 0ms, import 1.45s, tests 47ms, environment 683ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.1s

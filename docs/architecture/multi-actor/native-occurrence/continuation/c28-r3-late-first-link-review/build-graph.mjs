@@ -1,0 +1,17 @@
+import {createRequire} from 'node:module';
+import {writeFileSync,readFileSync} from 'node:fs';
+import {resolve,dirname,relative} from 'node:path';
+const require=createRequire('/Users/jonathanborgia/code/signaltree/package.json');
+const {build,version}=require('esbuild');
+const root=dirname(new URL(import.meta.url).pathname);
+const options={absWorkingDir:root,entryPoints:['initial.mjs'],outdir:'split',bundle:true,splitting:true,format:'esm',platform:'browser',minify:false,treeShaking:true,define:{ngDevMode:'false','process.env.NODE_ENV':'"production"'},external:['@angular/*','rxjs','rxjs/*','tslib'],metafile:true,logLevel:'info'};
+writeFileSync(root+'/BUILD-COMMAND.json',JSON.stringify({esbuild:version,options},null,2)+'\n');
+const result=await build(options);const meta=result.metafile;writeFileSync(root+'/metafile.json',JSON.stringify(meta,null,2)+'\n');
+const outputs=Object.keys(meta.outputs);const first=outputs.find(k=>meta.outputs[k].entryPoint==='initial.mjs');
+const target=p=>outputs.find(k=>resolve(root,k)===resolve(root,p));
+const closure=(start)=>{const seen=new Set();const visit=k=>{if(seen.has(k))return;seen.add(k);for(const imp of meta.outputs[k].imports)if(!imp.external&&imp.kind!=='dynamic-import'){const next=target(imp.path);if(!next)throw Error('Unresolved graph import '+imp.path);visit(next);}};visit(start);return [...seen];};
+const initial=closure(first);const contributions=(files,suffix)=>files.filter(k=>Object.entries(meta.outputs[k].inputs).some(([p,v])=>p.endsWith(suffix)&&v.bytesInOutput>0));
+const registrations=contributions(outputs,'/lib/link.js');const authorities=contributions(outputs,'/lib/internals/entity-publication.js');
+const initialRegistration=registrations.filter(k=>initial.includes(k));
+const classification=initialRegistration.length?'unreached-registration-in-initial-closure':authorities.length!==1?'unreached-authority-graph-not-single':'candidate-late-single-authority-requires-code-inspection';
+const record={classification,initial,registrations,authorities,initialRegistration,outputs};writeFileSync(root+'/GRAPH-RESULT.json',JSON.stringify(record,null,2)+'\n');console.log(JSON.stringify(record));

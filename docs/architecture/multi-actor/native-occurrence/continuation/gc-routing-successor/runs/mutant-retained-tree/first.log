@@ -1,0 +1,320 @@
+Forwarding retention artifacts: /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/artifacts/forwarding-retention/run-CAXSo1
+hold-proceed-success: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 813ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 812ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:10
+   Duration  3.48s (transform 1.33s, setup 0ms, import 1.62s, tests 813ms, environment 814ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+hold-proceed-skip: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 1005ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 1003ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:14
+   Duration  3.73s (transform 1.73s, setup 0ms, import 2.06s, tests 1.00s, environment 420ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+hold-proceed-caught: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 723ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 721ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:19
+   Duration  2.96s (transform 1.33s, setup 0ms, import 1.59s, tests 723ms, environment 452ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+drop-proceed-success: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 833ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 832ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:22
+   Duration  3.06s (transform 1.37s, setup 0ms, import 1.62s, tests 833ms, environment 420ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+drop-proceed-skip: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 734ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 733ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:26
+   Duration  2.64s (transform 1.06s, setup 0ms, import 1.27s, tests 734ms, environment 454ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+drop-proceed-caught: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 1116ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 1115ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:29
+   Duration  3.44s (transform 1.33s, setup 0ms, import 1.57s, tests 1.12s, environment 560ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+hold-value-success: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 895ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 894ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:33
+   Duration  2.97s (transform 1.10s, setup 0ms, import 1.32s, tests 895ms, environment 563ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+hold-value-skip: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 1233ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 1230ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:36
+   Duration  3.29s (transform 1.20s, setup 0ms, import 1.46s, tests 1.23s, environment 397ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+hold-value-caught: FAIL
+
+ RUN  v4.1.9 /private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/packages/kernel
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts (1 test | 1 failed) 864ms
+   × closed success skip and caught-failure callbacks release sampled receivers and errors 862ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  14:05:40
+   Duration  4.33s (transform 1.61s, setup 0ms, import 1.93s, tests 864ms, environment 978ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/forwarding-retention-probe.spec.ts > closed success skip and caught-failure callbacks release sampled receivers and errors
+AssertionError: tree: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/forwarding-retention-probe.spec.ts:63:101
+     61|  if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const err…
+     62|  for(const key of Object.keys(refs)){
+     63|   if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))e…
+       |                                                                                                     ^
+     64|   expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
+     65|  }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+held-hold-proceed: PASS
+held-drop-proceed: PASS
+held-hold-row: PASS
+Forwarding retention: 3/12 passed
+Failed or mismatched execution: hold-proceed-success
+Failed or mismatched execution: hold-proceed-skip
+Failed or mismatched execution: hold-proceed-caught
+Failed or mismatched execution: drop-proceed-success
+Failed or mismatched execution: drop-proceed-skip
+Failed or mismatched execution: drop-proceed-caught
+Failed or mismatched execution: hold-value-success
+Failed or mismatched execution: hold-value-skip
+Failed or mismatched execution: hold-value-caught

@@ -1,0 +1,16 @@
+{
+  "cwd": "/private/tmp/st-r4-review-resumed/c8-candidate",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "c8-review-singleton-row-reuse.spec.ts",
+    "c8-review-packet-index-review.spec.ts",
+    "c8-review-publication-retirement-boundaries.spec.ts",
+    "--testNamePattern=recipient finalizer reentry preserves|later recipient finalizer source reentry|callback-capable finalization reentry",
+    "--maxWorkers=1"
+  ]
+}

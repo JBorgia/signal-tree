@@ -1,0 +1,6 @@
+[
+  "packages/kernel/src/lib/entity-key-evidence-public.spec.ts",
+  "packages/kernel/src/lib/entity-signal.ts",
+  "packages/kernel/src/lib/physical/ordinary-key-evidence.spec.ts",
+  "packages/kernel/src/lib/physical/ordinary-key-evidence.ts"
+]

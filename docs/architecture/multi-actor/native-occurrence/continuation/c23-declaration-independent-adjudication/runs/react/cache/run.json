@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test react branch-declaration-qualification.spec.tsx --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T22:02:29.233Z",
+    "endTime": "2026-11-02T22:02:56.952Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "react:test",
+      "target": "test",
+      "projectName": "react",
+      "hash": "16066974058705453484",
+      "startTime": "2026-11-02T22:02:29.370Z",
+      "endTime": "2026-11-02T22:02:56.951Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

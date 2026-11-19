@@ -1,0 +1,14 @@
+{
+  "/private/tmp/st-native-combined-c11/candidate/packages/kernel/vitest.config.ts": "76f5676437b9d8e8236e7b3a48e47c42b326458dcf1f712407a97ceac447b566",
+  "/private/tmp/st-native-combined-c11/candidate/packages/kernel/vitest.retention.config.ts": "90b6c446f93bc3acd15511f214a15a6c39b7159798cf523433882ddfbe2c1d37",
+  "/private/tmp/st-native-combined-c11/candidate/vitest.config.ts": "b414af05494ac95a58b300635f3fb6fe5edc794fcd4f0c5094f592b0148089b3",
+  "/private/tmp/st-native-combined-c11/candidate/tools/verify-gates.mjs": "21ac1c5f2e2e1b347af819f685d0b9ce7c58bc330092312c9819a2d6b8980843",
+  "/private/tmp/st-native-combined-c11/candidate/tsconfig.typecheck-specs.json": "24925071ff6eb7819abfce8de23213f59fa2e5da5b6fd361951208378f040bff",
+  "/private/tmp/st-native-combined-c11/candidate/packages/kernel/src/lib/native-netzero-diagnostic.spec.ts": "243e224b7fbf95deaeaf9d42c721c78f0d94449da1ef3c877c7ef2a370138c63",
+  "/private/tmp/st-native-combined-c11/candidate/packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts": "3774b2e3bcb983b3b7f85d8280c3907b8fbeb732b8aab9a8cec7b1ec1b157ae9",
+  "/private/tmp/st-native-combined-c11/candidate/packages/kernel/src/lib/forwarding-retention-probe.spec.ts": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+  "/private/tmp/st-native-combined-c11/candidate/packages/kernel/src/lib/internals/selected-write-operation.ts": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111",
+  "/private/tmp/st-native-combined-c11/runs/native-diagnostic-harness/observations.jsonl": "199fafb8ae38b2f42ea81982ec9387cf1cc1861e8a8edec5154e77bbf0a03442",
+  "/private/tmp/st-c11-forwarding-retention/RESULTS.json": "f945d198889896e89b82231c233587964755d400b1e09a9cc27b8544d879f34d",
+  "/private/tmp/st-native-combined-c10-promoted/runs/kernel-full/REPORTED-FAILURE-GROUPS.json": "25b091e7f3b65748cc7c30a3461ae25dc80d2078e0db362a7db5be0533c093dd"
+}

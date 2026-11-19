@@ -1,0 +1,56 @@
+function leaf(proof:Proof, provenance?:boolean):NativeRequirement {
+ const result:NativeRequirement={proof,inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};
+ if(provenance!==undefined)Object.defineProperty(result,'retirementOwnWindowOnly',{value:provenance,enumerable:true});
+ return result;
+}
+const clean=()=>leaf({owners:[],unknown:false,invalid:false});
+function ownWindow(cell:OwnerCell){return leaf({owners:[],unknown:true,invalid:false,historicalWindow:true,possible:[cell]},true);}
+const arbitrary=()=>leaf({owners:[],unknown:true,invalid:false},false);
+function flatten(root:NativeRequirement):NativeRequirement {
+ const result=leaf(nativeProof(root));
+ if(Object.hasOwn(root,'retirementOwnWindowOnly'))Object.defineProperty(result,'retirementOwnWindowOnly',{value:root.retirementOwnWindowOnly,enumerable:true});
+ assert.deepEqual(nativeProof(result),nativeProof(root));
+ assert.equal(Object.hasOwn(result,'retirementOwnWindowOnly'),Object.hasOwn(root,'retirementOwnWindowOnly'));
+ assert.equal(result.retirementOwnWindowOnly,root.retirementOwnWindowOnly);
+ assert.equal(result.components,undefined);
+ return result;
+}
+const cell:OwnerCell={owner:1,id:1,outcome:'confirmed',dependents:new Set()};
+function compare(name:string,root:NativeRequirement,expectedOriginal:boolean,expectedFlat:boolean){
+ const flat=flatten(root),original=assess(root),flattened=assess(flat);
+ assert.equal(original.canRetire,expectedOriginal,name+' original');
+ assert.equal(flattened.canRetire,expectedFlat,name+' flattened');
+ assert.equal(original.ready,true);assert.equal(flattened.ready,true);
+ console.log(JSON.stringify({case:name,original,flattened,rootProvenance:Object.hasOwn(root,'retirementOwnWindowOnly')?root.retirementOwnWindowOnly:'absent'}));
+ return {flat,original,flattened};
+}
+compare('clean+clean',combineNativeRequirements([clean(),clean()]),true,true);
+compare('own-window-confirmed+clean',combineNativeRequirements([ownWindow(cell),clean()]),true,false);
+cell.outcome='rolled-back';
+compare('own-window-rolled-back+clean',combineNativeRequirements([ownWindow(cell),clean()]),true,false);
+compare('arbitrary-unknown+clean',combineNativeRequirements([arbitrary(),clean()]),false,false);
+const mixed=combineNativeRequirements([ownWindow(cell),arbitrary()]);
+const mixedResult=compare('own-window+arbitrary-unknown',mixed,false,false);
+// Deliberately UNSAFE comparison: guessing true provenance from one component.
+const unsafe=leaf(nativeProof(mixed),true);
+assert.deepEqual(nativeProof(unsafe),nativeProof(mixed));
+assert.equal(assess(unsafe).canRetire,true);
+console.log(JSON.stringify({case:'unsafe-promoted-provenance',original:mixedResult.original,flattenedWithInventedTrue:assess(unsafe)}));
+cell.outcome='pending';sources.set(cell.owner,{cells:new Map([[cell.id,cell]])});
+const pendingLeaf=ownWindow(cell),pendingComposite=combineNativeRequirements([pendingLeaf,clean()]);
+const pending=compare('own-window-pending-present+clean',pendingComposite,false,false);
+assert.equal(pending.original.canRelease,true);assert.equal(pending.original.wouldSubscribe,true);
+assert.deepEqual(pending.original.waiting,['1:1']);assert.equal(pending.flattened.canRelease,false);
+const proofBefore=nativeProof(pendingLeaf),outcomeBefore=cell.outcome;
+const before=assess(pendingLeaf);
+// Exact source-disappearance effects used by abandonOwnerSource: clear/delete
+// storage; no owner outcome transition. Wake/notification scheduling is omitted.
+sources.get(cell.owner)!.cells.clear();sources.delete(cell.owner);
+assert.equal(cell.outcome,outcomeBefore);assert.equal(nativeProof(pendingLeaf),proofBefore);
+const after=assess(pendingLeaf);
+assert.equal(before.canRelease,true);assert.equal(before.wouldSubscribe,true);
+assert.equal(after.canRelease,false);assert.equal(after.wouldSubscribe,false);
+console.log(JSON.stringify({case:'source-disappearance-same-leaf',before,after,outcomeUnchanged:cell.outcome,proofIdentityUnchanged:true}));
+const missing=compare('own-window-pending-disappeared+clean',pendingComposite,false,false);
+assert.equal(missing.original.canRelease,false);
+console.log('PASS: 7 original/flattened comparisons plus unsafe-provenance and source-disappearance controls; predicate model only.');

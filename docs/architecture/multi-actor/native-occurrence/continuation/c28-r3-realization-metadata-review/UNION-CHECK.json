@@ -1,0 +1,18 @@
+{
+  "rawEventRuns": 3,
+  "pairwiseStartedOverlap": false,
+  "completedFiles": 636,
+  "startedFiles": 638,
+  "unstartedFiles": 0,
+  "incompleteFiles": [
+    "/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts"
+  ],
+  "observedCounts": {
+    "passed": 7040,
+    "failed": 19,
+    "skipped": 12,
+    "expectedFailureSatisfied": 5
+  },
+  "remaining280ReportAccurate": true
+}

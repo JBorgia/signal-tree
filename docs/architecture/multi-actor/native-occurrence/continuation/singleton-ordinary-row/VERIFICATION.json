@@ -1,0 +1,13 @@
+{
+  "baseManifestSha256": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+  "baseFilesVerifiedUnchanged": 2986,
+  "candidateChangedExistingFiles": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts"
+  ],
+  "addedTests": [
+    "packages/kernel/src/lib/singleton-row-reuse.spec.ts",
+    "packages/kernel/src/lib/singleton-row-allocation.spec.ts"
+  ],
+  "originalPointGateUnchanged": true,
+  "newSourceManifestSha256": "c2fd0a2e27a3a0e80601e2909d0b7ad4720d1bfca8ee1dda0053fea7503af9f0"
+}

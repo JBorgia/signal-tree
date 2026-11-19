@@ -1,0 +1,10 @@
+{
+  "packages/kernel/src/index.ts": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388",
+  "packages/kernel/src/lib/link.ts": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65",
+  "packages/kernel/src/lib/path-notifier.ts": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+  "packages/kernel/src/lib/internals/location-runtime.ts": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5",
+  "packages/kernel/src/lib/internals/native-location-realization.ts": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680",
+  "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+  "packages/kernel/src/lib/internals/observation-adapter.ts": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574"
+}

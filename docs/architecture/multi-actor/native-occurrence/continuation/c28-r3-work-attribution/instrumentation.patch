@@ -1,0 +1,93 @@
+--- /private/tmp/st-c28-r3-work-attribution/original.spec.ts	2026-11-02 21:25:27
++++ /private/tmp/st-c28-r3-work-attribution/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts	2026-11-02 21:25:28
+@@ -1,3 +1,4 @@
++import { appendFileSync } from 'node:fs';
+ import { entityMap } from '../index';
+ import { signalTree } from './signal-tree';
+ import type { AcquiredSubjectHandle } from './physical/structural-store';
+@@ -84,6 +85,20 @@
+  */
+ function countIteratedElements(run: () => void): number {
+   let visited = 0;
++  let recording = false;
++  let attributing = false;
++  const origins: Record<string, number> = Object.create(null);
++  const countVisit = (n: number): void => {
++    if (attributing) return;
++    visited += n;
++    if (!recording || n === 0) return;
++    attributing = true;
++    try {
++      const lines = new Error().stack?.split('\n') ?? [];
++      const origin = lines.find(line => line.includes('/src/') && !line.includes('entity-granular-reactivity.spec.ts')) ?? 'unattributed';
++      origins[origin] = (origins[origin] ?? 0) + n;
++    } finally { attributing = false; }
++  };
+   const restore: Array<() => void> = [];
+   const patch = (
+     target: object,
+@@ -101,7 +116,7 @@
+   const counting = (iterator: Iterator<unknown>): IterableIterator<unknown> => ({
+     next() {
+       const step = iterator.next();
+-      if (!step.done) visited++;
++      if (!step.done) countVisit(1);
+       return step;
+     },
+     [Symbol.iterator]() {
+@@ -118,7 +133,7 @@
+   for (const proto of [Map.prototype, Set.prototype])
+     patch(proto, 'forEach', (original) =>
+       function (this: { size: number }, ...args: unknown[]) {
+-        visited += this.size;
++        countVisit(this.size);
+         return original.apply(this, args);
+       }
+     );
+@@ -144,7 +159,7 @@
+   ])
+     patch(Array.prototype, key, (original) =>
+       function (this: unknown[], ...args: unknown[]) {
+-        visited += this.length;
++        countVisit(this.length);
+         return original.apply(this, args);
+       }
+     );
+@@ -152,31 +167,34 @@
+     patch(Object, key, (original) =>
+       function (this: unknown, ...args: unknown[]) {
+         const result = original.apply(this, args) as unknown[];
+-        visited += result.length;
++        countVisit(result.length);
+         return result;
+       }
+     );
+   patch(Array.prototype, 'push', (original) =>
+     function (this: unknown[], ...args: unknown[]) {
+-      visited += args.length;
++      countVisit(args.length);
+       return original.apply(this, args);
+     }
+   );
+   patch(Array, 'from', (original) =>
+     function (this: unknown, ...args: unknown[]) {
+       const result = original.apply(this, args) as unknown[];
+-      visited += result.length;
++      countVisit(result.length);
+       return result;
+     }
+   );
+   let counted: number;
+   try {
+     visited = 0;
++    recording = true;
+     run();
+     counted = visited;
++    recording = false;
+   } finally {
+     for (let i = restore.length - 1; i >= 0; i--) restore[i]();
+   }
++  appendFileSync(process.env['ST_WORK_ATTRIBUTION']!, JSON.stringify({ counted, origins }) + '\n');
+   return counted;
+ }
+ 

@@ -1,0 +1,210 @@
+[
+  {
+    "arm": "baseline",
+    "size": 128,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      61447
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 61599176,
+    "firstSampleHeapUsed": 44276608,
+    "sampledPositiveGrowth": 17322568,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "indexed",
+    "size": 128,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      62177
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 69758456,
+    "firstSampleHeapUsed": 43363112,
+    "sampledPositiveGrowth": 26395344,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "indexed",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      62357
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 82324880,
+    "firstSampleHeapUsed": 45574744,
+    "sampledPositiveGrowth": 36750136,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      62593
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 81496992,
+    "firstSampleHeapUsed": 44327904,
+    "sampledPositiveGrowth": 37169088,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "baseline",
+    "size": 2048,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      63121
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 196933696,
+    "firstSampleHeapUsed": 43929904,
+    "sampledPositiveGrowth": 153003792,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "indexed",
+    "size": 2048,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      63206
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 179019208,
+    "firstSampleHeapUsed": 43929616,
+    "sampledPositiveGrowth": 135089592,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "indexed",
+    "size": 512,
+    "replicate": 2,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      63309
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 81381256,
+    "firstSampleHeapUsed": 44122032,
+    "sampledPositiveGrowth": 37259224,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 2,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      63402
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 89945752,
+    "firstSampleHeapUsed": 39092856,
+    "sampledPositiveGrowth": 50852896,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  }
+]

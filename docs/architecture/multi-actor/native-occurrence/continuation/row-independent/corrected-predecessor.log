@@ -1,0 +1,265 @@
+
+> nx run kernel:test row-source-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs row-source-independent.spec.ts --maxWorkers=1
+
+(node:53993) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:54002) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-row-source-independent/predecessor/packages/kernel
+
+(node:54015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/row-source-independent.spec.ts (6 tests | 4 failed) 46ms
+   × row plus selected and empty-key fields distinguish sibling and independent row writes 26ms
+   × row and field hold pending then confirm, later ordinary publication remains useful 7ms
+   × row and field hold pending then rollback, later ordinary publication remains useful 6ms
+   × row and field retain original subject across rekey, remove, same-key recreation 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/row-source-independent.spec.ts > row plus selected and empty-key fields distinguish sibling and independent row writes
+AssertionError: expected [ false, true, true ] to deeply equal [ true, true, true ]
+
+Compared values have no visual difference.
+
+ ❯ complete src/lib/row-source-independent.spec.ts:15:29
+     13|  const done=connections.map(()=>false);
+     14|  const waits=connections.map((c,i)=>c.settled().then(()=>{done[i]=true…
+     15|  await drain();expect(done).toEqual(connections.map(()=>true));await P…
+       |                             ^
+     16| };
+     17|
+ ❯ src/lib/row-source-independent.spec.ts:25:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/row-source-independent.spec.ts > row and field hold pending then confirm, later ordinary publication remains useful
+AssertionError: expected [ false, false ] to deeply equal [ true, true ]
+
+Compared values have no visual difference.
+
+ ❯ complete src/lib/row-source-independent.spec.ts:15:29
+     13|  const done=connections.map(()=>false);
+     14|  const waits=connections.map((c,i)=>c.settled().then(()=>{done[i]=true…
+     15|  await drain();expect(done).toEqual(connections.map(()=>true));await P…
+       |                             ^
+     16| };
+     17|
+ ❯ src/lib/row-source-independent.spec.ts:41:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/row-source-independent.spec.ts > row and field hold pending then rollback, later ordinary publication remains useful
+AssertionError: expected [ false, true ] to deeply equal [ true, true ]
+
+Compared values have no visual difference.
+
+ ❯ complete src/lib/row-source-independent.spec.ts:15:29
+     13|  const done=connections.map(()=>false);
+     14|  const waits=connections.map((c,i)=>c.settled().then(()=>{done[i]=true…
+     15|  await drain();expect(done).toEqual(connections.map(()=>true));await P…
+       |                             ^
+     16| };
+     17|
+ ❯ src/lib/row-source-independent.spec.ts:41:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/lib/row-source-independent.spec.ts > row and field retain original subject across rekey, remove, same-key recreation
+AssertionError: expected [ false, true ] to deeply equal [ true, true ]
+
+Compared values have no visual difference.
+
+ ❯ complete src/lib/row-source-independent.spec.ts:15:29
+     13|  const done=connections.map(()=>false);
+     14|  const waits=connections.map((c,i)=>c.settled().then(()=>{done[i]=true…
+     15|  await drain();expect(done).toEqual(connections.map(()=>true));await P…
+       |                             ^
+     16| };
+     17|
+ ❯ src/lib/row-source-independent.spec.ts:53:51
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 8 unhandled errors during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ src/lib/experimental-publication/private.ts:252:98
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row plus selected and empty-key fields distinguish sibling and independent row writes". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ src/lib/experimental-publication/private.ts:252:98
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field hold pending then confirm, later ordinary publication remains useful". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ Object.wake src/lib/experimental-publication/private.ts:326:121
+ ❯ src/lib/experimental-publication/lifecycle.ts:15:308
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field hold pending then confirm, later ordinary publication remains useful". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ src/lib/experimental-publication/private.ts:252:98
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field hold pending then rollback, later ordinary publication remains useful". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ src/lib/experimental-publication/private.ts:252:98
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field hold pending then rollback, later ordinary publication remains useful". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ Object.wake src/lib/experimental-publication/private.ts:326:121
+ ❯ src/lib/experimental-publication/lifecycle.ts:15:308
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field hold pending then rollback, later ordinary publication remains useful". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ src/lib/experimental-publication/private.ts:252:98
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field retain original subject across rekey, remove, same-key recreation". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+Error: Support has no enrolled occurrence
+ ❯ installFact src/lib/experimental-publication/private.ts:151:64
+    149| }
+    150| function installFact(b:Binding,node:object,key:unknown,fact:Fact,requi…
+    151|  const occurrence=b.occurrences.get(node);if(!occurrence)throw Error('…
+       |                                                                ^
+    152|  factRequirements.set(fact,requirement);
+    153|  b.index.replace(occurrence,key,requirement,proof=>{ownProofs.set(fact…
+ ❯ ready src/lib/experimental-publication/private.ts:229:16
+ ❯ src/lib/experimental-publication/private.ts:252:98
+ ❯ processTicksAndRejections node:internal/process/task_queues:104:5
+
+This error originated in "src/lib/row-source-independent.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "row and field retain original subject across rekey, remove, same-key recreation". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+     Errors  8 errors
+   Start at  16:47:05
+   Duration  1.60s (transform 811ms, setup 0ms, import 983ms, tests 46ms, environment 426ms)
+
+Warning: command "node tools/run-core-vitest.mjs row-source-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.3s

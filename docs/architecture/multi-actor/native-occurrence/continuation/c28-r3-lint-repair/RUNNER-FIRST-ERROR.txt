@@ -1,0 +1,1 @@
+Initial candidate precedence invocation reused existing runs/precedence-first name, mkdir failed before launching compiler/test; preserved baseline folder. Renamed own candidate invocation candidate-precedence-first. No runtime execution occurred in failed runner launch.

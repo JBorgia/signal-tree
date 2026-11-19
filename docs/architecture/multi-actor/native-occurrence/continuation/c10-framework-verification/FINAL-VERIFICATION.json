@@ -1,0 +1,38 @@
+{
+  "manifestSha256": "de88e207c66e65a1a191d05ab4f2b5b2a4deeead71a06f239f278e28dee70dc4",
+  "files": 3042,
+  "mismatches": [],
+  "executedSequentially": true,
+  "results": [
+    {
+      "name": "source-types",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "spec-types",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "angular",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "react",
+      "exit": 1,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "vue",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "solid",
+      "exit": 1,
+      "manifestMismatchesAfter": []
+    }
+  ]
+}

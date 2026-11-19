@@ -1,0 +1,467 @@
+{
+  "n2": [
+    {
+      "terminal": "confirm",
+      "relative": [
+        "x"
+      ],
+      "noop": false,
+      "previousRevision": 8,
+      "effectivePreviousRevision": 8,
+      "mask": [
+        {
+          "owner": 1,
+          "id": 4,
+          "outcome": "confirmed"
+        }
+      ],
+      "changed": false,
+      "clean": false,
+      "previousClean": false,
+      "difference": {
+        "roles": {
+          "prior": {
+            "owners": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              },
+              {
+                "owner": 1,
+                "id": 2,
+                "outcome": "confirmed"
+              }
+            ],
+            "destination": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "input": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              },
+              {
+                "owner": 1,
+                "id": 2,
+                "outcome": "confirmed"
+              }
+            ],
+            "validation": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              },
+              {
+                "owner": 1,
+                "id": 2,
+                "outcome": "confirmed"
+              }
+            ],
+            "possible": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ]
+          },
+          "effective": {
+            "owners": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "destination": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "input": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "validation": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "possible": [
+              {
+                "owner": 1,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "terminal": "confirm",
+      "relative": [
+        "y"
+      ],
+      "noop": true,
+      "previousRevision": 12,
+      "effectivePreviousRevision": 12,
+      "mask": [
+        {
+          "owner": 1,
+          "id": 4,
+          "outcome": "confirmed"
+        }
+      ],
+      "changed": false,
+      "clean": false,
+      "previousClean": false,
+      "difference": {}
+    },
+    {
+      "terminal": "dispose-pending",
+      "relative": [
+        "x"
+      ],
+      "noop": false,
+      "previousRevision": 25,
+      "effectivePreviousRevision": 25,
+      "mask": [
+        {
+          "owner": 2,
+          "id": 4,
+          "outcome": "confirmed"
+        }
+      ],
+      "changed": false,
+      "clean": false,
+      "previousClean": false,
+      "difference": {
+        "roles": {
+          "prior": {
+            "owners": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              },
+              {
+                "owner": 2,
+                "id": 2,
+                "outcome": "confirmed"
+              }
+            ],
+            "destination": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "input": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              },
+              {
+                "owner": 2,
+                "id": 2,
+                "outcome": "confirmed"
+              }
+            ],
+            "validation": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              },
+              {
+                "owner": 2,
+                "id": 2,
+                "outcome": "confirmed"
+              }
+            ],
+            "possible": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ]
+          },
+          "effective": {
+            "owners": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "destination": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "input": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "validation": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ],
+            "possible": [
+              {
+                "owner": 2,
+                "id": 1,
+                "outcome": "pending"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "terminal": "dispose-pending",
+      "relative": [
+        "y"
+      ],
+      "noop": true,
+      "previousRevision": 29,
+      "effectivePreviousRevision": 29,
+      "mask": [
+        {
+          "owner": 2,
+          "id": 4,
+          "outcome": "confirmed"
+        }
+      ],
+      "changed": false,
+      "clean": false,
+      "previousClean": false,
+      "difference": {}
+    }
+  ],
+  "terminals": [
+    {
+      "terminal": "confirm",
+      "phase": "confirmed",
+      "earlier": {
+        "state": "superseded"
+      },
+      "fresh": [
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "started",
+          "basis": "surviving"
+        },
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "no-write"
+        }
+      ],
+      "sent": [
+        {
+          "x": 7,
+          "y": 0
+        }
+      ],
+      "settled": true,
+      "errors": [],
+      "operations": [],
+      "originalRegistrations": [
+        {
+          "owner": 1,
+          "id": 1,
+          "registered": false
+        },
+        {
+          "owner": 1,
+          "id": 2,
+          "registered": false
+        }
+      ]
+    },
+    {
+      "terminal": "confirm",
+      "phase": "write-after-dispose",
+      "earlier": {
+        "state": "superseded"
+      },
+      "fresh": [
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "started",
+          "basis": "surviving"
+        },
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "no-write"
+        }
+      ],
+      "sent": [
+        {
+          "x": 7,
+          "y": 0
+        }
+      ],
+      "settled": true,
+      "errors": [],
+      "operations": [],
+      "originalRegistrations": [
+        {
+          "owner": 1,
+          "id": 1,
+          "registered": false
+        },
+        {
+          "owner": 1,
+          "id": 2,
+          "registered": false
+        }
+      ]
+    },
+    {
+      "terminal": "dispose-pending",
+      "phase": "disposed-pending",
+      "earlier": {
+        "state": "superseded"
+      },
+      "fresh": [
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "disposed"
+        },
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "no-write"
+        }
+      ],
+      "sent": [],
+      "settled": true,
+      "errors": [],
+      "operations": [],
+      "originalRegistrations": [
+        {
+          "owner": 2,
+          "id": 1,
+          "registered": false
+        },
+        {
+          "owner": 2,
+          "id": 2,
+          "registered": false
+        }
+      ]
+    },
+    {
+      "terminal": "dispose-pending",
+      "phase": "confirmed-after-dispose",
+      "earlier": {
+        "state": "superseded"
+      },
+      "fresh": [
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "disposed"
+        },
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "no-write"
+        }
+      ],
+      "sent": [],
+      "settled": true,
+      "errors": [],
+      "operations": [],
+      "originalRegistrations": [
+        {
+          "owner": 2,
+          "id": 1,
+          "registered": false
+        },
+        {
+          "owner": 2,
+          "id": 2,
+          "registered": false
+        }
+      ]
+    },
+    {
+      "terminal": "dispose-pending",
+      "phase": "write-after-dispose",
+      "earlier": {
+        "state": "superseded"
+      },
+      "fresh": [
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "disposed"
+        },
+        {
+          "state": "no-write"
+        },
+        {
+          "state": "no-write"
+        }
+      ],
+      "sent": [],
+      "settled": true,
+      "errors": [],
+      "operations": [],
+      "originalRegistrations": [
+        {
+          "owner": 2,
+          "id": 1,
+          "registered": false
+        },
+        {
+          "owner": 2,
+          "id": 2,
+          "registered": false
+        }
+      ]
+    }
+  ]
+}

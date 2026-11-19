@@ -1,0 +1,253 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1462,6 +1462,27 @@
+       );
+     }
+   );
++  // Only this initializer's resources: normal destruction and failed attachment
++  // share releases. Clear the captured callback before invoking it so retries and
++  // later tree destruction cannot release a replacement owner's resources.
++  const ownedCleanups = new Set<() => void>();
++  const registerOwnedCleanup = (cleanup: () => void): void => {
++    let current: (() => void) | undefined = cleanup;
++    const release = (): void => {
++      const run = current;
++      current = undefined;
++      ownedCleanups.delete(release);
++      run?.();
++    };
++    ownedCleanups.add(release);
++    tree.registerCleanup(release);
++  };
++  const unwindOwnedInitialization = (): void => {
++    for (const release of [...ownedCleanups].reverse()) {
++      try { release(); }
++      catch (error) { reportCleanupFailure('initialization unwind', error); }
++    }
++  };
+   const transactionOwnerToken = {};
+   let nextTransactionId = 1;
+   let destroyed = false;
+@@ -2308,7 +2329,7 @@
+   };
+   const installedOperations = new Map<number, OperationRecord>();
+   const expectedDispositions = new Map<number, readonly TurnEffect[]>();
+-  tree.registerCleanup(() => {
++  registerOwnedCleanup(() => {
+     installedOperations.clear();
+     expectedDispositions.clear();
+   });
+@@ -2316,7 +2337,7 @@
+   if (sourceCaptureRuntime) {
+     const sourceRegistry = getPositionRegistry(tree.$);
+     if (sourceRegistry)
+-      tree.registerCleanup(
++      registerOwnedCleanup(
+         bindMutationCaptureRegistry(sourceRegistry, sourceCaptureRuntime)
+       );
+     sourceCaptureRuntime.prepareMemberResponsibility = (
+@@ -2700,7 +2721,7 @@
+         ],
+       };
+     };
+-    tree.registerCleanup(() => {
++    registerOwnedCleanup(() => {
+       delete sourceCaptureRuntime.prepareEntityResponsibility;
+       delete sourceCaptureRuntime.prepareMemberResponsibility;
+     });
+@@ -3949,6 +3970,86 @@
+     );
+     markOwnerInvalidatedFrom(tree.$ as object);
+   };
++
++  function reportCleanupFailure(step: string, error: unknown): void {
++    // Guarded: a throwing console (a fail-on-console harness) must not turn
++    // a report into a new failure on the path that is cleaning up.
++    try {
++      console.error(
++        `SignalTree: transactions() cleanup failed during ${step}.`,
++        error
++      );
++    } catch {
++      // Nothing further can be reported safely.
++    }
++  }
++
++  registerOwnedCleanup(() => {
++      destroyed = true;
++      releaseScalarSelection?.();
++      research.unregister(lifecycleRegistry?.id);
++      lifecycleViews.clear();
++      lifecycleScopes.clear();
++      authority.releaseConfirmedTurnsOnDestroy();
++      cancelCommitScopes(transactionOwnerToken);
++      for (const id of authority.getPendingTurnIds()) {
++        const discarded = authority.discardPending(id);
++        forgetUnclaimedDescriptorSubjects(
++          discarded?.restorationSubjectIds ?? [],
++          new Set(),
++          discarded?.__positionIds ?? []
++        );
++      }
++      pendingTransactions.clear();
++      lastWindowWriteSeq.clear();
++      lastWindowRowWriteSeq.clear();
++      callbackExternalEffects.clear();
++      inspectionWrites.clear();
++      sourceSegments.clear();
++      sourceAdmissions.clear();
++      pairedEntityAdmissions = new WeakMap();
++      inspectionTransactionByTurn.clear();
++      unsubscribeEnqueue?.();
++      unsubscribeEnqueue = null;
++      pendingCreatedListeners.clear();
++      pendingConfirmedListeners.clear();
++      pendingDiscardedListeners.clear();
++      drainCaptureBucket(pendingCapture);
++
++      try {
++        unsubscribeFlush?.();
++      } catch (error) {
++        reportCleanupFailure('flush unsubscription', error);
++      }
++      try {
++        unsubscribeNotifications?.();
++      } catch (error) {
++        reportCleanupFailure('notification unsubscription', error);
++      }
++      try {
++        unsubscribeReset?.();
++      } catch (error) {
++        reportCleanupFailure('reset unsubscription', error);
++      }
++      try {
++        unsubscribePairedBoundaries?.();
++        unsubscribeCollectionOrders?.();
++      } catch (error) {
++        reportCleanupFailure('collection-order unsubscription', error);
++      }
++      try {
++        restoreLeafInterceptors?.();
++      } catch (error) {
++        reportCleanupFailure('leaf interceptor teardown', error);
++      }
++      unsubscribeFlush = null;
++      unsubscribeNotifications = null;
++      unsubscribeReset = null;
++      unsubscribeCollectionOrders = null;
++      restoreLeafInterceptors = null;
++      pendingOrderDeltas.clear();
++      transactionOrderAdmissions.clear();
++  });
+ 
+   try {
+     const notifier = getPathNotifier();
+@@ -4377,7 +4478,7 @@
+         }
+       );
+ 
+-        if(releaseScalarResponsibility)tree.registerCleanup(releaseScalarResponsibility);
++        if(releaseScalarResponsibility)registerOwnedCleanup(releaseScalarResponsibility);
+       }catch(error){scalarAttachmentFailed=true;releaseScalarResponsibility?.();throw error;}
+ 
+       if (typeof notifier.onFlush === 'function') {
+@@ -4391,7 +4492,10 @@
+       }
+     }
+   } catch(error) {
+-    if(scalarAttachmentFailed)throw error;
++    if (scalarAttachmentFailed) {
++      unwindOwnedInitialization();
++      throw error;
++    }
+     // fall through without capture support
+   }
+ 
+@@ -5176,87 +5280,6 @@
+     },
+   };
+ 
+-  const reportCleanupFailure = (step: string, error: unknown): void => {
+-    // Guarded: a throwing console (a fail-on-console harness) must not turn
+-    // a report into a new failure on the path that is cleaning up.
+-    try {
+-      console.error(
+-        `SignalTree: transactions() cleanup failed during ${step}.`,
+-        error
+-      );
+-    } catch {
+-      // Nothing further can be reported safely.
+-    }
+-  };
+-
+-  if (typeof tree.registerCleanup === 'function') {
+-    tree.registerCleanup(() => {
+-      destroyed = true;
+-      releaseScalarSelection?.();
+-      research.unregister(lifecycleRegistry?.id);
+-      lifecycleViews.clear();
+-      lifecycleScopes.clear();
+-      authority.releaseConfirmedTurnsOnDestroy();
+-      cancelCommitScopes(transactionOwnerToken);
+-      for (const id of authority.getPendingTurnIds()) {
+-        const discarded = authority.discardPending(id);
+-        forgetUnclaimedDescriptorSubjects(
+-          discarded?.restorationSubjectIds ?? [],
+-          new Set(),
+-          discarded?.__positionIds ?? []
+-        );
+-      }
+-      pendingTransactions.clear();
+-      lastWindowWriteSeq.clear();
+-      lastWindowRowWriteSeq.clear();
+-      callbackExternalEffects.clear();
+-      inspectionWrites.clear();
+-      sourceSegments.clear();
+-      sourceAdmissions.clear();
+-      pairedEntityAdmissions = new WeakMap();
+-      inspectionTransactionByTurn.clear();
+-      unsubscribeEnqueue?.();
+-      unsubscribeEnqueue = null;
+-      pendingCreatedListeners.clear();
+-      pendingConfirmedListeners.clear();
+-      pendingDiscardedListeners.clear();
+-      drainCaptureBucket(pendingCapture);
+-
+-      try {
+-        unsubscribeFlush?.();
+-      } catch (error) {
+-        reportCleanupFailure('flush unsubscription', error);
+-      }
+-      try {
+-        unsubscribeNotifications?.();
+-      } catch (error) {
+-        reportCleanupFailure('notification unsubscription', error);
+-      }
+-      try {
+-        unsubscribeReset?.();
+-      } catch (error) {
+-        reportCleanupFailure('reset unsubscription', error);
+-      }
+-      try {
+-        unsubscribePairedBoundaries?.();
+-        unsubscribeCollectionOrders?.();
+-      } catch (error) {
+-        reportCleanupFailure('collection-order unsubscription', error);
+-      }
+-      try {
+-        restoreLeafInterceptors?.();
+-      } catch (error) {
+-        reportCleanupFailure('leaf interceptor teardown', error);
+-      }
+-      unsubscribeFlush = null;
+-      unsubscribeNotifications = null;
+-      unsubscribeReset = null;
+-      unsubscribeCollectionOrders = null;
+-      restoreLeafInterceptors = null;
+-      pendingOrderDeltas.clear();
+-      transactionOrderAdmissions.clear();
+-    });
+-  }
+ 
+   (tree as unknown as Record<PropertyKey, unknown>)[
+     INTERNAL_TRANSACTION_RUNTIME

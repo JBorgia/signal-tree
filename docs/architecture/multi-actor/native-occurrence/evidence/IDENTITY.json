@@ -1,0 +1,22 @@
+{
+  "baselineGit": "87ddcfdedcb5d91e700d812bd6cbee2f77038510",
+  "predecessor": "/private/tmp/st-projection-certificate-successor",
+  "predecessorSourceManifestSha256": "51554d3192ae20bcf2e3a39cfa0e1daf2d22d2a883f963fea9b7108b343cf7f3",
+  "candidate": "/private/tmp/st-occurrence-successor",
+  "sourceManifestSha256": "80a0116269b26af939f775b9a10ff8a79d99b6e9b556a17b05137ab5e3f67502",
+  "sourcePatchSha256": "bea5f7a50528b2b5c73922a3bab3d1a9705c73d720c0185a0b1935fe869c0bdb",
+  "runtimePatchSha256": "6c8e8c943da9a06499c55711e4b90724af9f1f12505439bbd34a8b58dc6655d8",
+  "changedFiles": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/internals/native-occurrence.ts",
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/occurrence-successor.spec.ts",
+    "packages/kernel/src/lib/publication-terminal-consumer-independent.spec.ts",
+    "packages/kernel/src/lib/signal-tree.ts"
+  ],
+  "sourceFiles": 2918,
+  "status": "frozen on covered restoration recurrence; independent review pending; no acceptance"
+}

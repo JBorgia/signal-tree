@@ -1,0 +1,68 @@
+
+> nx run kernel:test construction-routes-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs construction-routes-review.spec.ts --maxWorkers=1
+
+(node:44655) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44662) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-shared-construction-independent/candidate/packages/kernel
+
+(node:44672) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/construction-routes-review.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ❯ src/lib/construction-routes-review.spec.ts (6 tests | 1 failed) 23ms
+   × route keyed=false: installed receipt survives completion reentry and throw 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/construction-routes-review.spec.ts > route keyed=false: installed receipt survives completion reentry and throw
+AssertionError: expected { b: { n: 2 } } to deeply equal { a: { n: 1 }, b: { n: 2 } }
+
+- Expected
++ Received
+
+  {
+-   "a": {
+-     "n": 1,
+-   },
+    "b": {
+      "n": 2,
+    },
+  }
+
+ ❯ src/lib/construction-routes-review.spec.ts:22:272
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  20:59:54
+   Duration  1.29s (transform 700ms, setup 0ms, import 848ms, tests 23ms, environment 315ms)
+
+Warning: command "node tools/run-core-vitest.mjs construction-routes-review.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.8s

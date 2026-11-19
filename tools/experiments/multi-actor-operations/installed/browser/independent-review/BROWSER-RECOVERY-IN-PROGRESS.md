@@ -1,0 +1,1 @@
+Browser recovery implementation is ready for review. See RECOVERY-REVIEW.md and ../recovery-review/identities.json for final source identities. Previous review targets remain archived in ../history/pre-local-recovery. No further app/checks edits are in progress.

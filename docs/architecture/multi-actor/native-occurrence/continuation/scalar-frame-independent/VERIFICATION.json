@@ -1,0 +1,15 @@
+{
+  "author": {
+    "checked": 2970,
+    "mismatches": []
+  },
+  "independent": {
+    "checked": 2970,
+    "mismatches": []
+  },
+  "independentFixtureSha256": "ba492604bc1a4db0346186a9b12d4ac93cad5679bf1c429b07af31391036a073",
+  "baseline": {
+    "checked": 2963,
+    "mismatches": []
+  }
+}

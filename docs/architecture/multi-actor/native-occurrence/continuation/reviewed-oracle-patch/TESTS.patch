@@ -1,0 +1,64 @@
+--- a/packages/kernel/src/lib/occurrence-successor.spec.ts
++++ b/packages/kernel/src/lib/occurrence-successor.spec.ts
+@@ -56,7 +56,7 @@
+  try{
+   const a=index.enroll(tree.$.a),b=index.enroll(tree.$.b);
+   life.runDeclaration(channel,{kind:'independent'},()=>{
+-   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+    index.replace(a,'value',p.requirement);index.replace(b,'value',p.requirement);
+    expect(index.unresolved()).toBe(2);
+    index.replace(a,'value',life.initialRequirement());expect(index.unresolved()).toBe(1);
+@@ -64,7 +64,7 @@
+   });
+   expect(index.unresolved()).toBe(0);expect(index.inspect().finalized).toBe(1);expect(wakes).toBe(1);
+   life.runDeclaration(channel,{kind:'independent'},()=>{
+-   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+    index.replace(a,'value',p.requirement);index.dispose();expect(index.inspect().subscriptions).toBe(0);
+   });expect(wakes).toBe(1);
+  }finally{index.dispose();life.disposeConnection(channel);tree.destroy();}
+@@ -81,7 +81,7 @@
+    for(const handle of handles)index.replace(handle,'value',life.initialRequirement());
+    let before=0;
+    life.runDeclaration(channel,{kind:'independent'},()=>{
+-    const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++    const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+     index.replace(handles[0],'value',p.requirement);before=index.inspect().propagated;
+    });
+    expect(index.inspect().finalized).toBe(1);work.push(index.inspect().propagated-before);
+@@ -108,7 +108,7 @@
+  try{
+   const branch=index.enroll(tree.$.branch),x=index.enroll(tree.$.branch.x);
+   life.runDeclaration(channel,{kind:'independent'},()=>{
+-   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);
++   const p=life.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);life.finalizeNativeRequirement(p.requirement);life.deliverNativeRequirementReady(p.requirement);
+    index.replace(x,'value',p.requirement);expect(index.unresolved()).toBe(1);
+    index.setPresence(branch,false,life.initialRequirement());expect(index.unresolved()).toBe(0);
+    index.setPresence(branch,true,life.initialRequirement());expect(index.unresolved()).toBe(1);
+--- a/packages/kernel/src/lib/entity-tap-reads.spec.ts
++++ b/packages/kernel/src/lib/entity-tap-reads.spec.ts
+@@ -259,10 +259,10 @@
+     expect(rows.ids()).toEqual(['a2', 'b', 'q']);
+   });
+ 
+-  it('a cell held from before the tap keeps its cache until the group ends', async () => {
+-    // Documented: a tap reads fresh through the collection (`rows.all()`), not
+-    // through a cell it obtained earlier (`const all = rows.all`). Making held
+-    // cells fresh would need the location runtime to settle groups early.
++  it('a cell held from before the tap reads installed state without early native delivery', async () => {
++    // Owner-approved v16 contract: acquiring a SignalTree projection earlier
++    // does not make its callback reads stale. Native computed timing is tested
++    // separately; current projection reads do not settle the native group.
+     const tree = build();
+     const rows = tree.$.a.rows;
+     const held = rows.all;
+@@ -275,7 +275,7 @@
+     });
+     tree.transact(() => rows.removeOne('a'));
+     await flush();
+-    expect(seen).toEqual([['a', 'b'], ['b']]);
++    expect(seen).toEqual([['b'], ['b']]);
+     expect(held()).toEqual([B]);
+   });
+ });

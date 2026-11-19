@@ -1,0 +1,24 @@
+{
+  "kernel": {
+    "before": 608,
+    "after": 605,
+    "removed": [
+      "/private/tmp/st-test-routing-successor/candidate/packages/kernel/src/lib/forwarding-retention-probe.spec.ts",
+      "/private/tmp/st-test-routing-successor/candidate/packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts",
+      "/private/tmp/st-test-routing-successor/candidate/packages/kernel/src/lib/native-netzero-diagnostic.spec.ts"
+    ],
+    "added": []
+  },
+  "root": {
+    "before": 817,
+    "after": 814,
+    "removed": [
+      "/private/tmp/st-test-routing-successor/candidate/packages/kernel/src/lib/forwarding-retention-probe.spec.ts",
+      "/private/tmp/st-test-routing-successor/candidate/packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts",
+      "/private/tmp/st-test-routing-successor/candidate/packages/kernel/src/lib/native-netzero-diagnostic.spec.ts"
+    ],
+    "added": []
+  },
+  "bodyPreservation": "Both archived files identical after reversing only import path changes; all assertions preserved",
+  "forwardingProbe": "byte identical to C11"
+}

@@ -1,0 +1,41 @@
+{
+  "status": "frozen prototype; one unchanged-control conflict; not accepted",
+  "baseUnchanged": true,
+  "fixturesUnchanged": true,
+  "changedPaths": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts"
+  ],
+  "sha256": {
+    "BASE-MANIFEST.json": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+    "MANIFEST.json": "b528cc06421748f41b570e45ad841786c565dece483cd306922a0e77b49a21b7",
+    "RUNTIME-MANIFEST.json": "6dd50ff6e44b9b5e4140deb4e09cf8f419f70fca8b4f8713d30b9c4a637cb505",
+    "runtime.patch": "d82886f6eea6aa5b8f5036f43197d321e6b4817c2079ca6ad1e0feaba119f645",
+    "TRACE.patch": "925e2f054dc9e7fe973c9ee2e42eed4024bb7985c36ed550873d8241d98f4ce5",
+    "REPORT.md": "e67cb7c055a929c19210ae0cc06fe88f6d1a4d2389c0b47dbf04da71a8764044",
+    "implement.py": "1fd34cae31215f92601c3650fb6e1f273ee6845c40e71d4cc32f0fd5cc21542b",
+    "prepare.py": "c3d5eb79090ebafa5cfca8f29be75125053c127a1490845de6d9017c74896afd",
+    "run.py": "1fffba717070d50052c47b7c6991a21e10b54a03a05048f52cd479778a4131c4",
+    "runs/baseline-stale-first/COMMAND.json": "d02241fd390c1cbe9d1c3ecf42cc4ea59a6dd9b416696aeb6a3d9e9fd9d9c481",
+    "runs/baseline-stale-first/PROCESS.json": "d8311f7809cc54c590a29d28a561eedc780df423c1bed9a6a7ff5e99f5d1e008",
+    "runs/baseline-stale-first/RESULT.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "runs/baseline-stale-first/SOURCE.json": "abdd480e595ba7a033ea4e138d8ffb58a4676252d8776284ce68095155fa0f78",
+    "runs/baseline-stale-first/first.log": "4573022391494303ea0e2ba758fe048b6e809374102851613b3c3a3c651a93e0",
+    "runs/repaired-two-first/COMMAND.json": "6ad39224a19372d212748a95b2f5ff90a4efcb6317444779ccc4fe48757ea2a7",
+    "runs/repaired-two-first/PROCESS.json": "3707604a0c390304b2823ab15536f2005cb2702628879efd0741b4e37dea41e3",
+    "runs/repaired-two-first/RESULT.json": "bd2867867f5b9854444486f9490f673f9b95bc4c1a1764f05846038f2cc29d72",
+    "runs/repaired-two-first/SOURCE.json": "b6110cb933fa15f3e453588d1f09065520125123f29fc1935e9925601fbf3215",
+    "runs/repaired-two-first/first.log": "fba1746f3196f728ae0df3d6fe0a25ec3d8a4efd15c01cb4cd4e7699fc6061af",
+    "runs/source-types-first/COMMAND.json": "5b13997d4ce5f9ae39a4c20e79d82c2a34ca3dcbacc2a6ce6bba9a907183eab6",
+    "runs/source-types-first/PROCESS.json": "e72283859c9468dd5c48bf09466edf8adea1218171f279e155337fb08cb782d1",
+    "runs/source-types-first/RESULT.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "runs/source-types-first/SOURCE.json": "b6110cb933fa15f3e453588d1f09065520125123f29fc1935e9925601fbf3215",
+    "runs/source-types-first/first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/trace-first/COMMAND.json": "8df4cc280e4a1e5894504718f3d1a1af701117ef38fc7708fc6e778575400b68",
+    "runs/trace-first/PROCESS.json": "a3b0628cbb692e5d6ceac7ee302ef02644c57c55cdd77c10c60e6fc044af1169",
+    "runs/trace-first/RESULT.json": "bd2867867f5b9854444486f9490f673f9b95bc4c1a1764f05846038f2cc29d72",
+    "runs/trace-first/SOURCE.json": "abdd480e595ba7a033ea4e138d8ffb58a4676252d8776284ce68095155fa0f78",
+    "runs/trace-first/first.log": "a97123931a005f918357870a129fb51ab113bdcc353da26aea1e9581c06a2d16",
+    "runs/trace-first/trace.jsonl": "961548616043444e93c4b135afa3616cd2121f1f123705bc918ad1e83eb5cb18"
+  }
+}

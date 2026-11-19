@@ -1,0 +1,103 @@
+
+> nx run kernel:test main-invocation-scope.spec.ts native-explicit-handoff.spec.ts independent-explicit-continuation.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts
+
+> node tools/run-core-vitest.mjs main-invocation-scope.spec.ts native-explicit-handoff.spec.ts independent-explicit-continuation.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts
+
+(node:77242) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-explicit-independent-gj4nkv4m/candidate/packages/kernel
+
+(node:77258) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77260) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77257) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:77259) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/independent-explicit-continuation.spec.ts > selected continuation cannot replay after its invocation closes (first throws=false)
+STALE-CONTINUATION {
+  failFirst: false,
+  value: 0,
+  baselineRestored: true,
+  error: undefined
+}
+
+stdout | src/lib/independent-explicit-continuation.spec.ts > selected continuation cannot replay after its invocation closes (first throws=true)
+STALE-CONTINUATION { failFirst: true, value: 0, baselineRestored: true, error: undefined }
+
+stdout | src/lib/independent-explicit-continuation.spec.ts > double proceed cannot reuse the same selected endpoint within one interceptor invocation
+DOUBLE-PROCEED { secondValue: 0, secondBaseline: true }
+
+ ❯ src/lib/independent-explicit-continuation.spec.ts (3 tests | 3 failed) 24ms
+   × selected continuation cannot replay after its invocation closes (first throws=false) 18ms
+   × selected continuation cannot replay after its invocation closes (first throws=true) 4ms
+   × double proceed cannot reuse the same selected endpoint within one interceptor invocation 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-explicit-continuation.spec.ts > selected continuation cannot replay after its invocation closes (first throws=false)
+ FAIL  src/lib/independent-explicit-continuation.spec.ts > selected continuation cannot replay after its invocation closes (first throws=true)
+AssertionError: expected +0 to be 13 // Object.is equality
+
+- Expected
++ Received
+
+- 13
++ 0
+
+ ❯ src/lib/independent-explicit-continuation.spec.ts:23:18
+     21|   let lateError:unknown;try{saved!();}catch(e){lateError=e;}
+     22|   console.log('STALE-CONTINUATION',{failFirst,value:leaf(),baselineRes…
+     23|   expect(leaf()).toBe(13);expect(evidence()).toBe(later);
+       |                  ^
+     24|  }finally{off();tree.destroy();}
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/independent-explicit-continuation.spec.ts > double proceed cannot reuse the same selected endpoint within one interceptor invocation
+AssertionError: expected +0 to be 19 // Object.is equality
+
+- Expected
++ Received
+
+- 19
++ 0
+
+ ❯ src/lib/independent-explicit-continuation.spec.ts:33:110
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  3 failed | 16 passed (19)
+   Start at  14:56:29
+   Duration  878ms (transform 2.25s, setup 0ms, import 2.84s, tests 122ms, environment 914ms)
+
+Warning: command "node tools/run-core-vitest.mjs main-invocation-scope.spec.ts native-explicit-handoff.spec.ts independent-explicit-continuation.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

@@ -1,0 +1,13 @@
+{
+  "candidate": {
+    "manifestSHA256": "d3b6da2906ae9cef72e5623b35eb6de3dee73d64b12f5c9bd408352aa627e73b",
+    "verifiedFiles": 2941,
+    "mismatches": []
+  },
+  "main-copy": {
+    "manifestSHA256": "87faced095f784b3925518ac5a592a17c8b6b0f391a4dc09472802977f75ea91",
+    "verifiedFiles": 2941,
+    "mismatches": []
+  },
+  "sidecarSpecSHA256": "b4e4f60b5d395413bbe4127286c6e1743f73ec6b5ac137df51bca107a79ad8e9"
+}

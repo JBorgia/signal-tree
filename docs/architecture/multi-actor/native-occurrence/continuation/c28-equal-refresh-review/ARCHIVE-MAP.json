@@ -1,0 +1,194 @@
+[
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "2783fddb251887b35f0477e63869dff569d598ca7329094b2b5174b0400dfed1",
+    "archiveSha256": "2783fddb251887b35f0477e63869dff569d598ca7329094b2b5174b0400dfed1"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "1e818e0626ffcf3da1de6b5a6062fd9902bfdcf6ac5db9282c9c781caf6ab825",
+    "archiveSha256": "1e818e0626ffcf3da1de6b5a6062fd9902bfdcf6ac5db9282c9c781caf6ab825"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "cb195c6566dc51c85dc60484c7a5d2256a6924c7d93e2f02c5d466069e318852",
+    "archiveSha256": "cb195c6566dc51c85dc60484c7a5d2256a6924c7d93e2f02c5d466069e318852"
+  },
+  {
+    "source": "TESTS.patch",
+    "archive": "TESTS.patch",
+    "sourceSha256": "81df77c23087884899e73893e4fcac9ab1e44db680c4cc2dcc0bcf93d9be43d0",
+    "archiveSha256": "81df77c23087884899e73893e4fcac9ab1e44db680c4cc2dcc0bcf93d9be43d0"
+  },
+  {
+    "source": "execution/run.py",
+    "archive": "execution/run.py",
+    "sourceSha256": "0ef33a0a1241563f2388c6c69fe0fe5aeabacc86a7db9dcfc5325a50af1d911b",
+    "archiveSha256": "0ef33a0a1241563f2388c6c69fe0fe5aeabacc86a7db9dcfc5325a50af1d911b"
+  },
+  {
+    "source": "execution/SNAPSHOT-EXECUTION.json",
+    "archive": "execution/SNAPSHOT-EXECUTION.json",
+    "sourceSha256": "95d59826db8cfdb0a7aa6686f3c68f4fa70141469bed28f836d48c97d067b8d1",
+    "archiveSha256": "95d59826db8cfdb0a7aa6686f3c68f4fa70141469bed28f836d48c97d067b8d1"
+  },
+  {
+    "source": "execution/REPORT.md",
+    "archive": "execution/REPORT.md",
+    "sourceSha256": "22b9d4da8b634161a3783b71645775849bbffbf0be8cf9c2ebd18f6d156f231b",
+    "archiveSha256": "22b9d4da8b634161a3783b71645775849bbffbf0be8cf9c2ebd18f6d156f231b"
+  },
+  {
+    "source": "execution/IDENTITY.json",
+    "archive": "execution/IDENTITY.json",
+    "sourceSha256": "3f29e80f2eefadbfc8152ade1bedb507c2a60df2dc4a93905bad5cecdd8d55fc",
+    "archiveSha256": "3f29e80f2eefadbfc8152ade1bedb507c2a60df2dc4a93905bad5cecdd8d55fc"
+  },
+  {
+    "source": "execution/C27-MANIFEST.json",
+    "archive": "execution/C27-MANIFEST.json.gz",
+    "sourceSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+    "archiveSha256": "667d8a12ef72ace28079309ca087e2fe8aeef444bcd86ff33a26b93e6ebe542f"
+  },
+  {
+    "source": "execution/runs/spec-types-first/RESULT.json",
+    "archive": "execution/runs/spec-types-first/RESULT.json",
+    "sourceSha256": "066b2338c47b9507945208a04517e0de4d914fbd8e5655faf285f86f3d18a236",
+    "archiveSha256": "066b2338c47b9507945208a04517e0de4d914fbd8e5655faf285f86f3d18a236"
+  },
+  {
+    "source": "execution/runs/spec-types-first/first.log",
+    "archive": "execution/runs/spec-types-first/first.log",
+    "sourceSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  {
+    "source": "execution/runs/spec-types-first/COMMAND.json",
+    "archive": "execution/runs/spec-types-first/COMMAND.json",
+    "sourceSha256": "aae1377050f3a9832548f7b15857587f5eb6df571d00b2399f13e73921370aa5",
+    "archiveSha256": "aae1377050f3a9832548f7b15857587f5eb6df571d00b2399f13e73921370aa5"
+  },
+  {
+    "source": "execution/runs/spec-types-first/PROCESS.json",
+    "archive": "execution/runs/spec-types-first/PROCESS.json",
+    "sourceSha256": "1350fdf7759bcc3299b0c4043aae3ea818f0783cecd34c1a058662dd08832465",
+    "archiveSha256": "1350fdf7759bcc3299b0c4043aae3ea818f0783cecd34c1a058662dd08832465"
+  },
+  {
+    "source": "execution/runs/probes-first/RESULT.json",
+    "archive": "execution/runs/probes-first/RESULT.json",
+    "sourceSha256": "066b2338c47b9507945208a04517e0de4d914fbd8e5655faf285f86f3d18a236",
+    "archiveSha256": "066b2338c47b9507945208a04517e0de4d914fbd8e5655faf285f86f3d18a236"
+  },
+  {
+    "source": "execution/runs/probes-first/first.log",
+    "archive": "execution/runs/probes-first/first.log",
+    "sourceSha256": "3cd8389eb5e20d0c07a203f070207bc045396955b137f70312409d56f95fdf0f",
+    "archiveSha256": "3cd8389eb5e20d0c07a203f070207bc045396955b137f70312409d56f95fdf0f"
+  },
+  {
+    "source": "execution/runs/probes-first/COMMAND.json",
+    "archive": "execution/runs/probes-first/COMMAND.json",
+    "sourceSha256": "34930e3d51deb6dbf6f1f49223332a38d16185e4a36fffee51b09cc105aa6b79",
+    "archiveSha256": "34930e3d51deb6dbf6f1f49223332a38d16185e4a36fffee51b09cc105aa6b79"
+  },
+  {
+    "source": "execution/runs/probes-first/PROCESS.json",
+    "archive": "execution/runs/probes-first/PROCESS.json",
+    "sourceSha256": "c6762731f48d2b43dff6f3c91ccfca447b61d3865145aa643eb1a57671c4a13f",
+    "archiveSha256": "c6762731f48d2b43dff6f3c91ccfca447b61d3865145aa643eb1a57671c4a13f"
+  },
+  {
+    "source": "packet/packages/kernel/src/lib/equal-refresh-protected-paths.spec.ts",
+    "archive": "packet/packages/kernel/src/lib/equal-refresh-protected-paths.spec.ts",
+    "sourceSha256": "af5a2df6ea0eec7197b121ca09c812e801c36bcb2b531a47ebfdd65b85617759",
+    "archiveSha256": "af5a2df6ea0eec7197b121ca09c812e801c36bcb2b531a47ebfdd65b85617759"
+  },
+  {
+    "source": "inputs/C28-AUTHORITY.md",
+    "archive": "inputs/C28-AUTHORITY.md",
+    "sourceSha256": "a7ba3c21b9d49c938d2f6f45a28429b5faa6385419bdf6add5aa354cab3ad87f",
+    "archiveSha256": "a7ba3c21b9d49c938d2f6f45a28429b5faa6385419bdf6add5aa354cab3ad87f"
+  },
+  {
+    "source": "inputs/SNAPSHOT-C27.json",
+    "archive": "inputs/SNAPSHOT-C27.json.gz",
+    "sourceSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+    "archiveSha256": "667d8a12ef72ace28079309ca087e2fe8aeef444bcd86ff33a26b93e6ebe542f"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/publication-role-overlap-audit.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/publication-role-overlap-audit.spec.ts",
+    "sourceSha256": "eae5c11466234782135259651fc610042b6334fbbbaf3287fe9167027bad6d5b",
+    "archiveSha256": "eae5c11466234782135259651fc610042b6334fbbbaf3287fe9167027bad6d5b"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts",
+    "sourceSha256": "ac0a34afd897db63761ea699cc9386d72a22e9837d3c55bb1cbb3443cc151171",
+    "archiveSha256": "ac0a34afd897db63761ea699cc9386d72a22e9837d3c55bb1cbb3443cc151171"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts",
+    "sourceSha256": "5daa8ac74fe590f173c1c7ddd52b24fef76f06aad2c9c7702403881b21982802",
+    "archiveSha256": "5daa8ac74fe590f173c1c7ddd52b24fef76f06aad2c9c7702403881b21982802"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "sourceSha256": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3",
+    "archiveSha256": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/inspection-egress-conformance.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/inspection-egress-conformance.spec.ts",
+    "sourceSha256": "a315ed554c8cafc5c31629b3300cc380ff97b444822b9dc5a5ead1b01dc1777d",
+    "archiveSha256": "a315ed554c8cafc5c31629b3300cc380ff97b444822b9dc5a5ead1b01dc1777d"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "sourceSha256": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f",
+    "archiveSha256": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/scalar-frame-publication.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/scalar-frame-publication.spec.ts",
+    "sourceSha256": "e8554d47371ca1891279bf17387418018b17993be9b843f5b7a50eb9516e1075",
+    "archiveSha256": "e8554d47371ca1891279bf17387418018b17993be9b843f5b7a50eb9516e1075"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/entity-obligation-matrix.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/entity-obligation-matrix.spec.ts",
+    "sourceSha256": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55",
+    "archiveSha256": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/equal-owner-admission.spec.ts",
+    "sourceSha256": "8028723fc87c052cea7ef2c256fd0fb87b3c9014cc73226b712e4477c61ac945",
+    "archiveSha256": "8028723fc87c052cea7ef2c256fd0fb87b3c9014cc73226b712e4477c61ac945"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/scalar-native-support.spec.ts",
+    "archive": "inputs/packages/kernel/src/lib/scalar-native-support.spec.ts",
+    "sourceSha256": "74acda5f67e00ec0ad070b5ef1562b5f2e18bcc5eb18accb0d4124e99d52bfb1",
+    "archiveSha256": "74acda5f67e00ec0ad070b5ef1562b5f2e18bcc5eb18accb0d4124e99d52bfb1"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/experimental-publication/private.ts",
+    "archive": "inputs/packages/kernel/src/lib/experimental-publication/private.ts",
+    "sourceSha256": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647",
+    "archiveSha256": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647"
+  },
+  {
+    "source": "inputs/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "archive": "inputs/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "sourceSha256": "f21f99f975a5ad9577c618ddb2593edf200faa4b00de1c0a8c2e484479405873",
+    "archiveSha256": "f21f99f975a5ad9577c618ddb2593edf200faa4b00de1c0a8c2e484479405873"
+  }
+]

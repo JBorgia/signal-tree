@@ -1,0 +1,55 @@
+--- 
++++ 
+@@ -1,3 +1,4 @@
++import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
+ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+@@ -972,7 +973,8 @@
+     changes: readonly CommittedEntityMutation[],
+     physical = structuralStore.preparePlacement(),
+     authoredOrder?: readonly number[],
+-    authoredDomain?: readonly number[]
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
+   ) {
+     const placement = ordinaryTopology.preparePlacement(
+       structuralStore.preparePlacement()
+@@ -1085,7 +1087,8 @@
+           ): number | undefined => {
+             visibility ??= createPreparedPlacementVisibility(
+               physical,
+-              (id) => placement.read(id).present
++              (id) => placement.read(id).present,
++              physicalEntries
+             );
+             return visibility.resolve(
+               subject,
+@@ -1339,6 +1342,8 @@
+       }
+     }
+     const physicalPlacement = frame.preparePlacement();
++    // Capture after all placement edits; both consumers use this exact stage.
++    const physicalEntries = physicalPlacement.capturePatch();
+     for (let index = 0; index < changes.length; index++) {
+       const change = changes[index];
+       if (change.structuralRecord?.kind !== 'add') continue;
+@@ -1357,7 +1362,8 @@
+       changes,
+       physicalPlacement,
+       frame.ordinaryOrder,
+-      frame.orderEndpoints?.before
++      frame.orderEndpoints?.before,
++      physicalEntries
+     );
+     const valueResultsByStep = frame.mutations.map((mutation) => {
+       if (mutation.kind !== 'replace-value') return undefined;
+@@ -1388,7 +1394,7 @@
+           }
+         : undefined;
+     const physicalInterval =
+-      ordinaryTopology.prepareInterval(physicalPlacement);
++      ordinaryTopology.prepareInterval(physicalPlacement, physicalEntries);
+     const physicalBeforeToken = structuralStore.activeOrderFrontier();
+     const topologyUnit = Object.freeze({
+       id: Object.freeze({}),

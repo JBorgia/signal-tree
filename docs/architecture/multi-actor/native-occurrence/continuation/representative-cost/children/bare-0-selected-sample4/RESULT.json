@@ -1,0 +1,21 @@
+{
+  "id": "bare-0-selected-sample4",
+  "ordinal": 12,
+  "profile": "bare",
+  "size": 0,
+  "arm": "selected",
+  "label": "sample4",
+  "exit": 0,
+  "pid": 69914,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.6945226250682026,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1081344,
+  "minimumObservedHostFreePercentage": 49.0,
+  "attempts": 1
+}

@@ -1,0 +1,34 @@
+{
+  "status": "Frozen first R2 gate; independent review before expansion",
+  "baseManifestSha256": "8845040f287d4062ff368d558e713edd5b30ad684b51d67d10ed93a9189c3f22",
+  "manifestSha256": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "runtimePatchSha256": "0d01c32f3faccb74f464d1e6de9e49606dbae0a1c70184ae682d6f79c6e08834",
+  "testsPatchSha256": "fc94f458281139ae54e192cc28be6238e18b2d3003c9b0da23f60df03105a91a",
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "added": [
+    "packages/kernel/src/lib/approved-current-obligation.spec.ts",
+    "packages/kernel/src/lib/current-cutoff-r2.spec.ts",
+    "packages/kernel/src/lib/scalar-horizon-lifecycle-controls.spec.ts"
+  ],
+  "baseUnchanged": true,
+  "preregisteredTestsUnchanged": true,
+  "runtime": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "69fd14f8883e2240997b25ee1edbb347585229bee27df118faa2c6a77c1531da",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "c7822db0f351bc488a78029b9df34382894fccef7355bca7b8b0866a608a8951"
+  },
+  "runs": {
+    "before-first": {
+      "exit": 1,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "after-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

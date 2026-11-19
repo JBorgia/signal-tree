@@ -1,0 +1,22 @@
+check-spec-types: 3 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/angular/src/lib/parent-freshness-focused.spec.ts: 9 error(s), baseline allows 0
+  packages/kernel/src/lib/internals/member-membership.ts: 1 error(s), baseline allows 0
+  packages/kernel/src/lib/parent-freshness-focused.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/angular/src/lib/parent-freshness-focused.spec.ts(20,18): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<number>'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(20,80): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<unknown>'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(20,93): error TS18046: 'n' is of type 'unknown'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(26,116): error TS2339: Property 'n' does not exist on type '{}'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(26,221): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<number>'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(30,166): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<number>'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(30,278): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<number>'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(36,354): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<number>'.
+packages/angular/src/lib/parent-freshness-focused.spec.ts(40,64): error TS2345: Argument of type 'AngularLeaf<number>' is not assignable to parameter of type 'Location<number>'.
+packages/kernel/src/lib/internals/member-membership.ts(776,22): error TS2345: Argument of type 'string | symbol' is not assignable to parameter of type 'string'.
+packages/kernel/src/lib/parent-freshness-focused.spec.ts(26,116): error TS2339: Property 'n' does not exist on type '{}'.

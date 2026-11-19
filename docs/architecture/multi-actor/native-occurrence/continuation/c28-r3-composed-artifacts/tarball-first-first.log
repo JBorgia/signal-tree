@@ -1,0 +1,14 @@
+  kernel: 7 exports target(s) all shipped ✓
+  angular: 3 exports target(s) all shipped ✓
+  react: 3 exports target(s) all shipped ✓
+  vue: 3 exports target(s) all shipped ✓
+  solid: 3 exports target(s) all shipped ✓
+  release consumer: resolved @signal-tree/kernel ✓
+  release consumer: resolved @signal-tree/kernel/adapter ✓
+  release consumer: resolved @signal-tree/kernel/internals ✓
+  release consumer: resolved @signal-tree/angular ✓
+  release consumer: resolved @signal-tree/react ✓
+  release consumer: resolved @signal-tree/vue ✓
+  release consumer: resolved @signal-tree/solid ✓
+
+✅ Tarball-consumer gate passed: every packed exports target ships, and all release package subpaths resolve from a real install.

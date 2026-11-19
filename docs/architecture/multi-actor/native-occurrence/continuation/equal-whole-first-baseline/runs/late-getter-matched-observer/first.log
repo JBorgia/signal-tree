@@ -1,0 +1,35 @@
+
+> nx run kernel:test whole-late-getter.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs whole-late-getter.spec.ts --maxWorkers=1
+
+(node:83841) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83853) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-equal-whole-c16-successor/baseline/candidate/packages/kernel
+
+(node:83872) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  11:45:58
+   Duration  2.40s (transform 1.28s, setup 0ms, import 1.51s, tests 63ms, environment 629ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.9s

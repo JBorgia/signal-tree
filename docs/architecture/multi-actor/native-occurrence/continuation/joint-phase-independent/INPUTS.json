@@ -1,0 +1,13 @@
+{
+  "/private/tmp/st-joint-publication-phase-design/DESIGN.md": "1cbe0464630c7a8dce9917e1ea5743999d19f9acc5c9311a085d084b94574f4d",
+  "/private/tmp/st-rich-unit-causal-trace/HEISENBERG-HANDOFF.md": "9e30f56c5036956a2b9e70e8c349a6b230b7f99a177f3377bbe87a03bb890eb3",
+  "/private/tmp/st-scalar-frame-publication-independent/REVIEW.md": "503965f44f4ff19d4d8ee949524dd9914ec356ca5be4aa9128419c7b5b60e25c",
+  "/private/tmp/st-native-combined-c/SNAPSHOT-C0.json": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+  "/private/tmp/st-rich-unit-successor/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "a382f4241809648e17afeb5aaf4f28d2342a88128523deb3806859a15a68e2ef",
+  "/private/tmp/st-native-combined-c/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts": "e1908fff513014d1edbfa804c9e0bc778a6d57850e18789365be3f8994490e14",
+  "/private/tmp/st-native-combined-c/candidate/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+  "/private/tmp/st-native-combined-c/candidate/packages/kernel/src/lib/internals/observation-adapter.ts": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574",
+  "/private/tmp/st-native-combined-c/candidate/packages/vue/src/lib/vue-observation.ts": "cd1d1276fe946a7166f68addb3ca08a1375980ce82c816a47092fc8719fc2bce",
+  "/private/tmp/st-native-combined-c/candidate/packages/angular/src/lib/observation-adapter.ts": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+  "/private/tmp/st-native-combined-c/candidate/packages/solid/src/lib/solid-observation.ts": "1007de2283f5af3c0c2ee2e535ccfe7bb926a0a4be73a9aab8ce097a2c69ec13"
+}

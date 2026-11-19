@@ -1,0 +1,9 @@
+{
+  "packages/kernel/src/lib/dynamic-member-enrollment.spec.ts": "d6b38b99a81a07b3810acf0948969ad8f95f0592bbc9aed249c646d29d9499eb",
+  "packages/kernel/src/lib/experimental-publication/private.ts": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b",
+  "packages/kernel/src/lib/internals/materialize-markers.ts": "044518584339bf3872438f83bb42079635acfa4e376d842a9b5c4958c47a3b42",
+  "packages/kernel/src/lib/internals/member-membership.ts": "dc7cb7c8e61f57ea05784ad751fa395d6c32ed5f23bf43734787e0894b57263e",
+  "packages/kernel/src/lib/internals/native-occurrence.ts": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+  "packages/kernel/src/lib/signal-tree.ts": "09ac81190b7bfc84ae8df0e7ffe705ab5cae8037fb587ae61724d20bbe0c3c53"
+}

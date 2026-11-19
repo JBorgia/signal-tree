@@ -1,0 +1,6 @@
+(node:58466) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///private/tmp/st-current-read-capability-proof/proof-evidence/baseline-vue-observation.ts is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /private/tmp/st-current-read-capability-proof/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+{"name":"retained87f6831f","isReadonly":true,"heldValue":"X","calls":1}
+{"name":"candidate","isReadonly":true,"heldValue":"X","calls":1}

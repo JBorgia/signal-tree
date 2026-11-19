@@ -1,0 +1,9 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate",
+  "argv": [
+    "node",
+    "tools/verify-consumer-typecheck.mjs"
+  ],
+  "node": "24.15.0",
+  "sourceManifestSha256": "9ed147cfe0b48c0287c38a20a86a84a825b41741d1e5ea5daa2b917af3633d5d"
+}

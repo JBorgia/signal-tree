@@ -1,0 +1,88 @@
+{
+  "candidateManifest": "e4ab440c101fbac6cc89f22924dba0842c3670ea519ac33087f62175c74e26e3",
+  "runtimePatch": "3b3d210534b969affc9decd28585a8aa6fcae443b991f03351c76372bffd04bc",
+  "allCandidateFilesVerified": 3100,
+  "exactOriginalFalsifier": "423bd5b8e8b574959656dc9696092623fc273dae28e881fd12018b309537bbfa",
+  "independentResult": {
+    "exit": 0,
+    "timeout": false
+  },
+  "rawHash": "4fcda2cc0d7c4371c0f5ec43ac01373c968674456ac9441932176f5c355f6d5d",
+  "authorResults": {
+    "angular-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "6dc8f548cea7e51f6efbf32a2cf05bcc1b43310752a4f4ca0d207e24e4b294ea",
+      "summary": [
+        " Test Files  1 passed (1)",
+        "      Tests  3 passed (3)"
+      ]
+    },
+    "react-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "6ae4695d3cc81a56a1dcc754d25a8da1911b773883bb603897c9bd12dacd999c",
+      "summary": [
+        " Test Files  1 passed (1)",
+        "      Tests  3 passed (3)"
+      ]
+    },
+    "vue-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "1ed884d1db178811b9beb38d8dafa68c15d57f8bb4b770b122d20318119d6aac",
+      "summary": [
+        " Test Files  1 passed (1)",
+        "      Tests  3 passed (3)"
+      ]
+    },
+    "solid-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "ca4a3394c31b4528338a532bb4420e352079a303850b20d0471ddd04d6c41e05",
+      "summary": [
+        " Test Files  1 passed (1)",
+        "      Tests  3 passed (3)"
+      ]
+    },
+    "source-types-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "f6db13d58f6d1311818229e737187f81f63f143802850a409d3d84a514d3ee69",
+      "summary": []
+    },
+    "public-types-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "74b1b050e2f299aa2d3d1af6c17614f5b841257d4eaf16d68bb365c023f23a98",
+      "summary": []
+    },
+    "spec-types-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "logHash": "a61b2c9e85cc3dba41c65060e232c4c341b90ef9f4e95cbe691ba5b24e88fba5",
+      "summary": []
+    }
+  }
+}

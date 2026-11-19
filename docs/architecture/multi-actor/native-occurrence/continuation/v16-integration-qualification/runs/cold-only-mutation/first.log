@@ -1,0 +1,86 @@
+
+> nx run kernel:test cold-row-responsibility.spec.ts
+
+> node tools/run-core-vitest.mjs cold-row-responsibility.spec.ts
+
+(node:37639) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:37651) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-v16-integration-evidence/dispatch-mutant/packages/kernel
+
+(node:37661) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/cold-row-responsibility.spec.ts (2 tests | 2 failed) 139ms
+     × cold disjoint replacement captures useful undo/redo without test-acquired row facades 99ms
+     × cold collection transaction has populated inspection and rolls back useful state/output 34ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/cold-row-responsibility.spec.ts > cold row responsibility baseline > cold disjoint replacement captures useful undo/redo without test-acquired row facades
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ expectNoRetainedFacades src/lib/cold-row-responsibility.spec.ts:26:46
+     24|   for (const inventory of inventories) {
+     25|     if (inventory === undefined) continue;
+     26|     expect(inventory.nodeFacadeMaterialized).toBe(false);
+       |                                              ^
+     27|     expect(inventory.fieldFacadesMaterialized).toEqual([]);
+     28|   }
+ ❯ src/lib/cold-row-responsibility.spec.ts:76:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/cold-row-responsibility.spec.ts > cold row responsibility baseline > cold collection transaction has populated inspection and rolls back useful state/output
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ expectNoRetainedFacades src/lib/cold-row-responsibility.spec.ts:26:46
+     24|   for (const inventory of inventories) {
+     25|     if (inventory === undefined) continue;
+     26|     expect(inventory.nodeFacadeMaterialized).toBe(false);
+       |                                              ^
+     27|     expect(inventory.fieldFacadesMaterialized).toEqual([]);
+     28|   }
+ ❯ src/lib/cold-row-responsibility.spec.ts:117:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  10:54:27
+   Duration  2.20s (transform 1.11s, setup 0ms, import 1.40s, tests 139ms, environment 418ms)
+
+Warning: command "node tools/run-core-vitest.mjs cold-row-responsibility.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.1s

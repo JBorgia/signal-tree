@@ -1,0 +1,9 @@
+{
+  "reason": "no-progress-180s",
+  "lastEvent": {
+    "at": 1793680325787,
+    "kind": "module-start",
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts"
+  },
+  "elapsedSeconds": 247.8461597498972
+}

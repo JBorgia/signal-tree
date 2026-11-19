@@ -1,0 +1,63 @@
+
+> nx run kernel:test independent-packet-producers.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-packet-producers.spec.ts --maxWorkers=1
+
+(node:84000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84009) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-admission-independent/candidate/packages/kernel
+
+(node:84017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-packet-producers.spec.ts (7 tests | 1 failed) 53ms
+   × actual add temporary structural mutation cannot split native and later recipient admission 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-packet-producers.spec.ts > actual add temporary structural mutation cannot split native and later recipient admission
+AssertionError: expected { member: [Function member], …(4) } not to be { member: [Function member], …(4) } // Object.is equality
+
+Compared values have no visual difference.
+
+ ❯ Object.prepare src/lib/independent-packet-producers.spec.ts:60:203
+
+ ❯ EntityPublicationSource.prepare src/lib/internals/entity-publication.ts:223:32
+ ❯ prepareEntityPublication src/lib/entity-signal.ts:2338:126
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1410:23
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3046:23
+ ❯ addOne src/lib/entity-signal.ts:3949:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5113:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/lib/independent-packet-producers.spec.ts:61:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  20:01:24
+   Duration  2.71s (transform 1.23s, setup 0ms, import 1.48s, tests 53ms, environment 948ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-packet-producers.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.7s

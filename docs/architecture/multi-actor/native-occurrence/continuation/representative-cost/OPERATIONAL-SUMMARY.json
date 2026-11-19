@@ -1,0 +1,11 @@
+{
+  "costChildren": 84,
+  "distinctDirectChildPids": 84,
+  "validChildren": 84,
+  "maxSampledOwnedRssBytes": 254459904,
+  "minimumMemoryPressureFreePercentage": 36.0,
+  "maximumMemoryPressureFreePercentage": 49.0,
+  "maxHostTelemetryLatencySeconds": 0.08924995898269117,
+  "guards": "operational4GiB/25%, not cost acceptance thresholds",
+  "allRemainingOwnedEmpty": true
+}

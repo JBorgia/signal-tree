@@ -1,0 +1,35 @@
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts:389:      frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts:390:        kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts:435:      frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts:436:        kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:28:    frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:29:      kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:34:    frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:35:      kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:92:    frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts:93:      kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:1149:      if (mutation.kind !== 'replace-value') continue;
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:1189:      if (m.kind === 'replace-value') {
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:1269:      if (mutation.kind !== 'replace-value') return undefined;
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:1801:          frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:1802:            kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:2021:   * CLEANUP OWED: have `EntityMutationFrame`'s `replace-value` instruction go
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:2029:   * construction — it stages one `replace-value` and nothing else — which is
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:2619:      frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:2620:        kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:3807:        kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:3814:      frame.stageValueReplacement(replacement);
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:3914:        frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:3915:          kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:4283:          frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:4284:            kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:4680:          frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-signal.ts:4681:            kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/entity-update-one-equivalence.spec.ts:57: * `replace-value`, no create/restore/retire, no key, ordering, membership or
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/physical/entity-mutation-frame.ts:16:  kind: 'replace-value';
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/physical/entity-mutation-frame.ts:233:  stageValueReplacement(replacement: PreparedValueReplacement<K, E>): void {
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/physical/entity-mutation-frame.ts:295:            mutation.kind !== 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/physical/entity-mutation-frame.ts:331:      if (mutation.kind === 'replace-value') {
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts:105:    frame.stageValueReplacement({
+/private/tmp/st-occurrence-successor/packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts:106:      kind: 'replace-value',
+/private/tmp/st-occurrence-successor/packages/kernel/src/enhancers/restoration/add-many-overwrite-reversal.spec.ts:10: * storage commit is a `replace-value` of the row's existing lifetime, and the

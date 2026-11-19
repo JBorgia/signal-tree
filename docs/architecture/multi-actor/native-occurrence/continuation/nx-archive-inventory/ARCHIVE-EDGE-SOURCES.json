@@ -1,0 +1,544 @@
+[
+  {
+    "file": "docs/audits/2026-10-17-incumbent-readiness/reconciliation/k2-fixture.ts",
+    "hash": "13588721330422345459",
+    "deps": [
+      "vue",
+      "npm:vue"
+    ]
+  },
+  {
+    "file": "docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/artifact-consumer/react.ts",
+    "hash": "8970960598931544237",
+    "deps": [
+      "react"
+    ]
+  },
+  {
+    "file": "docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/artifact-consumer/solid.ts",
+    "hash": "18181339315086150310",
+    "deps": [
+      "solid"
+    ]
+  },
+  {
+    "file": "docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/artifact-consumer/vue.ts",
+    "hash": "16734885642221002060",
+    "deps": [
+      "vue"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-capture-boundary-0/controls-v2.mjs",
+    "hash": "6457249553245434152",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-capture-boundary-0/controls-v3.mjs",
+    "hash": "997798146271222070",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-capture-boundary-0/controls.mjs",
+    "hash": "12587519451779991919",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-capture-boundary-0/reentry.mjs",
+    "hash": "10704805347936836208",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-capture-boundary-0/run.mjs",
+    "hash": "9458502178890097253",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/atomic-capture-boundary-0/settlement.mjs",
+    "hash": "6342417024051334448",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-installation-capture-0/freshness.mjs",
+    "hash": "377958890359459405",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-installation-capture-0/reentry.mjs",
+    "hash": "10704805347936836208",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/atomic-installation-capture-0/run.mjs",
+    "hash": "1870702487921041093",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/atomic-installation-capture-0/settlement.mjs",
+    "hash": "6342417024051334448",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/composition-acceptance.mjs",
+    "hash": "4078568537309601913",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/composition-first.mjs",
+    "hash": "5690134704606833567",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/composition-physical.mjs",
+    "hash": "7777895272380447934",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/composition-rekey.mjs",
+    "hash": "11243075825775499776",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/composition-siblings.mjs",
+    "hash": "5175035992680613384",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/composition-two-rekeys.mjs",
+    "hash": "11751009199012030947",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/replay/operation-work-runner-template.mjs",
+    "hash": "8901815682734438804",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/member-point-composition-0/run.mjs",
+    "hash": "16766988515693495956",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/membership-point-work-0/run.mjs",
+    "hash": "2963427920831995057",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/operation-disposition-0/omitted-publisher.mjs",
+    "hash": "4321986251930507179",
+    "deps": [
+      "npm:solid-js",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/operation-disposition-0/run.mjs",
+    "hash": "18116298593534611578",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/operation-record-boundary-0/review-absent.mjs",
+    "hash": "6904099798490425587",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/operation-record-boundary-0/routes-observation.mjs",
+    "hash": "5855760420325807304",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/operation-record-boundary-0/routes.mjs",
+    "hash": "16327415093773184415",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/operation-record-boundary-0/run.mjs",
+    "hash": "16165915568250564877",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/prepared-selection-order-0/callback-controls.mjs",
+    "hash": "1120570539573237688",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/prepared-selection-order-0/order-trace.mjs",
+    "hash": "10458277586257000336",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/prepared-selection-order-0/review-order-cross-diagnostic.mjs",
+    "hash": "18042875163968399422",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/prepared-selection-order-0/review-order-cross.mjs",
+    "hash": "17279732539761548014",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/prepared-selection-order-0/review-order-late-subject.mjs",
+    "hash": "15583135973490934061",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/prepared-selection-order-0/run.mjs",
+    "hash": "2682418589935806737",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/selected-key-restoration-0/run.mjs",
+    "hash": "12815864823234261803",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/owned-read-controls-v2.mjs",
+    "hash": "881736194748333753",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/owned-read-controls.mjs",
+    "hash": "13319526676991348911",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/review-active.mjs",
+    "hash": "9349155103904477161",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/review-empty.mjs",
+    "hash": "9866219824018102134",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/review-readonly-memo.mjs",
+    "hash": "13820239888242543825",
+    "deps": [
+      "npm:vue"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/run.mjs",
+    "hash": "6130729416262949492",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/timing-p3.mjs",
+    "hash": "6909666368345108604",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/timing.mjs",
+    "hash": "13683537415711648451",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/settlement-publication-boundary-0/vue-native-undefined-control.mjs",
+    "hash": "2461254458139298314",
+    "deps": [
+      "npm:vue"
+    ]
+  },
+  {
+    "file": "docs/research/shared-projection-publication-0/review-active-restoration.mjs",
+    "hash": "13422137875045602315",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/shared-projection-publication-0/review-shared-controls-v2.mjs",
+    "hash": "13187927943427202205",
+    "deps": [
+      "npm:vue"
+    ]
+  },
+  {
+    "file": "docs/research/shared-projection-publication-0/review-shared-controls.mjs",
+    "hash": "4100197710922762274",
+    "deps": [
+      "npm:vue"
+    ]
+  },
+  {
+    "file": "docs/research/shared-projection-publication-0/review-shared-multitree.mjs",
+    "hash": "789969779807061034",
+    "deps": [
+      "npm:vue",
+      "kernel"
+    ]
+  },
+  {
+    "file": "docs/research/shared-projection-publication-0/run.mjs",
+    "hash": "3046080991121197828",
+    "deps": [
+      "npm:esbuild",
+      [
+        "npm:solid-js",
+        "dynamic"
+      ]
+    ]
+  },
+  {
+    "file": "package.json",
+    "hash": "8683993925655779327",
+    "deps": [
+      "npm:@analogjs/vite-plugin-angular",
+      "npm:@angular-devkit/core",
+      "npm:@angular-devkit/schematics",
+      "npm:@angular/build",
+      "npm:@angular/cli",
+      "npm:@angular/compiler-cli",
+      "npm:@angular/language-service",
+      "npm:@angular/platform-browser-dynamic",
+      "npm:@babel/generator",
+      "npm:@babel/parser",
+      "npm:@babel/traverse",
+      "npm:@babel/types",
+      "npm:@eslint/js",
+      "npm:@microsoft/api-extractor",
+      "npm:@nx/angular",
+      "npm:@nx/devkit",
+      "npm:@nx/eslint",
+      "npm:@nx/eslint-plugin",
+      "npm:@nx/jest",
+      "npm:@nx/js",
+      "npm:@nx/playwright",
+      "npm:@nx/react",
+      "npm:@nx/rollup",
+      "npm:@nx/vite",
+      "npm:@nx/vitest",
+      "npm:@nx/web",
+      "npm:@nx/workspace",
+      "npm:@playwright/test",
+      "npm:@rollup/plugin-commonjs",
+      "npm:@rollup/plugin-node-resolve",
+      "npm:@rollup/plugin-typescript",
+      "npm:@schematics/angular",
+      "kernel",
+      "npm:@swc-node/register",
+      "npm:@swc/core",
+      "npm:@swc/helpers",
+      "npm:@testing-library/dom",
+      "npm:@testing-library/react",
+      "npm:@types/jest",
+      "npm:@types/lodash",
+      "npm:@types/lodash-es",
+      "npm:@types/marked",
+      "npm:@types/node",
+      "npm:@types/react",
+      "npm:@types/react-dom",
+      "npm:@typescript-eslint/utils",
+      "npm:@vercel/node",
+      "npm:@vitejs/plugin-react",
+      "npm:@vitest/coverage-v8",
+      "npm:@vitest/ui",
+      "npm:angular-eslint",
+      "npm:autoprefixer",
+      "npm:esbuild",
+      "npm:eslint",
+      "npm:eslint-config-prettier",
+      "npm:eslint-plugin-playwright",
+      "npm:gh-pages",
+      "npm:happy-dom",
+      "npm:jest",
+      "npm:jest-environment-jsdom",
+      "npm:jest-preset-angular",
+      "npm:jiti",
+      "npm:jsdom",
+      "npm:jsonc-eslint-parser",
+      "npm:ng-packagr",
+      "npm:nx",
+      "npm:playwright",
+      "npm:postcss",
+      "npm:postcss-url",
+      "npm:prettier",
+      "npm:rollup",
+      "npm:rollup-plugin-dts",
+      "npm:semver",
+      "npm:solid-js",
+      "npm:source-map-explorer",
+      "npm:ts-jest",
+      "npm:ts-node",
+      "npm:tslib",
+      "npm:typedoc",
+      "npm:typescript",
+      "npm:typescript-eslint",
+      "npm:verdaccio",
+      "npm:vite",
+      "npm:vite-plugin-solid",
+      "npm:vite-tsconfig-paths",
+      "npm:vitest",
+      "npm:zone.js",
+      "npm:@angular/common",
+      "npm:@angular/compiler",
+      "npm:@angular/core",
+      "npm:@angular/forms",
+      "npm:@angular/platform-browser",
+      "npm:@angular/router",
+      "npm:@datorama/akita",
+      "npm:@ngrx/effects",
+      "npm:@ngrx/signals",
+      "npm:@ngrx/store",
+      "npm:@ngrx/store-devtools",
+      "npm:@ngxs/store",
+      "npm:@reduxjs/toolkit",
+      "npm:@stackblitz/sdk",
+      "npm:highlight.js",
+      "npm:lodash",
+      "npm:lodash-es",
+      "npm:marked",
+      "npm:react",
+      "npm:react-dom",
+      "npm:rxjs",
+      "npm:vue",
+      "npm:zod"
+    ]
+  }
+]

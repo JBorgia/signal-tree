@@ -1,0 +1,48 @@
+{
+  "identities": {
+    "base": {
+      "manifest": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+      "verifiedEntries": 3061
+    },
+    "left": {
+      "manifest": "e87715deeebe1392fb4d8996376b6cb2e2a9e9678d47e8dbcf864857560d8382",
+      "verifiedEntries": 3062
+    },
+    "right": {
+      "manifest": "a95b716f10c7dc43efc0f60d13a31a947695affff153b376ba6232c6835a28e3",
+      "verifiedEntries": 3066
+    },
+    "c18": {
+      "manifest": "cdfdf039f8cac66c90de26ff47cec3850b5e33db00e4b5c335c51bc934facbee",
+      "verifiedEntries": 3065
+    }
+  },
+  "compositionExceptions": {
+    "packages/kernel/src/lib/whole-late-getter.spec.ts": {
+      "assembled": "c167e0dc7bbdf11dcacc3e8706839bca8f67c58bacf57258ba254c605ccd7f9d",
+      "c18": null
+    },
+    "packages/kernel/src/lib/whole-mixed-trace.spec.ts": {
+      "assembled": "88776d52e058cf176bfd1b524b6f93d4001874216b9a0a56236318684fc491a6",
+      "c18": null
+    },
+    "packages/kernel/src/lib/value-work-handoff.spec.ts": {
+      "assembled": "52b1395ab6a1a2dad2bb94e2a4e9c32f7f3dc385af2ceb3f75af5e839af6dc57",
+      "c18": "9e9d7f905686754977472629400ee7512bae863762830088f092b00da61838de"
+    }
+  },
+  "conflicts": [],
+  "archiveHashes": {
+    "whole-late-getter.spec.ts": "c167e0dc7bbdf11dcacc3e8706839bca8f67c58bacf57258ba254c605ccd7f9d",
+    "ORIGINAL-value-work-handoff.spec.ts": "52b1395ab6a1a2dad2bb94e2a4e9c32f7f3dc385af2ceb3f75af5e839af6dc57",
+    "whole-mixed-trace.spec.ts": "88776d52e058cf176bfd1b524b6f93d4001874216b9a0a56236318684fc491a6",
+    "private-reduction-reentry.case.txt": "f8141e45409451e4a94c6eeddb2e29f1c8f1d22fc6e4773a0270e62b0e72a1d9"
+  },
+  "checks": [
+    "three-way union exact except three authorized routing paths",
+    "archive full files byte identical",
+    "active handoff plus archived suffix reconstruct original exact bytes",
+    "mixed rollback fixture whole file unchanged",
+    "runtime left/right files retained exact"
+  ]
+}

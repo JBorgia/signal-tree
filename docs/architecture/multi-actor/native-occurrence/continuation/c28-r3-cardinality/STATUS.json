@@ -1,0 +1,110 @@
+[
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      95886
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 79581672,
+    "firstSampleHeapUsed": 42057112,
+    "sampledPositiveGrowth": 37524560,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "counterInvariantFailures": 0,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "indexed",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      96051
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 81684832,
+    "firstSampleHeapUsed": 45654144,
+    "sampledPositiveGrowth": 36030688,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "counterInvariantFailures": 0,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "indexed",
+    "size": 2048,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      96201
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 193241168,
+    "firstSampleHeapUsed": 43949248,
+    "sampledPositiveGrowth": 149291920,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "counterInvariantFailures": 0,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "baseline",
+    "size": 2048,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      96371
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 174827824,
+    "firstSampleHeapUsed": 45671040,
+    "sampledPositiveGrowth": 129156784,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "counterInvariantFailures": 0,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  }
+]

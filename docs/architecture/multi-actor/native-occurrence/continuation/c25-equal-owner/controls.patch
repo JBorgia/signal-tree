@@ -1,0 +1,1221 @@
+--- a/packages/angular/src/lib/equal-owner-facade-controls.spec.ts
++++ b/packages/angular/src/lib/equal-owner-facade-controls.spec.ts
+@@ -0,0 +1,139 @@
++// Test-only C23 counterpart packet. Not executed; no shipping typing claim.
++// The existing runtime method is reached through a local capability cast only.
++// Public/native observations and authentic handles; no publication internals.
++import { expect, it } from 'vitest';
++import { computed } from '@angular/core';
++import { signalTree, transactions, link } from '../index';
++
++type Shape = 'leaf' | 'whole';
++type State = Readonly<{
++  state: string;
++  basis?: string;
++  reason?: string;
++}>;
++type Receipt = Readonly<{ read: () => State }>;
++type DeclarationLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => void): Receipt;
++};
++function declarationLink(connection: ReturnType<typeof link>): DeclarationLink {
++  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
++  return connection as DeclarationLink;
++}
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++const step = async (work: () => void) => { work(); await drain(); };
++const cases = (['leaf', 'whole'] as const).flatMap((shape) =>
++  ([true, false] as const).flatMap((owned) =>
++    (['confirm', 'rollback'] as const).map((terminal) => ({ shape, owned, terminal }))
++  )
++);
++const expected = (shape: Shape, x: number): number | { x: number; y: number } =>
++  shape === 'leaf' ? x : { x, y: 0 };
++
++it.each(cases)(
++  'angular equal $shape / actual-owned=$owned / $terminal',
++  async ({ shape, owned, terminal }) => {
++    const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++    const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++    const sent: (number | { x: number; y: number })[] = [];
++    const writeX = (value: number): void => { tree.$.pair.x.set(value); };
++    const writeOwner = (value: number): void => { owner.$.z.set(value); };
++    const readX = (): number => tree.$.pair.x();
++    const readOwner = (): number => owner.$.z();
++    const native = computed(() => tree.$.pair.x());
++    const readNative = () => native();
++    const stopNative = () => { /* Lazy computed has no effect/root teardown. */ };
++    // Separate calls preserve the actual facade source typing, avoiding a union cast.
++    const c = declarationLink(shape === 'leaf'
++      ? link(tree.$.pair.x, { set: (value) => { sent.push(value); } })
++      : link(tree.$.pair, { set: (value) => { sent.push({ x: value.x, y: value.y }); } })
++    );
++    try {
++      await step(() => { /* Settle construction/native observation before setup. */ });
++      expect(readNative()).toBe(0);
++      let pending!: ReturnType<typeof tree.transact>;
++      await step(() => {
++        pending = owned
++          ? tree.transact(() => { writeX(7); })
++          : owner.transact(() => { writeOwner(7); });
++        if (!owned) writeX(7);
++      });
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(sent).toEqual([]); // Required predecessor hold, not a cleared log.
++      const pendingBefore = pending.inspect();
++      let receipt: Receipt | undefined;
++      let calls = 0;
++      await step(() => {
++        receipt = c.declare({ kind: 'independent' }, () => {
++          calls++;
++          if (shape === 'leaf') writeX(7);
++          else tree.$.pair({ x: 7, y: 0 }); // explicit whole literal, no updater read
++        });
++      });
++      expect(calls).toBe(1);
++      if (!receipt) throw new Error('Declaration did not return a receipt');
++      expect(Object.isFrozen(receipt)).toBe(true);
++      const admission = receipt.read();
++      expect(Object.isFrozen(admission)).toBe(true);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(readOwner()).toBe(owned ? 0 : 7);
++      if (owned) {
++        expect(sent).toEqual([]);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
++      } else {
++        expect(sent).toEqual([expected(shape, 7)]);
++        expect(admission).toEqual({ state: 'started', basis: 'declared' });
++      }
++      const admissionCopy = { ...admission };
++      let settled = false;
++      const wait = c.settled().then(() => { settled = true; });
++      await step(() => { /* Observe settlement without awaiting an intentionally held Link. */ });
++      expect(settled).toBe(!owned);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      await step(() => { pending[terminal](); });
++      const final = owned && terminal === 'rollback' ? 0 : 7;
++      expect(readX()).toBe(final);
++      expect(tree.$.pair()).toEqual({ x: final, y: 0 });
++      expect(readNative()).toBe(final);
++      expect(readOwner()).toBe(!owned && terminal === 'confirm' ? 7 : 0);
++      expect(sent).toEqual([expected(shape, final)]);
++      expect(settled).toBe(true);
++      await wait;
++      const terminalState = receipt.read();
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
++      } else {
++        expect(terminalState.state).toBe('started');
++      }
++      if (!owned) expect(terminalState).toEqual(admissionCopy);
++      expect(admission).toEqual(admissionCopy); // retained snapshot never mutated
++      expect(Object.isFrozen(terminalState)).toBe(true);
++      expect(Reflect.set(terminalState, 'state', 'forged')).toBe(false);
++      await step(() => { /* No duplicate after terminal settlement. */ });
++      expect(sent).toEqual([expected(shape, final)]);
++      await step(() => { writeX(8); });
++      await c.settled();
++      expect(readNative()).toBe(8);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++      c.dispose();
++      await step(() => { writeX(9); });
++      expect(readNative()).toBe(9);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++    } finally {
++      c.dispose();
++      stopNative();
++      tree.destroy();
++      owner.destroy();
++    }
++  }
++);
+--- a/packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts
++++ b/packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts
+@@ -0,0 +1,67 @@
++// Separate authored-revision counterweight to the equal/no-write counterparts.
++// Test-only C23 public-shaped capability; no runtime internals or execution claim.
++import { expect, it } from 'vitest';
++import { link, signalTree, transactions, type PendingTransaction } from '../index';
++
++type State = Readonly<{ state: string; reason?: string; basis?: string }>;
++type Receipt = Readonly<{ read: () => State }>;
++type DeclaredLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'dependent'; owners: readonly PendingTransaction[] }, work: () => void): Receipt;
++};
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++
++it('disposing a genuinely authored dependent revision terminates its held receipt and releases the waiter', async () => {
++  const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
++  const sent: number[] = [];
++  const connection = link(tree.$.y, { set: (value) => { sent.push(value); } });
++  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
++  const c = connection as DeclaredLink;
++  try {
++    const p = tree.transact(() => tree.$.x(7));
++    await drain();
++    const ownership = p.inspect();
++    expect(tree.$()).toEqual({ x: 7, y: 0 });
++    expect(sent).toEqual([]);
++    let calls = 0;
++    // Changed y0 -> y7, with an authentic pending contributor: not an equal no-op.
++    const receipt = c.declare({ kind: 'dependent', owners: [p] }, () => {
++      calls++;
++      tree.$.y(tree.$.x());
++    });
++    await drain();
++    expect(calls).toBe(1);
++    expect(tree.$()).toEqual({ x: 7, y: 7 });
++    expect(p.inspect()).toEqual(ownership);
++    expect(sent).toEqual([]);
++    const held = receipt.read();
++    expect(held).toEqual({ state: 'held', reason: 'pending-dependency' });
++    expect(Object.isFrozen(receipt)).toBe(true);
++    expect(Object.isFrozen(held)).toBe(true);
++    let settled = false;
++    const wait = c.settled().then(() => { settled = true; });
++    await drain();
++    expect(settled).toBe(false);
++    c.dispose();
++    await drain();
++    expect(settled).toBe(true);
++    await wait;
++    expect(receipt.read()).toEqual({ state: 'disposed' });
++    expect(Object.isFrozen(receipt.read())).toBe(true);
++    expect(held).toEqual({ state: 'held', reason: 'pending-dependency' });
++    expect(p.inspect()).toEqual(ownership);
++    expect(tree.$()).toEqual({ x: 7, y: 7 });
++    expect(sent).toEqual([]);
++    p.rollback();
++    await drain();
++    expect(tree.$()).toEqual({ x: 0, y: 7 });
++    expect(receipt.read()).toEqual({ state: 'disposed' });
++    expect(sent).toEqual([]);
++    tree.$.y(9);
++    await drain();
++    expect(tree.$.y()).toBe(9);
++    expect(receipt.read()).toEqual({ state: 'disposed' });
++    expect(sent).toEqual([]);
++  } finally { c.dispose(); tree.destroy(); }
++});
+--- a/packages/kernel/src/lib/equal-owner-current-input.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-current-input.spec.ts
+@@ -0,0 +1,38 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions,type PendingTransaction} from '../index';
++type C=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly PendingTransaction[]}|{kind:'unknown'},work:()=>unknown):{read():Readonly<{state:string;reason?:string}>}};
++const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++for(const mode of ['independent','dependent','unknown'] as const)it(`current ancestor input remains distinct from retained support: ${mode}`,async()=>{
++ const t=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});const sent:unknown[]=[];const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as C;
++ try{
++  const p=t.transact(()=>t.$.pair.x(7)),q=t.transact(()=>t.$.q(1));await drain();let calls=0;
++  const invoke=()=>c.declare(mode==='dependent'?{kind:mode,owners:[p,q]}:{kind:mode},()=>t.$(current=>{calls++;return {...current,pair:{x:current.q===1?current.pair.x:0,y:current.pair.y}};}));
++  if(mode==='independent')expect(invoke).toThrow('contradiction');else expect(invoke).not.toThrow();
++  expect(calls).toBe(1);expect(t.$.pair()).toEqual({x:7,y:0});await drain();expect(sent).toEqual([]);
++  p.confirm();await drain();expect(sent).toEqual([]);
++  // New public updater consumes pair alone; q is no longer present as a root sibling input.
++  let laterCalls=0;
++  expect(()=>c.declare({kind:'independent'},()=>t.$.pair(current=>{laterCalls++;return {...current};}))).toThrow('contradiction');
++  expect(laterCalls).toBe(1);await drain();expect(sent).toEqual([]);
++  q.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();}
++});
++for(const failure of ['throw','contradiction'] as const)it(`nonmatching late recipient keeps admitted unfinished support after retained equality: ${failure}`,async()=>{
++ const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const anchor=link(t.$.pair,{set:()=>{/* Anchor has its own recipient. */}}) as C;let child:C|undefined;
++ try{
++  const q=other.transact(()=>other.$.q(1));const sentinel=Object.freeze({failure});let calls=0;
++  let error:unknown;
++  try{anchor.declare({kind:'independent'},()=>{
++   calls++;t.$.pair.x(7);child=link(t.$.pair,{set:v=>{sent.push(v);}}) as C;
++   // An equal retaining call in this still-open horizon cannot certify the preceding write.
++   anchor.declare({kind:'independent'},()=>t.$.pair.x(7));
++   expect(sent).toEqual([]);
++   if(failure==='throw')throw sentinel;
++   anchor.declare({kind:'dependent',owners:[q]},()=>t.$.pair.y(1));
++  });}catch(e){error=e;}
++  expect(calls).toBe(1);if(failure==='throw')expect(error).toBe(sentinel);else expect(error).toMatchObject({reason:'contradiction'});
++  if(!child)throw Error('Late recipient missing');child.declare({kind:'independent'},()=>t.$.pair.y(8));await drain();expect(sent).toEqual([]);
++  q.confirm();await drain();expect(sent).toEqual([{x:7,y:8}]);await child.settled();
++ }finally{child?.dispose();anchor.dispose();t.destroy();other.destroy();}
++});
+--- a/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
+@@ -0,0 +1,232 @@
++// Test-only public-kernel packet against C23. Unexecuted; not a shipping type gate.
++import { expect, it } from 'vitest';
++import { link, signalTree, transactions, type PendingTransaction } from '../index';
++
++type State = Readonly<{ state: string; basis?: string; reason?: string }>;
++type Receipt = Readonly<{ read: () => State }>;
++type Declaration = { kind: 'independent' } | { kind: 'dependent'; owners: readonly PendingTransaction[] };
++type DeclaredLink = ReturnType<typeof link> & {
++  declare(input: Declaration, work: () => unknown): Receipt;
++};
++function declared(connection: ReturnType<typeof link>): DeclaredLink {
++  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
++  return connection as DeclaredLink;
++}
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++const caught = (work: () => unknown): unknown => {
++  try { work(); } catch (error) { return error; }
++  return undefined;
++};
++
++it.each(['independent', 'dependent'] as const)(
++  'pending native ancestor input is respected by a %s declaration',
++  async (kind) => {
++    const tree = signalTree({ x: 0, pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++    const sent: { x: number; y: number }[] = [];
++    const c = declared(link(tree.$.pair, { set: (value) => { sent.push({ ...value }); } }));
++    try {
++      const p = tree.transact(() => tree.$.x(7));
++      await drain();
++      const ownership = p.inspect();
++      expect(sent).toEqual([]);
++      let calls = 0;
++      let receipt: Receipt | undefined;
++      const error = caught(() => {
++        receipt = c.declare(kind === 'independent' ? { kind } : { kind, owners: [p] }, () => {
++          tree.$((input) => {
++            calls++;
++            expect(input.x).toBe(7);
++            return { ...input, pair: { x: input.x, y: input.pair.y } };
++          });
++        });
++      });
++      expect(calls).toBe(1);
++      if (kind === 'independent') {
++        expect(error).toMatchObject({
++          code: 'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',
++          stage: 'after-callback', reason: 'contradiction',
++        });
++        expect(receipt).toBeUndefined();
++      } else {
++        expect(error).toBeUndefined();
++        if (!receipt) throw new Error('Dependent declaration returned no receipt');
++        expect(receipt.read()).toEqual({ state: 'held', reason: 'pending-dependency' });
++      }
++      // Contradiction is not rollback of the callback's installed writes.
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(tree.$.x()).toBe(7);
++      expect(p.inspect()).toEqual(ownership);
++      await drain();
++      expect(sent).toEqual([]);
++      let settled = false;
++      const wait = c.settled().then(() => { settled = true; });
++      await drain();
++      expect(settled).toBe(false);
++      p.confirm();
++      await drain();
++      expect(sent).toEqual([{ x: 7, y: 0 }]);
++      expect(settled).toBe(true);
++      await wait;
++      if (kind === 'dependent') expect(receipt?.read()).toEqual({ state: 'started', basis: 'declared' });
++      await drain();
++      expect(sent).toEqual([{ x: 7, y: 0 }]);
++    } finally { c.dispose(); tree.destroy(); }
++  }
++);
++
++it('a genuinely changed independent successor supersedes the older owned contribution', async () => {
++  const tree = signalTree({ x: 0, sibling: 0 }, { enhancers: [transactions()] });
++  const sent: number[] = [];
++  const c = declared(link(tree.$.x, { set: (value) => { sent.push(value); } }));
++  try {
++    const p = tree.transact(() => { tree.$.x(7); tree.$.sibling(4); });
++    await drain();
++    expect(sent).toEqual([]);
++    expect(tree.$()).toEqual({ x: 7, sibling: 4 });
++    // Changed ordinary7 -> ordinary9: deliberately NOT the equal-owner case.
++    const fresh = c.declare({ kind: 'independent' }, () => tree.$.x(9));
++    await drain();
++    expect(tree.$()).toEqual({ x: 9, sibling: 4 });
++    expect(sent).toEqual([9]);
++    expect(fresh.read()).toEqual({ state: 'started', basis: 'declared' });
++    await c.settled();
++    // Same-location replacement survives; untouched owned sibling compensates.
++    expect(() => p.rollback()).not.toThrow();
++    await drain();
++    expect(tree.$()).toEqual({ x: 9, sibling: 0 });
++    expect(sent).toEqual([9]);
++    tree.$.x(10);
++    await drain();
++    await c.settled();
++    expect(sent).toEqual([9, 10]);
++    expect(fresh.read()).toEqual({ state: 'started', basis: 'declared' });
++  } finally { c.dispose(); tree.destroy(); }
++});
++
++it('acknowledging an earlier send does not release a newer owner-held equal whole write', async () => {
++  const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++  const sent: { x: number; y: number }[] = [];
++  let releaseFirst!: () => void;
++  const firstAck = new Promise<void>((resolve) => { releaseFirst = resolve; });
++  const c = declared(link(tree.$.pair, {
++    set: (value) => {
++      sent.push({ ...value });
++      return sent.length === 1 ? firstAck : Promise.resolve();
++    },
++  }));
++  try {
++    tree.$.pair.x(1);
++    await drain();
++    expect(sent).toEqual([{ x: 1, y: 0 }]); // Endpoint really started and is unresolved.
++    const p = tree.transact(() => tree.$.pair.x(7));
++    await drain();
++    const ownership = p.inspect();
++    const held = c.declare({ kind: 'independent' }, () => tree.$.pair({ x: 7, y: 0 }));
++    await drain();
++    expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++    expect(p.inspect()).toEqual(ownership);
++    expect(sent).toEqual([{ x: 1, y: 0 }]);
++    expect(held.read()).toEqual({ state: 'no-write' });
++    let settled = false;
++    const wait = c.settled().then(() => { settled = true; });
++    releaseFirst();
++    await drain();
++    expect(settled).toBe(false);
++    expect(p.inspect()).toEqual(ownership);
++    expect(sent).toEqual([{ x: 1, y: 0 }]);
++    expect(held.read()).toEqual({ state: 'no-write' });
++    p.confirm();
++    await drain();
++    expect(sent).toEqual([{ x: 1, y: 0 }, { x: 7, y: 0 }]);
++    expect(settled).toBe(true);
++    await wait;
++    expect(held.read()).toEqual({ state: 'no-write' });
++    await drain();
++    expect(sent).toEqual([{ x: 1, y: 0 }, { x: 7, y: 0 }]);
++    c.dispose();
++    expect(held.read()).toEqual({ state: 'no-write' });
++  } finally { releaseFirst(); c.dispose(); tree.destroy(); }
++});
++
++it('return-shape getter reentry stays in the horizon but cannot poison a later declaration', async () => {
++  const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
++  const later = signalTree({ n: 0 });
++  const sent: number[] = [], freshSent: number[] = [];
++  const c = declared(link(tree.$.y, { set: (value) => { sent.push(value); } }));
++  const fresh = declared(link(later.$.n, { set: (value) => { freshSent.push(value); } }));
++  try {
++    const p = tree.transact(() => tree.$.x(7));
++    const ownership = p.inspect();
++    let getters = 0, nestedCalls = 0;
++    const error = caught(() => c.declare({ kind: 'independent' }, () => ({
++      get then() {
++        getters++;
++        c.declare({ kind: 'dependent', owners: [p] }, () => { nestedCalls++; tree.$.y(7); });
++        return undefined; // Not async; the nested declared dependency is the contradiction.
++      },
++    })));
++    expect(error).toMatchObject({
++      code: 'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',
++      stage: 'after-callback', reason: 'contradiction',
++    });
++    expect(getters).toBe(1);
++    expect(nestedCalls).toBe(1);
++    await drain();
++    expect(tree.$()).toEqual({ x: 7, y: 7 });
++    expect(p.inspect()).toEqual(ownership);
++    expect(sent).toEqual([]);
++    const recovery = fresh.declare({ kind: 'independent' }, () => later.$.n(1));
++    await drain();
++    expect(freshSent).toEqual([1]);
++    expect(recovery.read()).toEqual({ state: 'started', basis: 'declared' });
++    expect(p.inspect()).toEqual(ownership); // Recovery did not settle the original owner.
++    await fresh.settled();
++    expect(sent).toEqual([]);
++    c.dispose();
++    p.rollback();
++    await drain();
++    expect(tree.$()).toEqual({ x: 0, y: 7 });
++    expect(sent).toEqual([]);
++    expect(freshSent).toEqual([1]);
++  } finally { c.dispose(); fresh.dispose(); tree.destroy(); later.destroy(); }
++});
++
++it('primary callback error survives nested contradiction and exited context does not leak', async () => {
++  const tree = signalTree({ x: 0, y: 0 }, { enhancers: [transactions()] });
++  const later = signalTree({ n: 0 });
++  const sent: number[] = [], freshSent: number[] = [];
++  const c = declared(link(tree.$.y, { set: (value) => { sent.push(value); } }));
++  const fresh = declared(link(later.$.n, { set: (value) => { freshSent.push(value); } }));
++  const primary = Object.freeze({ failure: 'public callback primary' });
++  try {
++    const p = tree.transact(() => tree.$.x(7));
++    const ownership = p.inspect();
++    let nestedCalls = 0;
++    const error = caught(() => c.declare({ kind: 'independent' }, () => {
++      c.declare({ kind: 'dependent', owners: [p] }, () => { nestedCalls++; tree.$.y(7); });
++      tree.$.y(8);
++      throw primary;
++    }));
++    expect(error).toBe(primary);
++    expect(nestedCalls).toBe(1);
++    await drain();
++    expect(tree.$()).toEqual({ x: 7, y: 8 });
++    expect(p.inspect()).toEqual(ownership);
++    expect(sent).toEqual([]);
++    const recovery = fresh.declare({ kind: 'independent' }, () => later.$.n(2));
++    await drain();
++    expect(freshSent).toEqual([2]);
++    expect(recovery.read()).toEqual({ state: 'started', basis: 'declared' });
++    expect(p.inspect()).toEqual(ownership);
++    await fresh.settled();
++    expect(sent).toEqual([]);
++    c.dispose();
++    p.rollback();
++    await drain();
++    expect(tree.$()).toEqual({ x: 0, y: 8 });
++    expect(sent).toEqual([]);
++    expect(freshSent).toEqual([2]);
++  } finally { c.dispose(); fresh.dispose(); tree.destroy(); later.destroy(); }
++});
+--- a/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts
++++ b/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts
+@@ -0,0 +1,107 @@
++import { expect, it } from 'vitest';
++import { leaf, link, signalTree, transactions } from '../index';
++import { withWriteContext } from './write-context';
++
++type Receipt = {
++  read(): Readonly<{ state: string; reason?: string; basis?: string }>;
++};
++type DeclaringLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => unknown): Receipt;
++};
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++
++// One scenario, parameterized only over the physical return-to-ordinary route.
++// Inspection is the sole private ingress; no proof or publication internals.
++for (const route of ['direct', 'frame'] as const) {
++  it(`saved inspection snapshot cannot borrow fresh ordinary support: ${route}`, async () => {
++    const source = signalTree({ pair: { x: 0 } });
++    const foreign = signalTree({ x: 0 }, { enhancers: [transactions()] });
++    const oldTarget = signalTree({ value: 0 });
++    const freshTarget = signalTree({ value: 0 });
++    const oldSent: number[] = [];
++    const freshSent: number[] = [];
++    const oldLink = link(oldTarget.$.value, {
++      set: (value) => { oldSent.push(value); },
++    }) as DeclaringLink;
++    const freshLink = link(freshTarget.$.value, {
++      set: (value) => { freshSent.push(value); },
++    }) as DeclaringLink;
++    const holders: { destroy(): void }[] = [];
++    try {
++      source.$.pair.x(7);
++      withWriteContext({ participation: 'inspection' }, () => {
++        source.$.pair.x(99);
++      });
++      const saved = source.$.pair();
++      expect(saved).toEqual({ x: 99 });
++      if (route === 'direct') source.$.pair.x(7);
++      else source.$.pair({ x: 7 });
++      const fresh = source.$.pair();
++      expect(fresh).toEqual({ x: 7 });
++      expect(fresh).not.toBe(saved);
++      expect(saved).toEqual({ x: 99 });
++      await drain();
++
++      // Public opaque terminals preserve these exact snapshot objects. A real
++      // updater receives them AFTER the source has returned to ordinary 7.
++      const oldHolder = signalTree({ input: leaf(saved) });
++      const freshHolder = signalTree({ input: leaf(fresh) });
++      holders.push(oldHolder, freshHolder);
++      const q = foreign.transact(() => foreign.$.x(1));
++      const pendingQ = q.inspect();
++      let oldCalls = 0;
++      let freshCalls = 0;
++      const oldReceipt = oldLink.declare({ kind: 'independent' }, () => {
++        oldHolder.$((current) => {
++          oldCalls++;
++          expect(current.input).toBe(saved);
++          expect(current.input.x).toBe(99);
++          oldTarget.$.value(current.input.x);
++          return current;
++        });
++      });
++      const freshReceipt = freshLink.declare({ kind: 'independent' }, () => {
++        freshHolder.$((current) => {
++          freshCalls++;
++          expect(current.input).toBe(fresh);
++          expect(current.input.x).toBe(7);
++          freshTarget.$.value(current.input.x);
++          return current;
++        });
++      });
++      expect([oldCalls, freshCalls]).toEqual([1, 1]);
++      expect(oldTarget.$.value()).toBe(99);
++      expect(freshTarget.$.value()).toBe(7);
++      expect(oldReceipt.read()).toMatchObject({ state: 'conservative', reason: 'unknown' });
++      await drain();
++      expect(oldSent).toEqual([]);
++      expect(freshSent).toEqual([7]);
++      expect(freshReceipt.read()).toMatchObject({ state: 'started' });
++      expect(q.inspect()).toEqual(pendingQ);
++      expect(source.$.pair()).toEqual({ x: 7 });
++      expect(saved).toEqual({ x: 99 });
++
++      q.confirm();
++      await drain();
++      await Promise.all([oldLink.settled(), freshLink.settled()]);
++      expect(oldSent).toEqual([99]);
++      expect(freshSent).toEqual([7]);
++      expect(oldReceipt.read()).toMatchObject({ state: 'started', basis: 'surviving' });
++      expect(source.$.pair()).toEqual({ x: 7 });
++      expect(saved).toEqual({ x: 99 });
++      await drain();
++      expect(oldSent).toEqual([99]);
++      expect(freshSent).toEqual([7]);
++    } finally {
++      oldLink.dispose();
++      freshLink.dispose();
++      for (const holder of holders) holder.destroy();
++      oldTarget.destroy();
++      freshTarget.destroy();
++      source.destroy();
++      foreign.destroy();
++    }
++  });
++}
+--- a/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts
++++ b/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts
+@@ -0,0 +1,20 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions,type PendingTransaction} from '../index';
++type C=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly PendingTransaction[]},work:()=>unknown):unknown};
++const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++for(const route of ['leaf','whole'] as const)for(const role of ['validation','consumed-input'] as const)it(`confirmed destination preserves actual q through NEW equal ${route}: ${role}`,async()=>{
++ const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as C;let off=()=>{};
++ try{
++  const q=other.transact(()=>other.$.q(7));let p!:ReturnType<typeof t.transact>;
++  c.declare({kind:'dependent',owners:[q]},()=>{p=t.transact(()=>{
++   if(role==='validation')t.$.pair.x(7);
++   else other.$(current=>{t.$.pair.x(current.q);return current;});
++  });});
++  await drain();expect(sent).toEqual([]);p.confirm();await drain();expect(sent).toEqual([]);
++  const before=q.inspect();let calls=0,notices=0;off=t.$.pair.x.subscribe(()=>notices++);
++  c.declare({kind:'independent'},()=>{calls++;if(route==='leaf')t.$.pair.x(7);else t.$.pair({x:7,y:0});});await drain();
++  expect(calls).toBe(1);expect(notices).toBe(0);expect(q.inspect()).toEqual(before);expect(sent).toEqual([]);expect(t.$.pair()).toEqual({x:7,y:0});
++  q.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();await drain();expect(sent).toEqual([{x:7,y:0}]);
++ }finally{off();c.dispose();t.destroy();other.destroy();}
++});
+--- a/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts
++++ b/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts
+@@ -0,0 +1,61 @@
++// Preregistered public discriminator; unexecuted, separate from author candidate.
++import { expect, it } from 'vitest';
++import { link, signalTree, transactions } from '../index';
++type Declared = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => unknown): unknown;
++};
++const drain = async () => { for (let i = 0; i < 120; i++) await Promise.resolve(); };
++for (const route of ['leaf', 'whole'] as const) {
++  it(`terminal destination does not prevent unowned possible-only refresh: ${route}`, async () => {
++    const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++    const foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
++    const sent: { x: number; y: number }[] = [];
++    const c = link(tree.$.pair, { set: value => { sent.push({ ...value }); } }) as Declared;
++    let off = () => {};
++    try {
++      const q = foreign.transact(() => foreign.$.z(1));
++      // No q read, declaration, updater input, or shared validation horizon.
++      const p = tree.transact(() => tree.$.pair.x(7));
++      await drain();
++      expect(sent).toEqual([]);
++      const qBefore = q.inspect();
++      p.confirm();
++      await drain();
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(sent).toEqual([]);
++      expect(q.inspect()).toEqual(qBefore);
++      let notices = 0;
++      off = tree.$.pair.x.subscribe(() => { notices++; });
++      let settled = false;
++      const waiting = c.settled().then(() => { settled = true; });
++      await drain();
++      expect(settled).toBe(false);
++      let calls = 0;
++      c.declare({ kind: 'independent' }, () => {
++        calls++;
++        if (route === 'leaf') tree.$.pair.x(7);
++        else tree.$.pair({ x: 7, y: 0 });
++      });
++      await drain();
++      expect(calls).toBe(1);
++      expect(notices).toBe(0);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(q.inspect()).toEqual(qBefore);
++      expect(foreign.$.z()).toBe(1);
++      expect(sent).toEqual([{ x: 7, y: 0 }]);
++      expect(settled).toBe(true);
++      await waiting;
++      // Foreign compensation must not change the independent destination.
++      q.rollback();
++      await drain();
++      expect(foreign.$.z()).toBe(0);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(sent).toEqual([{ x: 7, y: 0 }]);
++      expect(notices).toBe(0);
++      c.dispose();
++      tree.$.pair.x(8);
++      await drain();
++      expect(sent).toEqual([{ x: 7, y: 0 }]);
++    } finally { off(); c.dispose(); tree.destroy(); foreign.destroy(); }
++  });
++}
+--- a/packages/react/src/equal-owner-facade-controls.spec.tsx
++++ b/packages/react/src/equal-owner-facade-controls.spec.tsx
+@@ -0,0 +1,139 @@
++// Test-only C23 counterpart packet. Not executed; no shipping typing claim.
++// The existing runtime method is reached through a local capability cast only.
++// Public/native observations and authentic handles; no publication internals.
++import { expect, it } from 'vitest';
++import { act, renderHook } from '@testing-library/react';
++import { signalTree, transactions, link, useSignalTree } from './index';
++
++type Shape = 'leaf' | 'whole';
++type State = Readonly<{
++  state: string;
++  basis?: string;
++  reason?: string;
++}>;
++type Receipt = Readonly<{ read: () => State }>;
++type DeclarationLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => void): Receipt;
++};
++function declarationLink(connection: ReturnType<typeof link>): DeclarationLink {
++  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
++  return connection as DeclarationLink;
++}
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++const step = async (work: () => void) => { await act(async () => { work(); await drain(); }); };
++const cases = (['leaf', 'whole'] as const).flatMap((shape) =>
++  ([true, false] as const).flatMap((owned) =>
++    (['confirm', 'rollback'] as const).map((terminal) => ({ shape, owned, terminal }))
++  )
++);
++const expected = (shape: Shape, x: number): number | { x: number; y: number } =>
++  shape === 'leaf' ? x : { x, y: 0 };
++
++it.each(cases)(
++  'react equal $shape / actual-owned=$owned / $terminal',
++  async ({ shape, owned, terminal }) => {
++    const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++    const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++    const sent: (number | { x: number; y: number })[] = [];
++    const writeX = (value: number): void => { tree.$.pair.x(value); };
++    const writeOwner = (value: number): void => { owner.$.z(value); };
++    const readX = (): number => tree.$.pair.x();
++    const readOwner = (): number => owner.$.z();
++    const mounted = renderHook(() => useSignalTree(tree, ($) => $.pair.x()));
++    const readNative = () => mounted.result.current;
++    const stopNative = () => mounted.unmount();
++    // Separate calls preserve the actual facade source typing, avoiding a union cast.
++    const c = declarationLink(shape === 'leaf'
++      ? link(tree.$.pair.x, { set: (value) => { sent.push(value); } })
++      : link(tree.$.pair, { set: (value) => { sent.push({ x: value.x, y: value.y }); } })
++    );
++    try {
++      await step(() => { /* Settle construction/native observation before setup. */ });
++      expect(readNative()).toBe(0);
++      let pending!: ReturnType<typeof tree.transact>;
++      await step(() => {
++        pending = owned
++          ? tree.transact(() => { writeX(7); })
++          : owner.transact(() => { writeOwner(7); });
++        if (!owned) writeX(7);
++      });
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(sent).toEqual([]); // Required predecessor hold, not a cleared log.
++      const pendingBefore = pending.inspect();
++      let receipt: Receipt | undefined;
++      let calls = 0;
++      await step(() => {
++        receipt = c.declare({ kind: 'independent' }, () => {
++          calls++;
++          if (shape === 'leaf') writeX(7);
++          else tree.$.pair({ x: 7, y: 0 }); // explicit whole literal, no updater read
++        });
++      });
++      expect(calls).toBe(1);
++      if (!receipt) throw new Error('Declaration did not return a receipt');
++      expect(Object.isFrozen(receipt)).toBe(true);
++      const admission = receipt.read();
++      expect(Object.isFrozen(admission)).toBe(true);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(readOwner()).toBe(owned ? 0 : 7);
++      if (owned) {
++        expect(sent).toEqual([]);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
++      } else {
++        expect(sent).toEqual([expected(shape, 7)]);
++        expect(admission).toEqual({ state: 'started', basis: 'declared' });
++      }
++      const admissionCopy = { ...admission };
++      let settled = false;
++      const wait = c.settled().then(() => { settled = true; });
++      await step(() => { /* Observe settlement without awaiting an intentionally held Link. */ });
++      expect(settled).toBe(!owned);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      await step(() => { pending[terminal](); });
++      const final = owned && terminal === 'rollback' ? 0 : 7;
++      expect(readX()).toBe(final);
++      expect(tree.$.pair()).toEqual({ x: final, y: 0 });
++      expect(readNative()).toBe(final);
++      expect(readOwner()).toBe(!owned && terminal === 'confirm' ? 7 : 0);
++      expect(sent).toEqual([expected(shape, final)]);
++      expect(settled).toBe(true);
++      await wait;
++      const terminalState = receipt.read();
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
++      } else {
++        expect(terminalState.state).toBe('started');
++      }
++      if (!owned) expect(terminalState).toEqual(admissionCopy);
++      expect(admission).toEqual(admissionCopy); // retained snapshot never mutated
++      expect(Object.isFrozen(terminalState)).toBe(true);
++      expect(Reflect.set(terminalState, 'state', 'forged')).toBe(false);
++      await step(() => { /* No duplicate after terminal settlement. */ });
++      expect(sent).toEqual([expected(shape, final)]);
++      await step(() => { writeX(8); });
++      await c.settled();
++      expect(readNative()).toBe(8);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++      c.dispose();
++      await step(() => { writeX(9); });
++      expect(readNative()).toBe(9);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++    } finally {
++      c.dispose();
++      stopNative();
++      tree.destroy();
++      owner.destroy();
++    }
++  }
++);
+--- a/packages/solid/src/lib/equal-owner-facade-controls.spec.ts
++++ b/packages/solid/src/lib/equal-owner-facade-controls.spec.ts
+@@ -0,0 +1,139 @@
++// Test-only C23 counterpart packet. Not executed; no shipping typing claim.
++// The existing runtime method is reached through a local capability cast only.
++// Public/native observations and authentic handles; no publication internals.
++import { expect, it } from 'vitest';
++import { createMemo, createRoot } from 'solid-js';
++import { signalTree, transactions, link } from '../index';
++
++type Shape = 'leaf' | 'whole';
++type State = Readonly<{
++  state: string;
++  basis?: string;
++  reason?: string;
++}>;
++type Receipt = Readonly<{ read: () => State }>;
++type DeclarationLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => void): Receipt;
++};
++function declarationLink(connection: ReturnType<typeof link>): DeclarationLink {
++  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
++  return connection as DeclarationLink;
++}
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++const step = async (work: () => void) => { work(); await drain(); };
++const cases = (['leaf', 'whole'] as const).flatMap((shape) =>
++  ([true, false] as const).flatMap((owned) =>
++    (['confirm', 'rollback'] as const).map((terminal) => ({ shape, owned, terminal }))
++  )
++);
++const expected = (shape: Shape, x: number): number | { x: number; y: number } =>
++  shape === 'leaf' ? x : { x, y: 0 };
++
++it.each(cases)(
++  'solid equal $shape / actual-owned=$owned / $terminal',
++  async ({ shape, owned, terminal }) => {
++    const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++    const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++    const sent: (number | { x: number; y: number })[] = [];
++    const writeX = (value: number): void => { tree.$.pair.x.set(value); };
++    const writeOwner = (value: number): void => { owner.$.z.set(value); };
++    const readX = (): number => tree.$.pair.x();
++    const readOwner = (): number => owner.$.z();
++    const native = createRoot((dispose) => ({ read: createMemo(() => tree.$.pair.x()), dispose }));
++    const readNative = () => native.read();
++    const stopNative = () => native.dispose();
++    // Separate calls preserve the actual facade source typing, avoiding a union cast.
++    const c = declarationLink(shape === 'leaf'
++      ? link(tree.$.pair.x, { set: (value) => { sent.push(value); } })
++      : link(tree.$.pair, { set: (value) => { sent.push({ x: value.x, y: value.y }); } })
++    );
++    try {
++      await step(() => { /* Settle construction/native observation before setup. */ });
++      expect(readNative()).toBe(0);
++      let pending!: ReturnType<typeof tree.transact>;
++      await step(() => {
++        pending = owned
++          ? tree.transact(() => { writeX(7); })
++          : owner.transact(() => { writeOwner(7); });
++        if (!owned) writeX(7);
++      });
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(sent).toEqual([]); // Required predecessor hold, not a cleared log.
++      const pendingBefore = pending.inspect();
++      let receipt: Receipt | undefined;
++      let calls = 0;
++      await step(() => {
++        receipt = c.declare({ kind: 'independent' }, () => {
++          calls++;
++          if (shape === 'leaf') writeX(7);
++          else tree.$.pair({ x: 7, y: 0 }); // explicit whole literal, no updater read
++        });
++      });
++      expect(calls).toBe(1);
++      if (!receipt) throw new Error('Declaration did not return a receipt');
++      expect(Object.isFrozen(receipt)).toBe(true);
++      const admission = receipt.read();
++      expect(Object.isFrozen(admission)).toBe(true);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(readOwner()).toBe(owned ? 0 : 7);
++      if (owned) {
++        expect(sent).toEqual([]);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
++      } else {
++        expect(sent).toEqual([expected(shape, 7)]);
++        expect(admission).toEqual({ state: 'started', basis: 'declared' });
++      }
++      const admissionCopy = { ...admission };
++      let settled = false;
++      const wait = c.settled().then(() => { settled = true; });
++      await step(() => { /* Observe settlement without awaiting an intentionally held Link. */ });
++      expect(settled).toBe(!owned);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      await step(() => { pending[terminal](); });
++      const final = owned && terminal === 'rollback' ? 0 : 7;
++      expect(readX()).toBe(final);
++      expect(tree.$.pair()).toEqual({ x: final, y: 0 });
++      expect(readNative()).toBe(final);
++      expect(readOwner()).toBe(!owned && terminal === 'confirm' ? 7 : 0);
++      expect(sent).toEqual([expected(shape, final)]);
++      expect(settled).toBe(true);
++      await wait;
++      const terminalState = receipt.read();
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
++      } else {
++        expect(terminalState.state).toBe('started');
++      }
++      if (!owned) expect(terminalState).toEqual(admissionCopy);
++      expect(admission).toEqual(admissionCopy); // retained snapshot never mutated
++      expect(Object.isFrozen(terminalState)).toBe(true);
++      expect(Reflect.set(terminalState, 'state', 'forged')).toBe(false);
++      await step(() => { /* No duplicate after terminal settlement. */ });
++      expect(sent).toEqual([expected(shape, final)]);
++      await step(() => { writeX(8); });
++      await c.settled();
++      expect(readNative()).toBe(8);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++      c.dispose();
++      await step(() => { writeX(9); });
++      expect(readNative()).toBe(9);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++    } finally {
++      c.dispose();
++      stopNative();
++      tree.destroy();
++      owner.destroy();
++    }
++  }
++);
+--- a/packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts
++++ b/packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts
+@@ -0,0 +1,107 @@
++import { expect, it } from 'vitest';
++import { leaf, link, signalTree, transactions } from '../index';
++import { realizeAs as withWriteContext } from '../../../kernel/src/transaction-realization-contract';
++
++type Receipt = {
++  read(): Readonly<{ state: string; reason?: string; basis?: string }>;
++};
++type DeclaringLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => unknown): Receipt;
++};
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++
++// One scenario, parameterized only over the physical return-to-ordinary route.
++// Inspection is the sole private ingress; no proof or publication internals.
++for (const route of ['direct', 'frame'] as const) {
++  it(`saved inspection snapshot cannot borrow fresh ordinary support: ${route}`, async () => {
++    const source = signalTree({ pair: { x: 0 } });
++    const foreign = signalTree({ x: 0 }, { enhancers: [transactions()] });
++    const oldTarget = signalTree({ value: 0 });
++    const freshTarget = signalTree({ value: 0 });
++    const oldSent: number[] = [];
++    const freshSent: number[] = [];
++    const oldLink = link(oldTarget.$.value, {
++      set: (value) => { oldSent.push(value); },
++    }) as DeclaringLink;
++    const freshLink = link(freshTarget.$.value, {
++      set: (value) => { freshSent.push(value); },
++    }) as DeclaringLink;
++    const holders: { destroy(): void }[] = [];
++    try {
++      source.$.pair.x.set(7);
++      withWriteContext({ participation: 'inspection' }, () => {
++        source.$.pair.x.set(99);
++      });
++      const saved = source.$.pair();
++      expect(saved).toEqual({ x: 99 });
++      if (route === 'direct') source.$.pair.x.set(7);
++      else source.$.pair({ x: 7 });
++      const fresh = source.$.pair();
++      expect(fresh).toEqual({ x: 7 });
++      expect(fresh).not.toBe(saved);
++      expect(saved).toEqual({ x: 99 });
++      await drain();
++
++      // Public opaque terminals preserve these exact snapshot objects. A real
++      // updater receives them AFTER the source has returned to ordinary 7.
++      const oldHolder = signalTree({ input: leaf(saved) });
++      const freshHolder = signalTree({ input: leaf(fresh) });
++      holders.push(oldHolder, freshHolder);
++      const q = foreign.transact(() => foreign.$.x.set(1));
++      const pendingQ = q.inspect();
++      let oldCalls = 0;
++      let freshCalls = 0;
++      const oldReceipt = oldLink.declare({ kind: 'independent' }, () => {
++        oldHolder.$((current) => {
++          oldCalls++;
++          expect(current.input).toBe(saved);
++          expect(current.input.x).toBe(99);
++          oldTarget.$.value.set(current.input.x);
++          return current;
++        });
++      });
++      const freshReceipt = freshLink.declare({ kind: 'independent' }, () => {
++        freshHolder.$((current) => {
++          freshCalls++;
++          expect(current.input).toBe(fresh);
++          expect(current.input.x).toBe(7);
++          freshTarget.$.value.set(current.input.x);
++          return current;
++        });
++      });
++      expect([oldCalls, freshCalls]).toEqual([1, 1]);
++      expect(oldTarget.$.value()).toBe(99);
++      expect(freshTarget.$.value()).toBe(7);
++      expect(oldReceipt.read()).toMatchObject({ state: 'conservative', reason: 'unknown' });
++      await drain();
++      expect(oldSent).toEqual([]);
++      expect(freshSent).toEqual([7]);
++      expect(freshReceipt.read()).toMatchObject({ state: 'started' });
++      expect(q.inspect()).toEqual(pendingQ);
++      expect(source.$.pair()).toEqual({ x: 7 });
++      expect(saved).toEqual({ x: 99 });
++
++      q.confirm();
++      await drain();
++      await Promise.all([oldLink.settled(), freshLink.settled()]);
++      expect(oldSent).toEqual([99]);
++      expect(freshSent).toEqual([7]);
++      expect(oldReceipt.read()).toMatchObject({ state: 'started', basis: 'surviving' });
++      expect(source.$.pair()).toEqual({ x: 7 });
++      expect(saved).toEqual({ x: 99 });
++      await drain();
++      expect(oldSent).toEqual([99]);
++      expect(freshSent).toEqual([7]);
++    } finally {
++      oldLink.dispose();
++      freshLink.dispose();
++      for (const holder of holders) holder.destroy();
++      oldTarget.destroy();
++      freshTarget.destroy();
++      source.destroy();
++      foreign.destroy();
++    }
++  });
++}
+--- a/packages/vue/src/lib/equal-owner-facade-controls.spec.ts
++++ b/packages/vue/src/lib/equal-owner-facade-controls.spec.ts
+@@ -0,0 +1,139 @@
++// Test-only C23 counterpart packet. Not executed; no shipping typing claim.
++// The existing runtime method is reached through a local capability cast only.
++// Public/native observations and authentic handles; no publication internals.
++import { expect, it } from 'vitest';
++import { computed, nextTick } from 'vue';
++import { signalTree, transactions, link } from '../index';
++
++type Shape = 'leaf' | 'whole';
++type State = Readonly<{
++  state: string;
++  basis?: string;
++  reason?: string;
++}>;
++type Receipt = Readonly<{ read: () => State }>;
++type DeclarationLink = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => void): Receipt;
++};
++function declarationLink(connection: ReturnType<typeof link>): DeclarationLink {
++  expect(typeof Reflect.get(connection, 'declare')).toBe('function');
++  return connection as DeclarationLink;
++}
++const drain = async () => {
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++const step = async (work: () => void) => { work(); await drain(); await nextTick(); };
++const cases = (['leaf', 'whole'] as const).flatMap((shape) =>
++  ([true, false] as const).flatMap((owned) =>
++    (['confirm', 'rollback'] as const).map((terminal) => ({ shape, owned, terminal }))
++  )
++);
++const expected = (shape: Shape, x: number): number | { x: number; y: number } =>
++  shape === 'leaf' ? x : { x, y: 0 };
++
++it.each(cases)(
++  'vue equal $shape / actual-owned=$owned / $terminal',
++  async ({ shape, owned, terminal }) => {
++    const tree = signalTree({ pair: { x: 0, y: 0 } }, { enhancers: [transactions()] });
++    const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++    const sent: (number | { x: number; y: number })[] = [];
++    const writeX = (value: number): void => { tree.$.pair.x.value = value; };
++    const writeOwner = (value: number): void => { owner.$.z.value = value; };
++    const readX = (): number => tree.$.pair.x.value;
++    const readOwner = (): number => owner.$.z.value;
++    const native = computed(() => tree.$.pair.x.value);
++    const readNative = () => native.value;
++    const stopNative = () => { /* Lazy computed; no watch/effect was installed. */ };
++    // Separate calls preserve the actual facade source typing, avoiding a union cast.
++    const c = declarationLink(shape === 'leaf'
++      ? link(tree.$.pair.x, { set: (value) => { sent.push(value); } })
++      : link(tree.$.pair, { set: (value) => { sent.push({ x: value.x, y: value.y }); } })
++    );
++    try {
++      await step(() => { /* Settle construction/native observation before setup. */ });
++      expect(readNative()).toBe(0);
++      let pending!: ReturnType<typeof tree.transact>;
++      await step(() => {
++        pending = owned
++          ? tree.transact(() => { writeX(7); })
++          : owner.transact(() => { writeOwner(7); });
++        if (!owned) writeX(7);
++      });
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(sent).toEqual([]); // Required predecessor hold, not a cleared log.
++      const pendingBefore = pending.inspect();
++      let receipt: Receipt | undefined;
++      let calls = 0;
++      await step(() => {
++        receipt = c.declare({ kind: 'independent' }, () => {
++          calls++;
++          if (shape === 'leaf') writeX(7);
++          else tree.$.pair({ x: 7, y: 0 }); // explicit whole literal, no updater read
++        });
++      });
++      expect(calls).toBe(1);
++      if (!receipt) throw new Error('Declaration did not return a receipt');
++      expect(Object.isFrozen(receipt)).toBe(true);
++      const admission = receipt.read();
++      expect(Object.isFrozen(admission)).toBe(true);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      expect(readX()).toBe(7);
++      expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
++      expect(readNative()).toBe(7);
++      expect(readOwner()).toBe(owned ? 0 : 7);
++      if (owned) {
++        expect(sent).toEqual([]);
++        // This invocation adopts no new support; older connection work is still held.
++        expect(admission).toEqual({ state: 'no-write' });
++      } else {
++        expect(sent).toEqual([expected(shape, 7)]);
++        expect(admission).toEqual({ state: 'started', basis: 'declared' });
++      }
++      const admissionCopy = { ...admission };
++      let settled = false;
++      const wait = c.settled().then(() => { settled = true; });
++      await step(() => { /* Observe settlement without awaiting an intentionally held Link. */ });
++      expect(settled).toBe(!owned);
++      expect(pending.inspect()).toEqual(pendingBefore);
++      await step(() => { pending[terminal](); });
++      const final = owned && terminal === 'rollback' ? 0 : 7;
++      expect(readX()).toBe(final);
++      expect(tree.$.pair()).toEqual({ x: final, y: 0 });
++      expect(readNative()).toBe(final);
++      expect(readOwner()).toBe(!owned && terminal === 'confirm' ? 7 : 0);
++      expect(sent).toEqual([expected(shape, final)]);
++      expect(settled).toBe(true);
++      await wait;
++      const terminalState = receipt.read();
++      if (owned) {
++        // No-write is terminal even when the Link's older work later publishes.
++        expect(terminalState).toEqual({ state: 'no-write' });
++      } else {
++        expect(terminalState.state).toBe('started');
++      }
++      if (!owned) expect(terminalState).toEqual(admissionCopy);
++      expect(admission).toEqual(admissionCopy); // retained snapshot never mutated
++      expect(Object.isFrozen(terminalState)).toBe(true);
++      expect(Reflect.set(terminalState, 'state', 'forged')).toBe(false);
++      await step(() => { /* No duplicate after terminal settlement. */ });
++      expect(sent).toEqual([expected(shape, final)]);
++      await step(() => { writeX(8); });
++      await c.settled();
++      expect(readNative()).toBe(8);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++      c.dispose();
++      await step(() => { writeX(9); });
++      expect(readNative()).toBe(9);
++      expect(sent).toEqual([expected(shape, final), expected(shape, 8)]);
++      expect(receipt.read()).toEqual(terminalState);
++    } finally {
++      c.dispose();
++      stopNative();
++      tree.destroy();
++      owner.destroy();
++    }
++  }
++);

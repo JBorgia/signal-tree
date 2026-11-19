@@ -1,0 +1,11 @@
+{
+  "working": {
+    "paths": 3091,
+    "unchanged": true
+  },
+  "runtimeOnly": {
+    "paths": 3087,
+    "unchanged": true
+  },
+  "fixtureUnchanged": true
+}

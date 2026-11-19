@@ -1,0 +1,21 @@
+{
+  "baseManifest": "fa371d221f9904c4feec2d8f684360c73ccb7e30b98bf03a18d0dea5768bf791",
+  "baseFiles": 3095,
+  "changed": {
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "0e9e8347f26bec9a360b0db5080fb52b0949b3f30da011db93efe018a8d57fce"
+  },
+  "original": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+  "patch": "1381415b67f26ec53f28b07b51c7d219d39efd706a9ea304822dbc88015e27a9",
+  "counterFixtureEqualAcrossArms": "49af2081acae02a7c3b5386baae6c1a8a375822c208b3460faad059c89cd618e",
+  "artifacts": {
+    "/private/tmp/st-c28-r3-disposition-index/IDENTITY.json": "3811ea0ffb59206e48d8648bc5c94cf3466b31b0ab41a68ec7a8b593259dab9e",
+    "/private/tmp/st-c28-r3-disposition-index/REPORT.md": "1f8aa65f6dae2d0e488c6d351a0e69872bb01d0be14f45a3dc5d651128a75b91",
+    "/private/tmp/st-c28-r3-disposition-index/prepared-counted/first.log": "d181cd203a133f1afd1604e75947a4fca921ba9fb121a2481244a93463ad6df9",
+    "/private/tmp/st-c28-r3-disposition-index/prepared-counted/counts.jsonl": "b15fff96b985bd8981c6b080120d9f45df8d2bbb62b99f4b1a149dd441e43513",
+    "/private/tmp/st-c28-r3-disposition-index/semantics-first/first.log": "87a5be75faadd55112684178e388bc14c2608646e381ff6bbc8cb904a045e725",
+    "/private/tmp/st-c28-r3-disposition-index/source-types/first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/private/tmp/st-c28-r3-work-attribution/slice-corrected/counts.jsonl": "46a5d87723a76b3971fa8197752e38d31acbd7eba20b901f803953c84a299112",
+    "/private/tmp/st-c28-r3-work-attribution/restoration-sites-corrected/observations.jsonl": "d6955b2ed85d49d009356759e74499136c3df3c3499d83e9483f53d7866ad101",
+    "/private/tmp/st-c28-r3-work-attribution/restoration-sites-corrected/first.log": "4125e6df4a7e7fd7b8fe71787937b8750513fde78395dcd4fba52f391c3a2a45"
+  }
+}

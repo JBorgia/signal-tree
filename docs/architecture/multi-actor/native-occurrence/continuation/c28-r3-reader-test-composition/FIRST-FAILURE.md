@@ -1,0 +1,1 @@
+First no-env Nx attempt exited 1 before Vitest: Main replaced PATH with a minimal list, dropping the pnpm executable required by tools/run-core-vitest.mjs. Raw first.log is preserved. No test or runtime assertion executed. Repeat restores the inherited PATH with pinned Node first; source is unchanged.

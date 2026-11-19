@@ -1,0 +1,46 @@
+import {appendFileSync} from 'node:fs';
+import {describe,it,expect,vi} from 'vitest';
+import {signalTree,entityMap,restoration,transactions,undoable,link} from '../index';
+type Row={id:string;n:number;extra?:number};
+const flush=async()=>{for(let i=0;i<40;i++)await Promise.resolve();};
+function record(name:string,value:unknown){const sink=process.env['ST_SNAPSHOT_OUTPUT'];if(!sink)throw Error('Missing sink');appendFileSync(sink,JSON.stringify({name,value})+'\n');}
+const initial:Row[]=[{id:'a',n:1},{id:'b',n:2}];
+describe('additional private snapshot baseline',()=>{
+ it('A public hidden ancestor rollback keeps nested tap absent and undo reexposes compensated rows',async()=>{
+  const t=signalTree({g:{rows:entityMap<Row,string>(),k:0},count:0},{enhancers:[transactions(),restoration()]}),other=signalTree({g:{rows:entityMap<Row,string>()}});
+  let off=()=>{};let nested=0;const observations:unknown[]=[];
+  try{const rows=t.$.g.rows;rows.setAll([initial[0]]);other.$.g.rows.setAll([{id:'x',n:99}]);await flush();
+   const p=t.transact(()=>rows.addOne({id:'b',n:2}));await flush();undoable(()=>(t.$ as unknown as (v:object)=>void)({count:1}));(other.$ as unknown as (v:object)=>void)({});await flush();
+   off=rows.tap({onRemove:()=>{nested++;observations.push({own:rows.all(),foreign:other.$.g.rows.all()});expect(rows.byId('a')).toBeUndefined();expect(other.$.g.rows.byId('x')).toBeUndefined();}});
+   p.rollback();await flush();expect(rows.all()).toEqual([]);expect(t.$()).toEqual({count:1});expect(nested).toBeGreaterThan(0);
+   off();off=()=>{};t.undo();await flush();expect(t.$()).toEqual({g:{rows:{all:[initial[0]]},k:0},count:0});expect(rows.byIdOrFail('a')()).toEqual(initial[0]);
+   rows.updateOne('a',{n:8});expect(rows.byIdOrFail('a').n()).toBe(8);record('A-public-hidden',{nested,observations});
+  }finally{off();t.destroy();other.destroy();}
+ });
+ it('B public point rollback and reorder undo record exact helper reach with useful endpoints',async()=>{
+  const t=signalTree({rows:entityMap<Row,string>()},{enhancers:[transactions(),restoration()]});let phase='off';const stacks:{phase:string;stack:string}[]=[];
+  const rows=t.$.rows,original=rows.byIdOrFail;const spy=vi.spyOn(rows,'byIdOrFail').mockImplementation(function(key){if(phase!=='off')stacks.push({phase,stack:new Error().stack??''});return original.call(rows,key);});
+  try{rows.setAll(initial);await flush();const p=t.transact(()=>rows.updateOne('a',{n:7}));await flush();phase='point-rollback';p.rollback();phase='off';await flush();expect(rows.all()).toEqual(initial);
+   undoable(()=>rows.setAll([initial[1],initial[0]]));await flush();expect(rows.ids()).toEqual(['b','a']);phase='placement-undo';t.undo();phase='off';await flush();expect(rows.all()).toEqual(initial);t.redo();await flush();expect(rows.all()).toEqual([initial[1],initial[0]]);
+   record('B-helper-stacks',stacks);
+  }finally{spy.mockRestore();t.destroy();}
+ });
+ it('C nonthrowing clone reentry preserves nested write and refuses stale outer installation',async()=>{
+  const t=signalTree({rows:entityMap<Row,string>(),stamp:0},{enhancers:[restoration()]});let reads=0;
+  try{t.$.rows.setAll([{id:'a',n:1,extra:2}]);await flush();undoable(()=>t.$.rows.updateOne('a',{n:7}));await flush();const value=t.$.rows.byIdOrFail('a')()!;
+   Object.defineProperty(value,'extra',{enumerable:true,configurable:true,get(){reads++;if(reads===1)t.$.stamp(5);return 2;}});
+   let failure:unknown;try{t.undo();}catch(e){failure=e;}
+   record('C-nonthrowing-reentry',{reads,error:failure instanceof Error?failure.message:String(failure),stamp:t.$.stamp(),n:t.$.rows.byIdOrFail('a').n()});
+   expect(reads).toBeGreaterThan(0);expect(failure).toBeInstanceOf(Error);expect(t.$.stamp()).toBe(5);expect(t.$.rows.byIdOrFail('a').n()).toBe(7);
+   Object.defineProperty(t.$.rows.byIdOrFail('a')()!,'extra',{value:2,enumerable:true,configurable:true,writable:true});t.$.rows.updateOne('a',{n:9});expect(t.$.rows.byIdOrFail('a').n()).toBe(9);
+  }finally{t.destroy();}
+ });
+ it('D foreign pending owner holds row Link through another-field reversal and delivers after confirm',async()=>{
+  const t=signalTree({rows:entityMap<Row,string>()},{enhancers:[transactions(),restoration()]}),foreign=signalTree({v:0},{enhancers:[transactions()]});const sent:Row[][]=[];let c:ReturnType<typeof link>|undefined;const q=foreign.transact(()=>foreign.$.v(7));
+  try{t.$.rows.setAll([{id:'a',n:1,extra:0}]);await flush();const rows=t.$.rows;c=link(rows,{set:v=>{sent.push(v.map(x=>({...x})));}});
+   c.declare({kind:'dependent',owners:[q]},()=>rows.byIdOrFail('a').extra(foreign.$.v()));await flush();expect(sent).toEqual([]);
+   undoable(()=>rows.updateOne('a',{n:9}));await flush();expect(sent).toEqual([]);t.undo();await flush();expect(rows.byIdOrFail('a')()).toEqual({id:'a',n:1,extra:7});expect(sent).toEqual([]);
+   q.confirm();await flush();expect(sent).toEqual([[{id:'a',n:1,extra:7}]]);await c.settled();await flush();expect(sent).toHaveLength(1);record('D-sends',sent);
+  }finally{c?.dispose();q.confirm();t.destroy();foreign.destroy();}
+ });
+});

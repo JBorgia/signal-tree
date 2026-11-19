@@ -1,0 +1,9 @@
+{
+  "base": "C1",
+  "reviewedDelta": "placement-sharing/from-B.runtime.patch",
+  "manual": "First import context changed by lazy owner; dry run refused without edits. Applied five exact single-occurrence replacements plus type import. Three unchanged B-base physical files copied from reviewed sharing source.",
+  "addedTests": [
+    "packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts",
+    "packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts"
+  ]
+}

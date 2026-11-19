@@ -1,0 +1,5 @@
+patching file 'packages/kernel/src/lib/entity-signal.ts'
+1 out of 6 hunks failed while patching 'packages/kernel/src/lib/entity-signal.ts'
+patching file 'packages/kernel/src/lib/physical/entity-ordinary-topology.ts'
+patching file 'packages/kernel/src/lib/physical/entity-placement-stage.ts'
+patching file 'packages/kernel/src/lib/physical/prepared-placement-visibility.ts'

@@ -1,0 +1,9 @@
+# Controller R1 review request — no measurement launch
+
+Historical run.py SHA092d450bc1e0a380b05dd60f0344700949fc21ad88559ac739ce89754e4504d7 and original PREREGISTRATION.md are preserved unchanged at packet root and controller-first-092d450b/. C0 started one Nx command, administratively cancelled after Main reported overlap; zero test events and memory samples. No retry or R1 command has started.
+
+Review run-r1.py, SHA1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344, against preserved run.py. Changes are bounded: new R1 output/command paths, positive complete ordered30-stage stream, requested N equality, finite numeric samples, original membership/restoration case order, and stop on test-overlay hash drift against BOTH saved test and preregistered hash. Existing source drift, worker freshness, equal heap limit,512MiB/64MiB+8x stops,180s/360s watchdog and birth-matched cleanup remain. Same original instrumentation/workload/commands and maximum eight new invocations planned.
+
+CONTROLLER-R1-CHECKS.json evaluates actual extracted AST predicates, without importing the controller or running measurements. It includes both reviewer counterexamples, valid control, missing/duplicate/reordered stages, wrong sizes, nonfinite numbers, case order, runtime drift and equal drift of live/saved test against preregistration. Please independently review executable stop behavior and any remaining blocker. Do not infer review qualification from worker checks.
+
+R1 preregistration/COMMANDS will be created only after controller review qualifies, explicitly citing restart reasons (administrative cancellation with zero data plus controller defects). Main has cleared heavy jobs; no additional clearance needed after qualifying review. Original eight-run order remains; no profiler/GC/heap flags/130k/CPU campaign. No frozen runtime/spec/source edits.

@@ -1,0 +1,14 @@
+[
+  {
+    "ancestorTitles": [
+      "absent collection \u2014 Vue sync effects (v16 8e)"
+    ],
+    "fullName": "absent collection \u2014 Vue sync effects (v16 8e) a rollback writing hidden rows runs no effect that could see them",
+    "status": "passed",
+    "title": "a rollback writing hidden rows runs no effect that could see them",
+    "duration": 21.341125000000147,
+    "failureMessages": [],
+    "meta": {},
+    "tags": []
+  }
+]

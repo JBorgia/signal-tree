@@ -1,0 +1,10 @@
+{
+  "inputFilesVerified": 3066,
+  "allInputBytesUnchanged": true,
+  "originalTestsUnchanged": true,
+  "runtimeRestoredSha256": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+  "newTestFiles": {
+    "packages/kernel/src/lib/restoration-calibrated-large-sequence.spec.ts": "51503f58b8fccffd877a7e13478ac1b3eae55c66a4235b25b08439010a893cb8",
+    "packages/kernel/src/lib/restoration-calibrated-paired.spec.ts": "12d8ce35bed7ce23d8e73a645b61e602faf0b53ad908883595ca0d414bbcffe2"
+  }
+}

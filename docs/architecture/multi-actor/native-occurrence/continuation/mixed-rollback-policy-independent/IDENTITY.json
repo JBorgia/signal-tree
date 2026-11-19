@@ -1,0 +1,8 @@
+{
+  "base_manifest_sha256": "a95b716f10c7dc43efc0f60d13a31a947695affff153b376ba6232c6835a28e3",
+  "verified_base_files": 3066,
+  "mismatches": [],
+  "root_head_read_only": "628d302dadb082a48c58528651c9088234d0a777",
+  "runtime_changes": [],
+  "added_test": "packages/kernel/src/lib/whole-rollback-policy-trace.spec.ts"
+}

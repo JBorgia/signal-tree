@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel intercept-leaf-signals.spec.ts heterogeneous-live-subject.spec.ts structural-admission-sequence.spec.ts occupancy-successor-realization.spec.ts complete-structural-sequence.spec.ts structural-completeness.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T17:35:53.373Z",
+    "endTime": "2026-11-02T17:36:00.560Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "17976434208810826927",
+      "startTime": "2026-11-02T17:35:53.427Z",
+      "endTime": "2026-11-02T17:36:00.558Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

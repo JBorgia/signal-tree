@@ -1,0 +1,32 @@
+[
+  {
+    "source": "EVIDENCE.json",
+    "archive": "EVIDENCE.json",
+    "sourceSha256": "1df01603ac84021a73df8ed0379d36a58424cb26fad7cc925ea876f6762cc6de",
+    "archiveSha256": "1df01603ac84021a73df8ed0379d36a58424cb26fad7cc925ea876f6762cc6de"
+  },
+  {
+    "source": "c0.log",
+    "archive": "c0.log",
+    "sourceSha256": "1565e807b8f6a70f61655d73fafcf1b45ea2de100488f1623cb8cb30e2bedd84",
+    "archiveSha256": "1565e807b8f6a70f61655d73fafcf1b45ea2de100488f1623cb8cb30e2bedd84"
+  },
+  {
+    "source": "r2.log",
+    "archive": "r2.log",
+    "sourceSha256": "8584c0e1a4f231699a15b4794583992eac280dbff1e26fc1d6b1e120da95bd55",
+    "archiveSha256": "8584c0e1a4f231699a15b4794583992eac280dbff1e26fc1d6b1e120da95bd55"
+  },
+  {
+    "source": "r3.log",
+    "archive": "r3.log",
+    "sourceSha256": "876f80e9bfa71003e787c0951262c5ef9757984b9a5bb9006d514cb39ae965fe",
+    "archiveSha256": "876f80e9bfa71003e787c0951262c5ef9757984b9a5bb9006d514cb39ae965fe"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "9e9616a23b25985afeadd2d5e604423fa0433c143481b6a03e4d3c464a1817ac",
+    "archiveSha256": "9e9616a23b25985afeadd2d5e604423fa0433c143481b6a03e4d3c464a1817ac"
+  }
+]

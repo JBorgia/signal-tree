@@ -1,0 +1,8 @@
+{
+  "authorFreeze": "ae2d5bb7b2be7fe06cadc5bd09c1bba531ca9e305739ca2d06fad238cd5b4378",
+  "C15": "02aba88c81c413700ef4af2f9bf8facc422cabf01fddf6a31b4ec2d777b16568",
+  "combinedOwnManifestSha256": "7a9f0a9ac36976c3580d7ec1e34df67ba942194fce0e63aff3d7d0026593ffa2",
+  "counterpartPatchSha256": "b244afac293ecea3cb07450798fe324897dac2fab51acf4747607fb6ea359dcb",
+  "verdict": "blocked-equal-final-sibling-projection-regression",
+  "runtimeCorrectiveEdits": false
+}

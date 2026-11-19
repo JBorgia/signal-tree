@@ -1,0 +1,133 @@
+--- a/packages/kernel/src/lib/internals/construction-allocation.ts
++++ b/packages/kernel/src/lib/internals/construction-allocation.ts
+@@ -1,3 +1,4 @@
++import type {TerminalRecordPlan} from './intrinsic-mutation';
+ /** One member construction owns only its own provisional resources. */
+ export class ConstructionAllocation {
+  private state: 'preparing'|'installed'|'canceled' = 'preparing';
+@@ -22,3 +23,10 @@
+  }
+  private clear():void{this.attaches=[];this.cancels=[];this.checks=[];}
+ }
++
++/** Prepared by the source constructor; never reconstruct responsibility at install. */
++export interface PreparedMemberConstruction {
++ readonly child:object;
++ readonly responsibility?:TerminalRecordPlan;
++ readonly allocation:ConstructionAllocation;
++}
+--- a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ b/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -1,4 +1,4 @@
+-import type {ConstructionAllocation} from './construction-allocation';
++import type {ConstructionAllocation,PreparedMemberConstruction} from './construction-allocation';
+ import { inheritObservationForAddedMember } from './observation-substrate';
+ import { installTerminalRecord, combineTerminalRecords, membershipPublicationPreparer, completePreparedPublication } from './intrinsic-mutation';
+ import { reportContainedObserverError } from './error-reporter';
+@@ -784,11 +784,11 @@
+   ];
+   if (!bind) return undefined;
+ 
+-  const child = bind(key, value); // may throw — nothing observable yet
+-
+-  installPreparedMember(branch as object, key, child);
+-  publishMembershipChange(branch as object);
+-  return child;
++  const prepared = bind(key, value); // source owns cancellation if construction throws
++  try {
++    installPreparedMember(branch as object,key,prepared.child,prepared.responsibility,prepared.allocation);
++    return prepared.child;
++  } finally {prepared.allocation.cancel();}
+ }
+ 
+ /** Install both physical halves and their records. Construction-owned children
+@@ -920,7 +920,7 @@
+  * DERIVED from the owning branch, so there is no argument through which a caller
+  * could target topology elsewhere in the tree.
+  */
+-export type MemberMaterializer = (key: string, value: unknown) => unknown;
++export type MemberMaterializer = (key: string, value: unknown) => PreparedMemberConstruction;
+ 
+ /**
+  * @internal The canonical construction authority as seen by the marker
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -1,5 +1,5 @@
+ import {releaseConstructionPosition} from './internals/position-registry';
+-import {ConstructionAllocation} from './internals/construction-allocation';
++import {ConstructionAllocation,type PreparedMemberConstruction} from './internals/construction-allocation';
+ import { registerNativeOccurrenceRoot } from './internals/native-occurrence';
+ import { beginBranchPublicationInput, endBranchPublicationInput, hasPublicationPreparation } from './internals/intrinsic-mutation';
+ import {needsLocationAuthorityAdmission} from './internals/location-runtime';
+@@ -898,7 +898,19 @@
+ // Whole-value writes may introduce ordinary members (owner decision 2026-10-17).
+ // Construction remains bound to the original tree; lookup alone creates nothing.
+ const constructionContexts = new WeakMap<MaterializationContext,MaterializationContext>();
+-type PreparedOrdinaryMember = { child: object; responsibility?: TerminalRecordPlan; allocation: ConstructionAllocation };
++/** Each public acquisition uses a new owner, even when called from a preparer. */
++function constructionContext(materializationContext:MaterializationContext,owned:ConstructionAllocation):MaterializationContext {
++ const base=constructionContexts.get(materializationContext)??materializationContext;
++ const context:MaterializationContext={...base,allocatePositionId(parent){
++   const id=base.allocatePositionId(parent);
++   owned.add(()=>{},()=>releaseConstructionPosition(base.positionRegistry,id));
++   return id;
++ }};
++ constructionContexts.set(context,base);
++ return context;
++}
++
++type PreparedOrdinaryMember = PreparedMemberConstruction;
+ const ordinaryMemberBuilders = new WeakMap<
+   object,
+   (key: string, value: unknown) => PreparedOrdinaryMember
+@@ -1585,13 +1597,7 @@
+     // Use the same child classification/finalization as initial construction,
+     // including primitive/undefined leaves and structured literal addresses.
+     const owned = new ConstructionAllocation();
+-    const baseContext = constructionContexts.get(materializationContext) ?? materializationContext;
+-    const context: MaterializationContext = {...baseContext,allocatePositionId(parent){
+-      const id=baseContext.allocatePositionId(parent);
+-      owned.add(()=>{},()=>releaseConstructionPosition(baseContext.positionRegistry,id));
+-      return id;
+-    }};
+-    constructionContexts.set(context,baseContext);
++    const context=constructionContext(materializationContext,owned);
+     try {
+     const prepared = createSignalStore(
+       { [key]: value },
+@@ -1907,21 +1913,20 @@
+       if (!ownerAddress)
+         throw new Error('Missing dynamic branch construction address.');
+       return (key: string, value: unknown) => {
+-        const childPositionIds = materializationContext.positionTopologyEnabled
+-          ? [materializationContext.allocatePositionId(ownerPositionId)]
+-          : undefined;
+-        const childPath = ownerPath ? `${ownerPath}.${key}` : key;
+-        return materializeOrdinaryBranch(
+-          value,
+-          equalityFn,
+-          materializationContext,
+-          buildPlan,
+-          captureRuntime,
+-          scalarSlotRuntime,
+-          childPositionIds,
+-          childPath,
+-          childAddressOf(ownerAddress, key)
+-        );
++        const allocation=new ConstructionAllocation();
++        const context=constructionContext(materializationContext,allocation);
++        try {
++          const childPositionIds=context.positionTopologyEnabled
++            ? [context.allocatePositionId(ownerPositionId)] : undefined;
++          const childPath=ownerPath?`${ownerPath}.${key}`:key;
++          const child=materializeOrdinaryBranch(
++            value,equalityFn,context,buildPlan,captureRuntime,scalarSlotRuntime,
++            childPositionIds,childPath,childAddressOf(ownerAddress,key),false,allocation
++          ) as object;
++          const responsibility=captureRuntime.prepareMemberResponsibility?.(ownerBranch,key,child);
++          return {child,responsibility,allocation};
++        } catch(error){allocation.cancel();throw error;}
++
+       };
+     },
+   };

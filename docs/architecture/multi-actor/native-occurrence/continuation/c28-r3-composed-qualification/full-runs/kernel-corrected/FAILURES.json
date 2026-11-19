@@ -1,0 +1,17 @@
+[
+  {
+    "file": "/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+    "name": "entityMap \u2014 collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected 13000 to be less than 2000",
+        "stack": "AssertionError: expected 13000 to be less than 2000\n    at /private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts:215:19\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      }
+    ],
+    "classification": "current first failure; compare original ledger and source"
+  }
+]

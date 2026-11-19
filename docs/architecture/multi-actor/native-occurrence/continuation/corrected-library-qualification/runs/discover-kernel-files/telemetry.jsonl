@@ -1,0 +1,1 @@
+{"elapsed": 0.07658120803534985, "perPid": [{"pid": 11588, "ppid": 11532, "rssBytes": 311296, "birth": "Tue Nov 3 12:22:46 2026"}], "aggregateRssBytes": 311296, "hostFreePercentage": 34.0, "censusLatencySeconds": 0.05913729197345674, "hostLatencySeconds": 0.010604750015772879}

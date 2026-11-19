@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "apply",
+    "/private/tmp/st-c21-recipient-positive-counterparts/COUNTERPARTS.patch"
+  ],
+  "cwd": "/private/tmp/st-c21-recipient-positive-counterparts/patch-replay",
+  "exit": 0,
+  "changedHashesMatchFreeze": true,
+  "oldActiveAggregateRemoved": true
+}

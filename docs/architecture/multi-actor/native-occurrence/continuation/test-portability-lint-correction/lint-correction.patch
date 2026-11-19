@@ -1,0 +1,211 @@
+--- a/packages/kernel/src/lib/approved-current-obligation.spec.ts
++++ b/packages/kernel/src/lib/approved-current-obligation.spec.ts
+@@ -1,4 +1,4 @@
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {expect,it} from 'vitest';
+ import {link,signalTree,transactions,type PublicationReceipt,type PendingTransaction} from '../index';
+ const drain=async()=>{for(let i=0;i<160;i++)await Promise.resolve();};
+--- a/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
+@@ -1,4 +1,4 @@
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {expect,it,vi} from 'vitest';
+ import {link,signalTree,transactions} from '../index';
+ import * as selection from './internals/native-scalar-selection';
+--- a/packages/kernel/src/lib/fixed-window-retirement.spec.ts
++++ b/packages/kernel/src/lib/fixed-window-retirement.spec.ts
+@@ -1,5 +1,5 @@
+ import {expect,it,vi} from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ import {getEntityPublicationBinding} from './internals/entity-publication';
+ import {getPathNotifier} from './path-notifier';
+--- a/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
++++ b/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
+@@ -1,4 +1,4 @@
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {expect,it} from 'vitest';
+ import {signalTree,link,transactions,entityMap} from '../index';
+ import {withWriteContext} from './write-context';
+@@ -52,7 +52,7 @@
+ 
+ it('repeated preinstall refusal leaves no child observer and no scalar slot growth',async()=>{
+  const t=signalTree({rows:{} as Record<string,{n:number}>});const sent:unknown[]=[];const l=link(t.$.rows,{set:v=>{sent.push(v);}});const rt=getTreeScalarSlotRuntime(t.$)!;const slots=rt.slotCount();const before=diagnostics();const escaped:Row[]=[];const failure=Error('independent preinstall');
+- const off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped.push(edit.child as Row);throw failure;}return undefined;},()=>{});
++ const off=registerMembershipPublication(edit=>{if(edit.key==='a'){escaped.push(edit.child as Row);throw failure;}return undefined;},()=>{ /* This refusal probe needs no membership completion work. */ });
+  try{for(let i=0;i<3;i++)expect(()=>t.$.rows({a:{n:i}})).toThrow(failure);off();expect(rt.slotCount()).toBe(slots);for(const row of escaped)row.n(99);await tick();expect(sent).toEqual([]);expect(t.$.rows()).toEqual({});expect(diagnostics().listeners).toBe(before.listeners);expect(diagnostics().latest).toBe(before.latest);
+   t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([{a:{n:2}}]);log({case:'failed-plan-live-counts',listeners:before.listeners,latest:before.latest,slots});
+  }finally{off();l.dispose();t.destroy();}
+--- a/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
++++ b/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
+@@ -1,4 +1,4 @@
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {expect,it} from 'vitest';
+ import {signalTree,link,transactions,entityMap} from '../index';
+ import {getPathNotifier} from './path-notifier';
+--- a/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
++++ b/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
+@@ -1,5 +1,5 @@
+ import {it,expect} from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ import {getPathNotifier} from './path-notifier';
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+@@ -21,7 +21,7 @@
+  const t=signalTree({rows:entityMap<{id:string;x:number;y:number;z:number},string>()},{enhancers:[transactions()]});const r=t.$.rows;r.addOne({id:'a',x:0,y:0,z:7});await flush();
+  const row=r.byIdOrFail('a');withWriteContext({participation:'inspection'},()=>r.updateOne('a',{z:99}));
+  const q=t.transact(()=>{for(const k of order)r.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();
+- const packets:EntityPublicationPacket[]=[];const off=getEntityPublicationBinding(row)!.source.subscribe({prepare(p){packets.push(p);return undefined;},complete(){}});
++ const packets:EntityPublicationPacket[]=[];const off=getEntityPublicationBinding(row)!.source.subscribe({prepare(p){packets.push(p);return undefined;},complete(){ /* Packet capture happens during preparation only. */ }});
+  try{q.rollback();const data=packets.map(p=>({physical:p.physical,ordinary:p.ordinary,steps:p.steps}));writeDiagnostic(process.env['ST_PREPARED_REVIEW_OUTPUT'] ? process.env['ST_PREPARED_REVIEW_OUTPUT']+`/packet-${order}.json` : undefined,JSON.stringify(data,null,2));
+  expect(packets).toHaveLength(1);const p=packets[0]!;expect(p.steps).toHaveLength(2);
+  for(const edit of p.steps!.flatMap(s=>s.ordinary)){expect((edit.before as {z:number}).z).toBe(7);expect((edit.after as {z:number}).z).toBe(7);}
+--- a/packages/kernel/src/lib/independent-prepared-unit.spec.ts
++++ b/packages/kernel/src/lib/independent-prepared-unit.spec.ts
+@@ -1,5 +1,5 @@
+ import {expect,it} from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ import {getEntityPublicationBinding} from './internals/entity-publication';
+ import {interceptLocationWrites} from './internals/location-runtime';
+--- a/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
+@@ -1,4 +1,4 @@
+-import { writeDiagnostic } from '../../../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../../../test/optional-diagnostic';
+ import { getEntityPublicationBinding } from '../entity-publication';
+ import { expect, it } from 'vitest';
+ import { entityMap, restoration, signalTree, undoable } from '../../../index';
+--- a/packages/kernel/src/lib/optional-diagnostic.spec.ts
++++ b/packages/kernel/src/lib/optional-diagnostic.spec.ts
+@@ -2,7 +2,7 @@
+ import { tmpdir } from 'node:os';
+ import { join } from 'node:path';
+ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ 
+ vi.mock('node:fs', async (importOriginal) => {
+   const actual = await importOriginal<typeof import('node:fs')>();
+--- a/packages/kernel/src/lib/public-selected-unit.spec.ts
++++ b/packages/kernel/src/lib/public-selected-unit.spec.ts
+@@ -1,5 +1,5 @@
+ import {expect,it} from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {entityMap,signalTree,transactions} from '../index';
+ const flush=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
+ for(const order of ['xy','yx'] as const)for(const followup of ['retry','confirm'] as const)it(`public onUpdate refuses x inverse after y; ${followup}, writes=${order}`,async()=>{
+--- a/packages/kernel/src/lib/recipient-window-review.spec.ts
++++ b/packages/kernel/src/lib/recipient-window-review.spec.ts
+@@ -1,5 +1,5 @@
+ import {expect,it,vi} from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import {signalTree,transactions,link} from '../index';
+ import * as life from './experimental-publication/lifecycle';
+ import {getPathNotifier} from './path-notifier';
+@@ -31,7 +31,7 @@
+ 
+ it('a finalizer throw installs neither recipient authority nor prepared writes',async()=>{
+  const {preparePublicationMutations}=await import('./internals/intrinsic-mutation');
+- const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0});const sent:unknown[]=[];const a=link(t.$.x,{set:()=>{}}) as Declared,b=link(t.$.x,{set:v=>{sent.push(v);}});const p=o.transact(()=>o.$.z(7));const records=new Map<unknown,unknown>();let complete=0,finalized=0;const initial=life.diagnostics().operations;
++ const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0});const sent:unknown[]=[];const a=link(t.$.x,{set:()=>{ /* This connection supplies the declaration without recording deliveries. */ }}) as Declared,b=link(t.$.x,{set:v=>{sent.push(v);}});const p=o.transact(()=>o.$.z(7));const records=new Map<unknown,unknown>();let complete=0,finalized=0;const initial=life.diagnostics().operations;
+  const off=preparePublicationMutations(t.$.x,()=>({record:{writes:[{map:records,key:1,value:7}],adds:[]},completion:{},finalize(){finalized++;expect(records.size).toBe(0);expect(t.$.x()).toBe(0);throw Error('review-finalize-abort');}}),()=>{complete++;});
+  try{expect(()=>a.declare({kind:'independent'},()=>t.$.x(7))).toThrow();expect(finalized).toBe(1);expect(t.$.x()).toBe(0);expect(records.size).toBe(0);expect(complete).toBe(0);await flush();expect(life.diagnostics().operations).toBe(initial);expect(sent).toEqual([]);p.confirm();await flush();expect(sent).toEqual([]);}finally{off?.();a.dispose();b.dispose();t.destroy();o.destroy();}
+ });
+--- a/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
+@@ -1,5 +1,5 @@
+ import { it, expect } from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import { entityMap, signalTree, restoration, undoable } from '../index';
+ const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+ const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
+@@ -7,7 +7,7 @@
+  type Row={id:string;value:number;opaque:()=>void};
+  const t=signalTree({left:entityMap<Row,string>(),right:entityMap<Row,string>()},{enhancers:[restoration()]});
+  let armed=false;const reads:unknown[]=[];let partial=false;
+- const row=(id:string):Row=>({id,get value(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){partial=true;reads.push({id,left,right,stack:new Error().stack});}}return 1;},opaque:()=>{}});
++ const row=(id:string):Row=>({id,get value(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){partial=true;reads.push({id,left,right,stack:new Error().stack});}}return 1;},opaque:()=>{ /* Callable row data is deliberately inert in this getter probe. */ }});
+  try{
+  t.$.left.addOne(row('a'));t.$.right.addOne(row('b'));await drain();
+  undoable(()=>{t.$.left.removeOne('a');t.$.right.removeOne('b');});await drain();
+--- a/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
+@@ -1,5 +1,5 @@
+ import { it, expect } from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import { entityMap, signalTree, restoration, undoable } from '../index';
+ import { getEntityPublicationBinding } from './internals/entity-publication';
+ const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+@@ -10,7 +10,7 @@
+  try{
+  t.$.left.addOne({id:'a'});t.$.right.addOne({id:'b'});await drain();
+  undoable(()=>{t.$.left.removeOne('a');t.$.right.removeOne('b');});await drain();
+- for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){seen.push({left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){}}));
++ for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){seen.push({left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){ /* This fixture observes preparation, not completion. */ }}));
+  armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;
+  writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/participant.jsonl` : undefined,JSON.stringify({seen,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n',true);
+  expect(seen).toEqual([]);
+--- a/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
+@@ -1,5 +1,5 @@
+ import { it, expect } from 'vitest';
+-import { writeDiagnostic } from '../../../../tools/testing/optional-diagnostic';
++import { writeDiagnostic } from '../../test/optional-diagnostic';
+ import { entityMap, signalTree, restoration, undoable } from '../index';
+ import { getEntityPublicationBinding } from './internals/entity-publication';
+ const diagnosticDirectory=process.env['ST_JOINT_PHASE_OUTPUT'];
+@@ -10,7 +10,7 @@
+  try{
+  t.$.left.addOne({id:'a'});t.$.right.addOne({id:'b'});await drain();
+  undoable(()=>{t.$.n(9);t.$.left.removeOne('a');});await drain();
+- for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if(t.$.n()===0&&left.length===0){seen.push({n:t.$.n(),left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){}}));
++ for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if(t.$.n()===0&&left.length===0){seen.push({n:t.$.n(),left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){ /* This fixture observes preparation, not completion. */ }}));
+  armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;
+  writeDiagnostic(diagnosticDirectory ? `${diagnosticDirectory}/preparation-scalar.jsonl` : undefined,JSON.stringify({seen,error,n:t.$.n(),left:t.$.left.ids(),right:t.$.right.ids()})+'\n',true);
+  expect(seen).toEqual([]);
+--- /dev/null
++++ b/packages/kernel/test/optional-diagnostic.ts
+@@ -0,0 +1,14 @@
++import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
++import { dirname } from 'node:path';
++
++// Test-only: callers serialize eagerly; only disk persistence is optional.
++export function writeDiagnostic(
++  file: string | undefined,
++  text: string,
++  append = false,
++): void {
++  if (!file) return;
++  mkdirSync(dirname(file), { recursive: true });
++  if (append) appendFileSync(file, text);
++  else writeFileSync(file, text);
++}
+--- a/tools/testing/optional-diagnostic.ts
++++ /dev/null
+@@ -1,14 +0,0 @@
+-import { appendFileSync, mkdirSync, writeFileSync } from 'node:fs';
+-import { dirname } from 'node:path';
+-
+-// Test-only: callers serialize eagerly; only disk persistence is optional.
+-export function writeDiagnostic(
+-  file: string | undefined,
+-  text: string,
+-  append = false,
+-): void {
+-  if (!file) return;
+-  mkdirSync(dirname(file), { recursive: true });
+-  if (append) appendFileSync(file, text);
+-  else writeFileSync(file, text);
+-}

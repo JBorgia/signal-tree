@@ -1,0 +1,5 @@
+#!/bin/sh
+export PATH=/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:$PATH
+export NX_DAEMON=false NX_ISOLATE_PLUGINS=false NX_TUI=false
+cd /private/tmp/st-recipient-window-classification-independent/candidate
+corepack pnpm nx test kernel --skip-nx-cache recipient-cause-classification.spec.ts recipient-window-review.spec.ts known-input-contract-review.spec.ts recipient-window-independent.spec.ts publication-enrollment-invariance.spec.ts aggregate-independent-input.spec.ts aggregate-installed-publication.spec.ts a1-installed-publication.spec.ts publication-validation-window-audit.spec.ts publication-terminal-horizon-independent.spec.ts publication-terminal-consumer-independent.spec.ts publication-terminal-obligation.spec.ts declaration-extensibility-e5-fork.spec.ts a1-independent-review.spec.ts intrinsic-mutation-pay-for-use.spec.ts a1-publication-installation.spec.ts publication-membership-provenance.spec.ts publication-native-provenance.spec.ts publication-evidence-scope-controls.spec.ts publication-proof-retirement.spec.ts collection-contributor-core.spec.ts aggregate-native-input-independent.spec.ts --maxWorkers=1

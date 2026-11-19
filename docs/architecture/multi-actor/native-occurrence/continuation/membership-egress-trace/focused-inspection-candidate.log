@@ -1,0 +1,35 @@
+
+> nx run kernel:test branch-omission-correctness.spec.ts --testNamePattern=inspection-only omission does not hitchhike --maxWorkers=1
+
+> node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts --testNamePattern="inspection-only omission does not hitchhike" --maxWorkers=1
+
+(node:76485) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76498) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-membership-egress-trace/candidate/packages/kernel
+
+(node:76530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 34 skipped (35)
+   Start at  16:57:02
+   Duration  2.36s (transform 1.52s, setup 0ms, import 1.84s, tests 13ms, environment 379ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.3s

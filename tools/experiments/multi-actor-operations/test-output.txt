@@ -1,0 +1,17 @@
+✔ review is immutable, detached, unforgeable locally, and invalidated by revision (0.868416ms)
+✔ backend rejects reviewed operation after a relevant human edit, including ABA (0.443042ms)
+✔ two agents and human independently edit the same entity; rejection preserves later work (0.555542ms)
+✔ explicit read dependencies reject a proposal when an external input changes (0.221167ms)
+✔ lost acknowledgment is uncertain; retry keeps command identity and applies once (0.243333ms)
+✔ explicit unknown UI actor remains unknown through asynchronous delivery (0.206084ms)
+✔ definitive persistence failure does not install state or report success (0.474417ms)
+✔ server permission revocation overrides local approval (0.084208ms)
+✔ unrelated acknowledgment cannot mark success; backend rejects key reuse (0.128667ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 45.520667

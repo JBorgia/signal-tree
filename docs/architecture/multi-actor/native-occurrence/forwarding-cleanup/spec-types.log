@@ -1,0 +1,14 @@
+check-spec-types: 2 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/forwarding-retention-probe.spec.ts: 3 error(s), baseline allows 0
+  packages/kernel/src/lib/held-continuation-probe.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/forwarding-retention-probe.spec.ts(7,23): error TS7016: Could not find a declaration file for module '../../../../tools/lib/heap-quiescence.mjs'. '/private/tmp/st-selected-forwarding-cleanup-successor/candidate/tools/lib/heap-quiescence.mjs' implicitly has an 'any' type.
+packages/kernel/src/lib/forwarding-retention-probe.spec.ts(33,41): error TS2345: Argument of type 'EntityNodeOf<{ n: number; }, "location">' is not assignable to parameter of type 'Location<{ n: number; }>'.
+packages/kernel/src/lib/forwarding-retention-probe.spec.ts(34,41): error TS2345: Argument of type 'EntityNodeOf<{ n: number; }, "location">' is not assignable to parameter of type 'Location<unknown>'.
+packages/kernel/src/lib/held-continuation-probe.spec.ts(8,23): error TS7016: Could not find a declaration file for module '../../../../tools/lib/heap-quiescence.mjs'. '/private/tmp/st-selected-forwarding-cleanup-successor/candidate/tools/lib/heap-quiescence.mjs' implicitly has an 'any' type.

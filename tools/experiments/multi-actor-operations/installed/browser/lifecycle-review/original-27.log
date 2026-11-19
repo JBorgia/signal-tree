@@ -1,0 +1,35 @@
+✔ primary failure survives every cleanup and reporting failure (0.702ms)
+✔ cleanup failure after successful assertions remains a failed test (0.074333ms)
+✔ review is immutable, detached, unforgeable locally, and invalidated by revision (1.686667ms)
+✔ backend rejects reviewed operation after a relevant human edit, including ABA (0.954667ms)
+✔ two agents and human independently edit the same entity; rejection preserves later work (1.204125ms)
+✔ explicit read dependencies reject a proposal when an external input changes (0.966375ms)
+✔ lost acknowledgment is uncertain; retry keeps command identity and applies once (0.7445ms)
+✔ explicit unknown UI actor remains unknown through asynchronous delivery (0.526583ms)
+✔ definitive persistence failure does not install state or report success (0.218417ms)
+✔ server permission revocation overrides local approval (0.106ms)
+✔ unrelated acknowledgment cannot mark success; backend rejects key reuse (0.153541ms)
+✔ unsupported proposal data is rejected before recording or revising (0.79075ms)
+✔ external snapshots and reviews cannot mutate operation or accepted state (0.420958ms)
+✔ forget and dispose refuse unresolved work and release terminal records (0.927042ms)
+✔ fragmented tool output creates a proposal; finished run does not grant approval (1.878792ms)
+✔ transport metadata and state events cannot approve or mutate canonical data (0.173709ms)
+✔ invalid and oversize arguments leave no operation (0.081083ms)
+✔ duplicate calls, unrelated finishes and incomplete runs are refused (0.076833ms)
+✔ host actor context is declared; tool-provided actor and permission are rejected (0.065167ms)
+✔ review: forged approval fields and tool result never grant consent (0.589833ms)
+✔ review: byte boundary, tool count, tool identity and terminal run checks (1.312917ms)
+✔ review: disposing stream from proposal callback prevents later operation creation (0.16625ms)
+✔ review: recursive tool end is refused before invoking builder twice (0.120334ms)
+✔ adapter reentry cannot duplicate an in-flight attempt (0.812167ms)
+✔ synchronous transport throw cannot be interpreted as definitive rejection (0.676125ms)
+✔ an approved operation cannot be changed through a retained draft reference (0.168875ms)
+✔ permission rejection and lost acknowledgment remain distinct terminal outcomes (0.131667ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 52.6145

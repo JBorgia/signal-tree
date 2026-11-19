@@ -1,0 +1,2 @@
+patching file 'packages/kernel/src/lib/singleton-row-reuse.spec.ts'
+patching file 'packages/kernel/src/lib/singleton-row-allocation.spec.ts'

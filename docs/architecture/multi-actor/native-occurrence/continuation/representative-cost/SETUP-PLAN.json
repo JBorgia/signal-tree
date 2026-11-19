@@ -1,0 +1,29 @@
+{
+  "registeredAt": "2026-11-03T18:30:42.039349+00:00",
+  "sourcePreparation": "git archive full retained commit, manifest-listed frozen selected reused",
+  "setupOnly": true,
+  "graphCommand": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "show",
+    "project",
+    "kernel",
+    "--json"
+  ],
+  "graphTimeoutSeconds": 180,
+  "buildCommand": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "build",
+    "kernel",
+    "--skip-nx-cache"
+  ],
+  "buildTimeoutSeconds": 900,
+  "cwd": "/private/tmp/st-v16-representative-cost/retained",
+  "selectedBuild": "reuse sealed8bd five-package build; no rebuild",
+  "dependencyPolicy": "same installed dependency tree, identical declared package/lock/config pins; record exact selected tool versions and installed lock identity",
+  "children": "zero until final built bindings and finite84-child preregistration saved",
+  "sourceEdits": false
+}

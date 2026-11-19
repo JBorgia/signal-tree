@@ -1,0 +1,15 @@
+{
+  "cwd": "/private/tmp/st-collection-egress-independent/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "independent-egress-negative.spec.ts",
+    "--reporter=json",
+    "--outputFile=/private/tmp/st-collection-egress-independent/negative-vitest.json",
+    "--maxWorkers=1"
+  ]
+}

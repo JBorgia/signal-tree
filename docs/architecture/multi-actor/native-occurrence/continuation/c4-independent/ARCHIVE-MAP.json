@@ -1,0 +1,47 @@
+{
+  "COMPONENT-MATCHES.json": {
+    "sha256": "1d3d3da8453389f294dceab378b8aa6a0e0c7ed6bc2321240851c976843f3a03",
+    "archive": "COMPONENT-MATCHES.json",
+    "archiveSha256": "1d3d3da8453389f294dceab378b8aa6a0e0c7ed6bc2321240851c976843f3a03"
+  },
+  "RETIREMENT-1.patch": {
+    "sha256": "7850303fc29921bfab5b0bc5a80dd219be9c822d0086200cf26daad0253c3c83",
+    "archive": "RETIREMENT-1.patch",
+    "archiveSha256": "7850303fc29921bfab5b0bc5a80dd219be9c822d0086200cf26daad0253c3c83"
+  },
+  "MANIFEST-DELTAS.json": {
+    "sha256": "433346a3c1cd1677993e23478a427f8ff170d1b4437a4a39926501e0f8dc84e4",
+    "archive": "MANIFEST-DELTAS.json",
+    "archiveSha256": "433346a3c1cd1677993e23478a427f8ff170d1b4437a4a39926501e0f8dc84e4"
+  },
+  "entity-publication-C2-C3.patch": {
+    "sha256": "f20c85de128b32ba3168259c471dfd8d20e8b86a0ddb5ba31b8dd27f0c8d65d7",
+    "archive": "entity-publication-C2-C3.patch",
+    "archiveSha256": "f20c85de128b32ba3168259c471dfd8d20e8b86a0ddb5ba31b8dd27f0c8d65d7"
+  },
+  "RETIREMENT-0.patch": {
+    "sha256": "0c54641f0e4b1ace74d08f9a8bea5faa322cf94db680f5e3382d6a017a35550b",
+    "archive": "RETIREMENT-0.patch",
+    "archiveSha256": "0c54641f0e4b1ace74d08f9a8bea5faa322cf94db680f5e3382d6a017a35550b"
+  },
+  "entity-signal-C1-C2.patch": {
+    "sha256": "484b49ba0f96aa1ca894e00e855ea855cf4729d5c24a57709181b95e4386a784",
+    "archive": "entity-signal-C1-C2.patch",
+    "archiveSha256": "484b49ba0f96aa1ca894e00e855ea855cf4729d5c24a57709181b95e4386a784"
+  },
+  "VERIFICATION.json": {
+    "sha256": "f7b15e130dadbcb40bad1f8eff331799a808496ce9031c4b9b0cbbbc30354177",
+    "archive": "VERIFICATION.json",
+    "archiveSha256": "f7b15e130dadbcb40bad1f8eff331799a808496ce9031c4b9b0cbbbc30354177"
+  },
+  "entity-C2-C3.patch": {
+    "sha256": "adc0ffe91dd42baa92844d0e0304e43f35d4c734ddf25bc1fecb357fa494ac9a",
+    "archive": "entity-C2-C3.patch",
+    "archiveSha256": "adc0ffe91dd42baa92844d0e0304e43f35d4c734ddf25bc1fecb357fa494ac9a"
+  },
+  "REVIEW.md": {
+    "sha256": "57675c7fced0010e70da34d2113a68e3f0febf357a4ebd0ca8e0073c3be1fffc",
+    "archive": "REVIEW.md",
+    "archiveSha256": "57675c7fced0010e70da34d2113a68e3f0febf357a4ebd0ca8e0073c3be1fffc"
+  }
+}

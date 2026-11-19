@@ -1,0 +1,10 @@
+{
+  "counterexampleReport": "e1e085a1bce71302c0d0b115240892aa069e7d4e9ebd13ca6372b7657b8aa039",
+  "artifacts": {
+    "EXPLICIT-VALUE-PREMISE.md": "3c5d85dc43715e294476ee35557c156a7cc37e5234d4f12abbf8886effe32ab9",
+    "MODULE-GRAPH.json": "f3d385c3a3c1d262adbf9c0cf4c295bc4d533bad04bdd88de8c5850b354f4c0e",
+    "LINK-MODULE-GRAPH.json": "9fa7bec1f2f7b5e9f824f039078088b2c93295ad7693987a3b7939533cbda44b",
+    "audit-graph.cjs": "61acd5922f96e3ea85d14d8d974054afb56c3503c811dd990e25e7c5fa1399b7",
+    "audit-link-graph.cjs": "6d6a42511a54ff0eae4f23f098f0734b7075781f5b2eedce6814ff64da525e19"
+  }
+}

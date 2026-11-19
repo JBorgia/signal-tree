@@ -1,0 +1,27 @@
+{
+  "c2-c3": {
+    "changed": [
+      "packages/kernel/src/lib/admission-refusal.spec.ts",
+      "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "packages/kernel/src/lib/independent-refusal-branches.spec.ts",
+      "packages/kernel/src/lib/internals/entity-publication.ts",
+      "packages/kernel/src/lib/occurrence-successor.spec.ts",
+      "packages/kernel/src/lib/packet-admission-r1.spec.ts",
+      "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+      "packages/kernel/src/lib/packet-index-review.spec.ts",
+      "packages/kernel/src/lib/point-admission-followup.spec.ts"
+    ],
+    "deleted": []
+  },
+  "c3-c4": {
+    "changed": [
+      "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "packages/kernel/src/lib/fixed-window-independent.spec.ts",
+      "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+      "packages/kernel/src/lib/internals/entity-publication.ts",
+      "packages/kernel/src/lib/owner-transition-cancellation.spec.ts"
+    ],
+    "deleted": []
+  }
+}

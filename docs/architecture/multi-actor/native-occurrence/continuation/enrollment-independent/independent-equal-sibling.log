@@ -1,0 +1,67 @@
+
+> nx run kernel:test --testFile=scalar-frame-publication.spec.ts --testNamePattern=sibling prepared records retain changed contribution when final sibling is equal --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=scalar-frame-publication.spec.ts --testNamePattern="sibling prepared records retain changed contribution when final sibling is equal" --maxWorkers=1
+
+(node:71719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-enrollment-independent-review/independent/packages/kernel
+
+(node:71733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (26 tests | 1 failed | 25 skipped) 20ms
+   × sibling prepared records retain changed contribution when final sibling is equal 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > sibling prepared records retain changed contribution when final sibling is equal
+AssertionError: expected undefined to deeply equal { a: 1, b: +0 }
+
+- Expected:
+{
+  "a": 1,
+  "b": 0,
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:391:25
+    389|     await flush();
+    390|     expect(tree.$()).toEqual({ a: 1, b: 0 });
+    391|     expect(sent.at(-1)).toEqual({ a: 1, b: 0 });
+       |                         ^
+    392|   } finally {
+    393|     c.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 25 skipped (26)
+   Start at  11:22:01
+   Duration  2.08s (transform 1.20s, setup 0ms, import 1.45s, tests 20ms, environment 428ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=scalar-frame-publication.spec.ts --testNamePattern="sibling prepared records retain changed contribution when final sibling is equal" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.0s

@@ -1,0 +1,41 @@
+{
+  "at": "2026-11-03T23:10:13.553094+00:00",
+  "disposition": "HOLD; no waiver or publication authority",
+  "candidate": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+  "branch": "codex/v16-integration-qualification",
+  "finalCommit": "c2127a34b2fdd162ea1bd7bb2000f4815a2d8461",
+  "finalTree": "eaba727d386ebeed5fe73cea50f8d638d2cb6e07",
+  "runtimeCheckpointCommit": "95bae1fada088ef16212a0eebbae5df6a42a7532",
+  "productionInputsUnchangedSinceRuntimeCheckpoint": true,
+  "qualifiedArtifactSeal": "sha256-21af60880b3e0168baad05c20aacca761bb5f4d28153c277bfded6db5f7ea8e5",
+  "artifactFiles": 193,
+  "finalSourceInputManifestSha256": "e31769e4635d2b681d9c1b2388ee33f8179b6040c2bb8347e6ee1e574b013e7d",
+  "finalSourceInputFiles": 3527,
+  "archives": {
+    "qualification-evidence.tar.gz": {
+      "sha256": "49cd94d3cd132624a9a50b84f8954765c815065e31fa4df9631a45179c2e4c5a",
+      "bytes": 71249606
+    },
+    "source-restoration-overrides.tar.gz": {
+      "sha256": "07e737470edb087d00487bf7ec4464b2b58ed7836a44215e1155cdd192fd3185",
+      "bytes": 960952
+    }
+  },
+  "candidateGitStatus": "",
+  "ownedProcessIdentitiesChecked": 1470,
+  "remainingOwned": [],
+  "finalSourceControls": {
+    "sourceManifestSha256": "e31769e4635d2b681d9c1b2388ee33f8179b6040c2bb8347e6ee1e574b013e7d",
+    "exit": 0,
+    "timeout": false,
+    "guardReason": null,
+    "maxObservedOwnedRssBytes": 1097728,
+    "minObservedHostFreePercentage": 55.0,
+    "sourceMismatches": [],
+    "remainingOwned": [],
+    "completedAt": "2026-11-03T23:08:32.691326+00:00"
+  },
+  "coordinationRootHead": "628d302dadb082a48c58528651c9088234d0a777",
+  "coordinationRootStatus": " M .gitignore\n M RELEASE-CURRENT.md\n M TODO.md\n M tools/check-doc-links.mjs\n?? .worktrees/\n?? docs/architecture/multi-actor/\n?? docs/archive/2026-11-03-active-queues/\n?? docs/audits/2026-10-29-multi-actor-product/\n?? docs/audits/2026-11-03-progress-and-workflow/\n?? frontier\n?? tools/experiments/multi-actor-operations/\n",
+  "limits": "Final Git tree binds documentation/evidence; artifact and behavioral receipts retain explicit source/equivalence identities. Full release remains failed."
+}

@@ -1,0 +1,35 @@
+
+> nx run kernel:test c8-review-composition.spec.ts --testNamePattern=drain-only discriminator --maxWorkers=1
+
+> node tools/run-core-vitest.mjs c8-review-composition.spec.ts --testNamePattern="drain-only discriminator" --maxWorkers=1
+
+(node:53719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:53726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-r4-review-resumed/c8-candidate/packages/kernel
+
+(node:53733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 5 skipped (6)
+   Start at  08:57:41
+   Duration  856ms (transform 467ms, setup 0ms, import 553ms, tests 18ms, environment 208ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

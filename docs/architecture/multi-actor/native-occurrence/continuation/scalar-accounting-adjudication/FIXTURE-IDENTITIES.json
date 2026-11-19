@@ -1,0 +1,18 @@
+{
+  "C1": {
+    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": "f4245476f7cc67ecc2016690d1c2a01383c44af9985c566fa3d60e4f9657acc4",
+    "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c"
+  },
+  "original-combined": {
+    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": "f4245476f7cc67ecc2016690d1c2a01383c44af9985c566fa3d60e4f9657acc4",
+    "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c"
+  },
+  "predecessor": {
+    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": "f4245476f7cc67ecc2016690d1c2a01383c44af9985c566fa3d60e4f9657acc4",
+    "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c"
+  },
+  "paired": {
+    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": "f4245476f7cc67ecc2016690d1c2a01383c44af9985c566fa3d60e4f9657acc4",
+    "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts": "e88ef703666602c20ba6874d42c25657b3dda235f0f591753c7e691b09167e9c"
+  }
+}

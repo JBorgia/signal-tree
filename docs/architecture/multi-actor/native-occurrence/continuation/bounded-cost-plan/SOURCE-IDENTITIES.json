@@ -1,0 +1,27 @@
+{
+  "snapshot": "/private/tmp/st-native-combined-c12/SNAPSHOT-C12.json",
+  "manifestSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+  "allFilesVerified": 3053,
+  "mismatches": [],
+  "inspected": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "b5b6ba96c5c96c10e2c0bb8561b21b16ec75a377d8d60c015f149bece321539d",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+    "packages/kernel/src/lib/entity-signal.ts": "d88a717430732d76e7a3c6cfcba3211a707ae9adee1b7731f4b5fd9ed176cd22",
+    "packages/kernel/src/lib/physical/entity-value-store.ts": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0",
+    "packages/kernel/src/lib/physical/entity-ordinary-topology.ts": "d66cfb6b8476877c44c64532a3d62328ac8b184d1fd3ea4053f00a849d09144b",
+    "packages/kernel/src/lib/physical/ordinary-restoration-placement.ts": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0",
+    "packages/kernel/src/lib/physical/order-restores-for-placement.ts": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c",
+    "packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts": "100d9028bb73442b9d6280dfda9d6c2cb4d07f3ba6d3151b3b2098b72697f004",
+    "packages/kernel/src/enhancers/restoration/order-boundary-evidence.spec.ts": "8fa3e52b4b1ced40401632bee7c9926e5b3cf41095e49c5ec16e0bf21ebd1904",
+    "packages/kernel/src/enhancers/restoration/paired-order-composer.spec.ts": "f25e90b34a5b65e66ffd9b858f434a242522a804a8082d12ab238bf548c75264",
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "7c4b9d481e481db43fba92f1e32789c36300bcbda2a3cf0316f437c41f291fff",
+    "packages/kernel/src/enhancers/restoration/restoration.ts": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+    "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d",
+    "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": "cbeb44226cb42a1e8b35afa6111fee96de5f0c907f4d55e84b68e9875ce728a9",
+    "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56"
+  }
+}

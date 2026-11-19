@@ -1,0 +1,6 @@
+{"at": 1793654536.8981912, "pid": 11333, "birth": "Mon Nov 2 14:21:25 2026", "kind": "rollup", "package": "kernel", "cpuSeconds": 14.52}
+{"at": 1793654538.01877, "pid": 11333, "birth": "Mon Nov 2 14:21:25 2026", "kind": "rollup", "package": "kernel", "cpuSeconds": 15.36}
+{"at": 1793654539.1412559, "pid": 11333, "birth": "Mon Nov 2 14:21:25 2026", "kind": "rollup", "package": "kernel", "cpuSeconds": 16.96}
+{"at": 1793654543.683658, "pid": 11868, "birth": "Mon Nov 2 14:22:19 2026", "kind": "rollup", "package": "react", "cpuSeconds": 2.99}
+{"at": 1793654553.85837, "pid": 10802, "birth": "Mon Nov 2 14:20:25 2026", "kind": "nx-coordinator", "package": null, "cpuSeconds": 10.61}
+{"at": 1793654554.952868, "pid": 10802, "birth": "Mon Nov 2 14:20:25 2026", "kind": "nx-coordinator", "package": null, "cpuSeconds": 11.08}

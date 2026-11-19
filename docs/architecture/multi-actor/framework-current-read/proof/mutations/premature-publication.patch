@@ -1,0 +1,19 @@
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -53,14 +53,14 @@
+     let hasFailure = false;
+     try {
+       observation.runInvalidationGroup(() => {
+-        invalidationGroupDepth += 1;
++        // MUTANT: do not hold publication.
+         try {
+           run();
+         } catch (error) {
+           failure = error;
+           hasFailure = true;
+         } finally {
+-          invalidationGroupDepth -= 1;
++          // MUTANT: no held group to release.
+           if (invalidationGroupDepth === 0 && groupedPublishers.size > 0) {
+             const publishers = [...groupedPublishers];
+             groupedPublishers.clear();

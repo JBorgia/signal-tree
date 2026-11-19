@@ -1,0 +1,128 @@
+{
+  "angular20": {
+    "types-bundler": {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.bundler.json"
+      ],
+      "exit": 0
+    },
+    "types-node16": {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.node16.json"
+      ],
+      "exit": 0
+    },
+    "runtime": {
+      "command": [
+        "node",
+        "--test",
+        "public-controls.mjs"
+      ],
+      "exit": 0
+    },
+    "aot": {
+      "command": [
+        "node",
+        "node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+        "-p",
+        "tsconfig.aot.json"
+      ],
+      "exit": 0
+    },
+    "independent-runtime": {
+      "command": [
+        "node",
+        "--test",
+        "independent-controls.mjs"
+      ],
+      "exit": 0
+    }
+  },
+  "angular21": {
+    "types-bundler": {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.bundler.json"
+      ],
+      "exit": 0
+    },
+    "types-node16": {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.node16.json"
+      ],
+      "exit": 0
+    },
+    "runtime": {
+      "command": [
+        "node",
+        "--test",
+        "public-controls.mjs"
+      ],
+      "exit": 0
+    },
+    "aot": {
+      "command": [
+        "node",
+        "node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+        "-p",
+        "tsconfig.aot.json"
+      ],
+      "exit": 0
+    },
+    "independent-runtime": {
+      "command": [
+        "node",
+        "--test",
+        "independent-controls.mjs"
+      ],
+      "exit": 0
+    }
+  },
+  "vue350": {
+    "types-bundler": {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.bundler.json"
+      ],
+      "exit": 0
+    },
+    "types-node16": {
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.node16.json"
+      ],
+      "exit": 0
+    },
+    "runtime": {
+      "command": [
+        "node",
+        "--test",
+        "public-controls.mjs"
+      ],
+      "exit": 0
+    },
+    "independent-runtime": {
+      "command": [
+        "node",
+        "--test",
+        "independent-controls.mjs"
+      ],
+      "exit": 0
+    }
+  }
+}

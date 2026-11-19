@@ -1,0 +1,38 @@
+{
+  "status": "FROZEN C25 NON-INTEGRATABLE: derived same-input history remains unbounded; literal-only bound",
+  "baseC24": "cb54add521dafd9ec875b87d6c19f85de38e4b56d0c79c147a7c3c3e41306bcd",
+  "files": {
+    "SNAPSHOT-C25.json": "9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02",
+    "runtime.patch": "46daf933c1f0e3104d25496d2e5cf9324b2132c3b850971a69321a39a9106b3a",
+    "controls.patch": "f5789ed2f0b5d3e358b797f81f8e3d94bfa9f663fde2797c49542c97efd53d2c",
+    "research/instrumentation-final.patch": "bf8f6361083e88203dc8729e73af020575ac50562e7e510abb450c8c958491b1",
+    "research/RESTORED-SOURCE.json": "9b584df6e2647237104e129f57f1366af816ec2deb266c1c96353c58fc4ee014",
+    "research/SECOND-RESTORE.json": "bdcd77530ec57b341f6fa7204436b488408769a8c04660a0d5b4077aa5e5c13f",
+    "research/ROOTS-LARGE.jsonl": "9b8a1bcf8542bc08061359bd7c4773ac996880affa4967d6068cfdded39fc4f4",
+    "research/ROOTS-DERIVED.jsonl": "88a396b8fabb73b3dab3451079f3604438b2746888d4df1487f989510ada35c4"
+  },
+  "changedFiles": [
+    "packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts",
+    "packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/native-scalar-selection.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts",
+    "packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts",
+    "packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "packages/vue/src/lib/equal-owner-facade-controls.spec.ts"
+  ],
+  "Main13Unchanged": true,
+  "originalReact6Unchanged": true,
+  "noResearchExports": true
+}

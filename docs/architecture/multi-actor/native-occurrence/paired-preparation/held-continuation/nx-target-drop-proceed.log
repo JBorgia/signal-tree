@@ -1,0 +1,35 @@
+
+> nx run held-continuation-probe:retention
+
+> corepack pnpm exec vitest run --root packages/kernel --config retention-probe.config.ts
+
+(node:14107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:14220) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-held-continuation-review/candidate/packages/kernel
+
+(node:14255) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  15:37:27
+   Duration  6.13s (transform 2.45s, setup 0ms, import 3.14s, tests 716ms, environment 1.67s)
+
+
+
+
+ NX   Successfully ran target retention for project held-continuation-probe
+
+
+  Run duration:      7.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        held-continuation-probe:retention    7.4s

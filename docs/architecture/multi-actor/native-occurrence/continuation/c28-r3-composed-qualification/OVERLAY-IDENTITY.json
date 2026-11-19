@@ -1,0 +1,16 @@
+{
+  "broadFreeze": "8fe64fb8e16fb8b3f51f6a58067b16ab83827deb5c0a9286a645bdcd6170138f",
+  "originalSourceManifest": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "overlayManifest": "4a2511bd274eeca5bbb9a4af30a83b8dca00e28458dd708593488f45411a5c50",
+  "onlyAdded": {
+    "source": "/private/tmp/st-c28-r3-composition-independent/candidate/packages/kernel/src/lib/internals/dynamic-realization-composition-independent.spec.ts",
+    "sha256": "1469e3995f95ac634e1b29c2520fbde84b3d05aa5309b6360fa1b459da7256c8",
+    "destination": "packages/kernel/src/lib/internals/dynamic-realization-composition-independent.spec.ts",
+    "cases": 8,
+    "applyAfter": "broad runtime/type/lint results frozen",
+    "assertions": "copy unchanged, existing explicit Location<number> casts included",
+    "runtimeChanges": false
+  },
+  "files": 3103,
+  "runtimeUnchanged": true
+}

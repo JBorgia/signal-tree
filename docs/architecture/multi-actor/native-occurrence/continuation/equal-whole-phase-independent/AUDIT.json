@@ -1,0 +1,42 @@
+{
+  "inputHashes": {
+    "PHASE-ADJUDICATION.md": "8d2d7940bf8f29c041b368b631acbfce3158afc29768dac8804aeb363b101f1c",
+    "CHRONOLOGY-SUMMARY.json": "5a7c29d2a2f646e43e1efb94b8ae13d2f14e99708e75ed99ec9c7d558cdbfd61",
+    "failed-chronology.json": "c305ea962e123bf81259c0ab36f30b940d768401ff95fa23b57857f56327db6a",
+    "c16-chronology.json": "3d5fa070d8197502e44944ded266456e2767638439c9fe1e9266ccaee748e7f2",
+    "SUCCESSOR-MECHANISM.md": "014b0407699c523e07d04e65ea087ca59c7c77880a9ddbc4a86f107fdaf5c63e"
+  },
+  "independentlyCheckedRecords": [
+    {
+      "route": "setAll",
+      "pending": false,
+      "phaseAndErrorAndHoldChecks": true
+    },
+    {
+      "route": "setAll",
+      "pending": true,
+      "phaseAndErrorAndHoldChecks": true
+    },
+    {
+      "route": "replaceOne",
+      "pending": false,
+      "phaseAndErrorAndHoldChecks": true
+    },
+    {
+      "route": "replaceOne",
+      "pending": true,
+      "phaseAndErrorAndHoldChecks": true
+    },
+    {
+      "route": "row",
+      "pending": false,
+      "phaseAndErrorAndHoldChecks": true
+    },
+    {
+      "route": "row",
+      "pending": true,
+      "phaseAndErrorAndHoldChecks": true
+    }
+  ],
+  "newRuntimeExecutions": 0
+}

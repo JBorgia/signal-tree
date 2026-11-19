@@ -1,0 +1,32 @@
+[
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "comments": 1,
+    "emittedJavaScriptEqual": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "comments": 1,
+    "emittedJavaScriptEqual": true
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "comments": 1,
+    "emittedJavaScriptEqual": true
+  },
+  {
+    "path": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "comments": 1,
+    "emittedJavaScriptEqual": true
+  },
+  {
+    "path": "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "comments": 4,
+    "emittedJavaScriptEqual": true
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "comments": 10,
+    "emittedJavaScriptEqual": true
+  }
+]

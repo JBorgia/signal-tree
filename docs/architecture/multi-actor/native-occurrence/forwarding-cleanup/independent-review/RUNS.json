@@ -1,0 +1,131 @@
+[
+  {
+    "name": "nine-controls",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "selected-forwarding-cleanup.spec.ts"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": null,
+    "exit": 0
+  },
+  {
+    "name": "success-drop-proceed",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:retention",
+      "--skip-nx-cache"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": {
+      "NODE_OPTIONS": "--expose-gc",
+      "ST_GC_ARM": "drop-proceed",
+      "ST_GC_SCENARIO": "success",
+      "ST_GC_OUTPUT": "/private/tmp/st-forwarding-cleanup-independent/success-drop-proceed.json"
+    },
+    "exit": 0
+  },
+  {
+    "name": "success-hold-proceed",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:retention",
+      "--skip-nx-cache"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": {
+      "NODE_OPTIONS": "--expose-gc",
+      "ST_GC_ARM": "hold-proceed",
+      "ST_GC_SCENARIO": "success",
+      "ST_GC_OUTPUT": "/private/tmp/st-forwarding-cleanup-independent/success-hold-proceed.json"
+    },
+    "exit": 0
+  },
+  {
+    "name": "caught-drop-proceed",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:extended",
+      "--skip-nx-cache"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": {
+      "NODE_OPTIONS": "--expose-gc",
+      "ST_GC_ARM": "drop-proceed",
+      "ST_GC_SCENARIO": "caught",
+      "ST_GC_OUTPUT": "/private/tmp/st-forwarding-cleanup-independent/caught-drop-proceed.json"
+    },
+    "exit": 0
+  },
+  {
+    "name": "caught-hold-proceed",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:extended",
+      "--skip-nx-cache"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": {
+      "NODE_OPTIONS": "--expose-gc",
+      "ST_GC_ARM": "hold-proceed",
+      "ST_GC_SCENARIO": "caught",
+      "ST_GC_OUTPUT": "/private/tmp/st-forwarding-cleanup-independent/caught-hold-proceed.json"
+    },
+    "exit": 0
+  },
+  {
+    "name": "skip-drop-proceed",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:extended",
+      "--skip-nx-cache"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": {
+      "NODE_OPTIONS": "--expose-gc",
+      "ST_GC_ARM": "drop-proceed",
+      "ST_GC_SCENARIO": "skip",
+      "ST_GC_OUTPUT": "/private/tmp/st-forwarding-cleanup-independent/skip-drop-proceed.json"
+    },
+    "exit": 0
+  },
+  {
+    "name": "skip-hold-proceed",
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "run",
+      "held-continuation-probe:extended",
+      "--skip-nx-cache"
+    ],
+    "cwd": "/private/tmp/st-forwarding-cleanup-independent/candidate",
+    "extraEnv": {
+      "NODE_OPTIONS": "--expose-gc",
+      "ST_GC_ARM": "hold-proceed",
+      "ST_GC_SCENARIO": "skip",
+      "ST_GC_OUTPUT": "/private/tmp/st-forwarding-cleanup-independent/skip-hold-proceed.json"
+    },
+    "exit": 0
+  }
+]

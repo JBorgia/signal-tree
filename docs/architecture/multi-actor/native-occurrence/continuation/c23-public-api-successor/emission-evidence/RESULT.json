@@ -1,0 +1,38 @@
+{
+  "compilerVersion": "6.0.3",
+  "method": "Installed TypeScript transpileModule; ES2022/ESNext, comments removed, no source maps. No code executed; not a bundle/build comparison.",
+  "options": {
+    "target": 9,
+    "module": 99,
+    "removeComments": true,
+    "sourceMap": false,
+    "declaration": false
+  },
+  "results": [
+    {
+      "file": "packages/kernel/src/lib/link.ts",
+      "equal": true,
+      "beforeSha256": "558cd2c6b7d4bfcfe8dcef9f9a2d50796bbcede27545770c12555d38692478d9",
+      "afterSha256": "558cd2c6b7d4bfcfe8dcef9f9a2d50796bbcede27545770c12555d38692478d9",
+      "diagnostics": []
+    },
+    {
+      "file": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "equal": true,
+      "beforeSha256": "b313d9498965cfeb4858e8f84bbdbf3897bdb053e57c12948d092a73d905b3be",
+      "afterSha256": "b313d9498965cfeb4858e8f84bbdbf3897bdb053e57c12948d092a73d905b3be",
+      "diagnostics": []
+    }
+  ],
+  "newTypesModule": {
+    "file": "packages/kernel/src/lib/publication-declaration.ts",
+    "emitted": "export {};\n",
+    "onlyEmptyModuleMarker": true
+  },
+  "exceptions": [
+    {
+      "file": "packages/kernel/src/index.ts",
+      "description": "Intentional public value re-export of the existing SignalTreePublicationError class emits JavaScript. New type-only exports do not. The whole patch is NOT zero-JS."
+    }
+  ]
+}

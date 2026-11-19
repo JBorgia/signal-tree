@@ -1,0 +1,106 @@
+
+> nx run kernel:test tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:7296) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7306) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-structural-completeness-successor/candidate/packages/kernel
+
+(node:7319) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > applies scalar leaf effects without transaction recapture 7ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > preserves subject identity and owned positions across structural rekey 7ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > characterizes entity field PositionIds as shared collection coverage, not exact field identity 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > validates a subject descriptor added after adapter creation with zero tree visits 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > resolves the same semantic subject target after a rekey performed after adapter creation with zero tree visits 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > resolves a restored semantic subject target after adapter creation with zero tree visits 9ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses same-key structural work when that key is now occupied by a different subject 3ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > resolves scalar realization by stable PositionId after a physical rekey 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits mixed realization rekey and scalar publication coherently without relying on notifier batching 3ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes structural remove and add from owner-level producer metadata 3ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > prepares and realizes a retained-subject structural restore from removal metadata alone 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes a same-turn restore plus separate subject scalar under one shared physical revision 5ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps restore planning side-effect free when later scalar frame preparation fails 3ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes same-turn restore then rekey against prepared subject state 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps restore-rekey planning side-effect free when a later stale subject scalar fails 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses prepared restore-rekey when the destination key remains occupied 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes remove-restore-rekey when prepared vacancy overrides live occupancy 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps prepared vacancy side-effect free when a later scalar effect refuses 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps competing prepared restores side-effect free when earlier prepared occupancy blocks a later rekey 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes remove-restore-rekey-scalar as one coherent prepared topology turn 4ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses rekey when a later prepared restore re-occupies the vacated destination 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes same-subject remove then restore at a new key 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes fresh add plus later scalar without physically creating the subject during preparation 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > does not consume a planned fresh subject id when later realization validation refuses 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > consumes a committed fresh subject id exactly once and advances the next ordinary allocation 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > treats fresh add at a historical key as a new subject lifetime 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes fresh add followed by rekey and scalar against prepared future topology 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes same-key replacement as remove old subject then fresh add new subject 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > retains held subject facades across same-key fresh replacement until the old subject is restored elsewhere 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > validates known scalar positions with zero tree visits across 10 to 100k positions 1381ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses unknown positions without a traversal fallback 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > restores each removed subject from its own structural payload on one collection owner 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > reactivates the exact held row and field when restoring the same tombstoned subject 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > still emits canonical notifier traffic during realization, proving non-authoring is a broader seam than the adapter 0ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps scalar realization causally silent between authored writes 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps structural realization causally silent while preserving subject identity 4ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > restores authored capture after a realization write throws 3ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps outer transaction authorship active across an inner realization write 7ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > atomicity spike: pre-commit scalar staging failure leaves state and notifications unchanged 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > stales an open scalar frame after a structural rekey before commit 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses a stale heterogeneous realization before any prepared structural mutation applies 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits a root-scalar and structural realization under one shared physical revision 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > validates the full effect set before any mutation and refuses structural drift without partial application 0ms
+(node:7398) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=false 17ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=true 9ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=false 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=false 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=true 5ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=true 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes an atomic replacement with restoration alone 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > keeps ordinary branch children independently restorable 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > restores the entire terminal value across shape changes from null 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > restores the entire terminal value across shape changes from { min: +0, max: 10 } 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rolls back an atomic object leaf without a restoration enhancer 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses to overwrite external truth, including a safe sibling 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > keeps pending overlap refusal atomic and retries after settlement 5ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses structural drift before reversing an atomic leaf sibling 3ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > retains external undefined as terminal truth and refuses the whole undo 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > refuses redo after external undefined without changing the history position 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: transactions 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: transactions-first 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: restoration-first 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > does not treat a retained slot as permission to restore an externally omitted terminal 2ms
+(node:7415) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C1 — scalar collision > REPAIRED: undo is REFUSED, and the server value survives 9ms
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C2 — structural collision > a user rekey and a realization rekey of the same subject 7ms
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C3 — THE ATOMICITY CASE: mixed safe and unsafe in one turn > REPAIRED: one conflicting location refuses the WHOLE turn 2ms
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C4 — the state machine after a refusal > records where the undo cursor sits after a conflicting undo 2ms
+
+ Test Files  3 passed (3)
+      Tests  67 passed (67)
+   Start at  17:06:48
+   Duration  4.67s (transform 927ms, setup 0ms, import 1.44s, tests 1.55s, environment 1.22s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      5.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.2s

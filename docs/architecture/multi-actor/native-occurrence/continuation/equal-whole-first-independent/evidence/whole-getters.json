@@ -1,0 +1,122 @@
+[
+  {
+    "route": "setAll",
+    "scenario": "stable",
+    "calls": 8,
+    "thrown": "undefined",
+    "firstIdentity": false,
+    "endpointSame": false,
+    "notices": 0,
+    "inner": 0,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "setAll",
+    "scenario": "first-throw",
+    "calls": 1,
+    "thrown": "whole getter sentinel",
+    "firstIdentity": true,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "setAll",
+    "scenario": "reentry",
+    "calls": 5,
+    "thrown": "Entity frame responsibility preparation reentered installation",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 9,
+    "sent": []
+  },
+  {
+    "route": "replaceOne",
+    "scenario": "stable",
+    "calls": 8,
+    "thrown": "undefined",
+    "firstIdentity": false,
+    "endpointSame": false,
+    "notices": 0,
+    "inner": 0,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "replaceOne",
+    "scenario": "first-throw",
+    "calls": 1,
+    "thrown": "whole getter sentinel",
+    "firstIdentity": true,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "replaceOne",
+    "scenario": "reentry",
+    "calls": 5,
+    "thrown": "Entity frame responsibility preparation reentered installation",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 9,
+    "sent": []
+  },
+  {
+    "route": "row",
+    "scenario": "stable",
+    "calls": 8,
+    "thrown": "undefined",
+    "firstIdentity": false,
+    "endpointSame": false,
+    "notices": 0,
+    "inner": 0,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "row",
+    "scenario": "first-throw",
+    "calls": 1,
+    "thrown": "whole getter sentinel",
+    "firstIdentity": true,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 0,
+    "sent": []
+  },
+  {
+    "route": "row",
+    "scenario": "reentry",
+    "calls": 5,
+    "thrown": "Entity frame responsibility preparation reentered installation",
+    "firstIdentity": false,
+    "endpointSame": true,
+    "notices": 0,
+    "inner": 9,
+    "sent": []
+  }
+]

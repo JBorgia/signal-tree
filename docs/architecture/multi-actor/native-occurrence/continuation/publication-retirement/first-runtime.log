@@ -1,0 +1,62 @@
+
+> nx run kernel:test publication-retirement-acceptance.spec.ts entity-publication-work-lifetime.spec.ts
+
+> node tools/run-core-vitest.mjs publication-retirement-acceptance.spec.ts entity-publication-work-lifetime.spec.ts
+
+(node:83728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-publication-retirement-successor/candidate/packages/kernel
+
+(node:84049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84048) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts (3 tests | 1 failed) 349ms
+   × recipient disposal cannot retire source facts still needed by a pending structural inverse 39ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > recipient disposal cannot retire source facts still needed by a pending structural inverse
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Entity publication source changed before installation [effect-validation-failed]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:410:3
+    408|   cause: RollbackFailureCause
+    409| ): SignalTreeRollbackError =>
+    410|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    411|
+    412| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4945:23
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4565:19
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:66:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 11 passed (12)
+   Start at  17:00:01
+   Duration  8.32s (transform 8.59s, setup 0ms, import 10.85s, tests 479ms, environment 4.42s)
+
+Warning: command "node tools/run-core-vitest.mjs publication-retirement-acceptance.spec.ts entity-publication-work-lifetime.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      11.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     11.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    11.1s

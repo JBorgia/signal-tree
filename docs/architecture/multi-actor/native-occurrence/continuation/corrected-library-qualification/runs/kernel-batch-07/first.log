@@ -1,0 +1,74 @@
+
+> nx run kernel:test /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/snapshot-aliasing.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/snapshot-builder.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/snapshot-identity-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/staged-draft-editing-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/state-location-view-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/state-location-view.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/structural-admission-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/structural-admission-sequence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/structural-completeness.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/structured-address-producer.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/subject-address-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/subject-address-cardinality-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/tap-rekey-necessity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/transaction-observer-failure.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/transaction-reentrant-order.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/traversal-diagnostics.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/tree-error-attribution.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/types-schema.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/undo-nonscalar-leaf.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/undo-redo.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/unwrap-symbol-keys.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/update-and-report.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/upsert-many-reversal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/value-work-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/walker-conformance.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/whole-bounded-qualification.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/whole-getter-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/whole-mixed-promises.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/whole-unowned-publication-authorized.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/whole-value-membership.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/whole-value-new-keys.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/write-context.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/write-only-marker.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-07.json
+
+kernel:  RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+kernel:  ✓ src/lib/whole-value-membership.spec.ts (22 tests) 29ms
+kernel:  ✓ src/lib/transaction-observer-failure.spec.ts (34 tests) 93ms
+kernel:  ✓ src/lib/tree-error-attribution.spec.ts (11 tests) 46ms
+kernel:  ✓ src/lib/whole-value-new-keys.spec.ts (26 tests) 64ms
+kernel: stderr | src/lib/tree-error-public-contract.spec.ts > PUBLIC: delivery semantics > a throwing listener damages neither the link nor its peers
+kernel: SignalTree: an onTreeError listener threw. The original error was still handled normally; this is the listener failing. [ST2025] Error: listener exploded
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts:135:13
+kernel:     at reportTreeError (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/error-reporter.ts:123:7)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link.ts:1045:15
+kernel:     at processTicksAndRejections (node:internal/process/task_queues:104:5)
+kernel:  ✓ src/lib/tree-error-public-contract.spec.ts (8 tests) 23ms
+kernel:  ✓ src/lib/state-location-view.spec.ts (8 tests) 32ms
+kernel: stderr | src/lib/snapshot-builder.spec.ts
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel:  ✓ src/lib/snapshot-builder.spec.ts (6 tests) 7ms
+kernel:  ✓ src/lib/subject-address-cardinality-0.spec.ts (3 tests) 24ms
+kernel:  ✓ src/lib/subject-address-0.spec.ts (4 tests) 22ms
+kernel:  ✓ src/lib/value-work-handoff.spec.ts (12 tests) 27ms
+kernel:  ✓ src/lib/tap-rekey-necessity.spec.ts (5 tests) 13ms
+kernel:  ✓ src/lib/whole-bounded-qualification.spec.ts (12 tests) 47ms
+kernel:  ✓ src/lib/unwrap-symbol-keys.spec.ts (8 tests) 19ms
+kernel:  ✓ src/lib/state-location-view-v16-controls.spec.ts (5 tests) 24ms
+kernel:  ✓ src/lib/undo-nonscalar-leaf.spec.ts (7 tests) 70ms
+kernel:  ✓ src/lib/walker-conformance.spec.ts (4 tests) 47ms
+kernel:  ✓ src/lib/structural-admission-sequence.spec.ts (8 tests) 29ms
+kernel:  ✓ src/lib/structural-admission-controls.spec.ts (6 tests) 50ms
+kernel:  ✓ src/lib/staged-draft-editing-0.spec.ts (3 tests) 17ms
+kernel:  ✓ src/lib/structural-completeness.spec.ts (6 tests) 34ms
+kernel: stderr | src/lib/write-only-marker.spec.ts > ST2023 — snapshot without hydrate > the reported marker really does lose the write — the bug is real
+kernel: [SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (1 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+kernel: stderr | src/lib/write-only-marker.spec.ts > ST2023 — snapshot without hydrate > stays SILENT for a signal-shaped marker — the write path handles it
+kernel: [SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (2 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+kernel: stderr | src/lib/write-only-marker.spec.ts > ST2023 — snapshot without hydrate > warns once per processor, not once per node
+kernel: [SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (3 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+kernel:  ✓ src/lib/write-only-marker.spec.ts (4 tests) 8ms
+kernel:  ✓ src/lib/undo-redo.spec.ts (4 tests) 31ms
+kernel:  ✓ src/lib/write-context.spec.ts (8 tests) 8ms
+kernel:  ✓ src/lib/upsert-many-reversal.spec.ts (18 tests) 61ms
+kernel:  ✓ src/lib/traversal-diagnostics.spec.ts (6 tests) 20ms
+kernel:  ✓ src/lib/snapshot-identity-contract.spec.ts (5 tests) 22ms
+kernel:  ✓ src/lib/types-schema.spec.ts (6 tests) 3ms
+kernel:  ✓ src/lib/snapshot-aliasing.spec.ts (5 tests) 7ms
+kernel:  ✓ src/lib/structured-address-producer.spec.ts (3 tests) 12ms
+kernel:  ✓ src/lib/whole-mixed-promises.spec.ts (2 tests) 28ms
+kernel:  ✓ src/lib/terminal-owner-possible-refresh.spec.ts (2 tests) 25ms
+kernel:  ✓ src/lib/whole-getter-controls.spec.ts (9 tests) 43ms
+kernel:  ✓ src/lib/transaction-reentrant-order.spec.ts (4 tests) 43ms
+kernel:  ✓ src/lib/whole-unowned-publication-authorized.spec.ts (6 tests) 87ms
+kernel:  ✓ src/lib/update-and-report.spec.ts (4 tests) 8ms
+kernel:  ✓ src/lib/terminal-owner-actual-contributor.spec.ts (4 tests) 18ms
+kernel:  Test Files  36 passed (36)
+kernel:       Tests  288 passed (288)
+kernel:    Start at  12:33:51
+kernel:    Duration  14.57s (transform 1.92s, setup 0ms, import 6.86s, tests 1.14s, environment 16.49s)
+kernel: JSON report written to /private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-07.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      15.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     15.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    15.5s

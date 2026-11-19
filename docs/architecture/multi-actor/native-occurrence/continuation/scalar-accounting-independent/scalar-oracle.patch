@@ -1,0 +1,31 @@
+--- a/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts
++++ b/packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts
+@@ -1104,7 +1104,7 @@
+       try {
+         resetProductionSubstrateStatsForTesting(stats);
+         expect(harness.readTarget()).toBe(Math.floor(size / 2));
+-        expect(stats).toEqual<ProductionSubstrateStats>({
++        expect({ ...stats }).toEqual<ProductionSubstrateStats>({
+           slotReads: 1,
+           slotWrites: 0,
+           equalityChecks: 0,
+@@ -1130,8 +1130,8 @@
+ 
+         resetProductionSubstrateStatsForTesting(stats);
+         harness.setTarget(size + 1);
+-        expect(stats).toEqual<ProductionSubstrateStats>({
+-          slotReads: 1,
++        expect({ ...stats }).toEqual<ProductionSubstrateStats>({
++          slotReads: 0,
+           slotWrites: 1,
+           equalityChecks: 1,
+           revisionIncrements: 1,
+@@ -1166,7 +1166,7 @@
+         try {
+           resetProductionSubstrateStatsForTesting(stats);
+           frameHarness.commitFrame(width, size * 10_000 + width);
+-          expect(stats).toEqual<ProductionSubstrateStats>({
++          expect({ ...stats }).toEqual<ProductionSubstrateStats>({
+             slotReads: 0,
+             slotWrites: width,
+             equalityChecks: width,

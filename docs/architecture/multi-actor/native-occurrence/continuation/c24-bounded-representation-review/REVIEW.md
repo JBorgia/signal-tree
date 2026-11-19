@@ -1,0 +1,65 @@
+# Independent bounded-representation premise review
+
+**Eligible for a narrowly instrumented prototype, conditionally; not an accepted repair.** Exact retained endpoint selection is a credible way to remove the demonstrated literal-no-op source chain. The sketch does not yet establish all derived-input persistence, nonmatching-recipient readiness, physical certificate, or total-retention properties. Those are obligations for the prototype, not reasons to invent a compactor or silently drop evidence.
+
+Reviewed BOUNDED-REPRESENTATION.md against frozen manifest cb54add521dafd9ec875b87d6c19f85de38e4b56d0c79c147a7c3c3e41306bcd. Eleven relevant source/spec hashes verified; exact raw retention log hash5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d verified. SOURCE-IDENTITY.json names inputs. Author REPORT.md and other reviewers' conclusions were not read for this task; freeze metadata was used for identity. No runtime/fixture edits, tests, profiling or typechecks performed.
+
+## What the raw counterexample establishes
+
+The research fixture discards invocation receipts, repeats64/256 literal equal calls, then spies on the next scalar selection to capture its BEFORE requirement. The extra probe therefore does not contribute to the recorded graph. Its spy delegates to the original selector. Both leaf and whole routes, with fixed p or fixed p+q, record129/513 distinct component nodes,128/512 edges, depth64/256. This matches2N+1 nodes with one/two owner identities. `ready:true` means validation/activation readiness, NOT owner confirmation: the fixture still asserts no send until p and inherited q settle. It also checks zero value notices and useful final payload.
+
+Frozen private.ts:160–164 explains the graph: each retained no-effect selection combines the predecessor requirement with a new invocation requirement, then stores a new endpoint wrapper in nativeValues. The composite's components strongly reference its predecessors; weak nativeValues keys do not remove that chain while the source remains live. lifecycle.ts:124–126 builds live composite proof getters, so this is retained representation growth, not merely an obsolete traversal counter.
+
+The recorded run exited0 because the diagnostic records graph size but asserts no structural ceiling. Its8 semantic controls passing does not qualify bounded retention. The graph walker covers components, not every possible strong edge through inputs, frames, recipient operations or journals; it is a decisive lower-bound counterexample, not a complete retained-heap inventory. No timing/memory-byte claim follows.
+
+## Required semantic closures and cheapest discriminators
+
+### 1. Selection versus invocation is sound for the literal case; derived no-effect selection needs an explicit boundary
+
+transactions.ts:2874 onward selects before on an unchanged owner-bearing field. private.ts:152–159 still prepares actual consumed/branch inputs separately. EntityMap entity.ts:105,118–128,184,230–234 does separate per-invocation preparation from chosen field endpoints. This supports the representation direction, but is not a proof that scalar no-effect admission already makes every needed semantic selection decision.
+
+A new q consumed by a derive/ancestor updater must validate this invocation even if the selected scalar value remains p's7. Independent omission of q must still contradict; dependent/unknown must retain their actual horizon behavior. Conversely, inherited q already in selected support is not a newly consumed input merely because a literal supplies7. Preserving complete selected support without reclassifying it as invocation input is necessary.
+
+Cheapest discriminator: fixed p-owned7, independent literal7 (no new consumption) versus a public ancestor-updater that actually consumes pending q and returns an equal selected value; pair independent/dependent[q] with callback/getter sentinel counts. Check the declaration error/receipt and exact output before/after p and q confirmation. Then consume that source from a NEW public updater after the original invocation finishes. This last step distinguishes a legitimate retained-old endpoint from accidentally erasing a new obligation which admission should have selected. State the expected persistence from admitted authorship, not `mutation.changed` alone. If the boundary is not determined, constrain the first prototype to the independently supplied retaining literal; do not treat all derived/equal calls as proven no-write.
+
+### 2. The proposed operation-frame readiness argument is incomplete for other recipients
+
+lifecycle.prepareRevision:269–289 creates op.frames entries only for frames MATCHING the channel. For matches.length===0 it immediately seeds op.proof. lifecycle.proof:309–312 only withholds for op.frames.size. Therefore “the operation proof waits for the current declaration horizon” is not universally true. private.ready:273–282 also accepts cached proof before querying lifecycle.proof. Currently the selected/new native requirement and its unfinished/activation state supply other protections.
+
+The successor needs an explicit proof that current invocation validation/readiness is respected at every route that may publish newly admitted work, including nonmatching/late recipients and no-recipient source installation. Carrying an activation field and calling deliverNativeRequirementReady is not by itself proof that all readers/waiters consult it. Do not transfer another channel's declaration permission to solve this. Do not put transient invocation back into permanent selected storage merely to regain a barrier.
+
+Cheapest discriminator: adapt the existing scalar-native-support.spec.ts late-child setup. Start an outer declaration, install genuinely new support, enroll a second Link inside the callback, then throw/introduce contradiction; later independent sibling write must not cleanse the failed support, and foreign confirmation must still release useful transport. Add one retained endpoint/equal call within the same open horizon and observe both matching/nonmatching recipients before/after closure. Distinguish old independently eligible work from newly admitted work: an unrelated no-effect invocation is NOT automatically authority to block all old output. This is a source-based missing proof, not a reproduced leak in the proposed implementation (there is none).
+
+### 3. Keep complete evidence and real readiness; owner count alone is insufficient
+
+NativeRequirement/nativeProof carry D/I/V, possible W, invalid/unknown, rejected-role bits, unavailable-input and historical-window evidence. captureNativeInput discharges only already-confirmed actual owners at new consumption; it preserves source evidence and rejected roles. Retain the exact requirement identity for retain-before, including live readiness. Do not replace it with an owners array, sampled proof, “all confirmed” shortcut, or newly filtered ambient window. p.confirm cannot discharge inherited pending q; terminal rejected/unknown support must not become clean because q no longer appears pending.
+
+Cheapest checks: the existing fixed p+q case with p confirmed first; scalar-native-support's derived-cannot-cleanse-failed-validation and fresh-literal-positive counterpart; a still-unfinished selected requirement read during a nested horizon. Confirm no early payload and positive terminal/fresh-authorship progress. Retain a real possible-only input control, not just a nonmatching recipient window, so W is tested independently from D/I/V. No new policy for changed ordinary successors: real replacement may select a new endpoint, and historical location ownership is not sticky.
+
+### 4. Physical identity needs its own precomputed action, in BOTH scalar routes
+
+The sketch correctly identifies a source-level alias hazard. private.ts:163–164 chooses/mutates nativeViews using ordinary mutation.changed. For ordinary7→inspection99→ordinary7, ordinary changed=false but physical changed=true, so mutating the old view can make a saved99 certificate borrow7's support. This is distinct from whether ordinary7 retained p.
+
+tree-scalar-slot-runtime.prepareSlots:204–225 already computes the physical set separately from ordinary equality. commitRecorded:315–352 also computes both before calling preparation; however its current prepare/prepareUnchanged callback signatures DO NOT pass physical change. Thread the existing fact to neutral direct, native direct and frame preparation before stores; a returned physicalChanged flag arrives too late. Do not repeat comparers/getters or infer physical change from values after installation. Preserve the existing physical-equal adoption policy rather than reopening E5.
+
+Cheapest discriminator: save an inspection99 snapshot/view, explicitly return the source to ordinary7, then consume the OLD99 snapshot through a real updater while a foreign pending owner exists. Compare with a fresh current7 input. Old inspection input must not become certified merely because the live slot now reads7. Repeat direct/frame and a native facade only as necessary to prove both handoffs. Count getter/comparer calls against the unchanged route; no arbitrary new count budget. Also retain the existing physical-equal inspection-adoption control. Do not encode a new hold9 solely because p owned the earlier7.
+
+### 5. Source stability is necessary, but not sufficient for bounded lifetime
+
+The prototype should keep nativeValues endpoint AND requirement identical for completed no-effect literal invocations under fixed support. Still inspect other strong roots: nativeViews/saved snapshots, recipient index requirements, pending units, frame.ops/horizon requirements, owner.dependents, detached actual-effect pairs. A source graph can stop growing while an orphaned invocation observer or recipient fallback chain keeps every attempt alive.
+
+lifecycle.finish:350–374 clears transient input/frame state; noWrite:317–325 retires recipient dependency links, but same-horizon fallbacks can legitimately live until closure. Preserve finalize/activation/cleanup for invocation records even when they are not selected. On refusal before installation, prepared record additions must never become global installed state. On installed callback throw, drain completion with original first-error ordering. Do not assert constant storage DURING N unfinished nested operations; the required bound is after completion, under fixed live obligations/observers/history.
+
+Cheapest first check: N=1,2,4 literal loops with discarded receipts, fixed p and fixed p+q, comparing exact selected endpoint identity and every reachable requirement role edge, not just owners or component depth. After each CLOSED invocation verify recipient/transient counts return to the same baseline; repeat with no recipient and with one recipient/disposal. Preserve all semantic assertions. Only then replay the exact recorded64/256 workloads as the boundedness proof. No zero/no-listener claim from weak maps alone; do not count genuine rollback history as accidental no-op growth.
+
+### 6. Preparation/fold provenance cannot move to installation
+
+Retain predecessor endpoint identity plus physical-view identity AND its requirement (in-place view support changes otherwise evade an identity-only check). Validate after callback-capable preparation and again at the shared pre-install boundary. Every store below that boundary must be detached data-only: no nativeProof traversal that can observe changing frame state, no user equality/getter, no lookup selecting a new predecessor during installation. Source revision and enrollment refusal must stay atomic, with native and ordinary evidence installed together.
+
+Cheapest discriminator: tiny same-source reentry during preparation/finalization followed by a later ordinary write; ensure the stale attempt refuses without overwriting the newer endpoint/view and the next valid write succeeds. Pair with p-owned7, q actual7→9→7 net-zero fold and q unrelated-z activity. Preserve exact effect before/after endpoint provenance and rollback results; no added journal entry for no-effect calls. These are finite existing-rule checks, not a new source-identity model.
+
+## Eligibility boundary
+
+Prototype the exact-selection/transient-invocation representation only with the above explicit obligations, particularly the derived admission distinction and nonmatching readiness path. No demonstrated need for a new compactor, global owner ledger, API, policy change or retention budget. Literal no-write receipts stay terminal while older Link work can remain pending; genuinely authored held-disposal coverage remains separate.
+
+No blocker to a constrained experiment is demonstrated by the raw growth alone; it supports the proposed direction. The broader scalar-parity claim is unproven until the discriminators establish validation, physical certificate isolation and bounded ALL-root lifetime. Nothing here accepts a patch, closes retention, or authorizes activation/release. All recommended falsifiers are NOT RUN in this review.

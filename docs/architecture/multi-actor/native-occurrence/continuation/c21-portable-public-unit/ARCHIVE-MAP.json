@@ -1,0 +1,44 @@
+[
+  {
+    "source": "RESULT.json",
+    "archive": "RESULT.json",
+    "sourceSha256": "2f0fdd70f0b55d082feecbeeb533e97ad231dc69024cfa0dee3bae9b3f9c32c5",
+    "archiveSha256": "2f0fdd70f0b55d082feecbeeb533e97ad231dc69024cfa0dee3bae9b3f9c32c5"
+  },
+  {
+    "source": "first.log",
+    "archive": "first.log",
+    "sourceSha256": "d150bcbd555066da1f806b015ea4f3d5535a6951f2b8c3ce6c213e90a87f2c88",
+    "archiveSha256": "d150bcbd555066da1f806b015ea4f3d5535a6951f2b8c3ce6c213e90a87f2c88"
+  },
+  {
+    "source": "COMMAND.json",
+    "archive": "COMMAND.json",
+    "sourceSha256": "ec4905ad30105a0569546118e5a10161ea919adbf4140e9017e6714470dbdd66",
+    "archiveSha256": "ec4905ad30105a0569546118e5a10161ea919adbf4140e9017e6714470dbdd66"
+  },
+  {
+    "source": "public-observations/xy-retry.json",
+    "archive": "public-observations/xy-retry.json",
+    "sourceSha256": "7f16cf267941636fde5ab18bd0315bac28917da3c406374cdeb8c2ef8ad7879b",
+    "archiveSha256": "7f16cf267941636fde5ab18bd0315bac28917da3c406374cdeb8c2ef8ad7879b"
+  },
+  {
+    "source": "public-observations/xy-confirm.json",
+    "archive": "public-observations/xy-confirm.json",
+    "sourceSha256": "c1c0540c8c182d89a120cab09b483d75b3f574abfd1d6220cd86c17cd961ebcc",
+    "archiveSha256": "c1c0540c8c182d89a120cab09b483d75b3f574abfd1d6220cd86c17cd961ebcc"
+  },
+  {
+    "source": "public-observations/yx-retry.json",
+    "archive": "public-observations/yx-retry.json",
+    "sourceSha256": "8c682dc6a2a389bd1edfc7332a046689051a45fbb848e7ccefb23827d58d0c40",
+    "archiveSha256": "8c682dc6a2a389bd1edfc7332a046689051a45fbb848e7ccefb23827d58d0c40"
+  },
+  {
+    "source": "public-observations/yx-confirm.json",
+    "archive": "public-observations/yx-confirm.json",
+    "sourceSha256": "4c12b4f019f33a0421e4ee262392b60bc94e269216384ad9e2199f8dab189129",
+    "archiveSha256": "4c12b4f019f33a0421e4ee262392b60bc94e269216384ad9e2199f8dab189129"
+  }
+]

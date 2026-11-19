@@ -1,0 +1,29 @@
+# Independent source review — FAST-POINT-DUAL-MAP-0
+
+No concrete implementation blocker demonstrated in the reviewed entity.ts and fast-point-dual-map.spec.ts changes. This is conditional source admission for the bounded experiment, not semantic qualification, measured cost acceptance or production adoption.
+
+Reviewed the dirty implementation over HEAD eef7dfc0b95c16658b825d7b1466c95b1cf43c20 in v16-fast-point-dual-map-0, its diff against that exact commit and f165d28e55dce241ff6466a58c9b850f1bbc20f3, the design, review contract and scoped independent-review protocol. Inspected the retained integrated-field-facts witnesses and the actual EntityPublicationSource admission/exposure/completion boundary. No other reviewer's verdict supplied the conclusion. No tests, builds, measurements or reproduction scripts were run. The initially attempted shorthand eef7 was ambiguous; comparison was corrected to HEAD/exact revision, not inferred from that failed command.
+
+The reviewed frozen premises, quoted verbatim in DESIGN.md and carried there from eef7's 9a977/f165 product sources, remain:
+
+> Unknown attribution remains unknown; write ownership is not proof of input independence.
+
+> Destination settlement ownership, known input dependencies, fixed possible-owner holds, shared validation and recipient uncertainty remain separate roles even when owner identities coincide.
+
+> These are semantic requirements, not a selection of persistent roots, global replay, whole-store copies or a new ownership engine. Existing approved semantics and B's closure remain in force.
+
+## Source findings
+
+- The generic dual-map preparation is restored to f165's field/view preparation and selection logic. Its unit-local first-physical pairing, repeated-subject per-edit images, empty ordinary/physical map existence, independent Map insertion orders and dynamic fallback for untouched ordinary support remain. The meaningful additions against f165 are extracted native-requirement preparation, authenticated point specialization, exposure bookkeeping and retirement freshness; generic traversal/pairing was not silently replaced.
+- Point specialization stages immutable ordinary endpoint and physical View references, retaining payload access order, equal-value View terminal mutation and separately captured per-edit physical requirements. Both maps independently copy when previously exposed or busy. Busy membership spans callback-capable preparation and is removed only by the preparation that added it; callback-reentrant inner installation therefore does not mutate an outer preparation's base containers. Source revision checks still reject stale outer installation.
+- Source calls native.expose before passing completion to every recipient, including a recipient introduced during a payload getter. Existing-recipient paths use generic preparation. Native-only completion is opaque through the source WeakMap, while source.evidence remains a dynamic reader and captureViews returns deliberately live View cells. I found no supported source path in this slice that hands an unexposed native completion to a later reader. Direct access to the private native participant is test scaffolding, not a newly established public escape contract.
+- Generic exposure marks staged ordinary and physical maps independently; physical-only completion keeps its captured physical container while its ordinary lookup follows current source state. Retained integrated witnesses specifically assert this dynamic ordinary behavior and exact per-edit versus live View identity. Independent Map orders avoid a union-order substitution.
+- Retirement capture marks both existing maps escaped, causing subsequently prepared point operations to replace their identities. The extra lazy WeakMap tokens cover the distinct reverse ordering: prepare point, capture retirement plan, install point into the already-selected maps. Tokens are created only at retirement capture; repeated captures read the same token until installation. Point installation uses a precomputed token and updates only existing token entries, with no row traversal, copy or payload callback. Plan.current checks both identities and both captured tokens as well as the other subject evidence identities. A generic replacement still invalidates by identity.
+
+## Witnesses and remaining falsifiers
+
+The new two-cell parameterized witness tests both equal-value (0) and changed-value (7) installation after late retirement capture, asserts the plan initially current, verifies replacement requirement identity and then asserts it stale. That is meaningful coverage of the token hole, rather than a count-only assertion. Retained integrated witnesses address unread native completion, equal-value live View identity, reentrant inner installation, recipient enrollment during preparation, physical-only dynamic ordinary support and differing side order.
+
+No execution result is inferred from those test bodies. Cheapest decisive execution remains the scoped new/retained entity-source/field-facts/physical-pair/retirement witnesses through Nx, with the planned stale-token and escaped-reader negative controls and exact restoration. A useful direct freshness check is capture two plans without a write and assert both remain current, then install one prepared point and assert both stale; source inspection says the stable lazy token supports this. These are falsifiers, not an expanded architecture queue. Unchanged point-work controls, types/lint/framework qualification and the fresh preregistered cost screen remain independent obligations.
+
+The dual-map source removes the fused layout's explicit row/pair/order-array objects, but this review establishes no heap or CPU effect and no requirement to adopt this representation. No public API, stable-v15, ownership-role or threshold change is authorized by this verdict.

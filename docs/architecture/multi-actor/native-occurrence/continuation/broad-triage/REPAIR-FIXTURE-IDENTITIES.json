@@ -1,0 +1,65 @@
+[
+  {
+    "id": 14,
+    "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "c1268e6dcb11f5b98251d56a749854972ea2c28c5b114b9294151bcb32252827"
+  },
+  {
+    "id": 17,
+    "file": "packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "7ca2ca3c60b332b3cf01752618e409d9a8c0b0fc2d52f97865514dd7c26b6a94"
+  },
+  {
+    "id": 18,
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9"
+  },
+  {
+    "id": 19,
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9"
+  },
+  {
+    "id": 20,
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9"
+  },
+  {
+    "id": 21,
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9"
+  },
+  {
+    "id": 22,
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "laterSource": "/private/tmp/st-native-combined-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9"
+  },
+  {
+    "id": 26,
+    "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "laterSource": "/private/tmp/st-structural-completeness-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf"
+  },
+  {
+    "id": 47,
+    "file": "packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts",
+    "laterSource": "/private/tmp/st-structural-completeness-successor/candidate",
+    "sameFixture": true,
+    "laterFixtureSha256": "3a63515b7db07d9e08b1715e3f2bd705ca3920d39109bcc23bac5314410cdcf2"
+  }
+]

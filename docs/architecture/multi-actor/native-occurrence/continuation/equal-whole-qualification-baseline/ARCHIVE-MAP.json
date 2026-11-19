@@ -1,0 +1,74 @@
+[
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "b0dc0c738b2c6e8886ea982099837a4b9da007b2cd118004c086a8f60b63e6f0",
+    "archiveSha256": "b0dc0c738b2c6e8886ea982099837a4b9da007b2cd118004c086a8f60b63e6f0"
+  },
+  {
+    "source": "whole-qualification.json",
+    "archive": "whole-qualification.json",
+    "sourceSha256": "3283eda17e840017f90c3e5ba0a89eecb3e30d2e2f07167f4f41797bd78940d6",
+    "archiveSha256": "3283eda17e840017f90c3e5ba0a89eecb3e30d2e2f07167f4f41797bd78940d6"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+    "archiveSha256": "f2fd12688615fd03844426ebb6caca33bc301ce476890700d81ccc4bd359518a"
+  },
+  {
+    "source": "mixed-trace.json",
+    "archive": "mixed-trace.json",
+    "sourceSha256": "65a25d7fcc1e120c5f514e62d4d1c3ed7b6ba3b02588d44a3da8c62761578e4e",
+    "archiveSha256": "65a25d7fcc1e120c5f514e62d4d1c3ed7b6ba3b02588d44a3da8c62761578e4e"
+  },
+  {
+    "source": "runs/mixed-attribution/RESULT.json",
+    "archive": "runs/mixed-attribution/RESULT.json",
+    "sourceSha256": "9e8f66340f82f46e928bd66b4b3efdb783a9bcadbf459831b9b0d0759b181a1e",
+    "archiveSha256": "9e8f66340f82f46e928bd66b4b3efdb783a9bcadbf459831b9b0d0759b181a1e"
+  },
+  {
+    "source": "runs/mixed-attribution/first.log",
+    "archive": "runs/mixed-attribution/first.log",
+    "sourceSha256": "2b6fea048da15dae6de62230ddadb7615ab00c6097c11eeb3ad1401f15a4e251",
+    "archiveSha256": "2b6fea048da15dae6de62230ddadb7615ab00c6097c11eeb3ad1401f15a4e251"
+  },
+  {
+    "source": "runs/mixed-attribution/SOURCE-BEFORE.json",
+    "archive": "runs/mixed-attribution/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "c92b336035c8cf7c7f8ace94280c388346b9d6de40d55e99e755cf7162aef89c",
+    "archiveSha256": "54c55caa448fdc4e439957807363053ecc9b9cb28cc5d9f0d865894356a90ccd"
+  },
+  {
+    "source": "runs/mixed-attribution/COMMAND.json",
+    "archive": "runs/mixed-attribution/COMMAND.json",
+    "sourceSha256": "c34322a1698b955b6257a5698208de37d3b04c2872367f5696ee3add86aebda1",
+    "archiveSha256": "c34322a1698b955b6257a5698208de37d3b04c2872367f5696ee3add86aebda1"
+  },
+  {
+    "source": "runs/terminal-characterization/RESULT.json",
+    "archive": "runs/terminal-characterization/RESULT.json",
+    "sourceSha256": "7547a44a7f878afa5da7c06b088037eb74107ff649f176aa77e07947a9b46807",
+    "archiveSha256": "7547a44a7f878afa5da7c06b088037eb74107ff649f176aa77e07947a9b46807"
+  },
+  {
+    "source": "runs/terminal-characterization/first.log",
+    "archive": "runs/terminal-characterization/first.log",
+    "sourceSha256": "35e60f6e670a4f24d51ee58b8fea39169334443fa7cea570ae6b7d46db2b77bf",
+    "archiveSha256": "35e60f6e670a4f24d51ee58b8fea39169334443fa7cea570ae6b7d46db2b77bf"
+  },
+  {
+    "source": "runs/terminal-characterization/SOURCE-BEFORE.json",
+    "archive": "runs/terminal-characterization/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "c809ec157fa1ecd2602f52027536b7741f258ad201e668c17fb919a00f2f40da",
+    "archiveSha256": "5165b9173218f131d8ee38bd368a318d71df95830e207c89429ae68299a6abf6"
+  },
+  {
+    "source": "runs/terminal-characterization/COMMAND.json",
+    "archive": "runs/terminal-characterization/COMMAND.json",
+    "sourceSha256": "95598e758ddb0f012cfebe4384b3c94e416f50148c799dc23a35d12bcfd91286",
+    "archiveSha256": "95598e758ddb0f012cfebe4384b3c94e416f50148c799dc23a35d12bcfd91286"
+  }
+]

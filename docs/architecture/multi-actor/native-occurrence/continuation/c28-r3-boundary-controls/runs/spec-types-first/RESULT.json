@@ -1,0 +1,8 @@
+{
+  "exit": 1,
+  "timeout": false,
+  "changedManifestFiles": [],
+  "overlayUnchanged": {
+    "packages/kernel/src/lib/comparator-boundary-controls.spec.ts": true
+  }
+}

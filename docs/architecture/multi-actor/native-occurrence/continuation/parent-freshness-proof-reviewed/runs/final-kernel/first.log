@@ -1,0 +1,47 @@
+
+> nx run kernel:test parent-snapshot-currentness.spec.ts parent-freshness-focused.spec.ts parent-freshness-entity.spec.ts construction-resource-cleanup.spec.ts keyed-construction-cleanup.spec.ts marker-snapshot-memo.spec.ts snapshot-builder.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs parent-snapshot-currentness.spec.ts parent-freshness-focused.spec.ts parent-freshness-entity.spec.ts construction-resource-cleanup.spec.ts keyed-construction-cleanup.spec.ts marker-snapshot-memo.spec.ts snapshot-builder.spec.ts --maxWorkers=1
+
+(node:78123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78130) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel
+
+(node:78137) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78138) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78139) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78140) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78141) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78153) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  7 passed (7)
+      Tests  42 passed (42)
+   Start at  09:19:48
+   Duration  3.02s (transform 556ms, setup 0ms, import 1.06s, tests 119ms, environment 1.26s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

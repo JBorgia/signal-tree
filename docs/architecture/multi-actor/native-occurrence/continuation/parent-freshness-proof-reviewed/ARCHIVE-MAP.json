@@ -1,0 +1,1802 @@
+[
+  {
+    "source": "run-oracle.py",
+    "archive": "run-oracle.py",
+    "sourceSha256": "9097419a008215135fd9dfa95b165d55371da2e1f37cbbcdc3d8f9790131a395",
+    "archiveSha256": "9097419a008215135fd9dfa95b165d55371da2e1f37cbbcdc3d8f9790131a395"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "306c674c769445623ab610883beb513c68d97f6649a8d0a418f831741c2765a3",
+    "archiveSha256": "306c674c769445623ab610883beb513c68d97f6649a8d0a418f831741c2765a3"
+  },
+  {
+    "source": "implement-plain.py",
+    "archive": "implement-plain.py",
+    "sourceSha256": "ed5509480c848f3de3ee7da832b498b930d5d78e4b67d308ec464e6177f494cf",
+    "archiveSha256": "ed5509480c848f3de3ee7da832b498b930d5d78e4b67d308ec464e6177f494cf"
+  },
+  {
+    "source": "SETUP.json",
+    "archive": "SETUP.json",
+    "sourceSha256": "cd59c255cb7c7e23ab1de9793fe9462603b384eaf98faeff108d0b7de3368731",
+    "archiveSha256": "cd59c255cb7c7e23ab1de9793fe9462603b384eaf98faeff108d0b7de3368731"
+  },
+  {
+    "source": "PATCH-ROUNDTRIP.json",
+    "archive": "PATCH-ROUNDTRIP.json",
+    "sourceSha256": "073186e43ea97e639524fbdca562b89437a5f9369c5f18c4dab7d812fab9c3dc",
+    "archiveSha256": "073186e43ea97e639524fbdca562b89437a5f9369c5f18c4dab7d812fab9c3dc"
+  },
+  {
+    "source": "RUNTIME-REVIEW.patch",
+    "archive": "RUNTIME-REVIEW.patch",
+    "sourceSha256": "98b84a181c31c9e1ca5bb4d2f00629eff3e648db403ff3e2bff7210d1cf48004",
+    "archiveSha256": "98b84a181c31c9e1ca5bb4d2f00629eff3e648db403ff3e2bff7210d1cf48004"
+  },
+  {
+    "source": "PRE-IMPLEMENTATION.json",
+    "archive": "PRE-IMPLEMENTATION.json",
+    "sourceSha256": "9028d274d74b18a00a6a161e580b3bc3383794997c64b847dd9d7a74acaddd3c",
+    "archiveSha256": "9028d274d74b18a00a6a161e580b3bc3383794997c64b847dd9d7a74acaddd3c"
+  },
+  {
+    "source": "RUNTIME.patch",
+    "archive": "RUNTIME.patch",
+    "sourceSha256": "19e8c5dbd6208da35754e97244c389ade7f199548d6c81610ce309669cc78c6d",
+    "archiveSha256": "19e8c5dbd6208da35754e97244c389ade7f199548d6c81610ce309669cc78c6d"
+  },
+  {
+    "source": "COMMANDS.json",
+    "archive": "COMMANDS.json.gz",
+    "sourceSha256": "0ef11559770a8e2a25ed7dc35e0cdb7dc27248fb149662b3d48c9fbc11370cf4",
+    "archiveSha256": "4eb3ae074705286fb5568eae309250eca6c1cf0e886e29069ba4235763d77706"
+  },
+  {
+    "source": "PATCH-APPLICATION.json",
+    "archive": "PATCH-APPLICATION.json",
+    "sourceSha256": "b7a4a32abcb4cca314c0e1c8b8c32d1f99481ccacde848ddb0e3066ecc3c10b6",
+    "archiveSha256": "b7a4a32abcb4cca314c0e1c8b8c32d1f99481ccacde848ddb0e3066ecc3c10b6"
+  },
+  {
+    "source": "RESULTS.md",
+    "archive": "RESULTS.md",
+    "sourceSha256": "65418017b9459e2fc4c255507c76208d05384ee031faf04599691a1263a30019",
+    "archiveSha256": "65418017b9459e2fc4c255507c76208d05384ee031faf04599691a1263a30019"
+  },
+  {
+    "source": "SNAPSHOT-PROOF.json",
+    "archive": "SNAPSHOT-PROOF.json.gz",
+    "sourceSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+    "archiveSha256": "bd5dd6bbf9395f270f044b0bb98bc356e759ea675cbc1ccaa86422c94adf15cb"
+  },
+  {
+    "source": "DEPENDENCY-REPAIR.json",
+    "archive": "DEPENDENCY-REPAIR.json",
+    "sourceSha256": "12a59e4c2216b4f929b6d93c965af1ec65619204b925c33cc02143d9be3c79ca",
+    "archiveSha256": "12a59e4c2216b4f929b6d93c965af1ec65619204b925c33cc02143d9be3c79ca"
+  },
+  {
+    "source": "freeze.py",
+    "archive": "freeze.py",
+    "sourceSha256": "ea96a1260522cf9b7a7ec7c1db7c1ad415b6de255972eadf31b461848d3d8947",
+    "archiveSha256": "ea96a1260522cf9b7a7ec7c1db7c1ad415b6de255972eadf31b461848d3d8947"
+  },
+  {
+    "source": "verify-proof.py",
+    "archive": "verify-proof.py",
+    "sourceSha256": "172d01a35820fc7c0946a4aa2a143c33749c67d9f56c366f1cf23a1780851771",
+    "archiveSha256": "172d01a35820fc7c0946a4aa2a143c33749c67d9f56c366f1cf23a1780851771"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "68540cfe3c858aca0da217f91a669e993b3d781ba7c6c4df4a1876e5def3da99",
+    "archiveSha256": "68540cfe3c858aca0da217f91a669e993b3d781ba7c6c4df4a1876e5def3da99"
+  },
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "ecc6280f1158637c6142bbd15a068257ebed75c08fd5ca2331a6c318fb62acd8",
+    "archiveSha256": "ecc6280f1158637c6142bbd15a068257ebed75c08fd5ca2331a6c318fb62acd8"
+  },
+  {
+    "source": "make-callbacks.py",
+    "archive": "make-callbacks.py",
+    "sourceSha256": "a151153850e6783034f38bda98aebb423f71af8be4ccac150d153505b29ca328",
+    "archiveSha256": "a151153850e6783034f38bda98aebb423f71af8be4ccac150d153505b29ca328"
+  },
+  {
+    "source": "make-focused.py",
+    "archive": "make-focused.py",
+    "sourceSha256": "d82cd0dea4aa16e2b23f79079c72893514b6413aec5c838976f9cc05b149f450",
+    "archiveSha256": "d82cd0dea4aa16e2b23f79079c72893514b6413aec5c838976f9cc05b149f450"
+  },
+  {
+    "source": "make-entity-acceptance.py",
+    "archive": "make-entity-acceptance.py",
+    "sourceSha256": "409def030987249707b3544a1b70134e420517498285bd94702eddef847e3263",
+    "archiveSha256": "409def030987249707b3544a1b70134e420517498285bd94702eddef847e3263"
+  },
+  {
+    "source": "FROM-C8.patch",
+    "archive": "FROM-C8.patch",
+    "sourceSha256": "07d0cee0b6f8059d154f96875b53755cc66ad801ab6be499c4fe9e521b9d8020",
+    "archiveSha256": "07d0cee0b6f8059d154f96875b53755cc66ad801ab6be499c4fe9e521b9d8020"
+  },
+  {
+    "source": "prepare.py",
+    "archive": "prepare.py",
+    "sourceSha256": "9451114ceccef9da619420617670bd4df2f7ad3f2f2743ad932e05f23e04d83e",
+    "archiveSha256": "9451114ceccef9da619420617670bd4df2f7ad3f2f2743ad932e05f23e04d83e"
+  },
+  {
+    "source": "FREEZE.json",
+    "archive": "FREEZE.json",
+    "sourceSha256": "386b801eacaeb0468612b479acbaa9c19e1e0409f116a487a9c8751d0361d345",
+    "archiveSha256": "386b801eacaeb0468612b479acbaa9c19e1e0409f116a487a9c8751d0361d345"
+  },
+  {
+    "source": "BASE-SOURCE.json",
+    "archive": "BASE-SOURCE.json.gz",
+    "sourceSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+    "archiveSha256": "c87d417784e6b90fc333d83e600515da170f14bda1676e78e396b6d784d20af9"
+  },
+  {
+    "source": "tests.patch",
+    "archive": "tests.patch",
+    "sourceSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463",
+    "archiveSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463"
+  },
+  {
+    "source": "first-fixtures/angular/parent-freshness-focused.spec.ts",
+    "archive": "first-fixtures/angular/parent-freshness-focused.spec.ts",
+    "sourceSha256": "b3a3507d8c7b8d012fe7c408aa7c888dd704ec61d526f44f5ffdcd2cf3fc38cc",
+    "archiveSha256": "b3a3507d8c7b8d012fe7c408aa7c888dd704ec61d526f44f5ffdcd2cf3fc38cc"
+  },
+  {
+    "source": "first-fixtures/kernel/focused-capture.spec.ts",
+    "archive": "first-fixtures/kernel/focused-capture.spec.ts",
+    "sourceSha256": "b29ae2be7fba524a4a4a36bb0648e5b10eda4216b9e9e645e82d19c3da6545d5",
+    "archiveSha256": "b29ae2be7fba524a4a4a36bb0648e5b10eda4216b9e9e645e82d19c3da6545d5"
+  },
+  {
+    "source": "first-fixtures/kernel/parent-freshness-focused.spec.ts",
+    "archive": "first-fixtures/kernel/parent-freshness-focused.spec.ts",
+    "sourceSha256": "fad1145f248489d4c9ba064b495a90fd348e1756f36de06820b7840c079e1070",
+    "archiveSha256": "fad1145f248489d4c9ba064b495a90fd348e1756f36de06820b7840c079e1070"
+  },
+  {
+    "source": "oracle-nx-data/eslint-2654242865465226088.hash",
+    "archive": "oracle-nx-data/eslint-2654242865465226088.hash",
+    "sourceSha256": "f9db74d503e46688fc979bd34aedbf02d634b62ee095c57bfbc8e5aa0ef51bea",
+    "archiveSha256": "f9db74d503e46688fc979bd34aedbf02d634b62ee095c57bfbc8e5aa0ef51bea"
+  },
+  {
+    "source": "oracle-nx-data/source-maps.json",
+    "archive": "oracle-nx-data/source-maps.json.gz",
+    "sourceSha256": "3d8ec7c84f864eef41797fbcf34b34c8575fe568a8422306bd59bb180bc46616",
+    "archiveSha256": "1e382f1d5bb32aaeade28b87169f78211da682b4968c35d9cdef0ecf7df893b5"
+  },
+  {
+    "source": "oracle-nx-data/playwright-5186013267177752385.hash",
+    "archive": "oracle-nx-data/playwright-5186013267177752385.hash",
+    "sourceSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2",
+    "archiveSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2"
+  },
+  {
+    "source": "oracle-nx-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "archive": "oracle-nx-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "sourceSha256": "f96e95eb155a0ea9536ccfc77e96e09af64171e2ed286e3e9add4df39314ec89",
+    "archiveSha256": "f96e95eb155a0ea9536ccfc77e96e09af64171e2ed286e3e9add4df39314ec89"
+  },
+  {
+    "source": "oracle-nx-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "archive": "oracle-nx-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "oracle-nx-data/vite-7556005483977466535.hash",
+    "archive": "oracle-nx-data/vite-7556005483977466535.hash",
+    "sourceSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9",
+    "archiveSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9"
+  },
+  {
+    "source": "oracle-nx-data/file-map.json",
+    "archive": "oracle-nx-data/file-map.json.gz",
+    "sourceSha256": "50acd1f98a5a6e63dd4196ad0b7555cb34b456a53646bd54ad5f86dc48813149",
+    "archiveSha256": "6eb0f61de44dc46d2bbf30edc5ad1a7ee183f7a06a475958501b2f41dc011fee"
+  },
+  {
+    "source": "oracle-nx-data/lockfile-nodes.hash",
+    "archive": "oracle-nx-data/lockfile-nodes.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "oracle-nx-data/parsed-lock-file.nodes.json",
+    "archive": "oracle-nx-data/parsed-lock-file.nodes.json.gz",
+    "sourceSha256": "62c90f7a638dc748d016fa76093e0ee64f80c39a537fa208f007549d361d9dc6",
+    "archiveSha256": "6017597251949c522723a73b5b5ece9379e4a1fc280ee27fc4d91b5ca71b7614"
+  },
+  {
+    "source": "oracle-nx-data/project-graph.lock",
+    "archive": "oracle-nx-data/project-graph.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "oracle-nx-data/project-graph.json",
+    "archive": "oracle-nx-data/project-graph.json.gz",
+    "sourceSha256": "41b2f284ecf14b7fc8cb3cbdf4c60b63f6a7ec990d25f5f5afcff6d93e60c411",
+    "archiveSha256": "04e74d0a47f7f62449d2e2bfdc0e72caa95bf50b7150da01658f22c6b1a1ea0f"
+  },
+  {
+    "source": "oracle-nx-data/parsed-lock-file.dependencies.json",
+    "archive": "oracle-nx-data/parsed-lock-file.dependencies.json.gz",
+    "sourceSha256": "c1be78a6f49124f0bb445f8b50c3a7ecb973b2635c443f6662e9e805bc28c00e",
+    "archiveSha256": "b601457c77417fc19193617f627f2a7985413123598d3996bd415a80ea11c3c9"
+  },
+  {
+    "source": "oracle-nx-data/rollup-14273536953574808233.hash",
+    "archive": "oracle-nx-data/rollup-14273536953574808233.hash",
+    "sourceSha256": "a5220411be7c54dc7339c9502a33eb9d01c67137ebbaf9d67bdfe183e6ba9b6e",
+    "archiveSha256": "a5220411be7c54dc7339c9502a33eb9d01c67137ebbaf9d67bdfe183e6ba9b6e"
+  },
+  {
+    "source": "oracle-nx-data/lockfile-dependencies.hash",
+    "archive": "oracle-nx-data/lockfile-dependencies.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "oracle-nx-data/nx_files.nxt",
+    "archive": "oracle-nx-data/nx_files.nxt.gz",
+    "sourceSha256": "b2a740c9cb7886dd872cb084e07968fb33375c370d71fac8d8cb9b59e33c1d25",
+    "archiveSha256": "604f2bcac62fc73ee7b4afa9eaf4fbbe120ed5c98d0b47660b6f48091e4d4be8"
+  },
+  {
+    "source": "oracle-nx-data/vitest-7333614714660744029.hash",
+    "archive": "oracle-nx-data/vitest-7333614714660744029.hash.gz",
+    "sourceSha256": "2e3973b2a2eaa5b41a11dca303a45e0242d814f305bba0bb47f15aec8f96d3c2",
+    "archiveSha256": "980158cf7c9447a047b4f4278ccc1088542e71a7b8e1be94bf19cbbbeaeaee81"
+  },
+  {
+    "source": "oracle-nx-cache/run.json",
+    "archive": "oracle-nx-cache/run.json",
+    "sourceSha256": "ea6eb94627ce6525614cb2e31a6d211013c981f333b9dd1e2d008f07ba2082bf",
+    "archiveSha256": "ea6eb94627ce6525614cb2e31a6d211013c981f333b9dd1e2d008f07ba2082bf"
+  },
+  {
+    "source": "runs/grouped-kernel-final/RESULT.json",
+    "archive": "runs/grouped-kernel-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/grouped-kernel-final/first.log",
+    "archive": "runs/grouped-kernel-final/first.log",
+    "sourceSha256": "b9027551fec471920b7afaa575c9053eb3b4f11505da0d57e9608fa0ff41f87c",
+    "archiveSha256": "b9027551fec471920b7afaa575c9053eb3b4f11505da0d57e9608fa0ff41f87c"
+  },
+  {
+    "source": "runs/grouped-kernel-final/SOURCE-BEFORE.json",
+    "archive": "runs/grouped-kernel-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/grouped-kernel-final/COMMAND.json",
+    "archive": "runs/grouped-kernel-final/COMMAND.json",
+    "sourceSha256": "1998f422043e4428a08fef1ad03de566107dc2ec59ece521643d479e65b6aba5",
+    "archiveSha256": "1998f422043e4428a08fef1ad03de566107dc2ec59ece521643d479e65b6aba5"
+  },
+  {
+    "source": "runs/grouped-kernel-final/observations/sorted-false.json",
+    "archive": "runs/grouped-kernel-final/observations/sorted-false.json",
+    "sourceSha256": "d7e61f0b5619ab3a04ff1313b14098df7c77663db55ec364ae2d724932663f55",
+    "archiveSha256": "d7e61f0b5619ab3a04ff1313b14098df7c77663db55ec364ae2d724932663f55"
+  },
+  {
+    "source": "runs/grouped-kernel-final/observations/sorted-true.json",
+    "archive": "runs/grouped-kernel-final/observations/sorted-true.json",
+    "sourceSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446",
+    "archiveSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446"
+  },
+  {
+    "source": "runs/callbacks-oracle-angular/RESULT.json",
+    "archive": "runs/callbacks-oracle-angular/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/callbacks-oracle-angular/first.log",
+    "archive": "runs/callbacks-oracle-angular/first.log",
+    "sourceSha256": "7edfbbf90a17db1245961aef9444b6c0085a62cb6a101fd098d0727623c4c64b",
+    "archiveSha256": "7edfbbf90a17db1245961aef9444b6c0085a62cb6a101fd098d0727623c4c64b"
+  },
+  {
+    "source": "runs/callbacks-oracle-angular/SOURCE-BEFORE.json",
+    "archive": "runs/callbacks-oracle-angular/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "167d71f5454b4fed8d75c16d31efdc4baf6f1f4af3db9b34c5cdd646ed2c8c5d",
+    "archiveSha256": "c92f0eb25ffc0ddb9bd422a12ef1337d750fcc63509ea2669296a1ee7ce56382"
+  },
+  {
+    "source": "runs/callbacks-oracle-angular/COMMAND.json",
+    "archive": "runs/callbacks-oracle-angular/COMMAND.json",
+    "sourceSha256": "4f4b3ada3bf20adcf93a714aef8a19bae862bf94871c3ef16167149836c7021b",
+    "archiveSha256": "4f4b3ada3bf20adcf93a714aef8a19bae862bf94871c3ef16167149836c7021b"
+  },
+  {
+    "source": "runs/callbacks-oracle-angular/observations/sorted-false.json",
+    "archive": "runs/callbacks-oracle-angular/observations/sorted-false.json",
+    "sourceSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6",
+    "archiveSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6"
+  },
+  {
+    "source": "runs/callbacks-oracle-angular/observations/sorted-true.json",
+    "archive": "runs/callbacks-oracle-angular/observations/sorted-true.json",
+    "sourceSha256": "34cf759cf06bcb08997f2238887dbe36c900444b65f87a88f0c5a242e9e7e289",
+    "archiveSha256": "34cf759cf06bcb08997f2238887dbe36c900444b65f87a88f0c5a242e9e7e289"
+  },
+  {
+    "source": "runs/reentry-kernel-1/RESULT.json",
+    "archive": "runs/reentry-kernel-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/reentry-kernel-1/first.log",
+    "archive": "runs/reentry-kernel-1/first.log",
+    "sourceSha256": "76a8c3da0c5945f1d8ab48b38acda921b21c8d1603d886c4d04aeb7d22866b00",
+    "archiveSha256": "76a8c3da0c5945f1d8ab48b38acda921b21c8d1603d886c4d04aeb7d22866b00"
+  },
+  {
+    "source": "runs/reentry-kernel-1/SOURCE-BEFORE.json",
+    "archive": "runs/reentry-kernel-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "f1c440cdb981a1520c487663741cf904d5e784f1f13db16f0a3fdce092320c71",
+    "archiveSha256": "e2166a94b2770c84e29740198103478b1411fd94b07fb24c68fb699461accc00"
+  },
+  {
+    "source": "runs/reentry-kernel-1/COMMAND.json",
+    "archive": "runs/reentry-kernel-1/COMMAND.json",
+    "sourceSha256": "30c379168db0e7adbca00a9011107021761223eb3e9541fb82f07d54e8431e85",
+    "archiveSha256": "30c379168db0e7adbca00a9011107021761223eb3e9541fb82f07d54e8431e85"
+  },
+  {
+    "source": "runs/reentry-kernel-1/observations/marker-E5-child.json",
+    "archive": "runs/reentry-kernel-1/observations/marker-E5-child.json",
+    "sourceSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742",
+    "archiveSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742"
+  },
+  {
+    "source": "runs/reentry-kernel-1/observations/sort-E4.json",
+    "archive": "runs/reentry-kernel-1/observations/sort-E4.json",
+    "sourceSha256": "da1d12256fe3ba6a8990322fd39d7abec03510bec28841e54f4325827f6c792d",
+    "archiveSha256": "da1d12256fe3ba6a8990322fd39d7abec03510bec28841e54f4325827f6c792d"
+  },
+  {
+    "source": "runs/reentry-kernel-1/observations/marker-E5-self.json",
+    "archive": "runs/reentry-kernel-1/observations/marker-E5-self.json",
+    "sourceSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f",
+    "archiveSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f"
+  },
+  {
+    "source": "runs/reentry-kernel-1/observations/marker-E1.json",
+    "archive": "runs/reentry-kernel-1/observations/marker-E1.json",
+    "sourceSha256": "ae7ba2b4d37374cc27131515f77b5b31eacd8567ea376cfd6830ba0a77de7892",
+    "archiveSha256": "ae7ba2b4d37374cc27131515f77b5b31eacd8567ea376cfd6830ba0a77de7892"
+  },
+  {
+    "source": "runs/reentry-kernel-1/observations/marker-E3.json",
+    "archive": "runs/reentry-kernel-1/observations/marker-E3.json",
+    "sourceSha256": "50f618829100dab9cd628de00b66a2ac048daca3dac6cd23140590407e870638",
+    "archiveSha256": "50f618829100dab9cd628de00b66a2ac048daca3dac6cd23140590407e870638"
+  },
+  {
+    "source": "runs/reentry-kernel-1/observations/marker-E4.json",
+    "archive": "runs/reentry-kernel-1/observations/marker-E4.json",
+    "sourceSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a",
+    "archiveSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/RESULT.json",
+    "archive": "runs/reentry-oracle-angular/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/first.log",
+    "archive": "runs/reentry-oracle-angular/first.log",
+    "sourceSha256": "0d4c30b011becac3d0ee4a0e8f14a9c5114686aa338604977fbbd93f70a060db",
+    "archiveSha256": "0d4c30b011becac3d0ee4a0e8f14a9c5114686aa338604977fbbd93f70a060db"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/SOURCE-BEFORE.json",
+    "archive": "runs/reentry-oracle-angular/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9e022295d01b761258f65acba9939b88d25c8a9c5670e68b0964bab696b760c7",
+    "archiveSha256": "b6b25d6a62a6def298e39c301496585ec382f14d1b66e5904608c74d02b9e51e"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/COMMAND.json",
+    "archive": "runs/reentry-oracle-angular/COMMAND.json",
+    "sourceSha256": "456ddfbe172de98b2455a895bf73e33293023a35f4eba383c94c3c42527fdb6e",
+    "archiveSha256": "456ddfbe172de98b2455a895bf73e33293023a35f4eba383c94c3c42527fdb6e"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/observations/marker-E5-child.json",
+    "archive": "runs/reentry-oracle-angular/observations/marker-E5-child.json",
+    "sourceSha256": "01f73418a31334f53b736600e291930d9ec4a4999fb79b31fff3225291e2d344",
+    "archiveSha256": "01f73418a31334f53b736600e291930d9ec4a4999fb79b31fff3225291e2d344"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/observations/sort-E4.json",
+    "archive": "runs/reentry-oracle-angular/observations/sort-E4.json",
+    "sourceSha256": "f72e93552d3a752027216cc6d66dca9dc8cd03b743770f1609e17bff831a92d1",
+    "archiveSha256": "f72e93552d3a752027216cc6d66dca9dc8cd03b743770f1609e17bff831a92d1"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/observations/marker-E5-self.json",
+    "archive": "runs/reentry-oracle-angular/observations/marker-E5-self.json",
+    "sourceSha256": "343e9c36c2103145015b0a8dea088cf161e789fd011073aa2d361d307c8b8a41",
+    "archiveSha256": "343e9c36c2103145015b0a8dea088cf161e789fd011073aa2d361d307c8b8a41"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/observations/marker-E1.json",
+    "archive": "runs/reentry-oracle-angular/observations/marker-E1.json",
+    "sourceSha256": "e84195658c51ea772500255f9fa92959f5bb23a5f15750b13a5633c8801133e0",
+    "archiveSha256": "e84195658c51ea772500255f9fa92959f5bb23a5f15750b13a5633c8801133e0"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/observations/marker-E3.json",
+    "archive": "runs/reentry-oracle-angular/observations/marker-E3.json",
+    "sourceSha256": "6af8c8aeda97b882eae05fac0a2c69c29c74214066675bb9ab17246c3f1da106",
+    "archiveSha256": "6af8c8aeda97b882eae05fac0a2c69c29c74214066675bb9ab17246c3f1da106"
+  },
+  {
+    "source": "runs/reentry-oracle-angular/observations/marker-E4.json",
+    "archive": "runs/reentry-oracle-angular/observations/marker-E4.json",
+    "sourceSha256": "b322400977c12cf72ed8301d29e7625a3da2b2313fa66d94f622877286defa33",
+    "archiveSha256": "b322400977c12cf72ed8301d29e7625a3da2b2313fa66d94f622877286defa33"
+  },
+  {
+    "source": "runs/source-types-final/RESULT.json",
+    "archive": "runs/source-types-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/source-types-final/first.log",
+    "archive": "runs/source-types-final/first.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "runs/source-types-final/SOURCE-BEFORE.json",
+    "archive": "runs/source-types-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/source-types-final/COMMAND.json",
+    "archive": "runs/source-types-final/COMMAND.json",
+    "sourceSha256": "a66ed98887b75925408e1f477888e1a4bbf22a30b4a64ce01c2c4f236fd73464",
+    "archiveSha256": "a66ed98887b75925408e1f477888e1a4bbf22a30b4a64ce01c2c4f236fd73464"
+  },
+  {
+    "source": "runs/source-types-1/RESULT.json",
+    "archive": "runs/source-types-1/RESULT.json",
+    "sourceSha256": "6b081b25e082f49fd349b7392db8390e0148f4dacb24967d7ff7bc2d5b8682d9",
+    "archiveSha256": "6b081b25e082f49fd349b7392db8390e0148f4dacb24967d7ff7bc2d5b8682d9"
+  },
+  {
+    "source": "runs/source-types-1/first.log",
+    "archive": "runs/source-types-1/first.log",
+    "sourceSha256": "d70d0d866c29c8a546b81c7be89e13608ae0fbf28eae8c4bb1238beb1c3414b0",
+    "archiveSha256": "d70d0d866c29c8a546b81c7be89e13608ae0fbf28eae8c4bb1238beb1c3414b0"
+  },
+  {
+    "source": "runs/source-types-1/SOURCE-BEFORE.json",
+    "archive": "runs/source-types-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "95f72f5ed4730f7a84bca393a2c78767210230a123c0e68688d8c0d2117aed57",
+    "archiveSha256": "cc50d4fa6037c3122e08b8cdd27650afe0ed91b4e01392387e5619d1dafaae53"
+  },
+  {
+    "source": "runs/source-types-1/COMMAND.json",
+    "archive": "runs/source-types-1/COMMAND.json",
+    "sourceSha256": "6ad8fa2a6a31a1d8a3dcd8fba989737540fcfe1664aba11c891e23fce6edc515",
+    "archiveSha256": "6ad8fa2a6a31a1d8a3dcd8fba989737540fcfe1664aba11c891e23fce6edc515"
+  },
+  {
+    "source": "runs/callbacks-kernel-1/RESULT.json",
+    "archive": "runs/callbacks-kernel-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/callbacks-kernel-1/first.log",
+    "archive": "runs/callbacks-kernel-1/first.log",
+    "sourceSha256": "826beef62c9c2eb0f2a1372b67a3e7c905b20fb57de3a2d25ff54f38363b000e",
+    "archiveSha256": "826beef62c9c2eb0f2a1372b67a3e7c905b20fb57de3a2d25ff54f38363b000e"
+  },
+  {
+    "source": "runs/callbacks-kernel-1/SOURCE-BEFORE.json",
+    "archive": "runs/callbacks-kernel-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "dc9daad88f832e7d7fe03561f4ed007dd4dc0b0c59f91533e7a27098579a8f60",
+    "archiveSha256": "fa0aa4d172a807c5ddb2193d1058d39165adc3225b8b7e9efe110dff84045ebc"
+  },
+  {
+    "source": "runs/callbacks-kernel-1/COMMAND.json",
+    "archive": "runs/callbacks-kernel-1/COMMAND.json",
+    "sourceSha256": "e45cf48e4ff037fdde86e9e77a583b77afcacefb34c5f0686195286937df0255",
+    "archiveSha256": "e45cf48e4ff037fdde86e9e77a583b77afcacefb34c5f0686195286937df0255"
+  },
+  {
+    "source": "runs/callbacks-kernel-1/observations/sorted-false.json",
+    "archive": "runs/callbacks-kernel-1/observations/sorted-false.json",
+    "sourceSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6",
+    "archiveSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6"
+  },
+  {
+    "source": "runs/callbacks-kernel-1/observations/sorted-true.json",
+    "archive": "runs/callbacks-kernel-1/observations/sorted-true.json",
+    "sourceSha256": "a7fbb2c834f371fa8b7bc16b596f212296146c284da618f6eec47be1ed73a354",
+    "archiveSha256": "a7fbb2c834f371fa8b7bc16b596f212296146c284da618f6eec47be1ed73a354"
+  },
+  {
+    "source": "runs/grouped-kernel-1/RESULT.json",
+    "archive": "runs/grouped-kernel-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/grouped-kernel-1/first.log",
+    "archive": "runs/grouped-kernel-1/first.log",
+    "sourceSha256": "f410363a72f4bab62bf85215566b66c5685aeb88bba6a28ed7d84da41a69708f",
+    "archiveSha256": "f410363a72f4bab62bf85215566b66c5685aeb88bba6a28ed7d84da41a69708f"
+  },
+  {
+    "source": "runs/grouped-kernel-1/SOURCE-BEFORE.json",
+    "archive": "runs/grouped-kernel-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "f1c440cdb981a1520c487663741cf904d5e784f1f13db16f0a3fdce092320c71",
+    "archiveSha256": "e2166a94b2770c84e29740198103478b1411fd94b07fb24c68fb699461accc00"
+  },
+  {
+    "source": "runs/grouped-kernel-1/COMMAND.json",
+    "archive": "runs/grouped-kernel-1/COMMAND.json",
+    "sourceSha256": "e9dce49f28ee372f9ac06555c064d7713c3a0428a6ccf77147abb368bd673a96",
+    "archiveSha256": "e9dce49f28ee372f9ac06555c064d7713c3a0428a6ccf77147abb368bd673a96"
+  },
+  {
+    "source": "runs/grouped-kernel-1/observations/sorted-false.json",
+    "archive": "runs/grouped-kernel-1/observations/sorted-false.json",
+    "sourceSha256": "d7e61f0b5619ab3a04ff1313b14098df7c77663db55ec364ae2d724932663f55",
+    "archiveSha256": "d7e61f0b5619ab3a04ff1313b14098df7c77663db55ec364ae2d724932663f55"
+  },
+  {
+    "source": "runs/grouped-kernel-1/observations/sorted-true.json",
+    "archive": "runs/grouped-kernel-1/observations/sorted-true.json",
+    "sourceSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446",
+    "archiveSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446"
+  },
+  {
+    "source": "runs/warm-angular-1/RESULT.json",
+    "archive": "runs/warm-angular-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/warm-angular-1/first.log",
+    "archive": "runs/warm-angular-1/first.log",
+    "sourceSha256": "1616005d3d4501e64336fa79e566313133a22cdec71214489935f33530a33513",
+    "archiveSha256": "1616005d3d4501e64336fa79e566313133a22cdec71214489935f33530a33513"
+  },
+  {
+    "source": "runs/warm-angular-1/SOURCE-BEFORE.json",
+    "archive": "runs/warm-angular-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "f1c440cdb981a1520c487663741cf904d5e784f1f13db16f0a3fdce092320c71",
+    "archiveSha256": "e2166a94b2770c84e29740198103478b1411fd94b07fb24c68fb699461accc00"
+  },
+  {
+    "source": "runs/warm-angular-1/COMMAND.json",
+    "archive": "runs/warm-angular-1/COMMAND.json",
+    "sourceSha256": "ad1c1dce0ec02c3c9da99f7305dd1a22f7bd04cdf106a05731f7ca6a7fa1adb3",
+    "archiveSha256": "ad1c1dce0ec02c3c9da99f7305dd1a22f7bd04cdf106a05731f7ca6a7fa1adb3"
+  },
+  {
+    "source": "runs/warm-angular-1/observations/warm-marker-E5-self.json",
+    "archive": "runs/warm-angular-1/observations/warm-marker-E5-self.json",
+    "sourceSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f",
+    "archiveSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f"
+  },
+  {
+    "source": "runs/warm-angular-1/observations/warm-marker-E4.json",
+    "archive": "runs/warm-angular-1/observations/warm-marker-E4.json",
+    "sourceSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960",
+    "archiveSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960"
+  },
+  {
+    "source": "runs/warm-angular-1/observations/warm-marker-E5-child.json",
+    "archive": "runs/warm-angular-1/observations/warm-marker-E5-child.json",
+    "sourceSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e",
+    "archiveSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e"
+  },
+  {
+    "source": "runs/warm-angular-1/observations/warm-marker-E3.json",
+    "archive": "runs/warm-angular-1/observations/warm-marker-E3.json",
+    "sourceSha256": "4dd815fd172bd69b34f584e05b638132b6b93d36e699a19b8d12156a930167c3",
+    "archiveSha256": "4dd815fd172bd69b34f584e05b638132b6b93d36e699a19b8d12156a930167c3"
+  },
+  {
+    "source": "runs/reentry-kernel-final/RESULT.json",
+    "archive": "runs/reentry-kernel-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/reentry-kernel-final/first.log",
+    "archive": "runs/reentry-kernel-final/first.log",
+    "sourceSha256": "111433eef444f90942a838e3cab1f25956934bcde10e18428731836a183721fc",
+    "archiveSha256": "111433eef444f90942a838e3cab1f25956934bcde10e18428731836a183721fc"
+  },
+  {
+    "source": "runs/reentry-kernel-final/SOURCE-BEFORE.json",
+    "archive": "runs/reentry-kernel-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/reentry-kernel-final/COMMAND.json",
+    "archive": "runs/reentry-kernel-final/COMMAND.json",
+    "sourceSha256": "b418dbb1cbaea484e165e8b1147bb929375bfe2dc4b10427f415d5718de85f7e",
+    "archiveSha256": "b418dbb1cbaea484e165e8b1147bb929375bfe2dc4b10427f415d5718de85f7e"
+  },
+  {
+    "source": "runs/reentry-kernel-final/observations/marker-E5-child.json",
+    "archive": "runs/reentry-kernel-final/observations/marker-E5-child.json",
+    "sourceSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742",
+    "archiveSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742"
+  },
+  {
+    "source": "runs/reentry-kernel-final/observations/sort-E4.json",
+    "archive": "runs/reentry-kernel-final/observations/sort-E4.json",
+    "sourceSha256": "da1d12256fe3ba6a8990322fd39d7abec03510bec28841e54f4325827f6c792d",
+    "archiveSha256": "da1d12256fe3ba6a8990322fd39d7abec03510bec28841e54f4325827f6c792d"
+  },
+  {
+    "source": "runs/reentry-kernel-final/observations/marker-E5-self.json",
+    "archive": "runs/reentry-kernel-final/observations/marker-E5-self.json",
+    "sourceSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f",
+    "archiveSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f"
+  },
+  {
+    "source": "runs/reentry-kernel-final/observations/marker-E1.json",
+    "archive": "runs/reentry-kernel-final/observations/marker-E1.json",
+    "sourceSha256": "ae7ba2b4d37374cc27131515f77b5b31eacd8567ea376cfd6830ba0a77de7892",
+    "archiveSha256": "ae7ba2b4d37374cc27131515f77b5b31eacd8567ea376cfd6830ba0a77de7892"
+  },
+  {
+    "source": "runs/reentry-kernel-final/observations/marker-E3.json",
+    "archive": "runs/reentry-kernel-final/observations/marker-E3.json",
+    "sourceSha256": "50f618829100dab9cd628de00b66a2ac048daca3dac6cd23140590407e870638",
+    "archiveSha256": "50f618829100dab9cd628de00b66a2ac048daca3dac6cd23140590407e870638"
+  },
+  {
+    "source": "runs/reentry-kernel-final/observations/marker-E4.json",
+    "archive": "runs/reentry-kernel-final/observations/marker-E4.json",
+    "sourceSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a",
+    "archiveSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a"
+  },
+  {
+    "source": "runs/focused-angular-2/RESULT.json",
+    "archive": "runs/focused-angular-2/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/focused-angular-2/first.log",
+    "archive": "runs/focused-angular-2/first.log",
+    "sourceSha256": "ce3c94fe9f7525274d30f465f52265c7e7813e5841c7bcbb042954b9a93bc2b4",
+    "archiveSha256": "ce3c94fe9f7525274d30f465f52265c7e7813e5841c7bcbb042954b9a93bc2b4"
+  },
+  {
+    "source": "runs/focused-angular-2/SOURCE-BEFORE.json",
+    "archive": "runs/focused-angular-2/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "c8c27f9b517069a57dee91d40ceec9f9e59ec59dc058a90c8a44b088032ce341",
+    "archiveSha256": "4b13545833c135aae8917069f6d2a77c3edc3dcf9245f17069948c83ed937478"
+  },
+  {
+    "source": "runs/focused-angular-2/COMMAND.json",
+    "archive": "runs/focused-angular-2/COMMAND.json",
+    "sourceSha256": "da1ee6822a6eecb882f44e3ac7c4ae6ea216271d98f92da49e5076321ca1b23d",
+    "archiveSha256": "da1ee6822a6eecb882f44e3ac7c4ae6ea216271d98f92da49e5076321ca1b23d"
+  },
+  {
+    "source": "runs/focused-angular-2/observations/terminal-window.json",
+    "archive": "runs/focused-angular-2/observations/terminal-window.json",
+    "sourceSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183",
+    "archiveSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183"
+  },
+  {
+    "source": "runs/focused-angular-2/observations/direct-capture.json",
+    "archive": "runs/focused-angular-2/observations/direct-capture.json",
+    "sourceSha256": "e8e3d60bf38454952d9c5808dae4c87ea8ed3924fe98252d7fd4bf415aed06f1",
+    "archiveSha256": "e8e3d60bf38454952d9c5808dae4c87ea8ed3924fe98252d7fd4bf415aed06f1"
+  },
+  {
+    "source": "runs/focused-angular-2/observations/builder-work.json",
+    "archive": "runs/focused-angular-2/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/focused-kernel-1/RESULT.json",
+    "archive": "runs/focused-kernel-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/focused-kernel-1/first.log",
+    "archive": "runs/focused-kernel-1/first.log",
+    "sourceSha256": "eb6ec481072165aee4f57875ed37377ddb0ac4a8f694e0d7ea489f641fd1b603",
+    "archiveSha256": "eb6ec481072165aee4f57875ed37377ddb0ac4a8f694e0d7ea489f641fd1b603"
+  },
+  {
+    "source": "runs/focused-kernel-1/SOURCE-BEFORE.json",
+    "archive": "runs/focused-kernel-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9dc4b87b410b9d86e7ecdfe5633977d7eef8dcd5d8c9fb1452d92d66d360ec99",
+    "archiveSha256": "89a94daa18e25518829b379f80b1215930d1fee7105fe2fe2585675a8d4e6a60"
+  },
+  {
+    "source": "runs/focused-kernel-1/COMMAND.json",
+    "archive": "runs/focused-kernel-1/COMMAND.json",
+    "sourceSha256": "438b78ed3f08e8afe4f784306cf148481692c10b77e588a8a0585b1aa77ba31f",
+    "archiveSha256": "438b78ed3f08e8afe4f784306cf148481692c10b77e588a8a0585b1aa77ba31f"
+  },
+  {
+    "source": "runs/focused-kernel-1/observations/terminal-window.json",
+    "archive": "runs/focused-kernel-1/observations/terminal-window.json",
+    "sourceSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5",
+    "archiveSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5"
+  },
+  {
+    "source": "runs/focused-kernel-1/observations/builder-work.json",
+    "archive": "runs/focused-kernel-1/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/spec-types-3/RESULT.json",
+    "archive": "runs/spec-types-3/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/spec-types-3/first.log",
+    "archive": "runs/spec-types-3/first.log",
+    "sourceSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  {
+    "source": "runs/spec-types-3/SOURCE-BEFORE.json",
+    "archive": "runs/spec-types-3/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "c8c27f9b517069a57dee91d40ceec9f9e59ec59dc058a90c8a44b088032ce341",
+    "archiveSha256": "4b13545833c135aae8917069f6d2a77c3edc3dcf9245f17069948c83ed937478"
+  },
+  {
+    "source": "runs/spec-types-3/COMMAND.json",
+    "archive": "runs/spec-types-3/COMMAND.json",
+    "sourceSha256": "95b3299a5a226f1274fc9752032c3847675b4264c1f291887b29cb36828a7a80",
+    "archiveSha256": "95b3299a5a226f1274fc9752032c3847675b4264c1f291887b29cb36828a7a80"
+  },
+  {
+    "source": "runs/final-kernel/RESULT.json",
+    "archive": "runs/final-kernel/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/final-kernel/first.log",
+    "archive": "runs/final-kernel/first.log",
+    "sourceSha256": "ce698f2a905c29dcf8b85dcabf20e236321f2bcea622694a8500946c954d5242",
+    "archiveSha256": "ce698f2a905c29dcf8b85dcabf20e236321f2bcea622694a8500946c954d5242"
+  },
+  {
+    "source": "runs/final-kernel/SOURCE-BEFORE.json",
+    "archive": "runs/final-kernel/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/final-kernel/COMMAND.json",
+    "archive": "runs/final-kernel/COMMAND.json",
+    "sourceSha256": "16c49ca231cb7f5032f1f23fe9f89c990bfbeb398cc7fd07d8fa8eb00e44cfb2",
+    "archiveSha256": "16c49ca231cb7f5032f1f23fe9f89c990bfbeb398cc7fd07d8fa8eb00e44cfb2"
+  },
+  {
+    "source": "runs/final-kernel/observations/kernel-ordinary.json",
+    "archive": "runs/final-kernel/observations/kernel-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/final-kernel/observations/terminal-window.json",
+    "archive": "runs/final-kernel/observations/terminal-window.json",
+    "sourceSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5",
+    "archiveSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5"
+  },
+  {
+    "source": "runs/final-kernel/observations/direct-capture.json",
+    "archive": "runs/final-kernel/observations/direct-capture.json",
+    "sourceSha256": "3760490e25d7a149b1e25cb28bc8dd27fd2d5e2d2aea075c42f7ca0dceedd01e",
+    "archiveSha256": "3760490e25d7a149b1e25cb28bc8dd27fd2d5e2d2aea075c42f7ca0dceedd01e"
+  },
+  {
+    "source": "runs/final-kernel/observations/builder-work.json",
+    "archive": "runs/final-kernel/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/final-kernel/observations/kernel-keyed.json",
+    "archive": "runs/final-kernel/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/reentry-angular-1/RESULT.json",
+    "archive": "runs/reentry-angular-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/reentry-angular-1/first.log",
+    "archive": "runs/reentry-angular-1/first.log",
+    "sourceSha256": "56a26dafb3bf6bcabdfcafdb50958433bcd1a1580a1bd3abea8cf90e803a3367",
+    "archiveSha256": "56a26dafb3bf6bcabdfcafdb50958433bcd1a1580a1bd3abea8cf90e803a3367"
+  },
+  {
+    "source": "runs/reentry-angular-1/SOURCE-BEFORE.json",
+    "archive": "runs/reentry-angular-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "f1c440cdb981a1520c487663741cf904d5e784f1f13db16f0a3fdce092320c71",
+    "archiveSha256": "e2166a94b2770c84e29740198103478b1411fd94b07fb24c68fb699461accc00"
+  },
+  {
+    "source": "runs/reentry-angular-1/COMMAND.json",
+    "archive": "runs/reentry-angular-1/COMMAND.json",
+    "sourceSha256": "70212c4edd510ed91ece5946d08e24e3ab9a303dd91ab983fde17a4d31a61d65",
+    "archiveSha256": "70212c4edd510ed91ece5946d08e24e3ab9a303dd91ab983fde17a4d31a61d65"
+  },
+  {
+    "source": "runs/reentry-angular-1/observations/marker-E5-child.json",
+    "archive": "runs/reentry-angular-1/observations/marker-E5-child.json",
+    "sourceSha256": "6f83017025785c1b5aff7e4fd9ab96e472070364f13764e04962f63e0fa5df30",
+    "archiveSha256": "6f83017025785c1b5aff7e4fd9ab96e472070364f13764e04962f63e0fa5df30"
+  },
+  {
+    "source": "runs/reentry-angular-1/observations/sort-E4.json",
+    "archive": "runs/reentry-angular-1/observations/sort-E4.json",
+    "sourceSha256": "ed7e1b277f5476e4f3ab1cd6bf557fcf298216243f354aabefa82e3e2e0ee084",
+    "archiveSha256": "ed7e1b277f5476e4f3ab1cd6bf557fcf298216243f354aabefa82e3e2e0ee084"
+  },
+  {
+    "source": "runs/reentry-angular-1/observations/marker-E5-self.json",
+    "archive": "runs/reentry-angular-1/observations/marker-E5-self.json",
+    "sourceSha256": "db13be2b4b2af9e3b7343bad75bcb3c2556972894677a48f7dc57b013c2b6589",
+    "archiveSha256": "db13be2b4b2af9e3b7343bad75bcb3c2556972894677a48f7dc57b013c2b6589"
+  },
+  {
+    "source": "runs/reentry-angular-1/observations/marker-E1.json",
+    "archive": "runs/reentry-angular-1/observations/marker-E1.json",
+    "sourceSha256": "633f59f4e11de9f9e0e9029b0504aec6319e853b08671682c0ef4673d206041f",
+    "archiveSha256": "633f59f4e11de9f9e0e9029b0504aec6319e853b08671682c0ef4673d206041f"
+  },
+  {
+    "source": "runs/reentry-angular-1/observations/marker-E3.json",
+    "archive": "runs/reentry-angular-1/observations/marker-E3.json",
+    "sourceSha256": "4f75d7b6a4789b0e99dac75a2ee1de4e23400089cb07e34272a84bb7c67773bd",
+    "archiveSha256": "4f75d7b6a4789b0e99dac75a2ee1de4e23400089cb07e34272a84bb7c67773bd"
+  },
+  {
+    "source": "runs/reentry-angular-1/observations/marker-E4.json",
+    "archive": "runs/reentry-angular-1/observations/marker-E4.json",
+    "sourceSha256": "1fcc7f3cc44a738ae9fc39d1952c14c642ae330ae949394956177f2cd813f6a5",
+    "archiveSha256": "1fcc7f3cc44a738ae9fc39d1952c14c642ae330ae949394956177f2cd813f6a5"
+  },
+  {
+    "source": "runs/spec-types-2/RESULT.json",
+    "archive": "runs/spec-types-2/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/spec-types-2/first.log",
+    "archive": "runs/spec-types-2/first.log",
+    "sourceSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  {
+    "source": "runs/spec-types-2/SOURCE-BEFORE.json",
+    "archive": "runs/spec-types-2/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "dc9daad88f832e7d7fe03561f4ed007dd4dc0b0c59f91533e7a27098579a8f60",
+    "archiveSha256": "fa0aa4d172a807c5ddb2193d1058d39165adc3225b8b7e9efe110dff84045ebc"
+  },
+  {
+    "source": "runs/spec-types-2/COMMAND.json",
+    "archive": "runs/spec-types-2/COMMAND.json",
+    "sourceSha256": "46884a4bb8f932f03eaed225cabfc1bcc34205f5e6ef0478cf9454d284446606",
+    "archiveSha256": "46884a4bb8f932f03eaed225cabfc1bcc34205f5e6ef0478cf9454d284446606"
+  },
+  {
+    "source": "runs/warm-oracle-angular/RESULT.json",
+    "archive": "runs/warm-oracle-angular/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/warm-oracle-angular/first.log",
+    "archive": "runs/warm-oracle-angular/first.log",
+    "sourceSha256": "2119af200e04f70ec8922b029957bc2ac8f415f90002ca185eaf4f0bf628b465",
+    "archiveSha256": "2119af200e04f70ec8922b029957bc2ac8f415f90002ca185eaf4f0bf628b465"
+  },
+  {
+    "source": "runs/warm-oracle-angular/SOURCE-BEFORE.json",
+    "archive": "runs/warm-oracle-angular/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9e022295d01b761258f65acba9939b88d25c8a9c5670e68b0964bab696b760c7",
+    "archiveSha256": "b6b25d6a62a6def298e39c301496585ec382f14d1b66e5904608c74d02b9e51e"
+  },
+  {
+    "source": "runs/warm-oracle-angular/COMMAND.json",
+    "archive": "runs/warm-oracle-angular/COMMAND.json",
+    "sourceSha256": "90d8e26ac2e4556efcea56ef9e094252f95ec0fd2319c01542a6da9d56e87636",
+    "archiveSha256": "90d8e26ac2e4556efcea56ef9e094252f95ec0fd2319c01542a6da9d56e87636"
+  },
+  {
+    "source": "runs/warm-oracle-angular/observations/warm-marker-E5-self.json",
+    "archive": "runs/warm-oracle-angular/observations/warm-marker-E5-self.json",
+    "sourceSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f",
+    "archiveSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f"
+  },
+  {
+    "source": "runs/warm-oracle-angular/observations/warm-marker-E4.json",
+    "archive": "runs/warm-oracle-angular/observations/warm-marker-E4.json",
+    "sourceSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960",
+    "archiveSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960"
+  },
+  {
+    "source": "runs/warm-oracle-angular/observations/warm-marker-E5-child.json",
+    "archive": "runs/warm-oracle-angular/observations/warm-marker-E5-child.json",
+    "sourceSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e",
+    "archiveSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e"
+  },
+  {
+    "source": "runs/warm-oracle-angular/observations/warm-marker-E3.json",
+    "archive": "runs/warm-oracle-angular/observations/warm-marker-E3.json",
+    "sourceSha256": "0f79cd94aedeca1df6255ae51cdf26ae31677a5a1e2367a38abf593aa34694fb",
+    "archiveSha256": "0f79cd94aedeca1df6255ae51cdf26ae31677a5a1e2367a38abf593aa34694fb"
+  },
+  {
+    "source": "runs/parent-angular-1/RESULT.json",
+    "archive": "runs/parent-angular-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/parent-angular-1/first.log",
+    "archive": "runs/parent-angular-1/first.log",
+    "sourceSha256": "688c60e79ab07dafdf794660d94eef0eda2afe13d3038a2e045f8db9a918c4cb",
+    "archiveSha256": "688c60e79ab07dafdf794660d94eef0eda2afe13d3038a2e045f8db9a918c4cb"
+  },
+  {
+    "source": "runs/parent-angular-1/SOURCE-BEFORE.json",
+    "archive": "runs/parent-angular-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "6b393e212d7034e90d0d0f59af6f76a7859c7d2e42a4308bb9bf79fc7045adc2",
+    "archiveSha256": "8e6b636379f873453bae89d2c546255bffc4c8f57aea1f16ce4ddcf07f15faaf"
+  },
+  {
+    "source": "runs/parent-angular-1/COMMAND.json",
+    "archive": "runs/parent-angular-1/COMMAND.json",
+    "sourceSha256": "df9b6bcfcce6d2839b6482b260f5718fb2a0e917b1f37ccf49ce895843f8e386",
+    "archiveSha256": "df9b6bcfcce6d2839b6482b260f5718fb2a0e917b1f37ccf49ce895843f8e386"
+  },
+  {
+    "source": "runs/parent-angular-1/observations/angular-ordinary.json",
+    "archive": "runs/parent-angular-1/observations/angular-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/parent-angular-1/observations/angular-native-timing.json",
+    "archive": "runs/parent-angular-1/observations/angular-native-timing.json",
+    "sourceSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158",
+    "archiveSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158"
+  },
+  {
+    "source": "runs/parent-angular-1/observations/angular-keyed.json",
+    "archive": "runs/parent-angular-1/observations/angular-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/parent-kernel-1/RESULT.json",
+    "archive": "runs/parent-kernel-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/parent-kernel-1/first.log",
+    "archive": "runs/parent-kernel-1/first.log",
+    "sourceSha256": "473a66d8dd7f92fda00fa0e65c183ab30eca8fa021a5155e6ad3fffd7b13d70d",
+    "archiveSha256": "473a66d8dd7f92fda00fa0e65c183ab30eca8fa021a5155e6ad3fffd7b13d70d"
+  },
+  {
+    "source": "runs/parent-kernel-1/SOURCE-BEFORE.json",
+    "archive": "runs/parent-kernel-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "6b393e212d7034e90d0d0f59af6f76a7859c7d2e42a4308bb9bf79fc7045adc2",
+    "archiveSha256": "8e6b636379f873453bae89d2c546255bffc4c8f57aea1f16ce4ddcf07f15faaf"
+  },
+  {
+    "source": "runs/parent-kernel-1/COMMAND.json",
+    "archive": "runs/parent-kernel-1/COMMAND.json",
+    "sourceSha256": "7ae3adc60951cbc0db83af84f765f443a8dcd80554c670cb14067b2229424d3f",
+    "archiveSha256": "7ae3adc60951cbc0db83af84f765f443a8dcd80554c670cb14067b2229424d3f"
+  },
+  {
+    "source": "runs/parent-kernel-1/observations/kernel-ordinary.json",
+    "archive": "runs/parent-kernel-1/observations/kernel-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/parent-kernel-1/observations/kernel-keyed.json",
+    "archive": "runs/parent-kernel-1/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/grouped-oracle-kernel/RESULT.json",
+    "archive": "runs/grouped-oracle-kernel/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/grouped-oracle-kernel/first.log",
+    "archive": "runs/grouped-oracle-kernel/first.log",
+    "sourceSha256": "4b4eb4ab5716b408a6c1bdc2f19a1a7bd10493b6cd6f3bcc86a9e05379024256",
+    "archiveSha256": "4b4eb4ab5716b408a6c1bdc2f19a1a7bd10493b6cd6f3bcc86a9e05379024256"
+  },
+  {
+    "source": "runs/grouped-oracle-kernel/SOURCE-BEFORE.json",
+    "archive": "runs/grouped-oracle-kernel/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9e022295d01b761258f65acba9939b88d25c8a9c5670e68b0964bab696b760c7",
+    "archiveSha256": "b6b25d6a62a6def298e39c301496585ec382f14d1b66e5904608c74d02b9e51e"
+  },
+  {
+    "source": "runs/grouped-oracle-kernel/COMMAND.json",
+    "archive": "runs/grouped-oracle-kernel/COMMAND.json",
+    "sourceSha256": "d3cb038d95af4f6f5941301484db0929397d82c38dd112413f8c4f0b9582d151",
+    "archiveSha256": "d3cb038d95af4f6f5941301484db0929397d82c38dd112413f8c4f0b9582d151"
+  },
+  {
+    "source": "runs/grouped-oracle-kernel/observations/sorted-false.json",
+    "archive": "runs/grouped-oracle-kernel/observations/sorted-false.json",
+    "sourceSha256": "9e300b13dc3f621baabca52cca87352a879246a0ff86636b2b8d19081ca8dc13",
+    "archiveSha256": "9e300b13dc3f621baabca52cca87352a879246a0ff86636b2b8d19081ca8dc13"
+  },
+  {
+    "source": "runs/grouped-oracle-kernel/observations/sorted-true.json",
+    "archive": "runs/grouped-oracle-kernel/observations/sorted-true.json",
+    "sourceSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63",
+    "archiveSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63"
+  },
+  {
+    "source": "runs/grouped-angular-1/RESULT.json",
+    "archive": "runs/grouped-angular-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/grouped-angular-1/first.log",
+    "archive": "runs/grouped-angular-1/first.log",
+    "sourceSha256": "1d81dc7058c2efee5cf18b5231dedf1b00127a46b79ee0ef07b344cfb8986104",
+    "archiveSha256": "1d81dc7058c2efee5cf18b5231dedf1b00127a46b79ee0ef07b344cfb8986104"
+  },
+  {
+    "source": "runs/grouped-angular-1/SOURCE-BEFORE.json",
+    "archive": "runs/grouped-angular-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "f1c440cdb981a1520c487663741cf904d5e784f1f13db16f0a3fdce092320c71",
+    "archiveSha256": "e2166a94b2770c84e29740198103478b1411fd94b07fb24c68fb699461accc00"
+  },
+  {
+    "source": "runs/grouped-angular-1/COMMAND.json",
+    "archive": "runs/grouped-angular-1/COMMAND.json",
+    "sourceSha256": "284cbac504943378dcabeee6e4c4f4c36ec0425efa165ec80da682f04069b812",
+    "archiveSha256": "284cbac504943378dcabeee6e4c4f4c36ec0425efa165ec80da682f04069b812"
+  },
+  {
+    "source": "runs/grouped-angular-1/observations/sorted-false.json",
+    "archive": "runs/grouped-angular-1/observations/sorted-false.json",
+    "sourceSha256": "4f032dffa3c396378661726281964bfae0f3494f168a0a246979b2ae9efec074",
+    "archiveSha256": "4f032dffa3c396378661726281964bfae0f3494f168a0a246979b2ae9efec074"
+  },
+  {
+    "source": "runs/grouped-angular-1/observations/sorted-true.json",
+    "archive": "runs/grouped-angular-1/observations/sorted-true.json",
+    "sourceSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446",
+    "archiveSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/RESULT.json",
+    "archive": "runs/reentry-oracle-kernel/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/first.log",
+    "archive": "runs/reentry-oracle-kernel/first.log",
+    "sourceSha256": "d44b640cc3c6f215296d6066cb8c1cb3d9cd9d053e623652908bfeb4d8b82e10",
+    "archiveSha256": "d44b640cc3c6f215296d6066cb8c1cb3d9cd9d053e623652908bfeb4d8b82e10"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/SOURCE-BEFORE.json",
+    "archive": "runs/reentry-oracle-kernel/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9e022295d01b761258f65acba9939b88d25c8a9c5670e68b0964bab696b760c7",
+    "archiveSha256": "b6b25d6a62a6def298e39c301496585ec382f14d1b66e5904608c74d02b9e51e"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/COMMAND.json",
+    "archive": "runs/reentry-oracle-kernel/COMMAND.json",
+    "sourceSha256": "c6a5659206577e6df9210f6e44e934bf4ae26beaaa16e177f750f5c3b0e50d8c",
+    "archiveSha256": "c6a5659206577e6df9210f6e44e934bf4ae26beaaa16e177f750f5c3b0e50d8c"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/observations/marker-E5-child.json",
+    "archive": "runs/reentry-oracle-kernel/observations/marker-E5-child.json",
+    "sourceSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742",
+    "archiveSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/observations/sort-E4.json",
+    "archive": "runs/reentry-oracle-kernel/observations/sort-E4.json",
+    "sourceSha256": "7109f53b9592dc2235b8bfca4c3aa92a619698d950eecfc7e6af1ebf8588a698",
+    "archiveSha256": "7109f53b9592dc2235b8bfca4c3aa92a619698d950eecfc7e6af1ebf8588a698"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/observations/marker-E5-self.json",
+    "archive": "runs/reentry-oracle-kernel/observations/marker-E5-self.json",
+    "sourceSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f",
+    "archiveSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/observations/marker-E1.json",
+    "archive": "runs/reentry-oracle-kernel/observations/marker-E1.json",
+    "sourceSha256": "73119760d52b78d57dafd4d517aa846ef6cf1028644fe1618bb12d659400e367",
+    "archiveSha256": "73119760d52b78d57dafd4d517aa846ef6cf1028644fe1618bb12d659400e367"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/observations/marker-E3.json",
+    "archive": "runs/reentry-oracle-kernel/observations/marker-E3.json",
+    "sourceSha256": "6fc1a24ceeac5dba98c9fbc137ec4bac1be52769cadd4a1a559f3f7f4178f35e",
+    "archiveSha256": "6fc1a24ceeac5dba98c9fbc137ec4bac1be52769cadd4a1a559f3f7f4178f35e"
+  },
+  {
+    "source": "runs/reentry-oracle-kernel/observations/marker-E4.json",
+    "archive": "runs/reentry-oracle-kernel/observations/marker-E4.json",
+    "sourceSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a",
+    "archiveSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a"
+  },
+  {
+    "source": "runs/callbacks-angular-final/RESULT.json",
+    "archive": "runs/callbacks-angular-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/callbacks-angular-final/first.log",
+    "archive": "runs/callbacks-angular-final/first.log",
+    "sourceSha256": "b8bd83039f26477ad22434095c4a48c1d9f8148863228e291ebfcc30f8b36657",
+    "archiveSha256": "b8bd83039f26477ad22434095c4a48c1d9f8148863228e291ebfcc30f8b36657"
+  },
+  {
+    "source": "runs/callbacks-angular-final/SOURCE-BEFORE.json",
+    "archive": "runs/callbacks-angular-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/callbacks-angular-final/COMMAND.json",
+    "archive": "runs/callbacks-angular-final/COMMAND.json",
+    "sourceSha256": "132a7218a5093f89b4ab03d9536110811ed526f4c64ae48e6696a6c190cf6522",
+    "archiveSha256": "132a7218a5093f89b4ab03d9536110811ed526f4c64ae48e6696a6c190cf6522"
+  },
+  {
+    "source": "runs/callbacks-angular-final/observations/sorted-false.json",
+    "archive": "runs/callbacks-angular-final/observations/sorted-false.json",
+    "sourceSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6",
+    "archiveSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6"
+  },
+  {
+    "source": "runs/callbacks-angular-final/observations/sorted-true.json",
+    "archive": "runs/callbacks-angular-final/observations/sorted-true.json",
+    "sourceSha256": "34cf759cf06bcb08997f2238887dbe36c900444b65f87a88f0c5a242e9e7e289",
+    "archiveSha256": "34cf759cf06bcb08997f2238887dbe36c900444b65f87a88f0c5a242e9e7e289"
+  },
+  {
+    "source": "runs/grouped-oracle-angular/RESULT.json",
+    "archive": "runs/grouped-oracle-angular/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/grouped-oracle-angular/first.log",
+    "archive": "runs/grouped-oracle-angular/first.log",
+    "sourceSha256": "9026838d47a0b11a2dcfd7e8cba2ea9a6d10e236f48e218d84f05a97d8a119ca",
+    "archiveSha256": "9026838d47a0b11a2dcfd7e8cba2ea9a6d10e236f48e218d84f05a97d8a119ca"
+  },
+  {
+    "source": "runs/grouped-oracle-angular/SOURCE-BEFORE.json",
+    "archive": "runs/grouped-oracle-angular/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9e022295d01b761258f65acba9939b88d25c8a9c5670e68b0964bab696b760c7",
+    "archiveSha256": "b6b25d6a62a6def298e39c301496585ec382f14d1b66e5904608c74d02b9e51e"
+  },
+  {
+    "source": "runs/grouped-oracle-angular/COMMAND.json",
+    "archive": "runs/grouped-oracle-angular/COMMAND.json",
+    "sourceSha256": "43629e5f1d5684d52fafaa88a1013c690ee3249f86522820a3f177aec81ce70b",
+    "archiveSha256": "43629e5f1d5684d52fafaa88a1013c690ee3249f86522820a3f177aec81ce70b"
+  },
+  {
+    "source": "runs/grouped-oracle-angular/observations/sorted-false.json",
+    "archive": "runs/grouped-oracle-angular/observations/sorted-false.json",
+    "sourceSha256": "fa9db5956f45863cf3ef3d4efe7879630a2c76192612fd94bd7ccfbb5745495d",
+    "archiveSha256": "fa9db5956f45863cf3ef3d4efe7879630a2c76192612fd94bd7ccfbb5745495d"
+  },
+  {
+    "source": "runs/grouped-oracle-angular/observations/sorted-true.json",
+    "archive": "runs/grouped-oracle-angular/observations/sorted-true.json",
+    "sourceSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63",
+    "archiveSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63"
+  },
+  {
+    "source": "runs/callbacks-angular-1/RESULT.json",
+    "archive": "runs/callbacks-angular-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/callbacks-angular-1/first.log",
+    "archive": "runs/callbacks-angular-1/first.log",
+    "sourceSha256": "5af88cb934292e69a88c058cfa61c6000f98acee47b8662a7cf5923401405bec",
+    "archiveSha256": "5af88cb934292e69a88c058cfa61c6000f98acee47b8662a7cf5923401405bec"
+  },
+  {
+    "source": "runs/callbacks-angular-1/SOURCE-BEFORE.json",
+    "archive": "runs/callbacks-angular-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "dc9daad88f832e7d7fe03561f4ed007dd4dc0b0c59f91533e7a27098579a8f60",
+    "archiveSha256": "fa0aa4d172a807c5ddb2193d1058d39165adc3225b8b7e9efe110dff84045ebc"
+  },
+  {
+    "source": "runs/callbacks-angular-1/COMMAND.json",
+    "archive": "runs/callbacks-angular-1/COMMAND.json",
+    "sourceSha256": "961fe7f999310721ed41077e51f205b6ef8a57807fff9beadb57f1acabae82b7",
+    "archiveSha256": "961fe7f999310721ed41077e51f205b6ef8a57807fff9beadb57f1acabae82b7"
+  },
+  {
+    "source": "runs/callbacks-angular-1/observations/sorted-false.json",
+    "archive": "runs/callbacks-angular-1/observations/sorted-false.json",
+    "sourceSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6",
+    "archiveSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6"
+  },
+  {
+    "source": "runs/callbacks-angular-1/observations/sorted-true.json",
+    "archive": "runs/callbacks-angular-1/observations/sorted-true.json",
+    "sourceSha256": "34cf759cf06bcb08997f2238887dbe36c900444b65f87a88f0c5a242e9e7e289",
+    "archiveSha256": "34cf759cf06bcb08997f2238887dbe36c900444b65f87a88f0c5a242e9e7e289"
+  },
+  {
+    "source": "runs/final-angular/RESULT.json",
+    "archive": "runs/final-angular/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/final-angular/first.log",
+    "archive": "runs/final-angular/first.log",
+    "sourceSha256": "1ce52d56a29126df319725999496f0bd0c5b150be25acb9b1b4f0251d207af78",
+    "archiveSha256": "1ce52d56a29126df319725999496f0bd0c5b150be25acb9b1b4f0251d207af78"
+  },
+  {
+    "source": "runs/final-angular/SOURCE-BEFORE.json",
+    "archive": "runs/final-angular/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/final-angular/COMMAND.json",
+    "archive": "runs/final-angular/COMMAND.json",
+    "sourceSha256": "24ecd04b240d7f94a08b691b86c9fb3f1c17bb7fa6e453e4d2fb8f436425b46d",
+    "archiveSha256": "24ecd04b240d7f94a08b691b86c9fb3f1c17bb7fa6e453e4d2fb8f436425b46d"
+  },
+  {
+    "source": "runs/final-angular/observations/angular-ordinary.json",
+    "archive": "runs/final-angular/observations/angular-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/final-angular/observations/angular-native-timing.json",
+    "archive": "runs/final-angular/observations/angular-native-timing.json",
+    "sourceSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158",
+    "archiveSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158"
+  },
+  {
+    "source": "runs/final-angular/observations/terminal-window.json",
+    "archive": "runs/final-angular/observations/terminal-window.json",
+    "sourceSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183",
+    "archiveSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183"
+  },
+  {
+    "source": "runs/final-angular/observations/direct-capture.json",
+    "archive": "runs/final-angular/observations/direct-capture.json",
+    "sourceSha256": "e8e3d60bf38454952d9c5808dae4c87ea8ed3924fe98252d7fd4bf415aed06f1",
+    "archiveSha256": "e8e3d60bf38454952d9c5808dae4c87ea8ed3924fe98252d7fd4bf415aed06f1"
+  },
+  {
+    "source": "runs/final-angular/observations/builder-work.json",
+    "archive": "runs/final-angular/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/final-angular/observations/angular-keyed.json",
+    "archive": "runs/final-angular/observations/angular-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/plain-angular-final/RESULT.json",
+    "archive": "runs/plain-angular-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/plain-angular-final/first.log",
+    "archive": "runs/plain-angular-final/first.log",
+    "sourceSha256": "165e4f0d9d65dbe4e2a0907bcf29fbedb3805c6b7d43e63947dc2da13d65cfb2",
+    "archiveSha256": "165e4f0d9d65dbe4e2a0907bcf29fbedb3805c6b7d43e63947dc2da13d65cfb2"
+  },
+  {
+    "source": "runs/plain-angular-final/SOURCE-BEFORE.json",
+    "archive": "runs/plain-angular-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "dc9daad88f832e7d7fe03561f4ed007dd4dc0b0c59f91533e7a27098579a8f60",
+    "archiveSha256": "fa0aa4d172a807c5ddb2193d1058d39165adc3225b8b7e9efe110dff84045ebc"
+  },
+  {
+    "source": "runs/plain-angular-final/COMMAND.json",
+    "archive": "runs/plain-angular-final/COMMAND.json",
+    "sourceSha256": "6b57d04e84c95d5736bb63c3dc04b8d429e1a26619960cab26c28008e58d3671",
+    "archiveSha256": "6b57d04e84c95d5736bb63c3dc04b8d429e1a26619960cab26c28008e58d3671"
+  },
+  {
+    "source": "runs/plain-angular-final/observations/angular-ordinary.json",
+    "archive": "runs/plain-angular-final/observations/angular-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/plain-angular-final/observations/angular-native-timing.json",
+    "archive": "runs/plain-angular-final/observations/angular-native-timing.json",
+    "sourceSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158",
+    "archiveSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158"
+  },
+  {
+    "source": "runs/plain-angular-final/observations/terminal-window.json",
+    "archive": "runs/plain-angular-final/observations/terminal-window.json",
+    "sourceSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183",
+    "archiveSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183"
+  },
+  {
+    "source": "runs/plain-angular-final/observations/builder-work.json",
+    "archive": "runs/plain-angular-final/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/plain-angular-final/observations/angular-keyed.json",
+    "archive": "runs/plain-angular-final/observations/angular-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/callbacks-oracle-kernel/RESULT.json",
+    "archive": "runs/callbacks-oracle-kernel/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/callbacks-oracle-kernel/first.log",
+    "archive": "runs/callbacks-oracle-kernel/first.log",
+    "sourceSha256": "431dac2d6fdc13abe37677ae174f9d41b5785991e81827f01fd95ff2b41091e6",
+    "archiveSha256": "431dac2d6fdc13abe37677ae174f9d41b5785991e81827f01fd95ff2b41091e6"
+  },
+  {
+    "source": "runs/callbacks-oracle-kernel/SOURCE-BEFORE.json",
+    "archive": "runs/callbacks-oracle-kernel/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "167d71f5454b4fed8d75c16d31efdc4baf6f1f4af3db9b34c5cdd646ed2c8c5d",
+    "archiveSha256": "c92f0eb25ffc0ddb9bd422a12ef1337d750fcc63509ea2669296a1ee7ce56382"
+  },
+  {
+    "source": "runs/callbacks-oracle-kernel/COMMAND.json",
+    "archive": "runs/callbacks-oracle-kernel/COMMAND.json",
+    "sourceSha256": "8eec76842c8690dba1cd7b59f782545e2494cee827ba7fc927c78ed17d2a1d92",
+    "archiveSha256": "8eec76842c8690dba1cd7b59f782545e2494cee827ba7fc927c78ed17d2a1d92"
+  },
+  {
+    "source": "runs/callbacks-oracle-kernel/observations/sorted-false.json",
+    "archive": "runs/callbacks-oracle-kernel/observations/sorted-false.json",
+    "sourceSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6",
+    "archiveSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6"
+  },
+  {
+    "source": "runs/callbacks-oracle-kernel/observations/sorted-true.json",
+    "archive": "runs/callbacks-oracle-kernel/observations/sorted-true.json",
+    "sourceSha256": "a7fbb2c834f371fa8b7bc16b596f212296146c284da618f6eec47be1ed73a354",
+    "archiveSha256": "a7fbb2c834f371fa8b7bc16b596f212296146c284da618f6eec47be1ed73a354"
+  },
+  {
+    "source": "runs/spec-types-final/RESULT.json",
+    "archive": "runs/spec-types-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/spec-types-final/first.log",
+    "archive": "runs/spec-types-final/first.log",
+    "sourceSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  {
+    "source": "runs/spec-types-final/SOURCE-BEFORE.json",
+    "archive": "runs/spec-types-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/spec-types-final/COMMAND.json",
+    "archive": "runs/spec-types-final/COMMAND.json",
+    "sourceSha256": "34a16ebdc47377743f1675ebc0fee71de84270c82e145e4d36ca2c7bfa88d877",
+    "archiveSha256": "34a16ebdc47377743f1675ebc0fee71de84270c82e145e4d36ca2c7bfa88d877"
+  },
+  {
+    "source": "runs/plain-kernel-final/RESULT.json",
+    "archive": "runs/plain-kernel-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/plain-kernel-final/first.log",
+    "archive": "runs/plain-kernel-final/first.log",
+    "sourceSha256": "8d6a4a79d1985a1aef6b7687fb16baf3455296f285ecc87c4e0cf9395bc2c3e3",
+    "archiveSha256": "8d6a4a79d1985a1aef6b7687fb16baf3455296f285ecc87c4e0cf9395bc2c3e3"
+  },
+  {
+    "source": "runs/plain-kernel-final/SOURCE-BEFORE.json",
+    "archive": "runs/plain-kernel-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "dc9daad88f832e7d7fe03561f4ed007dd4dc0b0c59f91533e7a27098579a8f60",
+    "archiveSha256": "fa0aa4d172a807c5ddb2193d1058d39165adc3225b8b7e9efe110dff84045ebc"
+  },
+  {
+    "source": "runs/plain-kernel-final/COMMAND.json",
+    "archive": "runs/plain-kernel-final/COMMAND.json",
+    "sourceSha256": "6e29cd58c9442424f2e01bad06a33e300d55a28081c1ae5356fdf627e79ca718",
+    "archiveSha256": "6e29cd58c9442424f2e01bad06a33e300d55a28081c1ae5356fdf627e79ca718"
+  },
+  {
+    "source": "runs/plain-kernel-final/observations/kernel-ordinary.json",
+    "archive": "runs/plain-kernel-final/observations/kernel-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/plain-kernel-final/observations/terminal-window.json",
+    "archive": "runs/plain-kernel-final/observations/terminal-window.json",
+    "sourceSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5",
+    "archiveSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5"
+  },
+  {
+    "source": "runs/plain-kernel-final/observations/builder-work.json",
+    "archive": "runs/plain-kernel-final/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/plain-kernel-final/observations/kernel-keyed.json",
+    "archive": "runs/plain-kernel-final/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/source-types-2/RESULT.json",
+    "archive": "runs/source-types-2/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/source-types-2/first.log",
+    "archive": "runs/source-types-2/first.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "runs/source-types-2/SOURCE-BEFORE.json",
+    "archive": "runs/source-types-2/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "dc9daad88f832e7d7fe03561f4ed007dd4dc0b0c59f91533e7a27098579a8f60",
+    "archiveSha256": "fa0aa4d172a807c5ddb2193d1058d39165adc3225b8b7e9efe110dff84045ebc"
+  },
+  {
+    "source": "runs/source-types-2/COMMAND.json",
+    "archive": "runs/source-types-2/COMMAND.json",
+    "sourceSha256": "a1a2770cbcb13fa9f3415d0dcb5ae6828e01a3c6ca2d77e608bf3bc192aeff9f",
+    "archiveSha256": "a1a2770cbcb13fa9f3415d0dcb5ae6828e01a3c6ca2d77e608bf3bc192aeff9f"
+  },
+  {
+    "source": "runs/callbacks-kernel-final/RESULT.json",
+    "archive": "runs/callbacks-kernel-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/callbacks-kernel-final/first.log",
+    "archive": "runs/callbacks-kernel-final/first.log",
+    "sourceSha256": "2c0cb50ac26b8f646f04baa130b5efb924bcfacd30b1aa212d213bf54e3df966",
+    "archiveSha256": "2c0cb50ac26b8f646f04baa130b5efb924bcfacd30b1aa212d213bf54e3df966"
+  },
+  {
+    "source": "runs/callbacks-kernel-final/SOURCE-BEFORE.json",
+    "archive": "runs/callbacks-kernel-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/callbacks-kernel-final/COMMAND.json",
+    "archive": "runs/callbacks-kernel-final/COMMAND.json",
+    "sourceSha256": "487a3bcd2f10c53e380b5596aa0cb2e1c0b54cc3afd9c251b531fd1a75f64312",
+    "archiveSha256": "487a3bcd2f10c53e380b5596aa0cb2e1c0b54cc3afd9c251b531fd1a75f64312"
+  },
+  {
+    "source": "runs/callbacks-kernel-final/observations/sorted-false.json",
+    "archive": "runs/callbacks-kernel-final/observations/sorted-false.json",
+    "sourceSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6",
+    "archiveSha256": "bd579095852fdddc79bd88a1c1c0c5959fc3cdcdabecab3b87b4c63c5f94a4f6"
+  },
+  {
+    "source": "runs/callbacks-kernel-final/observations/sorted-true.json",
+    "archive": "runs/callbacks-kernel-final/observations/sorted-true.json",
+    "sourceSha256": "a7fbb2c834f371fa8b7bc16b596f212296146c284da618f6eec47be1ed73a354",
+    "archiveSha256": "a7fbb2c834f371fa8b7bc16b596f212296146c284da618f6eec47be1ed73a354"
+  },
+  {
+    "source": "runs/grouped-angular-final/RESULT.json",
+    "archive": "runs/grouped-angular-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/grouped-angular-final/first.log",
+    "archive": "runs/grouped-angular-final/first.log",
+    "sourceSha256": "83e5bb765817478cd9a1981f62179487a2aff68df893c414a6529a907905a82b",
+    "archiveSha256": "83e5bb765817478cd9a1981f62179487a2aff68df893c414a6529a907905a82b"
+  },
+  {
+    "source": "runs/grouped-angular-final/SOURCE-BEFORE.json",
+    "archive": "runs/grouped-angular-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/grouped-angular-final/COMMAND.json",
+    "archive": "runs/grouped-angular-final/COMMAND.json",
+    "sourceSha256": "f4967fa25ed6d2da5a547e4dd1b599194bfe9aaa99142e2a09773f5c2f5b9079",
+    "archiveSha256": "f4967fa25ed6d2da5a547e4dd1b599194bfe9aaa99142e2a09773f5c2f5b9079"
+  },
+  {
+    "source": "runs/grouped-angular-final/observations/sorted-false.json",
+    "archive": "runs/grouped-angular-final/observations/sorted-false.json",
+    "sourceSha256": "4f032dffa3c396378661726281964bfae0f3494f168a0a246979b2ae9efec074",
+    "archiveSha256": "4f032dffa3c396378661726281964bfae0f3494f168a0a246979b2ae9efec074"
+  },
+  {
+    "source": "runs/grouped-angular-final/observations/sorted-true.json",
+    "archive": "runs/grouped-angular-final/observations/sorted-true.json",
+    "sourceSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446",
+    "archiveSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446"
+  },
+  {
+    "source": "runs/focused-angular-1/RESULT.json",
+    "archive": "runs/focused-angular-1/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/focused-angular-1/first.log",
+    "archive": "runs/focused-angular-1/first.log",
+    "sourceSha256": "391138cbebf6d569a778c88d0594998a219f7527e81d8fd5bbec55b62cb44268",
+    "archiveSha256": "391138cbebf6d569a778c88d0594998a219f7527e81d8fd5bbec55b62cb44268"
+  },
+  {
+    "source": "runs/focused-angular-1/SOURCE-BEFORE.json",
+    "archive": "runs/focused-angular-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "9dc4b87b410b9d86e7ecdfe5633977d7eef8dcd5d8c9fb1452d92d66d360ec99",
+    "archiveSha256": "89a94daa18e25518829b379f80b1215930d1fee7105fe2fe2585675a8d4e6a60"
+  },
+  {
+    "source": "runs/focused-angular-1/COMMAND.json",
+    "archive": "runs/focused-angular-1/COMMAND.json",
+    "sourceSha256": "b60e1a680b60e9e9aa20fce2e47ed51d59e123c56c01c7e0dcdf715857f1f2e4",
+    "archiveSha256": "b60e1a680b60e9e9aa20fce2e47ed51d59e123c56c01c7e0dcdf715857f1f2e4"
+  },
+  {
+    "source": "runs/focused-angular-1/observations/terminal-window.json",
+    "archive": "runs/focused-angular-1/observations/terminal-window.json",
+    "sourceSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183",
+    "archiveSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183"
+  },
+  {
+    "source": "runs/focused-angular-1/observations/builder-work.json",
+    "archive": "runs/focused-angular-1/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/reentry-angular-final/RESULT.json",
+    "archive": "runs/reentry-angular-final/RESULT.json",
+    "sourceSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b",
+    "archiveSha256": "6fbcc4900f65f9fbe3e548cf0653d38919c134377248fb1054ea54bab56b527b"
+  },
+  {
+    "source": "runs/reentry-angular-final/first.log",
+    "archive": "runs/reentry-angular-final/first.log",
+    "sourceSha256": "c24234bfadc9d70b5d416a48abe16971c1402f2d329ff87944512cdf94f659e9",
+    "archiveSha256": "c24234bfadc9d70b5d416a48abe16971c1402f2d329ff87944512cdf94f659e9"
+  },
+  {
+    "source": "runs/reentry-angular-final/SOURCE-BEFORE.json",
+    "archive": "runs/reentry-angular-final/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "068bde8a9e50274a229d69903c6cbeda9b4e4efc619df036f693afcf39883ee0",
+    "archiveSha256": "d1307474669e6105dcb73f9466fe087f5c8c6fe3aa7c5b9d5905eb8750ed1fc9"
+  },
+  {
+    "source": "runs/reentry-angular-final/COMMAND.json",
+    "archive": "runs/reentry-angular-final/COMMAND.json",
+    "sourceSha256": "560cbed9f18c9b8e79a507f69dadeb3adbcdb05ec3dc55234bbcf1797250633b",
+    "archiveSha256": "560cbed9f18c9b8e79a507f69dadeb3adbcdb05ec3dc55234bbcf1797250633b"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/marker-E5-child.json",
+    "archive": "runs/reentry-angular-final/observations/marker-E5-child.json",
+    "sourceSha256": "6f83017025785c1b5aff7e4fd9ab96e472070364f13764e04962f63e0fa5df30",
+    "archiveSha256": "6f83017025785c1b5aff7e4fd9ab96e472070364f13764e04962f63e0fa5df30"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/sort-E4.json",
+    "archive": "runs/reentry-angular-final/observations/sort-E4.json",
+    "sourceSha256": "ed7e1b277f5476e4f3ab1cd6bf557fcf298216243f354aabefa82e3e2e0ee084",
+    "archiveSha256": "ed7e1b277f5476e4f3ab1cd6bf557fcf298216243f354aabefa82e3e2e0ee084"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/marker-E5-self.json",
+    "archive": "runs/reentry-angular-final/observations/marker-E5-self.json",
+    "sourceSha256": "db13be2b4b2af9e3b7343bad75bcb3c2556972894677a48f7dc57b013c2b6589",
+    "archiveSha256": "db13be2b4b2af9e3b7343bad75bcb3c2556972894677a48f7dc57b013c2b6589"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/warm-marker-E5-self.json",
+    "archive": "runs/reentry-angular-final/observations/warm-marker-E5-self.json",
+    "sourceSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f",
+    "archiveSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/marker-E1.json",
+    "archive": "runs/reentry-angular-final/observations/marker-E1.json",
+    "sourceSha256": "633f59f4e11de9f9e0e9029b0504aec6319e853b08671682c0ef4673d206041f",
+    "archiveSha256": "633f59f4e11de9f9e0e9029b0504aec6319e853b08671682c0ef4673d206041f"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/warm-marker-E4.json",
+    "archive": "runs/reentry-angular-final/observations/warm-marker-E4.json",
+    "sourceSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960",
+    "archiveSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/warm-marker-E5-child.json",
+    "archive": "runs/reentry-angular-final/observations/warm-marker-E5-child.json",
+    "sourceSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e",
+    "archiveSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/marker-E3.json",
+    "archive": "runs/reentry-angular-final/observations/marker-E3.json",
+    "sourceSha256": "4f75d7b6a4789b0e99dac75a2ee1de4e23400089cb07e34272a84bb7c67773bd",
+    "archiveSha256": "4f75d7b6a4789b0e99dac75a2ee1de4e23400089cb07e34272a84bb7c67773bd"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/warm-marker-E3.json",
+    "archive": "runs/reentry-angular-final/observations/warm-marker-E3.json",
+    "sourceSha256": "4dd815fd172bd69b34f584e05b638132b6b93d36e699a19b8d12156a930167c3",
+    "archiveSha256": "4dd815fd172bd69b34f584e05b638132b6b93d36e699a19b8d12156a930167c3"
+  },
+  {
+    "source": "runs/reentry-angular-final/observations/marker-E4.json",
+    "archive": "runs/reentry-angular-final/observations/marker-E4.json",
+    "sourceSha256": "1fcc7f3cc44a738ae9fc39d1952c14c642ae330ae949394956177f2cd813f6a5",
+    "archiveSha256": "1fcc7f3cc44a738ae9fc39d1952c14c642ae330ae949394956177f2cd813f6a5"
+  },
+  {
+    "source": "runs/focused-kernel-2/RESULT.json",
+    "archive": "runs/focused-kernel-2/RESULT.json",
+    "sourceSha256": "db388ae13c0a4f5d96241dd9c8f4d59b18c6884994763319be25ec6cc7e74ca5",
+    "archiveSha256": "db388ae13c0a4f5d96241dd9c8f4d59b18c6884994763319be25ec6cc7e74ca5"
+  },
+  {
+    "source": "runs/focused-kernel-2/first.log",
+    "archive": "runs/focused-kernel-2/first.log",
+    "sourceSha256": "f2a56ae5a40269a9e7b702fbd0df09732aab7db9d51580f5adcacbe5e2e80dd7",
+    "archiveSha256": "f2a56ae5a40269a9e7b702fbd0df09732aab7db9d51580f5adcacbe5e2e80dd7"
+  },
+  {
+    "source": "runs/focused-kernel-2/SOURCE-BEFORE.json",
+    "archive": "runs/focused-kernel-2/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "c8c27f9b517069a57dee91d40ceec9f9e59ec59dc058a90c8a44b088032ce341",
+    "archiveSha256": "4b13545833c135aae8917069f6d2a77c3edc3dcf9245f17069948c83ed937478"
+  },
+  {
+    "source": "runs/focused-kernel-2/COMMAND.json",
+    "archive": "runs/focused-kernel-2/COMMAND.json",
+    "sourceSha256": "3b82e04b19444e0e990c47300e7a1625a062b551858cb0a3887e93c7722f7633",
+    "archiveSha256": "3b82e04b19444e0e990c47300e7a1625a062b551858cb0a3887e93c7722f7633"
+  },
+  {
+    "source": "runs/focused-kernel-2/observations/terminal-window.json",
+    "archive": "runs/focused-kernel-2/observations/terminal-window.json",
+    "sourceSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5",
+    "archiveSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5"
+  },
+  {
+    "source": "runs/focused-kernel-2/observations/direct-capture.json",
+    "archive": "runs/focused-kernel-2/observations/direct-capture.json",
+    "sourceSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "archiveSha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  {
+    "source": "runs/focused-kernel-2/observations/builder-work.json",
+    "archive": "runs/focused-kernel-2/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/spec-types-1/RESULT.json",
+    "archive": "runs/spec-types-1/RESULT.json",
+    "sourceSha256": "db388ae13c0a4f5d96241dd9c8f4d59b18c6884994763319be25ec6cc7e74ca5",
+    "archiveSha256": "db388ae13c0a4f5d96241dd9c8f4d59b18c6884994763319be25ec6cc7e74ca5"
+  },
+  {
+    "source": "runs/spec-types-1/first.log",
+    "archive": "runs/spec-types-1/first.log",
+    "sourceSha256": "953917243e40e8dffd8c79e1052a2bb987c8ff341e573a3f85c6a1129e19183c",
+    "archiveSha256": "953917243e40e8dffd8c79e1052a2bb987c8ff341e573a3f85c6a1129e19183c"
+  },
+  {
+    "source": "runs/spec-types-1/SOURCE-BEFORE.json",
+    "archive": "runs/spec-types-1/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "95f72f5ed4730f7a84bca393a2c78767210230a123c0e68688d8c0d2117aed57",
+    "archiveSha256": "cc50d4fa6037c3122e08b8cdd27650afe0ed91b4e01392387e5619d1dafaae53"
+  },
+  {
+    "source": "runs/spec-types-1/COMMAND.json",
+    "archive": "runs/spec-types-1/COMMAND.json",
+    "sourceSha256": "6096cce5e7ac8fd9b734c6647eb6f09a8cff39fb9b24345f9a8e29ccb9222e35",
+    "archiveSha256": "6096cce5e7ac8fd9b734c6647eb6f09a8cff39fb9b24345f9a8e29ccb9222e35"
+  }
+]

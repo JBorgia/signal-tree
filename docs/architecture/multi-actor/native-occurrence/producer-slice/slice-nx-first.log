@@ -1,0 +1,143 @@
+
+> nx run kernel:test native-authored-footprint.spec.ts native-certificate-successor.spec.ts occurrence-successor.spec.ts native-equal-inverse-diagnostic.spec.ts native-netzero-diagnostic.spec.ts entity-publication-work-lifetime.spec.ts entity-mutation-frame.spec.ts
+
+> node tools/run-core-vitest.mjs native-authored-footprint.spec.ts native-certificate-successor.spec.ts occurrence-successor.spec.ts native-equal-inverse-diagnostic.spec.ts native-netzero-diagnostic.spec.ts entity-publication-work-lifetime.spec.ts entity-mutation-frame.spec.ts
+
+(node:98516) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98523) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-reviewed-successor/candidate/packages/kernel
+
+(node:98536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98530) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts (3 tests | 3 failed) 19ms
+   × fixed field capture and rollback metadata work does not grow with unrelated rows 15ms
+   × ordinary churn retires new metadata while retained receipts and old references stay detached 2ms
+   × recipient disposal cannot retire source facts still needed by a pending structural inverse 1ms
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 33ms
+   × omission then restored retained collection selects matching payload and support 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > fixed field capture and rollback metadata work does not grow with unrelated rows
+Error: Native occurrence has no verified root/address
+ ❯ captureNativeOccurrence src/lib/internals/native-occurrence.ts:31:32
+     29|   const registry = getPositionRegistry(anchor), address = getNodeAddre…
+     30|   const root = registry && roots.get(registry)?.deref();
+     31|   if (!root || !address) throw new Error('Native occurrence has no ver…
+       |                                ^
+     32|   const edges: NativeOccurrenceEdge[] = [];
+     33|   let parent = root;
+ ❯ RecipientOccurrences.enroll src/lib/experimental-publication/recipient-occurrence.ts:33:69
+ ❯ enroll src/lib/experimental-publication/private.ts:351:55
+ ❯ Module.bindSource src/lib/experimental-publication/private.ts:352:3
+ ❯ link src/lib/link.ts:555:12
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:19:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > ordinary churn retires new metadata while retained receipts and old references stay detached
+Error: Native occurrence has no verified root/address
+ ❯ captureNativeOccurrence src/lib/internals/native-occurrence.ts:31:32
+     29|   const registry = getPositionRegistry(anchor), address = getNodeAddre…
+     30|   const root = registry && roots.get(registry)?.deref();
+     31|   if (!root || !address) throw new Error('Native occurrence has no ver…
+       |                                ^
+     32|   const edges: NativeOccurrenceEdge[] = [];
+     33|   let parent = root;
+ ❯ RecipientOccurrences.enroll src/lib/experimental-publication/recipient-occurrence.ts:33:69
+ ❯ enroll src/lib/experimental-publication/private.ts:351:55
+ ❯ Module.bindSource src/lib/experimental-publication/private.ts:352:3
+ ❯ link src/lib/link.ts:555:12
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:44:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/entity-publication-work-lifetime.spec.ts > recipient disposal cannot retire source facts still needed by a pending structural inverse
+Error: Native occurrence has no verified root/address
+ ❯ captureNativeOccurrence src/lib/internals/native-occurrence.ts:31:32
+     29|   const registry = getPositionRegistry(anchor), address = getNodeAddre…
+     30|   const root = registry && roots.get(registry)?.deref();
+     31|   if (!root || !address) throw new Error('Native occurrence has no ver…
+       |                                ^
+     32|   const edges: NativeOccurrenceEdge[] = [];
+     33|   let parent = root;
+ ❯ RecipientOccurrences.enroll src/lib/experimental-publication/recipient-occurrence.ts:33:69
+ ❯ enroll src/lib/experimental-publication/private.ts:351:55
+ ❯ Module.bindSource src/lib/experimental-publication/private.ts:352:3
+ ❯ link src/lib/link.ts:555:12
+ ❯ src/lib/entity-publication-work-lifetime.spec.ts:61:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 5 passed (7)
+      Tests  4 failed | 51 passed (55)
+   Start at  13:45:53
+   Duration  1.26s (transform 2.57s, setup 0ms, import 3.32s, tests 233ms, environment 3.77s)
+
+Warning: command "node tools/run-core-vitest.mjs native-authored-footprint.spec.ts native-certificate-successor.spec.ts occurrence-successor.spec.ts native-equal-inverse-diagnostic.spec.ts native-netzero-diagnostic.spec.ts entity-publication-work-lifetime.spec.ts entity-mutation-frame.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

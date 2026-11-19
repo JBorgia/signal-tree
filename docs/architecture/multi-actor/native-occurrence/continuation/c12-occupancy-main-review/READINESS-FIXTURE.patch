@@ -1,0 +1,20 @@
+--- a/packages/kernel/src/lib/native-certificate-successor.spec.ts
++++ b/packages/kernel/src/lib/native-certificate-successor.spec.ts
+@@ -14,7 +14,7 @@
+  try{
+   expect(()=>lifecycle.runDeclaration(channel,{kind:'independent'},()=>{
+    const prepared=lifecycle.prepareNativeRequirement([],false,[]);requirement=prepared.requirement;
+-   installTerminalRecord(prepared.record);lifecycle.finalizeNativeRequirement(requirement);
++   installTerminalRecord(prepared.record);lifecycle.finalizeNativeRequirement(requirement);lifecycle.deliverNativeRequirementReady(requirement);
+    composite=lifecycle.combineNativeRequirements([requirement,lifecycle.initialRequirement()]);
+    expect(lifecycle.nativeRequirementReady(composite)).toBe(false);
+    lifecycle.onNativeRequirementReady(composite,()=>seen.push(lifecycle.nativeProof(composite).invalid));
+@@ -29,6 +29,8 @@
+  try{lifecycle.runDeclaration(channel,{kind:'independent'},()=>{
+   const p=lifecycle.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);lifecycle.finalizeNativeRequirement(p.requirement);
+   lifecycle.onNativeRequirementReady(p.requirement,()=>calls++)();
++  lifecycle.deliverNativeRequirementReady(p.requirement);
++  expect(lifecycle.nativeRequirementReady(p.requirement)).toBe(false);
+  });expect(calls).toBe(0);}finally{lifecycle.disposeConnection(channel);}
+ });
+ 

@@ -1,0 +1,56 @@
+{
+  "commandsHashMatches": true,
+  "originalHashMatches": true,
+  "templateHashMatches": true,
+  "reporterHashMatches": true,
+  "inverseExact": true,
+  "schedule": [
+    [
+      "baseline",
+      128,
+      1
+    ],
+    [
+      "reader",
+      128,
+      1
+    ],
+    [
+      "reader",
+      512,
+      1
+    ],
+    [
+      "baseline",
+      512,
+      1
+    ],
+    [
+      "baseline",
+      2048,
+      1
+    ],
+    [
+      "reader",
+      2048,
+      1
+    ],
+    [
+      "reader",
+      512,
+      2
+    ],
+    [
+      "baseline",
+      512,
+      2
+    ]
+  ],
+  "allOverlayHashesMatch": true,
+  "runtimeDelta": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/entity-preparation-reader.ts"
+  ],
+  "diagnosticsAbsent": true
+}

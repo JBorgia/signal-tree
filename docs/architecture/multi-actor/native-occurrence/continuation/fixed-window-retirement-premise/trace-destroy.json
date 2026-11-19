@@ -1,0 +1,217 @@
+{
+  "id": 1,
+  "before": {
+    "maps": {
+      "rows": 0,
+      "fields": 0,
+      "presence": 1,
+      "negativePresence": 1,
+      "placements": 0,
+      "viewRows": 0,
+      "viewFields": 0,
+      "negativeViewFields": 0,
+      "visible": 1,
+      "negativeVisible": 1,
+      "placementViews": 0,
+      "mappings": 1,
+      "mappingViews": 1,
+      "preparedFieldEdits": 2,
+      "retireCalls": 0,
+      "inputFactVisits": 0,
+      "recipients": 0,
+      "native": 1,
+      "retirementRequests": 0
+    },
+    "ready": true,
+    "proof": {
+      "destination": [],
+      "input": [],
+      "validation": [],
+      "owners": [],
+      "possible": [
+        {
+          "owner": 10,
+          "id": 1,
+          "outcome": "pending",
+          "recipientDependents": 0
+        }
+      ],
+      "terminalRejectedRoles": 0,
+      "unavailableInput": false,
+      "historicalWindow": true,
+      "unknown": true,
+      "invalid": false
+    },
+    "compacted": {
+      "destination": [],
+      "input": [],
+      "validation": [],
+      "owners": [],
+      "possible": [
+        {
+          "owner": 10,
+          "id": 1,
+          "outcome": "pending",
+          "recipientDependents": 0
+        }
+      ],
+      "terminalRejectedRoles": 0,
+      "unavailableInput": false,
+      "historicalWindow": true,
+      "unknown": true,
+      "invalid": false
+    },
+    "sameFact": true,
+    "exclusions": [
+      {
+        "id": 1,
+        "same": true
+      }
+    ],
+    "sent": []
+  },
+  "consumed": {
+    "maps": {
+      "rows": 0,
+      "fields": 0,
+      "presence": 1,
+      "negativePresence": 1,
+      "placements": 0,
+      "viewRows": 0,
+      "viewFields": 0,
+      "negativeViewFields": 0,
+      "visible": 1,
+      "negativeVisible": 1,
+      "placementViews": 0,
+      "mappings": 1,
+      "mappingViews": 1,
+      "preparedFieldEdits": 2,
+      "retireCalls": 0,
+      "inputFactVisits": 1,
+      "recipients": 0,
+      "native": 1,
+      "retirementRequests": 0
+    },
+    "ready": true,
+    "proof": {
+      "destination": [],
+      "input": [],
+      "validation": [],
+      "owners": [],
+      "possible": [
+        {
+          "owner": 10,
+          "id": 1,
+          "outcome": "pending",
+          "recipientDependents": 1
+        }
+      ],
+      "terminalRejectedRoles": 0,
+      "unavailableInput": false,
+      "historicalWindow": true,
+      "unknown": true,
+      "invalid": false
+    },
+    "compacted": {
+      "destination": [],
+      "input": [],
+      "validation": [],
+      "owners": [],
+      "possible": [
+        {
+          "owner": 10,
+          "id": 1,
+          "outcome": "pending",
+          "recipientDependents": 1
+        }
+      ],
+      "terminalRejectedRoles": 0,
+      "unavailableInput": false,
+      "historicalWindow": true,
+      "unknown": true,
+      "invalid": false
+    },
+    "sameFact": true,
+    "exclusions": [
+      {
+        "id": 1,
+        "same": true
+      }
+    ],
+    "sent": []
+  },
+  "terminal": {
+    "maps": {
+      "rows": 0,
+      "fields": 0,
+      "presence": 1,
+      "negativePresence": 1,
+      "placements": 0,
+      "viewRows": 0,
+      "viewFields": 0,
+      "negativeViewFields": 0,
+      "visible": 1,
+      "negativeVisible": 1,
+      "placementViews": 0,
+      "mappings": 1,
+      "mappingViews": 1,
+      "preparedFieldEdits": 2,
+      "retireCalls": 0,
+      "inputFactVisits": 1,
+      "recipients": 0,
+      "native": 1,
+      "retirementRequests": 0
+    },
+    "ready": true,
+    "proof": {
+      "destination": [],
+      "input": [],
+      "validation": [],
+      "owners": [],
+      "possible": [
+        {
+          "owner": 10,
+          "id": 1,
+          "outcome": "pending",
+          "recipientDependents": 1
+        }
+      ],
+      "terminalRejectedRoles": 0,
+      "unavailableInput": false,
+      "historicalWindow": true,
+      "unknown": true,
+      "invalid": false
+    },
+    "compacted": {
+      "destination": [],
+      "input": [],
+      "validation": [],
+      "owners": [],
+      "possible": [
+        {
+          "owner": 10,
+          "id": 1,
+          "outcome": "pending",
+          "recipientDependents": 1
+        }
+      ],
+      "terminalRejectedRoles": 0,
+      "unavailableInput": false,
+      "historicalWindow": true,
+      "unknown": true,
+      "invalid": false
+    },
+    "sameFact": true,
+    "exclusions": [
+      {
+        "id": 1,
+        "same": true
+      }
+    ],
+    "sent": []
+  },
+  "receipt": {
+    "state": "conservative",
+    "reason": "unknown"
+  }
+}

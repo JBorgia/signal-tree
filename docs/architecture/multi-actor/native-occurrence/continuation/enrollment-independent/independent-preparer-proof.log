@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=preparer-native-evidence.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=preparer-native-evidence.spec.ts --maxWorkers=1
+
+(node:70534) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70541) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-enrollment-independent-review/independent/packages/kernel
+
+(node:70548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  11:20:27
+   Duration  2.04s (transform 838ms, setup 0ms, import 990ms, tests 23ms, environment 798ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.8s

@@ -1,0 +1,86 @@
+[
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "2278d00206ec7564d0036f0eaec8afcb03b35537ceb9cbe847119b9090d1927f",
+    "archiveSha256": "2278d00206ec7564d0036f0eaec8afcb03b35537ceb9cbe847119b9090d1927f"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+    "archiveSha256": "f2fd12688615fd03844426ebb6caca33bc301ce476890700d81ccc4bd359518a"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json.gz",
+    "sourceSha256": "94418a1f53da374f591444e10079ce621dcb6b0e90796796f8a3eae6c426b299",
+    "archiveSha256": "34def279f93250e6554728ca9b384d6414d5571e485a856b2555d7b68fc92619"
+  },
+  {
+    "source": "COMPARISON.json",
+    "archive": "COMPARISON.json",
+    "sourceSha256": "3f1f8f9a0cfd770050c9520c13128d73d0c59bb5daec6fc3a84b208e4dab2cc0",
+    "archiveSha256": "3f1f8f9a0cfd770050c9520c13128d73d0c59bb5daec6fc3a84b208e4dab2cc0"
+  },
+  {
+    "source": "PRIOR-SUCCESSOR-WHOLE.json",
+    "archive": "PRIOR-SUCCESSOR-WHOLE.json",
+    "sourceSha256": "bb94f86b1926f759f8593bb59954976bf3249d0819cc7c67bf74b929ba497f45",
+    "archiveSha256": "bb94f86b1926f759f8593bb59954976bf3249d0819cc7c67bf74b929ba497f45"
+  },
+  {
+    "source": "EVIDENCE-SNAPSHOT.json",
+    "archive": "EVIDENCE-SNAPSHOT.json",
+    "sourceSha256": "40538417b1d2f066e43a0e1d3bb1a4737516c956f37a0194c44f7ab5e2929052",
+    "archiveSha256": "40538417b1d2f066e43a0e1d3bb1a4737516c956f37a0194c44f7ab5e2929052"
+  },
+  {
+    "source": "PRIOR-C16-WHOLE.json",
+    "archive": "PRIOR-C16-WHOLE.json",
+    "sourceSha256": "3283eda17e840017f90c3e5ba0a89eecb3e30d2e2f07167f4f41797bd78940d6",
+    "archiveSha256": "3283eda17e840017f90c3e5ba0a89eecb3e30d2e2f07167f4f41797bd78940d6"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "9112d9f0fc26b7aeaa58194ea3138f1df7928b0513a25b57442fada6fc910543",
+    "archiveSha256": "9112d9f0fc26b7aeaa58194ea3138f1df7928b0513a25b57442fada6fc910543"
+  },
+  {
+    "source": "EXPLICIT-FIELD.json",
+    "archive": "EXPLICIT-FIELD.json",
+    "sourceSha256": "bb94f86b1926f759f8593bb59954976bf3249d0819cc7c67bf74b929ba497f45",
+    "archiveSha256": "bb94f86b1926f759f8593bb59954976bf3249d0819cc7c67bf74b929ba497f45"
+  },
+  {
+    "source": "runs/explicit-field-first/RESULT.json",
+    "archive": "runs/explicit-field-first/RESULT.json",
+    "sourceSha256": "7f52c4794f727f2ed35d89feca2995087bb22ab4267ab79f8e5314ac1e21aa8b",
+    "archiveSha256": "7f52c4794f727f2ed35d89feca2995087bb22ab4267ab79f8e5314ac1e21aa8b"
+  },
+  {
+    "source": "runs/explicit-field-first/first.log",
+    "archive": "runs/explicit-field-first/first.log",
+    "sourceSha256": "f7ed58019f61962739d20c09ed11d8ba3aef9c6634cfea169ccc3c64a3b3c826",
+    "archiveSha256": "f7ed58019f61962739d20c09ed11d8ba3aef9c6634cfea169ccc3c64a3b3c826"
+  },
+  {
+    "source": "runs/explicit-field-first/SOURCE-BEFORE.json",
+    "archive": "runs/explicit-field-first/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "f855a8c17eb77b2650fae166cc28047abb1c28a77caa739940c2540daadfa841",
+    "archiveSha256": "74163da9d7dd06e51461137f2dd01e9463dc4de6944ae8a38b9b2c1d8a014790"
+  },
+  {
+    "source": "runs/explicit-field-first/COMMAND.json",
+    "archive": "runs/explicit-field-first/COMMAND.json",
+    "sourceSha256": "9cd60070bd8f935f86ddfd0de00dafd4ab9591befa60edcded1b2dcc19c1c584",
+    "archiveSha256": "9cd60070bd8f935f86ddfd0de00dafd4ab9591befa60edcded1b2dcc19c1c584"
+  },
+  {
+    "source": "runs/explicit-field-first/terminal-explicit-field.json",
+    "archive": "runs/explicit-field-first/terminal-explicit-field.json",
+    "sourceSha256": "bb94f86b1926f759f8593bb59954976bf3249d0819cc7c67bf74b929ba497f45",
+    "archiveSha256": "bb94f86b1926f759f8593bb59954976bf3249d0819cc7c67bf74b929ba497f45"
+  }
+]

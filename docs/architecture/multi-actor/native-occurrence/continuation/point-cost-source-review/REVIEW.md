@@ -1,0 +1,48 @@
+# C19 bounded cost premise and local candidates
+
+Read-only source review during Main's full-kernel run. No runtime/test edits, test runs, microbenchmarks, profiling, or ceiling changes. Exact relevant C19 source hashes verified against SNAPSHOT-C19.json; see SOURCE-IDENTITY.json. Read prior C12 PLAN.md, prior attributed point review/histogram, measurement contract, and exact C19 code. Prior counts are not relabeled as C19 measurements.
+
+## What the failure establishes
+
+entity-granular-reactivity.spec.ts:184–215 builds 2,000 then20,000 rows, counts200 updateOne calls, checks useful row value, asserts equal counts across populations, THEN strict small<2,000. Two independent obligations: collection-size independence in the instrumented work, and absolute counted overhead under10 visits/write on average. A failure at the latter after the former passes is fixed-work budget failure, not evidence of O(collection-size) rebuild. Main reports the count failure; the still-running first.log currently reports the test failure but not its final assertion values. This review does not assert a fresh C19 count or histogram.
+
+Historical evidence is strong but scoped: attributed earlier point candidate14,200 at both populations; C12 exact unchanged test13,800. C19 retains the indexed/singleton packet pairing, point result-demand split, and per-touched-row native preparation. Those changes must not be proposed/booked again. No new size-scaling defect is demonstrated by source inspection. Neither two sizes nor this selective proxy proves all runtime work O(1): native row-field width, owner/input count, active frames, recipients, and actual subscriber-requested projections are separate dimensions.
+
+The counter (:79–180) charges full array length even for early find/some/includes, charges push arguments, iterable consumption and copying (which can count one operation through multiple wrappers); flatMap itself, object spread, WeakMap operations, Map get/set and indexed loops are not uniformly charged. The positive calibration guards a collection copy but not all possible work. Therefore do not “fix” by translating map/filter/iteration to indexed loops or moving work into uncounted operators. Keep the exact <2,000 test and equality assertion. A real allocation/work reduction can have zero proxy benefit; a proxy drop is not a measured speedup.
+
+## Source candidates, ordered by boundedness
+
+### A. Avoid allocating a flattened ordinary list for an admitted single step with no authored removal
+
+internals/entity-publication.ts:27–33 always flatMaps steps. For exactly one step and absent authoredRemoval, the output is precisely that step's ordinary sequence. Returning the already admitted readonly array avoids a real temporary array. Preserve no-steps fallback, explicit empty steps, multi-step order, duplicate edit identity, and tombstone injection. Admission (:74–94) owns/freezes membership arrays. Production callers currently iterate/search, not mutate the returned sequence; tests that reverse already copy first. Restrict the shortcut to admitted immutable membership or prove the helper's broader input lifetime expectations; do not silently make borrowed mutable private packet inputs aliases when the old flatMap isolated membership.
+
+Controls before promotion: ordinary empty versus steps absent/empty; one-step duplicates; authoredRemoval absent/present/already present; multi-step same subject first-physical vs last-ordinary selection; held forEdit evidence after later writes; source mutation/recipient enrollment refusal. Existing packet-index-adversarial, packet-index-review, packet-physical-pair-semantics and singleton-row-reuse are relevant. This saves an actual array, but flatMap is not directly charged by this counter: no proxy or speed claim.
+
+### B. Omit producer-certified empty terminal-plan assembly
+
+experimental-publication/entity.ts:230 passes responsibility, prepared native record, and actual source stores to combineTerminalRecords. lifecycle.ts:182–200 makes a no-active-frame record with writes=[]/adds=[]; intrinsic-mutation.ts:19–27 filters and merges even though that producer record carries no edits. A local fast path may return the actual source-store plan ONLY when responsibility is absent and the locally created native record is certified empty. Continue native preparation, finalize, registration, activation and completion normally. Preserve deletes-before-writes-before-adds and source publication's revision-token write (internals/entity-publication.ts:247); do not skip the outer validation/finalization envelope or mutate a borrowed plan to append edits.
+
+This removes an actual merge and arrays, unlike rewriting filter. C12's estimated3 filter visits/write on this exact call shape is conditional, not fresh C19 attribution, and far short of closing the historical gap. Generic plan property access can be fault-capable: prefer producer-certified emptiness over scanning arbitrary participant plans for zero lengths and altering getter/error order.
+
+Controls: active complete/unknown declaration, foreign pending/window finalization, installed parent-invalid proof and later reauthoring, no-recipient native authoring followed by late enrollment, finalizer reentry/refusal, exact primary error and later completion drain, deletes/writes/adds order. Native activation cannot be elided because no Link currently exists.
+
+### C. Remove only unused empty-context proof evaluation
+
+lifecycle.ts:189 computes nativeProof(requirement), consumed only in the active-frame loop. With no active frames it is unused. Cheapest conservative subcase also has no inputs: there is no input proof getter/error timing to lose. For the broader no-active-frame but nonempty-input case, prove that skipping this read preserves readiness/fault behavior before extending. Keep fresh requirement identity, captured inputs, unfinished/unactivated sets, captureWindow, finalization AFTER preparers, and exact pending-window capture. Never reuse a previous “clean” requirement or infer purity from no listeners/owners.
+
+Controls: no frames/no inputs; captured inputs with pending/invalid/unavailable proof; active-frame contradiction; reentry opening owner during later preparation; same selected endpoint readiness and error identity. Prior attribution charged lifecycle zero: this may reduce computation without helping the count budget.
+
+### D. Lazy completion memo only where structural completion actually needs it
+
+entity-signal.ts:1332–1368 allocates completedChanges even for a pure point change with no structuralRecord. Defer the memo until a structural add/remove needs identity reuse, or omit only for proven one-consumption demand. Do not assume every updateOne is structurally empty: writing an inspection-hidden ordinary subject can adopt it. Preserve completed object identity across byPhysicalSubject/byStep/changes, and their distinct occurrence ordering. Existing point-result-demand adoption and rollback controls, membership order handoff, held descriptors and structural reentry are required. One Map allocation saved on pure point path; no claimed counted visits saved.
+
+## Candidates not promoted
+
+- Duplicate ordinary descriptors at entity-signal.ts:2599–2600 remain a real local allocation candidate from prior review. Sharing mapped edit objects across packet.ordinary and step.ordinary changes descriptor identity and admission reuse. Same scoped partial-field explicit list does not imply safe sharing across whole, derive, restoration, duplicate steps or getters. Keep per-edit identity/forEdit, authored footprint, restoredFields precedence and callback/reflection order. Prior review already identified this; no new implementation recommendation or quantified saving here.
+- Empty endpoint extension in order-boundary-evidence.ts:98–202,207–285 still rebuilds graph structures. Canonical no-extension reuse could remove real work but must retain fresh-array ownership and malformed duplicate/undefined/cycle refusal. It is not shown on the no-transactions point workload, nor is clear's +1 attributed to it. Do not promote it as the point fix or remove the intentional two-pass inverse adjacency resolution.
+- No-recipient suppression/dormancy is NOT a local reduction. EntityPublicationSource.prepare always invokes native before recipients. C19 whole unowned authorship and late enrollment require native endpoints without a current Link; selected old/physical endpoints and unfinished readiness must survive. Removing physical snapshots based on current recipient count can miss enrollment during preparation and alter captured evidence. No such shortcut approved.
+- Getter-count/result caching is not warranted: whole-authorship phase qualification already separated installed callback faults from preinstallation refusal. Avoid moving or eliminating user accessor evaluation across those boundaries without a concrete semantic proof.
+
+## Qualification boundary
+
+Source candidates only, none measured or accepted as implementation. Start with A/B if Main elects a small reduction; C/D can be reviewed independently but do not promise a budget pass. The prior gaps require thousands of visits removed, which these candidates do not establish. No broad rewrite or budget waiver follows from selective counter coverage. Main's ongoing full run remains the execution authority; do not launch duplicate profiling or claim release qualification. Later, run each changed contract's narrow falsifiers plus unchanged point test/source/spec gates in isolated scratch, retain first failures and distinguish counter delta from time/space benefit.

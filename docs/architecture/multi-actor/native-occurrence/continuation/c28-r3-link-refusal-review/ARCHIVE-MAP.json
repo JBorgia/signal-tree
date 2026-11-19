@@ -1,0 +1,20 @@
+[
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "565ec947130a41fee0b294f3d8047e12aea01d4e469f2b08764b9f576176c218",
+    "archiveSha256": "565ec947130a41fee0b294f3d8047e12aea01d4e469f2b08764b9f576176c218"
+  },
+  {
+    "source": "corrected/IDENTITY.json",
+    "archive": "corrected/IDENTITY.json",
+    "sourceSha256": "aadb97f8d06657da585581bf5b72a050d5ba8a0bac7336b49734ba6c8c463773",
+    "archiveSha256": "aadb97f8d06657da585581bf5b72a050d5ba8a0bac7336b49734ba6c8c463773"
+  },
+  {
+    "source": "corrected/REVIEW.md",
+    "archive": "corrected/REVIEW.md",
+    "sourceSha256": "b5d1f84d41c135c7639b322adb46723a0dd71a732705e581fd528dff4e239dd2",
+    "archiveSha256": "b5d1f84d41c135c7639b322adb46723a0dd71a732705e581fd528dff4e239dd2"
+  }
+]

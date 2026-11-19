@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/lib/whole-value-new-keys.spec.ts src/lib/dynamic-admission-minimal.spec.ts src/lib/scalar-responsibility-lifecycle.spec.ts src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts src/lib/construction-resource-cleanup.spec.ts src/enhancers/transactions/native-admission-segments.spec.ts src/lib/initializer-attachment-independent.spec.ts src/lib/initializer-owned-cleanup.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:05:40.002Z",
+    "endTime": "2026-11-03T05:05:44.699Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "6116571251046367021",
+      "startTime": "2026-11-03T05:05:40.040Z",
+      "endTime": "2026-11-03T05:05:44.697Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

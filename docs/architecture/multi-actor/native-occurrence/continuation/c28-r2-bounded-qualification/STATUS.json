@@ -1,0 +1,92 @@
+[
+  {
+    "name": "kernel54",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 11.962039083009586,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "kernel59",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 6.707481999997981,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "source-types",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 4.825526042026468,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "public-types",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 3.606116999988444,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "spec-types",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 14.587763749994338,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "angular-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 4.300401165965013,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "react-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 7.075231458991766,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "vue-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 10.905371916946024,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  },
+  {
+    "name": "solid-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 7.8281557919690385,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c"
+  }
+]

@@ -1,0 +1,43 @@
+
+> nx run kernel:test fixed-window-independent.spec.ts fixed-window-retirement.spec.ts owner-transition-cancellation.spec.ts occurrence-successor.spec.ts enrollment-invariance.spec.ts recipient-domain.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs fixed-window-independent.spec.ts fixed-window-retirement.spec.ts owner-transition-cancellation.spec.ts occurrence-successor.spec.ts enrollment-invariance.spec.ts recipient-domain.spec.ts --maxWorkers=1
+
+(node:51412) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51419) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c6/candidate/packages/kernel
+
+(node:51427) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51428) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51429) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51434) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  5 passed (5)
+      Tests  61 passed (61)
+   Start at  21:10:49
+   Duration  2.19s (transform 443ms, setup 0ms, import 820ms, tests 166ms, environment 840ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.6s

@@ -1,0 +1,685 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from './internals/publication-preparation';
+ import { reportContainedObserverError } from './internals/error-reporter';
+ import type { EntityStructureOperation, PreparedEntityStructure } from './internals/prepared-entity-structure';
+ import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
+@@ -522,7 +523,7 @@
+     return new EntityMutationFrame(valueStore, structuralStore);
+   }
+ 
+-  function prepareStructuralUnit(operations: readonly EntityStructureOperation[], finalizers?: Array<()=>void>): PreparedEntityStructure {
++  function prepareStructuralUnit(operations: readonly EntityStructureOperation[], publicationPhase?: PublicationPreparation): PreparedEntityStructure {
+     const frame = createEntityMutationFrame();
+     frame.useProposedPlacement();
+     const stage = structuralStore.preparePlacement();
+@@ -566,10 +567,11 @@
+       }
+     }
+     const prepared = prepareEntityMutationFrame(frame,{advancePhysicalRevision:false,publication:'physical'});
+-    if(finalizers)finalizers.push(prepared.finalize);else prepared.finalize();
++    const phase=publicationPhase ?? new PublicationPreparation();
++    phase.add(prepared.finalize,prepared.validate);if(!publicationPhase)phase.seal();
+     let result: ReturnType<typeof prepared.install> | undefined;
+     return {
+-      install(){result=prepared.install();},
++      install(){if(!publicationPhase)phase.validate();result=prepared.install();},
+       complete(){prepared.complete();},
+       invalidate(){
+         if(!result)throw new Error('Structural source unit not installed');
+@@ -588,7 +590,7 @@
+     };
+   }
+ 
+-  function prepareSelectedRows(operations: readonly SelectedRowIntent[],finalizers?:Array<()=>void>) {
++  function prepareSelectedRows(operations: readonly SelectedRowIntent[],publicationPhase?:PublicationPreparation) {
+     const rows = new Map<number,{subjectId:number;key:string|number;value:unknown;edits:EntityRealizationEdit[];transition:EntityValueTransition<E>}>();
+     const steps: SelectedRowEdit[] = [];
+     for (const operation of operations) {
+@@ -609,7 +611,7 @@
+       rows.set(operation.subject,{subjectId:operation.subject,key:operation.key,value:after,edits:[],transition:previous?Object.freeze({...transition,physicalBefore:previous.transition.physicalBefore,ordinaryBefore:previous.transition.ordinaryBefore}):transition});
+       steps.push({...operation,physicalBefore:before,physicalAfter:after,ordinaryBefore:transition.ordinaryBefore,ordinaryAfter:transition.ordinaryAfter});
+     }
+-    return preparePointValues([...rows.values()],steps,finalizers);
++    return preparePointValues([...rows.values()],steps,publicationPhase);
+   }
+   function stageSelected(id:K, before:E, after:E, fields:readonly string[] | null, selection:ClaimedFieldEndpoint):void {
+     const selections=selectedInverseField(selection,selection.subject,after,id)!;
+@@ -626,7 +628,7 @@
+       transition?: EntityValueTransition<E>;
+     }[],
+     selectedSteps?: readonly SelectedRowEdit[],
+-    finalizers?: Array<()=>void>
++    publicationPhase?: PublicationPreparation
+   ): { install(): void; invalidate(): void; publish(): void; complete():void } {
+     const prepared = values.map(({ subjectId, key, value, edits, transition }) => {
+       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+@@ -657,12 +659,14 @@
+       ordinarySteps ?? prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,
+       selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinarySteps![ordinal]!]}))
+     );
+-    if(finalizers)finalizers.push(()=>publication.unit?.finalize?.());else publication.unit?.finalize?.();
++    const phase=publicationPhase ?? new PublicationPreparation();
++    phase.add(()=>publication.unit?.finalize?.(),()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
+     let completed=false;
+     const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+     return {
+       complete,
+       install(): void {
++        if(!publicationPhase)phase.validate();
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
+         if(publication.unit) installTerminalRecord(publication.unit.record);
+@@ -686,7 +690,7 @@
+           if (epoch) stage(() => advanceEpochHandle(epoch));
+         }
+         stage(() => updateSignals());
+-        if(!finalizers)stage(complete);
++        if(!publicationPhase)stage(complete);
+         if (failed) throw firstError;
+       },
+       publish(): void {
+@@ -793,7 +797,7 @@
+     physicalEffects: readonly import('./internals/causal-runtime/causal-types').ReversalEffect[] = effects,
+     physicalPlacement?: EntityPlacementStage<K>,
+     ordinaryOrder?: readonly number[],
+-    finalizers?: Array<()=>void>
++    publicationPhase?: PublicationPreparation
+   ) {
+     type Presence = OrdinaryEntityPresence<K, E>;
+     const physical = physicalPlacement ?? structuralStore.preparePlacement();
+@@ -1027,7 +1031,8 @@
+     );
+     if(publication.unit)markEntityPublicationFacts(changes,publication.id);
+     const finalize=()=>publication.unit?.finalize?.();
+-    if(finalizers)finalizers.push(finalize);else finalize();
++    const phase=publicationPhase ?? new PublicationPreparation();
++    phase.add(finalize,()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
+     let completed=false;
+     const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+     return {
+@@ -1036,7 +1041,7 @@
+       ordinaryEndpoints,
+       interval: installPlacement.interval,
+       install: () => {
+-
++        if(!publicationPhase)phase.validate();
+         // Both realization callers install the complete physical unit first.
+         // Preserve its backing; this plan installs only ordinary authority.
+         for (const transition of valueTransitions)
+@@ -1046,7 +1051,7 @@
+         installPlacement();
+         if(publication.unit)installTerminalRecord(publication.unit.record);
+         installedReadRevision++;
+-        if(!finalizers)complete();
++        if(!publicationPhase)complete();
+       },
+     };
+   }
+@@ -1312,6 +1317,7 @@
+   ) {
+     const prepared = prepareEntityMutationFrame(frame, options);
+     prepared.finalize();
++    prepared.validate();
+     const result = prepared.install();
+     if(!deferCompletion)prepared.complete();
+     return {...result,complete:prepared.complete};
+@@ -1560,6 +1566,7 @@
+       topologyUnit, orderEndpoints: frame.orderEndpoints,
+     });
+     return {
++      validate(){publication.unit?.validate?.();if(physicalCommitClock?.revision()!==revision)throw new Error('Entity prepared source revision changed');},
+       finalize(){publication.unit?.finalize?.();if(physicalCommitClock?.revision()!==revision)throw new Error('Entity finalization reentered installation');},
+       install() {
+         if (consumed || physicalCommitClock?.revision() !== revision)
+@@ -2492,6 +2499,7 @@
+         'Entity responsibility preparation reentered installation'
+       );
+     publication.unit?.finalize?.();
++    publication.unit?.validate?.();
+     valueStore.installValueTransition(transition);
+     ordinaryPlan.install();
+     if (plan) installTerminalRecord(plan);
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from '../publication-preparation';
+ import { completeScalarFrame } from '../tree-scalar-slot-runtime';
+ import type { EntityStructureOperation, PreparedEntityStructure } from '../prepared-entity-structure';
+ import {scalarFrameMetadata} from '../scalar-publication-coverage';
+@@ -60,7 +61,7 @@
+   __prepareOrdinaryRealization?(
+     effects: readonly ReversalEffect[],
+     physicalAfter?: ReadonlyMap<number, unknown>,
+-    physicalEffects?: readonly ReversalEffect[], _placement?:never,_order?:never,finalizers?:Array<()=>void>
++    physicalEffects?: readonly ReversalEffect[], _placement?:never,_order?:never,publicationPhase?:PublicationPreparation
+   ): { install(): void; complete():void; changes: readonly CommittedEntityMutation[] };
+   __preparePointValues?(
+     values: readonly {
+@@ -68,7 +69,7 @@
+       key: string | number;
+       value: unknown;
+       edits: readonly EntityRealizationEdit[];
+-    }[], _selected?:never, finalizers?:Array<()=>void>
++    }[], _selected?:never, publicationPhase?:PublicationPreparation
+   ): {
+     complete():void;
+     install(): void;
+@@ -93,7 +94,7 @@
+     commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
+     publish(metaOverride?: WriteMetadata): void;
+   };
+-  __prepareStructuralUnit?(operations: readonly EntityStructureOperation[], finalizers?:Array<()=>void>): PreparedEntityStructure;
++  __prepareStructuralUnit?(operations: readonly EntityStructureOperation[], publicationPhase?:PublicationPreparation): PreparedEntityStructure;
+   __planRestore?(
+     key: string | number,
+     entity: unknown,
+@@ -809,7 +810,7 @@
+  const clock=getPhysicalCommitClock(tree.$)??getPhysicalCommitClock(tree);
+  if(!descriptors||!slots||!clock)throw new Error('Selected operation source unavailable');
+  const revision=clock.revision();
+- const edits:SelectedRowIntent[]=[];const deliveries:Array<()=>void>=[];const finalizers:Array<()=>void>=[];
++ const edits:SelectedRowIntent[]=[];const deliveries:Array<()=>void>=[];const publicationPhase=new PublicationPreparation();
+  const scalarEffects:ReversalEffect[]=[];const frame=slots.beginFrame();
+  let active=true;
+  const preparation:SelectedPreparation={stage(edit){if(!active)throw new Error('Selected preparation closed');edits.push(edit);},defer(delivery){if(!active)throw new Error('Selected preparation closed');deliveries.push(delivery);}};
+@@ -823,14 +824,14 @@
+      if(edits.length!==count+1)throw new Error('Selected continuation did not prepare exactly one operation');
+    }
+    const groups=new Map<object,SelectedRowIntent[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
+-   const plans=[...groups.values()].map(group=>group[0]!.prepare(group,finalizers));
++   const plans=[...groups.values()].map(group=>group[0]!.prepare(group,publicationPhase));
+    if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
+-   const installScalars=frame.prepareCommit({advanceRevision:false,publish:false,finalizers});
+-   for(const seal of finalizers)seal();
++   const installScalars=frame.prepareCommit({advanceRevision:false,publish:false,publicationPhase});
++   publicationPhase.seal();
+    if(clock.revision()!==revision)throw new Error('Selected operation preparation reentered installation');
+    active=false;edits.length=0;groups.clear();let installed=false;let scalarResult:ReturnType<typeof installScalars>|undefined;
+    return {
+-     install(){if(installed||clock.revision()!==revision)throw new Error('Selected operation revision changed');scalarResult=installScalars();for(const plan of plans)plan.install();clock.advance();installed=true;},
++     install(){if(installed||clock.revision()!==revision)throw new Error('Selected operation revision changed');publicationPhase.validate();scalarResult=installScalars();for(const plan of plans)plan.install();clock.advance();installed=true;},
+      complete(){let failed=false,first:unknown;for(const work of [()=>{if(scalarResult)completeScalarFrame(scalarResult);},...plans.map(plan=>()=>plan.complete())])try{work();}catch(error){if(!failed){failed=true;first=error;}}plans.length=0;if(failed)throw first;},
+      publish(options){if(!installed||!scalarResult)throw new Error('Selected operation not installed');let failed=false;let first:unknown;const run=(body:()=>void)=>{try{body();}catch(error){if(!failed){failed=true;first=error;}}};
+        try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared({...scalarResult!,publication:undefined}));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);
+@@ -909,6 +910,7 @@
+       install(): void {
+         if (installed || clock.revision() !== baseRevision)
+           throw new Error('Point realization base revision is stale');
++        heterogeneous.validate();
+         members?.install();
+         // Existing structural commits resolve anchors in their established order.
+         // The surrounding invalidation group defers native delivery until all install.
+@@ -1016,18 +1018,18 @@
+   const members = memberTargets.size
+     ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects)
+     : undefined;
+-  const finalizers:Array<()=>void>=[];
++  const publicationPhase=new PublicationPreparation();
+   const collections = [...rows].map(([collection, subjects]) => {
+     const prepare = collection.__preparePointValues;
+     if (!prepare)
+       throw new Error('Point realization preparation is unavailable');
+-    return prepare.call(collection, [...subjects.values()],undefined,finalizers);
++    return prepare.call(collection, [...subjects.values()],undefined,publicationPhase);
+   });
+   if (!frame.prepareCommit) return undefined;
+   const installScalars = members
+     ? () => undefined
+-    : frame.prepareCommit({ advanceRevision: false, publish: false,finalizers });
+-  for(const seal of finalizers)seal();
++    : frame.prepareCommit({ advanceRevision: false, publish: false,publicationPhase });
++  publicationPhase.seal();
+   if (clock.revision() !== baseRevision)
+     throw new Error('Point realization preparation reentered installation');
+   let result: ReturnType<typeof frame.commit> | undefined;
+@@ -1037,6 +1039,7 @@
+     install(): void {
+       if (installed || clock.revision() !== baseRevision)
+         throw new Error('Point realization base revision is stale');
++      publicationPhase.validate();
+       if (members) members.install();
+       else result = installScalars();
+       for (const collection of collections) collection.install();
+@@ -1101,7 +1104,7 @@
+   effects: readonly ReversalEffect[],
+   ordinaryEffects?: readonly ReversalEffect[]
+ ):
+-  | { commit(detachedCompletions?:Array<()=>void>): void; install(): void; invalidate(): void; publish(): void; complete():void }
++  | { commit(detachedCompletions?:Array<()=>void>): void; validate(): void; install(): void; invalidate(): void; publish(): void; complete():void }
+   | undefined {
+   if (
+     !(ordinaryEffects ?? effects).some(
+@@ -1121,7 +1124,7 @@
+     return undefined;
+   }
+ 
+-  const finalizers:Array<()=>void>=[];
++  const publicationPhase=new PublicationPreparation();
+   const basePhysicalRevision = physicalCommitClock?.revision();
+   const scalarEffects = effects.filter((effect) => !effect.structural);
+   const preparedContext = buildPreparedRealizationContext(
+@@ -1272,7 +1275,7 @@
+   // One independently contained delivery per lifetime: a callback from one
+   // row cannot starve a later row after the complete frame is installed.
+   const livePointPlans = withEntityPointPublicationPreparation(()=>[...liveRows].flatMap(([collection, rows]) =>
+-    [...rows.values()].map(row=>collection.__preparePointValues!([row],undefined,finalizers))
++    [...rows.values()].map(row=>collection.__preparePointValues!([row],undefined,publicationPhase))
+   ));
+   const preparedSubjectScalarEffects = scalarEffects.filter((effect) =>
+     isPreparedSubjectScalarEffect(effect, preparedContext)
+@@ -1569,7 +1572,7 @@
+       ].filter((effect) => effect.owner === owner);
+       ordinaryPlans.set(
+         owner,
+-        node.__prepareOrdinaryRealization(group, undefined, physicalGroup,undefined,undefined,finalizers)
++        node.__prepareOrdinaryRealization(group, undefined, physicalGroup,undefined,undefined,publicationPhase)
+       );
+     }
+   }
+@@ -1588,7 +1591,7 @@
+       : meta;
+   };
+ 
+-  const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false,finalizers});
++  const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false,publicationPhase});
+   if (scalarFrame && !installScalarFrame) throw new Error('Scalar realization preparation unavailable');
+   // One source frame sees this unit's complete ordered occupancy proposal.
+   const structuralGroups = new Map<CollectionNode, EntityStructureOperation[]>();
+@@ -1609,9 +1612,9 @@
+       }
+     }
+   }
+-  const structuralUnits=[...structuralGroups].map(([node,operations])=>node.__prepareStructuralUnit!(operations,finalizers));
+-
+-  for(const finalize of finalizers)finalize();
++  const structuralUnits=[...structuralGroups].map(([node,operations])=>node.__prepareStructuralUnit!(operations,publicationPhase));
++
++  publicationPhase.seal();
+   if(physicalCommitClock&&physicalCommitClock.revision()!==basePhysicalRevision)throw new Error('Joint preparation reentered installation');
+   let scalarCommitResult:
+     | ReturnType<NonNullable<typeof scalarFrame>['commit']>
+@@ -1624,6 +1627,7 @@
+       throw new Error('Heterogeneous realization base revision is stale.');
+     }
+ 
++    publicationPhase.validate();
+     scalarCommitResult = installScalarFrame?.();
+ 
+     for (const unit of structuralUnits) unit.install();
+@@ -1723,6 +1727,7 @@
+     if (failed) throw firstError;
+   };
+   return {
++    validate:()=>publicationPhase.validate(),
+     install,
+     invalidate,
+     publish,
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -157,7 +157,7 @@
+       const state:PointPreparation={packets:[],source,unit:undefined,installed:false,finalized:false,completed:false};
+       const completion={};pointCompletions.set(completion,()=>{if(!state.completed){state.completed=true;if(state.unit)source.complete(state.unit.completion);}});
+       const gate={set(_key:unknown,_value:unknown){if(!state.installed){state.installed=true;if(state.unit)installTerminalRecord(state.unit.record);}}};
+-      group={state,publication:{record:{writes:[{map:gate,key:undefined,value:undefined}],adds:[]},completion,finalize:()=>{if(!state.finalized){state.finalized=true;state.unit?.finalize?.();}}}};
++      group={state,publication:{record:{writes:[{map:gate,key:undefined,value:undefined}],adds:[]},completion,validate:()=>state.unit?.validate?.(),finalize:()=>{if(!state.finalized){state.finalized=true;state.unit?.finalize?.();}}}};
+       pointPreparation.set(this,group);
+     }
+     group.state.packets.push(packet);return group.publication;
+@@ -177,14 +177,15 @@
+     if(sourceRevision!==this.revisionToken&&recipientRevision===this.recipientRevision)throw new Error("Entity publication source changed during preparation");
+     if (recipientRevision !== this.recipientRevision) throw new Error('Entity publication recipients changed during preparation');
+     if (!parts.length && !fallbackRecord) return undefined;
++    const validate = () => {
++      if (this.disposed || retirementRevision !== this.retirementRevision || recipientRevision !== this.recipientRevision || sourceRevision !== this.revisionToken)
++        throw new Error('Entity publication source changed before installation');
++    };
+     return {
++      validate,
+       record: combineTerminalRecords(fallbackRecord,...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]})!,
+       completion: { parts },
+       finalize: () => {
+-        const validate = () => {
+-          if (this.disposed || retirementRevision !== this.retirementRevision || recipientRevision !== this.recipientRevision)
+-            throw new Error('Entity publication source changed before installation');
+-        };
+         validate();
+         const beforeFinalize = this.revisionToken;
+         for (const part of parts) part.unit.finalize?.();
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -33,6 +33,8 @@
+   readonly coveredRecipients?: readonly object[];
+   /** Pure private metadata finalization after all callback-capable preparation. */
+   readonly finalize?: () => void;
++  /** Callback-free source identity check before any operation store. */
++  readonly validate?: () => void;
+ }
+ type PublicationPreparer = (mutation: IntrinsicMutation<unknown>, input?: object, native?: object) => PreparedPublicationUnit | undefined;
+ type PublicationInputCapture = () => object | undefined;
+@@ -309,7 +311,7 @@
+     native: native?.captureInput(),
+     inputs: new Map(snapshot.map(([prepare, entry]) => [prepare, entry.captureInput?.()])),
+   });
+-  source.publicationPreparer = (mutation, input) => {
++  const publicationPreparer: PublicationPreparer = (mutation, input) => {
+     const captured = input as PublicationInput | undefined;
+     const nativeUnit = native?.prepare(mutation, captured?.native);
+     const plans: TerminalRecordPlan[] = nativeUnit ? [nativeUnit.record] : [];
+@@ -323,13 +325,15 @@
+     }
+     // Every private unit finalizes after all callback-capable preparation.
+     let sealed=false;
+-    const finalize=()=>{if(sealed)return;sealed=true;for(const seal of finalizers)seal();};
++    const validate=()=>{if(source.publicationPreparer!==publicationPreparer)throw new Error('Scalar publication enrollment changed before installation');};
++    const finalize=()=>{if(sealed)return;sealed=true;validate();for(const seal of finalizers)seal();validate();};
+     if(!mutation.deferPublicationFinalization)finalize();
+     const record = combineTerminalRecords(...plans);
+     if (!record) return undefined;
+     const completion = { parts };
+-    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion,coveredRecipients,finalize };
+-  };
++    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion,coveredRecipients,finalize,validate };
++  };
++  source.publicationPreparer = publicationPreparer;
+ }
+ 
+ /** Optional ordinary-membership admission; producers retain descriptor authority. */
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from './publication-preparation';
+ import { completeScalarFrame } from './tree-scalar-slot-runtime';
+ import { reportContainedObserverError as reportFrameError } from './error-reporter';
+ import type { PositionId } from '../types';
+@@ -117,11 +118,11 @@
+   }
+ 
+   prepareCommit(options?: {
+-    advanceRevision?: boolean; finalizers?: Array<() => void>;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+     publish?: boolean;
+   }): () => ScalarSlotCommitResult {
+     const install = this.frame.prepareCommit({
+-      advanceRevision: options?.advanceRevision, finalizers: options?.finalizers,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
+     });
+     return () => {
+       const result = install();
+@@ -131,11 +132,11 @@
+   }
+ 
+   commit(options?: {
+-    advanceRevision?: boolean; finalizers?: Array<() => void>;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+     publish?: boolean;
+   }): ScalarSlotCommitResult {
+     const result = this.frame.commit({
+-      advanceRevision: options?.advanceRevision, finalizers: options?.finalizers,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
+     });
+     if (options?.publish !== false) {
+       this.publication.publish(result);
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/publication-preparation.ts
+@@ -0,0 +1,21 @@
++/** One operation's source preparation, never an ambient scheduler. */
++export class PublicationPreparation {
++  private readonly seals: Array<() => void> = [];
++  private readonly validations: Array<() => void> = [];
++  private sealed = false;
++  add(seal: () => void, validate: () => void): void {
++    if (this.sealed) throw new Error('Publication preparation is sealed');
++    this.seals.push(seal);
++    this.validations.push(validate);
++  }
++  seal(): void {
++    if (this.sealed) throw new Error('Publication preparation already sealed');
++    this.sealed = true;
++    for (const seal of this.seals) seal();
++  }
++  /** Captured source checks only: no proof resampling or readiness delivery. */
++  validate(): void {
++    if (!this.sealed) throw new Error('Publication preparation is not sealed');
++    for (const validate of this.validations) validate();
++  }
++}
+--- a/packages/kernel/src/lib/internals/selected-write-operation.ts
++++ b/packages/kernel/src/lib/internals/selected-write-operation.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from './publication-preparation';
+ import type {ClaimedFieldEndpoint,NativeFieldEndpoint} from './native-field-selection';
+ /** Intercepted semantic intent, before producer-owned ordinary composition. */
+ export interface SelectedRowIntent {
+@@ -5,7 +6,7 @@
+  readonly physicalBefore:unknown; readonly physicalAfter:unknown;
+  readonly fields:readonly string[] | null;
+  readonly selections:ReadonlyMap<string,NativeFieldEndpoint>;
+- readonly prepare:(edits:readonly SelectedRowIntent[],finalizers?:Array<()=>void>)=>SelectedInstallation;
++ readonly prepare:(edits:readonly SelectedRowIntent[],publicationPhase?:PublicationPreparation)=>SelectedInstallation;
+ }
+ export interface SelectedRowEdit extends SelectedRowIntent {
+  readonly ordinaryBefore:unknown; readonly ordinaryAfter:unknown;
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from './publication-preparation';
+ import { completeScalarFrame } from './tree-scalar-slot-runtime';
+ import { reportContainedObserverError as reportFrameError } from './error-reporter';
+ import type { PositionId } from '../types';
+@@ -104,11 +105,11 @@
+   }
+ 
+   prepareCommit(options?: {
+-    advanceRevision?: boolean; finalizers?: Array<() => void>;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+     publish?: boolean;
+   }): () => ScalarSlotCommitResult {
+     const install = this.frame.prepareCommit({
+-      advanceRevision: options?.advanceRevision, finalizers: options?.finalizers,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
+     });
+     return () => {
+       const result = install();
+@@ -118,11 +119,11 @@
+   }
+ 
+   commit(options?: {
+-    advanceRevision?: boolean; finalizers?: Array<() => void>;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+     publish?: boolean;
+   }): ScalarSlotCommitResult {
+     const result = this.frame.commit({
+-      advanceRevision: options?.advanceRevision, finalizers: options?.finalizers,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
+     });
+     if (options?.publish !== false) {
+       this.publication.publish(result);
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from './publication-preparation';
+ import type { PositionId } from '../types';
+ import type { Location } from './cell-runtime';
+ import { isTraversableNode } from './node-shape';
+@@ -26,11 +27,11 @@
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
+   prepareCommit?(options?: {
+-    advanceRevision?: boolean; finalizers?: Array<() => void>;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+     publish?: boolean;
+   }): () => ScalarSlotCommitResult;
+   commit(options?: {
+-    advanceRevision?: boolean; finalizers?: Array<() => void>;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
+     publish?: boolean;
+   }): ScalarSlotCommitResult;
+ }
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,3 +1,4 @@
++import { PublicationPreparation } from './publication-preparation';
+ import {getActiveWriteContext} from '../write-context';
+ import { prepareScalarSourcePublication, completeScalarSourcePublication, installTerminalRecord } from './intrinsic-mutation';
+ import type { PreparedPublicationUnit, TerminalRecordPlan } from './intrinsic-mutation';
+@@ -43,8 +44,8 @@
+   set(slotIndex: SlotIndex, value: unknown): void;
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
+-  prepareCommit(options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }): () => ScalarSlotCommitResult;
+-  commit(options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }): ScalarSlotCommitResult;
++  prepareCommit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): () => ScalarSlotCommitResult;
++  commit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): ScalarSlotCommitResult;
+ }
+ 
+ export interface TreeScalarSlotRuntime {
+@@ -91,10 +92,10 @@
+     private readonly readValue: (slotIndex: SlotIndex) => unknown,
+     private readonly commitValues: (
+       staged: ReadonlyMap<SlotIndex, unknown>,
+-      options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }
++      options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }
+     ) => ScalarSlotCommitResult,
+     private readonly assertSlotIndex: (slotIndex: SlotIndex) => void,
+-    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }) => () => ScalarSlotCommitResult
++    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }) => () => ScalarSlotCommitResult
+   ) {}
+ 
+   set(slotIndex: SlotIndex, value: unknown): void {
+@@ -118,14 +119,14 @@
+     this.staged.clear();
+   }
+ 
+-  prepareCommit(options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }): () => ScalarSlotCommitResult {
++  prepareCommit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): () => ScalarSlotCommitResult {
+     this.assertOpen();
+     this.closed = true;
+     if (this.getCommittedRevision() !== this.baseRevision) throw new Error('Stale scalar preparation');
+     return this.prepareValues(this.staged, options);
+   }
+ 
+-  commit(options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }): ScalarSlotCommitResult {
++  commit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): ScalarSlotCommitResult {
+     this.assertOpen();
+     this.closed = true;
+ 
+@@ -201,7 +202,7 @@
+   };
+ 
+   // Research-only preparation: run equality before any target installs.
+-  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }): (() => ScalarSlotCommitResult) => {
++  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): (() => ScalarSlotCommitResult) => {
+     const base=getCommittedRevision();
+     const changed=collectSlotChanges(staged);
+     const physical=new Set(changed.map(x=>x.slotIndex));
+@@ -224,7 +225,9 @@
+     }
+     if(getCommittedRevision()!==base)throw new Error('Reentrant scalar preparation');
+     const seal=()=>{for(const unit of units)unit.finalize?.();if(getCommittedRevision()!==base)throw new Error('Reentrant scalar finalization');};
+-    if(options?.finalizers)options.finalizers.push(seal);else seal();
++    const phase=options?.publicationPhase ?? new PublicationPreparation();
++    phase.add(seal,()=>{for(const unit of units)unit.validate?.();});
++    if(!options?.publicationPhase)phase.seal();
+     if(getCommittedRevision()!==base)throw new Error('Reentrant scalar preparation');
+     let used=false;
+     const publication: ScalarFramePublication | undefined = units.length ? {
+@@ -242,6 +245,7 @@
+     return()=>{
+       if(used)throw new Error('Prepared scalar commit already used');
+       if(getCommittedRevision()!==base)throw new Error('Stale prepared scalar commit');
++      if(!options?.publicationPhase)phase.validate();
+       used=true;
+       for(const {slotIndex,nextValue}of changed)values[slotIndex]=nextValue;
+       for(const p of shadowPlans){if(p.keep)inspectionBaseline.set(p.slotIndex,p.value);else inspectionBaseline.delete(p.slotIndex);}
+@@ -255,7 +259,7 @@
+   const commitSlot = <T>(
+     slotIndex: SlotIndex,
+     nextValue: T,
+-    options?: { advanceRevision?: boolean; finalizers?: Array<() => void> }
++    options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }
+   ): SingleSlotCommitResult => {
+     const changed = commitSlotValue(slotIndex, nextValue, options);
+     return changed
+--- /dev/null
++++ b/packages/kernel/src/lib/joint-install-boundary-independent.spec.ts
+@@ -0,0 +1,18 @@
++import {expect,it} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getOwnedPositionIds} from './internals/owned-mutation';
++import {preparePointRealization} from './internals/causal-runtime/tree-realization-adapter';
++for(const change of ['enroll','dispose'] as const)it(`prepared mixed source refuses ${change} before any installation`,()=>{
++ const t=signalTree({left:entityMap<{id:number;n:number},number>(),right:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});let off=()=>{};
++ try{
++  const nodes=[t.$.left,t.$.right];for(const node of nodes)node.addOne({id:1,n:0});
++  const effects=nodes.map(node=>({owner:getOwnedPositionIds(node)![0],subjectId:getEntityPublicationBinding(node.byIdOrFail(1))!.subject!,subjectFieldSegments:['n'],before:0,after:1}));
++  const plan=preparePointRealization(t,effects);expect(plan).toBeDefined();
++  const source=getEntityPublicationBinding(t.$.right)!.source;
++  if(change==='enroll')off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){}});else source.dispose();
++  let error:unknown;try{plan!.install();}catch(e){error=e;}
++  console.log(JSON.stringify({change,refused:error!==undefined,values:nodes.map(n=>n.byIdOrFail(1).n())}));
++  expect(error).toBeDefined();expect(nodes.map(n=>n.byIdOrFail(1).n())).toEqual([0,0]);
++ }finally{off();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/joint-install-validation.spec.ts
+@@ -0,0 +1,29 @@
++import {expect,it} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getOwnedPositionIds} from './internals/owned-mutation';
++import {preparePointRealization} from './internals/causal-runtime/tree-realization-adapter';
++import {preparePublicationMutations} from './internals/intrinsic-mutation';
++import * as life from './experimental-publication/lifecycle';
++for(const reverse of [false,true])for(const change of ['enroll','release','retire'] as const)it(`all source validation precedes stores ${change} reverse=${reverse}`,()=>{
++ const t=signalTree({scalar:0,left:entityMap<{id:number;n:number},number>(),right:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});let off=()=>{};
++ try{
++  const nodes=reverse?[t.$.right,t.$.left]:[t.$.left,t.$.right];for(const n of nodes)n.addOne({id:1,n:0});
++  const source=getEntityPublicationBinding(nodes[1])!.source;let completed=0;
++  const participant={prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){completed++;}};
++  if(change==='release')off=source.subscribe(participant);
++  const effects=[{owner:getOwnedPositionIds(t.$.scalar)![0],before:0,after:1},...nodes.map(node=>({owner:getOwnedPositionIds(node)![0],subjectId:getEntityPublicationBinding(node.byIdOrFail(1))!.subject!,subjectFieldSegments:['n'],before:0,after:1}))];
++  const plan=preparePointRealization(t,effects);expect(plan).toBeDefined();
++  if(change==='enroll')off=source.subscribe(participant);else if(change==='release')off();else source.retire(getEntityPublicationBinding(nodes[1].byIdOrFail(1))!.subject!);
++  expect(()=>plan!.install()).toThrow('Entity publication source changed before installation');
++  expect(t.$.scalar()).toBe(0);expect(nodes.map(n=>n.byIdOrFail(1).n())).toEqual([0,0]);expect(completed).toBe(0);
++ }finally{off();t.destroy();}
++});
++it('scalar recipient enrollment invalidates the whole prepared mixed unit before stores',()=>{
++ const t=signalTree({x:0,rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});let off=()=>{};
++ try{t.$.rows.addOne({id:1,n:0});const plan=preparePointRealization(t,[{owner:getOwnedPositionIds(t.$.rows)![0],subjectId:getEntityPublicationBinding(t.$.rows.byIdOrFail(1))!.subject!,subjectFieldSegments:['n'],before:0,after:1},{owner:getOwnedPositionIds(t.$.x)![0],before:0,after:1}]);expect(plan).toBeDefined();off=preparePublicationMutations(t.$.x,()=>undefined,()=>{})!;expect(()=>plan!.install()).toThrow('Scalar publication enrollment changed before installation');expect(t.$.x()).toBe(0);expect(t.$.rows.byIdOrFail(1).n()).toBe(0);}finally{off();t.destroy();}
++});
++it('validation does not resample a later foreign possible owner or deliver readiness',()=>{
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});const foreign=signalTree({x:0},{enhancers:[transactions()]});let pending:ReturnType<typeof foreign.transact>|undefined;let off=()=>{};let requirement:life.NativeRequirement|undefined;let ready=0;
++ try{t.$.rows.addOne({id:1,n:0});off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(_p,native){requirement=(native as {requirement:life.NativeRequirement}).requirement;life.onNativeRequirementReady(requirement,()=>ready++);return undefined;},complete(){}});const plan=preparePointRealization(t,[{owner:getOwnedPositionIds(t.$.rows)![0],subjectId:getEntityPublicationBinding(t.$.rows.byIdOrFail(1))!.subject!,subjectFieldSegments:['n'],before:0,after:1}]);expect(plan).toBeDefined();expect(requirement).toBeDefined();const before=life.nativeProof(requirement!).possible;expect(before?.length??0).toBe(0);pending=foreign.transact(()=>foreign.$.x(7));plan!.install();expect(life.nativeProof(requirement!).possible).toBe(before);expect(ready).toBe(0);plan!.publish();expect(ready).toBe(1);expect(t.$.rows.byIdOrFail(1).n()).toBe(1);expect(foreign.$.x()).toBe(7);}finally{off();pending?.rollback();t.destroy();foreign.destroy();}
++});
+--- /dev/null
++++ b/packages/vue/src/lib/joint-direct-independent.spec.ts
+@@ -0,0 +1,25 @@
++import {expect,it} from 'vitest';
++import {signalTree,entityMap} from '../index';
++import {getEntityPublicationBinding} from '../../../kernel/src/lib/internals/entity-publication';
++for(const writer of ['update','replace'] as const)for(const throws of [false,true])it(`direct ${writer} completion coherent; throws=${throws}`,()=>{
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>()});
++ t.$.rows.addOne({id:1,n:0});const leaf=t.$.rows.byIdOrFail(1).n;
++ const read=()=>[leaf.value,t.$.rows.byIdOrFail(1).n.value,t.$.rows.all.value.map(x=>({...x}))];
++ expect(read()).toEqual([0,0,[{id:1,n:0}]]);
++ const seen:unknown[]=[];const sentinel=new Error('completion sentinel');let caught:unknown;
++ const stop=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){seen.push(read());if(throws)throw sentinel;}});
++ try{
++  try{if(writer==='update')t.$.rows.updateOne(1,{n:2});else t.$.rows.replaceOne(1,{id:1,n:2});}catch(e){caught=e;}
++  console.log(JSON.stringify({writer,throws,seen,after:read(),caught:caught===sentinel}));
++  expect(caught).toBe(throws?sentinel:undefined);
++  expect(seen.length).toBeGreaterThan(0);
++  expect(read()).toEqual([2,2,[{id:1,n:2}]]);
++  expect(seen).toEqual([[2,2,[{id:1,n:2}]]]);
++ }finally{stop();t.destroy();}
++});
++it('direct completion nested write remains final truth',()=>{
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>()});t.$.rows.addOne({id:1,n:0});
++ let nested=false;let calls=0;
++ const stop=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{}};},complete(){calls++;if(!nested){nested=true;t.$.rows.updateOne(1,{n:777});}}});
++ try{t.$.rows.updateOne(1,{n:2});expect(calls).toBe(2);expect(t.$.rows.byIdOrFail(1).n.value).toBe(777);expect(t.$.rows.all.value).toEqual([{id:1,n:777}]);}finally{stop();t.destroy();}
++});

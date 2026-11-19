@@ -1,0 +1,20 @@
+[
+  {
+    "source": "verify.cjs",
+    "archive": "verify.cjs",
+    "sourceSha256": "93378428f64d0cbff7e40b283a77ea77cba9c71466e6069aa4fb3593e192c692",
+    "archiveSha256": "93378428f64d0cbff7e40b283a77ea77cba9c71466e6069aa4fb3593e192c692"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "f5ac9f877e5b400e3ddf81688ba7e7430d31a7be5c27c187bd80b8396e38f18d",
+    "archiveSha256": "f5ac9f877e5b400e3ddf81688ba7e7430d31a7be5c27c187bd80b8396e38f18d"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "89cf21c5f60309c7a74c02f55ee539b5d557716451c3ab0b86866f695a4422aa",
+    "archiveSha256": "89cf21c5f60309c7a74c02f55ee539b5d557716451c3ab0b86866f695a4422aa"
+  }
+]

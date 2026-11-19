@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel realization-admission-metadata --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:07:31.474Z",
+    "endTime": "2026-11-03T05:07:33.747Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "15747457206784080512",
+      "startTime": "2026-11-03T05:07:31.502Z",
+      "endTime": "2026-11-03T05:07:33.746Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

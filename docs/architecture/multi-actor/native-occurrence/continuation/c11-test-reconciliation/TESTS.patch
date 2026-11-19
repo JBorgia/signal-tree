@@ -1,0 +1,129 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts
+@@ -186,7 +186,10 @@
+           return result;
+         });
+       try {
+-        expect(() => t.undo()).toThrow(mode === 'throw' ? sentinel : /stale/);
++        // Reentry is rejected during joint preparation, before the install guard.
++        expect(() => t.undo()).toThrow(
++          mode === 'throw' ? sentinel : 'Joint preparation reentered installation'
++        );
+       } finally {
+         spy.mockRestore();
+       }
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts
+@@ -36,6 +36,28 @@
+   };
+ }
+ 
++// Scalar callbacks carry an uncovered private receipt even without write context.
++// Check every own field and descriptor; do not discard symbols or accept subsets.
++function expectScalarMetadata(
++  actual: WriteMetadata | undefined,
++  fields: WriteMetadata
++): void {
++  if (actual === undefined) throw new Error('Scalar callback metadata missing');
++  expect(Object.getPrototypeOf(actual)).toBe(Object.prototype);
++  expect(Object.getOwnPropertyNames(actual).sort()).toEqual(Object.keys(fields).sort());
++  for (const [key, value] of Object.entries(fields)) {
++    expect(Object.getOwnPropertyDescriptor(actual, key)).toEqual({
++      value, enumerable: true, configurable: true, writable: true,
++    });
++  }
++  const symbols = Object.getOwnPropertySymbols(actual);
++  expect(symbols).toHaveLength(1);
++  expect(symbols[0].description).toBe('ScalarPublicationCoverage');
++  expect(Object.getOwnPropertyDescriptor(actual, symbols[0])).toEqual({
++    value: undefined, enumerable: true, configurable: true, writable: true,
++  });
++}
++
+ describe('interceptLeafSignals — WriteMetadata passthrough (PR1)', () => {
+   it('passes `meta` from withWriteContext to onWrite on .set()', () => {
+     const tree = { count: signal(0) };
+@@ -51,7 +73,7 @@
+     expect(list[0].ownerPath).toBe('count');
+     expect(list[0].next).toBe(1);
+     expect(list[0].prev).toBe(0);
+-    expect(list[0].meta).toEqual({
++    expectScalarMetadata(list[0].meta, {
+       intent: 'hydrate',
+       origin: 'external',
+       mutationIntent: 'replace',
+@@ -70,7 +92,7 @@
+     });
+ 
+     expect(list).toHaveLength(1);
+-    expect(list[0].meta).toEqual({
++    expectScalarMetadata(list[0].meta, {
+       intent: 'user',
+       mutationIntent: 'derive',
+     });
+@@ -81,7 +103,7 @@
+     restore();
+   });
+ 
+-  it('passes meta=undefined when no withWriteContext frame is active', () => {
++  it('supplies mutation intent and an uncovered receipt when no write context is active', () => {
+     const tree = { count: signal(0) };
+     const { list, onWrite } = captureWrites();
+     const restore = interceptLeafSignals(tree, onWrite);
+@@ -89,7 +111,7 @@
+     tree.count(5); // no context
+ 
+     expect(list).toHaveLength(1);
+-    expect(list[0].meta).toEqual({ mutationIntent: 'replace' });
++    expectScalarMetadata(list[0].meta, { mutationIntent: 'replace' });
+     expect(list[0].ownerPath).toBe('count');
+ 
+     restore();
+@@ -131,11 +153,11 @@
+     });
+ 
+     expect(list).toHaveLength(2);
+-    expect(list[0].meta).toEqual({
++    expectScalarMetadata(list[0].meta, {
+       intent: 'bulk',
+       mutationIntent: 'replace',
+     });
+-    expect(list[1].meta).toEqual({
++    expectScalarMetadata(list[1].meta, {
+       intent: 'bulk',
+       mutationIntent: 'replace',
+     });
+@@ -156,11 +178,11 @@
+     });
+ 
+     expect(list).toHaveLength(2);
+-    expect(list[0].meta).toEqual({
++    expectScalarMetadata(list[0].meta, {
+       intent: 'hydrate',
+       mutationIntent: 'replace',
+     });
+-    expect(list[1].meta).toEqual({
++    expectScalarMetadata(list[1].meta, {
+       intent: 'user',
+       mutationIntent: 'replace',
+     });
+--- a/packages/kernel/src/lib/structural-admission-sequence.spec.ts
++++ b/packages/kernel/src/lib/structural-admission-sequence.spec.ts
+@@ -14,7 +14,16 @@
+  if(owner===undefined||a===undefined||b===undefined||!port?.prepareOrdinaryEffects)throw new Error('Native realization seam unavailable');
+  const prepare=(effects:readonly ReversalEffect[])=>port.prepareOrdinaryEffects!(effects);
+  const rekey=(subjectId:number,before:string|number,after:string|number):ReversalEffect=>({owner,subjectId,before,after,structural:'rekey'});
+- const remove=(subjectId:number,before:string|number):ReversalEffect=>({owner,subjectId,before,after:undefined,structural:'remove'});
++ // Preserve the seeded existence recipe independently of later physical inspection.
++ const removalRecipes=new Map([
++  [a,{key:1,value:{id:1}}],
++  [b,{key:2,value:{id:2}}],
++ ]);
++ const remove=(subjectId:number,before:string|number):ReversalEffect=>{
++  const recipe=removalRecipes.get(subjectId);
++  if(!recipe)throw new Error('Removal fixture has no captured existence recipe');
++  return {owner,subjectId,before,after:undefined,structural:'remove',structuralContext:{kind:'remove',subject:subjectId,...recipe}};
++ };
+  const add=(subjectId:number,after:string|number):ReversalEffect=>({owner,subjectId,before:undefined,after,structural:'add',structuralContext:{kind:'remove',subject:subjectId,key:after,value:{id:after}}});
+  return {tree,port,prepare,a,b,rekey,remove,add};
+ };

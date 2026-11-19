@@ -1,0 +1,5 @@
+[
+  "packages/kernel/src/lib/independent-public-handoff.spec.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+  "packages/kernel/src/lib/structural-completeness.spec.ts"
+]

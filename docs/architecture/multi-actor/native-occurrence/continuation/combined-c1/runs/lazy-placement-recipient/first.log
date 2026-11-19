@@ -1,0 +1,806 @@
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildViteTargets (/private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:113:29)
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vite@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vite/dist/src/plugins/plugin.js:63:44
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 1)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at buildVitestTargets (/private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:114:29)
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/@nx+vitest@23.1.0_499776f45f7edc1085bbaa6e02551444/node_modules/@nx/vitest/dist/src/plugins/plugin.js:56:44
+    at /private/tmp/v16-transition-qualification/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/dist/src/project-graph/plugins/utils.js:8:27 {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 9)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 1) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+(node:43672) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 exit listeners added to [process]. MaxListeners is 10. Use emitter.setMaxListeners() to increase limit
+(Use `node --trace-warnings ...` to show where the warning was created)
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 11)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+[tsconfig-paths] An error occurred while parsing "/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json". See below for details. To disable this message, set the `ignoreConfigErrors` option to true.
+TSConfckParseError: failed to resolve "extends":"/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json" in /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+    at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:262:8)
+    at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+    ... 3 lines matching cause stack trace ...
+    at async Promise.all (index 2)
+    at resolveConfig (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:49259:3)
+    at _createServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_less@4.4.2_lightningcss@1.33.0_sass-embedded@_2c0aacb9731c2b0b489694423b1930b0/node_modules/vite/dist/node/chunks/dep-Dm0c1Wj2.js:38478:66)
+    at createViteServer (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:8835:17)
+    at createVitest (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/chunks/cli-api.24X8XwN1.js:14221:18) {
+  code: 'EXTENDS_RESOLVE',
+  cause: Error: Cannot find module '/private/tmp/st-unknown-access-candidate/tsconfig.typecheck-all.json'
+  Require stack:
+  - /private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json
+      at Module._resolveFilename (node:internal/modules/cjs/loader:1476:15)
+      at wrapResolveFilename (node:internal/modules/cjs/loader:1049:27)
+      at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1094:12)
+      at require.resolve (node:internal/modules/helpers:171:31)
+      at resolveExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:250:14)
+      at parseExtends (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:197:24)
+      at Module.parse (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/tsconfck@3.1.6_typescript@6.0.3/node_modules/tsconfck/src/parse.js:54:23)
+      at async Promise.all (index 8)
+      at configResolved (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/vite-tsconfig-paths@5.1.4_typescript@6.0.3_vite@6.4.3_@types+node@22.18.1_jiti@2.4.2_le_007a28ba5b1f19e6bc135f614cc87088/node_modules/vite-tsconfig-paths/dist/index.js:117:9)
+      at async Promise.all (index 2) {
+    code: 'MODULE_NOT_FOUND',
+    requireStack: [
+      '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+    ]
+  },
+  tsconfigFile: '/private/tmp/st-native-combined-c1/candidate/docs/audits/2026-10-17-incumbent-readiness/unknown-dynamic-access/review/tsconfig.json'
+}
+
+> nx run kernel:test committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts recipient-cause-classification.spec.ts publication-enrollment-invariance.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts recipient-cause-classification.spec.ts publication-enrollment-invariance.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts --maxWorkers=1
+
+(node:43708) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43715) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c1/candidate/packages/kernel
+
+(node:43722) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts (7 tests | 7 failed) 15ms
+     × the thrown error carries a handle to the still-pending transaction 11ms
+     × the recovered handle can settle once the conflict is gone 1ms
+     × callbackFailed is explicit, because callbackError cannot carry it 1ms
+     × a refused rollback on a healthy callback is unchanged 0ms
+     × the original callback error is rethrown, with no recovery 1ms
+     × a destroyed tree attaches no recovery 1ms
+     × reports the partial turn it hands back, not just how to settle it 0ms
+(node:43723) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/ordinary-restoration-placement.spec.ts (13 tests | 1 failed) 29ms
+   × source retains sequential values and last surviving add episode across repeated lifetime and rekey 11ms
+(node:43724) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts (11 tests | 9 failed) 88ms
+     × publishes prepared membership only after every collection and plain member installs 11ms
+     × protects a committed pending reorder before membership callbacks run 2ms
+     × point deltas never scan an inventory of 1000 rows 9ms
+     × point deltas never scan an inventory of 10000 rows 48ms
+     × retains an authored removal following rollback in the same tick (reader=false) 1ms
+     × retains an authored removal following rollback in the same tick (reader=true) 0ms
+     × protects pending membership before reader callbacks can undo 4ms
+     × protects pending membership before reader callbacks can redo 1ms
+     × protects pending membership of the same lifetime before a reader callback can redo 0ms
+(node:43725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/rollback-refusal-scope.spec.ts (4 tests | 3 failed) 20ms
+     × both at once — still pending, still holding 10ms
+     × an explicit confirm() resolves both 1ms
+     × the PLAN-CONFLICT door holds too, and is a separate path 4ms
+(node:43726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts (12 tests | 12 failed) 30ms
+     × coalesces an added field to present undefined without losing its reversal 15ms
+     × coalesces present undefined to absent while retaining its original membership 1ms
+     × keeps a presence-only coalesced transaction inspectable and reversible 1ms
+     × drops an absent-to-present-to-absent net effect without losing sibling work 2ms
+     × preserves queued external presence (ABA=false) across atomic refusal and confirm 2ms
+     × preserves queued external presence (ABA=true) across atomic refusal and confirm 1ms
+     × coalesces an added field to present undefined without losing its reversal 1ms
+     × coalesces present undefined to absent while retaining its original membership 1ms
+     × keeps a presence-only coalesced transaction inspectable and reversible 0ms
+     × drops an absent-to-present-to-absent net effect without losing sibling work 1ms
+     × preserves queued external presence (ABA=false) across atomic refusal and confirm 1ms
+     × preserves queued external presence (ABA=true) across atomic refusal and confirm 3ms
+(node:43727) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts (3 tests | 3 failed) 12ms
+     × preserves selection C to X to C authored by a structural rollback callback 10ms
+     × settles an unrelated pending turn during structural rollback delivery after complete installation 1ms
+     × keeps compound inspection membership and order consistent with inspect and ordinary Link rejection 1ms
+(node:43728) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43730) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/audit-entity-projection.spec.ts (4 tests | 1 failed) 12ms
+     × bare row and field metadata reuse one lazily allocated collection owner 9ms
+(node:43732) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts (1 test | 1 failed) 10ms
+     × keeps untouched inspected order out of the ordinary Link payload after structural rejection 10ms
+(node:43733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43735) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts (3 tests | 3 failed) 12ms
+     × preserves a foreign rekey and retains confirmation after atomic refusal 10ms
+     × preserves foreign lifetime removal while rejecting its own fresh same-key replacement 1ms
+     × retains foreign replacement on refusal and restores original lifetime after conflict removal 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 40 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/audit-entity-projection.spec.ts > entity ownership and order authority controls > bare row and field metadata reuse one lazily allocated collection owner
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ src/lib/audit-entity-projection.spec.ts:23:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/40]⎯
+
+ FAIL  src/lib/ordinary-restoration-placement.spec.ts > source retains sequential values and last surviving add episode across repeated lifetime and rekey
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/lib/ordinary-restoration-placement.spec.ts:78:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > coalesces an added field to present undefined without losing its reversal
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > coalesces an added field to present undefined without losing its reversal
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts:26:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > coalesces present undefined to absent while retaining its original membership
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > coalesces present undefined to absent while retaining its original membership
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts:50:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > keeps a presence-only coalesced transaction inspectable and reversible
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > keeps a presence-only coalesced transaction inspectable and reversible
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts:73:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > drops an absent-to-present-to-absent net effect without losing sibling work
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > drops an absent-to-present-to-absent net effect without losing sibling work
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts:95:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > preserves queued external presence (ABA=false) across atomic refusal and confirm
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: transactions first > preserves queued external presence (ABA=true) across atomic refusal and confirm
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > preserves queued external presence (ABA=false) across atomic refusal and confirm
+ FAIL  src/enhancers/restoration/entity-field-presence-capture.spec.ts > field presence capture: restoration first > preserves queued external presence (ABA=true) across atomic refusal and confirm
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-field-presence-capture.spec.ts:128:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > publishes prepared membership only after every collection and plain member installs
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:23:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > protects a committed pending reorder before membership callbacks run
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:45:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > point deltas never scan an inventory of 1000 rows
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > point deltas never scan an inventory of 10000 rows
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:93:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > retains an authored removal following rollback in the same tick (reader=false)
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > retains an authored removal following rollback in the same tick (reader=true)
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:112:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > protects pending membership before reader callbacks can undo
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > protects pending membership before reader callbacks can redo
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:128:34
+ ❯ withRestorationDesignation src/lib/internals/restoration-eligibility.ts:106:14
+ ❯ undoable src/lib/undoable.ts:78:10
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:128:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/40]⎯
+
+ FAIL  src/enhancers/restoration/entity-membership-capture.spec.ts > production entity membership capture > protects pending membership of the same lifetime before a reader callback can redo
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/restoration/entity-membership-capture.spec.ts:160:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/40]⎯
+
+ FAIL  src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts > compound ordinary order rejection regression > keeps untouched inspected order out of the ordinary Link payload after structural rejection
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts:18:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/40]⎯
+
+ FAIL  src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts > foreign structural disposition across captured segments > preserves a foreign rekey and retains confirmation after atomic refusal
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts:9:41
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/40]⎯
+
+ FAIL  src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts > foreign structural disposition across captured segments > preserves foreign lifetime removal while rejecting its own fresh same-key replacement
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts:16:41
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/40]⎯
+
+ FAIL  src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts > foreign structural disposition across captured segments > retains foreign replacement on refusal and restores original lifetime after conflict removal
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-foreign-disposition-matrix.spec.ts:22:41
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/40]⎯
+
+ FAIL  src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > preserves selection C to X to C authored by a structural rollback callback
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts:17:38
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/40]⎯
+
+ FAIL  src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > settles an unrelated pending turn during structural rollback delivery after complete installation
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts:38:38
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/40]⎯
+
+ FAIL  src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > keeps compound inspection membership and order consistent with inspect and ordinary Link rejection
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ setAll src/lib/entity-signal.ts:4865:27
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts:58:10
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 1 — callback threw and compensation refused > the thrown error carries a handle to the still-pending transaction
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:113:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 1 — callback threw and compensation refused > the recovered handle can settle once the conflict is gone
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:150:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 2 — a thrown undefined still reports a failure > callbackFailed is explicit, because callbackError cannot carry it
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:179:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 3 — CONTROL: refusal with no callback failure > a refused rollback on a healthy callback is unchanged
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:206:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 4 — CONTROL: callback threw, compensation SUCCEEDED > the original callback error is rethrown, with no recovery
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:234:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 5 — no handle when the handle cannot work > a destroyed tree attaches no recovery
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:257:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/40]⎯
+
+ FAIL  src/enhancers/transactions/recovery-handle-0.spec.ts > RECOVERY-HANDLE-0 / 4 — the recovered handle can INSPECT > reports the partial turn it hands back, not just how to settle it
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ makeStore src/enhancers/transactions/recovery-handle-0.spec.ts:68:16
+ ❯ src/enhancers/transactions/recovery-handle-0.spec.ts:280:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/40]⎯
+
+ FAIL  src/enhancers/transactions/rollback-refusal-scope.spec.ts > a refused rollback keeps the turn AND the durable hold > both at once — still pending, still holding
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ refusedRollback src/enhancers/transactions/rollback-refusal-scope.spec.ts:60:15
+ ❯ src/enhancers/transactions/rollback-refusal-scope.spec.ts:86:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/40]⎯
+
+ FAIL  src/enhancers/transactions/rollback-refusal-scope.spec.ts > a refused rollback keeps the turn AND the durable hold > an explicit confirm() resolves both
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ refusedRollback src/enhancers/transactions/rollback-refusal-scope.spec.ts:60:15
+ ❯ src/enhancers/transactions/rollback-refusal-scope.spec.ts:99:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/40]⎯
+
+ FAIL  src/enhancers/transactions/rollback-refusal-scope.spec.ts > a refused rollback keeps the turn AND the durable hold > the PLAN-CONFLICT door holds too, and is a separate path
+ReferenceError: prepareResponsibilityCapture is not defined
+ ❯ commitAndProjectEntityMutationFrame src/lib/entity-signal.ts:1435:7
+    1433|           return {subjectId,key:placement.key,row};
+    1434|         });
+    1435|       })():undefined,
+       |       ^
+    1436|       prepareResponsibilityCapture(ordinaryPlan.changes, topologyUnit,…
+    1437|     );
+ ❯ addOneWithStructuralEffect src/lib/entity-signal.ts:3053:23
+ ❯ addOne src/lib/entity-signal.ts:3956:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/enhancers/transactions/rollback-refusal-scope.spec.ts:133:19
+ ❯ withWriteContext src/lib/write-context.ts:65:12
+ ❯ executeTransaction src/enhancers/transactions/transactions.ts:4664:11
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ Object.transaction [as transact] src/enhancers/transactions/transactions.ts:4679:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/40]⎯
+
+
+ Test Files  9 failed | 3 passed (12)
+      Tests  40 failed | 44 passed (84)
+   Start at  19:47:08
+   Duration  3.83s (transform 486ms, setup 0ms, import 1.17s, tests 289ms, environment 1.53s)
+
+Warning: command "node tools/run-core-vitest.mjs committed-entity-capture.spec.ts entity-field-presence-capture.spec.ts entity-membership-capture.spec.ts audit-entity-projection.spec.ts ordinary-restoration-placement.spec.ts native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts recipient-cause-classification.spec.ts publication-enrollment-invariance.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.2s

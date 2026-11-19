@@ -1,0 +1,21 @@
+{
+  "id": "point-1000-retained-sample3",
+  "ordinal": 22,
+  "profile": "point",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample3",
+  "exit": 0,
+  "pid": 70086,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 1.077147375093773,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1130496,
+  "minimumObservedHostFreePercentage": 45.0,
+  "attempts": 1
+}

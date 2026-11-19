@@ -1,0 +1,6 @@
+Automatic approval rejection of:
+python3 /private/tmp/st-parent-freshness-implementation-independent/c11-test-reconciliation/review-independent-codex-retry.py
+
+This action was rejected due to unacceptable risk.
+Reason: The command submits private repository source, tests, and raw logs to an external Codex service; the user authorized an independent review but not exporting this sensitive payload to that destination.
+Do not bypass this rejection through a workaround or indirect execution. Continue with a safer alternative, or carry out checks to prove that the action is authorized or low risk before trying again. Complete unaffected work without asking for confirmation. Report anything that remains blocked, clarify why it was blocked by auto-review, inform the user of the risk and ask for approval.

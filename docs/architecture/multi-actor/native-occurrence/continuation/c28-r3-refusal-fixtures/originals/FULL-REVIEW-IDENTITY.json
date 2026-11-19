@@ -1,0 +1,9 @@
+{
+  "FAILURES-AS-READ.json": "28daef1e83708009a6b7eaa6d863c0bd6ea88296664eb41d2e35eb25fa29638e",
+  "packages/kernel/src/enhancers/restoration/restoration.spec.ts": "6e7e13999ac6161cec1065804521b5608ad2eb82d2d615c4943450ab63e75c35",
+  "packages/kernel/src/lib/transaction-observer-failure.spec.ts": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+  "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts": "3caf653470ce0136ecd912c60410eda76476c134dad711e6dab2ae63df0af5af",
+  "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts": "9beb551de9a15e2585420c9b62f3aa5d36a62ca2e63071a535e9e36a171905c1",
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6"
+}

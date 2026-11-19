@@ -1,0 +1,8 @@
+{
+  "packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts": "3137c15af4c45b2c681f239e68c12b70057efa05f84b0ef12a1f85bd32bed692",
+  "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0",
+  "packages/react/src/equal-owner-facade-controls.spec.tsx": "7c7525c6fb3fa73d38a6afe7c5f8da49981bf4da49a417272005d8b4120867d1",
+  "packages/solid/src/lib/equal-owner-facade-controls.spec.ts": "f0cf9ad14f4ddaeb4acc566fbe8b7cd47edf1615cbf363e8eec5a54f3a322ebe",
+  "packages/angular/src/lib/equal-owner-facade-controls.spec.ts": "d431664a34accaf94c46d76d0329e462fb0464cda4fa2c1ff0bb8d1afd190510",
+  "packages/vue/src/lib/equal-owner-facade-controls.spec.ts": "1107c9e81c960dc7507690bfde9599aad87e8c40d811fc6eab0d8a5a914ca6f9"
+}

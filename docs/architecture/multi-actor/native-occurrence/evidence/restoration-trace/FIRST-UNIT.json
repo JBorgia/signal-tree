@@ -1,0 +1,284 @@
+[
+  {
+    "seq": 33,
+    "event": "frameReplacement",
+    "data": {
+      "kind": "replace-value",
+      "subject": 1,
+      "nextValue": {
+        "id": "a",
+        "x": 7
+      },
+      "physicalBefore": {
+        "id": "a",
+        "x": 7
+      },
+      "physicalAfter": {
+        "id": "a",
+        "x": 7
+      },
+      "ordinaryBefore": {
+        "id": "a",
+        "x": 7
+      },
+      "ordinaryAfter": {
+        "id": "a",
+        "x": 7
+      }
+    }
+  },
+  {
+    "seq": 34,
+    "event": "entityPacket",
+    "data": {
+      "physical": [
+        {
+          "subject": 1,
+          "before": {
+            "id": "a",
+            "x": 7
+          },
+          "after": {
+            "id": "a",
+            "x": 7
+          },
+          "path": "branch.rows.a",
+          "fields": []
+        }
+      ],
+      "ordinary": [
+        {
+          "subject": 1,
+          "before": {
+            "id": "a",
+            "x": 7
+          },
+          "after": {
+            "id": "a",
+            "x": 7
+          },
+          "path": "branch.rows.a",
+          "fields": []
+        }
+      ],
+      "steps": [
+        {
+          "ordinal": 0,
+          "ordinary": [
+            {
+              "subject": 1,
+              "before": {
+                "id": "a",
+                "x": 7
+              },
+              "after": {
+                "id": "a",
+                "x": 7
+              },
+              "path": "branch.rows.a",
+              "fields": []
+            }
+          ],
+          "physical": [
+            {
+              "subject": 1,
+              "before": {
+                "id": "a",
+                "x": 7
+              },
+              "after": {
+                "id": "a",
+                "x": 7
+              },
+              "path": "branch.rows.a",
+              "fields": []
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "seq": 35,
+    "event": "entityRecipientPrepared",
+    "data": {
+      "affected": true,
+      "changed": false,
+      "next": [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ],
+      "supportEdits": [],
+      "native": {
+        "id": 13
+      }
+    }
+  },
+  {
+    "seq": 36,
+    "event": "completeCollection",
+    "data": {
+      "revision": 40
+    }
+  },
+  {
+    "seq": 37,
+    "event": "setAllNotifyFootprint",
+    "data": {
+      "subject": 1,
+      "fields": null,
+      "before": {
+        "id": "a",
+        "x": 7
+      },
+      "after": {
+        "id": "a",
+        "x": 7
+      }
+    }
+  },
+  {
+    "seq": 40,
+    "event": "prepareMembership",
+    "data": {
+      "address": [],
+      "key": "branch",
+      "present": true,
+      "ordinary": {
+        "before": {
+          "present": false
+        },
+        "after": {
+          "present": true,
+          "value": {
+            "rows": {
+              "all": []
+            }
+          }
+        }
+      }
+    }
+  },
+  {
+    "seq": 41,
+    "event": "completeMembership",
+    "data": {
+      "units": [
+        42
+      ]
+    }
+  },
+  {
+    "seq": 42,
+    "event": "reduceUnit",
+    "data": {
+      "revision": 40,
+      "kind": "collection",
+      "payload": [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ],
+      "native": {
+        "id": 13,
+        "proof": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": [],
+          "destination": [],
+          "input": []
+        }
+      },
+      "proof": {
+        "unknown": false,
+        "invalid": false,
+        "owners": [],
+        "possible": [],
+        "destination": [],
+        "input": []
+      }
+    }
+  },
+  {
+    "seq": 46,
+    "event": "reduceUnit",
+    "data": {
+      "revision": 42,
+      "kind": "membership",
+      "member": {
+        "key": "branch",
+        "present": true,
+        "ordinary": {
+          "before": {
+            "present": false
+          },
+          "after": {
+            "present": true,
+            "value": {
+              "rows": {
+                "all": []
+              }
+            }
+          }
+        }
+      },
+      "native": {
+        "id": 15,
+        "proof": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": [],
+          "destination": [],
+          "input": []
+        }
+      },
+      "proof": {
+        "unknown": false,
+        "invalid": false,
+        "owners": [],
+        "possible": [],
+        "destination": [],
+        "input": []
+      }
+    }
+  },
+  {
+    "seq": 47,
+    "event": "reducedSelection",
+    "data": {
+      "revision": 42,
+      "payload": {
+        "branch": {
+          "rows": {
+            "all": [
+              {
+                "id": "a",
+                "x": 7
+              }
+            ]
+          }
+        },
+        "other": 2
+      },
+      "proof": {
+        "unknown": true,
+        "invalid": false,
+        "owners": [],
+        "possible": [
+          {
+            "id": 10,
+            "outcome": "pending"
+          }
+        ],
+        "destination": [],
+        "input": []
+      },
+      "unresolved": 0
+    }
+  }
+]

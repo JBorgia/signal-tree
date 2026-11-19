@@ -1,0 +1,11 @@
+{
+  "frozenR1ManifestSha256": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b",
+  "basePaths": 3090,
+  "qualificationRuntimeUnchanged": true,
+  "frozenOriginalUnchanged": true,
+  "tracePublicRowsEqualOriginal": true,
+  "traceRows": 20,
+  "candidate-MANIFEST.json": "6fd9fb17205fff68c9603c48f23f347e6a1deb14ae09a4a810f4368580d38c35",
+  "diagnostic-candidate-MANIFEST.json": "33cc7c4640b7f11275a6c102e512d5adf639a6ea2ff9167ca9bdd1d54fe3c90a",
+  "trace-candidate-MANIFEST.json": "23fd5112f98cfbe1583bac71a28228470179ac4559cca4c26201bf10a62ccad5"
+}

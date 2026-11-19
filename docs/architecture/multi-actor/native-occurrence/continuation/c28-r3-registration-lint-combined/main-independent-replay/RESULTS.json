@@ -1,0 +1,50 @@
+[
+  {
+    "label": "production8",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c28-r3-registration-lint-combined/consumer/consumer.production.mjs"
+    ],
+    "cwd": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+    "exit": 0,
+    "timeout": false,
+    "sha256Before": "842a7ea42aa416a090650dcbc30ae1d15053434114168e8c0b79f49e01e97c21",
+    "sha256After": "842a7ea42aa416a090650dcbc30ae1d15053434114168e8c0b79f49e01e97c21"
+  },
+  {
+    "label": "production-lifecycle6",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c28-r3-registration-lint-combined/consumer/lifecycle-consumer.production.mjs"
+    ],
+    "cwd": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+    "exit": 0,
+    "timeout": false,
+    "sha256Before": "0717e3777b25fe27ffeeb7f513d52feb4d91eb3ddf6a010cc8ab169c6ca9e334",
+    "sha256After": "0717e3777b25fe27ffeeb7f513d52feb4d91eb3ddf6a010cc8ab169c6ca9e334"
+  },
+  {
+    "label": "production-receipts6",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c28-r3-registration-lint-combined/consumer/receipt-consumer.production.mjs"
+    ],
+    "cwd": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+    "exit": 0,
+    "timeout": false,
+    "sha256Before": "28fa22de10ce9eb1a17f16c14814d395e321571123c33405f2eb23c6a58a7c3f",
+    "sha256After": "28fa22de10ce9eb1a17f16c14814d395e321571123c33405f2eb23c6a58a7c3f"
+  },
+  {
+    "label": "production-no-link",
+    "argv": [
+      "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "/private/tmp/st-c28-r3-registration-lint-combined/consumer/no-link.production.mjs"
+    ],
+    "cwd": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+    "exit": 0,
+    "timeout": false,
+    "sha256Before": "02bc38229de561bad10c28d6334d60b84eef9efd617dadebca4b62a1526122da",
+    "sha256After": "02bc38229de561bad10c28d6334d60b84eef9efd617dadebca4b62a1526122da"
+  }
+]

@@ -1,0 +1,35 @@
+
+> nx run kernel:test independent-value-work-getter --maxWorkers=1 --silent=false
+
+> node tools/run-core-vitest.mjs independent-value-work-getter --maxWorkers=1 --silent=false
+
+(node:97979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97986) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/value-work-implementation-review/predecessor/packages/kernel
+
+(node:97993) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  12:05:41
+   Duration  2.06s (transform 1.19s, setup 0ms, import 1.44s, tests 27ms, environment 433ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.8s

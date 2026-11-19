@@ -1,0 +1,32 @@
+[
+  {
+    "source": "EMIT-CHECK.json",
+    "archive": "EMIT-CHECK.json",
+    "sourceSha256": "70202c892e7b24e78a0ca56e24c8568cf418aaedfd19747e4653b4a49c7c14bd",
+    "archiveSha256": "70202c892e7b24e78a0ca56e24c8568cf418aaedfd19747e4653b4a49c7c14bd"
+  },
+  {
+    "source": "PATCH.diff",
+    "archive": "PATCH.diff",
+    "sourceSha256": "d95a6dcc6a8c76903371437aacdcc207307f13c3cbb27a69fd4a9f96d003ac93",
+    "archiveSha256": "d95a6dcc6a8c76903371437aacdcc207307f13c3cbb27a69fd4a9f96d003ac93"
+  },
+  {
+    "source": "ORIGINAL.ts",
+    "archive": "ORIGINAL.ts",
+    "sourceSha256": "90a8460e1a7bd75af1f545c3b713b1687d5438f5a0b1690c8799d3bb118f97d7",
+    "archiveSha256": "90a8460e1a7bd75af1f545c3b713b1687d5438f5a0b1690c8799d3bb118f97d7"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "b5780e9cd1607744aa588534e2d4475fdeafa50064fa06210b82653b19def639",
+    "archiveSha256": "b5780e9cd1607744aa588534e2d4475fdeafa50064fa06210b82653b19def639"
+  },
+  {
+    "source": "FIXED.ts",
+    "archive": "FIXED.ts",
+    "sourceSha256": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a",
+    "archiveSha256": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a"
+  }
+]

@@ -1,0 +1,68 @@
+--- C24/packages/kernel/src/lib/experimental-publication/private.ts
++++ provisional-C25/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -21,7 +21,7 @@
+ type Fact=Readonly<{revision:number;clean:boolean;blockers:readonly Cell[];unknown:boolean}>;
+ type Slot=Readonly<{branch:object;key:string;child:object;address?:readonly string[]}>;
+ type Presence=Readonly<{present:boolean;fact:Fact}>;
+-type Unit={collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
++type Unit={collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;invocation?:lifecycle.NativeRequirement;releaseInvocation?:()=>void;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+@@ -158,10 +158,14 @@
+    // Selection is not consumption. Keep every role of the selected predecessor.
+    const admitted=retained.requirement===prepared.requirement;
+    if(!admitted)prepared=lifecycle.prepareNativeRequirement([],authored.unknown,[...consumed,...branchInputs.flatMap(scope=>scope.native),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])]);
+-   const requirement=restoration?restoration.requirement as lifecycle.NativeRequirement:admitted?prepared.requirement:lifecycle.combineNativeRequirements([retained.requirement as lifecycle.NativeRequirement,prepared.requirement]);
+-   const endpoint=admitted?retained:Object.freeze({...retained,requirement});
+-   const view=mutation.changed||!existingView?{requirement}:existingView;
+-   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view},...(!mutation.changed&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:requirement}]:[])],adds:[]})!,completion:{requirement,activation:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
++   // Only an independently supplied retaining literal has no newly consumed input.
++   // Keep derived/branch/entity input evidence on the established admission path.
++   const literal=mutation.intent==='replace'&&branchInputs.length===0&&currentEntityPublicationInputs().length===0;
++   const exact=!!restoration||!admitted&&literal&&retained.owner!==undefined;
++   const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted?prepared.requirement:lifecycle.combineNativeRequirements([retained.requirement as lifecycle.NativeRequirement,prepared.requirement]);
++   const endpoint=exact||admitted?retained:Object.freeze({...retained,requirement});
++   const view=mutation.changed||mutation.physicalChanged||!existingView?{requirement}:existingView;
++   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view},...(view===existingView&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:requirement}]:[])],adds:[]})!,completion:{requirement,activation:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
+   },
+   complete:(completion)=>{lifecycle.deliverNativeRequirementReady((completion as {activation?:lifecycle.NativeRequirement;requirement?:lifecycle.NativeRequirement}).activation??(completion as {requirement?:lifecycle.NativeRequirement}).requirement);},
+  };
+@@ -276,6 +280,8 @@
+  try{
+  for(const unit of b.pending){
+   if(!unit.complete)break;
++  if(unit.invocation&&!lifecycle.nativeRequirementReady(unit.invocation))break;
++  unit.releaseInvocation?.();unit.releaseInvocation=undefined;
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+   const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(proof),...(unit.native?[unit.native]:[])]);
+@@ -361,7 +367,7 @@
+  const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin||uncertainty.uncapturedUpdaterInput||uncertainty.recipientDomain);
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);scalarFacts.add(fact);mutation.publicationPredecessors?.set(channel,fact);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+- const unit:Unit={native,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
++ const unit:Unit={native,invocation:(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
+  const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,uncertainty,fact.blockers,native,b.aggregate,(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation??native);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+@@ -414,7 +420,9 @@
+  const {channel,unit,cleanIngress}=completion as {channel:object;unit:Unit;cleanIngress?:{consumed:boolean}};
+  if(!bindings.get(channel)?.pending.has(unit))return;
+  if(cleanIngress)cleanIngress.consumed=true;
+- unit.complete=true;wakeChannel(channel);
++ unit.complete=true;
++ if(unit.invocation&&!lifecycle.nativeRequirementReady(unit.invocation))unit.releaseInvocation=lifecycle.onNativeRequirementReady(unit.invocation,()=>wakeChannel(channel));
++ wakeChannel(channel);
+ }
+ export function bindSource(channel:object,owner:number,position:number,identity:Parameters<typeof projection.bindSource>[3],report:(error:unknown)=>void=()=>{/* No reporter was supplied. */},source?:object,context?:{registry:object;address:readonly string[];value:unknown;aggregate?:boolean;presence:readonly {parent:object;key:string;child:object;present:boolean}[]}):void{
+  projection.bindSource(channel,owner,position,identity);
+@@ -498,7 +506,7 @@
+  original({...r,run:()=>{if(fact){let set=grants.get(fact);if(!set)grants.set(fact,set=new Set());set.add(channel);}r.run();}});return true;
+ }
+ export function started(fact:Fact|undefined,channel:object):void{if(fact)lifecycle.started(channel,fact,grants.get(fact)?.has(channel)?'surviving':'declared');}
+-export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);}if(b)b.legacyScalars.length=0;for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
++export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);}if(b)b.legacyScalars.length=0;for(const unit of b?.pending??[]){unit.releaseInvocation?.();unit.releaseInvocation=undefined;unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
+ export function heldCount():number{return lifecycle.diagnostics().operations;}
+ export function diagnostics(){return {...lifecycle.diagnostics(),...projection.projectionCounts(),listeners:callbacks.size,latest:bindings.size};}
+ export function declare(channel:object,_owner:number,_position:number,input:unknown,work:()=>unknown,_disposed:()=>boolean){return lifecycle.runDeclaration(channel,input,work);}

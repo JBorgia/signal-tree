@@ -1,0 +1,14 @@
+{
+  "/private/tmp/st-c28-r3-reader-memory/run-r1.py": "1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344",
+  "/private/tmp/st-c28-r3-reader-memory/R1/runs/baseline-2048-r1/OWNED.json": "1029e5a553b5177434cd40ba2fe239569b3121200060f085f8d5dc6fa647020b",
+  "/private/tmp/st-c28-r3-reader-memory/R1/runs/baseline-2048-r1/first.log": "e50dd1a1e5c3fab926363d6224e673c667ee23cad68928917ae8fbfe5ea4d3ef",
+  "/private/tmp/st-c28-r3-reader-memory/R1/runs/baseline-2048-r1/WATCHDOG.json": "faf663c5871978ac646f3bc9b132e9ca5fec0532d27ec33b07a70c685926818b",
+  "/private/tmp/st-c28-r3-reader-memory/R1/runs/baseline-2048-r1/SIGNALS.jsonl": "6aec5c2cc8a5d39016696aed52c632e7317e5a61f9a2b16412e4ba8ffad86017",
+  "/private/tmp/st-c28-r3-reader-memory/baseline/candidate/tools/run-core-vitest.mjs": "7f10fcc5361b9f5112bcca63e9b1459b220a806928574dd7d2c9eac6441f5a00",
+  "/private/tmp/st-c28-r3-reader-memory/baseline/candidate/packages/kernel/project.json": "6a72ec115860f8f2dea793e2fb36a350fcbec6a2b98c9f56e289bcce11037687",
+  "/private/tmp/st-c28-r3-reader-memory/baseline/candidate/nx.json": "e2048ccf0f8cc92dd42d65e7aa2b8e7f7cf87a504cab666d3020f86b6dc535db",
+  "/Users/jonathanborgia/code/signaltree/node_modules/nx/dist/src/utils/cache-directory.js": "30c2b8ab9c9a3d454aa674eb71956f93ba6732630055a12c8ff711def8ae8982",
+  "/Users/jonathanborgia/code/signaltree/node_modules/nx/dist/src/project-graph/project-graph.js": "771a7353a3b43e13f179671c7f1ba0103253a078e25d057d4243dc55c1c1edf5",
+  "/Users/jonathanborgia/code/signaltree/node_modules/nx/dist/src/tasks-runner/task-orchestrator.js": "6418f14780e1a108198e1c1a40457403dada6dad4ce72041bb8cc6828792b34a",
+  "/Users/jonathanborgia/code/signaltree/node_modules/nx/dist/src/command-line/show/project.js": "f8032b63853f53026973522045e81666db8ecea86667269a91617dfecbbc61b9"
+}

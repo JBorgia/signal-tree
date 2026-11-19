@@ -1,0 +1,35 @@
+{
+  "sealedAt": "2026-11-04T00:49:09.367559+00:00",
+  "candidate": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+  "branch": "codex/v16-integration-qualification",
+  "qualifiedCodeCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+  "documentationCommit": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+  "documentationTree": "68a92d9ff68aed8bda453c2e62669f52bfa9b62f",
+  "candidateClean": true,
+  "artifactSeal": "sha256-7892fe8daaff3c11fce09d3d5f2a4614ad5cadb45bdb0b8369ab94450a7940d9",
+  "sourceInputManifestSha256": "85fa30697244a34395e1716dc4236a98154753fa9df7be9097a2b7e2d47ab278",
+  "archive": {
+    "file": "qualification-evidence.tar.gz",
+    "bytes": 15281221,
+    "sha256": "f0dcad898f0f4dd75cd558aaff186fba7da4e265f19de8b14697fbcdf0bb343a",
+    "members": 4220,
+    "artifactSeal": "sha256-7892fe8daaff3c11fce09d3d5f2a4614ad5cadb45bdb0b8369ab94450a7940d9",
+    "codeCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e"
+  },
+  "finalStagedControls": {
+    "sourceManifestSha256": "1633b76bb7244fd952b288511fb5c6950db2fb3389efe23431fc160e8adae9c7",
+    "exit": 0,
+    "timeout": false,
+    "guardReason": null,
+    "maxObservedOwnedRssBytes": 116080640,
+    "minObservedHostFreePercentage": 53.0,
+    "sourceMismatches": [],
+    "remainingOwned": [],
+    "completedAt": "2026-11-04T00:47:46.808526+00:00"
+  },
+  "productionDemoManifestSha256": "0195946564a806ce1420c4f92a592d652e0e966b398b917dbe31742b61f69078",
+  "remoteActions": false,
+  "disposition": "HOLD for point-work/runtime-cost acceptance; complete current outer mutation proof required before release",
+  "rootCoordinationBranch": "fix/d1-d2-forward-port",
+  "rootCoordinationHead": "628d302dadb082a48c58528651c9088234d0a777"
+}

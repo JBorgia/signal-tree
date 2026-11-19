@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "git",
+    "archive",
+    "--format=tar",
+    "87f6831fa60cafe87508f0ace84b7638698ca3b0"
+  ],
+  "cwd": "/Users/jonathanborgia/code/signaltree"
+}

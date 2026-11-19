@@ -1,0 +1,8 @@
+{
+  "cwd": "/private/tmp/st-retained-source-controls/main-copy",
+  "command": [
+    "node",
+    "tools/check-spec-types.mjs"
+  ],
+  "exit": 0
+}

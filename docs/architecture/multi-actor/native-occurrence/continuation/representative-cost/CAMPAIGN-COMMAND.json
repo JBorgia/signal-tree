@@ -1,0 +1,12 @@
+{
+  "issuedAt": "2026-11-03T18:38:43.201766+00:00",
+  "argv": [
+    "python3",
+    "/private/tmp/st-v16-representative-cost/campaign.py"
+  ],
+  "stdoutStderr": "/private/tmp/st-v16-representative-cost/campaign.log",
+  "preregistration": "/private/tmp/st-v16-representative-cost/PREREGISTRATION.json",
+  "preregistrationSha256": "b146b78582c7fdcef539baab91dd84c6f5efbd6d6acbffc2d65e59f3b45a4889",
+  "maxCostChildren": 84,
+  "exclusiveHeavySlot": true
+}

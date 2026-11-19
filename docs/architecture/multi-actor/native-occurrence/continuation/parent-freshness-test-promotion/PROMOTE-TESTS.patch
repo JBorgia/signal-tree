@@ -1,0 +1,251 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-snapshot-currentness.spec.ts
+@@ -0,0 +1,49 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,link,transactions} from '../index';
++import {registerMembershipPublication} from './internals/intrinsic-mutation';
++import {materializeMember,ordinaryBranch,registerMarkerProcessor} from './internals/materialize-markers';
++import {getLocationRuntime} from './internals/location-runtime';
++
++type Image=Record<string,{n:number}>;
++type Cell={():number;(value:number):void;};
++type Child={():{n:number};n:Cell};
++type Rows={():Image;(value:Image):void;[key:string]:unknown};
++const KIND=Symbol('parent-currentness-keyed');type Marker={[KIND]:true;seed:Image};
++registerMarkerProcessor((v:unknown):v is Marker=>typeof v==='object'&&v!==null&&KIND in v,(m:Marker)=>ordinaryBranch(m.seed,{keyedLookup:true}));
++function setup(keyed:boolean){
++ const t=signalTree({rows:keyed?({[KIND]:true,seed:{}} as Marker):({} as Image),sibling:{n:20}},{enhancers:[transactions()]});
++ const rows=t.$.rows as unknown as Rows;return{t,rows};
++}
++function child(rows:Rows,key:string):Child{const x=rows[key];if(typeof x!=='function'||!('n'in x)||typeof x.n!=='function')throw Error('missing actual installed child');return x as Child;}
++function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
++for(const keyed of [false,true])it(`fresh read-derived completion retains a and nested b: ${keyed?'keyed':'ordinary'}`,()=>{
++ const {t,rows}=setup(keyed);const l=link(rows,{set:()=>{}});const sentinel=Error('completion sentinel');let calls=0;let seen:unknown;let physical:unknown;let held:Child|undefined;let supplied:unknown;
++ rows();
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'&&e.ordinary?.before.present===false?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;seen=rows();held=child(rows,'a');physical=held.n();const next={...rows(),b:{n:2}};supplied=next;rows(next);throw sentinel;});
++ try{
++  expect(()=>keyed?materializeMember(rows,'a',{n:1}):rows({a:{n:1}})).toThrow(sentinel);
++  off();const after=rows();record(`kernel-${keyed?'keyed':'ordinary'}`,{calls,seen,physical,supplied,after});
++  expect(calls).toBe(1);expect(physical).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect.soft(supplied).toEqual({a:{n:1},b:{n:2}});expect.soft(after).toEqual({a:{n:1},b:{n:2}});expect(child(rows,'a')).toBe(held);
++ held!.n(3);child(rows,'b').n(4);
++  expect(rows()).toEqual({a:{n:3},b:{n:4}});
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('fresh ancestor and sibling identity during completion; no repeated-read churn',()=>{
++ const {t,rows}=setup(false);const rootBefore=t.$();const sibling=t.$.sibling();let seen:unknown;let rootDuring:{rows:unknown;sibling:{n:number}}|undefined;let first:Image|undefined;let repeat=false;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;first=rows();seen=first;rootDuring=t.$();repeat=Array.from({length:100},()=>rows()).every(v=>v===first);});
++ try{rows({a:{n:1}});expect(calls).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect(rootDuring?.rows).toEqual({a:{n:1}});expect(rootDuring).not.toBe(rootBefore);expect(rootDuring?.sibling).toBe(sibling);expect(repeat).toBe(true);expect(rows()).toBe(first);expect(t.$()).toBe(rootDuring);}
++ finally{off();t.destroy();}
++});
++
++it('ordinary unchanged reads and unrelated writes preserve memo identities',()=>{
++ const {t,rows}=setup(false);try{rows({a:{n:1}});const first=rows();const root=t.$();for(let i=0;i<100;i++){expect(rows()).toBe(first);expect(t.$()).toBe(root);} t.$.sibling.n(21);expect(rows()).toBe(first);expect(t.$().sibling).toEqual({n:21});}finally{t.destroy();}
++});
++
++it('no observer or snapshot demand performs no derived output work; counter has positive calibration',()=>{
++ const {t,rows}=setup(false);const runtime=getLocationRuntime(rows);if(!runtime)throw Error('missing actual location runtime');const original=runtime.createDerived.bind(runtime);let computations=0;
++ const spy=vi.spyOn(runtime,'createDerived').mockImplementation(<T>(compute:()=>T)=>original(()=>{computations++;return compute();}));
++ try{rows({a:{n:1}});child(rows,'a').n(7);expect(computations).toBe(0);expect(rows()).toEqual({a:{n:7}});expect(computations).toBeGreaterThan(0);const count=computations;const first=rows();for(let i=0;i<100;i++)expect(rows()).toBe(first);expect(computations).toBe(count);}finally{spy.mockRestore();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-freshness-focused.spec.ts
+@@ -0,0 +1,55 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,transactions} from '../index';
++import {getTreeScalarSlotRuntime} from './internals/tree-scalar-slot-port';
++import {getOwnedPositionIds} from './internals/owned-metadata';
++import {completeScalarFrame} from './internals/tree-scalar-slot-runtime';
++import {bindLocationRuntime,getLocationRuntime,replaceLocation,deriveLocation} from './internals/location-runtime';
++import {observeIntrinsicMutations,preparePublicationMutations,registerMembershipPublication} from './internals/intrinsic-mutation';
++import {markTreeStore} from './internals/snapshot-authority';
++import {materializeNode} from './utils';
++
++function write(leaf:unknown,value:number){if(typeof leaf!=='function')throw Error('missing leaf');(leaf as (v:number)=>void)(value);}
++function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}
++it('prepared slot completion discriminates current snapshot from undelivered native mirror and derived',()=>{
++ const t=signalTree({box:{n:1},sibling:{n:8}},{enhancers:[transactions()]});const rt=getTreeScalarSlotRuntime(t.$)!;const lr=getLocationRuntime(t.$)!;
++ let runs=0;const observed=lr.createDerived(()=>{runs++;return t.$.box();});const before=observed();const sibling=t.$.sibling();let delivered=0;let during:unknown;let mirror:unknown;let cached:unknown;let direct:unknown;let root:unknown;
++ const off=preparePublicationMutations(t.$.box.n,()=>({record:{writes:[],adds:[]},completion:{}}),()=>{delivered++;during=t.$.box();mirror=t.$.box.n();cached=observed();direct=t.$.box();root=t.$();});expect(off).toBeTypeOf('function');
++ try{const id=getOwnedPositionIds(t.$.box.n)![0]!;const slot=rt.resolveScalarSlot(id)!;const frame=rt.beginFrame();frame.set(slot,2);const install=frame.prepareCommit!({publish:false});const installed=install();completeScalarFrame(installed);
++ save('terminal-window',{delivered,during,mirror,cached,direct,root,runs});expect(delivered).toBe(1);expect(during).toEqual({n:2});expect(direct).toBe(during);expect(root).toEqual({box:{n:2},sibling:{n:8}});expect(t.$.sibling()).toBe(sibling);expect(mirror).toBe(2);
++ rt.publishPrepared(installed);expect(observed()).toEqual({n:2});expect(t.$.box()).toBe(during);expect(runs).toBeGreaterThan(1);
++ write(t.$.box.n,3);expect(observed()).toEqual({n:3});write(t.$.box.n, t.$.box.n()+1);expect(observed()).toEqual({n:4});
++ }finally{off!();t.destroy();}
++});
++it('new child dependencies survive early current read then normal delivery',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>,other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let runs=0;const held=lr.createDerived(()=>{runs++;return t.$();});held();let early:unknown;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===t.$.rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;early=t.$();});
++ try{t.$.rows({a:{n:1}});expect(calls).toBe(1);expect(held()).toBe(early);const n=runs;write((t.$.rows.a as unknown as {n: unknown}).n,2);expect(held().rows).toEqual({a:{n:2}});expect(runs).toBeGreaterThan(n);const m=runs;write(t.$.other.n,3);expect(held().other).toEqual({n:3});expect(runs).toBeGreaterThan(m);}finally{off();t.destroy();}
++});
++it('held dormant descendants recover on equal-value reactivation without sibling invalidation',()=>{
++ const t=signalTree({rows:{a:{deep:{n:1}},b:{deep:{n:2}}}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;const a=t.$.rows.a;const deep=a.deep;deep();const held=lr.createDerived(()=>t.$.rows());held();
++ try{t.$.rows({b:{deep:{n:2}}} as {a:{deep:{n:number}};b:{deep:{n:number}}});expect(held()).toEqual({b:{deep:{n:2}}});expect(deep()).toBeUndefined();write(deep.n,1);expect(held()).toEqual({a:{deep:{n:1}},b:{deep:{n:2}}});expect(deep()).toEqual({n:1});write(deep.n,3);expect(held().a.deep.n).toBe(3);}finally{t.destroy();}
++});
++it('supported symbol store child shares ancestry before grouped slot delivery',()=>{
++ const key=Symbol('child');const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ // Existing supported unwrap/materialize plain-store form; no symbol write API invented.
++ const store:{[key]:typeof t.$.box}={[key]:t.$.box};markTreeStore(store);bindLocationRuntime(store,lr);const read=()=>materializeNode<{[key]:{n:number}}>(store);const old=read();
++ try{const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);const result=frame.commit({publish:false});expect(read()[key]).toEqual({n:2});expect(read()).not.toBe(old);const now=read();rt.publishPrepared(result);expect(read()).toBe(now);write(t.$.box.n,3);expect(read()[key].n).toBe(3);}finally{t.destroy();}
++});
++it('no-op and discarded preparation preserve output; temporary delivery builds are measured',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let builds=0;const create=lr.createDerived.bind(lr);const spy=vi.spyOn(lr,'createDerived').mockImplementation(<T>(fn:()=>T)=>create(()=>{builds++;return fn();}));
++ try{const before=t.$.box();const count=builds;write(t.$.box.n,1);expect(t.$.box()).toBe(before);const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const canceled=rt.beginFrame();canceled.set(slot,2);canceled.discard();expect(t.$.box()).toBe(before);expect(builds).toBe(count);
++ const frame=rt.beginFrame();frame.set(slot,3);const result=frame.commit({publish:false});const current=t.$.box();expect(current).toEqual({n:3});const earlyBuilds=builds;for(let i=0;i<20;i++)expect(t.$.box()).toBe(current);expect(builds).toBe(earlyBuilds);rt.publishPrepared(result);expect(t.$.box()).toBe(current);save('builder-work',{initialTrackedBuilds:count,beforeDelivery:earlyBuilds,afterDelivery:builds,limit:'tracked derived callback executions only; direct fallback builds not counted'});expect(builds).toBeGreaterThan(count);
++ }finally{spy.mockRestore();t.destroy();}
++});
++
++it('refused prepared slot leaves physical value and snapshot identity unchanged',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const before=t.$();const sentinel=Error('prepare refused');const rt=getTreeScalarSlotRuntime(t.$)!;
++ const off=preparePublicationMutations(t.$.box.n,()=>{throw sentinel;},()=>{throw Error('must not complete');});expect(off).toBeTypeOf('function');
++ try{const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);expect(()=>frame.prepareCommit!({publish:false})).toThrow(sentinel);expect(t.$()).toBe(before);expect(t.$.box.n()).toBe(1);}finally{off!();t.destroy();}
++});
++it('direct replace and derive capture read installed backing before native publication',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});t.$.box();const seen:unknown[]=[];
++ const off=observeIntrinsicMutations(t.$.box.n,()=>{seen.push({parent:t.$.box(),mirror:t.$.box.n()});},false);expect(off).toBeTypeOf('function');
++ try{t.$.box.n(2);t.$.box.n(n=>n+1);save('direct-capture',seen);expect(seen).toEqual([{parent:{n:2},mirror:2},{parent:{n:3},mirror:3}]);expect(t.$.box()).toEqual({n:3});}finally{off!();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-freshness-entity.spec.ts
+@@ -0,0 +1,12 @@
++import {it,expect} from 'vitest';import {signalTree,entityMap,transactions} from '../index';
++import {getLocationRuntime} from './internals/location-runtime';import {getEntityPublicationBinding} from './internals/entity-publication';
++
++for(const sorted of [false,true])it(`entity wrapper early identity and subsequent dependencies sorted=${sorted}`,()=>{
++ let comparisons=0;const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:sorted?(a,b)=>{comparisons++;return a.n-b.n;}:undefined}),other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const old=t.$();let runs=0;const held=lr.createDerived(()=>{runs++;return t.$();});held();let early:unknown;let inside:unknown;let calls=0;
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;early=t.$();inside=held();expect(t.$()).toBe(early);}});
++ lr.runInvalidationGroup(()=>{t.$.rows.addOne({id:3,n:0});});off();off=undefined;
++ expect(calls).toBe(1);expect(inside).toBe(old);expect(early).toBeDefined();expect((early as unknown as {rows:{all:{id:number}[]}}).rows.all.map(x=>x.id)).toEqual(sorted?[3,2,1]:[1,2,3]);expect(t.$()).toBe(early);expect(held()).toBe(early);
++ const prior=runs;t.$.rows.addOne({id:4,n:4});expect(held().rows.all).toHaveLength(4);expect(runs).toBeGreaterThan(prior);const stable=t.$();const comparisonCount=comparisons;for(let i=0;i<20;i++)expect(t.$()).toBe(stable);expect(comparisons).toBe(comparisonCount);
++ }finally{off?.();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-snapshot-currentness.spec.ts
+@@ -0,0 +1,50 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {join} from 'node:path';
++import {signalTree,link,transactions} from '../index';
++import {computed,isSignal} from '@angular/core';
++import {registerMembershipPublication} from '../../../kernel/src/lib/internals/intrinsic-mutation';
++import {materializeMember,ordinaryBranch,registerMarkerProcessor} from '../../../kernel/src/lib/internals/materialize-markers';
++import {getLocationRuntime} from '../../../kernel/src/lib/internals/location-runtime';
++
++type Image=Record<string,{n:number}>;
++type Cell={():number;set(value:number):void;update(fn:(n:number)=>number):void;};
++type Child={():{n:number};n:Cell};
++type Rows={():Image;(value:Image):void;[key:string]:unknown};
++const KIND=Symbol('parent-currentness-keyed');type Marker={[KIND]:true;seed:Image};
++registerMarkerProcessor((v:unknown):v is Marker=>typeof v==='object'&&v!==null&&KIND in v,(m:Marker)=>ordinaryBranch(m.seed,{keyedLookup:true}));
++function setup(keyed:boolean){
++ const t=signalTree({rows:keyed?({[KIND]:true,seed:{}} as Marker):({} as Image),sibling:{n:20}},{enhancers:[transactions()]});
++ const rows=t.$.rows as unknown as Rows;return{t,rows};
++}
++function child(rows:Rows,key:string):Child{const x=rows[key];if(typeof x!=='function'||!('n'in x)||typeof x.n!=='function')throw Error('missing actual installed child');return x as Child;}
++function record(name:string,value:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2));}
++for(const keyed of [false,true])it(`fresh read-derived completion retains a and nested b: ${keyed?'keyed':'ordinary'}`,()=>{
++ const {t,rows}=setup(keyed);const l=link(rows,{set:()=>{}});const sentinel=Error('completion sentinel');let calls=0;let seen:unknown;let physical:unknown;let held:Child|undefined;let supplied:unknown;
++ rows();
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'&&e.ordinary?.before.present===false?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;seen=rows();held=child(rows,'a');physical=held.n();const next={...rows(),b:{n:2}};supplied=next;rows(next);throw sentinel;});
++ try{
++  expect(()=>keyed?materializeMember(rows,'a',{n:1}):rows({a:{n:1}})).toThrow(sentinel);
++  off();const after=rows();record(`angular-${keyed?'keyed':'ordinary'}`,{calls,seen,physical,supplied,after});
++  expect(calls).toBe(1);expect(physical).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect.soft(supplied).toEqual({a:{n:1},b:{n:2}});expect.soft(after).toEqual({a:{n:1},b:{n:2}});expect(child(rows,'a')).toBe(held);
++ held!.n.set(3);child(rows,'b').n.update(n=>n+2);
++  expect(rows()).toEqual({a:{n:3},b:{n:4}});
++ }finally{off();l.dispose();t.destroy();}
++});
++
++it('fresh ancestor and sibling identity during completion; no repeated-read churn',()=>{
++ const {t,rows}=setup(false);const rootBefore=t.$();const sibling=t.$.sibling();let seen:unknown;let rootDuring:{rows:unknown;sibling:{n:number}}|undefined;let first:Image|undefined;let repeat=false;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;first=rows();seen=first;rootDuring=t.$();repeat=Array.from({length:100},()=>rows()).every(v=>v===first);});
++ try{rows({a:{n:1}});expect(calls).toBe(1);expect.soft(seen).toEqual({a:{n:1}});expect(rootDuring?.rows).toEqual({a:{n:1}});expect(rootDuring).not.toBe(rootBefore);expect(rootDuring?.sibling).toBe(sibling);expect(repeat).toBe(true);expect(rows()).toBe(first);expect(t.$()).toBe(rootDuring);}
++ finally{off();t.destroy();}
++});
++
++it('ordinary unchanged reads and unrelated writes preserve memo identities',()=>{
++ const {t,rows}=setup(false);try{rows({a:{n:1}});const first=rows();const root=t.$();for(let i=0;i<100;i++){expect(rows()).toBe(first);expect(t.$()).toBe(root);} t.$.sibling.n.set(21);expect(rows()).toBe(first);expect(t.$().sibling).toEqual({n:21});}finally{t.destroy();}
++});
++
++it('warmed Angular computed preserves notification timing while direct held reader is current',()=>{
++ const {t,rows}=setup(false);const direct=rows;let runs=0;const cached=computed(()=>{runs++;return rows();});const before=cached();const initialRuns=runs;let insideNative:unknown;let insideDirect:unknown;let insideRuns=0;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;insideNative=cached();insideRuns=runs;insideDirect=direct();});
++ try{rows({a:{n:1}});const current=cached();record('angular-native-timing',{calls,insideNative,insideDirect,insideRuns,initialRuns,after:current,runs});expect(calls).toBe(1);expect(isSignal(child(rows,'a').n)).toBe(true);expect(insideNative).toBe(before);expect(insideRuns).toBe(initialRuns);expect(current).toEqual({a:{n:1}});expect(runs).toBeGreaterThan(initialRuns);expect(insideDirect).toEqual({a:{n:1}});}finally{off();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-freshness-focused.spec.ts
+@@ -0,0 +1,55 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';import {join} from 'node:path';
++import {signalTree,transactions} from '../index';
++import {getTreeScalarSlotRuntime} from '../../../kernel/src/lib/internals/tree-scalar-slot-port';
++import {getOwnedPositionIds} from '../../../kernel/src/lib/internals/owned-metadata';
++import {completeScalarFrame} from '../../../kernel/src/lib/internals/tree-scalar-slot-runtime';
++import {bindLocationRuntime,getLocationRuntime,replaceLocation,deriveLocation} from '../../../kernel/src/lib/internals/location-runtime';
++import {observeIntrinsicMutations,preparePublicationMutations,registerMembershipPublication} from '../../../kernel/src/lib/internals/intrinsic-mutation';
++import {markTreeStore} from '../../../kernel/src/lib/internals/snapshot-authority';
++import {materializeNode} from '../../../kernel/src/lib/utils';
++import {computed} from '@angular/core';
++function write(leaf:unknown,value:number){if(typeof leaf!=='function'||!('set'in leaf)||typeof leaf.set!=='function')throw Error('missing native leaf');(leaf as unknown as {set(v:number):void}).set(value);}
++function save(name:string,data:unknown){const out=process.env.ST_PREPARED_REVIEW_OUTPUT;if(out)writeFileSync(join(out,name+'.json'),JSON.stringify(data,null,2));}
++it('prepared slot completion discriminates current snapshot from undelivered native mirror and derived',()=>{
++ const t=signalTree({box:{n:1},sibling:{n:8}},{enhancers:[transactions()]});const rt=getTreeScalarSlotRuntime(t.$)!;const lr=getLocationRuntime(t.$)!;
++ let runs=0;const observed=computed(()=>{runs++;return t.$.box();});const before=observed();const sibling=t.$.sibling();let delivered=0;let during:unknown;let mirror:unknown;let cached:unknown;let direct:unknown;let root:unknown;
++ const off=preparePublicationMutations(t.$.box.n,()=>({record:{writes:[],adds:[]},completion:{}}),()=>{delivered++;during=t.$.box();mirror=t.$.box.n();cached=observed();direct=t.$.box();root=t.$();});expect(off).toBeTypeOf('function');
++ try{const id=getOwnedPositionIds(t.$.box.n)![0]!;const slot=rt.resolveScalarSlot(id)!;const frame=rt.beginFrame();frame.set(slot,2);const install=frame.prepareCommit!({publish:false});const installed=install();completeScalarFrame(installed);
++ save('terminal-window',{delivered,during,mirror,cached,direct,root,runs});expect(delivered).toBe(1);expect(during).toEqual({n:2});expect(direct).toBe(during);expect(root).toEqual({box:{n:2},sibling:{n:8}});expect(t.$.sibling()).toBe(sibling);expect(mirror).toBe(1);expect(cached).toBe(before);
++ rt.publishPrepared(installed);expect(observed()).toEqual({n:2});expect(t.$.box()).toBe(during);expect(runs).toBeGreaterThan(1);
++ write(t.$.box.n,3);expect(observed()).toEqual({n:3});write(t.$.box.n, t.$.box.n()+1);expect(observed()).toEqual({n:4});
++ }finally{off!();t.destroy();}
++});
++it('new child dependencies survive early current read then normal delivery',()=>{
++ const t=signalTree({rows:{} as Record<string,{n:number}>,other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let runs=0;const held=computed(()=>{runs++;return t.$();});held();let early:unknown;let calls=0;
++ const off=registerMembershipPublication(e=>e.branch===t.$.rows&&e.key==='a'?{record:{writes:[],adds:[]},completion:{}}:undefined,()=>{calls++;early=t.$();});
++ try{t.$.rows({a:{n:1}});expect(calls).toBe(1);expect(held()).toBe(early);const n=runs;write((t.$.rows.a as unknown as {n: unknown}).n,2);expect(held().rows).toEqual({a:{n:2}});expect(runs).toBeGreaterThan(n);const m=runs;write(t.$.other.n,3);expect(held().other).toEqual({n:3});expect(runs).toBeGreaterThan(m);}finally{off();t.destroy();}
++});
++it('held dormant descendants recover on equal-value reactivation without sibling invalidation',()=>{
++ const t=signalTree({rows:{a:{deep:{n:1}},b:{deep:{n:2}}}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;const a=t.$.rows.a;const deep=a.deep;deep();const held=computed(()=>t.$.rows());held();
++ try{t.$.rows({b:{deep:{n:2}}} as {a:{deep:{n:number}};b:{deep:{n:number}}});expect(held()).toEqual({b:{deep:{n:2}}});expect(deep()).toBeUndefined();write(deep.n,1);expect(held()).toEqual({a:{deep:{n:1}},b:{deep:{n:2}}});expect(deep()).toEqual({n:1});write(deep.n,3);expect(held().a.deep.n).toBe(3);}finally{t.destroy();}
++});
++it('supported symbol store child shares ancestry before grouped slot delivery',()=>{
++ const key=Symbol('child');const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;
++ // Existing supported unwrap/materialize plain-store form; no symbol write API invented.
++ const store:{[key]:typeof t.$.box}={[key]:t.$.box};markTreeStore(store);bindLocationRuntime(store,lr);const read=()=>materializeNode<{[key]:{n:number}}>(store);const old=read();
++ try{const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);const result=frame.commit({publish:false});expect(read()[key]).toEqual({n:2});expect(read()).not.toBe(old);const now=read();rt.publishPrepared(result);expect(read()).toBe(now);write(t.$.box.n,3);expect(read()[key].n).toBe(3);}finally{t.destroy();}
++});
++it('no-op and discarded preparation preserve output; temporary delivery builds are measured',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let builds=0;const create=lr.createDerived.bind(lr);const spy=vi.spyOn(lr,'createDerived').mockImplementation(<T>(fn:()=>T)=>create(()=>{builds++;return fn();}));
++ try{const before=t.$.box();const count=builds;write(t.$.box.n,1);expect(t.$.box()).toBe(before);const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const canceled=rt.beginFrame();canceled.set(slot,2);canceled.discard();expect(t.$.box()).toBe(before);expect(builds).toBe(count);
++ const frame=rt.beginFrame();frame.set(slot,3);const result=frame.commit({publish:false});const current=t.$.box();expect(current).toEqual({n:3});const earlyBuilds=builds;for(let i=0;i<20;i++)expect(t.$.box()).toBe(current);expect(builds).toBe(earlyBuilds);rt.publishPrepared(result);expect(t.$.box()).toBe(current);save('builder-work',{initialTrackedBuilds:count,beforeDelivery:earlyBuilds,afterDelivery:builds,limit:'tracked derived callback executions only; direct fallback builds not counted'});expect(builds).toBeGreaterThan(count);
++ }finally{spy.mockRestore();t.destroy();}
++});
++
++it('refused prepared slot leaves physical value and snapshot identity unchanged',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});const before=t.$();const sentinel=Error('prepare refused');const rt=getTreeScalarSlotRuntime(t.$)!;
++ const off=preparePublicationMutations(t.$.box.n,()=>{throw sentinel;},()=>{throw Error('must not complete');});expect(off).toBeTypeOf('function');
++ try{const slot=rt.resolveScalarSlot(getOwnedPositionIds(t.$.box.n)![0]!)!;const frame=rt.beginFrame();frame.set(slot,2);expect(()=>frame.prepareCommit!({publish:false})).toThrow(sentinel);expect(t.$()).toBe(before);expect(t.$.box.n()).toBe(1);}finally{off!();t.destroy();}
++});
++it('direct replace and derive capture read installed backing before native publication',()=>{
++ const t=signalTree({box:{n:1}},{enhancers:[transactions()]});t.$.box();const seen:unknown[]=[];
++ const off=observeIntrinsicMutations(t.$.box.n,()=>{seen.push({parent:t.$.box(),mirror:t.$.box.n()});},true);expect(off).toBeTypeOf('function');
++ try{t.$.box.n.set(2);t.$.box.n.update(n=>n+1);save('direct-capture',seen);expect(seen).toEqual([{parent:{n:2},mirror:1},{parent:{n:3},mirror:2}]);expect(t.$.box()).toEqual({n:3});}finally{off!();t.destroy();}
++});
+--- /dev/null
++++ b/packages/angular/src/lib/parent-freshness-entity.spec.ts
+@@ -0,0 +1,12 @@
++import {it,expect} from 'vitest';import {signalTree,entityMap,transactions} from '../index';
++import {getLocationRuntime} from '../../../kernel/src/lib/internals/location-runtime';import {getEntityPublicationBinding} from '../../../kernel/src/lib/internals/entity-publication';
++import {computed} from '@angular/core';
++for(const sorted of [false,true])it(`entity wrapper early identity and subsequent dependencies sorted=${sorted}`,()=>{
++ let comparisons=0;const t=signalTree({rows:entityMap<{id:number;n:number},number>({sortComparer:sorted?(a,b)=>{comparisons++;return a.n-b.n;}:undefined}),other:{n:1}},{enhancers:[transactions()]});const lr=getLocationRuntime(t.$)!;let off:(()=>void)|undefined;
++ try{t.$.rows.addMany([{id:1,n:2},{id:2,n:1}]);const old=t.$();let runs=0;const held=computed(()=>{runs++;return t.$();});held();let early:unknown;let inside:unknown;let calls=0;
++ off=getEntityPublicationBinding(t.$.rows)!.source.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{}};},complete(){calls++;early=t.$();inside=held();expect(t.$()).toBe(early);}});
++ lr.runInvalidationGroup(()=>{t.$.rows.addOne({id:3,n:0});});off();off=undefined;
++ expect(calls).toBe(1);expect(inside).toBe(old);expect(early).toBeDefined();expect((early as unknown as {rows:{all:{id:number}[]}}).rows.all.map(x=>x.id)).toEqual(sorted?[3,2,1]:[1,2,3]);expect(t.$()).toBe(early);expect(held()).toBe(early);
++ const prior=runs;t.$.rows.addOne({id:4,n:4});expect(held().rows.all).toHaveLength(4);expect(runs).toBeGreaterThan(prior);const stable=t.$();const comparisonCount=comparisons;for(let i=0;i<20;i++)expect(t.$()).toBe(stable);expect(comparisons).toBe(comparisonCount);
++ }finally{off?.();t.destroy();}
++});

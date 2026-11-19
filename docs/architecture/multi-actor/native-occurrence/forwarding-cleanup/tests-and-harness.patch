@@ -1,0 +1,208 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/selected-forwarding-cleanup.spec.ts
+@@ -0,0 +1,55 @@
++import {expect,it} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {interceptLocationWrites} from './internals/location-runtime';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getPathNotifier} from './path-notifier';
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++
++for(const mode of ['success','skip','before','after','caught','caught-undefined','replace-error','reenter'] as const)
++it(`two saved forwarding edges preserve ${mode} dispatch semantics`,async()=>{
++ const tree=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]});
++ const rows=tree.$.rows;rows.addOne({id:'a',x:0});await flush();const leaf=rows.byIdOrFail('a').x;
++ const binding=getEntityPublicationBinding(leaf)!;const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();
++ const authored=binding.source.evidence()!.field(binding.subject!,'x','ordinary');
++ const sentinel=mode==='caught-undefined'?undefined:new Error('inner sentinel'),replacement=new Error('outer replacement');
++ let outer:(()=>void)|undefined,inner:(()=>void)|undefined,calls=0,duplicate:unknown;
++ const offInner=interceptLocationWrites(leaf,(_op,proceed)=>{
++  inner=proceed;calls++;
++  if(mode==='skip')return;
++  if(mode==='before'||mode==='caught'||mode==='caught-undefined'||mode==='replace-error')throw sentinel;
++  if(mode==='reenter'){try{outer!();}catch(error){duplicate=error;}}
++  proceed();if(mode==='after')throw sentinel;
++ });
++ const offOuter=interceptLocationWrites(leaf,(_op,proceed)=>{
++  outer=proceed;
++  if(mode==='caught'||mode==='caught-undefined'||mode==='replace-error'){
++   try{proceed();}catch(error){expect(error).toBe(sentinel);}
++   if(mode==='replace-error')throw replacement;
++  }else proceed();
++ });
++ try{
++  let failed=false,error:unknown;try{q.rollback();}catch(e){failed=true;error=e;}
++  expect(calls).toBe(1);expect(inner).toBeTypeOf('function');expect(outer).toBeTypeOf('function');
++  if(mode==='success'||mode==='reenter'){expect(failed).toBe(false);expect(leaf()).toBe(0);}
++  else{
++   expect(failed).toBe(true);expect(error).toMatchObject({code:'SIGNALTREE_ROLLBACK_FAILED',cause:{kind:'effect-validation-failed'}});
++   if(mode!=='skip')expect((error as {cause:{cause:unknown}}).cause.cause).toBe(mode==='replace-error'?replacement:sentinel);
++   expect(leaf()).toBe(7);expect(binding.source.evidence()!.field(binding.subject!,'x','ordinary')).toBe(authored);
++  }
++  if(mode==='reenter')expect(duplicate).toBeInstanceOf(Error);
++  offOuter();offInner();
++  for(const proceed of [outer!,inner!])expect(proceed).toThrow(/cannot replay|closed|consumed/);
++  if(mode!=='success'&&mode!=='reenter'){q.rollback();expect(leaf()).toBe(0);}
++  rows.updateOne('a',{x:13});expect(leaf()).toBe(13);
++  for(const proceed of [outer!,inner!])expect(proceed).toThrow(/cannot replay|closed|consumed/);
++  expect(leaf()).toBe(13);
++ }finally{offOuter();offInner();tree.destroy();}
++});
++
++it('ordinary public saved proceed retains ordinary immediate write behavior',async()=>{
++ const tree=signalTree({rows:entityMap<{id:string;x:number},string>()});tree.$.rows.addOne({id:'a',x:0});await flush();
++ const leaf=tree.$.rows.byIdOrFail('a').x;let saved:(()=>void)|undefined;
++ const off=interceptLocationWrites(leaf,(_operation,proceed)=>{saved=proceed;});
++ try{leaf(7);expect(leaf()).toBe(0);expect(saved).toBeTypeOf('function');saved!();expect(leaf()).toBe(7);off();leaf(9);expect(leaf()).toBe(9);}
++ finally{off();tree.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/held-continuation-probe.spec.ts
+@@ -0,0 +1,37 @@
++import {it,expect} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {interceptLocationWrites} from './internals/location-runtime';
++import {getPathNotifier} from './path-notifier';
++// Same collector used by repository retention tooling; this is not a byte measurement.
++import {collect} from '../../../../tools/lib/heap-quiescence.mjs';
++type Holder={proceed?:(()=>void);receiver?:object;positive?:object};
++const capture=(box:Holder)=>(_operation:unknown,proceed:()=>void)=>{box.proceed=proceed;proceed();};
++const turn=()=>new Promise<void>(resolve=>setTimeout(resolve,0));
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++async function setup(mode:string){
++ const box:Holder={positive:{positive:true}};
++ const tree=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]});const rows=tree.$.rows;rows.addOne({id:'a',x:0});await flush();
++ const row=rows.byIdOrFail('a'),leaf=row.x,binding=getEntityPublicationBinding(leaf)!;const baseline=binding.source.evidence()!.field(binding.subject!,'x','ordinary');
++ const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();
++ const off=interceptLocationWrites(leaf,capture(box));q.rollback();if(leaf()!==0)throw new Error('rollback incomplete');if(!box.proceed)throw new Error('selected proceed not captured');
++ off();tree.destroy();await flush();
++ const refs={tree:new WeakRef(tree),row:new WeakRef(row),leaf:new WeakRef(leaf),publicationBinding:new WeakRef(binding),nativePublicationSource:new WeakRef(binding.source),transaction:new WeakRef(q),baselineRequirement:new WeakRef(baseline),negative:new WeakRef({negative:true}),positive:new WeakRef(box.positive!)};
++ if(mode!=='hold-proceed')box.proceed=undefined;if(mode==='hold-row')box.receiver=row;
++ return {box,refs};
++}
++function snapshot(refs:Record<string,WeakRef<object>>){return Object.fromEntries(Object.entries(refs).map(([k,r])=>[k,r.deref()!==undefined]));}
++async function sample(refs:Record<string,WeakRef<object>>){const rounds:Record<string,boolean>[]=[];for(let n=0;n<12;n++){await turn();collect();rounds.push(snapshot(refs));}return rounds;}
++it('sample held selected continuation after completed rollback and destroy',async()=>{
++ expect(typeof globalThis.gc).toBe('function');const mode=process.env['ST_GC_ARM']!;if(!['hold-proceed','drop-proceed','hold-row'].includes(mode))throw new Error('invalid arm');
++ const {box,refs}=await setup(mode);
++ const held=await sample(refs);let staleError:string|undefined;
++ if(box.proceed){try{box.proceed();}catch(e){staleError=String(e);}}
++ box.proceed=undefined;box.receiver=undefined;box.positive=undefined;
++ const released=await sample(refs);
++ const result={mode,node:process.version,execArgv:process.execArgv,nodeOptions:process.env['NODE_OPTIONS'],held,released,staleError};writeFileSync(process.env['ST_GC_OUTPUT']!,JSON.stringify(result,null,2));
++ expect(held.at(-1)?.negative).toBe(false);expect(held.every(r=>r.positive)).toBe(true);expect(released.at(-1)?.positive).toBe(false);
++ if(mode==='hold-proceed')expect(staleError).toMatch(/cannot replay|closed|consumed/);
++ if(mode==='hold-row')expect(held.every(r=>r.row)).toBe(true);
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/forwarding-retention-probe.spec.ts
+@@ -0,0 +1,67 @@
++import {it,expect} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {interceptLocationWrites,type LocationWriteOperation} from './internals/location-runtime';
++import {getPathNotifier} from './path-notifier';
++import {collect} from '../../../../tools/lib/heap-quiescence.mjs';
++type Holder={outer?:()=>void;inner?:()=>void;value?:object;valueRef?:WeakRef<object>;positive?:object};
++const innerCapture=(box:Holder,scenario:string,error:Error,holdValue:boolean)=>(operation:LocationWriteOperation<{n:number}[]>,proceed:()=>void)=>{
++ box.inner=proceed;
++ if(operation.intent!=='replace')throw new Error('not replacement');
++ box.valueRef=new WeakRef(operation.value);
++ if(holdValue)box.value=operation.value;
++ if(scenario==='skip')return;
++ if(scenario==='caught')throw error;
++ proceed();
++};
++const outerCapture=(box:Holder,scenario:string)=>(_operation:unknown,proceed:()=>void)=>{
++ box.outer=proceed;
++ if(scenario==='caught'){try{proceed();}catch{/* Dispatch still must report the inner failure. */}}
++ else proceed();
++};
++const turn=()=>new Promise<void>(resolve=>setTimeout(resolve,0));
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++async function setup(scenario:string,arm:string){
++ const box:Holder={positive:{positive:true}};
++ const tree=signalTree({rows:entityMap<{id:string;x:{n:number}[]},string>()},{enhancers:[transactions()]});
++ const rows=tree.$.rows;rows.addOne({id:'a',x:[{n:0}]});await flush();
++ const row=rows.byIdOrFail('a'),leaf=row.x,binding=getEntityPublicationBinding(leaf)!;
++ const requirement=binding.source.evidence()!.field(binding.subject!,'x','ordinary');
++ const q=tree.transact(()=>rows.updateOne('a',{x:[{n:7}]}));await flush();
++ const sentinel=Object.assign(new Error('receiver-bearing caught error'),{receiver:tree});
++ const offInner=interceptLocationWrites(leaf,innerCapture(box,scenario,sentinel,arm==='hold-value'));
++ const offOuter=interceptLocationWrites(leaf,outerCapture(box,scenario));
++ let failed=false;
++ try{q.rollback();}catch(error){
++  failed=true;expect(error).toMatchObject({code:'SIGNALTREE_ROLLBACK_FAILED',cause:{kind:'effect-validation-failed'}});
++  if(scenario==='caught')expect((error as {cause:{cause:unknown}}).cause.cause).toBe(sentinel);
++ }
++ expect(failed).toBe(scenario!=='success');expect(leaf()[0].n).toBe(scenario==='success'?0:7);
++ expect(box.outer).toBeTypeOf('function');expect(box.inner).toBeTypeOf('function');
++ offOuter();offInner();if(failed){q.rollback();expect(leaf()[0].n).toBe(0);}
++ tree.destroy();await flush();
++ const refs={tree:new WeakRef(tree),row:new WeakRef(row),leaf:new WeakRef(leaf),publicationBinding:new WeakRef(binding),nativePublicationSource:new WeakRef(binding.source),transaction:new WeakRef(q),baselineRequirement:new WeakRef(requirement),failure:new WeakRef(sentinel),operationValue:box.valueRef!,negative:new WeakRef({negative:true}),positive:new WeakRef(box.positive!)};
++ box.valueRef=undefined;
++ if(arm!=='hold-proceed'){box.outer=undefined;box.inner=undefined;}
++ return {box,refs};
++}
++function snapshot(refs:Record<string,WeakRef<object>>){return Object.fromEntries(Object.entries(refs).map(([key,ref])=>[key,ref.deref()!==undefined]));}
++async function sample(refs:Record<string,WeakRef<object>>){const rounds:Record<string,boolean>[]=[];for(let i=0;i<12;i++){await turn();collect();rounds.push(snapshot(refs));}return rounds;}
++it('closed success skip and caught-failure callbacks release sampled receivers and errors',async()=>{
++ expect(typeof globalThis.gc).toBe('function');
++ const arm=process.env['ST_GC_ARM']!,scenario=process.env['ST_GC_SCENARIO']!;
++ if(!['hold-proceed','drop-proceed','hold-value'].includes(arm)||!['success','skip','caught'].includes(scenario))throw new Error('invalid probe mode');
++ const {box,refs}=await setup(scenario,arm);const held=await sample(refs);const errors:string[]=[];
++ for(const proceed of [box.outer,box.inner])if(proceed){try{proceed();}catch(error){errors.push(String(error));}}
++ box.outer=undefined;box.inner=undefined;box.value=undefined;box.positive=undefined;
++ const released=await sample(refs);
++ writeFileSync(process.env['ST_GC_OUTPUT']!,JSON.stringify({arm,scenario,node:process.version,held,released,errors},null,2));
++ expect(held.every(row=>row.positive)).toBe(true);expect(held.at(-1)?.negative).toBe(false);
++ if(arm==='hold-proceed'){expect(errors).toHaveLength(2);for(const error of errors)expect(error).toMatch(/cannot replay|closed|consumed/);}
++ for(const key of Object.keys(refs)){
++  if(key!=='positive'&&!(arm==='hold-value'&&key==='operationValue'))expect(held.at(-1)?.[key],key).toBe(false);
++  expect(released.at(-1)?.[key],`${key} after release`).toBe(false);
++ }
++ if(arm==='hold-value')expect(held.every(row=>row.operationValue)).toBe(true);
++});
+--- /dev/null
++++ b/packages/kernel/retention-probe.config.ts
+@@ -0,0 +1,2 @@
++import {defineConfig} from 'vitest/config';
++export default defineConfig({test:{globals:true,environment:'happy-dom',include:['src/lib/held-continuation-probe.spec.ts'],maxWorkers:1},define:{__DEV__:true},esbuild:{tsconfigRaw:'{}'}});
+--- /dev/null
++++ b/packages/kernel/forwarding-retention.config.ts
+@@ -0,0 +1,2 @@
++import {defineConfig} from 'vitest/config';
++export default defineConfig({test:{globals:true,environment:'happy-dom',include:['src/lib/forwarding-retention-probe.spec.ts'],maxWorkers:1},define:{__DEV__:true},esbuild:{tsconfigRaw:'{}'}});
+--- /dev/null
++++ b/tools/held-continuation-probe/project.json
+@@ -0,0 +1,22 @@
++{
++  "name": "held-continuation-probe",
++  "root": "tools/held-continuation-probe",
++  "targets": {
++    "retention": {
++      "executor": "nx:run-commands",
++      "cache": false,
++      "options": {
++        "command": "corepack pnpm exec vitest run --root packages/kernel --config retention-probe.config.ts",
++        "cwd": "."
++      }
++    },
++    "extended": {
++      "executor": "nx:run-commands",
++      "cache": false,
++      "options": {
++        "command": "corepack pnpm exec vitest run --root packages/kernel --config forwarding-retention.config.ts",
++        "cwd": "."
++      }
++    }
++  }
++}
+--- /dev/null
++++ b/tools/lib/heap-quiescence.d.mts
+@@ -0,0 +1,2 @@
++/** Existing collector export used by the isolated retention probes. */
++export function collect(): void;

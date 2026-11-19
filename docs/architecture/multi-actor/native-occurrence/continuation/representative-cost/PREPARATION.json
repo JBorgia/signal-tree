@@ -1,0 +1,57 @@
+{
+  "preparedAt": "2026-11-03T18:30:14.244086+00:00",
+  "retainedCommit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "retainedSource": "/private/tmp/st-v16-representative-cost/retained",
+  "retainedSourceFiles": 2517,
+  "retainedManifestSha256": "d70c495c62b7dbc9bd636202230664bf4656f8e07e67b6a4e71f68b4657cfb26",
+  "gitArchiveSha256": "f68758a1fda1ccb3198098f97d1f0c4b254ce2def039c602d291b2deb72595ad",
+  "selectedSource": "/private/tmp/st-v16-integration-candidate",
+  "selectedManifestSha256": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+  "configComparison": {
+    "package.json": {
+      "retained": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+      "selected": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+      "identical": true
+    },
+    "pnpm-lock.yaml": {
+      "retained": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+      "selected": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+      "identical": true
+    },
+    ".nvmrc": {
+      "retained": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+      "selected": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+      "identical": true
+    },
+    "nx.json": {
+      "retained": "e2048ccf0f8cc92dd42d65e7aa2b8e7f7cf87a504cab666d3020f86b6dc535db",
+      "selected": "e2048ccf0f8cc92dd42d65e7aa2b8e7f7cf87a504cab666d3020f86b6dc535db",
+      "identical": true
+    },
+    "tsconfig.base.json": {
+      "retained": "a4e78b268f1c0087f6612b9d5833f6de81670ecb6b52753438b5953aa08fafa1",
+      "selected": "a4e78b268f1c0087f6612b9d5833f6de81670ecb6b52753438b5953aa08fafa1",
+      "identical": true
+    },
+    "packages/kernel/rollup.custom.mjs": {
+      "retained": "0d068873274415323015ae088a573edf281a2ba98da75678aaba9f2b07b21563",
+      "selected": "0d068873274415323015ae088a573edf281a2ba98da75678aaba9f2b07b21563",
+      "identical": true
+    },
+    "packages/kernel/project.json": {
+      "retained": "f414f578e7f16a5dc7ecb54aeb456ade3ecdd49a9c63fb2340cf9ec85679c336",
+      "selected": "6a72ec115860f8f2dea793e2fb36a350fcbec6a2b98c9f56e289bcce11037687",
+      "identical": false
+    }
+  },
+  "buildTargetIdentical": true,
+  "projectDifference": "selected adds diagnostic-replay target only",
+  "dependencies": "both arms explicitly resolve the same existing root node_modules; no copied cache archives",
+  "harness": {
+    "child.mjs": "ea5dbb54d68f2585f9823f013ab9558a3a586a5f76ad3ce265c41838d4164da3",
+    "child-heap-v2.mjs": "568504985dfc13630e0555727fd97cf34714988a6496339616032139e1ac43fb",
+    "heap-quiescence.mjs": "b9df8334d2ece2ba6f3e2eb4fb7aef7d45ff00fd8eb62c94ccbabc0937551186"
+  },
+  "oldRunner": "not copied/executed; old hardcoded paths and27-profile schedule excluded",
+  "costChildrenLaunched": 0
+}

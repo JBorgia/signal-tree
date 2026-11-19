@@ -1,0 +1,20 @@
+[
+  {
+    "path": "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "original": "/private/tmp/st-c28-r3-suite-correction/originals/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "originalSha256": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0",
+    "qualifiedSha256": "1e0940740e1a535b7d343a0105a800337eb78331e0fc1cbb08df9defd0009e4d"
+  },
+  {
+    "path": "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "original": "/private/tmp/st-c28-r3-suite-correction/originals/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "originalSha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f",
+    "qualifiedSha256": "f740a20625dd71bbb92d7dc00f9d6d84067dceab428747f154d455e5bb851b20"
+  },
+  {
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "original": "/private/tmp/st-c28-r3-suite-correction/originals/packages/react/src/branch-declaration-qualification.spec.tsx",
+    "originalSha256": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461",
+    "qualifiedSha256": "5078516b64ac2c705073727749b64e5d6884eb5f597bcb4ae9cce9875724c2f3"
+  }
+]

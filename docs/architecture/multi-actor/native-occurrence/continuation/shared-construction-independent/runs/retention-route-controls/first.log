@@ -1,0 +1,9 @@
+
+ RUN  v4.1.9 /private/tmp/st-shared-construction-independent/candidate/packages/kernel
+
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  20:59:13
+   Duration  1.83s (transform 488ms, setup 0ms, import 584ms, tests 966ms, environment 156ms)
+

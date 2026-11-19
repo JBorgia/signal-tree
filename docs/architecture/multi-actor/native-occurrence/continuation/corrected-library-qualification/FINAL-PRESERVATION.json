@@ -1,0 +1,9 @@
+{
+  "time": "2026-11-03T19:34:49.142157+00:00",
+  "manifestSha256": "8fb14250ded4d19f3ee380b2cf13df35492dc0170e4e7f5cc0ecd945569289a2",
+  "sourceFiles": 3135,
+  "artifactFiles": 193,
+  "mismatches": [],
+  "allBatchOwnedSurvivors": [],
+  "batchReceiptCheck": true
+}

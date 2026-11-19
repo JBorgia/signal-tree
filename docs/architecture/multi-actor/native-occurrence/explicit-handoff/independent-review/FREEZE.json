@@ -1,0 +1,33 @@
+{
+  "status": "focused-ready; independent execution review pending; structural work gated",
+  "predecessorFilesVerified": 2924,
+  "originalSpecsUnchanged": true,
+  "mainScopeFixtureUnchanged": true,
+  "runtimeChangedPaths": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/native-location-realization.ts"
+  ],
+  "sourceManifestSha256": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+  "runtimePatchSha256": "1c4d49a827a88dbf20ef206bbdd40d664ff2d28e7e6ab4c450c25ba54b6dce2d",
+  "files": {
+    "source-types-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source.patch": "9bd0e356c5d1b51c36d7c38a8e16e5d0949b461abb958294279f88e90db981eb",
+    "SEAM-PROPOSAL.md": "6fde638bc853748b18506face4a784b7da81d3070d948da5bcfaa3d40667e6de",
+    "focused-final.log": "b43f6acff28a3034a41bf0a00062db80e836150b02c5d0050c427bc9b87abcc3",
+    "first-runtime.log": "958160df556e92c16cfb89b8d4955a6ba2212b5ef1af55036ff468077cff3ef7",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "SOURCE-SHA256.json": "057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3",
+    "runtime.patch": "1c4d49a827a88dbf20ef206bbdd40d664ff2d28e7e6ab4c450c25ba54b6dce2d",
+    "RESULTS.md": "1e8918b22b22f0ec05d91f4b5d36182f3d8fd3d53de2a1db2682fe006eb7d699",
+    "spec-types-first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "implement.py": "30c126c2f067d6865843b3509704ac9badbc22f674d8e7c5f6bba14596149078",
+    "PREDECESSOR-SHA256.json": "5d2a2893bde2e196f79c69985a425bb30974e5028ac9b2ad833db9d1a9c83272",
+    "PREREGISTERED.spec.ts": "faf4f7b52092d4908943152c96525402cd470a1c5713b9ec3c31a204d7cd7aac",
+    "source-types-final.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "focused.log": "8027ca13197c8f595682b5b6a8ac016e7598b064a01d480eeb7521c3f892b9ca",
+    "RECURRENCE.md": "2349a9ca9a226f8f9791781ef5394448c1db05c5ab542a7c471dd51a2fb6f8e5"
+  }
+}

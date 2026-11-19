@@ -1,0 +1,26 @@
+{
+  "arm": "indexed",
+  "size": 128,
+  "replicate": 1,
+  "exit": 0,
+  "watchdog": null,
+  "counts": {
+    "passed": 2,
+    "skipped": 9
+  },
+  "workerPids": [
+    62177
+  ],
+  "heapSizeLimits": [
+    4496293888
+  ],
+  "maxSampledHeapUsed": 69758456,
+  "firstSampleHeapUsed": 43363112,
+  "sampledPositiveGrowth": 26395344,
+  "steepGrowthStop": false,
+  "validTwoCasesAndFreshWorker": true,
+  "remainingOwned": [],
+  "runtimeMismatches": [],
+  "testUnchanged": true,
+  "attempts": 1
+}

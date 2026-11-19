@@ -1,0 +1,79 @@
+{
+  "base": "/private/tmp/st-native-combined-c21",
+  "left": "/private/tmp/st-native-combined-c22",
+  "changes": [
+    {
+      "path": "packages/kernel/vitest.config.ts",
+      "source": "/private/tmp/st-c21-gc-routing-successor/SNAPSHOT-CANDIDATE.json",
+      "before": "d1e247e5f0f90050b96daa1b889a09301e94ac338597b425127395351e0d3fdd",
+      "after": "6d4d513f837212af3960c49dfb46f7fef0e47e28e4f762dd4ffc9a93160da880"
+    },
+    {
+      "path": "packages/kernel/vitest.retention.config.ts",
+      "source": "/private/tmp/st-c21-gc-routing-successor/SNAPSHOT-CANDIDATE.json",
+      "before": "30f6a25ac7bd1890913636b5428ad51721f15c354ee558b3dc91504a844e4336",
+      "after": "7becd09c6cbea411e8c8005c81c4881442014d5e1f00ee17e474db4c642c0d39"
+    },
+    {
+      "path": "tools/check-forwarding-retention.mjs",
+      "source": "/private/tmp/st-c21-gc-routing-successor/SNAPSHOT-CANDIDATE.json",
+      "before": "e2aa24c5fef96465f11a9ec8809175cc9cd60f6006847f1a4c2d28c8e74659e6",
+      "after": "5a3791c204fe0a8291dbcf1df02ef440cbb9bc6f1be421772d0c184c8b234d84"
+    },
+    {
+      "path": "tools/lib/forwarding-retention-matrix.mjs",
+      "source": "/private/tmp/st-c21-gc-routing-successor/SNAPSHOT-CANDIDATE.json",
+      "before": null,
+      "after": "e0e2ed645e34a3ac12eb51befac86858956029dd3b7504bcd06fb0b3db22acba"
+    },
+    {
+      "path": "tools/verify-gates.mjs",
+      "source": "/private/tmp/st-c21-gc-routing-successor/SNAPSHOT-CANDIDATE.json",
+      "before": "fd51a412d12dd68d95754459f36de09278d4ddbec52253a241e0b834b3c62d18",
+      "after": "9677ff90a0df9887280384e91d7c02c4df903944bbe4b3b20768ecc761604c71"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+      "source": "/private/tmp/st-c21-fixture-corrections/SNAPSHOT-CANDIDATE.json",
+      "before": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544",
+      "after": "06cf63fe0338d8e3e94e0d10ff3f04d59468cd8b029798c4d430d013fc6d8d34"
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+      "source": "/private/tmp/st-c21-fixture-corrections/SNAPSHOT-CANDIDATE.json",
+      "before": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02",
+      "after": "cb2219188fb4587d2777c05ae7a9bb0a74538bb4ef68149db3f126e5282d219f"
+    },
+    {
+      "path": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+      "source": "/private/tmp/st-c21-recipient-positive-counterparts/SNAPSHOT-COUNTERPARTS.json",
+      "before": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+      "after": null
+    },
+    {
+      "path": "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+      "source": "/private/tmp/st-c21-recipient-positive-counterparts/SNAPSHOT-COUNTERPARTS.json",
+      "before": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+      "after": "d1ebb43f942137ddfeb4d51a3f219f8e4f2fa8da468d1ce8dc17728054ce8731"
+    },
+    {
+      "path": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+      "source": "/private/tmp/st-c21-recipient-positive-counterparts/SNAPSHOT-COUNTERPARTS.json",
+      "before": null,
+      "after": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e"
+    },
+    {
+      "path": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "source": "/private/tmp/st-restoration-ordinary-calibration/SNAPSHOT-CANDIDATE.json",
+      "before": "223de1a18e26295983f10f860cee2a40f7e719cafecbacf644c3a03e7bf4315d",
+      "after": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c"
+    },
+    {
+      "path": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+      "source": "/private/tmp/st-restoration-ordinary-calibration/SNAPSHOT-CANDIDATE.json",
+      "before": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c",
+      "after": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac"
+    }
+  ],
+  "runtimeUnchangedFromC22": true
+}

@@ -1,0 +1,11 @@
+{
+  "cwd": "/private/tmp/st-collection-egress-successor/candidate",
+  "command": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.typecheck-all.json"
+  ],
+  "exit": 0
+}

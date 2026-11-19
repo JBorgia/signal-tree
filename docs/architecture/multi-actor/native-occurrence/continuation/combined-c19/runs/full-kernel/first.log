@@ -1,0 +1,1041 @@
+
+> nx run kernel:test --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-native-combined-c19/progress-reporter.mjs
+
+> node tools/run-core-vitest.mjs --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-native-combined-c19/progress-reporter.mjs
+
+(node:19445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c19/candidate/packages/kernel
+
+(node:19463) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration.spec.ts (114 tests) 389ms
+(node:19473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts (43 tests) 2024ms
+     ✓ validates known scalar positions with zero tree visits across 10 to 100k positions  1905ms
+(node:19480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-signal.spec.ts (61 tests) 76ms
+(node:19484) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts (29 tests) 89ms
+(node:19506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts (30 tests) 16ms
+(node:19538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/production-scalar-substrate.benchmark.spec.ts (8 tests | 1 skipped) 17871ms
+     ✓ proves compiled scalar reads and writes stay constant in logical work  7073ms
+     ✓ proves public add reads one tail anchor and copies no existing key order  3577ms
+     ✓ proves public undo-of-remove realizes through one incremental restore  4077ms
+     ✓ rejects total-size scaling for compiled scalar operations  3021ms
+(node:19677) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/absent-collection.spec.ts (92 tests) 607ms
+(node:19679) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/pending-rollback.spec.ts (21 tests) 76ms
+(node:19683) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/transaction-observer-failure.spec.ts (34 tests) 108ms
+(node:19686) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/persistence-decompose-0.spec.ts (22 tests) 318ms
+(node:19689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/hidden-terminal-reversal.spec.ts (173 tests) 367ms
+(node:19690) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/derived.spec.ts (24 tests | 2 skipped) 44ms
+(node:19695) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/absent-path-write.spec.ts > writes under an omitted member re-add the path, siblings stay absent > a member added after an omission above it was first linked is absent too
+[SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (15 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ✓ src/lib/absent-path-write.spec.ts (77 tests) 197ms
+(node:19696) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts (8 tests) 10ms
+(node:19737) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-reactive-settlement.spec.ts (48 tests) 365ms
+(node:19746) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/mut-participation.spec.ts (28 tests) 128ms
+(node:19753) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts (8 tests) 8ms
+(node:19754) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/demarcation-0.spec.ts (15 tests) 74ms
+(node:19755) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/designated-collection-omission.spec.ts (74 tests) 264ms
+(node:19759) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/branch-omission-correctness.spec.ts (35 tests) 134ms
+(node:19762) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/pending-confirmation.spec.ts (9 tests) 23ms
+(node:19764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-value-membership.spec.ts (22 tests) 15ms
+(node:19766) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/enhancers/devtools/devtools.spec.ts > devTools enhancer (v6 API) > restoration restores EntitySignal-like nodes via setAll(all)
+SignalTree: applyState REPLACED the live value at "count" with a raw value; its signal is gone. [ST2009]
+
+ ✓ src/enhancers/devtools/devtools.spec.ts (17 tests) 30ms
+(node:19768) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/egress-0-userland-link.spec.ts (16 tests) 95ms
+(node:19769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts (11 tests) 26ms
+(node:19773) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/transactions.spec.ts (14 tests) 78ms
+(node:19774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/jump-undo-equivalence.spec.ts (39 tests) 2023ms
+     ✓ 40 generated histories (restoration alone)  328ms
+     ✓ 40 generated histories (transactions first)  528ms
+     ✓ 40 generated histories (restoration first)  327ms
+(node:19776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/scalar-frame-publication.spec.ts (26 tests) 82ms
+(node:19777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/inspection-egress-conformance.spec.ts (20 tests) 46ms
+(node:19779) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/path-notifier.spec.ts (20 tests) 11ms
+(node:19786) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration-v16-controls.spec.ts (71 tests) 147ms
+(node:19787) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-1-relationship.spec.ts (15 tests) 296ms
+(node:19789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/E-expanded-lifetime-anchor.spec.ts (201 tests) 492ms
+(node:19801) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/proposal-rejection-0.spec.ts (16 tests) 48ms
+(node:19802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-value-new-keys.spec.ts (26 tests) 71ms
+(node:19803) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-missing-anchors.spec.ts (26 tests) 140ms
+(node:19806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/comparison-full-state-0.spec.ts (15 tests) 45ms
+(node:19836) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-persistence-conformance.spec.ts (13 tests) 93ms
+(node:19837) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/packet-index-adversarial.spec.ts (25 tests) 14ms
+(node:19846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+A1-ORDINARY-PRESENCE {"withLink":false,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[]}
+
+stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+A1-ORDINARY-PRESENCE {"withLink":false,"phase":"rolled-back","branch":{"keep":9},"sends":[]}
+
+stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+A1-ORDINARY-PRESENCE {"withLink":true,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[null]}
+
+stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+A1-ORDINARY-PRESENCE {"withLink":true,"phase":"rolled-back","branch":{"keep":9},"sends":[null]}
+
+ ✓ src/lib/a1-installed-publication.spec.ts (20 tests) 74ms
+(node:19847) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+A1-ORDINARY-PRESENCE {"withLink":false,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[]}
+
+stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+A1-ORDINARY-PRESENCE {"withLink":false,"phase":"rolled-back","branch":{"keep":9},"sends":[]}
+
+stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+A1-ORDINARY-PRESENCE {"withLink":true,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[null]}
+
+stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+A1-ORDINARY-PRESENCE {"withLink":true,"phase":"rolled-back","branch":{"keep":9},"sends":[null]}
+
+ ✓ src/lib/ordinary-presence-discriminator.spec.ts (20 tests) 71ms
+(node:19849) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-state-view.spec.ts (26 tests) 39ms
+(node:19850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-membership-view.spec.ts (14 tests) 23ms
+(node:19851) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/custom-markers.spec.ts (25 tests) 17ms
+(node:19852) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/change-reporting.spec.ts (27 tests) 17ms
+(node:19853) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/transaction-lifecycle-view.spec.ts (17 tests) 44ms
+(node:19858) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/address-repair-1.spec.ts (14 tests) 58ms
+(node:19859) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-membership-view-v16-controls.spec.ts (11 tests) 33ms
+(node:19869) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/descriptor-retention.spec.ts (21 tests) 140ms
+(node:19881) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-overlapping-rollback.spec.ts (16 tests) 99ms
+(node:19883) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/possible-owner-window-contract.spec.ts (19 tests) 84ms
+(node:19884) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/serialization-zero-state.spec.ts (11 tests) 27ms
+(node:19886) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-bulk-mutations.spec.ts (38 tests) 60ms
+(node:19887) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-authority-carrier.spec.ts (13 tests) 67ms
+(node:19891) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-lifetime-ledger-null.spec.ts (11 tests) 73ms
+(node:19892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/batch-duplicate-interceptors.spec.ts (62 tests) 204ms
+(node:19893) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/proposal-facade-0.spec.ts (20 tests) 80ms
+(node:19896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/identity-through-seams-0.spec.ts > STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required? > T06a rekey + later field write is INDEPENDENT
+[trichotomy] T06a rekey+field -> settled; ids=["A"]; name="later"
+
+stdout | src/lib/identity-through-seams-0.spec.ts > STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required? > T06b rekey + later add at the VACATED key is DEPENDENT
+[trichotomy] T06b rekey+occupy -> later-confirmed-dependency; ids=["B","A"]; x=1
+
+stdout | src/lib/identity-through-seams-0.spec.ts > STRUCTURAL-TRICHOTOMY-0 — is a dependency graph required? > T07 rekey + later remove is SUPERSEDED
+[trichotomy] T07  rekey+remove -> settled; ids=[]; x=0
+
+ ✓ src/lib/identity-through-seams-0.spec.ts (14 tests) 85ms
+(node:19898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/owner-invalidation.spec.ts (22 tests) 43ms
+(node:19899) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/link-2-public-contract.spec.ts > LINK-2 case 3: a rejected outbound set() is observable > a listener that throws does not damage the link
+SignalTree: an onTreeError listener threw. The original error was still handled normally; this is the listener failing. [ST2025] Error: listener exploded
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/link-2-public-contract.spec.ts:225:13
+    at reportTreeError (/private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/internals/error-reporter.ts:123:7)
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/link.ts:1031:15
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+ ✓ src/lib/link-2-public-contract.spec.ts (10 tests) 63ms
+(node:19900) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-0-three-directions.spec.ts (12 tests) 33ms
+(node:19901) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/add-many-overwrite-hardening.spec.ts (98 tests) 260ms
+(node:19903) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/plain-branch-membership.spec.ts (10 tests) 21ms
+(node:19904) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/batching/batching-semantic-scopes.spec.ts (41 tests) 116ms
+(node:19905) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e2s00-member-access.kernel.spec.ts (12 tests) 4ms
+(node:19906) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/retired-backing-ownership-null.spec.ts (10 tests) 60ms
+(node:19907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/plain-member-absence-observation.spec.ts (144 tests) 84ms
+(node:19910) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/external-authored-baseline.spec.ts (69 tests) 128ms
+(node:19913) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/applied-turn-projection.spec.ts (10 tests) 5ms
+(node:19932) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/multi-collection-subject-collision.spec.ts (7 tests) 98ms
+(node:19933) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/tree-error-attribution.spec.ts (11 tests) 33ms
+(node:19934) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts > refused automatic compensation reports the retained transaction > a post-callback failure whose compensation is refused stays pending and staged
+SignalTree: transactions() cleanup failed during a post-callback step whose rollback was then refused. Error: capture release failed
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts:103:15
+    at Object.transaction [as transact] (/private/tmp/st-native-combined-c19/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4698:13)
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts:111:12
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+
+ ✓ src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts (9 tests) 58ms
+(node:19953) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration.spec.ts (20 tests) 50ms
+(node:20012) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/membership-reversal-delivery.spec.ts (216 tests) 653ms
+(node:20044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/provenance-spike.spec.ts (15 tests) 39ms
+(node:20045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/physical/subject-record-target.spec.ts (29 tests) 9ms
+(node:20046) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/rekey-claim-width-0.spec.ts (12 tests) 133ms
+(node:20048) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-inspection-egress.spec.ts (16 tests) 46ms
+(node:20049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts (4 tests) 6ms
+(node:20052) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/a2-3-1-rollback-cancellation.spec.ts (6 tests) 30ms
+(node:20053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/transaction-safety.spec.ts (23 tests) 61ms
+(node:20054) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/turn-store.spec.ts (9 tests) 4ms
+(node:20055) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/utilities/deep-equal.property.spec.ts (22 tests) 24ms
+(node:20056) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/batching/batching.spec.ts (23 tests) 13ms
+(node:20058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/egress-1-observation-vs-consequence.spec.ts (8 tests) 31ms
+(node:20059) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/write-observation-scope.spec.ts (25 tests) 19ms
+(node:20060) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-reader.spec.ts (11 tests) 28ms
+(node:20061) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/pending-overlap.spec.ts (28 tests) 72ms
+(node:20063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/authored-removal-independent.spec.ts (8 tests) 39ms
+(node:20064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-granular-reactivity.spec.ts (10 tests | 1 failed) 815ms
+     ✓ publishes a field and collection projection as one coherent state 13ms
+     ✓ removal releases the entity: held reference reads undefined, byId absent 1ms
+     ✓ re-add after removal works through a fresh byId 3ms
+     × a single-entity update does not rebuild the collection 453ms
+     ✓ repeated collection reads between writes are cached  339ms
+     ✓ map() stays a snapshot, not a live view 1ms
+     ✓ does not let a held node revive when the same key is reused by a new subject 1ms
+     ✓ a held FIELD reference also stays absent across key reuse by a new subject 1ms
+     ✓ resolves internal acquired handles by subject, not by reused key address 1ms
+     ✓ keeps acquired handles isolated when setAll reuses a tombstoned key 0ms
+(node:20067) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/confirmed-undo.spec.ts (5 tests) 10ms
+(node:20068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/target-transition.spec.ts (18 tests) 77ms
+(node:20069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/after-commit-0.spec.ts (10 tests) 21ms
+(node:20071) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/tree-scalar-slot-runtime.spec.ts (15 tests) 9ms
+(node:20073) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-order-rollback.spec.ts (12 tests) 63ms
+(node:20075) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/nested-structural-rollback-1.spec.ts (15 tests) 46ms
+(node:20076) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-set-all-staging.spec.ts (12 tests) 14ms
+(node:20077) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/single-pass-construction.spec.ts (10 tests) 6ms
+(node:20082) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/production-link-conformance-0.spec.ts (9 tests) 22ms
+(node:20083) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/marker-location-grammar.spec.ts (9 tests) 19ms
+(node:20084) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/order-composition-readiness.spec.ts (24 tests) 72ms
+(node:20085) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/link-structured-address-audit.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ✓ src/lib/link-structured-address-audit.spec.ts (19 tests) 40ms
+(node:20086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/pending-active-entity.spec.ts (64 tests) 94ms
+(node:20087) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/conforming-collection-prototype.spec.ts (7 tests) 17ms
+(node:20088) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/turn-member-images.spec.ts (37 tests) 534ms
+     ✓ 60 generated histories  429ms
+(node:20089) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/path-notifier-enqueue.spec.ts (14 tests) 29ms
+(node:20097) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/publication-terminal-obligation.spec.ts (11 tests) 30ms
+(node:20098) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/incremental-materialization.spec.ts (14 tests) 68ms
+(node:20099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/hidden-collection-nesting.spec.ts (25 tests) 93ms
+(node:20100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/reversal-planner.spec.ts (6 tests) 3ms
+(node:20101) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/rekey-occupancy-0.spec.ts (10 tests) 36ms
+(node:20102) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/independent-prepared-unit.spec.ts (17 tests) 57ms
+(node:20103) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/prepend-publication-boundary.spec.ts (12 tests) 47ms
+(node:20104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/benchmarks.spec.ts (10 tests | 9 skipped) 15ms
+(node:20105) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/realization-namespace-0.spec.ts (9 tests) 36ms
+(node:20106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/confirmed-turn-reader.spec.ts (13 tests) 27ms
+(node:20107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/recovery-handle-0.spec.ts (7 tests) 28ms
+(node:20108) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/observation-substrate.spec.ts (11 tests) 17ms
+(node:20110) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/aggregate-installed-publication.spec.ts (15 tests) 43ms
+(node:20111) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/diag-journal-1-ownership.spec.ts (5 tests) 40ms
+(node:20112) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/markers/composed-acquisition.spec.ts (9 tests) 26ms
+(node:20118) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/reversal-known-limitations.spec.ts (24 tests) 71ms
+(node:20119) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/heterogeneous-atomicity.spec.ts (4 tests) 34ms
+(node:20120) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/update-then-remove-rollback.spec.ts (108 tests) 177ms
+(node:20121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/history-retention-0.spec.ts (13 tests) 82ms
+(node:20122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-collection-0.spec.ts (10 tests) 44ms
+(node:20123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/path-delivery-ownership.spec.ts (9 tests) 8ms
+(node:20124) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/add-many-overwrite-reversal.spec.ts (48 tests) 106ms
+(node:20125) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/realization-address-0.spec.ts (3 tests) 17ms
+(node:20126) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-restoration-authority.spec.ts (7 tests) 51ms
+(node:20128) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/turn-feed-0-2-reachability.spec.ts (13 tests) 27ms
+(node:20129) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/fixed-window-retirement.spec.ts (14 tests) 47ms
+(node:20130) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/owner-invalidation-membership.spec.ts (54 tests) 41ms
+(node:20131) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/physical/structural-store.spec.ts (16 tests) 6ms
+(node:20132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/batch-duplicate-ids.spec.ts (91 tests) 115ms
+(node:20162) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-async-settlement.spec.ts (8 tests) 63ms
+(node:20163) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-nested-collection.spec.ts (10 tests) 27ms
+(node:20167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/membership-input-contract.spec.ts (54 tests) 71ms
+(node:20168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/replace-one-subject-1.spec.ts (10 tests) 39ms
+(node:20169) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/pending-overlap-admission.spec.ts (12 tests) 51ms
+(node:20170) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-idle-density.spec.ts (11 tests) 45ms
+(node:20171) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/ordinary-restoration-placement.spec.ts (13 tests) 34ms
+(node:20172) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/dynamic-member-reactivation.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ✓ src/lib/dynamic-member-reactivation.spec.ts (8 tests) 11ms
+(node:20174) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/bind-branch-0-acquisition-turn.spec.ts (6 tests) 16ms
+(node:20175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/reclamation-eligibility.spec.ts (8 tests) 9ms
+(node:20176) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/hist0-remaining.spec.ts (8 tests) 36ms
+(node:20177) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/descriptor-merge-0.spec.ts (5 tests) 2ms
+(node:20178) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occurrence-successor.spec.ts (16 tests | 8 failed) 58ms
+   × first omission scalar: undeclared child waits then delivers after confirm 23ms
+   × first omission scalar: undeclared child waits then delivers after rollback 5ms
+   × first omission empty: undeclared child waits then delivers after confirm 3ms
+   × first omission empty: undeclared child waits then delivers after rollback 2ms
+   × first omission collection: undeclared child waits then delivers after confirm 3ms
+   × first omission collection: undeclared child waits then delivers after rollback 2ms
+   × first omission mixed: undeclared child waits then delivers after confirm 6ms
+   × first omission mixed: undeclared child waits then delivers after rollback 2ms
+   ✓ omission prunes selected nested support but not q consumed into surviving y 2ms
+   ✓ the same omission with independent replacement y does not acquire q 1ms
+   ✓ exact replacement cancels only its old slot and disposal cancels remaining slots 1ms
+   ✓ finalization work is independent of unrelated enrolled sibling count 1ms
+   ✓ reverse enrolled peer has no full ingress permission 2ms
+   ✓ reverse enrolled peer has no equal ingress permission 1ms
+   ✓ hidden unresolved support does not block selection reduction and reappearance restores it 0ms
+   ✓ new subject lifetime at reused key cannot retain replaced old proof 4ms
+(node:20179) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e2-precision-null.spec.ts (4 tests) 7ms
+(node:20180) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/state-location-view.spec.ts (8 tests) 31ms
+(node:20181) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/a1-ingress.spec.ts (9 tests) 33ms
+(node:20182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/histc2-door.spec.ts (13 tests) 42ms
+(node:20192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/scalar-native-support.spec.ts (10 tests) 39ms
+(node:20204) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/collection-contributor-core.spec.ts (11 tests) 58ms
+(node:20210) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/never-claimed-retirement.spec.ts (5 tests) 39ms
+(node:20211) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/proposal-0-kernel.spec.ts (10 tests) 41ms
+(node:20230) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts (11 tests) 4ms
+(node:20231) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/after-commit-1.spec.ts (10 tests) 23ms
+(node:20233) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/tree-error-public-contract.spec.ts > PUBLIC: delivery semantics > a throwing listener damages neither the link nor its peers
+SignalTree: an onTreeError listener threw. The original error was still handled normally; this is the listener failing. [ST2025] Error: listener exploded
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/tree-error-public-contract.spec.ts:135:13
+    at reportTreeError (/private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/internals/error-reporter.ts:123:7)
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/link.ts:1031:15
+    at processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+ ❯ src/lib/tree-error-public-contract.spec.ts (8 tests | 1 failed) 28ms
+     ✓ ⚠️ two identical trees are distinguishable through the public API 14ms
+     ✓ the same tree is stable 1ms
+     ✓ one failure -> one event 1ms
+     ✓ a throwing listener damages neither the link nor its peers 6ms
+     ✓ unsubscribe is clean, zero listeners are harmless, listeners are independent 2ms
+     ✓ ⚠️ a failed send: observable, X authored, queue alive, settled() RESOLVES 1ms
+     × the Link handle is still exactly three members 2ms
+     ✓ ⚠️ internal machinery stays internal 1ms
+(node:20253) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/ordinary-member-presence.spec.ts (8 tests) 30ms
+(node:20254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-claim-boundary.spec.ts (8 tests) 184ms
+(node:20267) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/native-order-interference.spec.ts (12 tests) 78ms
+(node:20268) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/authority-assessment.spec.ts (6 tests) 6ms
+(node:20271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/hotfix-15-2-2-safety.spec.ts (9 tests) 36ms
+(node:20272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/compensation-provenance.spec.ts (9 tests) 32ms
+(node:20281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/utilities/deep-equal-cycles.spec.ts (18 tests) 10ms
+(node:20571) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-commit-ordering.spec.ts (7 tests) 41ms
+(node:20572) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/entity-membership-capture.spec.ts (11 tests) 406ms
+(node:20573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-materialized-value-0.spec.ts (7 tests) 19ms
+(node:20574) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-tap-reads.spec.ts (13 tests) 83ms
+(node:20575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-absent-locations.spec.ts (21 tests) 319ms
+(node:20704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/markers/entity-map.spec.ts (16 tests) 29ms
+(node:20776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/realization-target-role-1.spec.ts (4 tests) 26ms
+(node:20798) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/restoration-turn-adapter.spec.ts (8 tests) 96ms
+(node:20842) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/subject-address-cardinality-0.spec.ts (3 tests) 55ms
+(node:20914) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/declarative-structural-transition-0.spec.ts (8 tests) 75ms
+(node:20916) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/separate-boundary-contract.spec.ts (6 tests) 73ms
+(node:20919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/confirmed-redo.spec.ts (4 tests) 4ms
+(node:20920) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/publication-retirement-acceptance.spec.ts (9 tests) 42ms
+(node:20921) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/fixed-window-independent.spec.ts (10 tests) 45ms
+(node:20924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e-hooks.spec.ts (9 tests) 28ms
+(node:20925) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-operation-outcome.spec.ts (8 tests) 18ms
+(node:20926) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/enhancer-metadata-authority.spec.ts (10 tests) 5ms
+(node:20927) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/realization-context.spec.ts (5 tests) 3ms
+(node:20928) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/turn-feed-0.spec.ts (8 tests) 33ms
+(node:20931) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-inflight-settlement-audit.spec.ts (9 tests) 26ms
+(node:20932) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/diag-journal-0-inventory.spec.ts (7 tests) 24ms
+(node:20962) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/publication-obligation-combination.spec.ts (14 tests) 69ms
+(node:20982) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/flush-0.spec.ts (7 tests) 36ms
+(node:20984) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e2c-real-causal-path.spec.ts (5 tests) 66ms
+(node:20985) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e2s-structural-null.spec.ts (5 tests) 51ms
+(node:21001) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/enhancers/transactions/semantics-current.spec.ts > TRANSACTION-SEMANTICS-2 — candidate A (current implementation) > reports semantic evidence and fails on execution errors
+
+TRANSACTION-SEMANTICS-2 / candidate A — current implementation
+
+  HELD        S01 one pending writer, rejected
+  HELD        S03 two pending, same location — reject OLDER
+  HELD        S04 THREE pending, same location — reject MIDDLE
+  HELD        S05 reject OLDEST then settle newer — newer must not be lost
+  HELD        S07 reject NEWEST — older pending value survives
+  HELD        S11 reject both — no rejected value may remain
+  HELD        S10 accept NEWER then accept OLDER — settlement must not reorder
+  UNSUPPORTED A1 unrelated snapshot advances canonical, P1 stays pending
+              Current implementation exposes no canonical/pending split
+  UNSUPPORTED A2 correlated ACCEPT settles the contribution
+              Current implementation has no correlated authority settlement input
+  HELD        A5 fresh snapshot, no relation — settlement must NOT be invented
+  UNSUPPORTED A6 stale versioned event must not regress canonical
+              Current implementation has no revision-ordering input
+  VIOLATED    F06 reject succeeds, then reject again
+              a second reject reported a fresh successful settlement
+  HELD        F07 reject succeeds, then accept must not resurrect
+
+  cases: 9 held, 1 violated, 3 unsupported, 0 error, 13 total
+  Held means this implemented case only; unsupported is not a pass or a law verdict.
+
+
+ ✓ src/enhancers/transactions/semantics-current.spec.ts (9 tests) 44ms
+(node:21002) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/redo-assessment.spec.ts (5 tests) 2ms
+(node:21003) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/snapshot-builder.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ✓ src/lib/snapshot-builder.spec.ts (6 tests) 9ms
+(node:21004) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/a3-tx-status-falsifier.spec.ts (3 tests) 14ms
+(node:21005) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/reentrant-order-v16-controls.spec.ts (6 tests) 24ms
+(node:21006) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/singleton-row-reuse.spec.ts (8 tests) 22ms
+(node:21007) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-bounded-qualification.spec.ts (12 tests) 48ms
+(node:21008) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/value-work-handoff.spec.ts (12 tests) 31ms
+(node:21009) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/compound-compensation-controls.spec.ts (9 tests) 66ms
+(node:21010) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-membership-producer.spec.ts (6 tests) 65ms
+(node:21011) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/subject-address-0.spec.ts (4 tests) 23ms
+(node:21012) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/two-setall-turn.spec.ts (21 tests) 65ms
+(node:21013) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-active-prepend-changeid.spec.ts (23 tests) 18ms
+(node:21014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/enhancer-protocol-continuity.spec.ts (8 tests) 7ms
+(node:21015) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts (9 tests) 34ms
+(node:21017) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/r6-liveness-0.spec.ts (7 tests) 29ms
+(node:21018) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/hist0-baseline.spec.ts (7 tests) 35ms
+(node:21021) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-readiness.spec.ts (8 tests) 22ms
+(node:21024) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/turn-effect-composition.spec.ts (7 tests) 27ms
+(node:21025) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/reversal-delivery-coherence.spec.ts (22 tests) 34ms
+(node:21026) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e-ordering-rekey.spec.ts (6 tests) 12ms
+(node:21027) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/derive-footprint.spec.ts (14 tests) 38ms
+(node:21028) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/devtools/devtools-jump-0-1.spec.ts (5 tests) 24ms
+(node:21029) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/supersession-0.spec.ts (6 tests) 22ms
+(node:21030) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/owner-scope-0.spec.ts (10 tests) 28ms
+(node:21032) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-link-0.spec.ts (4 tests) 22ms
+(node:21033) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/parent-freshness-focused.spec.ts (7 tests) 18ms
+(node:21034) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/confirmed-rollback-composition.spec.ts (2 tests) 4ms
+(node:21035) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/p0c-row-divergence.spec.ts (9 tests) 37ms
+(node:21036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/intercept-leaf-signals.spec.ts (9 tests) 11ms
+(node:21037) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/native-epoch-error-drain.spec.ts (25 tests) 5ms
+(node:21038) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-predicate-churn.spec.ts (12 tests) 16ms
+(node:21039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/a2-3-settlement-placement.spec.ts (4 tests) 16ms
+(node:21040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/descriptor-role-0.spec.ts (4 tests) 2ms
+(node:21041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/commit-consequence.spec.ts (7 tests) 2ms
+(node:21042) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-queued-authority.spec.ts (11 tests) 40ms
+(node:21043) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/owner-replay-2.spec.ts (4 tests) 28ms
+(node:21044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/semantics-authority-trace-selftest.spec.ts (13 tests) 9ms
+(node:21045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/membership-history-projection.spec.ts (10 tests) 42ms
+(node:21046) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-egress-footprint.spec.ts (15 tests) 36ms
+(node:21047) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diag-journal-1-grouping.spec.ts (5 tests) 27ms
+(node:21048) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/physical/declarative-target-binding.spec.ts (4 tests) 12ms
+(node:21049) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/enhancer-method-forwarding.spec.ts (21 tests) 16ms
+(node:21050) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/position-capture-0.spec.ts (6 tests) 39ms
+(node:21051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-snapshot-egress.spec.ts (6 tests) 20ms
+(node:21052) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/diag-journal-1-retention.spec.ts (3 tests) 30ms
+(node:21053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-semantic-transition.spec.ts (12 tests) 54ms
+(node:21054) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/tx-ledger-c3.spec.ts (7 tests) 27ms
+(node:21055) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-update-one-equivalence.spec.ts (11 tests) 34ms
+(node:21056) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/semantics-authority-selftest.spec.ts (28 tests) 5ms
+(node:21057) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-reader-v16-controls.spec.ts (6 tests) 29ms
+(node:21058) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/audit-entity-boundaries.spec.ts (9 tests) 32ms
+(node:21059) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/proposal-review-surface-0.spec.ts (3 tests) 24ms
+(node:21061) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/zero-net-compensation.spec.ts (7 tests) 55ms
+(node:21068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/devtools/devtools-jump-0.spec.ts (3 tests) 34ms
+(node:21095) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/proposal-inspection-0.spec.ts (6 tests) 23ms
+(node:21096) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-native-address.spec.ts (10 tests) 38ms
+(node:21097) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/turn-feed-0-1-identity.spec.ts (4 tests) 18ms
+(node:21098) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts > inspect() path ambiguity > a literal key and a nested path project to the same public path
+[inspect] LITERAL path : [ 'a.b=current' ] addr: [ '["a.b"]=current' ]
+[inspect] NESTED  path : [ 'a.b=current' ] addr: [ '["a","b"]=current' ]
+
+stdout | src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts > inspect() address — entity FIELDS are distinguishable too > a literal and a nested entity field have different addresses
+[entity-addr] [{"path":"rows.A.n.a","address":["rows","n.a"],"subject":1,"status":"current"},{"path":"rows.A.n","address":["rows","n"],"subject":1,"status":"current"}]
+
+ ✓ src/enhancers/transactions/inspect-path-ambiguity-0.spec.ts (2 tests) 17ms
+(node:21099) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/tap-rekey-necessity.spec.ts (5 tests) 15ms
+(node:21100) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/restoration-audit-regression.spec.ts (15 tests) 51ms
+(node:21101) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/diag-journal-1-1-correlation.spec.ts (4 tests) 28ms
+(node:21102) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/path-notifier-membership.spec.ts (8 tests) 16ms
+(node:21103) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/notifier-scope-0-identity.spec.ts (4 tests) 10ms
+(node:21104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/construction-resource-cleanup.spec.ts (7 tests) 26ms
+(node:21105) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/ordinary-order-indexed-work.spec.ts (8 tests) 134ms
+(node:21106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/enhancers/batching/batching.behavior.spec.ts > batching behavior > setter wrapping reaches callable accessors > preserves the callback failure when its deferred replacement also fails
+[SignalTree] Secondary error in coalesce(): Error: coalesced write failed
+    at /private/tmp/st-native-combined-c19/candidate/packages/kernel/src/enhancers/batching/batching.behavior.spec.ts:151:28
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+    at new Promise (<anonymous>)
+    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)
+    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64
+
+ ✓ src/enhancers/batching/batching.behavior.spec.ts (7 tests) 9ms
+(node:21107) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-obligation-matrix.spec.ts (13 tests) 46ms
+(node:21167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/pending-membership-admission.spec.ts (7 tests) 34ms
+(node:21168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-native-input-independent.spec.ts (12 tests) 46ms
+(node:21180) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/state-location-view-v16-controls.spec.ts (5 tests) 25ms
+(node:21181) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/packet-physical-pair-semantics.spec.ts (6 tests) 4ms
+(node:21182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/apply-state-pollution.spec.ts (8 tests) 9ms
+(node:21183) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/recipient-window-review.spec.ts (9 tests | 4 failed) 44ms
+   ✓ equal unknown proof retains pending predecessor and no-write receipt: scalar 15ms
+   ✓ equal unknown proof retains pending predecessor and no-write receipt: branch 5ms
+   × equal undeclared recipient proof does not discard held useful revision: confirm 7ms
+   × equal undeclared recipient proof does not discard held useful revision: rollback 4ms
+   ✓ trace actual native input vs recipient-only wider uncertainty: known=false 3ms
+   ✓ trace actual native input vs recipient-only wider uncertainty: known=true 2ms
+   × membership omission retains recipient window through terminal confirm 4ms
+   × membership omission retains recipient window through terminal rollback 2ms
+   ✓ a finalizer throw installs neither recipient authority nor prepared writes 2ms
+(node:21184) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/r8-overlap-0.spec.ts (9 tests) 19ms
+(node:21185) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/membership-hot-paths.spec.ts (6 tests) 32ms
+(node:21235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/a2-4-drain-ownership.spec.ts (3 tests) 15ms
+(node:21272) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/pending-footprint-v16-controls.spec.ts (10 tests) 45ms
+(node:21273) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/physical/entity-mutation-frame.spec.ts (6 tests) 5ms
+(node:21274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/transactions-entity-field-rollback.spec.ts (5 tests) 24ms
+(node:21275) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/owner-location-0.spec.ts > OWNER-LOCATION-0: which node kinds name their owning tree? > ⚠️ the inventory across every materialisable node kind in core
+tree (root)          pos=Y ownerPath=Y registry=Y callable=n
+tree.$ (namespace)   pos=Y ownerPath=Y registry=Y callable=Y
+branch accessor      pos=Y ownerPath=Y registry=Y callable=Y
+leaf                 pos=Y ownerPath=Y registry=Y callable=Y
+nested leaf          pos=Y ownerPath=Y registry=Y callable=Y
+entityMap node       pos=Y ownerPath=Y registry=Y callable=n
+ADDRESSABLE-WITHOUT-OWNER: []
+
+ ✓ src/lib/owner-location-0.spec.ts (2 tests) 13ms
+(node:21276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e2b-authorship.spec.ts (3 tests) 7ms
+(node:21277) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/diagnostics/owner-evidence-0.spec.ts (4 tests) 14ms
+(node:21278) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/location-runtime.spec.ts (10 tests) 5ms
+(node:21279) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-large-batches-v16-controls.spec.ts (16 tests | 6 failed) 60345ms
+     ✓ setAll, replace and clear with a notifier subscriber  7069ms
+     ✓ rolls back a transaction that replaced every row and reused a key (transactions)  28050ms
+     ✓ rolls back a transaction that replaced every row and reused a key (transactions, restoration)  24296ms
+     ✓ counts predicate visits and restores instrumentation even on failure 1ms
+       ✓ replacing every id (256 rows) 73ms
+       ✓ replacing every id (1024 rows) 184ms
+       × clearing with setAll([]) (256 rows) 24ms
+       × clearing with setAll([]) (1024 rows) 68ms
+       ✓ replacing every id (256 rows) 38ms
+       ✓ replacing every id (1024 rows) 158ms
+       × clearing with setAll([]) (256 rows) 21ms
+       × clearing with setAll([]) (1024 rows) 73ms
+       ✓ replacing every id (256 rows) 35ms
+       ✓ replacing every id (1024 rows) 159ms
+       × clearing with setAll([]) (256 rows) 17ms
+       × clearing with setAll([]) (1024 rows) 77ms
+(node:23615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

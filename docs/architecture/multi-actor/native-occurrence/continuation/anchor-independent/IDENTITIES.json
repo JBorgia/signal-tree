@@ -1,0 +1,12 @@
+{
+  "source": "/private/tmp/st-entity-anchor-successor/candidate",
+  "copiedPackageFilesVerifiedUnchanged": 946,
+  "files": {
+    "packages/kernel/src/lib/entity-signal.ts": "a2319dec7f66aa7f33f8a89a27951946553f50771496a3ceaf77ad7590c15ef9",
+    "packages/kernel/src/lib/native-anchor-independent.spec.ts": "cdddc1f888d9fab4e17bec2e5e6cecb5e013e3713c43296657ea96c0993de7e6",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "7885ead200a79c3d344e82ddb52a6aae4f13ee55964bf2f5619fddd90c03323d",
+    "packages/kernel/src/lib/internals/native-occurrence.ts": "421873e7534602a1328dc1d04dd3f09e80f955b66445b1d0b4044316a00773bc",
+    "packages/kernel/src/lib/internals/materialize-markers.ts": "6aa9b12c829d737a8ed00880aff880153deb4ab157eda884d16d6868efd9d8f4",
+    "tsconfig.anchor-review.json": "add99d9179c3d7e623ac09a40477c73a68c23fa6e956837660894f9390a60627"
+  }
+}

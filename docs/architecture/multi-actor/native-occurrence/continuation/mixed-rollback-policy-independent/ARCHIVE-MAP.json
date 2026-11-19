@@ -1,0 +1,62 @@
+[
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "558eec012cb89f2e969b39f19ce5d89c52824685bb70c45947361157f67c5430",
+    "archiveSha256": "558eec012cb89f2e969b39f19ce5d89c52824685bb70c45947361157f67c5430"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "a95b716f10c7dc43efc0f60d13a31a947695affff153b376ba6232c6835a28e3",
+    "archiveSha256": "7d2e92b279162c73968593178725be1b0ddead6fc73214923fb81f2f8545dbf6"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "3c49e3612e6bb331bede1abd639b673199a4a75ae5edbcdfc76a8b20723c2be4",
+    "archiveSha256": "3c49e3612e6bb331bede1abd639b673199a4a75ae5edbcdfc76a8b20723c2be4"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "ea4c4d2de4fa75b43292b68176cc9e38248f69a409f62078555f3c59b25c7c7b",
+    "archiveSha256": "ea4c4d2de4fa75b43292b68176cc9e38248f69a409f62078555f3c59b25c7c7b"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "3d88c65a23700b8a5d1891c4b000324795ea5f9e83bd478932a63b0cd13dbd08",
+    "archiveSha256": "3d88c65a23700b8a5d1891c4b000324795ea5f9e83bd478932a63b0cd13dbd08"
+  },
+  {
+    "source": "runs/bounded-trace/RESULT.json",
+    "archive": "runs/bounded-trace/RESULT.json",
+    "sourceSha256": "c029ccc9f6132d5390aa77e256ec366afe5acbdbc351698a1f651484e1468f56",
+    "archiveSha256": "c029ccc9f6132d5390aa77e256ec366afe5acbdbc351698a1f651484e1468f56"
+  },
+  {
+    "source": "runs/bounded-trace/first.log",
+    "archive": "runs/bounded-trace/first.log",
+    "sourceSha256": "9ef8f8b17f23f7820c4c98fa310d4c4ad6b3b0c862b60aab6e53146cf6bf96eb",
+    "archiveSha256": "9ef8f8b17f23f7820c4c98fa310d4c4ad6b3b0c862b60aab6e53146cf6bf96eb"
+  },
+  {
+    "source": "runs/bounded-trace/SOURCE-BEFORE.json",
+    "archive": "runs/bounded-trace/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "99439cdf43403cdfa147942a85d6284d9e21262dcbc9b4f7a4df6ee36f10ee8f",
+    "archiveSha256": "2714e0b3bb093176f51b51035b9f06c550213a3f167a9140bd383aaf4573f385"
+  },
+  {
+    "source": "runs/bounded-trace/COMMAND.json",
+    "archive": "runs/bounded-trace/COMMAND.json",
+    "sourceSha256": "9f9b43afca80809d2f6fe5bf805e4b52d8942920bc50d614346856e1bf08adab",
+    "archiveSha256": "9f9b43afca80809d2f6fe5bf805e4b52d8942920bc50d614346856e1bf08adab"
+  },
+  {
+    "source": "runs/bounded-trace/rollback-policy.json",
+    "archive": "runs/bounded-trace/rollback-policy.json",
+    "sourceSha256": "4938b49e38a512972682773303a90d5a35f92fb5cf76a9e6a8954bf400f6a5a1",
+    "archiveSha256": "4938b49e38a512972682773303a90d5a35f92fb5cf76a9e6a8954bf400f6a5a1"
+  }
+]

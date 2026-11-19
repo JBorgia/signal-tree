@@ -1,0 +1,22 @@
+{
+  "baseline-b": {
+    "experimental-publication/entity.ts": {
+      "original": "7e39ba1ae0609cd3a569b1228187b4ff3fe55c1e76ef4313d7ce2d9ed4b89a73",
+      "instrumented": "1c918089881a7c43fc98319adcca77be5cd316eb814ad2fd744ac35db3243bba"
+    },
+    "internals/entity-publication.ts": {
+      "original": "3662688effff3d13ef12d90c869cda98abb841793d0673b920a9beddcab30758",
+      "instrumented": "7430b90202a970c16b2280e05227ea98abb5c0b191d3d0c24b67cc8aa6363ddf"
+    }
+  },
+  "optimized": {
+    "experimental-publication/entity.ts": {
+      "original": "2b2982ca2dba16174aa8556d7aee4584f5ee6b9dfb1acdbacfe5197e48ade585",
+      "instrumented": "f7f458c6d27897b75f0810178bf721a35ff5f11775148c9b7d31e7e223b8f8b5"
+    },
+    "internals/entity-publication.ts": {
+      "original": "3662688effff3d13ef12d90c869cda98abb841793d0673b920a9beddcab30758",
+      "instrumented": "7430b90202a970c16b2280e05227ea98abb5c0b191d3d0c24b67cc8aa6363ddf"
+    }
+  }
+}

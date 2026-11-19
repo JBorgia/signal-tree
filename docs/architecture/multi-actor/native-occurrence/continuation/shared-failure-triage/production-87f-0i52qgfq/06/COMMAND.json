@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "entity-missing-id-guard.spec.ts",
+    "--testNamePattern=entityMap missing-id guard \\(dev mode\\) warns when entities have no id and no selectId",
+    "--reporter=verbose",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate",
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+    "fullName": "entityMap missing-id guard (dev mode) warns when entities have no id and no selectId",
+    "duplicateOrdinal": 1
+  },
+  "fixtureSha256": "c1268e6dcb11f5b98251d56a749854972ea2c28c5b114b9294151bcb32252827",
+  "environment": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "ST_OBSERVATIONS": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/06/observations/native.jsonl",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/06/observations/prepared",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/06/observations/public"
+  },
+  "filterNote": "Equivalent full-name regex; literal whitespace and hyphens need no escape. No fixture or timeout changes."
+}

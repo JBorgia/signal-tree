@@ -1,0 +1,1 @@
+Stopped owned diagnostic invocation after Nx exec launched repeated runs of the same four-case fixture. First complete run retained. No retry requested; no further test launch.

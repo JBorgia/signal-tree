@@ -1,0 +1,76 @@
+commit eb259b3a529f78154727b438fd111654a2769a8f
+Author: Borgia <jonathanborgia@gmail.com>
+Date:   Tue Oct 6 03:59:23 2026 -0600
+
+    test(v16): 8d(c) review follow-up: count searches and key listings too
+    
+    The second review pass found the iteration counter blind to whole-array
+    searches (`indexOf`, `includes`, `find` and the rest) and to `Object.keys`,
+    `values` and `entries`, so such an O(size) regression would pass. They are
+    counted now at their full length. Mutations adding an `indexOf` over the key
+    snapshot to `updateOne` and an `Object.keys` over the slots to a compiled
+    write are killed.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/packages/kernel/src/lib/entity-granular-reactivity.spec.ts b/packages/kernel/src/lib/entity-granular-reactivity.spec.ts
+index 19a6ed85..32acd685 100644
+--- a/packages/kernel/src/lib/entity-granular-reactivity.spec.ts
++++ b/packages/kernel/src/lib/entity-granular-reactivity.spec.ts
+@@ -77,10 +77,10 @@ describe('entityMap granular reactivity', () => {
+ 
+ /**
+  * Elements visited while `run` executes, counted where an O(size) rebuild or
+- * copy goes: Map and Set iteration, `Array.from`, and the Array methods that
+- * build or walk arrays. Counted work, not wall-clock time, so machine load
+- * cannot fail it (v16 integration slice 8d). An indexed loop that builds
+- * nothing is not counted.
++ * copy goes: Map and Set iteration, `Array.from`, `Object.keys`, `values` and
++ * `entries`, and the Array methods that build, search or walk arrays. Counted
++ * work, not wall-clock time, so machine load cannot fail it (v16 integration
++ * slice 8d). An indexed loop that builds nothing is not counted.
+  */
+ function countIteratedElements(run: () => void): number {
+   let visited = 0;
+@@ -122,13 +122,40 @@ function countIteratedElements(run: () => void): number {
+         return original.apply(this, args);
+       }
+     );
+-  for (const key of ['map', 'filter', 'forEach', 'slice', 'concat', 'reduce'])
++  // Whole-array walks, counted at their full length: a search that stops
++  // early still scales with the array it searches.
++  for (const key of [
++    'map',
++    'filter',
++    'forEach',
++    'slice',
++    'concat',
++    'reduce',
++    'indexOf',
++    'lastIndexOf',
++    'includes',
++    'find',
++    'findIndex',
++    'some',
++    'every',
++    'splice',
++    'sort',
++    'join',
++  ])
+     patch(Array.prototype, key, (original) =>
+       function (this: unknown[], ...args: unknown[]) {
+         visited += this.length;
+         return original.apply(this, args);
+       }
+     );
++  for (const key of ['keys', 'values', 'entries'])
++    patch(Object, key, (original) =>
++      function (this: unknown, ...args: unknown[]) {
++        const result = original.apply(this, args) as unknown[];
++        visited += result.length;
++        return result;
++      }
++    );
+   patch(Array.prototype, 'push', (original) =>
+     function (this: unknown[], ...args: unknown[]) {
+       visited += args.length;

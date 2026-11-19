@@ -1,0 +1,31 @@
+{
+  "byteIdentical": true,
+  "declarationFiles": 25,
+  "hashes": {
+    "kernel/dist/adapter.d.ts": "6bf35e1e1860606f6c777788bea636ac44ed781e3b4b0e064102a53eb25e9683",
+    "kernel/dist/internals.d.ts": "75ea10e60200a72de95e7df66acc71f6139ad0a8236bb7818eb21ab027d24f4a",
+    "kernel/dist/_adapter-Cp5WVkcj.d.ts": "9cd8c8d32fdee02184e04bb0a38274ad0ec6cdb42151effe97d935d6cbad4d1e",
+    "kernel/dist/index.d.ts": "d6718f35d6cd5179dcf54cae33b02f578a8a74954b7f6495fb821a69293a0418",
+    "kernel/dist/_position-registry-D8dCXLAS.d.ts": "5fa73d43d0525919b2731e54adbe1a2cb1adaafc6fe014c536b4dc75a69bfab6",
+    "react/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "react/src/use-signal-tree.d.ts": "7aad01ae6cdc339cef4d8440eeef664867dd4c69f0350879593379bb1aa90ee8",
+    "react/src/index.d.ts": "9ce57017a5bd4b15a7b23fcd72522e53054d1a07eb9bcf5b73cf715527f4a5d1",
+    "solid/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "solid/src/index.d.ts": "96a28b7c9d9ab7e00433f54de3e5f213d95298668834a69372baf578b1d71aee",
+    "solid/src/lib/carrier.d.ts": "3b018bddaf82a8b6b9a2e55a921ff80c6e22c17a890c72c05f6e30344a8097e2",
+    "solid/src/lib/solid-observation.d.ts": "c8d66235153b6b83d926d7c7f37a796d288e77ec611acaa73de7d3cc6a83634d",
+    "solid/src/lib/construction-input.d.ts": "84e4b8b6f9f5ed7170d9d16daa55bcabdce51756e87c2b64c320eb170095f1fc",
+    "angular/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "angular/src/index.d.ts": "2daf5ab5a11970ee0ee2265124de7a91e507b60ee851eb3b0b43c35345144b38",
+    "angular/src/lib/carrier.d.ts": "2f288f2515523b91f92a8443986d4e5a91ece9c3852121bb7c7b9376ce3472a3",
+    "angular/src/lib/observation-adapter.d.ts": "4a1c38eacb6b3d10ee268268924966944682d904197299b9ff32ccbe2879ab9f",
+    "angular/src/lib/define-store.d.ts": "c363131c635463bf9a4fe497c88db5c8a91bc2373a2f30b3bce880ed6879ef17",
+    "angular/src/lib/construction-input.d.ts": "c48903a8e799c49f3a67b79dc5355f4166fbb8f9e3cdb5cba588ba44da689804",
+    "angular/src/lib/to-writable-signal.d.ts": "a0b9327dcbce2fbf5306f5e6b3290adb70ce8ce9a6e0e8876922efc9e03ec77d",
+    "vue/dist/index.d.ts": "6453348bfc587bf67d5854ca3077db6dd6d21d59cb2e4d49e68ffba96b86e1ff",
+    "vue/src/index.d.ts": "17ae4feda5d1dd047831b5063db4f19da6cd101c35ac30cc4c2eacd94a7c90aa",
+    "vue/src/lib/carrier.d.ts": "2a2fde3319ea3836caf069c8d5a7048f71c6acc778fe75ed3c1ac3df58b986d7",
+    "vue/src/lib/vue-observation.d.ts": "410c2ede972d45164ce942e4bf54d8fabb57d6522fd6fde6dc2bc5935af4b46e",
+    "vue/src/lib/construction-input.d.ts": "6251df16aeba37e923d2374708386bc9a2fd32c2114ad133cdc8f3884e27a523"
+  }
+}

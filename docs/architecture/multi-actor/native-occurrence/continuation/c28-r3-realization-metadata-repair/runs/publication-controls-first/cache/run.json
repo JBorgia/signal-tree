@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel scalar-frame-publication cached-current-input opaque-current-input equal-owner-current-input native-certificate-successor --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:01:29.142Z",
+    "endTime": "2026-11-03T05:01:35.075Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "11373061032126029210",
+      "startTime": "2026-11-03T05:01:29.191Z",
+      "endTime": "2026-11-03T05:01:35.074Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

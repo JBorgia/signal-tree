@@ -1,0 +1,32 @@
+{
+  "scope": "TEST ONLY, UNEXECUTED",
+  "baseManifestSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "testFiles": {
+    "packages/angular/src/lib/equal-owner-facade-controls.spec.ts": {
+      "sha256": "fa426a26c613345d2c7e30def87e253963cab5d04873cd62339b1e4d52cd86cd",
+      "cases": 8,
+      "executed": false
+    },
+    "packages/vue/src/lib/equal-owner-facade-controls.spec.ts": {
+      "sha256": "351c6cc27f9d0c7bc04ac714115d7f264fea841c28bf9129ccee1ab69be70f17",
+      "cases": 8,
+      "executed": false
+    },
+    "packages/solid/src/lib/equal-owner-facade-controls.spec.ts": {
+      "sha256": "810abc2745af70cdec2b30559e52dfeebc0e04be4b80bdd238261e709ac61283",
+      "cases": 8,
+      "executed": false
+    },
+    "packages/react/src/equal-owner-facade-controls.spec.tsx": {
+      "sha256": "566be62df00db45abbc05bf95ba305e2798667e322af608dc88ee944e9e71b87",
+      "cases": 8,
+      "executed": false
+    }
+  },
+  "generatedCases": 32,
+  "executedCases": 0,
+  "typesRun": false,
+  "runtimeOrConfigChanges": false,
+  "patchSha256": "89430cc658907028e10017fcb128fa643c0e0b3ceb4ff1bd75fe07e13ce04d1f",
+  "runtimeCandidateRequiredBeforeRun": true
+}

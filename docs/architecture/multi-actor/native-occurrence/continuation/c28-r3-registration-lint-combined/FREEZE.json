@@ -1,0 +1,17 @@
+{
+  "status": "author frozen; no further source changes",
+  "manifestSha256": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84",
+  "files": 3119,
+  "uniqueSourceCases": 316,
+  "entityLogicalCases": 20,
+  "budget": "four ceilings failed; no waiver",
+  "hashes": {
+    "MANIFEST.json": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84",
+    "REPORT.md": "a6b72b767ee75262be3ddac1dad3dd4faf3c39a666e14743a682bdf690d72f53",
+    "runtime.patch": "bb1c413769c304f9c5f8505dd95eba7c053c26f12a0d429aba8198c380ccabf3",
+    "existing-fixture-comments.patch": "14a63df4ebee97a58747e285edc79a21605b5f2c472bddf313a784a64896890c",
+    "permanent-tests.patch": "0f015a7134fb13633fd623ce31eaa445e827879a5e66ba045e0ce353fdcac8c7",
+    "EVIDENCE-SNAPSHOT.json": "26444cbfd42cbb3e93abec41a048feda513b28cfc7ac568bbdbb831040fa4926",
+    "FINAL-IDENTITY.json": "58e7874a1e3c7251450643204916fda258819add311f6d4c7dcbd84ada85e7e3"
+  }
+}

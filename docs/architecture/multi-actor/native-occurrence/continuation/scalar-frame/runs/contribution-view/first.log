@@ -1,0 +1,70 @@
+
+> nx run kernel:test scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+(node:68106) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68113) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:68121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (21 tests | 1 failed) 31ms
+   × coalesced ABA coverage requires every contribution; mixed=true 2ms
+(node:68122) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:68124) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > coalesced ABA coverage requires every contribution; mixed=true
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:72:116
+     70|   // Ordinary notification coalescing remains one ABA result. The omit…
+     71|   // recipient on either contribution cannot borrow the other's receip…
+     72|   expect(seen).toHaveLength(1);expect(seen[0].value).toBe(2);expect(sc…
+       |                                                                                                                    ^
+     73|  }finally{off();n.clear();}
+     74| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 84 passed (85)
+   Start at  17:25:43
+   Duration  1.73s (transform 445ms, setup 0ms, import 715ms, tests 170ms, environment 569ms)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

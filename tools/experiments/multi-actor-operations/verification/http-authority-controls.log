@@ -1,0 +1,17 @@
+✔ real HTTP requires host-issued exact review grant independently of transport credential (21.436709ms)
+✔ lost HTTP acknowledgment retains exact grant and command through correlated retry (7.5535ms)
+✔ approved HTTP command still revalidates backend inputs and cannot issue grants over transport (4.430917ms)
+✔ lost HTTP acknowledgment retries the same command without repeating the effect (17.591041ms)
+✔ permission and persistence rejection return correlated failures without installing changes (7.491458ms)
+✔ review: forged actor and approval cannot replace host bearer credential (15.099792ms)
+✔ review: malformed and overlimit JSON install no state (7.72625ms)
+✔ review: command key reuse with different content cannot apply a second effect (6.134625ms)
+✔ review: lost acknowledgment of rejection remains uncertain until correlated retry (5.039042ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 94.48975

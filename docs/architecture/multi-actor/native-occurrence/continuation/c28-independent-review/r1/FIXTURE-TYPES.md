@@ -1,0 +1,15 @@
+# R1 fixture type disposition
+
+Recommend test-only correction in the separate qualified copy. No runtime, public API, discovery exclusion or spec-type baseline/ratchet change is justified.
+
+Evidence: /private/tmp/st-c28-r1-bounded-qualification/runs/spec-types/first.log records five errors: TS2322 at current-capture-r1.spec.ts:16 and :35; duplicate-property TS2783 for name/message at cached-current-input.spec.ts:56 and message at opaque-current-input.spec.ts:6. Preserve this first failure unchanged. The checked command is recorded in adjacent command.json: corepack pnpm exec node tools/check-spec-types.mjs.
+
+The actual public signature at candidate/packages/kernel/src/lib/types.ts:309 is updateAndReport(updates: Partial<T> | ((current: T) => Partial<T>)): string[]. A callback as a nested object property is outside that signature, although internal recursive runtime handling executes it. Runtime success does not establish public support.
+
+Smallest truthful organization: distinguish callable/report public cases from explicitly labeled internal runtime-only recursive cases. Preserve all useful callback-count, contradiction, owner-inspection, payload-identity, pending hold, useful delivery, settlement and disposal assertions. Place a narrow @ts-expect-error at each unsupported nested callback assignment, documenting the expected TS2322 and unsupported public shape. Keep surrounding setup positively typed. These directives provide negative type assertions: accepting the shape later should cause unused-directive errors. TypeScript does not bind a directive to a particular diagnostic code, so keep its target minimal and inspect future diagnostic changes; do not use a broad suppression or cast.
+
+A separate negative typing fixture is acceptable if desired, but does not by itself make the runtime invocation type-correct: the intentionally unsupported invocation still requires an explicit, narrow negative annotation. No JavaScript research isolate is necessary; retaining TypeScript preserves compiler scrutiny and runnable internal coverage. Do not count recursive cases as supported public API qualification.
+
+For diagnostic serialization, replace { name: error.name, message: error.message, ...error } with Object.assign({ name: error.name, message: error.message }, error), and use the analogous message-only form. With these fresh ordinary targets, this preserves the original enumerable output properties, explicit fallback fields, own enumerable string/symbol copying from the error, and last-source overwrite order. It does not make nonenumerable error properties enumerable except those explicitly copied into the target, as before.
+
+Qualification after correction: replay affected fixtures and spec-types, retaining original failures/results and reviewing the test-only diff. The reported 147 runtime passes and source/public-type passes do not discharge this spec-type failure or confer recursive-route public support. This disposition is source/log review; no correction or replay was executed by this reviewer.

@@ -1,0 +1,140 @@
+[
+  {
+    "source": "identity-and-results.json",
+    "archive": "identity-and-results.json",
+    "sourceSha256": "45c330aa6cde20b6b2f303e291280779b1fcee9891888b4828412c3603404a49",
+    "archiveSha256": "45c330aa6cde20b6b2f303e291280779b1fcee9891888b4828412c3603404a49"
+  },
+  {
+    "source": "reentry-evidence-verification.json",
+    "archive": "reentry-evidence-verification.json",
+    "sourceSha256": "9ed86357c471599a5e434d807c0a8c2cb28e3d5d8de4264ef6ea5c489a101520",
+    "archiveSha256": "9ed86357c471599a5e434d807c0a8c2cb28e3d5d8de4264ef6ea5c489a101520"
+  },
+  {
+    "source": "C8-control-verification.json",
+    "archive": "C8-control-verification.json",
+    "sourceSha256": "27ccb16fbb337068c8b55b7d71f71e34681a4667692236b4b0725b980b8ab06a",
+    "archiveSha256": "27ccb16fbb337068c8b55b7d71f71e34681a4667692236b4b0725b980b8ab06a"
+  },
+  {
+    "source": "mechanism-input-identity.json",
+    "archive": "mechanism-input-identity.json",
+    "sourceSha256": "6855f4975711eba1e66118b25179398612b8a23bd946df3b7f2aa61e533404c3",
+    "archiveSha256": "6855f4975711eba1e66118b25179398612b8a23bd946df3b7f2aa61e533404c3"
+  },
+  {
+    "source": "reviewed-DESIGN.md",
+    "archive": "reviewed-DESIGN.md",
+    "sourceSha256": "967f245b55fadcb152e6c7370752ca04ef0cc0f14cbd092b10dff88c950940da",
+    "archiveSha256": "967f245b55fadcb152e6c7370752ca04ef0cc0f14cbd092b10dff88c950940da"
+  },
+  {
+    "source": "reviewed-HOOKS.md",
+    "archive": "reviewed-HOOKS.md",
+    "sourceSha256": "fbc3bcfad250fc6778d17dfca3b95fe48334c5cb09640b1054f8e92748356da5",
+    "archiveSha256": "fbc3bcfad250fc6778d17dfca3b95fe48334c5cb09640b1054f8e92748356da5"
+  },
+  {
+    "source": "FINAL-VERIFICATION.json",
+    "archive": "FINAL-VERIFICATION.json",
+    "sourceSha256": "32a45f309298d31e158cd312a23e6c36bd298d419fe3cdc8cc2ee7030ac0b6e2",
+    "archiveSha256": "32a45f309298d31e158cd312a23e6c36bd298d419fe3cdc8cc2ee7030ac0b6e2"
+  },
+  {
+    "source": "C7a-to-C8-entity-signal.diff",
+    "archive": "C7a-to-C8-entity-signal.diff",
+    "sourceSha256": "ee229a10bc3b1a4f87abbcc8d905302aa3e7775b73b7327e0a90da5801d67a68",
+    "archiveSha256": "ee229a10bc3b1a4f87abbcc8d905302aa3e7775b73b7327e0a90da5801d67a68"
+  },
+  {
+    "source": "COMMANDS.json",
+    "archive": "COMMANDS.json",
+    "sourceSha256": "213a04ae14671948c61754ec6ac31156d384728fded01382a9bbd94977e9f8e1",
+    "archiveSha256": "213a04ae14671948c61754ec6ac31156d384728fded01382a9bbd94977e9f8e1"
+  },
+  {
+    "source": "MECHANISM-REVIEW.md",
+    "archive": "MECHANISM-REVIEW.md",
+    "sourceSha256": "a5cff629d39c224d698f3456d7c3aac6a98a03c5190866f34f60824b59bc32b2",
+    "archiveSha256": "a5cff629d39c224d698f3456d7c3aac6a98a03c5190866f34f60824b59bc32b2"
+  },
+  {
+    "source": "source-evidence.txt",
+    "archive": "source-evidence.txt.gz",
+    "sourceSha256": "49b54490a144e53dad40497417a3dd0544b4d74900b1153e9cc5f47dd75dce1c",
+    "archiveSha256": "3de97d42a0ac1115bdd7c71dbd44160fec68dd0210574f4d7bd735be7b05d937"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "67f077aff6a88b21413ab25b22b645ed8a0f84b7bbae977d38ca56ead15f5217",
+    "archiveSha256": "67f077aff6a88b21413ab25b22b645ed8a0f84b7bbae977d38ca56ead15f5217"
+  },
+  {
+    "source": "reviewed-REENTRY-CACHE-RULES.md",
+    "archive": "reviewed-REENTRY-CACHE-RULES.md",
+    "sourceSha256": "5274297976e4ebbfaa2889dceb3ffd968b0063fdfa4e81ced24f85e16fbfaead",
+    "archiveSha256": "5274297976e4ebbfaa2889dceb3ffd968b0063fdfa4e81ced24f85e16fbfaead"
+  },
+  {
+    "source": "tests.patch",
+    "archive": "tests.patch",
+    "sourceSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463",
+    "archiveSha256": "00a15e3ed20153d52b2993c27bd86e4ddd3bfb3460987da28afea021eb27f463"
+  },
+  {
+    "source": "raw-C8/angular-typed-contract/RESULT.json",
+    "archive": "raw-C8/angular-typed-contract/RESULT.json",
+    "sourceSha256": "298e0fd2605e8bf823d6179de2812d9b1f8d8d1c3d1520fd6a0dce6f7c123eac",
+    "archiveSha256": "298e0fd2605e8bf823d6179de2812d9b1f8d8d1c3d1520fd6a0dce6f7c123eac"
+  },
+  {
+    "source": "raw-C8/angular-typed-contract/first.log",
+    "archive": "raw-C8/angular-typed-contract/first.log",
+    "sourceSha256": "dd69c3c53f7b3bd0d3dc5b06a7f8371cc9e0e58912b8edde204c9fa8ea035770",
+    "archiveSha256": "dd69c3c53f7b3bd0d3dc5b06a7f8371cc9e0e58912b8edde204c9fa8ea035770"
+  },
+  {
+    "source": "raw-C8/angular-typed-contract/observations/angular-ordinary.json",
+    "archive": "raw-C8/angular-typed-contract/observations/angular-ordinary.json",
+    "sourceSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6",
+    "archiveSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6"
+  },
+  {
+    "source": "raw-C8/angular-typed-contract/observations/angular-native-timing.json",
+    "archive": "raw-C8/angular-typed-contract/observations/angular-native-timing.json",
+    "sourceSha256": "b9cddec0cd6714f604d1c9eabea018612492ff1659d1909a8cadd56813c96cf9",
+    "archiveSha256": "b9cddec0cd6714f604d1c9eabea018612492ff1659d1909a8cadd56813c96cf9"
+  },
+  {
+    "source": "raw-C8/angular-typed-contract/observations/angular-keyed.json",
+    "archive": "raw-C8/angular-typed-contract/observations/angular-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "raw-C8/kernel-typed-contract/RESULT.json",
+    "archive": "raw-C8/kernel-typed-contract/RESULT.json",
+    "sourceSha256": "23ca85138b47d59e3fbf419aecadd454a54e9a7d95d70bae38d94dd5adff2eda",
+    "archiveSha256": "23ca85138b47d59e3fbf419aecadd454a54e9a7d95d70bae38d94dd5adff2eda"
+  },
+  {
+    "source": "raw-C8/kernel-typed-contract/first.log",
+    "archive": "raw-C8/kernel-typed-contract/first.log",
+    "sourceSha256": "9db2c95bc5e5a0419f6eaf51c094581f7e64af035064941c8d2bc3c7b079aa86",
+    "archiveSha256": "9db2c95bc5e5a0419f6eaf51c094581f7e64af035064941c8d2bc3c7b079aa86"
+  },
+  {
+    "source": "raw-C8/kernel-typed-contract/observations/kernel-ordinary.json",
+    "archive": "raw-C8/kernel-typed-contract/observations/kernel-ordinary.json",
+    "sourceSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6",
+    "archiveSha256": "bc5936f3b0d34809f913023de0913ffa8222f5fad14bd1880baff0b526e080a6"
+  },
+  {
+    "source": "raw-C8/kernel-typed-contract/observations/kernel-keyed.json",
+    "archive": "raw-C8/kernel-typed-contract/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  }
+]

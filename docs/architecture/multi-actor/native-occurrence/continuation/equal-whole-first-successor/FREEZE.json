@@ -1,0 +1,44 @@
+{
+  "frozen": true,
+  "status": "STOP: getter/read/exception boundary; not for composition",
+  "baseManifestSha256": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+  "manifestSha256": "8ed29ecbbd0cb8cefcecff4bda5cb6351dd9e59ed7590fb571d412cc0a182d0b",
+  "runtimePatchSha256": "f7203ac99e828c33020772683a34f5d1c859b55c1b121e3924307e95052005e8",
+  "changed": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/native-authored-footprint.spec.ts",
+    "packages/kernel/src/lib/whole-getter-controls.spec.ts",
+    "packages/kernel/src/lib/whole-late-getter.spec.ts",
+    "packages/kernel/src/lib/whole-unowned-publication-authorized.spec.ts"
+  ],
+  "baseUnchanged": true,
+  "mainSixUnchanged": true,
+  "patchApplicationVerified": true,
+  "results": {
+    "runs/first-proof/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 13.227332249982283,
+      "source_unchanged": true
+    },
+    "runs/late-getter/RESULT.json": {
+      "exit": 1,
+      "elapsedSeconds": 8.026677292073146,
+      "source_unchanged": true
+    },
+    "runs/source-types/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 8.361255833064206,
+      "source_unchanged": true
+    },
+    "runs/late-getter-matched-observer/RESULT.json": {
+      "exit": 1,
+      "elapsedSeconds": 11.041371500003152,
+      "source_unchanged": true
+    },
+    "runs/spec-types/RESULT.json": {
+      "exit": 0,
+      "elapsedSeconds": 22.493118457961828,
+      "source_unchanged": true
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "current-route-mutant": {
+    "runtimeMutation": "packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+    "runtimeSha256": "8f35af3a931885a7b09c2a2102af17078057a1a0e87b1b9a67989461130f98ba",
+    "expectedSnapshot": "CURRENT-ROUTE-MUTANT-EXPECTED-SNAPSHOT.json",
+    "testSha256": "208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a"
+  },
+  "legacy-mutant": {
+    "runtimeMutation": "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "runtimeSha256": "9d315f7b7edf40e65c031469061fb0806e56187a220701dbaffce5bc7954ee45",
+    "expectedSnapshot": "LEGACY-MUTANT-EXPECTED-SNAPSHOT.json",
+    "testSha256": "208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a"
+  }
+}

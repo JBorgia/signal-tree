@@ -1,0 +1,250 @@
+import {expect,it} from 'vitest';
+import {writeFileSync} from 'node:fs';
+import {entityMap} from '../index';
+import {signalTree} from './signal-tree';
+let writeIndex=-1;
+function countIteratedElements(run: () => void): number {
+  let visited = 0;
+  const restore: Array<() => void> = [];
+  const patch = (
+    target: object,
+    key: PropertyKey,
+    wrap: (original: (...args: unknown[]) => unknown) => unknown
+  ): void => {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    if (!descriptor) throw new Error(`nothing to count at ${String(key)}`);
+    restore.push(() => Object.defineProperty(target, key, descriptor));
+    Object.defineProperty(target, key, {
+      ...descriptor,
+      value: wrap(descriptor.value),
+    });
+  };
+  const counting = (iterator: Iterator<unknown>): IterableIterator<unknown> => ({
+    next() {
+      const step = iterator.next();
+      if (!step.done) visited++;
+      return step;
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  });
+  for (const proto of [Map.prototype, Set.prototype, Array.prototype])
+    for (const key of ['keys', 'values', 'entries', Symbol.iterator])
+      patch(proto, key, (original) =>
+        function (this: unknown, ...args: unknown[]) {
+          return counting(original.apply(this, args) as Iterator<unknown>);
+        }
+      );
+  for (const proto of [Map.prototype, Set.prototype])
+    patch(proto, 'forEach', (original) =>
+      function (this: { size: number }, ...args: unknown[]) {
+        visited += this.size;
+        return original.apply(this, args);
+      }
+    );
+  // Whole-array walks, counted at their full length: a search that stops
+  // early still scales with the array it searches.
+  for (const key of [
+    'map',
+    'filter',
+    'forEach',
+    'slice',
+    'concat',
+    'reduce',
+    'indexOf',
+    'lastIndexOf',
+    'includes',
+    'find',
+    'findIndex',
+    'some',
+    'every',
+    'splice',
+    'sort',
+    'join',
+  ])
+    patch(Array.prototype, key, (original) =>
+      function (this: unknown[], ...args: unknown[]) {
+        visited += this.length;
+        return original.apply(this, args);
+      }
+    );
+  for (const key of ['keys', 'values', 'entries'])
+    patch(Object, key, (original) =>
+      function (this: unknown, ...args: unknown[]) {
+        const result = original.apply(this, args) as unknown[];
+        visited += result.length;
+        return result;
+      }
+    );
+  patch(Array.prototype, 'push', (original) =>
+    function (this: unknown[], ...args: unknown[]) {
+      visited += args.length;
+      return original.apply(this, args);
+    }
+  );
+  patch(Array, 'from', (original) =>
+    function (this: unknown, ...args: unknown[]) {
+      const result = original.apply(this, args) as unknown[];
+      visited += result.length;
+      return result;
+    }
+  );
+  let counted: number;
+  try {
+    visited = 0;
+    run();
+    counted = visited;
+  } finally {
+    for (let i = restore.length - 1; i >= 0; i--) restore[i]();
+  }
+  return counted;
+}
+
+function attribute(run: () => void) {
+  let visited = 0;
+  const perWrite = new Array<number>(200).fill(0);
+  let busy = true;
+  let events: Record<string,{operation:string;stack:string;calls:number;visits:number}> = Object.create(null);
+  const add = (n:number, operation:string) => {
+    if (busy) return;
+    busy = true;
+    try {
+      const stack=(new Error().stack ?? '').split('\n').filter(line=>line.includes('/packages/kernel/src/') && !line.includes('point-work-attribution.spec.ts')).slice(0,5).join('\n');
+      const key=operation+'\n'+stack;
+      const entry=events[key] ??= {operation,stack,calls:0,visits:0};
+      entry.calls++;entry.visits+=n;visited+=n;
+      if(writeIndex >= 0) perWrite[writeIndex]+=n;
+    } finally {busy=false;}
+  };
+  const restore: Array<() => void> = [];
+  const patch = (
+    target: object,
+    key: PropertyKey,
+    wrap: (original: (...args: unknown[]) => unknown) => unknown
+  ): void => {
+    const descriptor = Object.getOwnPropertyDescriptor(target, key);
+    if (!descriptor) throw new Error(`nothing to count at ${String(key)}`);
+    restore.push(() => Object.defineProperty(target, key, descriptor));
+    Object.defineProperty(target, key, {
+      ...descriptor,
+      value: wrap(descriptor.value),
+    });
+  };
+  const counting = (iterator: Iterator<unknown>, operation:string): IterableIterator<unknown> => ({
+    next() {
+      const step = iterator.next();
+      if (!step.done) add(1,operation);
+      return step;
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  });
+  for (const proto of [Map.prototype, Set.prototype, Array.prototype])
+    for (const key of ['keys', 'values', 'entries', Symbol.iterator])
+      patch(proto, key, (original) =>
+        function (this: unknown, ...args: unknown[]) {
+          return counting(original.apply(this, args) as Iterator<unknown>,proto.constructor.name+'.'+String(key));
+        }
+      );
+  for (const proto of [Map.prototype, Set.prototype])
+    patch(proto, 'forEach', (original) =>
+      function (this: { size: number }, ...args: unknown[]) {
+        add(this.size,proto.constructor.name+'.forEach');
+        return original.apply(this, args);
+      }
+    );
+  // Whole-array walks, counted at their full length: a search that stops
+  // early still scales with the array it searches.
+  for (const key of [
+    'map',
+    'filter',
+    'forEach',
+    'slice',
+    'concat',
+    'reduce',
+    'indexOf',
+    'lastIndexOf',
+    'includes',
+    'find',
+    'findIndex',
+    'some',
+    'every',
+    'splice',
+    'sort',
+    'join',
+  ])
+    patch(Array.prototype, key, (original) =>
+      function (this: unknown[], ...args: unknown[]) {
+        add(this.length,'Array.'+key);
+        return original.apply(this, args);
+      }
+    );
+  for (const key of ['keys', 'values', 'entries'])
+    patch(Object, key, (original) =>
+      function (this: unknown, ...args: unknown[]) {
+        const result = original.apply(this, args) as unknown[];
+        add(result.length,'Object.'+key);
+        return result;
+      }
+    );
+  patch(Array.prototype, 'push', (original) =>
+    function (this: unknown[], ...args: unknown[]) {
+      add(args.length,'Array.push');
+      return original.apply(this, args);
+    }
+  );
+  patch(Array, 'from', (original) =>
+    function (this: unknown, ...args: unknown[]) {
+      const result = original.apply(this, args) as unknown[];
+      add(result.length,'Array.from');
+      return result;
+    }
+  );
+  let counted: number;
+  try {
+    visited = 0;
+    events=Object.create(null);
+    busy=false;
+    run();
+    counted = visited;
+  } finally {
+    busy=true;
+    for (let i = restore.length - 1; i >= 0; i--) restore[i]();
+  }
+  return {total:counted,perWrite,events:Object.values(events)};
+}
+
+it('calibrates positive, empty, nested work and restores on throw',()=>{
+ const map=new Map([[1,1],[2,2]]);
+ const positive=()=>{Array.from(map.values());[1,2,3].map(x=>x+1);};
+ expect(countIteratedElements(positive)).toBe(7);expect(attribute(positive).total).toBe(7);
+ expect(attribute(()=>{}).total).toBe(0);
+ const nested=()=>{[1,2].map(()=>[1,2,3].includes(3));};
+ expect(countIteratedElements(nested)).toBe(8);expect(attribute(nested).total).toBe(8);
+ const before=[Array.prototype.map,Array.prototype.filter,Array.prototype.push,Array.from,Map.prototype[Symbol.iterator],Object.keys];
+ const sentinel=Object.freeze({error:'attribution calibration'});
+ let caught:unknown;try{attribute(()=>{[1].map(()=>{throw sentinel;});});}catch(e){caught=e;}
+ expect(caught).toBe(sentinel);
+ expect([Array.prototype.map,Array.prototype.filter,Array.prototype.push,Array.from,Map.prototype[Symbol.iterator],Object.keys]).toEqual(before);
+});
+for(const size of [2000,20000])it(`exact C21 point visits rows=${size}`,()=>{
+ function workload<T>(measure:(action:()=>void)=>T):T {
+  const tree=signalTree({rows:entityMap<{id:number;v:number},number>({selectId:r=>r.id})});
+  try{
+   tree.$.rows.setAll(Array.from({length:size},(_,id)=>({id,v:0})));
+   const result=measure(()=>{for(let i=0;i<200;i++){writeIndex=i;tree.$.rows.updateOne(i,{v:1});}});
+   writeIndex=-1;
+   for(let i=0;i<200;i++)expect(tree.$.rows.byId(i)?.().v).toBe(1);
+   expect(tree.$.rows.byId(201)?.().v).toBe(0);
+   return result;
+  }finally{writeIndex=-1;tree.destroy();}
+ }
+ const original=workload(countIteratedElements),traced=workload(attribute);
+ writeFileSync(`/private/tmp/st-c21-point-work-attribution/rows-${size}.json`,JSON.stringify({size,writes:200,width:2,original,...traced},null,2));
+ expect(traced.total).toBe(original);
+ expect(traced.events.reduce((n,e)=>n+e.visits,0)).toBe(original);
+ expect(traced.perWrite.reduce((a,b)=>a+b,0)).toBe(original);
+ expect(original).toBeGreaterThan(0);
+});

@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test angular --skip-nx-cache effective-presence-install-reentry.spec.ts --maxWorkers=1",
+    "startTime": "2026-11-02T17:28:54.938Z",
+    "endTime": "2026-11-02T17:28:58.404Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "angular:test",
+      "target": "test",
+      "projectName": "angular",
+      "hash": "16341406765511761236",
+      "startTime": "2026-11-02T17:28:55.005Z",
+      "endTime": "2026-11-02T17:28:58.403Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

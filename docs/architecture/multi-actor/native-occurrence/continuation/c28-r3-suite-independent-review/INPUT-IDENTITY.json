@@ -1,0 +1,18 @@
+{
+  "ORACLE-DECISION.md": {
+    "source": "/private/tmp/st-c28-r3-suite-oracle-review/REVIEW.md",
+    "sha256": "1bacf03a068f555de4054329895f492e6ffe25346cdf6ea0dd0e2d0283b85962"
+  },
+  "CURRENT-SPEC.md": {
+    "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/native-occurrence/continuation/declare-api-scope-review/CURRENT-SPEC.md",
+    "sha256": "70ced47b98aabe1b8b05f30b835caf6b30f4c9311736dcab06a974377c742289"
+  },
+  "AUTHORITY.md": {
+    "source": "/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/native-occurrence/continuation/declare-api-scope-review/AUTHORITY.md",
+    "sha256": "e2d95d2540ec8bd7ce54272d61f1f7ecc69dce0c1cee182de7bfb0b6b7bffc5b"
+  },
+  "OLD-ADJUDICATION.md": {
+    "source": "/private/tmp/st-c24-equal-owner-premise/implementation-review/RECEIPT-ADJUDICATION.md",
+    "sha256": "0110df79b6b6a77d55fa527e4f01a264365d7cb7c27eaad736a7269f896b520c"
+  }
+}

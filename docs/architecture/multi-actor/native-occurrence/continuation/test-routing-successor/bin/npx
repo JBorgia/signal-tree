@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+# Evidence-only resolver: execute the installed Vitest requested by the existing gate.
+import os,sys,subprocess,json
+from pathlib import Path
+if sys.argv[1:2]!=['vitest']:
+ raise SystemExit('Unexpected npx command in bounded routing verification: '+repr(sys.argv[1:]))
+argv=['/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node',str(Path.cwd()/'node_modules/vitest/vitest.mjs'),*sys.argv[2:]]
+r=subprocess.run(argv,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+f=Path(os.environ['ST_ROUTING_CHILD_LOG']);f.write_bytes(r.stdout);f.with_suffix('.COMMAND.json').write_text(json.dumps({'requested':['npx',*sys.argv[1:]],'resolved':argv,'cwd':str(Path.cwd()),'exit':r.returncode},indent=2)+'\n')
+sys.stdout.buffer.write(r.stdout);raise SystemExit(r.returncode)

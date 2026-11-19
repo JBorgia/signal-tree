@@ -1,0 +1,60 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+ import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+ import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
+@@ -994,10 +995,6 @@
+     });
+     for (const change of changes) {
+       const effect = change.structuralRecord;
+-      const physicalKey =
+-        ((effect?.kind === 'rekey' ? effect.beforeKey : effect?.key) as
+-          | K
+-          | undefined) ?? structuralStore.activeKeyForSubject(change.subject);
+       const ordinary = read(change.subject);
+       const group: CommittedEntityMutation[] = [];
+       if (inspection) {
+@@ -1010,15 +1007,17 @@
+           group.push(record('remove', change.subject, ordinary));
+         write(change.subject, { present: false });
+       } else {
+-        const key =
+-          effect?.kind === 'rekey' ? (effect.afterKey as K) : physicalKey;
+         const binds =
+           !ordinary.present ||
+           effect?.kind === 'add' ||
+           effect?.kind === 'rekey';
+         if (binds) {
+-          if (key === undefined)
+-            throw new Error('Ordinary entity admission lacks a key');
++          // Source record or prepared placement proves presence independently
++          // of the raw key value; do not replace an explicit nullish key.
++          const key = ordinaryAdmissionKey(
++            effect,
++            physical.read(change.subject)
++          ) as K;
+           const displaced = atKey(key);
+           if (displaced !== undefined && displaced !== change.subject) {
+             const state = read(displaced);
+--- a/packages/kernel/src/lib/physical/ordinary-key-evidence.ts
++++ b/packages/kernel/src/lib/physical/ordinary-key-evidence.ts
+@@ -0,0 +1,17 @@
++import type { StructuralEffect } from '../mutation-types';
++import type { EntityPlacement } from './entity-placement-stage';
++
++/** A key value is not a presence sentinel. Legacy malformed input can carry
++ * null/undefined at runtime without granting authority to an absent subject. */
++export function ordinaryAdmissionKey(
++  effect: StructuralEffect | undefined,
++  placement: EntityPlacement<string | number>
++): string | number {
++  if (effect) {
++    const field = effect.kind === 'rekey' ? 'afterKey' : 'key';
++    if (Object.prototype.hasOwnProperty.call(effect, field))
++      return effect.kind === 'rekey' ? effect.afterKey : effect.key;
++  }
++  if (placement.present) return placement.key;
++  throw new Error('Ordinary entity admission lacks a key');
++}

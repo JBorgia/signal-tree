@@ -1,0 +1,13 @@
+[
+  "corepack",
+  "pnpm",
+  "nx",
+  "test",
+  "kernel",
+  "--skip-nx-cache",
+  "independent-structural-probe.spec.ts",
+  "--testNamePattern=preparation reentry",
+  "--reporter=json",
+  "--outputFile=/private/tmp/st-structural-admission-independent/reentry-vitest.json",
+  "--maxWorkers=1"
+]

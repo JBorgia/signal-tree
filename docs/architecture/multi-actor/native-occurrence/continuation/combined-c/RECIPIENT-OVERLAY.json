@@ -1,0 +1,11 @@
+{
+  "packages/kernel/src/lib/aggregate-installed-publication.spec.ts": "11ed1ee5de87db332a9e12501ee4bd2427546863ca4f262ee3bd4549e25db179",
+  "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts": "dd3a96166f3f0987ec191b26201c7b98ae93e7d44025c4ef50935c5b2d0a6341",
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "e1908fff513014d1edbfa804c9e0bc778a6d57850e18789365be3f8994490e14",
+  "packages/kernel/src/lib/experimental-publication/private.ts": "eddf7a756dfa0b38a87a40f756341fdb63da4909f59af4aa2775425fe7623644",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "3cc8cb86f8bff03abbe088729aab5ac1191cd5a075d3b332b3dc34c4a0df81ee",
+  "packages/kernel/src/lib/known-input-contract-review.spec.ts": "6e8f443a169b10e992a008bab11c899ce1bb588b2c2b22654ad9327544f0bcd8",
+  "packages/kernel/src/lib/recipient-cause-classification.spec.ts": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+  "packages/kernel/src/lib/recipient-window-independent.spec.ts": "202eda5b18be8c07a5dafca0ad5a6c0bc3af7ce56090b2f2bdd67faee5b9bdde",
+  "packages/kernel/src/lib/recipient-window-review.spec.ts": "e4c5e4b25030b37c4365169441202d7ffb5c5d662af1daddc3ecc53dc71d0136"
+}

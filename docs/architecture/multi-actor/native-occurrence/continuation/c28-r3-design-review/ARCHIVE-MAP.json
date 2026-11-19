@@ -1,0 +1,20 @@
+[
+  {
+    "source": "COMPARATOR-ONLY.md",
+    "archive": "COMPARATOR-ONLY.md",
+    "sourceSha256": "78fcd0fddd83cb308c9c4e4aa4f0a476e32f95f86f14fb15aee44f3a05ad03de",
+    "archiveSha256": "78fcd0fddd83cb308c9c4e4aa4f0a476e32f95f86f14fb15aee44f3a05ad03de"
+  },
+  {
+    "source": "NECESSITY.md",
+    "archive": "NECESSITY.md",
+    "sourceSha256": "4e3ba13b8c7b11d7bbfc65ea84be23feddc08dd72cf19db71420e99efb684541",
+    "archiveSha256": "4e3ba13b8c7b11d7bbfc65ea84be23feddc08dd72cf19db71420e99efb684541"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "288614d4b1b674dc343772b6387f02662ff1bc5e1f643e0e9bf7396869616010",
+    "archiveSha256": "288614d4b1b674dc343772b6387f02662ff1bc5e1f643e0e9bf7396869616010"
+  }
+]

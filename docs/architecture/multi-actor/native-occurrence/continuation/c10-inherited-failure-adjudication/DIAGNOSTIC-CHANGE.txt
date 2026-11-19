@@ -1,0 +1,1 @@
+Copied occurrence-successor.spec.ts to independent-occurrence-completion.spec.ts in both owned arms. Appended life.deliverNativeRequirementReady(p.requirement) immediately after each of the four existing finalization calls. No original assertion or runtime edited. Run only the three originally failing private cases.

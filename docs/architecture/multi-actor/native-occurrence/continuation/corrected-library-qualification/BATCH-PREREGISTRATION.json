@@ -1,0 +1,60 @@
+{
+  "registeredAt": "2026-11-03T19:24:13.740804+00:00",
+  "candidate": "/private/tmp/st-v16-integration-candidate",
+  "manifestSha256": "8fb14250ded4d19f3ee380b2cf13df35492dc0170e4e7f5cc0ecd945569289a2",
+  "discoverySha256": "db5e625ceb0382ed180280a432364c6639bfac376c8cfcd28bd7f33e0eb5e718",
+  "batchesSha256": "c1762e27a54d4eb8e128e668900c70f91db80e6c2169a011e3ed5c0840391176",
+  "discoveredFiles": 652,
+  "newBatchFiles": 636,
+  "batchSizes": [
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    36
+  ],
+  "currentIdentityFocusedReuse": [
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/approved-current-obligation.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-prepared-boundary.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-prepared-unit.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/optional-diagnostic.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/recipient-window-review.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+    "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts"
+  ],
+  "focusedReportSha256": "ee0296fff8f050de9bcdea864acf018b4287520915323db3898bed1b5bc5136a",
+  "I4Reuse": {
+    "manifestSha256": "cae244793913aa51ffe36848a8ba3f6e77af24185323a6141ba6c66a03a5876f",
+    "files": {
+      "packages/kernel/src/lib/entity-large-batches.spec.ts": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+      "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c"
+    },
+    "casesReused": 13,
+    "priorPartition": "/private/tmp/st-large-qualification-4g/I7-PARTITION.json",
+    "priorOperationalAbortRetained": true
+  },
+  "normalExclusionsUnchanged": true,
+  "kernelConfigSha256": "6d4d513f837212af3960c49dfb46f7fef0e47e28e4f762dd4ffc9a93160da880",
+  "concurrency": 2,
+  "knownHeavyExclusion": "only two exact I4 files already qualified; no capacity research or added exclusion",
+  "guard": {
+    "outerSeconds": 900,
+    "noLogProgressSeconds": 180,
+    "aggregateOwnedRssBytes": 4294967296,
+    "hostMemoryPressureFreePercentageFloor": 25
+  },
+  "stop": "operational failure, missing or mismatched report, source drift, telemetry failure or survivors stops campaign; complete assertion failures classified and independent batches continue",
+  "restartReason": "prior unchanged-source single-worker 900s run operationally incomplete without full structured results; reviewed test-only lint correction now applied; no prior ordinary passes credited",
+  "ordinaryOverrides": "no ST diagnostic/fault/perf or NODE_OPTIONS overrides; clear inherited FORCE_COLOR and NO_COLOR; exact unchanged test timeouts and budgets",
+  "reporting": "default plus JSON each batch; completed-batch receipt with exact file union, tests and failures",
+  "appsOverlay": "separate pending Main review; no app/source edits during batches"
+}

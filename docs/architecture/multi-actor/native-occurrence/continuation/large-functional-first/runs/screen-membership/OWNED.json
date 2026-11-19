@@ -1,0 +1,51 @@
+[
+  {
+    "pid": 47533,
+    "ppid": 47467,
+    "rssBytes": 147456,
+    "birth": "Tue Nov 3 11:07:54 2026",
+    "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx test kernel src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit setAll, replace and clear with membership observed$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 47541,
+    "ppid": 47533,
+    "rssBytes": 48316416,
+    "birth": "Tue Nov 3 11:07:55 2026",
+    "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit setAll, replace and clear with membership observed$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 47605,
+    "ppid": 47588,
+    "rssBytes": 113852416,
+    "birth": "Tue Nov 3 11:07:58 2026",
+    "command": "node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config vitest.config.ts src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit setAll, replace and clear with membership observed$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 47588,
+    "ppid": 47541,
+    "rssBytes": 48414720,
+    "birth": "Tue Nov 3 11:07:58 2026",
+    "command": "node tools/run-core-vitest.mjs src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit setAll, replace and clear with membership observed$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 47620,
+    "ppid": 47614,
+    "rssBytes": 19841024,
+    "birth": "Tue Nov 3 11:07:58 2026",
+    "command": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  },
+  {
+    "pid": 47622,
+    "ppid": 47614,
+    "rssBytes": 36356096,
+    "birth": "Tue Nov 3 11:07:59 2026",
+    "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  },
+  {
+    "pid": 47614,
+    "ppid": 47605,
+    "rssBytes": 107298816,
+    "birth": "Tue Nov 3 11:07:58 2026",
+    "command": "node /private/tmp/st-large-qualification/screen-candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit setAll, replace and clear with membership observed$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  }
+]

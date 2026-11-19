@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "entity-declaration-useful-lifecycle",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c27-source-coverage/entity-execution/c27-copy",
+  "node": "v24.15.0",
+  "pnpm": "10.17.0",
+  "manifestSHA256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "verifiedBefore": 3086,
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c27-source-coverage/entity-execution/runs/new-packet/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c27-source-coverage/entity-execution/runs/new-packet/nx-data",
+    "TMPDIR": "/private/tmp/st-c27-source-coverage/entity-execution/runs/new-packet/tmp"
+  },
+  "timeoutSeconds": 180
+}

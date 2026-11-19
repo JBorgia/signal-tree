@@ -1,0 +1,12 @@
+Error: expect(locator).toHaveText(expected) failed
+
+Locator:  getByTestId('producer-observation')
+Expected: "none"
+Received: "{\"values\":{\"route\":\"north\",\"note\":\"\",\"window\":\"09:00\",\"capacity\":10},\"versions\":{\"route\":0,\"note\":0,\"window\":0,\"capacity\":0}}"
+Timeout:  5000ms
+
+Call log:
+  - Expect "to.have.text" with timeout 5000ms
+  - waiting for getByTestId('producer-observation')
+    9 × locator resolved to <span data-testid="producer-observation">{"values":{"route":"north","note":"","window":"09…</span>
+      - unexpected value "{"values":{"route":"north","note":"","window":"09:00","capacity":10},"versions":{"route":0,"note":0,"window":0,"capacity":0}}"

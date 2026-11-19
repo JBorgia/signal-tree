@@ -1,0 +1,9 @@
+{
+  "checkedAt": "2026-11-03T18:19:24.194Z",
+  "candidate": "/private/tmp/st-v16-integration-candidate",
+  "manifestSha256": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+  "filesChecked": 3127,
+  "mismatches": [],
+  "artifactSeal": "sha256-4e10ab551ba731818b9ab68941f7da013cd79c33920518c6eff2d8b501c8d012",
+  "artifactSealUnchanged": true
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "arm": "hold-proceed",
+    "exit": 0,
+    "sourceUnchanged": true,
+    "heldRounds": 12,
+    "releasedRounds": 12,
+    "staleError": "Error: Selected continuation cannot replay",
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    }
+  },
+  {
+    "arm": "drop-proceed",
+    "exit": 0,
+    "sourceUnchanged": true,
+    "heldRounds": 12,
+    "releasedRounds": 12,
+    "staleError": null,
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    }
+  },
+  {
+    "arm": "hold-row",
+    "exit": 0,
+    "sourceUnchanged": true,
+    "heldRounds": 12,
+    "releasedRounds": 12,
+    "staleError": null,
+    "heldLast": {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    }
+  }
+]

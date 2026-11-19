@@ -1,0 +1,20 @@
+{
+  "manifestUnchanged": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "allCandidateFilesVerified": 3102,
+  "allCompositionFromHashesMatch": true,
+  "mergeResolutionRecord": "bbbbbc3605e61eea77a740bcc169a5b15e569211999a0c540b08102c1f39b22f",
+  "resolutions": [
+    {
+      "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+      "preservedConflictSha256": "fbceb226f1e996bcd8985f41a216920b9ebe93c69ccd71f51dc6c3a2c626ab86",
+      "resolvedSha256": "76137a3920673ddab063bde956674bedde9ee5dfab29a2196c935070188bade5",
+      "independentResolutionMatches": true
+    },
+    {
+      "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+      "preservedConflictSha256": "8e7d5a9e0767d9a73caa8214fe91b58f67734d1d0555ab6fb5daad1adb45e2f2",
+      "resolvedSha256": "9fcd2ec62e4907b75abe86c89ae8e4008688e704f69179bf869fcff2a3f9761e",
+      "independentResolutionMatches": true
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "reportedBy": "Main (user message)",
+  "nodeVersionReported": "24.15.0",
+  "exitCodeReported": 0,
+  "outputFile": "main-replay.log",
+  "sha256": "a5d04152bbcfb3c34e38101bb57201208a97b6442627773baf869b5ca3133548",
+  "byteIdenticalToFirstOutput": true,
+  "additionalRunsByReviewer": 0
+}

@@ -1,0 +1,8 @@
+[
+  [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--test",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/authority/review-fixture.test.mjs",
+    "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/authority/independent-review.test.mjs"
+  ]
+]

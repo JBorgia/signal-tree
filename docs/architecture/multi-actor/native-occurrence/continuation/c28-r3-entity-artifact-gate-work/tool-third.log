@@ -1,0 +1,22 @@
+Entity artifact evidence: /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-suDqcd
+FAIL: AssertionError [ERR_ASSERTION]: gate inputs changed
++ actual - expected
+... Skipped lines
+
+  {
+    '.nvmrc': 'b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d',
+    'package.json': '7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b',
+    'packages/kernel/tests/entity-registration/cases.mjs': '6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71',
+    'packages/kernel/tests/entity-registration/lifecycle.mjs': 'e9528a1b3d53c4d14cba76a468227eafe77ad04a31c379e466e0ba3a41f3ee8b',
+...
+    'tools/fixtures/entity-registration-consumer/package.json': '9c855d591ba371aa59681dd6de40786621d4cfdc2c8f625044b5d3f3b522c9cc',
++   'tools/verify-entity-registration-artifacts.mjs': '9301086d59f762f055d6c8e6f26ffe35644e94c7a4c2f54416c02bcdab7c3d83',
+-   'tools/verify-entity-registration-artifacts.mjs': 'd8a58b31e4d964aa3e2d27af724d6c0730039fc945247d9536d6afc6e0ba4bf2',
+    'tools/verify-gates.mjs': 'daed40c27d90b0a3b3f612a8cddb221b617a00e489be53d9fd9e8732331a84a0'
+  }
+
+    at file:///private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-entity-registration-artifacts.mjs:278:14
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Evidence: /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-suDqcd

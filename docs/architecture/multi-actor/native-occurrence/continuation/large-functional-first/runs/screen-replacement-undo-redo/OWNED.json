@@ -1,0 +1,72 @@
+[
+  {
+    "pid": 47918,
+    "ppid": 47830,
+    "rssBytes": 933888,
+    "birth": "Tue Nov 3 11:08:25 2026",
+    "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx test kernel src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 47938,
+    "ppid": 47918,
+    "rssBytes": 1966080,
+    "birth": "Tue Nov 3 11:08:26 2026",
+    "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 47940,
+    "ppid": 47938,
+    "rssBytes": 1490944,
+    "birth": "Tue Nov 3 11:08:26 2026",
+    "command": "(bash)"
+  },
+  {
+    "pid": 47941,
+    "ppid": 47940,
+    "rssBytes": 1507328,
+    "birth": "Tue Nov 3 11:08:26 2026",
+    "command": "(bash)"
+  },
+  {
+    "pid": 47943,
+    "ppid": 47941,
+    "rssBytes": 32768,
+    "birth": "Tue Nov 3 11:08:26 2026",
+    "command": "(sed)"
+  },
+  {
+    "pid": 48056,
+    "ppid": 48038,
+    "rssBytes": 89554944,
+    "birth": "Tue Nov 3 11:08:36 2026",
+    "command": "node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config vitest.config.ts src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48038,
+    "ppid": 47938,
+    "rssBytes": 48562176,
+    "birth": "Tue Nov 3 11:08:36 2026",
+    "command": "node tools/run-core-vitest.mjs src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48067,
+    "ppid": 48056,
+    "rssBytes": 77824000,
+    "birth": "Tue Nov 3 11:08:37 2026",
+    "command": "node /private/tmp/st-large-qualification/screen-candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48078,
+    "ppid": 48067,
+    "rssBytes": 50724864,
+    "birth": "Tue Nov 3 11:08:38 2026",
+    "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  },
+  {
+    "pid": 48077,
+    "ppid": 48067,
+    "rssBytes": 18038784,
+    "birth": "Tue Nov 3 11:08:37 2026",
+    "command": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  }
+]

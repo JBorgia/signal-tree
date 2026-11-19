@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=scalar-frame-publication.spec.ts --testNamePattern=sibling prepared records retain changed contribution when final sibling is equal --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=scalar-frame-publication.spec.ts --testNamePattern="sibling prepared records retain changed contribution when final sibling is equal" --maxWorkers=1
+
+(node:71652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71660) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-enrollment-independent-review/baseline/packages/kernel
+
+(node:71667) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 25 skipped (26)
+   Start at  11:21:55
+   Duration  2.31s (transform 1.43s, setup 0ms, import 1.71s, tests 17ms, environment 414ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.2s

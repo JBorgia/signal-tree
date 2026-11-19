@@ -1,0 +1,20 @@
+{
+  "candidate": "/private/tmp/st-packet-admission-refusal-successor/candidate",
+  "status": "bounded refusal correction; independent review pending; original precedence and point gate remain red",
+  "files": {
+    "BASE-SOURCE-SHA256.json": "9863ad3f6955407e79e2663c4060f505b5f71c6f49cd96bc6e492335b09cd464",
+    "SOURCE-SHA256.json": "872d18d5b66200e6f8254c0c0ee318eb2f2bfd30b7eefff6a0f6efcdb5f4496c",
+    "VERIFICATION.json": "7585efec815b125bc0146653ec9338b916bbfc0f56b81b69b94dd9d039c806f3",
+    "runtime.patch": "6086211ecf96ec46d3b07edff8e3e41677b246cb7d985dace86f969ceb05928f",
+    "tests.patch": "45bdd3ad7b4cb0a0c722a38b2a7902896c4a45bebe4fa8a790e199e97c06274b",
+    "RESULTS.md": "1e4568ed0ab25680a4b8e11a0a5230027ae1215db4daef85dd8b9c7e65c1d0be",
+    "COMMANDS.md": "3cb4605dbefd622d871f27b8c88f46d44a9944a4dc004f1e6fe9e2bda617bd15",
+    "REVIEW-REQUEST.md": "228dc7d5e2cb4e17d5d23a207a3d386fdf856a2abf21130d3f30e9dcfdd67615",
+    "focused-first.log": "cb9f70222da25dca68dfb602f32574ec6224668081da8c10c6eacc54c72e556d",
+    "new-controls.log": "2728c632e46ade0ade231ee963b510e358cfdcf37f0f27156820adfcf8a041b2",
+    "original-precedence-refusal.log": "4a32a94c1e89333735b977460eeabd21e20ea4cb2184b07335955e1f29d6eae5",
+    "point.log": "0614368e52324542902b9b072ab5c8de217c2deab624f2f1bc00e42ca6a80322",
+    "source-types.log": "63ee28da2cc58f12fddc8257a7b3e1b40168658c30efac36cd13c67a69ce9ed9",
+    "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  }
+}

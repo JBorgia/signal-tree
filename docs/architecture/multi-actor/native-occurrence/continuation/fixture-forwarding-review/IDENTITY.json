@@ -1,0 +1,28 @@
+{
+  "candidateManifest": "10c10112f0f3d4c2ef0397f482e367427b904276427ad98fbc82541a5364dae2",
+  "patch": "a6f43d31fbdc3c51b7cc6549487256e6aad3daa691aa057e1347225f30961c63",
+  "freeze": "a761011d1b41b44f19fdcc037877681a8580d245101a3ac682ff83c35b9da7ab",
+  "changed": [
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts"
+  ],
+  "originalExpectationLinesUnchanged": true,
+  "rawResultClassification": {
+    "childExit": 0,
+    "passed": [
+      "restores ordinary membership with a foreign live-row field before the next transaction captures",
+      "attempts mixed installed invalidation and delivery while preserving the first failure",
+      "attempts later live lifetime invalidation after first installed row invalidation fails"
+    ],
+    "filtered": [
+      "contains a throwing row callback without dropping another live-row inverse publication",
+      "keeps mixed inverse atomic after live-row preparation throw",
+      "keeps mixed inverse atomic after live-row preparation reentry"
+    ],
+    "recorderEventsIncludeSkipped": true,
+    "originalWrapperExit": 1,
+    "originalWrapperFailure": "expected3 case starts, observed6 including3 filtered events",
+    "noTestRerun": true,
+    "sourceUnchanged": true
+  }
+}

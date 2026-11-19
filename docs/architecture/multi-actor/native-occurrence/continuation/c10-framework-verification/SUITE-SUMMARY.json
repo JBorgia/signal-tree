@@ -1,0 +1,38 @@
+{
+  "angular": {
+    "testFiles": "48 passed | 1 skipped (49)",
+    "tests": "281 passed | 3 skipped (284)",
+    "failures": []
+  },
+  "react": {
+    "testFiles": "1 failed | 15 passed (16)",
+    "tests": "6 failed | 85 passed (91)",
+    "failures": [
+      "src/absent-collection.spec.tsx > absent collection \u2014 React (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again",
+      "src/absent-collection.spec.tsx > absent collection \u2014 React (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again",
+      "src/absent-collection.spec.tsx > absent collection \u2014 React (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+      "src/absent-collection.spec.tsx > absent collection \u2014 React (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+      "src/absent-collection.spec.tsx > absent collection \u2014 React (transactions first) > rollback of a re-adding write makes it absent again",
+      "src/absent-collection.spec.tsx > absent collection \u2014 React (restoration first) > rollback of a re-adding write makes it absent again"
+    ]
+  },
+  "vue": {
+    "testFiles": "32 passed (32)",
+    "tests": "212 passed (212)",
+    "failures": []
+  },
+  "solid": {
+    "testFiles": "1 failed | 18 passed (19)",
+    "tests": "8 failed | 115 passed (123)",
+    "failures": [
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (transactions first) > rollback of a re-adding write makes it absent again",
+      "src/lib/absent-collection.spec.ts > absent collection \u2014 Solid (restoration first) > rollback of a re-adding write makes it absent again"
+    ]
+  }
+}

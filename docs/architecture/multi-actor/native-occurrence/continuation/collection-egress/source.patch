@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -211,14 +211,17 @@
+    const ownCollection=b.source&&b.collections.get(b.source);
+    if(ownCollection&&collectionSelected(b,ownCollection))b.valuePayload=ownCollection.payload;
+    const relative=slot.address&&relativeSourceAddress(b.address??[],slot.address),after=unit.presence.ordinary?.after;
+-   if(after?.present&&relative!==undefined){
++   // Direct collection recipients already selected their natural row array above.
++   // Membership snapshots use the containing branch's {all: ...} representation;
++   // applying one at relative [] would overwrite that source-owned array.
++   if(!ownCollection&&after?.present&&relative!==undefined){
+     // The source supplied this ordinary selection before completion. Its value
+     // does not come from a later physical read or notification reseed.
+     b.valuePayload=applyAtRelativePath(b.valuePayload,relative,after.value);
+     for(const collection of b.collections.values())if(collection.relative&&relativeSourceAddress(relative,collection.relative)!==undefined&&collectionSelected(b,collection)){
+      b.valuePayload=applyAtRelativePath(b.valuePayload,collection.relative,{all:collection.payload});
+     }
+-   }else if(after?.present&&!b.aggregate&&!b.valueInitialized&&slot.address&&b.address){
++   }else if(!ownCollection&&after?.present&&!b.aggregate&&!b.valueInitialized&&slot.address&&b.address){
+     const below=relativeSourceAddress(slot.address,b.address),supplied=below&&pathValue(after.value,below);
+     if(supplied?.present){b.valuePayload=supplied.value;b.valueInitialized=true;}
+    }

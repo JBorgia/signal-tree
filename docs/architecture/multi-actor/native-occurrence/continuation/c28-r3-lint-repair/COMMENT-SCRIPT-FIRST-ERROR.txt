@@ -1,0 +1,1 @@
+AST comment script first counted22 empty bodies including4 empty constructors, expected18. Emitted JavaScript equality passed for each file before the count guard. Restored six own candidate files from unchanged baseline; excluded constructors, reran bounded18 callbacks. No tests ran on first comment variant.

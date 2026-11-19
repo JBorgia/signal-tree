@@ -1,0 +1,29 @@
+
+> nx run kernel:test src/lib/entity-large-batches.spec.ts --testNamePattern=^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs
+
+> node tools/run-core-vitest.mjs src/lib/entity-large-batches.spec.ts --testNamePattern="^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$" --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs
+
+(node:51844) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:51863) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+
+(node:51877) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Warning: command "node tools/run-core-vitest.mjs src/lib/entity-large-batches.spec.ts --testNamePattern="^entity batches larger than the argument limit undo and redo of a setAll that replaced every row$" --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs" exited with non-zero status code
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      32.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     32.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    32.8s

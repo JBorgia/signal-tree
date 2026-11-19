@@ -1,0 +1,19 @@
+{
+  "candidate": "/private/tmp/st-native-invocation-successor/candidate",
+  "rootHEAD": "628d302dadb082a48c58528651c9088234d0a777",
+  "sourceManifestSha256": "5d2a2893bde2e196f79c69985a425bb30974e5028ac9b2ad833db9d1a9c83272",
+  "runtimePatchSha256": "23f988db710add731c60ca7cb42e16cea62ad01449a71a1d11708c888702e4cf",
+  "verifiedChangedFiles": {
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "6b8e29a9fa285c10fcabc6b13478c353d628bb1d9f9e1d600749ea519dee8f5d",
+    "packages/kernel/src/lib/entity-signal.ts": "d0b2d709a202ae70861bfc3f10745ff8bbaabfd78ce633129fc56cfc8bb212ee",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "c3f83f666d2aa520a50ee3694bb7b0e2a82295f3e15de772af7a1986e8d3e5cb",
+    "packages/kernel/src/lib/internals/native-field-selection.ts": "98a8160bbe928b1583d4064a17f637ac7879b3ca9ae948a894e8a782412f3336",
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts": "f3629844fd2705bdb290f9f6b2f17031f493a0eaf9a01826448165d1c8036244",
+    "packages/kernel/src/lib/native-invocation-handoff.spec.ts": "52104d564ade462b8afbc406f40528bf02004d6a007bfbc2c678fd6566350d09"
+  },
+  "reentryEvidenceSha256": {
+    "docs/architecture/multi-actor/native-occurrence/invocation-successor/reentry-review/RESULT.md": "2349a9ca9a226f8f9791781ef5394448c1db05c5ab542a7c471dd51a2fb6f8e5",
+    "docs/architecture/multi-actor/native-occurrence/invocation-successor/reentry-review/main-invocation-scope.spec.ts": "619bce19f21e648a02c652c44bc0fca80101622535b7980ebffd9f510e391d14",
+    "docs/architecture/multi-actor/native-occurrence/invocation-successor/reentry-review/main-invocation-trace.spec.ts": "74000e72a9871274a442272d26035daeb406b9892f0e5f23ee4f165b586aa4e8"
+  }
+}

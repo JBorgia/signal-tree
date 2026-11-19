@@ -1,0 +1,16 @@
+{
+  "packages/kernel/src/lib/entity-signal.ts": "ae349156a90d6f39baeaf62c0841b2e467779092d66e830ce6986915a2579209",
+  "packages/angular/src/lib/selected-active-id-preparation.spec.ts": "acbab376daa21a6cfe32808ecf74434ade711757132edc767c623c4b5b038cf1",
+  "packages/angular/src/lib/selected-callback-facade.spec.ts": "5d8878d6b3f68297bf915239cda265e59ef472fe013cef1c7e467fb70433607d",
+  "packages/kernel/src/lib/selected-callback-facade.spec.ts": "ff50c90f285549bcd0d965a51d8be726d1476dd5e13ddae863b7be749654f96a",
+  "packages/react/src/selected-callback-facade.spec.tsx": "52731cfa9bf6d3f165c3e32d5642fd1bf3e7289420e06a6082a330517ca1c4f3",
+  "packages/solid/src/lib/selected-callback-facade.spec.ts": "6375753efbdf8007f15c275a0d4e25d60e6fa9ca7bf0d74e63c74fa6bb3965fb",
+  "packages/vue/src/lib/selected-active-id-preparation.spec.ts": "05d118ddbd5fbc4f27aed441b8cfa3eefc96f076247f8cb53c41574698a5794f",
+  "packages/vue/src/lib/selected-callback-facade.spec.ts": "ccb16d689d90bac56ee701d93bec424e732d5333819ebb33c058209baf36a29d",
+  "repair-evidence/exact/ANGULAR-PUBLIC-EXECUTED.spec.ts": "6d74a223447fc3d307433c11fcb89b9f3485e6e71b4ca271dbc9358e41a9a9ce",
+  "repair-evidence/exact/PUBLIC-RESULT.md": "f3477fb1f6f3fb5c8568fbf4fc11ae82d4ac5e49b766aea9d76769b588a1a375",
+  "repair-evidence/exact/VUE-PUBLIC-EXECUTED.spec.ts": "429aff3a822e50a3d0dfacdd218b71323b6117f0529e578570cda9eddd361b6c",
+  "repair-evidence/REJECTED-candidate.patch": "129fa28475a7b8316e0ddb0d84dd5846abab6321c60ae466eb637993caafd917",
+  "repair-evidence/REJECTED-source.patch": "7134d90baf33b478fbcc924774a900334cb934a7bcae3c4613738fa9c0e71c05",
+  "repair-evidence/regression-tests.patch": "99d318b91445bae21f52b8fa2524f93008289b1817cae3bc60b0d7c0551ab3c1"
+}

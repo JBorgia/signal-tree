@@ -1,0 +1,5 @@
+{
+  "file": "packages/kernel/src/lib/held-continuation-probe.spec.ts",
+  "find": "box.positive=undefined;",
+  "replace": "/* mutant: positive remains held during released sampling */"
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "route": "setAll",
+    "calls": 7,
+    "thrown": "new seventh getter read",
+    "sentinel": true,
+    "endpointSame": false,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "replaceOne",
+    "calls": 7,
+    "thrown": "new seventh getter read",
+    "sentinel": true,
+    "endpointSame": false,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  },
+  {
+    "route": "row",
+    "calls": 7,
+    "thrown": "new seventh getter read",
+    "sentinel": true,
+    "endpointSame": false,
+    "sent": [
+      [
+        {
+          "id": "a",
+          "x": 7
+        }
+      ]
+    ]
+  }
+]

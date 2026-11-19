@@ -1,0 +1,8 @@
+{
+  "candidate": "/private/tmp/st-ordinary-placement-successor/candidate",
+  "predecessorManifestSha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+  "sourceManifestSha256": "304256fd4b844b3e1e082d1ba86d4938fd22929eb42b9b893145ba230ad6194d",
+  "sourcePatchSha256": "97088107e292d82936e153ee8f6fade6522c7a19015fbe76734928997326fb52",
+  "testsPatchSha256": "7dcfff79a11a9cdfcc9ce8c4e159d1832e4fbf9ca7e05f978f69dd011bf6d10e",
+  "status": "frozen for different independent reviewer; not integrated"
+}

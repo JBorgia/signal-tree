@@ -1,0 +1,636 @@
+{
+  "predecessor": [
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/active-transaction-context.spec.ts",
+        "activeTransactionContext refuses incomplete or invalid context {\"transactionOwner\":{},\"transactionId\":null}"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/active-transaction-context.spec.ts",
+          "fullName": "activeTransactionContext refuses incomplete or invalid context {\"transactionOwner\":{},\"transactionId\":null}",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/active-transaction-context.spec.ts",
+          "fullName": "activeTransactionContext refuses incomplete or invalid context {\"transactionOwner\":{},\"transactionId\":null}",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+        "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+          "fullName": "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+          "fullName": "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+          "fullName": "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+        "restores multi-removal caller order \"A\" independently of dependency order"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"A\" independently of dependency order",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"A\" independently of dependency order",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+        "restores multi-removal caller order \"B\" independently of dependency order"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"B\" independently of dependency order",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"B\" independently of dependency order",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+        "restores multi-removal caller order \"C\" independently of dependency order"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"C\" independently of dependency order",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"C\" independently of dependency order",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+        "write observation declaration scopes invalid token executes without attribution"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+          "fullName": "write observation declaration scopes invalid token executes without attribution",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+          "fullName": "write observation declaration scopes invalid token executes without attribution",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+          "fullName": "write observation declaration scopes invalid token executes without attribution",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "angular",
+        "packages/angular/src/lib/construction-input.spec.ts",
+        "angular construction input ownership rejects existing reactive values before derived initialization"
+      ],
+      "assertions": [
+        {
+          "project": "angular",
+          "file": "packages/angular/src/lib/construction-input.spec.ts",
+          "fullName": "angular construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "angular",
+          "file": "packages/angular/src/lib/construction-input.spec.ts",
+          "fullName": "angular construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "angular",
+          "file": "packages/angular/src/lib/construction-input.spec.ts",
+          "fullName": "angular construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "vue",
+        "packages/vue/src/lib/construction-input.spec.ts",
+        "vue construction input ownership rejects existing reactive values before derived initialization"
+      ],
+      "assertions": [
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 4,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 5,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 6,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 7,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 8,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 9,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 10,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    }
+  ],
+  "successor": [
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/active-transaction-context.spec.ts",
+        "activeTransactionContext refuses incomplete or invalid context {\"transactionOwner\":{},\"transactionId\":null}"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/active-transaction-context.spec.ts",
+          "fullName": "activeTransactionContext refuses incomplete or invalid context {\"transactionOwner\":{},\"transactionId\":null}",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/active-transaction-context.spec.ts",
+          "fullName": "activeTransactionContext refuses incomplete or invalid context {\"transactionOwner\":{},\"transactionId\":null}",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+        "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+          "fullName": "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+          "fullName": "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
+          "fullName": "6d \u2014 maxHistorySize validation (FIXED in 14.1.1) maxHistorySize %p no longer silently disables undo",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+        "restores multi-removal caller order \"A\" independently of dependency order"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"A\" independently of dependency order",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"A\" independently of dependency order",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+        "restores multi-removal caller order \"B\" independently of dependency order"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"B\" independently of dependency order",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"B\" independently of dependency order",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+        "restores multi-removal caller order \"C\" independently of dependency order"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"C\" independently of dependency order",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
+          "fullName": "restores multi-removal caller order \"C\" independently of dependency order",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "kernel",
+        "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+        "write observation declaration scopes invalid token executes without attribution"
+      ],
+      "assertions": [
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+          "fullName": "write observation declaration scopes invalid token executes without attribution",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+          "fullName": "write observation declaration scopes invalid token executes without attribution",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "kernel",
+          "file": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
+          "fullName": "write observation declaration scopes invalid token executes without attribution",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "angular",
+        "packages/angular/src/lib/construction-input.spec.ts",
+        "angular construction input ownership rejects existing reactive values before derived initialization"
+      ],
+      "assertions": [
+        {
+          "project": "angular",
+          "file": "packages/angular/src/lib/construction-input.spec.ts",
+          "fullName": "angular construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "angular",
+          "file": "packages/angular/src/lib/construction-input.spec.ts",
+          "fullName": "angular construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "angular",
+          "file": "packages/angular/src/lib/construction-input.spec.ts",
+          "fullName": "angular construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    },
+    {
+      "identity": [
+        "vue",
+        "packages/vue/src/lib/construction-input.spec.ts",
+        "vue construction input ownership rejects existing reactive values before derived initialization"
+      ],
+      "assertions": [
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 1,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 2,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 3,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 4,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 5,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 6,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 7,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 8,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 9,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        },
+        {
+          "project": "vue",
+          "file": "packages/vue/src/lib/construction-input.spec.ts",
+          "fullName": "vue construction input ownership rejects existing reactive values before derived initialization",
+          "duplicateOrdinal": 10,
+          "status": "passed",
+          "failureMessages": [],
+          "fixtureClass": "unchanged"
+        }
+      ]
+    }
+  ]
+}

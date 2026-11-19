@@ -1,0 +1,7 @@
+{
+  "baseManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "verifiedUnchangedBaselineFiles": 3066,
+  "counterByteExactSha256": "c00fca7b2807d6f676a2fe6ca40c678cf32c20d200c11dd30d3fd62a6b4aadb7",
+  "eventsIncludingStacksCallsVisitsIdenticalAcrossSizes": true,
+  "diagnosticManifestSha256": "8f793371ff6c1e0159b412f4b56021fda3590a4966bef24f18b58872f8a90146"
+}

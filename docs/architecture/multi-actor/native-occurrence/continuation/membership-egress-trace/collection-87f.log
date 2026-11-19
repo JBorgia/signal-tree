@@ -1,0 +1,35 @@
+
+> nx run kernel:test link-absent-locations.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs link-absent-locations.spec.ts --maxWorkers=1
+
+(node:73409) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-membership-egress-trace/baseline87f/packages/kernel
+
+(node:73423) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  21 passed (21)
+   Start at  16:54:33
+   Duration  1.69s (transform 765ms, setup 0ms, import 936ms, tests 178ms, environment 422ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.7s

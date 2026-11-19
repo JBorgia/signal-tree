@@ -1,0 +1,19 @@
+{
+  "manifest": "67be7d9620ff5ce4e426e2b489dd69e1dd6e26f030611d77d3e6036d09275d71",
+  "baseline": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "entries": 3065,
+  "onlyChangedTest": {
+    "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts": {
+      "base": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56",
+      "candidate": "208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a"
+    }
+  },
+  "mutantOnlyChanges": {
+    "current-route-mutant": {
+      "packages/kernel/src/lib/physical/order-restores-for-placement.ts": "8f35af3a931885a7b09c2a2102af17078057a1a0e87b1b9a67989461130f98ba"
+    },
+    "legacy-mutant": {
+      "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts": "9d315f7b7edf40e65c031469061fb0806e56187a220701dbaffce5bc7954ee45"
+    }
+  }
+}

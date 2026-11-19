@@ -1,0 +1,14 @@
+[
+  [
+    "    at orderRestoresForPlacement (/private/tmp/st-parent-freshness-other-frameworks/clear-adjudication/c10/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+    {
+      "calls": 3,
+      "visits": 513,
+      "byCall": [
+        256,
+        256,
+        1
+      ]
+    }
+  ]
+]

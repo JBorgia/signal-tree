@@ -1,0 +1,2 @@
+First invocation: python3 /private/tmp/st-c28-r3-matched-memory-retention/run.py
+Exit1 before worker launch. Initial census subprocess /bin/ps -axo pid=,ppid=,pgid=,lstart= raised PermissionError [Errno1] Operation not permitted under sandbox. No runs directory/worker/test/GC launched. Full tool traceback identified run.py line12 census(), line8 check_output. Retrying only with permission for required owned-process census, same source/workload/schedule.

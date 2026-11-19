@@ -1,0 +1,21 @@
+{
+  "id": "confirm-1000-retained-aa1",
+  "ordinal": 38,
+  "profile": "confirm",
+  "size": 1000,
+  "arm": "retained",
+  "label": "aa1",
+  "exit": 0,
+  "pid": 70357,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.7003005830338225,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1048576,
+  "minimumObservedHostFreePercentage": 40.0,
+  "attempts": 1
+}

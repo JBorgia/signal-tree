@@ -1,0 +1,30 @@
+{
+  "native-authored-footprint.spec.ts": {
+    "commentsEmitIdentically": true,
+    "onlyApprovedNonCommentChange": "none",
+    "assertionsUnchanged": true,
+    "emittedSHA256": "f2aef3c6fb42d3805dfeec569fbf6308430c9fb1995cea3f6fb362784e123804",
+    "baselineEmittedSHA256": "f2aef3c6fb42d3805dfeec569fbf6308430c9fb1995cea3f6fb362784e123804"
+  },
+  "whole-bounded-qualification.spec.ts": {
+    "commentsEmitIdentically": true,
+    "onlyApprovedNonCommentChange": "none",
+    "assertionsUnchanged": true,
+    "emittedSHA256": "7f40379a26bd0c41a8b95aaa0e8d6bcd2824678a9e467316388881a96194eec2",
+    "baselineEmittedSHA256": "7f40379a26bd0c41a8b95aaa0e8d6bcd2824678a9e467316388881a96194eec2"
+  },
+  "value-work-handoff.spec.ts": {
+    "commentsEmitIdentically": true,
+    "onlyApprovedNonCommentChange": "one-assignment fixture binding changed to const",
+    "assertionsUnchanged": true,
+    "emittedSHA256": "feef10092f121932617aa0d6f2bb57a5668ddafa89c72158de933aa3e0c39b34",
+    "baselineEmittedSHA256": "3f2e2a55af6a1f3510a16643933c7153db0478fba1ee91d6c6e368dbcba77e6a"
+  },
+  "entity-signal.ts": {
+    "commentsEmitIdentically": true,
+    "onlyApprovedNonCommentChange": "explicit undefined initializer",
+    "assertionsUnchanged": true,
+    "emittedSHA256": "346889a1cce278f1575ed3a88919fde99e20a54ede97d058cf8ba47618fd9c0e",
+    "baselineEmittedSHA256": "de4d788e1138e9636ff908f0d69ddb345dddc904111a1852a55dd0a272639cfd"
+  }
+}

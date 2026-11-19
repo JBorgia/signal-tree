@@ -1,0 +1,35 @@
+diff --git a/private/tmp/st-native-combined-c8/candidate/packages/kernel/src/lib/singleton-row-reuse.spec.ts b/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/singleton-row-reuse.spec.ts
+index f2d2e7c9..ae95b763 100644
+--- a/private/tmp/st-native-combined-c8/candidate/packages/kernel/src/lib/singleton-row-reuse.spec.ts
++++ b/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/singleton-row-reuse.spec.ts
+@@ -31,7 +31,7 @@ for(const repeat of [false,true])it(`multi-edit same-subject snapshots retain pe
+ it('recipient finalizer reentry preserves escaped outer facts and refuses outer install',()=>{
+  const s=new EntityPublicationSource(),{held,off}=capture(s),a=edit(7);let entered=false;const staged=new Map<string,number>();
+  const release=s.subscribe({prepare(){return{record:{writes:[],adds:[]},completion:{},finalize(){if(!entered){entered=true;install(s,packet([edit(99)]));}}};},complete(){}});
+- try{const u=s.prepare(packet([a],{prepareResponsibility:()=>({writes:[{map:staged,key:'outer',value:7}],adds:[]})}))!;const facts=held.get(a)!,req=facts.field(1,'x','ordinary');expect(()=>finish(s,u)).toThrow('Entity publication source changed during finalization');expect(staged.size).toBe(0);expect(endpoint(s).value).toBe(99);expect(facts.field(1,'x','ordinary')).toBe(req);}finally{release();off();s.dispose();}
++ try{const u=s.prepare(packet([a],{prepareResponsibility:()=>({writes:[{map:staged,key:'outer',value:7}],adds:[]})}))!;const facts=held.get(a)!,req=facts.field(1,'x','ordinary');expect(()=>finish(s,u)).toThrow('Entity publication source changed before installation');expect(staged.size).toBe(0);expect(endpoint(s).value).toBe(99);expect(facts.field(1,'x','ordinary')).toBe(req);}finally{release();off();s.dispose();}
+ });
+ it('recipient preparation throw leaves captured singleton evidence detached from later installations',()=>{
+  const s=new EntityPublicationSource(),{held,off}=capture(s),a=edit(7),failure=Error('later recipient refusal');const staged=new Map<string,number>();
+diff --git a/private/tmp/st-native-combined-c8/candidate/packages/kernel/src/lib/packet-index-review.spec.ts b/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/packet-index-review.spec.ts
+index bbd5ea46..0c8e24a4 100644
+--- a/private/tmp/st-native-combined-c8/candidate/packages/kernel/src/lib/packet-index-review.spec.ts
++++ b/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/packet-index-review.spec.ts
+@@ -27,5 +27,5 @@ it('duplicate step and edit identities preserve reverse-find oracle and restored
+ it('later recipient finalizer source reentry refuses outer installation and retains newer facts',()=>{
+  const source=new EntityPublicationSource();let entered=false;const install=(value:number)=>{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:[edit(value)],physical:[]})!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);};
+  const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){if(!entered){entered=true;install(99);}}};},complete(){}});
+- try{expect(()=>install(7)).toThrow('source changed during finalization');off();let value:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{value=s!.before(1,'x').value;return undefined;}});expect(value).toBe(99);}finally{off();source.dispose();}
++ try{expect(()=>install(7)).toThrow('source changed before installation');off();let value:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{value=s!.before(1,'x').value;return undefined;}});expect(value).toBe(99);}finally{off();source.dispose();}
+ });
+diff --git a/private/tmp/st-native-combined-c8/candidate/packages/kernel/src/lib/publication-retirement-boundaries.spec.ts b/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/publication-retirement-boundaries.spec.ts
+index 18b85560..a8ba2f1c 100644
+--- a/private/tmp/st-native-combined-c8/candidate/packages/kernel/src/lib/publication-retirement-boundaries.spec.ts
++++ b/private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/publication-retirement-boundaries.spec.ts
+@@ -54,5 +54,5 @@ for(const disposition of ['ready','dispose','replace'] as const)it(`exact readin
+ it('callback-capable finalization reentry invalidates the outer prepared source unit',async()=>{
+  const tree=make(),rows=tree.$.rows;rows.addOne({id:'a',n:1});await flush();const s=sourceOf(rows),id={};let calls=0;
+  const off=s.subscribe({prepare:p=>p.id===id?{record:{writes:[],adds:[]},completion:{},finalize(){calls++;rows.updateOne('a',{n:2});}}:undefined,complete(){}});
+- try{const unit=s.prepare({owner:0,id,meta:undefined,physical:[],ordinary:[]})!;expect(()=>unit.finalize?.()).toThrow('changed during finalization');expect(calls).toBe(1);expect(rows.byIdOrFail('a').n()).toBe(2);}finally{off();tree.destroy();}
++ try{const unit=s.prepare({owner:0,id,meta:undefined,physical:[],ordinary:[]})!;expect(()=>unit.finalize?.()).toThrow('changed before installation');expect(calls).toBe(1);expect(rows.byIdOrFail('a').n()).toBe(2);}finally{off();tree.destroy();}
+ });

@@ -1,0 +1,66 @@
+
+> nx run kernel:test effective-presence-successor.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs effective-presence-successor.spec.ts --maxWorkers=1
+
+(node:27627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27634) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-effective-presence-successor/candidate/packages/kernel
+
+(node:27641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/effective-presence-successor.spec.ts (6 tests | 2 failed) 45ms
+   × effective presence is current at completion: direct=false, warm-wrapper=false 24ms
+   × effective presence is current at completion: direct=true, warm-wrapper=false 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/effective-presence-successor.spec.ts > effective presence is current at completion: direct=false, warm-wrapper=false
+ FAIL  src/lib/effective-presence-successor.spec.ts > effective presence is current at completion: direct=true, warm-wrapper=false
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/effective-presence-successor.spec.ts:29:43
+     27|       expect(map().size).toBe(0); expect(has()).toBe(false); expect(wh…
+     28|       if (warmWrapper) expect(snapshotMarkerNode(rows)?.value).toEqual…
+     29|       else expect(MATERIALIZED.has(rows)).toBe(false);
+       |                                           ^
+     30|       // Warm native projection without warming a cold marker wrapper.
+     31|       const native = computed(() => all()); const before = native();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  10:23:29
+   Duration  1.76s (transform 954ms, setup 0ms, import 1.14s, tests 45ms, environment 416ms)
+
+Warning: command "node tools/run-core-vitest.mjs effective-presence-successor.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.6s

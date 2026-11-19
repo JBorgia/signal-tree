@@ -1,0 +1,317 @@
+--- a/packages/kernel/src/enhancers/restoration/restoration.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/restoration.spec.ts
+@@ -425,7 +425,9 @@
+     if (!realizationPort) {
+       throw new Error('Expected tree-owned realization port');
+     }
+-    const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
++    // Selected scalar compensation prepares on this port; public restored values below witness installation.
++    const prepareSpy = vi.spyOn(realizationPort, 'prepareSelectedUnit');
++    try {
+ 
+     expect(() =>
+       store.transact(() => {
+@@ -436,10 +438,11 @@
+     ).toThrow('boom');
+ 
+     expect(store.$()).toEqual({ left: '', right: '' });
+-    expect(applySpy).toHaveBeenCalledTimes(1);
++    expect(prepareSpy).toHaveBeenCalledTimes(1);
+ 
+     const turns = t.getTurns();
+     expect(turns).toHaveLength(baseline);
++    } finally { prepareSpy.mockRestore(); }
+   });
+ 
+   it('preserves causal order when a pending transaction is confirmed after a later confirmed turn', async () => {
+@@ -499,7 +502,9 @@
+     if (!realizationPort) {
+       throw new Error('Expected tree-owned realization port');
+     }
+-    const applySpy = vi.spyOn(realizationPort, 'applyAtomically');
++    // Selected scalar compensation prepares on this port; public restored values below witness installation.
++    const prepareSpy = vi.spyOn(realizationPort, 'prepareSelectedUnit');
++    try {
+ 
+     const pending = store.transact(() => {
+       undoable(() => store.$.a.x(10));
+@@ -511,11 +516,12 @@
+ 
+     pending.rollback();
+ 
+-    expect(applySpy).toHaveBeenCalledTimes(1);
++    expect(prepareSpy).toHaveBeenCalledTimes(1);
+     expect(store.$()).toEqual({
+       a: { x: 1 },
+       b: { y: 20 },
+     });
++    } finally { prepareSpy.mockRestore(); }
+   });
+ 
+   it('rolls back a pending write while preserving a later sibling write under the same owner', async () => {
+--- a/packages/kernel/src/lib/transaction-observer-failure.spec.ts
++++ b/packages/kernel/src/lib/transaction-observer-failure.spec.ts
+@@ -280,11 +280,16 @@
+     const relation = link(tree.$.x, { set: (v) => void sent.push(v) });
+     await flush();
+     sent.length = 0;
+-    const port = getTreeRealizationPort(tree.$ as object) as {
+-      validateEffects: (...args: unknown[]) => unknown;
+-    };
+-    const original = port.validateEffects;
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    const port = getTreeRealizationPort(tree.$ as object);
++    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++    const original = port.prepareSelectedUnit;
++    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++    let refusalCalls = 0, returnedPlans = 0;
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
++      const plan = original.apply(this, args); returnedPlans++; return plan;
++    };
+     let thrown: unknown;
+     try {
+       try {
+@@ -295,7 +300,9 @@
+       } catch (error) {
+         thrown = error;
+       }
+-      port.validateEffects = original;
++      port.prepareSelectedUnit = original;
++      expect(refusalCalls).toBe(1);
++      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
+       const recovery = (
+         thrown as { recovery?: { transaction: { confirm(): void } } }
+       )?.recovery;
+@@ -306,7 +313,7 @@
+       expect(await settledWithin(relation)).toBe(true);
+       expect(sent.at(-1)).toBe(1);
+     } finally {
+-      port.validateEffects = original;
++      port.prepareSelectedUnit = original;
+       relation.dispose();
+       tree.destroy();
+     }
+@@ -762,20 +769,27 @@
+       destroy(): void;
+     };
+     const offInv = tree.$.inv.subscribe(() => undefined);
+-    const port = getTreeRealizationPort(tree.$ as object) as {
+-      validateEffects: (...args: unknown[]) => unknown;
+-    };
+-    const original = port.validateEffects;
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    const port = getTreeRealizationPort(tree.$ as object);
++    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++    const original = port.prepareSelectedUnit;
++    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++    let refusalCalls = 0, returnedPlans = 0;
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
++      const plan = original.apply(this, args); returnedPlans++; return plan;
++    };
+     let thrown: unknown;
+     try {
+       tree.transact(() => tree.$.x(1));
+     } catch (error) {
+       thrown = error;
+     } finally {
+-      port.validateEffects = original;
+-    }
+-    try {
++      port.prepareSelectedUnit = original;
++    }
++    try {
++      expect(refusalCalls).toBe(1);
++      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
+       const recovery = (
+         thrown as {
+           recovery?: {
+@@ -829,21 +843,28 @@
+         throw new Error('capture release failed');
+       },
+     };
+-    const port = getTreeRealizationPort(tree.$ as object) as {
+-      validateEffects: (...args: unknown[]) => unknown;
+-    };
+-    const original = port.validateEffects;
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    const port = getTreeRealizationPort(tree.$ as object);
++    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++    const original = port.prepareSelectedUnit;
++    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++    let refusalCalls = 0, returnedPlans = 0;
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
++      const plan = original.apply(this, args); returnedPlans++; return plan;
++    };
+     let thrown: unknown;
+     try {
+       tree.transact(() => tree.$.x(1));
+     } catch (error) {
+       thrown = error;
+     } finally {
+-      port.validateEffects = original;
++      port.prepareSelectedUnit = original;
+       host[MUTATION_CAPTURE_RUNTIME] = previous;
+     }
+     try {
++      expect(refusalCalls).toBe(1);
++      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
+       const recovery = (
+         thrown as {
+           recovery?: {
+@@ -879,21 +900,28 @@
+         throw failure;
+       },
+     };
+-    const port = getTreeRealizationPort(tree.$ as object) as {
+-      validateEffects: (...args: unknown[]) => unknown;
+-    };
+-    const original = port.validateEffects;
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    const port = getTreeRealizationPort(tree.$ as object);
++    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++    const original = port.prepareSelectedUnit;
++    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++    let refusalCalls = 0, returnedPlans = 0;
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
++      const plan = original.apply(this, args); returnedPlans++; return plan;
++    };
+     let thrown: unknown;
+     try {
+       tree.transact(() => tree.$.x(1));
+     } catch (error) {
+       thrown = error;
+     } finally {
+-      port.validateEffects = original;
++      port.prepareSelectedUnit = original;
+       host[MUTATION_CAPTURE_RUNTIME] = previous;
+     }
+     try {
++      expect(refusalCalls).toBe(1);
++      expect(returnedPlans).toBe(0);
+       expect(report).toHaveBeenCalledWith(
+         expect.stringContaining('rollback was then refused'),
+         failure
+@@ -970,11 +998,16 @@
+         throw new Error('capture release failed');
+       },
+     };
+-    const port = getTreeRealizationPort(tree.$ as object) as {
+-      validateEffects: (...args: unknown[]) => unknown;
+-    };
+-    const original = port.validateEffects;
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    const port = getTreeRealizationPort(tree.$ as object);
++    if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++    const original = port.prepareSelectedUnit;
++    const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++    let refusalCalls = 0, returnedPlans = 0;
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw refusal; // No original call or installable plan.
++      const plan = original.apply(this, args); returnedPlans++; return plan;
++    };
+     report.mockImplementation(() => {
+       throw new Error('fail-on-console');
+     });
+@@ -984,13 +1017,15 @@
+     } catch (error) {
+       thrown = error;
+     } finally {
+-      port.validateEffects = original;
++      port.prepareSelectedUnit = original;
+       host[MUTATION_CAPTURE_RUNTIME] = previous;
+     }
+     try {
+       expect((thrown as Error | undefined)?.message).not.toBe(
+         'fail-on-console'
+       );
++      expect(refusalCalls).toBe(1);
++      expect(returnedPlans).toBe(0); // Preparation threw before any compensation plan could install.
+       const recovery = (
+         thrown as { recovery?: { transaction: { confirm(): void } } }
+       )?.recovery;
+--- a/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts
++++ b/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts
+@@ -116,12 +116,15 @@
+         { enhancers: enhancers() }
+       );
+       trees.push(tree);
+-      const port = getTreeRealizationPort(tree.$) as unknown as {
+-        validateEffects: (...args: unknown[]) => unknown;
+-      };
+-      const spy = vi
+-        .spyOn(port, 'validateEffects')
+-        .mockImplementation(() => ({ kind: 'structural-drift' }));
++      const port = getTreeRealizationPort(tree.$);
++      if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++      const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++      let refusalCalls = 0;
++      // One-shot throw before calling the real method: no installable compensation plan exists.
++      const spy = vi.spyOn(port, 'prepareSelectedUnit').mockImplementationOnce(() => {
++        refusalCalls++; throw refusal;
++      });
++      let refusedBeforePlan = false;
+       let thrown: unknown;
+       try {
+         tree.transact(() => {
+@@ -132,8 +135,11 @@
+       } catch (error) {
+         thrown = error;
+       } finally {
++        refusedBeforePlan = spy.mock.results.length === 1 && spy.mock.results[0]?.type === 'throw' && spy.mock.results[0]?.value === refusal;
+         spy.mockRestore();
+       }
++      expect(refusalCalls).toBe(1);
++      expect(refusedBeforePlan).toBe(true);
+       expect(thrown).toBeInstanceOf(SignalTreeRollbackError);
+       const recovery = (
+         thrown as {
+--- a/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts
++++ b/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts
+@@ -327,17 +327,26 @@
+   }
+ });
+ 
+-it('reports realization refusal with retained authority and permits confirmation', () => {
++it('reports injected pre-install realization refusal with retained authority and permits confirmation', () => {
+   const tree = make();
+   const events: TransactionLifecycleObservation[] = [];
+   const port = getTreeRealizationPort(tree.$)!;
+-  const validate = port.validateEffects;
++  if (!port.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++  const prepare = port.prepareSelectedUnit;
++  let refusalCalls = 0, returnedPlans = 0;
+   try {
+     const reader = transactionLifecycleReader(tree)!;
+     reader.subscribe((event) => events.push(event));
+     const pending = tree.transact(() => tree.$.x(1));
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    // Generic injected preparation failure, not a public structural-drift witness.
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw new Error('injected pre-install failure: structural-drift');
++      const plan = prepare.apply(this, args); returnedPlans++; return plan;
++    };
+     expect(() => pending.rollback()).toThrow(/structural-drift/);
++    expect(refusalCalls).toBe(1); expect(returnedPlans).toBe(0);
++    expect(tree.$.x()).toBe(1);
+     // v16 (slice 6, class b): the scope stays open until real settlement, and
+     // a validation refusal is the owner's `effect-validation-failed`.
+     expect(events.at(-1)).toMatchObject({
+@@ -351,7 +360,7 @@
+     expect(events.at(-1)!.kind).toBe('confirmed');
+     expect(reader.snapshot().pending).toEqual([]);
+   } finally {
+-    port.validateEffects = validate;
++    port.prepareSelectedUnit = prepare;
+     tree.destroy();
+   }
+ });

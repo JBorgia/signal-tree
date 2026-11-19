@@ -1,0 +1,42 @@
+{
+  "preserved/c10-react/first.log": {
+    "origin": "/private/tmp/st-c10-promoted-framework-verification/runs/react/first.log",
+    "sha256": "a4c55eadeea219c6bae64dadbdcfbbee6c3e7362f7469a72f7e1f546a713949f"
+  },
+  "preserved/c10-react/COMMAND.json": {
+    "origin": "/private/tmp/st-c10-promoted-framework-verification/runs/react/COMMAND.json",
+    "sha256": "29494198927eb12d9fb387d8ed1bf4b38d4102e13bc2e80e975dcc2cd7a783b2"
+  },
+  "preserved/c10-solid/first.log": {
+    "origin": "/private/tmp/st-c10-promoted-framework-verification/runs/solid/first.log",
+    "sha256": "ff890d05052b7dc9f0abbad08e87b8f0ae03b0dab8389b7500cbdefe8df95bfc"
+  },
+  "preserved/c10-solid/COMMAND.json": {
+    "origin": "/private/tmp/st-c10-promoted-framework-verification/runs/solid/COMMAND.json",
+    "sha256": "badf5c586c710e70de575cebf4f941d0604c57f7cfb11a0def68153a8225721c"
+  },
+  "preserved/causal-c10/first.log": {
+    "origin": "/private/tmp/st-absent-collection-introduction/probe-c10/runs/first-absent/first.log",
+    "sha256": "740ee4a83638f3af0c05f8cc83001f48682e2214592673ab25175346bc408af1"
+  },
+  "preserved/causal-c10/COMMAND.json": {
+    "origin": "/private/tmp/st-absent-collection-introduction/probe-c10/runs/first-absent/COMMAND.json",
+    "sha256": "04d744783e24d214bb8ae96b771e0fd7fff5315b516232c2f608f4e0204ed05d"
+  },
+  "preserved/causal-parent/first.log": {
+    "origin": "/private/tmp/st-absent-collection-introduction/probe-parent/runs/first-absent/first.log",
+    "sha256": "1ec6a6716a84fde3cdd49790161756551383fc0d787c1df25a07fd4bb0e659fe"
+  },
+  "preserved/causal-parent/COMMAND.json": {
+    "origin": "/private/tmp/st-absent-collection-introduction/probe-parent/runs/first-absent/COMMAND.json",
+    "sha256": "e006fd829a24494d1c0995833be69bf18a0f4a914d686c2211a0cfb5327979ad"
+  },
+  "preserved/causal-c8a/first.log": {
+    "origin": "/private/tmp/st-absent-collection-introduction/probe-c8a/runs/first-absent/first.log",
+    "sha256": "317e386297259df2048d7c7a360439363b7caee0163f76dc041d8b666a3c2c01"
+  },
+  "preserved/causal-c8a/COMMAND.json": {
+    "origin": "/private/tmp/st-absent-collection-introduction/probe-c8a/runs/first-absent/COMMAND.json",
+    "sha256": "4bca6e7ec6e35c54ff0283fbb3b242163c35b69983e0919f59da07fab56c2f17"
+  }
+}

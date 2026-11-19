@@ -1,0 +1,134 @@
+--- a/packages/kernel/src/lib/aggregate-installed-publication.spec.ts
++++ b/packages/kernel/src/lib/aggregate-installed-publication.spec.ts
+@@ -128,7 +128,10 @@
+   const c=experimental(link(t.$.pair,{set:v=>{sent.push(v);}}));const p=owner.transact(()=>owner.$.z(7));
+   try{
+    const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x+1,y:input.pair.y}})));
+-   await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).toEqual([]);expect(receipt.read()).toMatchObject({state:'conservative',reason:'unknown'});
++   // Historical hold oracle corrected by 75c645eb's explicit recipient-only exception.
++   expect(receipt.read().basis).not.toBe('declared');
++   await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(sent).toEqual([{x:1,y:0}]);
++   expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});
+    expect(owner.$.z()).toBe(7);p.rollback();await flush();expect(sent).toEqual([{x:1,y:0}]);await c.settled();
+   }finally{c.dispose();t.destroy();owner.destroy();}
+  });
+--- a/packages/kernel/src/lib/aggregate-native-input-independent.spec.ts
++++ b/packages/kernel/src/lib/aggregate-native-input-independent.spec.ts
+@@ -11,13 +11,15 @@
+  const p=t.transact(()=>t.$.x(7));
+  try{
+   await flush();const ownership=p.inspect();
+-  const receipt=c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x,y:input.pair.y}})));
++  // Approved 247cfec7 contradiction contract: installed writes remain, no receipt returns.
++  let error:unknown;let returned=false;
++  try{c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x,y:input.pair.y}})));returned=true;}catch(e){error=e;}
++  expect(returned).toBe(false);
++  expect(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'after-callback',reason:'contradiction'});
+   await flush();
+-  console.info('NATIVE-INPUT',JSON.stringify({sent,receipt:receipt.read(),rootX:t.$.x(),pair:t.$.pair(),ownershipSame:JSON.stringify(p.inspect())===JSON.stringify(ownership)}));
+   expect(t.$.pair()).toEqual({x:7,y:0});
+   expect(t.$.x()).toBe(7);
+   expect(p.inspect()).toEqual(ownership);
+   expect(sent).toEqual([]);
+-  expect(receipt.read()).toMatchObject({state:'conservative',reason:'unknown'});
+  }finally{c.dispose();p.rollback();t.destroy();}
+ });
+--- /dev/null
++++ b/packages/kernel/src/lib/known-input-contract-review.spec.ts
+@@ -0,0 +1,16 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++import {getPathNotifier} from './path-notifier';
++type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):unknown};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<60;i++)await Promise.resolve();};
++for(const outcome of ['confirm','reject'] as const)it(`known input contradiction retains writes and authority through ${outcome}`,async()=>{
++ const t=signalTree({x:0,pair:{x:0,y:0}},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:value=>{sent.push(value);}}) as Experimental;
++ const p=t.transact(()=>t.$.x(7));
++ try{await flush();const ownership=p.inspect();let error:unknown;let returned=false;
++ try{c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x,y:input.pair.y}})));returned=true;}catch(e){error=e;}
++ expect(returned).toBe(false);expect(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'after-callback',reason:'contradiction'});
++ await flush();expect(t.$.pair()).toEqual({x:7,y:0});expect(t.$.x()).toBe(7);expect(p.inspect()).toEqual(ownership);expect(sent).toEqual([]);
++ if(outcome==='confirm')p.confirm();else p.rollback();await flush();await c.settled();expect(sent).toEqual([{x:7,y:0}]);
++ }finally{c.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/recipient-cause-classification.spec.ts
+@@ -0,0 +1,28 @@
++import {expect,it,vi} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++import {getPathNotifier} from './path-notifier';
++import {withWriteContext} from './write-context';
++import * as life from './experimental-publication/lifecycle';
++type Receipt={read():Readonly<{state:string;basis?:string;reason?:string}>};
++type Declared=ReturnType<typeof link>&{declare(input:{kind:'independent'|'unknown'},work:()=>unknown):Receipt};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<80;i++)await Promise.resolve();};
++for(const cause of ['domain-only','external-origin','unknown-declaration'] as const)for(const terminal of ['confirm','rollback'] as const)it(`${cause}: distinct fixed-window treatment and useful ${terminal}`,async()=>{
++ const owner=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0,pair:{x:0,y:0}});const sent:unknown[]=[],secondary:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;const other=link(t.$.pair,{set:v=>{secondary.push(v);}});const p=owner.transact(()=>owner.$.z(7));
++ const evidence:life.RecipientUncertainty[]=[];const proofs:life.Proof[]=[];const prepare=life.prepareRevision;const project=life.projectRevision;
++ const a=vi.spyOn(life,'prepareRevision').mockImplementation((...args)=>{if(args[3])evidence.push(args[3]);return prepare(...args);});
++ const b=vi.spyOn(life,'projectRevision').mockImplementation((...args)=>{const result=project(...args);proofs.push(result);return result;});
++ let later:ReturnType<typeof owner.transact>|undefined;
++ try{const ownership=p.inspect();const write=()=>t.$(input=>({...input,pair:{x:input.x+1,y:input.pair.y}}));
++ const receipt=c.declare({kind:cause==='unknown-declaration'?'unknown':'independent'},()=>cause==='external-origin'?withWriteContext({origin:'external'},write):write());
++ await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(p.inspect()).toEqual(ownership);expect(secondary).toEqual([]);
++ expect(evidence.some(e=>e.recipientDomain)).toBe(true);expect(evidence.some(e=>e.unobservedOrigin)).toBe(cause==='external-origin');expect(evidence.every(e=>!e.invalidAttribution&&!e.uncapturedUpdaterInput)).toBe(true);
++ expect(proofs.some(proof=>proof.unknown)).toBe(true);
++ if(cause==='domain-only'){expect(sent).toEqual([{x:1,y:0}]);expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});await c.settled();}
++ else{expect(sent).toEqual([]);expect(receipt.read()).toMatchObject({state:'conservative',reason:'unknown'});}
++ later=owner.transact(()=>owner.$.z(8));later.confirm();later=undefined;
++ // A distinct pending owner authored later cannot extend either recipient window.
++ const lateOwner=signalTree({z:0},{enhancers:[transactions()]});const late=lateOwner.transact(()=>lateOwner.$.z(9));
++ try{p[terminal]();await flush();expect(sent).toEqual([{x:1,y:0}]);expect(secondary).toEqual([{x:1,y:0}]);expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});await c.settled();await other.settled();expect(lateOwner.$.z()).toBe(9);}finally{late.confirm();lateOwner.destroy();}
++ }finally{a.mockRestore();b.mockRestore();c.dispose();other.dispose();later?.confirm();t.destroy();owner.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/recipient-window-review.spec.ts
+@@ -0,0 +1,46 @@
++import {expect,it,vi} from 'vitest';
++import {appendFileSync} from 'node:fs';
++import {signalTree,transactions,link} from '../index';
++import * as life from './experimental-publication/lifecycle';
++import {getPathNotifier} from './path-notifier';
++type Receipt={read():Readonly<{state:string;basis?:string;reason?:string}>};
++type Declared=ReturnType<typeof link>&{declare(input:{kind:'independent'|'unknown'},work:()=>unknown):Receipt};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<100;i++)await Promise.resolve();};
++const output='/private/tmp/st-recipient-window-classification-successor/raw-traces.jsonl';
++for(const scope of ['scalar','branch'] as const)it(`equal unknown proof retains pending predecessor and no-write receipt: ${scope}`,async()=>{
++ const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0,pair:{x:0,y:0}});const sent:unknown[]=[];const c=link(scope==='scalar'?t.$.x:t.$.pair,{set:v=>{sent.push(v);}}) as Declared;const p=o.transact(()=>o.$.z(7));
++ const write=()=>{if(scope==='scalar')t.$.x(1);else t.$.pair({x:1,y:0});};
++ try{const first=c.declare({kind:'unknown'},write);await flush();expect(sent).toEqual([]);const second=c.declare({kind:'unknown'},write);await flush();appendFileSync(output,JSON.stringify({scope,first:first.read(),second:second.read(),sent})+'\n');expect(second.read()).toMatchObject({state:'no-write'});expect(first.read()).toMatchObject({state:'conservative'});expect(sent).toEqual([]);p.confirm();await flush();expect(sent).toEqual([scope==='scalar'?1:{x:1,y:0}]);expect(first.read()).toMatchObject({state:'started',basis:'surviving'});expect(second.read()).toMatchObject({state:'no-write'});}finally{c.dispose();t.destroy();o.destroy();}
++});
++
++for(const outcome of ['confirm','rollback'] as const)it(`equal undeclared recipient proof does not discard held useful revision: ${outcome}`,async()=>{
++ const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({pair:{x:0,y:0}});const left:unknown[]=[],right:unknown[]=[];const a=link(t.$.pair,{set:v=>{left.push(v);}}) as Declared;const b=link(t.$.pair,{set:v=>{right.push(v);}});const p=o.transact(()=>o.$.z(7));
++ try{a.declare({kind:'independent'},()=>t.$.pair({x:1,y:0}));await flush();const second=a.declare({kind:'independent'},()=>t.$.pair({x:1,y:0}));await flush();expect(second.read()).toMatchObject({state:'no-write'});expect(left).toEqual([{x:1,y:0}]);expect(right).toEqual([]);p[outcome]();await flush();expect(right).toEqual([{x:1,y:0}]);await b.settled();}finally{a.dispose();b.dispose();t.destroy();o.destroy();}
++});
++
++for(const known of [false,true])it(`trace actual native input vs recipient-only wider uncertainty: known=${known}`,async()=>{
++ const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0,pair:{x:0,y:0}},{enhancers:[transactions()]});const sent:unknown[]=[];const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;const p=known?t.transact(()=>t.$.x(7)):o.transact(()=>o.$.z(7));
++ const original=life.prepareRevision;const records:unknown[]=[];let sawKnown=false,sawCoverage=false;const spy=vi.spyOn(life,'prepareRevision').mockImplementation((...args)=>{
++  const native=args[5]?life.nativeProof(args[5]):undefined;
++  const role=(cells:readonly life.OwnerCell[]|undefined)=>cells?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}));
++  if(native?.input?.some(c=>c.outcome==='pending'))sawKnown=true;if(args[3]&&Object.values(args[3]).some(Boolean))sawCoverage=true;
++  records.push({unknown:args[3],native:native&&{unknown:native.unknown,invalid:native.invalid,historicalWindow:native.historicalWindow,input:role(native.input),destination:role(native.destination),validation:role(native.validation),possible:role(native.possible)}});
++  return original(...args);
++ });
++ try{let error:unknown,receipt:Receipt|undefined;try{receipt=c.declare({kind:'independent'},()=>t.$(input=>({...input,pair:{x:input.x+(known?0:1),y:input.pair.y}})));}catch(e){error=e;}
++ await flush();appendFileSync(output,JSON.stringify({known,records,error:error&&{code:(error as {code?:string}).code,stage:(error as {stage?:string}).stage,reason:(error as {reason?:string}).reason},receipt:receipt?.read(),sent})+'\n');
++ expect(sawCoverage).toBe(true);expect(sawKnown).toBe(known);expect(sent).toEqual(known?[]:[{x:1,y:0}]);if(known)expect(error).toMatchObject({stage:'after-callback',reason:'contradiction'});else{expect(error).toBeUndefined();expect(receipt?.read()).toMatchObject({state:'started',basis:'surviving'});}p.confirm();await flush();expect(sent).toEqual([{x:known?7:1,y:0}]);
++ }finally{spy.mockRestore();c.dispose();t.destroy();o.destroy();}
++});
++
++for(const outcome of ['confirm','rollback'] as const)it(`membership omission retains recipient window through terminal ${outcome}`,async()=>{
++ const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree<{pair:{x:number;y?:number}}>({pair:{x:0,y:0}});const left:unknown[]=[],right:unknown[]=[];const a=link(t.$.pair,{set:v=>{left.push(v);}}) as Declared;const b=link(t.$.pair,{set:v=>{right.push(v);}});const p=o.transact(()=>o.$.z(7));
++ try{a.declare({kind:'independent'},()=>t.$.pair({x:1}));await flush();expect(left).toEqual([{x:1}]);expect(right).toEqual([]);p[outcome]();await flush();expect(right).toEqual([{x:1}]);await b.settled();}finally{a.dispose();b.dispose();t.destroy();o.destroy();}
++});
++
++it('a finalizer throw installs neither recipient authority nor prepared writes',async()=>{
++ const {preparePublicationMutations}=await import('./internals/intrinsic-mutation');
++ const o=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0});const sent:unknown[]=[];const a=link(t.$.x,{set:()=>{}}) as Declared,b=link(t.$.x,{set:v=>{sent.push(v);}});const p=o.transact(()=>o.$.z(7));const records=new Map<unknown,unknown>();let complete=0,finalized=0;const initial=life.diagnostics().operations;
++ const off=preparePublicationMutations(t.$.x,()=>({record:{writes:[{map:records,key:1,value:7}],adds:[]},completion:{},finalize(){finalized++;expect(records.size).toBe(0);expect(t.$.x()).toBe(0);throw Error('review-finalize-abort');}}),()=>{complete++;});
++ try{expect(()=>a.declare({kind:'independent'},()=>t.$.x(7))).toThrow();expect(finalized).toBe(1);expect(t.$.x()).toBe(0);expect(records.size).toBe(0);expect(complete).toBe(0);await flush();expect(life.diagnostics().operations).toBe(initial);expect(sent).toEqual([]);p.confirm();await flush();expect(sent).toEqual([]);}finally{off?.();a.dispose();b.dispose();t.destroy();o.destroy();}
++});

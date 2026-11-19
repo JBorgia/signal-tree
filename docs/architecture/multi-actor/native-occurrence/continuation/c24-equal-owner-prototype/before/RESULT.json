@@ -1,0 +1,19 @@
+{
+  "exit": 1,
+  "passed": 4,
+  "failed": 6,
+  "runtimeBaseManifest": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "specSha256": "921af77af25269a9248dc64d703eec0c0f53560b97b06005b792aa7ad450e08c",
+  "argv": [
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "equal-owner-admission.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c24-equal-owner/candidate",
+  "node": "24.15.0",
+  "limits": "No deadline fired; exact test output preserved. No performance claim."
+}

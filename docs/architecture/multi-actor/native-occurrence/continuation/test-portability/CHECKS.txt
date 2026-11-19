@@ -1,0 +1,2 @@
+PASS: 15 TypeScript files parse; all 13 normalized ASTs match originals (payloads, serialization, assertions, cases, controls, comments, sequencing); helper imports resolve. No test/type/build execution.
+PASS: patch apply --check against preserved before/; 38 source inventory hashes unchanged; all six diagnosticDirectory declarations follow imports.

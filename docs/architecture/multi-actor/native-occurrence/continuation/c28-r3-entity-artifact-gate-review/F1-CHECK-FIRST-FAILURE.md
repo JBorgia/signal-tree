@@ -1,0 +1,1 @@
+Reviewer-only harness first failure: missing expected token case reported true !== false. The harness parameter nonce=token substituted the current token when the test explicitly supplied undefined. Corrected only the harness defaulting to distinguish omitted argument from explicit undefined; no worker source changed. This was not a validator defect.

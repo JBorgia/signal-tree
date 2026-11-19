@@ -1,0 +1,11 @@
+--- a/packages/angular/src/lib/observation-adapter.ts
++++ b/packages/angular/src/lib/observation-adapter.ts
+@@ -86,7 +86,7 @@
+   },
+ 
+   createReadonlyCell: <T,>(compute: () => T) => computed(compute),
+-  createCurrentReadonlyCell: currentReadonly,
++  createCurrentReadonlyCell: <T>(read: () => T) => computed(read),
+ 
+   createWritableProjection: <T,>(compute: () => T) => {
+     const cell = linkedSignal(compute);

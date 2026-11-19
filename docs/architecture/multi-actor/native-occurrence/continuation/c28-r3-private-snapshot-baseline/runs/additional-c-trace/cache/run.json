@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel private-snapshot-additional --testNamePattern=C nonthrowing --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:56:53.378Z",
+    "endTime": "2026-11-03T05:56:55.367Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "403085318394263674",
+      "startTime": "2026-11-03T05:56:53.404Z",
+      "endTime": "2026-11-03T05:56:55.366Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

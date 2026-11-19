@@ -1,0 +1,962 @@
+[
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/native-publication-error-boundary.spec.ts",
+    "name": "Solid public EntityMap publication error timing > completes native bookkeeping before reporting a post-writable-token invalidation fault",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/native-publication-error-boundary.spec.ts",
+    "name": "Solid public EntityMap publication error timing > completes native bookkeeping before reporting a post-last-epoch invalidation fault",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/native-publication-error-boundary.spec.ts",
+    "name": "Solid public EntityMap publication error timing > separately retains the later-epoch-handle obligation after a first-handle fault",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/native-publication-error-boundary.spec.ts",
+    "name": "Solid mixed settlement member publication failures > finishes sibling publication before reporting the first error member-token failure",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/native-publication-error-boundary.spec.ts",
+    "name": "Solid mixed settlement member publication failures > finishes sibling publication before reporting the first undefined member-token failure",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > reads it absent and empty, held reads too",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > an omission nested in a whole value wakes held reads after it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > a tap inside transact reads the collection as it is (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (transactions first) > rollback of a re-adding write makes it absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > reads it absent and empty, held reads too",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > an omission nested in a whole value wakes held reads after it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > a tap inside transact reads the collection as it is (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Solid (restoration first) > rollback of a re-adding write makes it absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/selected-callback-facade.spec.ts",
+    "name": "realizes fresh tap reads and preserves later callback writes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/selected-callback-facade.spec.ts",
+    "name": "keeps ordinary selected observation granular and native computations cached during the callback",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/selected-callback-facade.spec.ts",
+    "name": "preserves a callback selection followed by rekey",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/selected-callback-facade.spec.ts",
+    "name": "preserves a callback selection followed by clear",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (transactions first) > held consumers read absent; a held leaf write re-adds only its path",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (transactions first) > a held branch write re-adds with its whole value; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (transactions first) > a held leaf updater receives undefined and re-adds with its result",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (transactions first) > undo of a designated omission brings back every held reader below it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (transactions first) > undo of a turn that omits the branch and writes under it is exact",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (transactions first) > rollback of a re-adding write makes the branch absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (restoration first) > held consumers read absent; a held leaf write re-adds only its path",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (restoration first) > a held branch write re-adds with its whole value; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (restoration first) > a held leaf updater receives undefined and re-adds with its result",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (restoration first) > undo of a designated omission brings back every held reader below it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (restoration first) > undo of a turn that omits the branch and writes under it is exact",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (restoration first) > rollback of a re-adding write makes the branch absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Solid (no enhancers) > a held leaf updater under an omitted member receives undefined",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'leaf' / actual-owned=true / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'leaf' / actual-owned=true / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'leaf' / actual-owned=false / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'leaf' / actual-owned=false / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'whole' / actual-owned=true / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'whole' / actual-owned=true / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'whole' / actual-owned=false / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "solid equal 'whole' / actual-owned=false / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 semantic conformance > reads and writes a scalar leaf through a Solid accessor",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 semantic conformance > notifies a Solid effect when kernel state changes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 semantic conformance > does not let Solid equality swallow a kernel publication",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 semantic conformance > keeps subject identity across remove and same-key re-add",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 semantic conformance > updates entity fields and whole entities",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 epoch advancement > propagates entity invalidation through the Solid epoch",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/solid-observation.spec.ts",
+    "name": "@signal-tree/solid \u2014 epoch advancement > publishes one coherent replacement for a whole-collection write",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/parent-freshness-counterparts.spec.ts",
+    "name": "installed parent freshness and retained native dependencies (false / false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/parent-freshness-counterparts.spec.ts",
+    "name": "installed parent freshness and retained native dependencies (false / true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/parent-freshness-counterparts.spec.ts",
+    "name": "installed parent freshness and retained native dependencies (true / true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 1 speculative publication \u2014 proposed values reach the native carrier before settlement",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 2 accept publication \u2014 the committed value stays visible through the SAME held reference",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 3 reject publication \u2014 the restored value republishes through the SAME held reference",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4 coherent mixed publication \u2014 accept exposes no torn scalar/structural frame",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4b coherent mixed publication \u2014 reject exposes no torn frame either",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4c coherent value settlement \u2014 own collection reads agree in native observers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4d owned projection settlement \u2014 add, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4d owned projection settlement \u2014 add, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4d owned projection settlement \u2014 remove, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4d owned projection settlement \u2014 remove, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4d owned projection settlement \u2014 field, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4d owned projection settlement \u2014 field, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 initial absence, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 initial absence, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 same lifetime restoration, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 same lifetime restoration, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 new lifetime at reused key, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 new lifetime at reused key, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selection while absent, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selection while absent, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selected rekey, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selected rekey, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 unrelated writes and disposal, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 4e selection lifetime projections \u2014 unrelated writes and disposal, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 5 lifetime preservation \u2014 a held reference never retargets to a reused business key",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/solid \u2014 pending realization conformance > 5b lifetime preservation holds when the rename happens inside a pending",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (no enhancers) > a membership-only removal is absent to accessor, memo and branch readers, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (no enhancers) > re-adding with the retained value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (no enhancers) > re-adding with a new value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (no enhancers) > an identical whole-branch write does not rerun a consumer",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (no enhancers) > a removal two levels deep is absent to every reader (outer write)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (position-topology capability) > a membership-only removal is absent to accessor, memo and branch readers, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (position-topology capability) > re-adding with the retained value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (position-topology capability) > re-adding with a new value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (position-topology capability) > an identical whole-branch write does not rerun a consumer",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (position-topology capability) > a removal two levels deep is absent to every reader (outer write)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (transactions()) > a membership-only removal is absent to accessor, memo and branch readers, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (transactions()) > re-adding with the retained value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (transactions()) > re-adding with a new value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (transactions()) > an identical whole-branch write does not rerun a consumer",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Solid (transactions()) > a removal two levels deep is absent to every reader (outer write)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/declared-publication-composition.spec.ts",
+    "name": "declared scalar independence progresses while two owners remain open; dependency waits",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/declared-publication-composition.spec.ts",
+    "name": "declared entity inspection adoption publishes ordinary authority through the facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/declared-publication-composition.spec.ts",
+    "name": "confirmed scalar input permits declared progress through the facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "name": "publishes newly supplied ordinary keys through the solid facade",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts:42:14\n    at withWriteContext (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/write-context.ts:65:12)"
+      }
+    ],
+    "classification": "unclassified first failure; no runtime/fixture causality inferred"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "name": "keeps failed transaction observations coherent (seeded=false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "name": "keeps failed transaction observations coherent (seeded=true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "name": "saved inspection snapshot cannot borrow fresh ordinary support: direct",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
+    "name": "saved inspection snapshot cannot borrow fresh ordinary support: frame",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > disposes a lazy derived memo with its creation owner",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > disposes external derived dependencies on tree destruction alone",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > releases external dependencies when the adapter is disposed without a Solid owner",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > does not acquire a persistent dependency after disposal before first read",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > preserves signed zero in derived values",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > observes reactivation to 1, observation after omission=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > observes reactivation to 2, observation after omission=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > observes reactivation to 1, observation after omission=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-observation.spec.ts",
+    "name": "audited Solid observation boundaries > observes reactivation to 2, observation after omission=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Solid (transactions first) > undo, redo and jumpTo restore the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Solid (transactions first) > rollback restores the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Solid (transactions first) > a row-naming write to the omitted collection refuses; undo still restores it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Solid (restoration first) > undo, redo and jumpTo restore the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Solid (restoration first) > rollback restores the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Solid (restoration first) > a row-naming write to the omitted collection refuses; undo still restores it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "registered terminals \u2014 Solid (transactions first) > undo and redo replace an object terminal and a Map terminal as one value",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "registered terminals \u2014 Solid (transactions first) > external undefined refuses the whole undo and nothing changes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "registered terminals \u2014 Solid (transactions first) > undo re-adds an ordinarily omitted terminal with its pre-image",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "registered terminals \u2014 Solid (restoration first) > undo and redo replace an object terminal and a Map terminal as one value",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "registered terminals \u2014 Solid (restoration first) > external undefined refuses the whole undo and nothing changes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "registered terminals \u2014 Solid (restoration first) > undo re-adds an ordinarily omitted terminal with its pre-image",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/entity-native-obligation-composition.spec.ts",
+    "name": "entity input ownership through facade, mode=pending-independent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/entity-native-obligation-composition.spec.ts",
+    "name": "entity input ownership through facade, mode=pending-dependent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/entity-native-obligation-composition.spec.ts",
+    "name": "entity input ownership through facade, mode=confirmed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/joint-rich-publication.spec.ts",
+    "name": "rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/scalar-frame-publication.spec.ts",
+    "name": "scalar frame rejected branch adoption preserves ordinary payload (solid)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/scalar-frame-publication.spec.ts",
+    "name": "same-turn scalar membership omission does not replay stale covered age (solid)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-native-tooling.spec.ts",
+    "name": "solid audit tooling and terminal values > observes tree identity and history lifetime",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/audit-native-tooling.spec.ts",
+    "name": "solid audit tooling and terminal values > Date fields expose native carrier access",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/joint-native-frontier.spec.ts",
+    "name": "first synchronous Solid observer and detached completion see the installed mixed unit",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/link-native-address.spec.ts",
+    "name": "solid native entity Link address > bare omission and later authored value progress",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/link-native-address.spec.ts",
+    "name": "solid native entity Link address > enhanced omission and later authored value progress",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/batching-dynamic-field.spec.ts",
+    "name": "solid dynamic entity batching > uses native writes without escaping coalesce",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  }
+]

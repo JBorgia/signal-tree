@@ -1,0 +1,1 @@
+The byte-identical replay fixture hardcodes the author raw-traces.jsonl path. First replay appended 1570 bytes there. Initial inventory recorded 3140 bytes; exact original prefix restored, appended bytes preserved here. Runtime/test source never changed. Any further review-fixture run must redirect the trace destination in the independent copy and document that harness-only edit.

@@ -1,0 +1,10 @@
+{
+  "graphSha256": "a1c7d8dee606b9d6bdb9300179209d0b8fe554e4ead63daa455cc4af8732e9f5",
+  "sameDataDirectory": true,
+  "graphPath": "/private/tmp/st-c28-r3-registration-lint-combined/runs/lint-local-fixtures/data/project-graph.json",
+  "noSkippedBoundaryWarning": true,
+  "noIgnoredFiles": true,
+  "explicitReceiptHelperCommand": true,
+  "errors": 0,
+  "warnings": 26
+}

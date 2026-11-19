@@ -1,0 +1,60 @@
+
+> nx run kernel:test main-invocation-scope.spec.ts
+
+> node tools/run-core-vitest.mjs main-invocation-scope.spec.ts
+
+(node:34460) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34781) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-invocation-successor/independent-review/replica/packages/kernel
+
+(node:34939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/main-invocation-scope.spec.ts (3 tests | 1 failed) 20ms
+   × preclaim projection getter cannot lend inverse authority to a nested setter 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/main-invocation-scope.spec.ts > preclaim projection getter cannot lend inverse authority to a nested setter
+AssertionError: expected { known: [], unknown: false, …(5) } not to be { known: [], unknown: false, …(5) } // Object.is equality
+
+Compared values have no visual difference.
+
+ ❯ src/lib/main-invocation-scope.spec.ts:31:106
+     29|  const q=tree.transact(()=>rows.replaceOne('a',row));await flush();
+     30|  const off=observeIntrinsicMutations(rows.byIdOrFail('a').x as object,…
+     31|  try{let error:unknown;try{q.rollback();}catch(e){error=e;}expect(ente…
+       |                                                                                                          ^
+     32| });
+     33|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  14:07:14
+   Duration  847ms (transform 436ms, setup 0ms, import 517ms, tests 20ms, environment 219ms)
+
+Warning: command "node tools/run-core-vitest.mjs main-invocation-scope.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

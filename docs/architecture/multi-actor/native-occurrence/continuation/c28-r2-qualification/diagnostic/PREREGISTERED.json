@@ -1,0 +1,7 @@
+{
+  "owner-history-current-certificate.spec.ts": "9f50115495455f091230e6aa69537f514ad4a2ada5a1485ed4f77c20e957001b",
+  "current-certificate-reader-path.spec.ts": "edb619eabe05157dbc76e01191f6fe955a94ddcb1f19398d0e78784385ff6433",
+  "scalar-finalized-lifecycle.spec.ts": "1a0dd6f581ee296775bd319f8313a7dc742204ad95765b367246c45ae1ce442d",
+  "repeated-no-write-roots.spec.ts": "f5e8d8474b5cb13dc6c785ac7808b5e74e8ec1533a8380b0b96447f175bf56ff",
+  "projected-invalidity.spec.ts": "ee350b05d7160ba3cacacf9f09520382f0be06514e472e6f5a901db0f6f3b0ff"
+}

@@ -1,0 +1,132 @@
+{
+  "baseline-b": {
+    "records": 9,
+    "identicalAuthorRecords": true,
+    "fixtureSha256": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7",
+    "instrumentedEntitySha256": "1c918089881a7c43fc98319adcca77be5cd316eb814ad2fd744ac35db3243bba",
+    "populate": [
+      {
+        "n": 32,
+        "mode": "bare",
+        "arrayEntries": 4128,
+        "mapContainers": 180
+      },
+      {
+        "n": 32,
+        "mode": "held",
+        "arrayEntries": 4128,
+        "mapContainers": 180
+      },
+      {
+        "n": 32,
+        "mode": "foreign",
+        "arrayEntries": 4128,
+        "mapContainers": 180
+      },
+      {
+        "n": 128,
+        "mode": "bare",
+        "arrayEntries": 65664,
+        "mapContainers": 660
+      },
+      {
+        "n": 128,
+        "mode": "held",
+        "arrayEntries": 65664,
+        "mapContainers": 660
+      },
+      {
+        "n": 128,
+        "mode": "foreign",
+        "arrayEntries": 65664,
+        "mapContainers": 660
+      },
+      {
+        "n": 1024,
+        "mode": "bare",
+        "arrayEntries": 4195328,
+        "mapContainers": 5140
+      },
+      {
+        "n": 1024,
+        "mode": "held",
+        "arrayEntries": 4195328,
+        "mapContainers": 5140
+      },
+      {
+        "n": 1024,
+        "mode": "foreign",
+        "arrayEntries": 4195328,
+        "mapContainers": 5140
+      }
+    ]
+  },
+  "optimized": {
+    "records": 9,
+    "identicalAuthorRecords": true,
+    "fixtureSha256": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7",
+    "instrumentedEntitySha256": "43d0d9112c30870348e149caf907a5d846a90df7f8e21667d2bc9e280b00f7fa",
+    "populate": [
+      {
+        "n": 32,
+        "mode": "bare",
+        "arrayEntries": 322,
+        "mapContainers": 182
+      },
+      {
+        "n": 32,
+        "mode": "held",
+        "arrayEntries": 322,
+        "mapContainers": 182
+      },
+      {
+        "n": 32,
+        "mode": "foreign",
+        "arrayEntries": 322,
+        "mapContainers": 182
+      },
+      {
+        "n": 128,
+        "mode": "bare",
+        "arrayEntries": 1282,
+        "mapContainers": 662
+      },
+      {
+        "n": 128,
+        "mode": "held",
+        "arrayEntries": 1282,
+        "mapContainers": 662
+      },
+      {
+        "n": 128,
+        "mode": "foreign",
+        "arrayEntries": 1282,
+        "mapContainers": 662
+      },
+      {
+        "n": 1024,
+        "mode": "bare",
+        "arrayEntries": 10242,
+        "mapContainers": 5142
+      },
+      {
+        "n": 1024,
+        "mode": "held",
+        "arrayEntries": 10242,
+        "mapContainers": 5142
+      },
+      {
+        "n": 1024,
+        "mode": "foreign",
+        "arrayEntries": 10242,
+        "mapContainers": 5142
+      }
+    ]
+  },
+  "sourceFilesVerified": 2968,
+  "authorManifestUnchanged": true,
+  "finalAuthorAndCopySourceFilesVerified": 2968,
+  "finalOriginalBFilesVerified": 2967,
+  "independentFixtureSha256": "a2bd1b818cbffeecbe40a8d0f3369ebbde1efdb2676fa6fd6e01aab5224ffd81",
+  "reportSha256": "756d6213660ff91b7c8ebaaee580ef6cca6209c38481a222225870c4940e808e"
+}

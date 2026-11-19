@@ -1,0 +1,12 @@
+{
+  "packages/kernel/src/lib/forwarding-retention-probe.spec.ts": {
+    "C13": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "afterAllRuns": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "restoredExactBytes": true
+  },
+  "packages/kernel/src/lib/link-lifetime.spec.ts": {
+    "C13": "fd7ca65a920211167c0cb51d6cf5eed8d9ae0a6737af2890cd593474c9cf2300",
+    "afterAllRuns": "fd7ca65a920211167c0cb51d6cf5eed8d9ae0a6737af2890cd593474c9cf2300",
+    "restoredExactBytes": true
+  }
+}

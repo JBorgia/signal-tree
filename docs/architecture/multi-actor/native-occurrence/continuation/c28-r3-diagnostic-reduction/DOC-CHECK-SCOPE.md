@@ -1,0 +1,5 @@
+# Documentation check scope
+
+Final clean documentation snapshot: tracked checkout files plus task-owned multi-actor docs/audit/experiment files, excluding unrelated ignored local evidence and worktrees. Node24.15.0, repository tools/check-doc-links.mjs: 945/945 relative links across197 live surfaces resolve; install instruction checks pass. Separately all127 relative file targets in the four edited controller/status/reduction-report files resolve. Anchors/external URLs are not checked.
+
+A stale incomplete scratch directory first lacked the checker, then reported missing targets because only changed files were copied. A direct working-checkout run traversed ignored local .claude evidence/worktrees and reported1121 broken links among18351. Neither run was silently counted as a pass. The clean tracked-plus-task snapshot establishes the intended source/doc surface; it does not repair historical ignored local archives. New artifact-gate review/composition documentation added afterward requires its own final check.

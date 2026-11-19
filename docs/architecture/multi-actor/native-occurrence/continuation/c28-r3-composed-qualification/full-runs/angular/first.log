@@ -1,0 +1,295 @@
+
+> nx run angular:test --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c28-r3-composed-qualification/full-reporter.mjs
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:90132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c28-r3-composed-qualification/candidate/packages/angular
+
+(node:90183) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/angular-validation-null.spec.ts (14 tests) 35ms
+(node:90225) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > CONTROL: an unreferenced carrier is actually collected
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > a held node keeps its carrier alive and still updates after GC
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > a held field carrier still updates after GC
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > a live reactive observer prevents collection and never goes stale
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > a re-added key does not retarget a reference held across GC
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > direct field.set still authors through a carrier recreated after GC
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: weakly held activation carriers > reclaiming and re-realizing the same subject yields current truth
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: replacement must not orphan an observer > a re-realization reuses the carrier a live observer depends on
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: transactions across a collection > keeps speculative state visible through a held node across GC
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-state-weak-realization.spec.ts > SUBJECT-STATE-SEMANTIC-0: transactions across a collection > rolls back through the same held carrier after a collection
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+ ✓ src/lib/subject-state-weak-realization.spec.ts (10 tests) 1398ms
+(node:90243) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e2s0-identity-function.spec.ts (5 tests) 12ms
+(node:90251) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/public-surface.spec.ts (9 tests) 71ms
+(node:90256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > CONTROL: the node facade really is collected
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees updateOne
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees a direct field.set
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees replaceOne
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees setAll
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees removeOne
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees remove then same-key re-add, without retargeting
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees speculative transaction state, and its rollback
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees a confirmed transaction
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > keeps a held node and a held field working across collection
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > sees a restore of the same SubjectId after collection
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/subject-epoch-non-retaining-observer.spec.ts > SUBJECT-EPOCH-0: a non-retaining computed survives collection > revives a reference held across the remove/restore cycle
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+ ✓ src/lib/subject-epoch-non-retaining-observer.spec.ts (12 tests) 1387ms
+(node:90270) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/define-store.spec.ts (19 tests) 55ms
+(node:90274) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+retained-native-metadata true
+
+ ✓ src/lib/selected-callback-facade.spec.ts (6 tests) 48ms
+(node:90281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/parent-freshness-focused.spec.ts (7 tests) 27ms
+(node:90283) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/reactivity-contract.spec.ts (11 tests) 25ms
+(node:90286) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/absent-collection.spec.ts (12 tests) 70ms
+(node:90294) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/current-read-capability.spec.ts > current-read native-only first dependency recovers with native publication error timing
+current-read-publication-counts {
+  mode: 'native',
+  escaped: false,
+  failedPublicationCalls: 1,
+  recoveredPublicationCalls: 1,
+  deliveries: [ 'value', 'error', 'value' ]
+}
+current-read-publication-counts {
+  mode: 'current',
+  escaped: false,
+  failedPublicationCalls: 2,
+  recoveredPublicationCalls: 2,
+  deliveries: [ 'value', 'error', 'value' ]
+}
+
+ ✓ src/lib/current-read-capability.spec.ts (4 tests) 7ms
+(node:90297) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/histc2-signal-forms.spec.ts (6 tests) 30ms
+(node:90308) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/equal-owner-facade-controls.spec.ts (8 tests) 45ms
+(node:90309) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/effective-presence-successor.spec.ts (7 tests) 43ms
+(node:90312) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/histc2-form-ingress.spec.ts (4 tests) 54ms
+(node:90317) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/native-storage-0-contract.spec.ts (6 tests) 34ms
+(node:90318) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/absent-path-write.spec.ts (13 tests) 48ms
+(node:90324) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/angular-realization-invariants.spec.ts > Angular realization invariants > schedules a zoneless template after a direct location write
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+stderr | src/lib/angular-realization-invariants.spec.ts > Angular realization invariants > republishes a rolled-back value through Angular dependency tracking
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+ ✓ src/lib/angular-realization-invariants.spec.ts (10 tests) 51ms
+(node:90327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/parent-snapshot-currentness.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ✓ src/lib/parent-snapshot-currentness.spec.ts (5 tests) 21ms
+(node:90330) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/histc2-form-dom.spec.ts (3 tests) 49ms
+(node:90410) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/transaction-realization.spec.ts (26 tests) 109ms
+(node:90411) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/declared-publication-composition.spec.ts (3 tests) 44ms
+(node:90413) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-value-new-keys.spec.ts (3 tests) 30ms
+(node:90414) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/plain-member-absence-observation.spec.ts (15 tests) 28ms
+(node:90422) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/construction-input.spec.ts (8 tests) 25ms
+(node:90510) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration.spec.ts (8 tests) 32ms
+(node:90531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/designated-collection-omission.spec.ts (6 tests) 38ms
+(node:90535) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/kernel-comparison.benchmark.spec.ts (3 tests | 3 skipped)
+(node:90537) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/construction-bound-realization.spec.ts (4 tests) 14ms
+(node:90538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/restoration-reactivity.spec.ts (8 tests) 38ms
+(node:90540) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/keyed-construction-cleanup.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ✓ src/lib/keyed-construction-cleanup.spec.ts (2 tests) 34ms
+(node:90546) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e-active-selection.spec.ts (2 tests) 14ms
+(node:90547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/native-leaf-experiment.spec.ts > native Angular leaf realization > invalidates a zoneless rendered consumer
+NG0914: The application is using zoneless change detection, but is still loading Zone.js. Consider removing Zone.js to get the full benefits of zoneless. In applications using the Angular CLI, Zone.js is typically included in the "polyfills" section of the angular.json file.
+
+ ✓ src/lib/native-leaf-experiment.spec.ts (4 tests) 35ms
+(node:90550) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-active-id-preparation.spec.ts > public callback discriminator sees restored library selection before choosing newer C
+selection-public-angular {"callbacks":[{"activeId":"A","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1}],"final":{"activeId":"C","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1},"seen":[{"activeId":"A","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1},{"activeId":"X","ids":["X","C","D"],"all":[{"id":"A","n":1},{"id":"C","n":3},{"id":"D","n":4}],"directA":null},{"activeId":"C","ids":["A","C"],"all":[{"id":"A","n":1},{"id":"C","n":3}],"directA":1}]}
+
+ ✓ src/lib/selected-active-id-preparation.spec.ts (1 test) 26ms
+(node:90552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/effective-presence-install-reentry.spec.ts (6 tests) 20ms
+(node:90553) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-native-obligation-composition.spec.ts (3 tests) 42ms
+(node:90565) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/ssr-transfer.spec.ts (3 tests) 20ms
+(node:90566) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/construction-resource-cleanup.spec.ts (2 tests) 12ms
+(node:90568) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-granular-reactivity.spec.ts (4 tests) 16ms
+(node:90575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e-granularity.spec.ts (3 tests) 18ms
+(node:90588) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-rich-publication.spec.ts (1 test) 33ms
+(node:90591) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/e-composition-nulls.spec.ts (2 tests) 24ms
+(node:90593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/joint-native-frontier.spec.ts (1 test) 29ms
+(node:90604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/scalar-frame-publication.spec.ts (2 tests) 32ms
+(node:90610) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/construction-boundaries.spec.ts (2 tests) 12ms
+(node:90616) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/audit-native-tooling.spec.ts (2 tests) 15ms
+(node:90617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/parent-freshness-entity.spec.ts (2 tests) 19ms
+(node:90620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/public-root-initialization.spec.ts (2 tests) 11ms
+(node:90630) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/link-native-address.spec.ts (2 tests) 26ms
+(node:90646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/demarcation.spec.ts (1 test) 21ms
+(node:90648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/audit-observation-lifecycle.spec.ts (2 tests) 19ms
+(node:90652) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/batching-dynamic-field.spec.ts (1 test) 10ms
+
+ Test Files  51 passed | 1 skipped (52)
+      Tests  302 passed | 3 skipped (305)
+   Start at  22:11:33
+   Duration  45.49s (transform 1.48s, setup 11.02s, import 8.15s, tests 4.36s, environment 15.19s)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      46.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     46.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    46.9s

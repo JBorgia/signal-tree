@@ -1,0 +1,12 @@
+{
+  "exitCode": 0,
+  "firstExecution": true,
+  "comparisonCases": 7,
+  "additionalControls": 2,
+  "scope": "isolated extracted predicate model",
+  "publicPathReachabilityEstablished": false,
+  "C25SourceUnchanged": {
+    "lifecycle.ts": true,
+    "entity.ts": true
+  }
+}

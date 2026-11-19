@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel dynamic-realization-composition-independent --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:23:39.924Z",
+    "endTime": "2026-11-03T05:23:42.344Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "3590346399493834979",
+      "startTime": "2026-11-03T05:23:39.960Z",
+      "endTime": "2026-11-03T05:23:42.344Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

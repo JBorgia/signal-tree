@@ -1,0 +1,57 @@
+{
+  "baseline": "/private/tmp/st-native-combined-c8a/candidate",
+  "baseline_manifest_sha256": "04ba51dec86f537921521cf0a8ef5276c788e48b9a4e4abc24c7c5d14eda9652",
+  "source_manifest_sha256": "ffba656df9413c59d334884064b0690281cc9a29c3170a8775a1cc32c845dc0d",
+  "runtime_patch_sha256": "69b81d15b5743974c57fa7fe9f6e0c7f0e87f216eec3a2321d57d93a0b2ce667",
+  "tests_patch_sha256": "83e1bfc2885239aaef88b95d3d5935ff217b811c13398abb1e2ed7b20154a58c",
+  "combined_patch_sha256": "0b872ca02b3ca3d9c399d81e8d8ae3da5b2b81e31550b3d499002665c47b1f3c",
+  "manifest_file_count": 3033,
+  "changed_baseline_files": [
+    "packages/kernel/src/lib/entity-signal.ts"
+  ],
+  "added_files": [
+    "packages/kernel/src/lib/point-result-demand.spec.ts",
+    "packages/kernel/src/lib/point-result-allocation.spec.ts"
+  ],
+  "runtime_edit_payload_matches_reviewed_patch": true,
+  "combined_patch_replay_exact": true,
+  "baseline_unchanged": true,
+  "runs": {
+    "successor-point-gate": {
+      "exit": 1,
+      "elapsedSeconds": 9.391917124972679,
+      "source_unchanged": true
+    },
+    "baseline-point-gate": {
+      "exit": 1,
+      "elapsedSeconds": 3.0303930829977617,
+      "source_unchanged": true
+    },
+    "optional-diagnostic-no-output": {
+      "exit": 0,
+      "elapsedSeconds": 28.208269582944922,
+      "source_unchanged": true
+    },
+    "baseline-controls": {
+      "exit": 0,
+      "elapsedSeconds": 13.492805875022896,
+      "source_unchanged": true
+    },
+    "successor-controls": {
+      "exit": 0,
+      "elapsedSeconds": 13.451970165944658,
+      "source_unchanged": true
+    },
+    "source-types": {
+      "exit": 0,
+      "elapsedSeconds": 4.993349250056781,
+      "source_unchanged": true
+    },
+    "spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 10.472421208047308,
+      "source_unchanged": true
+    }
+  },
+  "limits": "No CPU/heap/release claim; original point gate red; no budget changes; original unsupported monkeypatch research retained, not promoted or re-executed."
+}

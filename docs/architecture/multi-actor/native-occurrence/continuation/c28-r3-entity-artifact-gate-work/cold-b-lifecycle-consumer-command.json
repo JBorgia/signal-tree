@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "lifecycle-consumer.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-b",
+  "env": {}
+}

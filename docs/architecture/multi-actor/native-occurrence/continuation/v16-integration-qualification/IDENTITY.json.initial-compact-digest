@@ -1,0 +1,13 @@
+{
+  "candidate": "/private/tmp/st-v16-integration-candidate",
+  "manifest": "2959b5f03c09c074d2ab83f6dfde2da3631c98e4d07828ac86a35e8e3ec64cc6",
+  "manifestAlgorithm": "sha256(JSON sorted keys compact separators)",
+  "base": "0af649ba10c55e784d95ae323dcde8322ba018e465110c2a70a36ea2d4cb3949",
+  "files": 3127,
+  "delta": [
+    "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "packages/kernel/src/lib/internals/entity-preparation-reader.ts",
+    "packages/kernel/src/lib/preparation-reader-comparison.spec.ts"
+  ],
+  "dependencyReuse": "explicit node_modules symlink; no cache or dist copy"
+}

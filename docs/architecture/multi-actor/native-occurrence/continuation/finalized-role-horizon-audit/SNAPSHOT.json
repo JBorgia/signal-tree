@@ -1,0 +1,15 @@
+{
+  "REVIEW.md": "73365ed3a0152368b622b597e7f3ab8119fe7f20649282c1dda21cb5438982d3",
+  "SOURCE-IDENTITY.json": "8f49e1e2759036731a306b00d4342f4159828889706b27cf61635a949e540b0d",
+  "source/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+  "source/lib/experimental-publication/lifecycle.ts": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6",
+  "source/lib/experimental-publication/private.ts": "501bc25e28a2eae0c33adc608cd85c773b95e80a12a57c3ecc4c8d378327daa9",
+  "source/lib/internals/causal-runtime/post-application-failure.ts": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252",
+  "source/lib/internals/causal-runtime/tree-realization-adapter.ts": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+  "source/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+  "source/lib/internals/location-runtime.ts": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+  "source/lib/internals/native-tree-scalar-leaf-runtime.ts": "83e9d1a6fc724b32912f7ca18a3b6514e8a952906e35c67704ab5610ca88a335",
+  "source/lib/internals/tree-scalar-leaf-runtime.ts": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+  "source/lib/internals/tree-scalar-slot-runtime.ts": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+  "source/lib/internals/utilities/deep-clone.ts": "4d4052a19f5bc484792d3cfc2d821890ce255d69d0640565ccbeda18b81b2635"
+}

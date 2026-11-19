@@ -1,0 +1,3 @@
+patching file 'packages/kernel/src/lib/entity-signal.ts'
+patching file 'packages/kernel/src/lib/point-result-demand.spec.ts'
+patching file 'packages/kernel/src/lib/point-result-allocation.spec.ts'

@@ -1,0 +1,214 @@
+--- /private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/entity-signal.ts
++++ /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './internals/snapshot-installation';
+ import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { PublicationPreparation } from './internals/publication-preparation';
+ import { reportContainedObserverError } from './internals/error-reporter';
+@@ -435,6 +436,11 @@
+ 
+   // Source-owned install epoch makes library readers current before notifications.
+   let installedReadRevision=0;
++  let snapshotIdentity: object | undefined;
++  const advanceInstalledRead = (): void => {
++    installedReadRevision++;
++    if (snapshotIdentity) markSnapshotInstalled(snapshotIdentity);
++  };
+   const createVersionedProjection = <TValue>(
+     compute: () => TValue
+   ): ReadableCell<TValue> => {
+@@ -672,7 +678,7 @@
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
+         if(publication.unit) installTerminalRecord(publication.unit.record);
+-        installedReadRevision++;
++        advanceInstalledRead();
+       },
+       invalidate(): void {
+         let failed = false;
+@@ -1052,7 +1058,7 @@
+           if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+         installPlacement();
+         if(publication.unit)installTerminalRecord(publication.unit.record);
+-        installedReadRevision++;
++        advanceInstalledRead();
+         if(!publicationPhase)complete();
+       },
+     };
+@@ -1583,7 +1589,7 @@
+         const result = frame.commit(
+           observe ? () => observe(ordinaryPlan.changes, delivery => observations.push(delivery)) : undefined,
+           responsibility, structuralFrontier, valueTransitions,
+-          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); installedReadRevision++; installed = true; }
++          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); advanceInstalledRead(); installed = true; }
+         );
+         if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
+         // Capture installed facts inside their actual bulk unit. Delivery belongs
+@@ -2535,7 +2541,7 @@
+     ordinaryPlan.install();
+     if (plan) installTerminalRecord(plan);
+     if(publication.unit) installTerminalRecord(publication.unit.record);
+-    installedReadRevision++;
++    advanceInstalledRead();
+     const observations:Array<()=>void>=[];
+     capture?.(ordinaryPlan.changes,delivery=>observations.push(delivery));
+     physicalCommitClock?.advance();
+@@ -5586,6 +5592,7 @@
+   });
+   // The materializer stamps the returned collection identity, not its raw
+   // proxy target. Source enrollment must retain that same identity.
++  snapshotIdentity = proxy;
+   defineEntityPublicationBinding(proxy as object, { source: entityPublication });
+   return proxy;
+ }
+--- /private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/member-membership.ts
++++ /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel/src/lib/internals/member-membership.ts
+@@ -28,7 +28,7 @@
+ import { getOwnedPositionIds } from './owned-metadata';
+ import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+ import { capturePathReAddIfObserved } from './path-observation-port';
+-import { publishMembershipChange } from './snapshot-authority';
++import { markSnapshotInstalled, publishMembershipChange } from './snapshot-authority';
+ import {
+   getTreeScalarSlotRuntime,
+   type MemberAbsence,
+@@ -996,6 +996,20 @@
+       if (ordinaryDivergences.get(runtime)) runtime.enableAbsence?.(ABSENCE);
+       else if (!omittedMembers.get(runtime)) runtime.disableAbsence?.();
+     }
++    if (changed) {
++      markSnapshotInstalled(parent);
++      // A held descendant can have a cached value even without a demanded parent.
++      const mark = (node: unknown): void => {
++        if (!isNodeAccessor(node)) return;
++        markSnapshotInstalled(node);
++        for (const key of Reflect.ownKeys(node)) {
++          if (key === 'caller' || key === 'arguments') continue;
++          const descriptor = Object.getOwnPropertyDescriptor(node, key);
++          if (descriptor && 'value' in descriptor) mark(descriptor.value);
++        }
++      };
++      mark(child);
++    }
+     return changed;
+   } catch (error) {
+     failed = true;
+--- /private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/location-runtime.ts
++++ /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -1,3 +1,4 @@
++import { markSnapshotInstalled } from './snapshot-installation';
+ import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation,type SelectedOutcome} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+@@ -489,6 +490,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
++          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+           if (observer) observer({intent:'replace',before:before as T,after:changed ? next : before as T,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+@@ -523,6 +525,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
++          if (typeof result === 'boolean' && physicalChanged) markSnapshotInstalled(location);
+           mutationSource2.observer?.({intent:'derive',before,after:changed ? next : before,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+--- /private/tmp/st-native-combined-c8a/candidate/packages/kernel/src/lib/internals/snapshot-authority.ts
++++ /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel/src/lib/internals/snapshot-authority.ts
+@@ -1,3 +1,5 @@
++import { MATERIALIZED, SNAPSHOT_PARENT, type MaterializedSnapshot } from './snapshot-installation';
++export { bindSnapshotParent, markSnapshotInstalled, readSnapshotTerminal } from './snapshot-installation';
+ import type { Location, ReadableCell } from './cell-runtime';
+ import { isNodeAccessor, snapshotNodeKey } from './node-shape';
+ import { markOwnerInvalidatedFrom } from './owner-invalidation-port';
+@@ -10,12 +12,6 @@
+ 
+ declare const ngDevMode: boolean | undefined;
+ 
+-interface MaterializedSnapshot<T> {
+-  observe: ReadableCell<T>;
+-}
+-
+-const MATERIALIZED = new WeakMap<object, MaterializedSnapshot<unknown>>();
+-const SNAPSHOT_PARENT = new WeakMap<object, WeakRef<object>>();
+ const TREE_STORES = new WeakSet<object>();
+ const VOLATILE_SNAPSHOTS = new WeakSet<object>();
+ const MEMBERSHIP_REVISION = new WeakMap<object, Location<number>>();
+@@ -25,13 +21,6 @@
+ 
+ export function isSnapshotNode(node: object): boolean {
+   return TREE_STORES.has(node) || isNodeAccessor(node);
+-}
+-
+-export function bindSnapshotParent(node: object, parent: object): void {
+-  SNAPSHOT_PARENT.set(
+-    snapshotNodeKey(node),
+-    new WeakRef(snapshotNodeKey(parent))
+-  );
+ }
+ 
+ export function markSnapshotVolatile(node: object): void {
+@@ -84,17 +73,57 @@
+ 
+   if (!snapshot) {
+     const membershipRevision = membershipRevisionFor(key, locations);
++    // Register before the first evaluation, including a cold reentrant build.
++    let observe: ReadableCell<T> | undefined;
++    const record: MaterializedSnapshot<T> = {
++      generation: 0,
++      get observe() { return observe ??= locations.createDerived(read); },
++    };
+     const read = () => {
++      if (record.attempt) record.attempt.built = true;
++      const generation = record.generation;
++      const previousCache = record.cache;
+       membershipRevision();
+       const built = build();
+       if (typeof ngDevMode === 'undefined' || ngDevMode) {
+         if (built !== null && typeof built === 'object') Object.freeze(built);
+       }
++      // Never cache an output spanning an installation, nor retry its callback.
++      if (generation !== record.generation) return built;
++      if (record.cache?.generation === generation &&
++          (record.cache.pendingObservation || record.cache !== previousCache)) {
++        record.cache.pendingObservation = false;
++        return record.cache.value;
++      }
++      // An ordinary runtime invalidation can come from a foreign/custom source
++      // without an install hook. Only an early current-read winner is reusable.
++      record.cache = { generation, value: built, pendingObservation: false };
+       return built;
+     };
+-    snapshot = { observe: locations.createDerived(read) };
+-    MATERIALIZED.set(key, snapshot as MaterializedSnapshot<unknown>);
++    MATERIALIZED.set(key, record as MaterializedSnapshot<unknown>);
++    snapshot = record;
+   }
+ 
+-  return snapshot.observe();
++  const previous = snapshot.attempt;
++  const receipt = { built: false };
++  snapshot.attempt = receipt;
++  try {
++    const observed = snapshot.observe();
++    if (receipt.built) return observed;
++    if (snapshot.cache?.generation === snapshot.generation) return snapshot.cache.value;
++    // Observe was cached by the runtime: read installed truth without publishing.
++    // Use the same tracked builder; a later real observe pass still collects all
++    // dependencies and may allocate a temporary output before reusing this one.
++    const generation = snapshot.generation;
++    const built = build();
++    if (typeof ngDevMode === 'undefined' || ngDevMode) {
++      if (built !== null && typeof built === 'object') Object.freeze(built);
++    }
++    if (generation !== snapshot.generation) return built;
++    if (snapshot.cache?.generation === generation) return snapshot.cache.value;
++    snapshot.cache = { generation, value: built, pendingObservation: true };
++    return built;
++  } finally {
++    snapshot.attempt = previous;
++  }
+ }

@@ -1,0 +1,29 @@
+diff --git a/private/tmp/st-entity-anchor-successor/candidate/packages/kernel/src/lib/link.ts b/private/tmp/st-row-source-successor/candidate/packages/kernel/src/lib/link.ts
+index 0ad84d64..07d9714f 100644
+--- a/private/tmp/st-entity-anchor-successor/candidate/packages/kernel/src/lib/link.ts
++++ b/private/tmp/st-row-source-successor/candidate/packages/kernel/src/lib/link.ts
+@@ -552,12 +552,15 @@ export function link<S>(
+     // A post-write read could overwrite callback-authored newer truth.
+   };
+ 
++  // Enrollment and source subscription share the same source-issued identity.
++  // Entity row callables are supported even without a scalar carrier marker.
++  const ownEntitySource = getEntityPublicationBinding(x);
+   research.bindSource(
+     consequenceKey,
+     registry.id,
+     publicationPosition,
+     {
+-      supported:collection||isWritableLocation(x)||isNodeAccessor(x)||!!getRootTree(x),
++      supported:collection||isWritableLocation(x)||isNodeAccessor(x)||!!getRootTree(x)||!!ownEntitySource,
+       subject: entityLocation?.subjectId,
+       field: entityLocation?.fieldKey,
+     },
+@@ -572,7 +575,6 @@ export function link<S>(
+     sourceAddress ? { registry, address: sourceAddress, value: eligible, aggregate: !isWritableLocation(x), presence: getRetainedMembershipPath(x) } : undefined
+   );
+   const releaseEntityPublications: Array<()=>void> = [];
+-  const ownEntitySource=getEntityPublicationBinding(x);
+   const registerEntityRecipient=(node:unknown,projection:EntityEgressProjection|undefined,nested?:NestedCollection):void=>{
+     const binding=getEntityPublicationBinding(node); if(!binding)return;
+     if(projection)research.registerCollectionProjection(consequenceKey,node as object,nested?.relativeAddress,projection.support(),projection.value());

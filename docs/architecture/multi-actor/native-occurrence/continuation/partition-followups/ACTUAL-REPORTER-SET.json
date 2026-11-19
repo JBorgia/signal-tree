@@ -1,0 +1,13 @@
+{
+  "started": [
+    "src/lib/public-selected-unit.spec.ts"
+  ],
+  "ended": [
+    "src/lib/public-selected-unit.spec.ts"
+  ],
+  "unexpected": [],
+  "missingStart": [],
+  "missingEnd": [],
+  "duplicateStarts": false,
+  "duplicateEnds": false
+}

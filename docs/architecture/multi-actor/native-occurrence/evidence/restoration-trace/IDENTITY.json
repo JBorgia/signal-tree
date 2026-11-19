@@ -1,0 +1,17 @@
+{
+  "frozenCandidate": "/private/tmp/st-occurrence-successor",
+  "frozenSourceManifestSha256": "80a0116269b26af939f775b9a10ff8a79d99b6e9b556a17b05137ab5e3f67502",
+  "instrumentedCopy": "/private/tmp/st-occurrence-restoration-trace/candidate",
+  "uninstrumentedControl": "/private/tmp/st-occurrence-restoration-trace/control",
+  "instrumentationPatchSha256": "a51692540aaf8fa8b9cbc8782f17d5eb9280809bc660165cafdcb30e4eb9fb99",
+  "changedCopyFiles": {
+    "packages/kernel/src/lib/entity-signal.ts": "e7efb33d4775fc16c22be6e767f2e5052799d30aefc03fa76bed0ea769749f61",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "8922d309d33b6adf2f94665689a0015de651988e8a349da8f2f6897985bf6767",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "f44859a3ce7d39bf10b54e3c18782d96380960a8d261ea8456f896ad45791403",
+    "packages/kernel/src/lib/link.ts": "d5131eff63294c3a7a65129880937618f10835a90f0a682faf5eeeace879ac4f",
+    "packages/kernel/src/lib/restoration-diagnostic.spec.ts": "98f4297d5bbe43f843a04213e5efa4690b519e3dfad829a2d032699efd14a6d7",
+    "packages/kernel/src/lib/restoration-trace.ts": "b001fe2f7cb636f89be2005d61327cfd6510e48bfd72fe4e985c9d1e64794d04",
+    "packages/kernel/src/lib/signal-tree.ts": "43052af139cf5bf06a9dc195e904ec4d6c0e87556ce2c1cc13066df2aa728a9d"
+  },
+  "status": "diagnostic only; no runtime repair; frozen candidate verified unchanged"
+}

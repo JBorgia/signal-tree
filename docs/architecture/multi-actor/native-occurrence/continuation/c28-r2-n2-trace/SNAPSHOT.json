@@ -1,0 +1,22 @@
+{
+  "status": "Trace/design only; R2 no-write recurrence remains uncorrected",
+  "manifestSha256": "8b61b751508892864d360552c8a70f83308157fabe9325ff57995a3143c7c6d1",
+  "pureR2ManifestSha256": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "originalFrozenR2Unchanged": true,
+  "originalDiagnosticAllPathsUnchanged": true,
+  "originalFailingFixtureUnchanged": true,
+  "traceOverlaySha256": "052694481df6aa58f2fb27d1ea3bcf54f18037e365e689cd3a1a530f0eacc7d6",
+  "result": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "outcome": "two observational continuations passed useful terminal assertions; not original no-write qualification",
+  "changedFromDiagnostic": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "added": [
+    "packages/kernel/src/lib/n2-observational-trace.spec.ts"
+  ]
+}

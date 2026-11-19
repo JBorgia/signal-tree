@@ -1,0 +1,61 @@
+
+> nx run kernel:test independent-dynamic-enrollment.spec.ts independent-occurrence-terminal.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-dynamic-enrollment.spec.ts independent-occurrence-terminal.spec.ts --maxWorkers=1
+
+(node:30924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30931) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-enrollment-independent/candidate/packages/kernel
+
+(node:30938) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-dynamic-enrollment.spec.ts (7 tests | 1 failed) 32ms
+   × repeated preinstall refusal leaves no child observer and no scalar slot growth 5ms
+(node:30939) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-dynamic-enrollment.spec.ts > repeated preinstall refusal leaves no child observer and no scalar slot growth
+AssertionError: expected 3 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 3
+
+ ❯ src/lib/independent-dynamic-enrollment.spec.ts:56:104
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 14 passed (15)
+   Start at  20:12:47
+   Duration  1.29s (transform 495ms, setup 0ms, import 667ms, tests 77ms, environment 381ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-dynamic-enrollment.spec.ts independent-occurrence-terminal.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

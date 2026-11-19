@@ -1,0 +1,36 @@
+[
+  {
+    "phase": "baseline",
+    "name": "controls",
+    "cwd": "/private/tmp/st-singleton-ordinary-row-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "singleton-row-reuse.spec.ts",
+      "singleton-row-allocation.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "exit": 0
+  },
+  {
+    "phase": "baseline",
+    "name": "point",
+    "cwd": "/private/tmp/st-singleton-ordinary-row-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "entity-granular-reactivity.spec.ts",
+      "--testNamePattern=a single-entity update does not rebuild",
+      "--maxWorkers=1"
+    ],
+    "exit": 1
+  }
+]

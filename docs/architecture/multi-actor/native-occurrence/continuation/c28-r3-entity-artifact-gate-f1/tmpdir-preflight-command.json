@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "node",
+    "tools/verify-entity-registration-artifacts.mjs",
+    "--self-test"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate"
+  }
+}

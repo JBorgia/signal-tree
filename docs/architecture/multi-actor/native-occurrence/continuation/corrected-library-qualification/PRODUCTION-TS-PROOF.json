@@ -1,0 +1,7 @@
+{
+  "comparison": "manifest byte hashes; fresh source verification is in each guarded receipt",
+  "baselineManifest": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+  "selectedManifest": "8fb14250ded4d19f3ee380b2cf13df35492dc0170e4e7f5cc0ecd945569289a2",
+  "packageSourceTypeScriptFilesCompared": 203,
+  "mismatches": []
+}

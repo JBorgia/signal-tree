@@ -1,0 +1,9 @@
+
+ RUN  v4.1.9 /private/tmp/st-test-routing-successor/candidate/packages/kernel
+
+
+ Test Files  3 passed (3)
+      Tests  10 passed (10)
+   Start at  10:49:56
+   Duration  3.58s (transform 2.11s, setup 0ms, import 2.80s, tests 2.97s, environment 1.67s)
+

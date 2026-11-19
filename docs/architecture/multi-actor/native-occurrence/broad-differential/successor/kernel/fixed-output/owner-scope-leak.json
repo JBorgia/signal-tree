@@ -1,0 +1,25 @@
+[
+ {
+  "path": "rows.A",
+  "origin": "external",
+  "participation": "realized",
+  "ownerId": 7,
+  "hasOwner": true,
+  "carriesValue": true,
+  "before": {
+   "id": "A",
+   "name": "Alpha"
+  },
+  "after": {
+   "id": "A",
+   "name": "Server"
+  }
+ },
+ {
+  "path": "rows",
+  "origin": "external",
+  "participation": "realized",
+  "hasOwner": false,
+  "carriesValue": false
+ }
+]

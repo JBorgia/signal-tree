@@ -1,0 +1,29 @@
+{
+  "status": "frozen for independent classification review; not integrated or accepted",
+  "base": "/private/tmp/st-recipient-window-successor/candidate",
+  "candidate": "/private/tmp/st-recipient-window-classification-successor/candidate",
+  "results": {
+    "runtimePassed": 172,
+    "runtimeFailed": 0,
+    "runtimeFiles": 22,
+    "sourceTypes": "exit0",
+    "ratchetedSpecTypes": "exit0"
+  },
+  "sha256": {
+    "SOURCE-SHA256.json": "c374723071aa1aea781d1b2caf3c13c92d522a4c226831e2fb923a20e5c72147",
+    "BASE-SOURCE-SHA256.json": "f7138509c91316ab5b1cdc5d7bb9276d55637e8c88d3123b5e4d1596fc70fe55",
+    "VERIFICATION.json": "7f5813fe84d6ac1f67d91f657dd34ea89a4de7b5ed9d005126b253a07b8e61cb",
+    "runtime.patch": "bc5ca4ccda1beb57bdf59b6a49c4c589f40b49893c82ff469bfde57217d5cce8",
+    "tests.patch": "ccb4d2a3c58c5bf47ef80ffbeb7c4dba6aa867d164996d4f6121560d4ca7bd81",
+    "source.patch": "e3deb5c6299a1f5720a4588d6279612657840a6bed223ea642c826ead19cd03f",
+    "combined-B-runtime.patch": "676e376b395b5dfd815534824ca0a474d333aa5b66faf7a5a90df45880a314b7",
+    "DESIGN.md": "7d485092e11fcb6145ec0c406c9ec979b57bd82fa6617a7ac42c32500af94480",
+    "RESULTS.md": "aa31790afc9765f87d58608426832f7ed07fcabdbcdb3668ce1a4a956d475001",
+    "REVIEW-REQUEST.md": "8f104fe39c9eeea9bebb367f60e2e8a54f901969d4c4bcdfc6b6ebcc9f459ef6",
+    "final-runtime.log": "910243467faf019008074a136c73fa118d03ddc6b966f2d12b18252530942b30",
+    "source-types-first.log": "04724f529358c88c342d43e0540cc2b5d2c50bdb0b5484eaf02e72bddfda4eb9",
+    "spec-types-first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "before-change.log": "77c86047847f8e87919f6261ee8527f6bd5ac1a08c887d08980d684ae61eeeae",
+    "baseline-corrected-oracles.log": "137cdae96d75b1a2d5681bacd6ab939ba78815ca756b0e7c27f0691a34583127"
+  }
+}

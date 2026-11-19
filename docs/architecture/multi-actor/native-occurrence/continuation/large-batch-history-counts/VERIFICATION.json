@@ -1,0 +1,18 @@
+{
+  "baseManifestSha256": "d0d48da4b42e5a0c682e1cb7750cd73b27f425531f12c2f652a4f859e5e63e1b",
+  "baselinePaths": 3067,
+  "snapshotSha256": "f3f78a39851a7fd0a4187d8f1cd488dfd432d15dcdb52a9f44e48ec82dabce78",
+  "probeSha256": "383b9a732ecc9027d50e2a08d6c5f61a659d8ac4bedd57484c00babdb00e4571",
+  "patchSha256": "eda70d216e3e4c545a9dc644743741ecd741e2590b1da2ca22577d2e31bf3a0a",
+  "runtimeChanges": 0,
+  "successfulRuns": 4,
+  "testsPassed": 12,
+  "instrumentedSequences": 11,
+  "distinctWorkerPids": [
+    53413,
+    54833,
+    55894,
+    56112
+  ],
+  "sourceChecksMatchBasePlusOnlyNewProbe": true
+}

@@ -1,0 +1,36 @@
+--- R3/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts
++++ composed/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts
+@@ -116,12 +116,15 @@
+         { enhancers: enhancers() }
+       );
+       trees.push(tree);
+-      const port = getTreeRealizationPort(tree.$) as unknown as {
+-        validateEffects: (...args: unknown[]) => unknown;
+-      };
+-      const spy = vi
+-        .spyOn(port, 'validateEffects')
+-        .mockImplementation(() => ({ kind: 'structural-drift' }));
++      const port = getTreeRealizationPort(tree.$);
++      if (!port?.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++      const refusal = new Error('injected pre-install selected preparation failure: structural-drift');
++      let refusalCalls = 0;
++      // One-shot throw before calling the real method: no installable compensation plan exists.
++      const spy = vi.spyOn(port, 'prepareSelectedUnit').mockImplementationOnce(() => {
++        refusalCalls++; throw refusal;
++      });
++      let refusedBeforePlan = false;
+       let thrown: unknown;
+       try {
+         tree.transact(() => {
+@@ -132,8 +135,11 @@
+       } catch (error) {
+         thrown = error;
+       } finally {
++        refusedBeforePlan = spy.mock.results.length === 1 && spy.mock.results[0]?.type === 'throw' && spy.mock.results[0]?.value === refusal;
+         spy.mockRestore();
+       }
++      expect(refusalCalls).toBe(1);
++      expect(refusedBeforePlan).toBe(true);
+       expect(thrown).toBeInstanceOf(SignalTreeRollbackError);
+       const recovery = (
+         thrown as {

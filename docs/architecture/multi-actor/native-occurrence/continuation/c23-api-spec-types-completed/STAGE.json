@@ -1,0 +1,9 @@
+{
+  "stage": "complete",
+  "exit": 0,
+  "watchdog": null,
+  "compilerObserved": true,
+  "sourceUnchanged": true,
+  "changed": [],
+  "remainingOwnedProcesses": []
+}

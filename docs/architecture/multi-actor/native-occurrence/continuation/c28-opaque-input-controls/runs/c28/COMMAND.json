@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "opaque-current-input",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-c28-opaque-input-controls/c28-copy",
+  "node": "v24.15.0",
+  "pnpm": "10.17.0",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-opaque-input-controls/runs/c28/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-opaque-input-controls/runs/c28/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-opaque-input-controls/runs/c28/nx-data"
+  },
+  "timeoutSeconds": 180
+}

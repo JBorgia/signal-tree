@@ -1,0 +1,8 @@
+{
+  "exit": 0,
+  "timeout": false,
+  "changedManifestFiles": [],
+  "overlayUnchanged": {
+    "packages/kernel/src/lib/equal-refresh-protected-paths.spec.ts": true
+  }
+}

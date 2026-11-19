@@ -1,0 +1,14 @@
+import type {Signal, WritableSignal} from '@angular/core';
+import {signalTree,entityMap} from '@signal-tree/angular';
+import type {ObservationAdapter} from '@signal-tree/kernel/adapter';
+type Equal<A,B>=(<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
+type Assert<T extends true>=T;
+const tree=signalTree({count:1,rows:entityMap<{id:string;n:number},string>()});
+const id: Signal<string|undefined>=tree.$.rows.activeId;
+const all: Signal<readonly {id:string;n:number}[]>=tree.$.rows.all;
+const query: Signal<readonly {id:string;n:number}[]>=tree.$.rows.where(row=>row.n>0);
+type ExactId=Assert<Equal<typeof tree.$.rows.activeId,Signal<string|undefined>>>;
+const writable: WritableSignal<number>=tree.$.count; writable.set(2);
+const capability: NonNullable<ObservationAdapter['createCurrentReadonlyCell']>=<T>(read:()=>T)=>()=>read();
+const result:number=capability(()=>1)();
+void id;void all;void query;void result;tree.destroy();

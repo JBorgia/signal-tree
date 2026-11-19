@@ -1,0 +1,48 @@
+{
+  "baseManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "candidateManifestSha256": "4f828914a214bf556e16af6d44047a7f8b39ec1fa47eb231ca9981e564aec94d",
+  "patchSha256": "9e011c68223cc16402cf84e2f36bea874f767cca5f4caa62b0298491bdf4b10f",
+  "added": {
+    "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e"
+  },
+  "modified": {
+    "packages/kernel/src/lib/recipient-cause-classification.spec.ts": "d1ebb43f942137ddfeb4d51a3f219f8e4f2fa8da468d1ce8dc17728054ce8731"
+  },
+  "removed": {
+    "packages/kernel/src/lib/aggregate-independent-input.spec.ts": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00"
+  },
+  "verifiedUnchangedBaselineFiles": 3064,
+  "runtimeChanged": false,
+  "originalSixBodiesPreserved": "originals/",
+  "validUnknownAssertionsChanged": false,
+  "sourcePermissionNineControlsUnchanged": true,
+  "results": {
+    "affected-final-exit.json": {
+      "exit": 0
+    },
+    "affected-lint-exit.json": {
+      "exit": 0
+    },
+    "counterparts-first-exit.json": {
+      "exit": 0
+    },
+    "routed-final-exit.json": {
+      "exit": 0
+    },
+    "routed-spec-types-exit.json": {
+      "exit": 0
+    },
+    "source-types-exit.json": {
+      "exit": 0
+    },
+    "spec-types-final-exit.json": {
+      "exit": 0
+    },
+    "spec-types-first-exit.json": {
+      "exit": 1
+    },
+    "valid-unknown-controls-exit.json": {
+      "exit": 0
+    }
+  }
+}

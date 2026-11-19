@@ -1,0 +1,11 @@
+# Resolver config selection
+
+Installed vite-tsconfig-paths 5.1.4: supplying projects skips workspace tsconfck.findAll. Explicit config paths are parsed with normal errors; no ignoreConfigErrors option. tsconfck follows extends and references; the plugin installs referenced-project resolvers before the parent. Absolute fileURLToPath/new URL paths stay anchored to each live Vite config under Nx graph inference or CLI invocation, rather than relying on caller cwd.
+
+React tests select packages/react/tsconfig.json, which references tsconfig.lib.json and tsconfig.spec.json and inherits tsconfig.base.json. Runtime facade source imports @signal-tree/kernel and /adapter; retained explicit Vite aliases select the kernel source, overriding the library's declaration-output paths. Kernel runtime source itself uses relative internal imports, so no additional workspace tsconfig scan is needed for it in these routes.
+
+Reference app selects apps/react-reference/tsconfig.json (app/spec references, inherited root path aliases) and packages/react/tsconfig.json because the app imports the framework source via @signal-tree/react. This retains the facade's own resolver config when the importer is inside packages/react rather than inside the app. The existing explicit kernel and kernel/adapter aliases remain unchanged. Seven exact Vite resolution assertions cover app-to-facade, app-to-kernel, facade-to-kernel and adapter routes in both configs; results in ALIAS-RESULTS.json. Passing tests/build supply execution/bundling evidence beyond config parsing.
+
+The two plugin invocations do not configure unrelated package/tool projects; their own Nx targets and configs are untouched. .nxignore remains exactly `.angular`. No docs/audits exclusions, test discovery edits, archived file changes, error suppression, or new resolver authority introduced.
+
+Before warning evidence and graph preserved from exact C20 unmodified baseline graph run. New debug graph log records only explicit live projects/references; no archived tsconfig path appears. All ten complete project/target contracts and dependency edges compare equal after normalizing only the isolated checkout prefix. Discovered atomized test targets remain identical, including archived root test-ci fixtures and all working tools/experiments coverage.

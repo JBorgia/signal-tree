@@ -1,0 +1,47 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts
+
+(node:69927) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69934) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-explicit-handoff-successor/candidate/packages/kernel
+
+(node:69943) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69945) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69944) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69946) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69942) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69947) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69941) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  7 passed (7)
+      Tests  30 passed (30)
+   Start at  14:53:44
+   Duration  1.09s (transform 3.28s, setup 0ms, import 4.30s, tests 211ms, environment 2.07s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.5s

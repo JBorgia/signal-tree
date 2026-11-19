@@ -1,0 +1,86 @@
+[
+  {
+    "source": "DISCRIMINATOR.md",
+    "archive": "DISCRIMINATOR.md",
+    "sourceSha256": "9d2f259b7643a31efd92378e01952d813eb5eec9c390c478cdf5f916e15dc841",
+    "archiveSha256": "9d2f259b7643a31efd92378e01952d813eb5eec9c390c478cdf5f916e15dc841"
+  },
+  {
+    "source": "BUILD-COMMAND.json",
+    "archive": "BUILD-COMMAND.json",
+    "sourceSha256": "e0caa643b7b125740a0339bae5f0a01fa52fb96ad6e7afc3dbe96daf28f5359e",
+    "archiveSha256": "e0caa643b7b125740a0339bae5f0a01fa52fb96ad6e7afc3dbe96daf28f5359e"
+  },
+  {
+    "source": "GRAPH-RESULT.json",
+    "archive": "GRAPH-RESULT.json",
+    "sourceSha256": "83a2e3b9b62600daaf44314aa6ddebb5b8594b180fd9f3fd3de768fe5416d536",
+    "archiveSha256": "83a2e3b9b62600daaf44314aa6ddebb5b8594b180fd9f3fd3de768fe5416d536"
+  },
+  {
+    "source": "first-build.log",
+    "archive": "first-build.log",
+    "sourceSha256": "213b8745fdb0956ce4342d70db1929e34cb8ce5d59613535f53d802f91148c41",
+    "archiveSha256": "213b8745fdb0956ce4342d70db1929e34cb8ce5d59613535f53d802f91148c41"
+  },
+  {
+    "source": "lazy.mjs",
+    "archive": "lazy.mjs",
+    "sourceSha256": "e87a16c873de3031bd7e8231af7bbbb3bf5db7559d3de48ee1500d5e0fed05a5",
+    "archiveSha256": "e87a16c873de3031bd7e8231af7bbbb3bf5db7559d3de48ee1500d5e0fed05a5"
+  },
+  {
+    "source": "DISCRIMINATOR-HASHES.json",
+    "archive": "DISCRIMINATOR-HASHES.json",
+    "sourceSha256": "c20eaff4f00478bf5393e01b7a1004d9ad7ff091610aa3fa655a3a9e8debb27a",
+    "archiveSha256": "c20eaff4f00478bf5393e01b7a1004d9ad7ff091610aa3fa655a3a9e8debb27a"
+  },
+  {
+    "source": "build-graph.mjs",
+    "archive": "build-graph.mjs",
+    "sourceSha256": "ee561470972ce875d86336406c69be07f267350cea7593e73f7dd0ad20d37e3d",
+    "archiveSha256": "ee561470972ce875d86336406c69be07f267350cea7593e73f7dd0ad20d37e3d"
+  },
+  {
+    "source": "metafile.json",
+    "archive": "metafile.json.gz",
+    "sourceSha256": "f98b53416b5e4f4ea63f2658c515f55f21853ed8b947a0b9c789cdcc431d6f5c",
+    "archiveSha256": "f8424b81f9eb4345badf36ea41c29f6ca74f7a6044b44ac783aae4e94563efbf"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "c4359b6136d0bae71eb609eed83944bf49d8bb8d490dc6225105fd72508de728",
+    "archiveSha256": "c4359b6136d0bae71eb609eed83944bf49d8bb8d490dc6225105fd72508de728"
+  },
+  {
+    "source": "initial.mjs",
+    "archive": "initial.mjs",
+    "sourceSha256": "83455ffeb4e90d60f238b41ba6422ed201f78929de88fefd0104bab241de89c0",
+    "archiveSha256": "83455ffeb4e90d60f238b41ba6422ed201f78929de88fefd0104bab241de89c0"
+  },
+  {
+    "source": "INSTALLED-IDENTITY.json",
+    "archive": "INSTALLED-IDENTITY.json",
+    "sourceSha256": "bfd4d5532ec38a7d271f7e174f95300311ff9998dee61d9d679957c97ce1063d",
+    "archiveSha256": "bfd4d5532ec38a7d271f7e174f95300311ff9998dee61d9d679957c97ce1063d"
+  },
+  {
+    "source": "split/lazy-YTJPSRU4.js",
+    "archive": "split/lazy-YTJPSRU4.js",
+    "sourceSha256": "4e6d05841147f546cbf0a704af5308fbc8ee00b0351719f14b7bdcf68bb14c0e",
+    "archiveSha256": "4e6d05841147f546cbf0a704af5308fbc8ee00b0351719f14b7bdcf68bb14c0e"
+  },
+  {
+    "source": "split/chunk-4ZNWTTLN.js",
+    "archive": "split/chunk-4ZNWTTLN.js.gz",
+    "sourceSha256": "03ee75fdefc3996cd60f8defa59e4213898efdef4c7ebe71bcc64bef5513d1a5",
+    "archiveSha256": "424e8936083d5d04ea6ab110ca0f0b6ea1b7448de0d397d17c66344042a5212d"
+  },
+  {
+    "source": "split/initial.js",
+    "archive": "split/initial.js",
+    "sourceSha256": "83ce75a1307ce6c05683865981aad2a2f2227f3095666679fbff6737c65f94df",
+    "archiveSha256": "83ce75a1307ce6c05683865981aad2a2f2227f3095666679fbff6737c65f94df"
+  }
+]

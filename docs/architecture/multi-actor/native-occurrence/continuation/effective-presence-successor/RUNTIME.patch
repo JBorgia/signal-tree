@@ -1,0 +1,71 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -446,14 +446,26 @@
+   ): ReadableCell<TValue> => {
+     let projectedVersion = -1;
+     let projectedInstall = -1;
++    let projectedAbsent = false;
+     let initialized = false;
+     let value: TValue;
+     return locations.createCurrentReadonly(() => {
+       const currentVersion = version();
+-      if (!initialized || projectedVersion !== currentVersion || projectedInstall !== installedReadRevision) {
++      const currentInstall = installedReadRevision;
++      // Presence can install before the existing membership notification. All
++      // keys belong to this attempt: callback reentry must not label its first
++      // result with a newer install revision or effective presence.
++      const currentAbsent = absent();
++      if (
++        !initialized ||
++        projectedVersion !== currentVersion ||
++        projectedInstall !== currentInstall ||
++        projectedAbsent !== currentAbsent
++      ) {
+         value = compute();
++        projectedAbsent = currentAbsent;
+         projectedVersion = currentVersion;
+-        projectedInstall = installedReadRevision;
++        projectedInstall = currentInstall;
+         initialized = true;
+       }
+       return value;
+--- a/packages/kernel/src/lib/internals/member-membership.ts
++++ b/packages/kernel/src/lib/internals/member-membership.ts
+@@ -999,16 +999,33 @@
+     if (changed) {
+       markSnapshotInstalled(parent);
+       // A held descendant can have a cached value even without a demanded parent.
+-      const mark = (node: unknown): void => {
++      const visited = new Set<object>();
++      const mark = (node: unknown, effectiveChanged: boolean): void => {
++        if (!isTraversableNode(node) || visited.has(node)) return;
++        visited.add(node);
++        // A presence-aware marker is opaque. Invalidate only its existing
++        // wrapper, never its payload or its native membership notification.
++        if (membershipHook(node)) {
++          if (effectiveChanged) markSnapshotInstalled(node);
++          return;
++        }
+         if (!isNodeAccessor(node)) return;
+         markSnapshotInstalled(node);
+         for (const key of Reflect.ownKeys(node)) {
+-          if (key === 'caller' || key === 'arguments') continue;
++          if (
++            key === 'caller' || key === 'arguments' ||
++            key === NODE_STORE_SYMBOL || key === NODE_ACCESSOR_PEER
++          ) continue;
+           const descriptor = Object.getOwnPropertyDescriptor(node, key);
+-          if (descriptor && 'value' in descriptor) mark(descriptor.value);
++          if (descriptor && 'value' in descriptor)
++            mark(
++              descriptor.value,
++              effectiveChanged && descriptor.enumerable === true
++            );
+         }
+       };
+-      mark(child);
++      // An independently omitted edge keeps descendants effectively absent.
++      mark(child, !isAbsentMember(parent));
+     }
+     return changed;
+   } catch (error) {

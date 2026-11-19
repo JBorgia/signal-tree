@@ -1,0 +1,18 @@
+{
+  "candidate-own": {
+    "files": 3055,
+    "mismatches": []
+  },
+  "candidate-frozen": {
+    "files": 3055,
+    "mismatches": []
+  },
+  "oracle-own": {
+    "files": 3053,
+    "mismatches": []
+  },
+  "oracle-frozen": {
+    "files": 3053,
+    "mismatches": []
+  }
+}

@@ -1,0 +1,18 @@
+[
+  {
+    "directory": "/private/tmp/st-parent-freshness-implementation-independent/c13-retention-composition/candidate/artifacts/forwarding-retention/run-M9BnZU",
+    "exit": 1,
+    "modes": 9,
+    "node": "v24.15.0",
+    "probeSHA256": "8d57e063d1a357d7f55410aa6b22c07e05fa313be8f5ec65952004a969d6f6c3",
+    "actualRetainedTreeAssertionFailures": 9
+  },
+  {
+    "directory": "/private/tmp/st-parent-freshness-implementation-independent/c13-retention-composition/candidate/artifacts/forwarding-retention/run-TCrY5I",
+    "exit": 0,
+    "modes": 9,
+    "node": "v24.15.0",
+    "probeSHA256": "5c0b87063fbd80c6287e1841bc12f201d7a0fb0e46246ec7b46dd21a4ccc2838",
+    "actualRetainedTreeAssertionFailures": 0
+  }
+]

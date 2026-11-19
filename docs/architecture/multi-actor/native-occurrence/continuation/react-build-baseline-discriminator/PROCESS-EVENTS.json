@@ -1,0 +1,33 @@
+[
+  {
+    "event": "start",
+    "pid": 69802,
+    "pgid": 69802
+  },
+  {
+    "event": "output-observed",
+    "ownedProcesses": [
+      {
+        "pid": 69802,
+        "ppid": 69724,
+        "pgid": 69802,
+        "pcpu": 0.0,
+        "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx build react --skip-nx-cache --excludeTaskDependencies"
+      },
+      {
+        "pid": 69812,
+        "ppid": 69802,
+        "pgid": 69802,
+        "pcpu": 0.1,
+        "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js build react --skip-nx-cache --excludeTaskDependencies"
+      },
+      {
+        "pid": 70179,
+        "ppid": 69812,
+        "pgid": 69802,
+        "pcpu": 0.0,
+        "command": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+      }
+    ]
+  }
+]

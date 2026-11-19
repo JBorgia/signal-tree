@@ -1,0 +1,9 @@
+{
+  "baseManifestSha256": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "verifiedEntries": 3102,
+  "mismatches": {
+    "frozen": [],
+    "copy": []
+  },
+  "newTestSha256": "4a38b02a5f12421cf4c6ec5efa69f07f77a7e0a9f7e0b378af2f5ad17b05fe7c"
+}

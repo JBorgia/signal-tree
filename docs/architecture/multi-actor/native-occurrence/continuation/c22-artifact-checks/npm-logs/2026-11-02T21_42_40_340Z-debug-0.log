@@ -1,0 +1,48 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/dist/packages/angular/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm pack
+8 verbose argv "pack" "--pack-destination" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_42_40_340Z-
+10 verbose logfile /private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_42_40_340Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 notice
+14 notice 📦  @signal-tree/angular@16.0.0-dev
+15 notice Tarball Contents
+16 notice 11.0kB LICENSE
+16 notice 534B NOTICE
+16 notice 7.2kB README.md
+16 notice 671B dist/index.js
+16 notice 1.0kB dist/lib/construction-input.js
+16 notice 718B dist/lib/define-store.js
+16 notice 1.6kB dist/lib/observation-adapter.js
+16 notice 1.1kB dist/lib/to-writable-signal.js
+16 notice 12.4kB llms.txt
+16 notice 942B package.json
+16 notice 1.6kB src/index.d.ts
+16 notice 435B src/lib/carrier.d.ts
+16 notice 517B src/lib/construction-input.d.ts
+16 notice 4.7kB src/lib/define-store.d.ts
+16 notice 204B src/lib/observation-adapter.d.ts
+16 notice 3.0kB src/lib/to-writable-signal.d.ts
+17 notice Tarball Details
+18 notice name: @signal-tree/angular
+19 notice version: 16.0.0-dev
+20 notice filename: signal-tree-angular-16.0.0-dev.tgz
+21 notice package size: 17.2 kB
+22 notice unpacked size: 47.6 kB
+23 notice shasum: 63fba4e628000bfd60339bfd56bf348a807dc63b
+24 notice integrity: sha512-n2Kx3ernZF4ka[...]mkR0r9XyNvGZw==
+25 notice total files: 16
+26 notice
+27 verbose cwd /private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/dist/packages/angular
+28 verbose os Darwin 25.2.0
+29 verbose node v24.15.0
+30 verbose npm  v11.12.1
+31 verbose exit 0
+32 info ok

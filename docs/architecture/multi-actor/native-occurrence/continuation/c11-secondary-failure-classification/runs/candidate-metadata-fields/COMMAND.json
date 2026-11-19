@@ -1,0 +1,21 @@
+{
+  "cwd": "/private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "independent-metadata-fields.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate-data",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/runs/candidate-metadata-fields/observations"
+  }
+}

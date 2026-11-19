@@ -1,0 +1,15 @@
+proof-evidence/consumer/node_modules/@signal-tree/vue/src/lib/carrier.d.ts(1,15): error TS2305: Module '"vue"' has no exported member 'ComputedRef'.
+proof-evidence/consumer/node_modules/@signal-tree/vue/src/lib/carrier.d.ts(1,28): error TS2305: Module '"vue"' has no exported member 'Ref'.
+proof-evidence/consumer/node_modules/@signal-tree/vue/src/lib/construction-input.d.ts(1,15): error TS2305: Module '"vue"' has no exported member 'Ref'.
+proof-evidence/consumer/node_modules/solid-js/types/jsx.d.ts(6,26): error TS2307: Cannot find module 'csstype' or its corresponding type declarations.
+proof-evidence/consumer/node_modules/vue/dist/vue.d.mts(1,33): error TS2307: Cannot find module '@vue/compiler-dom' or its corresponding type declarations.
+proof-evidence/consumer/node_modules/vue/dist/vue.d.mts(2,32): error TS2307: Cannot find module '@vue/runtime-dom' or its corresponding type declarations.
+proof-evidence/consumer/node_modules/vue/dist/vue.d.mts(3,15): error TS2307: Cannot find module '@vue/runtime-dom' or its corresponding type declarations.
+proof-evidence/consumer/src/migration.ts(6,14): error TS2305: Module '"vue"' has no exported member 'ComputedRef'.
+proof-evidence/consumer/src/migration.ts(9,43): error TS2307: Cannot find module '../../../..//dist/packages/angular/src/lib/observation-adapter.js' or its corresponding type declarations.
+proof-evidence/consumer/src/migration.ts(10,43): error TS2307: Cannot find module '../../../..//dist/packages/vue/src/lib/vue-observation.js' or its corresponding type declarations.
+proof-evidence/consumer/src/migration.ts(11,45): error TS2307: Cannot find module '../../../..//dist/packages/solid/src/lib/solid-observation.js' or its corresponding type declarations.
+proof-evidence/consumer/src/migration.ts(36,19): error TS2345: Argument of type '{ rows: EntityMapBuilder<{ id: string; }, string, Record<string, never>>; }' is not assignable to parameter of type '{ rows: EntityMapBuilder<{ id: string; }, string, Record<string, never>>; } & NoInfer<readonly unknown[] | BuiltInObjectValue | LeafDefinition<unknown> | Primitive | Omit<...>>'.
+  Type '{ rows: EntityMapBuilder<{ id: string; }, string, Record<string, never>>; }' is not assignable to type 'readonly unknown[] | BuiltInObjectValue | LeafDefinition<unknown> | Primitive | Omit<EntityMapMarker<unknown, string | number>, "__entityMapConfig">'.
+    Type '{ rows: EntityMapBuilder<{ id: string; }, string, Record<string, never>>; }' is not assignable to type 'undefined'.
+proof-evidence/consumer/src/migration.ts(47,1): error TS2578: Unused '@ts-expect-error' directive.

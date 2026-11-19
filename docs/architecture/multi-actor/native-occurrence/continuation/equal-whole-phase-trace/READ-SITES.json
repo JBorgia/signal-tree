@@ -1,0 +1,1236 @@
+{
+  "c16": [
+    {
+      "route": "setAll",
+      "mode": "stable",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3607:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "setAll",
+      "mode": "throw7",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3607:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "setAll",
+      "mode": "reenter2",
+      "caught": "Entity frame responsibility preparation reentered installation",
+      "firstIdentity": false,
+      "inner": 9,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "replaceOne",
+      "mode": "stable",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3607:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "replaceOne",
+      "mode": "throw7",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3607:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "replaceOne",
+      "mode": "reenter2",
+      "caught": "Entity frame responsibility preparation reentered installation",
+      "firstIdentity": false,
+      "inner": 9,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "row",
+      "mode": "stable",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3607:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "row",
+      "mode": "throw7",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3607:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "row",
+      "mode": "reenter2",
+      "caught": "Entity frame responsibility preparation reentered installation",
+      "firstIdentity": false,
+      "inner": 9,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1588:240"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1589:82"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2525:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2525:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1596:155"
+          ]
+        }
+      ]
+    }
+  ],
+  "failed": [
+    {
+      "route": "setAll",
+      "mode": "stable",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 1,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3625:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 7,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 8,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "setAll",
+      "mode": "throw7",
+      "caught": "seventh read",
+      "firstIdentity": true,
+      "inner": 0,
+      "sends": 1,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3625:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 7,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "setAll",
+      "mode": "reenter2",
+      "caught": "Entity frame responsibility preparation reentered installation",
+      "firstIdentity": false,
+      "inner": 9,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "replaceOne",
+      "mode": "stable",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 1,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3625:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 7,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 8,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "replaceOne",
+      "mode": "throw7",
+      "caught": "seventh read",
+      "firstIdentity": true,
+      "inner": 0,
+      "sends": 1,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3625:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 7,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "replaceOne",
+      "mode": "reenter2",
+      "caught": "Entity frame responsibility preparation reentered installation",
+      "firstIdentity": false,
+      "inner": 9,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "row",
+      "mode": "stable",
+      "caught": "undefined",
+      "firstIdentity": false,
+      "inner": 0,
+      "sends": 1,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3625:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 7,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        },
+        {
+          "ordinal": 8,
+          "phase": "flush",
+          "site": "packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)",
+          "context": [
+            "packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)",
+            "packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "row",
+      "mode": "throw7",
+      "caught": "seventh read",
+      "firstIdentity": true,
+      "inner": 0,
+      "sends": 1,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        },
+        {
+          "ordinal": 6,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:3625:13)",
+          "context": [
+            "packages/kernel/src/lib/internals/location-runtime.ts:649:17)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:611:9)",
+            "packages/kernel/src/lib/internals/location-runtime.ts:252:16)"
+          ]
+        },
+        {
+          "ordinal": 7,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/path-notifier.ts:125:31",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/path-notifier.ts:121:72)",
+            "packages/kernel/src/lib/path-notifier.ts:358:23)"
+          ]
+        }
+      ]
+    },
+    {
+      "route": "row",
+      "mode": "reenter2",
+      "caught": "Entity frame responsibility preparation reentered installation",
+      "firstIdentity": false,
+      "inner": 9,
+      "sends": 0,
+      "reads": [
+        {
+          "ordinal": 1,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1601:60"
+          ]
+        },
+        {
+          "ordinal": 2,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/entity-signal.ts:2543:199",
+          "context": [
+            "    at Array.filter (<anonymous>)",
+            "packages/kernel/src/lib/entity-signal.ts:2543:78)",
+            "packages/kernel/src/lib/entity-signal.ts:1612:240"
+          ]
+        },
+        {
+          "ordinal": 3,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:122:65)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:128:156)",
+            "packages/kernel/src/lib/experimental-publication/entity.ts:184:26)"
+          ]
+        },
+        {
+          "ordinal": 4,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/experimental-publication/entity.ts:15:68)",
+          "context": [
+            "packages/kernel/src/lib/experimental-publication/entity.ts:187:140)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:232:32)",
+            "packages/kernel/src/lib/entity-signal.ts:2561:126)"
+          ]
+        },
+        {
+          "ordinal": 5,
+          "phase": "prepare",
+          "site": "packages/kernel/src/lib/internals/entity-egress-projection.ts:52:17)",
+          "context": [
+            "packages/kernel/src/lib/internals/entity-egress-projection.ts:210:25)",
+            "packages/kernel/src/lib/link.ts:588:115)",
+            "packages/kernel/src/lib/internals/entity-publication.ts:236:32)"
+          ]
+        }
+      ]
+    }
+  ]
+}

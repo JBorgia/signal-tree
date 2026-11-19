@@ -1,0 +1,47 @@
+{
+  "run-gate.py": {
+    "sha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archive": "run-gate.py",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  "ORIGINAL.spec.ts": {
+    "sha256": "17e604de81b4ef3069f87d04ab3aa49cd1fd0c58397e89486cb307c0776b7296",
+    "archive": "ORIGINAL.spec.ts",
+    "archiveSha256": "17e604de81b4ef3069f87d04ab3aa49cd1fd0c58397e89486cb307c0776b7296"
+  },
+  "ORACLE.patch": {
+    "sha256": "a1e2a33a57aa9484b08db299fffe5f691e4861b1902ff8c237c3fce70ce2a63f",
+    "archive": "ORACLE.patch",
+    "archiveSha256": "a1e2a33a57aa9484b08db299fffe5f691e4861b1902ff8c237c3fce70ce2a63f"
+  },
+  "DECISION.md": {
+    "sha256": "b0d3020088792ef5c8847331ffb427d880d772f37517a4100192941a6cec4e78",
+    "archive": "DECISION.md",
+    "archiveSha256": "b0d3020088792ef5c8847331ffb427d880d772f37517a4100192941a6cec4e78"
+  },
+  "runs/focused/RESULT.json": {
+    "sha256": "9174aba1ff80259295829ffe94ccc1942fd2e0eefdf40440638e7587c3ff9be3",
+    "archive": "runs/focused/RESULT.json",
+    "archiveSha256": "9174aba1ff80259295829ffe94ccc1942fd2e0eefdf40440638e7587c3ff9be3"
+  },
+  "runs/focused/first.log": {
+    "sha256": "6027893e245da268275f39cab9df7f791c99ea11459a62ed191ec0c915511a7f",
+    "archive": "runs/focused/first.log",
+    "archiveSha256": "6027893e245da268275f39cab9df7f791c99ea11459a62ed191ec0c915511a7f"
+  },
+  "runs/focused/SOURCE-BEFORE.json": {
+    "sha256": "e9b7313dcd1aec2eb858aa384a1ab320bc2acd108a81323284a2020470319c6c",
+    "archive": "runs/focused/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "5d0df2290dad290cf66cff01dfcb2c99aa5f462230249384d7a70e3c4a215ff4"
+  },
+  "runs/focused/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/focused/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/focused/COMMAND.json": {
+    "sha256": "4993a3b1cb88447bc9dd53f2dcb734d3971fd8fb66c6bdeadde3f12467d4047c",
+    "archive": "runs/focused/COMMAND.json",
+    "archiveSha256": "4993a3b1cb88447bc9dd53f2dcb734d3971fd8fb66c6bdeadde3f12467d4047c"
+  }
+}

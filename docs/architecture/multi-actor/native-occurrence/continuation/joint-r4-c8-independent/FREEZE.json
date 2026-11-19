@@ -1,0 +1,7 @@
+{
+  "SOURCE-SHA256.json": "d0105bca7f743e6b0c0ad07f5c828f560f09c67001597d1317d9c00be9c9ae5a",
+  "source.patch": "5e687be954c67254009c4d22f1cb1ac643da2a726e41bf48475bef8ffe8e2e08",
+  "tests.patch": "988b6489cb5faa68472847d1e7e386dc2817ebf15237ac36d4ab77df4e6acc76",
+  "R3-to-R4.source.patch": "4c1bd292e14d30f0e79e76b69cd84d74d33e17f01d6bee7916a97fce7017e61d",
+  "R3-to-R4.tests.patch": "92ab6863c3d6c7dd996888555bc7dcc0f365acc2b3a117d1000c947557c136fa"
+}

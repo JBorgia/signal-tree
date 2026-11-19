@@ -1,0 +1,72 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-c28-r3-entity-artifact-gate-work/peer-qualification/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm install
+8 verbose argv "install" "--package-lock-only" "--ignore-scripts" "--no-audit" "--no-fund" "--cache" "/private/tmp/st-c28-r3-entity-artifact-gate-work/cache-lock" "--fetch-retries" "0" "--fetch-timeout" "20000"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c28-r3-entity-artifact-gate-work/cache-lock/_logs/2026-11-03T14_51_07_637Z-
+10 verbose logfile /private/tmp/st-c28-r3-entity-artifact-gate-work/cache-lock/_logs/2026-11-03T14_51_07_637Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @angular/core@22.0.7
+15 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore cache-miss
+16 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with ENOTFOUND
+17 http fetch GET https://registry.npmjs.org/@angular%2fcore attempt 1 failed with ENOTFOUND
+18 silly fetch manifest rxjs@7.8.2
+19 silly packumentCache full:https://registry.npmjs.org/rxjs cache-miss
+20 http fetch GET https://registry.npmjs.org/rxjs attempt 1 failed with ENOTFOUND
+21 silly fetch manifest react@19.2.8
+22 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+23 http fetch GET https://registry.npmjs.org/react attempt 1 failed with ENOTFOUND
+24 silly fetch manifest @types/react@19.2.18
+25 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+26 http fetch GET https://registry.npmjs.org/@types%2freact attempt 1 failed with ENOTFOUND
+27 silly fetch manifest vue@3.5.42
+28 silly packumentCache full:https://registry.npmjs.org/vue cache-miss
+29 http fetch GET https://registry.npmjs.org/vue attempt 1 failed with ENOTFOUND
+30 silly fetch manifest solid-js@1.9.15
+31 silly packumentCache full:https://registry.npmjs.org/solid-js cache-miss
+32 http fetch GET https://registry.npmjs.org/solid-js attempt 1 failed with ENOTFOUND
+33 silly fetch manifest tslib@2.8.1
+34 silly packumentCache full:https://registry.npmjs.org/tslib cache-miss
+35 http fetch GET https://registry.npmjs.org/tslib attempt 1 failed with ENOTFOUND
+36 silly fetch manifest typescript@6.0.3
+37 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+38 http fetch GET https://registry.npmjs.org/typescript attempt 1 failed with ENOTFOUND
+39 silly placeDep ROOT @angular/core@ OK for: entity-registration-consumer@0.0.0 want: 22.0.7
+40 silly placeDep ROOT @types/react@ OK for: entity-registration-consumer@0.0.0 want: 19.2.18
+41 silly placeDep ROOT react@ OK for: entity-registration-consumer@0.0.0 want: 19.2.8
+42 silly placeDep ROOT rxjs@ OK for: entity-registration-consumer@0.0.0 want: 7.8.2
+43 silly placeDep ROOT solid-js@ OK for: entity-registration-consumer@0.0.0 want: 1.9.15
+44 silly placeDep ROOT tslib@ OK for: entity-registration-consumer@0.0.0 want: 2.8.1
+45 silly placeDep ROOT typescript@ OK for: entity-registration-consumer@0.0.0 want: 6.0.3
+46 silly placeDep ROOT vue@ OK for: entity-registration-consumer@0.0.0 want: 3.5.42
+47 verbose type system
+48 verbose stack FetchError: request to https://registry.npmjs.org/@angular%2fcore failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+48 verbose stack     at ClientRequest.<anonymous> (/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/node_modules/minipass-fetch/lib/index.js:130:14)
+48 verbose stack     at ClientRequest.emit (node:events:509:28)
+48 verbose stack     at emitErrorEvent (node:_http_client:109:11)
+48 verbose stack     at _destroy (node:_http_client:993:9)
+48 verbose stack     at onSocketNT (node:_http_client:1013:5)
+48 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:91:21)
+49 error code ENOTFOUND
+50 error syscall getaddrinfo
+51 error errno ENOTFOUND
+52 error network request to https://registry.npmjs.org/@angular%2fcore failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+53 error network This is a problem related to network connectivity.
+53 error network In most cases you are behind a proxy or have bad network settings.
+53 error network
+53 error network If you are behind a proxy, please make sure that the 'proxy' config is set properly.  See: 'npm help config'
+54 silly unfinished npm timer reify 1793717468361
+55 silly unfinished npm timer reify:loadTrees 1793717468361
+56 verbose cwd /private/tmp/st-c28-r3-entity-artifact-gate-work/peer-qualification
+57 verbose os Darwin 25.2.0
+58 verbose node v24.15.0
+59 verbose npm  v11.12.1
+60 verbose exit 1
+61 verbose code 1
+62 error A complete log of this run can be found in: /private/tmp/st-c28-r3-entity-artifact-gate-work/cache-lock/_logs/2026-11-03T14_51_07_637Z-debug-0.log

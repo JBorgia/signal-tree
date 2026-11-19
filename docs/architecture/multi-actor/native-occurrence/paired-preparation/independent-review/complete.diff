@@ -1,0 +1,448 @@
+--- 94ac/packages/kernel/src/enhancers/transactions/transactions.ts
++++ c47b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -111,8 +111,8 @@
+ import { createRealizationContextSource } from '../../lib/internals/causal-runtime/realization-context';
+ import {
+   createTreeRealizationAdapter,
+-  supportsSelectedOperation,
+-  prepareSelectedOperation,
++  admitSelectedOperation,
++
+   defineTreeRealizationDescriptors,
+   defineTreeRealizationPort,
+   forgetSubjectsInTreeRealizationDescriptors,
+@@ -3776,17 +3776,8 @@
+               installPreparedCompensation(undefined, frontiers, completion);
+               return { ok: true as const };
+             }
+-            if(supportsSelectedOperation(inverseEffects)){
+-              if(completion)completion.selected=true;
+-              const prepared=prepareSelectedOperation(realizationTree,inverseEffects);
+-              installPreparedCompensation(prepared,frontiers,completion);
+-              return {ok:true as const};
+-            }
+-            // Keep the baseline complete-target admission for structural
+-            // handoffs/order: per-effect occupancy is not its admissibility test.
+-            if (
+-              orderDeltas.length > 0 ||
+-              requiresDeclarativeStructuralTarget(inverseEffects, (owner) => {
++            const operation={effects:inverseEffects,orderDeltas,frontiers,
++              structuralRequired: requiresDeclarativeStructuralTarget(inverseEffects, (owner) => {
+                 let binding: CollectionTransitionTargetBinding | undefined;
+                 visitTree(tree.$, (node) => {
+                   const candidate = (
+@@ -3798,8 +3789,16 @@
+                   return undefined;
+                 });
+                 return binding?.readSource();
+-              })
+-            ) {
++              })};
++            const selected=admitSelectedOperation(realizationTree,operation);
++            if(selected){
++              if(completion)completion.selected=true;
++              const prepared=selected.prepare();
++              installPreparedCompensation(prepared,selected.operation.frontiers,completion);
++              return {ok:true as const};
++            }
++            // Inapplicable complete descriptions retain the existing complete route.
++            if (operation.orderDeltas.length > 0 || operation.structuralRequired) {
+               rollbackPendingTarget(
+                 inverseEffects,
+                 orderDeltas,
+--- 94ac/packages/kernel/src/lib/entity-signal.ts
++++ c47b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,4 +1,4 @@
+-import type {SelectedRowEdit} from './internals/selected-write-operation';
++import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+ import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+ import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
+ import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep } from './internals/entity-publication';
+@@ -513,27 +513,32 @@
+     return new EntityMutationFrame(valueStore, structuralStore);
+   }
+ 
+-  function prepareSelectedRows(operations: readonly SelectedRowEdit[]) {
+-    const rows = new Map<number,{subjectId:number;key:string|number;value:unknown;edits:EntityRealizationEdit[]}>();
++  function prepareSelectedRows(operations: readonly SelectedRowIntent[]) {
++    const rows = new Map<number,{subjectId:number;key:string|number;value:unknown;edits:EntityRealizationEdit[];transition:EntityValueTransition<E>}>();
+     const steps: SelectedRowEdit[] = [];
+     for (const operation of operations) {
+-      let row=rows.get(operation.subject);
+-      if(!row){row={subjectId:operation.subject,key:operation.key,value:operation.before,edits:[]};rows.set(operation.subject,row);}
+-      const before=row.value;
+-      const after={...(before as object)} as Record<string,unknown>;
+-      for(const field of operation.fields){
+-        const present=Object.prototype.hasOwnProperty.call(operation.after,field);
+-        const value=present?(operation.after as Record<string,unknown>)[field]:undefined;
++      const previous=rows.get(operation.subject);
++      const before=previous?.transition.physicalAfter ?? operation.physicalBefore;
++      const after=(operation.fields===null ? {...(operation.physicalAfter as object)} : {...(before as object)}) as Record<string,unknown>;
++      const edits:EntityRealizationEdit[]=[];
++      if(operation.fields===null) edits.push({kind:'row',value:after});
++      else for(const field of operation.fields){
++        const present=Object.prototype.hasOwnProperty.call(operation.physicalAfter,field);
++        const value=present?(operation.physicalAfter as Record<string,unknown>)[field]:undefined;
+         if(present)Object.defineProperty(after,field,{value,enumerable:true,configurable:true,writable:true});else delete after[field];
+-        row.edits.push({kind:'field',field,present,value,selection:operation.selections.get(field)});
+-      }
+-      row.value=after;steps.push({...operation,before,after});
++        edits.push({kind:'field',field,present,value,selection:operation.selections.get(field)});
++      }
++      const transition=valueStore.prepareRealizationTransition(operation.subject,after as E,edits,previous?.transition);
++      // Selected publication uses completed steps and this prepared transition.
++      // No fallback edit list is consumed; retaining every prefix is unnecessary.
++      rows.set(operation.subject,{subjectId:operation.subject,key:operation.key,value:after,edits:[],transition:previous?Object.freeze({...transition,physicalBefore:previous.transition.physicalBefore,ordinaryBefore:previous.transition.ordinaryBefore}):transition});
++      steps.push({...operation,physicalBefore:before,physicalAfter:after,ordinaryBefore:transition.ordinaryBefore,ordinaryAfter:transition.ordinaryAfter});
+     }
+     return preparePointValues([...rows.values()],steps);
+   }
+-  function stageSelected(id:K, before:E, after:E, fields:readonly string[], selection:ClaimedFieldEndpoint):void {
++  function stageSelected(id:K, before:E, after:E, fields:readonly string[] | null, selection:ClaimedFieldEndpoint):void {
+     const selections=selectedInverseField(selection,selection.subject,after,id)!;
+-    selection.preparation!.stage({source:entityPublication,subject:selection.subject,key:id,before,after,fields,selections,prepare:prepareSelectedRows});
++    selection.preparation!.stage({source:entityPublication,subject:selection.subject,key:id,physicalBefore:before,physicalAfter:after,fields,selections,prepare:prepareSelectedRows});
+   }
+ 
+   /** Existing-lifetime value plans: all reflection precedes physical installation. */
+@@ -543,10 +548,11 @@
+       key: string | number;
+       value: unknown;
+       edits: readonly EntityRealizationEdit[];
++      transition?: EntityValueTransition<E>;
+     }[],
+     selectedSteps?: readonly SelectedRowEdit[]
+   ): { install(): void; invalidate(): void; publish(): void } {
+-    const prepared = values.map(({ subjectId, key, value, edits }) => {
++    const prepared = values.map(({ subjectId, key, value, edits, transition }) => {
+       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+         throw new Error(
+           'Point realization subject is no longer active at its key'
+@@ -560,7 +566,7 @@
+         key: key as K,
+         before,
+         after,
+-        transition: valueStore.prepareRealizationTransition(
++        transition: transition ?? valueStore.prepareRealizationTransition(
+           subjectId,
+           after,
+           edits
+@@ -569,9 +575,11 @@
+         epoch: subjectEpochs.get(subjectId),
+       };
+     });
++    const ordinarySteps=selectedSteps?.map(step=>({subject:step.subject,before:step.ordinaryBefore,after:step.ordinaryAfter,fields:step.fields,restoredFields:step.selections}));
+     const publication=prepareEntityPublication(
+       prepared.map(row=>({subject:row.subjectId,before:row.before,after:row.after,fields:publicationFields(row.before,row.after)})),
+-      selectedSteps?selectedSteps.map(step=>({subject:step.subject,before:step.before,after:step.after,fields:step.fields,restoredFields:step.selections})):prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),ordinary:[{subject:step.subject,before:step.before,after:step.after,fields:step.fields,restoredFields:step.selections}]}))
++      ordinarySteps ?? prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,
++      selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinarySteps![ordinal]!]}))
+     );
+     if(selectedSteps)publication.unit?.finalize?.();
+     return {
+@@ -624,8 +632,8 @@
+           if (!selectedSteps && row.changed) emitTap('onUpdate', row.key, row.after, row.after);
+         } catch(error){if(!failed){failed=true;first=error;}}}
+         for(const step of selectedSteps??[])try{
+-          const delta:Record<string,unknown>={};for(const field of step.fields)if(Object.prototype.hasOwnProperty.call(step.after,field))Object.defineProperty(delta,field,{value:(step.after as Record<string,unknown>)[field],enumerable:true});
+-          emitTap('onUpdate',step.key as K,delta as Partial<E>,step.after as E);
++          const delta:Record<string,unknown>={};for(const field of step.fields??Object.keys(step.physicalAfter as object))if(Object.prototype.hasOwnProperty.call(step.physicalAfter,field))Object.defineProperty(delta,field,{value:(step.physicalAfter as Record<string,unknown>)[field],enumerable:true});
++          emitTap('onUpdate',step.key as K,delta as Partial<E>,step.physicalAfter as E);
+         }catch(error){if(!failed){failed=true;first=error;}}
+         if(failed)throw first;
+       },
+@@ -2136,6 +2144,7 @@
+       }
+ 
+       let next = entity;
++      let interceptorReplaced = false;
+       for (const handler of interceptHandlers) {
+         const ctx: InterceptContext<Partial<E>> = {
+           block: (reason?: string) => {
+@@ -2144,6 +2153,7 @@
+             );
+           },
+           transform: (value: Partial<E>) => {
++            interceptorReplaced = true;
+             next = value as E;
+           },
+           blocked: false,
+@@ -2162,7 +2172,9 @@
+ 
+       if(inverseClaim?.preparation){
+         const materialized={...next};
+-        const fields=[...new Set([...(publicationFields(prev,materialized)??[]),inverseClaim.field])];
++        // Row-shaped certified removal is not whole authorship. An explicit
++        // public replacement transform retains its whole authored domain.
++        const fields=interceptorReplaced ? null : [inverseClaim.field];
+         stageSelected(id,prev,materialized,fields,inverseClaim);return;
+       }
+       const mutationIntent =
+--- 94ac/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
++++ c47b/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
+@@ -0,0 +1,39 @@
++import {it,expect} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {entityMap,signalTree,transactions} from '../index';
++import {getPathNotifier} from './path-notifier';
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++it('selected field plus surviving-row order restores the complete transaction',async()=>{
++ const t=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:[transactions()]});
++ const rows=t.$.rows;rows.setAll([{id:'a',x:0},{id:'b',x:0}]);await flush();
++ const q=t.transact(()=>{rows.updateOne('a',{x:7});rows.setAll([{id:'b',x:0},{id:'a',x:7}]);});await flush();
++ try{
++  const pending=rows.all();let error:unknown;try{q.rollback();}catch(e){error=e;}await flush();const after=rows.all();
++  let confirmError:unknown;try{q.confirm();}catch(e){confirmError=e;}
++  writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+'/field-order.json',JSON.stringify({pending,after,error:String(error),confirmError:String(confirmError)},null,2));
++  expect(pending).toEqual([{id:'b',x:0},{id:'a',x:7}]);expect(error).toBeUndefined();expect(after).toEqual([{id:'a',x:0},{id:'b',x:0}]);
++ }finally{t.destroy();}
++});
++
++import {withWriteContext} from './write-context';
++import {getEntityPublicationBinding,type EntityPublicationPacket} from './internals/entity-publication';
++for(const order of ['xy','yx'] as const)it(`producer ordinary images exclude untouched inspection sibling ${order}`,async()=>{
++ const t=signalTree({rows:entityMap<{id:string;x:number;y:number;z:number},string>()},{enhancers:[transactions()]});const r=t.$.rows;r.addOne({id:'a',x:0,y:0,z:7});await flush();
++ const row=r.byIdOrFail('a');withWriteContext({participation:'inspection'},()=>r.updateOne('a',{z:99}));
++ const q=t.transact(()=>{for(const k of order)r.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();
++ const packets:EntityPublicationPacket[]=[];const off=getEntityPublicationBinding(row)!.source.subscribe({prepare(p){packets.push(p);return undefined;},complete(){}});
++ try{q.rollback();const data=packets.map(p=>({physical:p.physical,ordinary:p.ordinary,steps:p.steps}));writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/packet-${order}.json`,JSON.stringify(data,null,2));
++ expect(packets).toHaveLength(1);const p=packets[0]!;expect(p.steps).toHaveLength(2);
++ for(const edit of p.steps!.flatMap(s=>s.ordinary)){expect((edit.before as {z:number}).z).toBe(7);expect((edit.after as {z:number}).z).toBe(7);}
++ for(const edit of p.physical){expect((edit.before as {z:number}).z).toBe(99);expect((edit.after as {z:number}).z).toBe(99);}
++ }finally{off();t.destroy();}
++});
++for(const mode of ['untouched','equal','changed'] as const)it(`certified absence row transport preserves actual replacement scope ${mode}`,async()=>{
++ const t=signalTree({rows:entityMap<{id:string;x?:number;z:number},string>()},{enhancers:[transactions()]});const r=t.$.rows;r.addOne({id:'a',z:7});await flush();const row=r.byIdOrFail('a');const b=getEntityPublicationBinding(row)!;const req=()=>b.source.evidence()!.field(b.subject!,'z','ordinary');const base=req();
++ withWriteContext({participation:'inspection'},()=>r.updateOne('a',{z:99}));const q=t.transact(()=>r.updateOne('a',{x:7}));await flush();let calls=0;
++ const off=r.intercept({onUpdate(_id,p,ctx){calls++;if(mode!=='untouched')ctx.transform({...p,z:mode==='equal'?99:55});}});
++ try{q.rollback();off();await flush();const after=row(),sameSupport=req()===base;const adopted=mode==='changed'?55:99;const a=t.transact(()=>r.updateOne('a',{z:adopted}));await flush();a.rollback();await flush();
++ const data={calls,after,sameSupport,afterAdoptionReject:row()};writeFileSync(process.env['ST_PREPARED_REVIEW_OUTPUT']+`/absence-${mode}.json`,JSON.stringify(data,null,2));
++ expect(calls).toBe(1);expect(Object.prototype.hasOwnProperty.call(after,'x')).toBe(false);expect(after.z).toBe(adopted);expect(sameSupport).toBe(mode==='untouched');expect(row().z).toBe(mode==='untouched'?7:adopted);
++ }finally{off();t.destroy();}
++});
+--- 94ac/packages/kernel/src/lib/independent-prepared-unit.spec.ts
++++ c47b/packages/kernel/src/lib/independent-prepared-unit.spec.ts
+@@ -0,0 +1,75 @@
++import {expect,it} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {interceptLocationWrites} from './internals/location-runtime';
++import {getPathNotifier} from './path-notifier';
++import {withWriteContext} from './write-context';
++import {link} from './link';
++type Row={id:string;x:number;y:number;z:number};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++const record=(name:string,data:unknown)=>{const dir=process.env['ST_PREPARED_REVIEW_OUTPUT'];if(!dir)throw new Error('fresh output directory required');writeFileSync(`${dir}/${name}.json`,JSON.stringify(data,null,2));};
++const make=async()=>{const tree=signalTree({plain:0,rows:entityMap<Row,string>()},{enhancers:[transactions()]});tree.$.rows.addOne({id:'a',x:0,y:0,z:4});await flush();const rows=tree.$.rows,row=rows.byIdOrFail('a'),b=getEntityPublicationBinding(row)!;const req=(k:string)=>b.source.evidence()!.field(b.subject!,k,'ordinary');const value=()=>({x:row.x(),y:row.y(),z:row.z()});return {tree,rows,row,req,value};};
++for(const order of ['xy','yx'] as const)for(const followup of ['retry','confirm'] as const)it(`public second interceptor block is atomic; ${order}/${followup}`,async()=>{
++ const {tree,rows,value}=await make();const q=tree.transact(()=>{for(const k of order)rows.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();let calls=0;const seen:string[]=[];
++ const off=rows.intercept({onUpdate(_id,changes,ctx){calls++;seen.push(Object.keys(changes).join(','));if(calls===2)ctx.block('second required inverse refused');}});
++ try{let error:unknown;try{q.rollback();}catch(e){error=e;}const after=value();off();let followError:unknown;try{if(followup==='retry')q.rollback();else q.confirm();}catch(e){followError=e;}record(`public-${order}-${followup}`,{calls,seen,after,final:value(),error:String(error),followError:String(followError)});expect(calls).toBe(2);expect(error).toBeDefined();expect(after).toEqual({x:7,y:11,z:4});expect(followError).toBeUndefined();expect(value()).toEqual(followup==='retry'?{x:0,y:0,z:4}:{x:7,y:11,z:4});}finally{off();tree.destroy();}
++});
++for(const order of ['xy','yx'] as const)for(const transformedY of [0,99])it(`ordered transformed sibling support ${order}/${transformedY}`,async()=>{
++ const {tree,rows,req,value}=await make();const base={x:req('x'),y:req('y'),z:req('z')};const q=tree.transact(()=>{for(const k of order)rows.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();const calls:string[]=[];
++ const off=rows.intercept({onUpdate(_id,changes,ctx){const field=Object.prototype.hasOwnProperty.call(changes,'x')?'x':'y';calls.push(field);if(field==='x')ctx.transform({x:0,y:transformedY});}});
++ try{q.rollback();await flush();const xLast=calls.at(-1)==='x';record(`transform-${order}-${transformedY}`,{calls,value:value(),xBaseline:req('x')===base.x,yBaseline:req('y')===base.y,zBaseline:req('z')===base.z});expect(calls).toEqual([...order].reverse());expect(value()).toEqual({x:0,y:xLast?transformedY:0,z:4});expect(req('x')).toBe(base.x);expect(req('z')).toBe(base.z);if(xLast)expect(req('y')).not.toBe(base.y);else expect(req('y')).toBe(base.y);}finally{off();tree.destroy();}
++});
++it('independent callback write survives invalidated preparation; selected fields and authority remain',async()=>{
++ const {tree,rows,req,value}=await make();const q=tree.transact(()=>{rows.updateOne('a',{x:7});rows.updateOne('a',{y:11});});await flush();const authored={x:req('x'),y:req('y')};let entered=false;let independent:object|undefined;
++ const off=rows.intercept({onUpdate(_id,changes){if(!entered&&(changes.x===0||changes.y===0)){entered=true;rows.updateOne('a',{z:42});independent=req('z');}}});
++ try{let error:unknown;try{q.rollback();}catch(e){error=e;}const after=value(),sameX=req('x')===authored.x,sameY=req('y')===authored.y,sameZ=req('z')===independent;off();let retryError:unknown;try{q.rollback();}catch(e){retryError=e;}record('reentry',{entered,after,sameX,sameY,sameZ,error:String(error),retryError:String(retryError),final:value()});expect(entered).toBe(true);expect(error).toBeDefined();expect(after).toEqual({x:7,y:11,z:42});expect(sameX&&sameY&&sameZ).toBe(true);expect(retryError).toBeUndefined();expect(value()).toEqual({x:0,y:0,z:42});expect(req('z')).toBe(independent);}finally{off();tree.destroy();}
++});
++for(const mode of ['success','throw','skip'] as const)it(`saved selected continuation is closed after ${mode}`,async()=>{
++ const {tree,rows,row,req}=await make();const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();let saved:(()=>void)|undefined;const off=interceptLocationWrites(row.x,(_op,proceed)=>{saved=proceed;if(mode==='throw')throw new Error('selected preflight refuses');if(mode==='success')proceed();});
++ try{let error:unknown;try{q.rollback();}catch(e){error=e;}const first=row.x();off();expect(saved).toBeTypeOf('function');if(mode==='success'){expect(error).toBeUndefined();expect(first).toBe(0);}else{expect(error).toBeDefined();expect(first).toBe(7);q.rollback();expect(row.x()).toBe(0);}rows.updateOne('a',{x:13});await flush();const later=req('x');let lateError:unknown;try{saved!();}catch(e){lateError=e;}record(`saved-${mode}`,{first,error:String(error),lateError:String(lateError),value:row.x(),sameSupport:req('x')===later});expect(lateError).toBeDefined();expect(row.x()).toBe(13);expect(req('x')).toBe(later);}finally{off();tree.destroy();}
++});
++it('second selected proceed refuses before another preparation callback',async()=>{
++ const {tree,rows,row}=await make();const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();let calls=0,secondError:unknown,firstValue:unknown,secondValue:unknown;
++ const offRows=rows.intercept({onUpdate(){calls++;}});const off=interceptLocationWrites(row.x,(_op,proceed)=>{proceed();firstValue=row.x();try{proceed();}catch(e){secondError=e;}secondValue=row.x();});
++ try{let rollbackError:unknown;try{q.rollback();}catch(e){rollbackError=e;}record('double',{calls,firstValue,secondValue,secondError:String(secondError),rollbackError:String(rollbackError),value:row.x()});expect(calls).toBe(1);expect(secondError).toBeDefined();expect(firstValue).toBe(7);expect(secondValue).toBe(7);/* Whether caught misuse aborts an otherwise valid unit is deliberately not specified. */}finally{off();offRows();tree.destroy();}
++});
++it('mixed scalar/entity public refusal occurs before any selected install',async()=>{
++ const {tree,rows,req,value}=await make();const q=tree.transact(()=>{tree.$.plain(3);rows.updateOne('a',{x:7});});await flush();const authored=req('x');let calls=0;const off=rows.intercept({onUpdate(_id,_changes,ctx){calls++;ctx.block('mixed selected refusal');}});
++ try{let error:unknown;try{q.rollback();}catch(e){error=e;}const after={plain:tree.$.plain(),...value()},sameSupport=req('x')===authored;off();let retryError:unknown;try{q.rollback();}catch(e){retryError=e;}record('mixed-block',{calls,after,sameSupport,error:String(error),retryError:String(retryError),final:{plain:tree.$.plain(),...value()}});expect(calls).toBe(1);expect(error).toBeDefined();expect(after).toEqual({plain:3,x:7,y:0,z:4});expect(sameSupport).toBe(true);expect(retryError).toBeUndefined();expect(tree.$.plain()).toBe(0);expect(value()).toEqual({x:0,y:0,z:4});}finally{off();tree.destroy();}
++});
++it('mixed completed unit remains terminal after actual delivery throw',async()=>{
++ const {tree,rows,req,value}=await make();const baseline=req('x');const q=tree.transact(()=>{tree.$.plain(3);rows.updateOne('a',{x:7});});await flush();const sentinel=new Error('post-install delivery failure');const deliveries:Array<{plain:number;x:number}>=[];const off=rows.tap({onUpdate(){deliveries.push({plain:tree.$.plain(),x:rows.byIdOrFail('a').x()});throw sentinel;}});
++ try{let error:unknown;try{q.rollback();}catch(e){error=e;}const after={plain:tree.$.plain(),...value()},sameSupport=req('x')===baseline;off();let confirmError:unknown;try{q.confirm();}catch(e){confirmError=e;}const count=deliveries.length;q.rollback();record('mixed-delivery',{deliveries,after,sameSupport,error:String(error),exactError:error===sentinel,confirmError:String(confirmError)});expect(count).toBeGreaterThan(0);expect(deliveries.every(v=>v.plain===0&&v.x===0)).toBe(true);expect(after).toEqual({plain:0,x:0,y:0,z:4});expect(sameSupport).toBe(true);expect(confirmError).toBeDefined();expect(deliveries.length).toBe(count);/* Delivery error containment is recorded; no new propagation policy. */}finally{off();tree.destroy();}
++});
++
++for(const order of ['xy','yx'] as const)it(`inspection sibling retains ordinary baseline through composed rollback and equal-display adoption ${order}`,async()=>{
++ const {tree,rows,row,req,value}=await make();
++ rows.updateOne('a',{z:7});await flush();
++ const binding=getEntityPublicationBinding(row)!;
++ const physicalZ=()=>binding.source.evidence()!.field(binding.subject!,'z','physical');
++ const baseline=req('z');
++ const sent:unknown[]=[];
++ const connection=link(rows,{set:(v)=>{sent.push(v);}});
++ try{
++  withWriteContext({participation:'inspection'},()=>rows.updateOne('a',{z:99}));await flush();await connection.settled();
++  const inspectionSupport=physicalZ();
++  const inspectionState={value:value(),ordinaryBaseline:req('z')===baseline,physicalDistinct:inspectionSupport!==baseline};
++  const q=tree.transact(()=>{for(const k of order)rows.updateOne('a',k==='x'?{x:7}:{y:11});});await flush();
++  const beforeDelivery=sent.length;
++  q.rollback();await flush();await connection.settled();
++  const rollbackState={value:value(),ordinaryBaseline:req('z')===baseline,physicalInspection:physicalZ()===inspectionSupport,deliveries:sent.slice(beforeDelivery)};
++  const adoption=tree.transact(()=>rows.updateOne('a',{z:99}));await flush();
++  const adoptionState={value:value(),ordinaryChanged:req('z')!==baseline};
++  adoption.rollback();await flush();await connection.settled();
++  const rejectionState={value:value(),ordinaryBaseline:req('z')===baseline,delivery:sent.at(-1)};
++  record(`inspection-adoption-${order}`,{inspectionState,rollbackState,adoptionState,rejectionState});
++  expect(inspectionState).toEqual({value:{x:0,y:0,z:99},ordinaryBaseline:true,physicalDistinct:true});
++  expect(rollbackState.value).toEqual({x:0,y:0,z:99});
++  expect(rollbackState.ordinaryBaseline).toBe(true);expect(rollbackState.physicalInspection).toBe(true);
++  expect(rollbackState.deliveries.length).toBeGreaterThan(0);
++  expect(rollbackState.deliveries.at(-1)).toEqual([{id:'a',x:0,y:0,z:7}]);
++  expect(adoptionState).toEqual({value:{x:0,y:0,z:99},ordinaryChanged:true});
++  expect(rejectionState).toEqual({value:{x:0,y:0,z:7},ordinaryBaseline:true,delivery:[{id:'a',x:0,y:0,z:7}]});
++ }finally{connection.dispose();tree.destroy();}
++});
+--- 94ac/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ c47b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,4 +1,4 @@
+-import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowEdit} from '../selected-write-operation';
++import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent} from '../selected-write-operation';
+ import { replaceSelectedLocation } from '../location-runtime';
+ import {fieldEndpoints} from '../native-field-selection';
+ import {getEntityPublicationBinding} from '../entity-publication';
+@@ -697,16 +697,27 @@
+  * Undefined means the effects require the existing structural/member planner.
+  */
+ /** Bounded source-owned preparation for selected top-level entity fields and scalar slots. */
+-export function supportsSelectedOperation(effects:readonly ReversalEffect[]):boolean {
+- return effects.some(effect=>!!fieldEndpoints(effect)) && effects.every(effect=>!effect.structural&&!effect.plainBranchMembership && (typeof effect.subjectId==='number'?effect.subjectFieldSegments?.length===1&&!!fieldEndpoints(effect):effect.subjectFieldSegments===undefined));
+-}
+-export function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[]):{install():void;publish():void} {
++/** Admission sees the complete compensation, before invoking any preparation. */
++export function admitSelectedOperation<O extends {
++ readonly effects:readonly ReversalEffect[];
++ readonly orderDeltas:readonly unknown[];
++ readonly frontiers:ReadonlyMap<number,unknown>;
++ readonly structuralRequired:boolean;
++}>(tree:ISignalTree<object>,operation:O):{operation:O;prepare:()=>{install():void;publish():void}} | undefined {
++ const effects=operation.effects;
++ // This bounded producer has no order, structural or frontier installer.
++ // Return inapplicable for the entire description; the complete route owns it.
++ if(operation.orderDeltas.length || operation.frontiers.size || operation.structuralRequired)return undefined;
++ if(!effects.some(effect=>!!fieldEndpoints(effect)) || !effects.every(effect=>!effect.structural&&!effect.plainBranchMembership && (typeof effect.subjectId==='number'?effect.subjectFieldSegments?.length===1&&!!fieldEndpoints(effect):effect.subjectFieldSegments===undefined)))return undefined;
++ return {operation,prepare:()=>prepareSelectedOperation(tree,operation.effects)};
++}
++function prepareSelectedOperation(tree:ISignalTree<object>,effects:readonly ReversalEffect[]):{install():void;publish():void} {
+  const descriptors=getTreeRealizationDescriptors(tree.$);
+  const slots=getTreeScalarSlotRuntime(tree.$)??getTreeScalarSlotRuntime(tree);
+  const clock=getPhysicalCommitClock(tree.$)??getPhysicalCommitClock(tree);
+  if(!descriptors||!slots||!clock)throw new Error('Selected operation source unavailable');
+  const revision=clock.revision();const owners=indexPointOwnerPaths(tree.$,effects);
+- const edits:SelectedRowEdit[]=[];const deliveries:Array<()=>void>=[];
++ const edits:SelectedRowIntent[]=[];const deliveries:Array<()=>void>=[];
+  const scalarEffects:ReversalEffect[]=[];const frame=slots.beginFrame();
+  let active=true;
+  const preparation:SelectedPreparation={stage(edit){if(!active)throw new Error('Selected preparation closed');edits.push(edit);},defer(delivery){if(!active)throw new Error('Selected preparation closed');deliveries.push(delivery);}};
+@@ -719,7 +730,7 @@
+      const count=edits.length;applyEffect(tree,descriptors,owners,slots,effect,preparation);
+      if(edits.length!==count+1)throw new Error('Selected continuation did not prepare exactly one operation');
+    }
+-   const groups=new Map<object,SelectedRowEdit[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
++   const groups=new Map<object,SelectedRowIntent[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
+    const plans=[...groups.values()].map(group=>group[0]!.prepare(group));
+    if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
+    const installScalars=frame.prepareCommit({advanceRevision:false,publish:false});
+--- 94ac/packages/kernel/src/lib/internals/selected-write-operation.ts
++++ c47b/packages/kernel/src/lib/internals/selected-write-operation.ts
+@@ -1,13 +1,18 @@
+ import type {ClaimedFieldEndpoint,NativeFieldEndpoint} from './native-field-selection';
+-export interface SelectedRowEdit {
++/** Intercepted semantic intent, before producer-owned ordinary composition. */
++export interface SelectedRowIntent {
+  readonly source:object; readonly subject:number; readonly key:string|number;
+- readonly before:unknown; readonly after:unknown; readonly fields:readonly string[];
++ readonly physicalBefore:unknown; readonly physicalAfter:unknown;
++ readonly fields:readonly string[] | null;
+  readonly selections:ReadonlyMap<string,NativeFieldEndpoint>;
+- readonly prepare:(edits:readonly SelectedRowEdit[])=>SelectedInstallation;
++ readonly prepare:(edits:readonly SelectedRowIntent[])=>SelectedInstallation;
++}
++export interface SelectedRowEdit extends SelectedRowIntent {
++ readonly ordinaryBefore:unknown; readonly ordinaryAfter:unknown;
+ }
+ export interface SelectedInstallation {install():void;invalidate():void;publish():void}
+ export interface SelectedPreparation {
+- stage(edit:SelectedRowEdit):void;
++ stage(edit:SelectedRowIntent):void;
+  defer(delivery:()=>void):void;
+ }
+ export interface SelectedInvocation {
+--- 94ac/packages/kernel/src/lib/native-explicit-handoff.spec.ts
++++ c47b/packages/kernel/src/lib/native-explicit-handoff.spec.ts
+@@ -10,7 +10,7 @@
+  const binding=getEntityPublicationBinding(leaf)!;const baseline=binding.source.evidence()!.field(binding.subject!,'x','ordinary');
+  const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();let entered=0,nested:object|undefined;
+  const off=interceptLocationWrites(leaf,(operation,proceed)=>{if(entered++===0){expect(operation.intent).toBe('replace');rows.updateOne('a',{x:99});nested=binding.source.evidence()!.field(binding.subject!,'x','ordinary');}if(coalesced)tree.coalesce(proceed);else proceed();});
+- try{expect(()=>q.rollback()).toThrow(/reentered installation/);await flush();expect(entered).toBe(1);expect(nested).not.toBe(baseline);expect(leaf()).toBe(99);expect(binding.source.evidence()!.field(binding.subject!,'x','ordinary')).toBe(nested);expect(()=>q.confirm()).not.toThrow();}
++ try{let failure:unknown;try{q.rollback();}catch(error){failure=error;}expect(failure).toMatchObject({code:'SIGNALTREE_ROLLBACK_FAILED',cause:{kind:'effect-validation-failed',cause:expect.any(Error)}});await flush();expect(entered).toBe(1);expect(nested).not.toBe(baseline);expect(leaf()).toBe(99);expect(binding.source.evidence()!.field(binding.subject!,'x','ordinary')).toBe(nested);expect(()=>q.confirm()).not.toThrow();}
+  finally{off();tree.destroy();}
+ });
+ 
+--- 94ac/packages/kernel/src/lib/native-invocation-handoff.spec.ts
++++ c47b/packages/kernel/src/lib/native-invocation-handoff.spec.ts
+@@ -29,7 +29,7 @@
+  const baseline=source.evidence()!.field(subject,'x','ordinary');const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();
+  let entered=false,nested:object|undefined;
+  const off=rows.intercept({onUpdate(){if(!entered){entered=true;rows.updateOne('a',{x:99});nested=source.evidence()!.field(subject,'x','ordinary');}}});
+- try{expect(()=>q.rollback()).toThrow(/reentered installation/);await flush();expect(entered).toBe(true);expect(nested).not.toBe(baseline);expect(rows.byIdOrFail('a').x()).toBe(99);expect(source.evidence()!.field(subject,'x','ordinary')).toBe(nested);expect(()=>q.confirm()).not.toThrow();}
++ try{let failure:unknown;try{q.rollback();}catch(error){failure=error;}expect(failure).toMatchObject({code:'SIGNALTREE_ROLLBACK_FAILED',cause:{kind:'effect-validation-failed',cause:expect.any(Error)}});await flush();expect(entered).toBe(true);expect(nested).not.toBe(baseline);expect(rows.byIdOrFail('a').x()).toBe(99);expect(source.evidence()!.field(subject,'x','ordinary')).toBe(nested);expect(()=>q.confirm()).not.toThrow();}
+  finally{off();tree.destroy();}
+ });
+ it('throwing native interceptor does not leave inverse selection available to later write',async()=>{
+--- 94ac/packages/kernel/src/lib/physical/entity-value-store.ts
++++ c47b/packages/kernel/src/lib/physical/entity-value-store.ts
+@@ -94,11 +94,12 @@
+   prepareRealizationTransition(
+     subject: number,
+     physicalAfter: E,
+-    edits: readonly EntityRealizationEdit[]
++    edits: readonly EntityRealizationEdit[],
++    previous?: EntityValueTransition<E>
+   ): EntityValueTransition<E> {
+-    const physicalBefore = this.retainedEntities.get(subject);
++    const physicalBefore = previous?.physicalAfter ?? this.retainedEntities.get(subject);
+     const ordinaryBefore =
+-      this.inspectionBaselines.get(subject) ?? physicalBefore;
++      previous?.ordinaryAfter ?? this.inspectionBaselines.get(subject) ?? physicalBefore;
+     if (!ordinaryBefore)
+       throw new Error('Point realization ordinary lifetime is unavailable');
+     let ordinaryAfter = ordinaryBefore;
+--- 94ac/packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts
++++ c47b/packages/kernel/src/lib/selected-ordinary-domain-removal.spec.ts
+@@ -0,0 +1,10 @@
++import {expect,it} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {withWriteContext} from './write-context';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++const flush=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++it('transformed certified removal removes ordinary-only sibling and owns equal displayed sibling',async()=>{
++ const t=signalTree({rows:entityMap<{id:string;x?:number;y?:number;z:number},string>()},{enhancers:[transactions()]});const r=t.$.rows;r.addOne({id:'a',y:4,z:7});await flush();const row=r.byIdOrFail('a');const b=getEntityPublicationBinding(row)!;const req=(key:string)=>b.source.evidence()!.field(b.subject!,key,'ordinary');const yBefore=req('y'),zBefore=req('z');
++ withWriteContext({participation:'inspection'},()=>row({id:'a',z:99}));await flush();const q=t.transact(()=>r.updateOne('a',{x:7}));await flush();let calls=0;const off=r.intercept({onUpdate(_id,_patch,ctx){calls++;ctx.transform({id:'a',z:99});}});
++ try{q.rollback();expect(calls).toBe(1);off();expect(row()).toEqual({id:'a',z:99});expect(req('y')).not.toBe(yBefore);expect(req('z')).not.toBe(zBefore);const next=t.transact(()=>r.updateOne('a',{y:8,z:100}));next.rollback();expect(row()).toEqual({id:'a',z:99});expect(Object.prototype.hasOwnProperty.call(row(),'y')).toBe(false);}finally{off();t.destroy();}
++});
+--- 94ac/packages/kernel/src/lib/selected-real-batching-review.spec.ts
++++ c47b/packages/kernel/src/lib/selected-real-batching-review.spec.ts
+@@ -0,0 +1,17 @@
++import {expect,it} from 'vitest';
++import {batching,entityMap,signalTree,transactions} from '../index';
++import {interceptLocationWrites} from './internals/location-runtime';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getPathNotifier} from './path-notifier';
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++for(const reverse of [false,true])it(`real enhancer synchronous selected coalesce completes both fields (${reverse})`,async()=>{
++ const tree=signalTree({rows:entityMap<{id:string;x:number;y:number},string>()},{enhancers:reverse?[batching(),transactions()]:[transactions(),batching()]});
++ const rows=tree.$.rows;rows.addOne({id:'a',x:0,y:0});await flush();const row=rows.byIdOrFail('a');const b=getEntityPublicationBinding(row)!;const req=(k:string)=>b.source.evidence()!.field(b.subject!,k,'ordinary');const baseline=[req('x'),req('y')];
++ const q=tree.transact(()=>{rows.updateOne('a',{x:7});rows.updateOne('a',{y:11});});await flush();let calls=0;
++ const offs=[row.x,row.y].map(leaf=>interceptLocationWrites(leaf,(_op,proceed)=>{calls++;tree.coalesce(proceed);}));const seen:Array<[number,number]>=[];const offTap=rows.tap({onUpdate(){seen.push([row.x(),row.y()]);}});
++ try{q.rollback();expect(calls).toBe(2);expect(row()).toEqual({id:'a',x:0,y:0});expect(req('x')).toBe(baseline[0]);expect(req('y')).toBe(baseline[1]);expect(seen.length).toBeGreaterThan(0);expect(seen.every(v=>v[0]===0&&v[1]===0)).toBe(true);expect(()=>q.confirm()).toThrow();}finally{offTap();offs.forEach(off=>off());tree.destroy();}
++});
++for(const reverse of [false,true])it(`real enhancer outer coalesce refuses pending inverse and permits fresh retry (${reverse})`,async()=>{
++ const tree=signalTree({rows:entityMap<{id:string;x:number},string>()},{enhancers:reverse?[batching(),transactions()]:[transactions(),batching()]});const rows=tree.$.rows;rows.addOne({id:'a',x:0});await flush();const row=rows.byIdOrFail('a');const b=getEntityPublicationBinding(row)!;const req=()=>b.source.evidence()!.field(b.subject!,'x','ordinary');const baseline=req();const q=tree.transact(()=>rows.updateOne('a',{x:7}));await flush();const pending=req();
++ try{expect(()=>tree.coalesce(()=>q.rollback())).toThrow();expect(row.x()).toBe(7);expect(req()).toBe(pending);q.rollback();expect(row.x()).toBe(0);expect(req()).toBe(baseline);tree.coalesce(()=>{row.x(12);row.x(13);});expect(row.x()).toBe(13);await flush();expect(row.x()).toBe(13);}finally{tree.destroy();}
++});

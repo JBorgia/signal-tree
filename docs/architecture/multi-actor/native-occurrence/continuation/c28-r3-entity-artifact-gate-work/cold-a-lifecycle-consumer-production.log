@@ -1,0 +1,7 @@
+{"name":"pre-Link pending field confirm","sent":[9],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending field rollback","sent":[0],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending collection confirm","sent":[[{"id":"r","x":9}]],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending collection rollback","sent":[[{"id":"r","x":0}]],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"late collection multiple Links confirm","sent":[[{"id":"r","x":7}]],"second":[{"id":"r","x":7}],"third":[7],"phase":"complete","pass":true}
+{"name":"late collection multiple Links rollback","sent":[[{"id":"r","x":0}]],"second":[{"id":"r","x":0}],"third":[0],"phase":"complete","pass":true}
+{"passed":6,"total":6}

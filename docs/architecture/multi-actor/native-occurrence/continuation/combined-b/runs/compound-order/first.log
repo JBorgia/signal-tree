@@ -1,0 +1,119 @@
+
+> nx run kernel:test native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts --maxWorkers=1
+
+(node:45897) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:45904) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-b/candidate/packages/kernel
+
+(node:45922) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts (3 tests | 1 failed) 28ms
+     × keeps compound inspection membership and order consistent with inspect and ordinary Link rejection 10ms
+(node:45923) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts (1 test | 1 failed) 22ms
+     × keeps untouched inspected order out of the ordinary Link payload after structural rejection 22ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts > compound ordinary order rejection regression > keeps untouched inspected order out of the ordinary Link payload after structural rejection
+AssertionError: expected [ { id: 'b', n: 4 }, …(2) ] to deeply equal [ { id: 'a', n: 1 }, …(2) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "id": "a",
+-     "n": 1,
+-   },
+-   {
+      "id": "b",
+      "n": 4,
+    },
+    {
+      "id": "c",
+      "n": 3,
++   },
++   {
++     "id": "a",
++     "n": 1,
+    },
+  ]
+
+ ❯ src/enhancers/transactions/native-compound-ordinary-order-regression.spec.ts:83:27
+     81|       // Physical inspection placement is deliberately not prescribed …
+     82|       // Ordinary egress must preserve the preexisting authored A/B/C …
+     83|       expect(sent.at(-1)).toEqual(baseline);
+       |                           ^
+     84|       expect(
+     85|         sent.some((value) => value.some((row) => row.id === 'x' || row…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > keeps compound inspection membership and order consistent with inspect and ordinary Link rejection
+AssertionError: expected [ { id: 'b', n: 4 }, …(2) ] to deeply equal [ { id: 'a', n: 1 }, …(2) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "id": "a",
+-     "n": 1,
+-   },
+-   {
+      "id": "b",
+      "n": 4,
+    },
+    {
+      "id": "c",
+      "n": 3,
++   },
++   {
++     "id": "a",
++     "n": 1,
+    },
+  ]
+
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts:79:65
+     77|       expect(rows.ids()).toEqual(['a','b','c']); expect(rows.byIdOrFai…
+     78|       expect(freshA()).toBeUndefined(); expect(x()).toBeUndefined();
+     79|       expect(rows.all()).toEqual(baseline); expect(sent.at(-1)).toEqua…
+       |                                                                 ^
+     80|       expect(sent.some(value=>value.some(row=>row.id==='x'||row.n===9)…
+     81|       rows.updateOne('b',{n:5}); await tick(); await connection.settle…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 2 passed (4)
+   Start at  17:21:26
+   Duration  980ms (transform 395ms, setup 0ms, import 531ms, tests 50ms, environment 264ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-compound-ordinary-order-regression.spec.ts native-structural-composition-gates.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

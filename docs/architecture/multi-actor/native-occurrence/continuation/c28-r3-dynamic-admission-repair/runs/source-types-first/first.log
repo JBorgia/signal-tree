@@ -1,0 +1,4 @@
+
+> @signaltree/workspace@16.0.0-dev typecheck:source /private/tmp/st-c28-r3-dynamic-admission-repair/candidate
+> tsc --noEmit -p tsconfig.typecheck-all.json
+

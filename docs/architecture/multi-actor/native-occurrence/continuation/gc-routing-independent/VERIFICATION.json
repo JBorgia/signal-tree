@@ -1,0 +1,247 @@
+{
+  "candidateManifestSha256": "4aad3b2ab21df45928abbc0a6a4671a46402c524a8bb0c807783f43723218450",
+  "patchSha256": "63be7260b6e49eb168b16f7f6c1ae7857426a407d293fd46bb780822ff8578bd",
+  "verifiedCandidateFiles": 3067,
+  "verifiedEvidenceFiles": 176,
+  "changed": [
+    "packages/kernel/vitest.config.ts",
+    "packages/kernel/vitest.retention.config.ts",
+    "tools/check-forwarding-retention.mjs",
+    "tools/verify-gates.mjs"
+  ],
+  "added": [
+    "tools/lib/forwarding-retention-matrix.mjs"
+  ],
+  "allRuntimeAndOriginalSpecsUnchanged": true,
+  "discoveryCounts": {
+    "ordinaryBefore": 620,
+    "ordinaryAfter": 619,
+    "gcBefore": 4,
+    "gcAfter": 5
+  },
+  "rawRuns": [
+    {
+      "arm": "baseline",
+      "exit": 0,
+      "children": [
+        {
+          "name": "hold-proceed-success",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-proceed-skip",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-proceed-caught",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "drop-proceed-success",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "drop-proceed-skip",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "drop-proceed-caught",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-value-success",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-value-skip",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-value-caught",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "held-hold-proceed",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "held-drop-proceed",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "held-hold-row",
+          "exit": 0,
+          "failure": []
+        }
+      ]
+    },
+    {
+      "arm": "retained-tree",
+      "exit": 1,
+      "children": [
+        {
+          "name": "hold-proceed-success",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "hold-proceed-skip",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "hold-proceed-caught",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "drop-proceed-success",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "drop-proceed-skip",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "drop-proceed-caught",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "hold-value-success",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "hold-value-skip",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "hold-value-caught",
+          "exit": 1,
+          "failure": [
+            "AssertionError: tree: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "held-hold-proceed",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "held-drop-proceed",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "held-hold-row",
+          "exit": 0,
+          "failure": []
+        }
+      ]
+    },
+    {
+      "arm": "held-positive",
+      "exit": 1,
+      "children": [
+        {
+          "name": "hold-proceed-success",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-proceed-skip",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-proceed-caught",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "drop-proceed-success",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "drop-proceed-skip",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "drop-proceed-caught",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-value-success",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-value-skip",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "hold-value-caught",
+          "exit": 0,
+          "failure": []
+        },
+        {
+          "name": "held-hold-proceed",
+          "exit": 1,
+          "failure": [
+            "AssertionError: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "held-drop-proceed",
+          "exit": 1,
+          "failure": [
+            "AssertionError: expected true to be false // Object.is equality"
+          ]
+        },
+        {
+          "name": "held-hold-row",
+          "exit": 1,
+          "failure": [
+            "AssertionError: expected true to be false // Object.is equality"
+          ]
+        }
+      ]
+    }
+  ],
+  "mutantsIsolatedExactly": true
+}

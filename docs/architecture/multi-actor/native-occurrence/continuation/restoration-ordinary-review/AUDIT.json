@@ -1,0 +1,13 @@
+{
+  "candidateManifestSha256": "6d71b9f34c0e9c97eef6059ed8b2d0bf36366fca335c4f108ae12aae8a7034bd",
+  "patchSha256": "89a1676e9578af972c0d39ba5e78ca21457a706966243cc3b759214fd9d908bd",
+  "verifiedCandidateFiles": 3066,
+  "verifiedEvidenceFiles": 37,
+  "onlyChangedFiles": [
+    "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "packages/kernel/src/lib/restoration-paired-work.spec.ts"
+  ],
+  "patchReplayVerified": true,
+  "mutantsIdenticalToPreviouslyReviewedReachedSites": true,
+  "newTestsRun": false
+}

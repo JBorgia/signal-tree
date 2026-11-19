@@ -1,0 +1,24 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-c12-independent-framework-verification/candidate/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm exec vitest run --root packages/angular --maxWorkers=1
+8 verbose argv "exec" "--" "vitest" "run" "--root" "packages/angular" "--maxWorkers=1"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c12-independent-framework-verification/npm-cache/_logs/2026-11-02T17_48_26_577Z-
+10 verbose logfile /private/tmp/st-c12-independent-framework-verification/npm-cache/_logs/2026-11-02T17_48_26_577Z-debug-0.log
+11 warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+12 warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+13 warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+14 silly logfile done cleaning log files
+15 http fetch GET https://registry.npmjs.org/npm attempt 1 failed with ENOTFOUND
+16 http fetch GET https://registry.npmjs.org/npm attempt 2 failed with ENOTFOUND
+17 http fetch GET https://registry.npmjs.org/npm attempt 3 failed with ENOTFOUND
+18 verbose cwd /private/tmp/st-c12-independent-framework-verification/candidate
+19 verbose os Darwin 25.2.0
+20 verbose node v24.15.0
+21 verbose npm  v11.12.1
+22 verbose exit 0
+23 info ok

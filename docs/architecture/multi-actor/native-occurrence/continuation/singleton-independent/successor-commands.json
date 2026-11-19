@@ -1,0 +1,34 @@
+[
+  {
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "singleton-row-reuse.spec.ts",
+      "singleton-row-allocation.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "cwd": "/private/tmp/st-singleton-ordinary-row-independent/successor",
+    "exit": 0,
+    "allocationOutput": "/private/tmp/st-singleton-ordinary-row-independent/successor-allocation.jsonl"
+  },
+  {
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "entity-granular-reactivity.spec.ts",
+      "--testNamePattern=a single-entity update does not rebuild",
+      "--maxWorkers=1"
+    ],
+    "cwd": "/private/tmp/st-singleton-ordinary-row-independent/successor",
+    "exit": 1,
+    "allocationOutput": "/private/tmp/st-singleton-ordinary-row-independent/successor-allocation.jsonl"
+  }
+]

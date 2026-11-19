@@ -1,0 +1,26 @@
+[
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "a747db2413caf3c7fe8ccf51ce9627d924fac42506accbdbb9639c8b01aaca08",
+    "archiveSha256": "a747db2413caf3c7fe8ccf51ce9627d924fac42506accbdbb9639c8b01aaca08"
+  },
+  {
+    "source": "PRESERVATION.json",
+    "archive": "PRESERVATION.json",
+    "sourceSha256": "b7f88808e5eb7171d0e24e86022124de536b78d8e448e78ba17fa32dafc0c798",
+    "archiveSha256": "b7f88808e5eb7171d0e24e86022124de536b78d8e448e78ba17fa32dafc0c798"
+  },
+  {
+    "source": "MANIFEST.json",
+    "archive": "MANIFEST.json",
+    "sourceSha256": "b613edc6c0cb6b6eadfdef7ace710ae00edfe7e21e27ade881ceee43fd0b00cb",
+    "archiveSha256": "b613edc6c0cb6b6eadfdef7ace710ae00edfe7e21e27ade881ceee43fd0b00cb"
+  },
+  {
+    "source": "PLAN.md",
+    "archive": "PLAN.md",
+    "sourceSha256": "fc11efd6f9c8dd251fdeb045b3ae19e555d253cd44ec32569be5f400e87d2305",
+    "archiveSha256": "fc11efd6f9c8dd251fdeb045b3ae19e555d253cd44ec32569be5f400e87d2305"
+  }
+]

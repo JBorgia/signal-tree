@@ -1,0 +1,6 @@
+{
+  "base": "C13",
+  "patchSha256": "91c0452964f8b7773aca560567aca6337206bfdb5b345289cb0fc6030aec44d9",
+  "authorManifestSha256": "d0b54e145b88a38015b3176000e0a8c23b74ebdc33be6f8eab0c122f2fb4b812",
+  "status": "prepared-for-composition-replay-independent-review-pending"
+}

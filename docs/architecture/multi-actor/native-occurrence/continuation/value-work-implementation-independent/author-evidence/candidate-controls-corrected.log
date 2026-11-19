@@ -1,0 +1,174 @@
+
+> nx run kernel:test --testFile=value-work-handoff.spec.ts --testFile=scalar-frame-publication.spec.ts --testFile=recipient-window-independent.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=publication-enrollment-adjudicated.spec.ts --testFile=publication-enrollment-invariance.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=value-work-handoff.spec.ts --testFile=scalar-frame-publication.spec.ts --testFile=recipient-window-independent.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=publication-enrollment-adjudicated.spec.ts --testFile=publication-enrollment-invariance.spec.ts --maxWorkers=1
+
+(node:93014) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93021) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c17-value-work-correction/candidate/packages/kernel
+
+(node:93028) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/value-work-handoff.spec.ts (13 tests | 1 failed) 42ms
+   × private author reentry during reduction keeps live selection and subsequent sibling payload 4ms
+(node:93036) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93039) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 64ms
+   × omission then restored retained collection selects matching payload and support 25ms
+(node:93041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93042) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-enrollment-invariance.spec.ts (16 tests | 6 failed) 74ms
+   × enrollment invariance branch: before-pending 9ms
+   × enrollment invariance branch: during-pending 5ms
+   × enrollment invariance branch: enroll-in-updater 4ms
+   × enrollment invariance root: before-pending 4ms
+   × enrollment invariance root: during-pending 3ms
+   × enrollment invariance root: enroll-in-updater 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:63:23
+     61|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     62|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     63|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     64|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     65| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: before-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: enroll-in-updater
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: before-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: enroll-in-updater
+AssertionError: expected [ { pair: { x: +0, y: +0 }, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "pair": {
++       "x": 0,
++       "y": 0,
++     },
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/lib/value-work-handoff.spec.ts > private author reentry during reduction keeps live selection and subsequent sibling payload
+AssertionError: expected [ { a: 2, b: +0 }, { a: +0, b: 3 } ] to deeply equal [ { a: 2, b: +0 }, { a: 2, b: 3 } ]
+
+- Expected
++ Received
+
+@@ -2,9 +2,9 @@
+    {
+      "a": 2,
+      "b": 0,
+    },
+    {
+-     "a": 2,
++     "a": 0,
+      "b": 3,
+    },
+  ]
+
+ ❯ src/lib/value-work-handoff.spec.ts:48:245
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+
+ Test Files  3 failed | 3 passed (6)
+      Tests  8 failed | 77 passed (85)
+   Start at  11:56:26
+   Duration  5.05s (transform 885ms, setup 0ms, import 1.77s, tests 332ms, environment 2.12s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=value-work-handoff.spec.ts --testFile=scalar-frame-publication.spec.ts --testFile=recipient-window-independent.spec.ts --testFile=native-certificate-successor.spec.ts --testFile=publication-enrollment-adjudicated.spec.ts --testFile=publication-enrollment-invariance.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.8s

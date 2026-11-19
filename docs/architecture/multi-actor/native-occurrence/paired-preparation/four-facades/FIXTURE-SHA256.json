@@ -1,0 +1,6 @@
+{
+  "packages/vue/src/lib/selected-prepared-facade.spec.ts": "2b7586d597c68d295aba589f181b7c58eada5ee7f3148a9a2c6fbff43e8c7394",
+  "packages/angular/src/lib/selected-prepared-facade.spec.ts": "693003bb6c4570e07dfe50042b96f243bac25090525c2d52822cfe35f4378169",
+  "packages/solid/src/lib/selected-prepared-facade.spec.ts": "d851bca66364b774e8b486d228a7fe942d704442dcc31f48d8450ff992a2a724",
+  "packages/react/src/selected-prepared-facade.spec.tsx": "532e9c7ed8f42bd3915429fcc57b78cea6804aa53aab9bad3f1b9d87efd60ff8"
+}

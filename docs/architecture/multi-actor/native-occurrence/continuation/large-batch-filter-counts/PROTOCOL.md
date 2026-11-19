@@ -1,0 +1,5 @@
+# Bounded C19 predicate counts
+
+Exact C19 manifest verified before copy. Test-only instrumentation, no runtime edits. N=16,32,64,128. Same original first-test operations: setAll(rows(N)), setAll(rows(N,N)), setAll([]); plain tree with entityMembershipReader subscription versus no subscription. Reader acquisition retained in both to isolate subscription. Final actual count=0 and subscribed events>0 mandatory. Intermediate count/IDs asserted outside measurement. Uninstrumented parity for each workload; native-filter calibration before workload.
+
+Wrap Array.prototype.filter only synchronously around each operation; native filter still performs iteration/species/hole handling, original predicate receives original thisArg and arguments. Count actual predicate visits (not length), capture stack once per filter invocation, restore prototype on throw. Assertions/setup/teardown outside counting. Report counts by operation and first kernel callsite plus full example stacks. No timing or 130k extrapolated-runtime claims; OS ArrayFilter sample only motivates investigation. No cost ceiling changed. Stop at concrete source attribution; Tesla owns point-cost work.

@@ -1,0 +1,78 @@
+
+> nx run angular:test selected-callback-facade -t retains coherent native metadata --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade -t "retains coherent native metadata" --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:69919) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69977) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-selected-projection-repair/packages/angular
+
+(node:69989) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+retained-native-metadata false
+
+ ❯ src/lib/selected-callback-facade.spec.ts (5 tests | 1 failed | 4 skipped) 14ms
+   × retains coherent native metadata on one callback-acquired reader 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-callback-facade.spec.ts > retains coherent native metadata on one callback-acquired reader
+AssertionError: expected { …(2) } to be { …(2) } // Object.is equality
+
+If it should pass with deep equality, replace "toBe" with "toStrictEqual"
+
+Expected: { …(2) }
+Received: serializes to the same string
+
+
+Compared values have no visual difference.
+
+ ❯ Object.onAdd src/lib/selected-callback-facade.spec.ts:236:19
+    234|     const after = held[SIGNAL];
+    235|     console.log('retained-native-metadata', Object.is(before, after));
+    236|     expect(after).toBe(before);
+       |                   ^
+    237|   }});
+    238|   try {
+ ❯ emitTap ../kernel/src/lib/entity-signal.ts:2061:24
+ ❯ addOneWithStructuralEffect ../kernel/src/lib/entity-signal.ts:1912:5
+ ❯ addOne ../kernel/src/lib/entity-signal.ts:2769:14
+ ❯ Proxy.api.<computed> ../kernel/src/lib/entity-signal.ts:3968:16
+ ❯ src/lib/selected-callback-facade.spec.ts:239:17
+ ❯ new ZoneAwarePromise ../../node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  12:46:28
+   Duration  2.12s (transform 731ms, setup 602ms, import 865ms, tests 14ms, environment 498ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade -t "retains coherent native metadata" --maxWorkers=2" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    4.0s

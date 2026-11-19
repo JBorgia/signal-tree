@@ -1,0 +1,6 @@
+{
+  "guardBoundaryChecks": 3,
+  "validSyntheticTimingAccepted": true,
+  "wrongPidKindSizeRejected": 3,
+  "costChildren": 0
+}

@@ -1,0 +1,95 @@
+--- a/packages/kernel/src/lib/packet-index-adversarial.spec.ts
++++ b/packages/kernel/src/lib/packet-index-adversarial.spec.ts
+@@ -26,7 +26,7 @@
+ 
+ it('remove followed by restored same subject preserves final endpoint and per-edit restoredFields precedence',()=>{
+  const s=new EntityPublicationSource();const r=removal(1);const restored=Object.freeze({present:true,value:5,requirement:initialRequirement()});const selected=Object.freeze({present:true,value:8,requirement:initialRequirement()});
+- const add:Edit=Object.freeze({...edit(1,11),structural:{kind:'add',subject:1},restoredFields:new Map([['x',restored]])});
++ const add:Edit=Object.freeze({...edit(1,11),structural:Object.freeze({kind:'add' as const,subject:1}),restoredFields:new Map([['x',restored]])});
+  try{install(s,packet([r,add],{steps:[{ordinal:0,ordinary:[r],physical:[r]},{ordinal:1,ordinary:[add],physical:[add]}],prepareResponsibility:selection=>{expect(selection!.proposed(1,'x').value).toBe(11);selection!.choose(1,'x',selected);return undefined;}}));expect(before(s)).toBe(restored);expect(s.inspect().negativePresence).toBe(0);
+  }finally{s.dispose();}
+ });
+@@ -80,21 +80,31 @@
+  try{install(s,packet([a,b],{steps:[{ordinal:0,ordinary:[a],physical:[a]},{ordinal:1,ordinary:[b],physical:[b]}]}));expect(calls).toBe(1);}finally{off();s.dispose();}
+ });
+ 
+-for(const mutation of ['append','subject','kind'] as const)it(`private admission mutation refuses before installation: ${mutation}`,()=>{
+- const s=new EntityPublicationSource();const a:Edit={...edit(1,7),structural:{kind:'add',subject:1}};const edits:Edit[]=[a];const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:selection=>{
++for(const mutation of ['append','subject','kind'] as const)it(`admitted private metadata cannot change before installation: ${mutation}`,()=>{
++ const s=new EntityPublicationSource();const a:Edit={...edit(1,7),structural:{kind:'add',subject:1}};const edits:Edit[]=[a];const installed=new Map<string,number>();let attempts=0;
++ const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:selection=>{
++  attempts++;expect(selection!.proposed(1,'x').value).toBe(7);
++  expect(Object.isFrozen(edits)).toBe(true);expect(Object.isFrozen(a)).toBe(true);expect(Object.isFrozen(a.structural)).toBe(true);
++  const changed=mutation==='append'?Reflect.set(edits,1,edit(1,11)):mutation==='subject'?Reflect.set(a,'subject',2):Reflect.set(a.structural!,'kind','remove');
++  expect(changed).toBe(false);expect(edits).toEqual([a]);expect(a.subject).toBe(1);expect(a.structural!.kind).toBe('add');
+   expect(selection!.proposed(1,'x').value).toBe(7);
+-  if(mutation==='append')edits.push(edit(1,11));
+-  else if(mutation==='subject')Reflect.set(a,'subject',2);
+-  else Reflect.set(a.structural!,'kind','remove');
+-  return undefined;
++  return {writes:[{map:installed,key:'accepted',value:7}],adds:[]};
+  }};
+- try{expect(()=>s.prepare(p)).toThrow('admission structure changed');expect(s.inspect().rows).toBe(0);expect(s.inspect().presence).toBe(0);}finally{s.dispose();}
++ try{const u=s.prepare(p)!;expect(attempts).toBe(1);expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);u.finalize?.();installTerminalRecord(u.record);s.complete(u.completion);expect(installed.get('accepted')).toBe(7);expect(s.inspect().rows).toBe(1);expect(before(s).value).toBe(7);expect(before(s,2).present).toBe(false);}finally{s.dispose();}
+ });
+ 
+-it('later private recipient mutation refuses at finalize, before prepared responsibility installs',()=>{
+- const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();const a=edit(1,7);const edits=[a];const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:1,value:7}],adds:[]})};
+- const off=s.subscribe({prepare(){edits.push(edit(1,11));return undefined;},complete(){}});
+- try{const u=s.prepare(p)!;expect(()=>u.finalize!()).toThrow('admission structure changed');expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++it('recipient append attempt throws during prepare before responsibility or source installation',()=>{
++ const s=new EntityPublicationSource();const installed=new Map<unknown,unknown>();const a=edit(1,7);const edits=[a];let attempted=0,completed=0;let mutationError:unknown,prepareError:unknown;
++ const p:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:1,value:7}],adds:[]})};
++ const off=s.subscribe({prepare(){attempted++;try{edits.push(edit(1,11));}catch(error){mutationError=error;throw error;}throw Error('immutable append unexpectedly succeeded');},complete(){completed++;}});
++ try{try{s.prepare(p);}catch(error){prepareError=error;}expect(attempted).toBe(1);expect(Object.isFrozen(edits)).toBe(true);expect(mutationError).toBeInstanceOf(TypeError);expect(prepareError).toBe(mutationError);expect(edits).toEqual([a]);expect(completed).toBe(0);expect(installed.size).toBe(0);expect(s.inspect().rows).toBe(0);}finally{off();s.dispose();}
++});
++
++it('original frozen-shell precedence input refuses before callbacks and preserves borrowed structural metadata',()=>{
++ const s=new EntityPublicationSource();const r=removal(1),structural={kind:'add' as const,subject:1};const restored=Object.freeze({present:true,value:5,requirement:initialRequirement()});
++ const add:Edit=Object.freeze({...edit(1,11),structural,restoredFields:new Map([['x',restored]])});const descriptors=Object.getOwnPropertyDescriptors(structural);let responsibility=0,recipients=0;
++ const off=s.subscribe({prepare(){recipients++;return undefined;},complete(){throw Error('refusal cannot complete');}});
++ try{expect(()=>s.prepare(packet([r,add],{steps:[{ordinal:0,ordinary:[r],physical:[r]},{ordinal:1,ordinary:[add],physical:[add]}],prepareResponsibility:()=>{responsibility++;return undefined;}}))).toThrow('Frozen entity publication edit contains mutable admission metadata');expect([responsibility,recipients]).toEqual([0,0]);expect(Object.getOwnPropertyDescriptors(structural)).toEqual(descriptors);expect(Object.isFrozen(structural)).toBe(false);expect(s.inspect().rows).toBe(0);expect(s.inspect().negativePresence).toBe(0);}finally{off();s.dispose();}
+ });
+ 
+ for(const separate of [false,true])it(`authored removal dedup is same-step only, separate=${separate}`,()=>{
+@@ -108,11 +118,11 @@
+  try{install(s,packet([a],{prepareResponsibility:selection=>{expect(selection!.proposed(1,'x')).toMatchObject({present:true,value:undefined});expect(selection!.proposed(1,'missing')).toMatchObject({present:false,value:undefined});seen=true;return undefined;}}));expect(seen).toBe(true);expect(s.inspect().fields).toBe(fields===null?1:0);}finally{s.dispose();}
+ });
+ 
+-it('held support uses captured admitted subjects after source retirement and later private array mutation',()=>{
++it('held support retains admitted subjects after retirement and denied private array mutation',()=>{
+  const s=new EntityPublicationSource();const requirement=initialRequirement();requirement.proof={owners:[],unknown:true,invalid:false};
+  const a:Edit={...edit(1,7),restoredFields:new Map([['x',{present:true,value:7,requirement}]])};const edits=[a];let support:(()=>object)|undefined;
+  const off=s.subscribe({prepare(_p,native){support=(native as {support:()=>object}).support;return undefined;},complete(){}});
+- try{install(s,{owner:1,id:{},meta:undefined,ordinary:edits,physical:[a]});s.retire(1);edits.length=0;expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);}finally{off();s.dispose();}
++ try{install(s,{owner:1,id:{},meta:undefined,ordinary:edits,physical:[a]});expect(typeof support).toBe('function');expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);s.retire(1);expect(s.inspect().rows).toBe(0);expect(Object.isFrozen(edits)).toBe(true);expect(Reflect.set(edits,'length',0)).toBe(false);expect(edits).toEqual([a]);expect(nativeProof(support!() as NativeRequirement).unknown).toBe(true);}finally{off();s.dispose();}
+ });
+ 
+ it('deferred point aggregation indexes final packet once, including repeated ordinals',()=>{
+--- a/packages/kernel/src/lib/packet-index-review.spec.ts
++++ b/packages/kernel/src/lib/packet-index-review.spec.ts
+@@ -3,16 +3,16 @@
+ import {EntityPublicationSource,entityPublicationOrdinary,type EntityPublicationEdit as Edit,type EntityPublicationPacket as Packet} from './internals/entity-publication';
+ import {installTerminalRecord} from './internals/intrinsic-mutation';
+ const edit=(x:number):Edit=>({subject:1,before:undefined,after:{x},fields:['x']});
+-it('recipient finalizer admission mutation must refuse before installation',()=>{
+- const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();
++it('recipient finalizer append throws before responsibility and source installation',()=>{
++ const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();let attempts=0,completions=0;let mutationError:unknown,finalizeError:unknown;
+  const packet:Packet={owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})};
+- const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){edits.push(edit(99));}};},complete(){}});
+- try{const unit=source.prepare(packet)!;expect(()=>{unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);}).toThrow('admission structure changed');expect(installed.size).toBe(0);}finally{off();source.dispose();}
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){attempts++;try{edits.push(edit(99));}catch(error){mutationError=error;throw error;}throw Error('immutable append unexpectedly succeeded');}};},complete(){completions++;}});
++ try{const unit=source.prepare(packet)!;expect(attempts).toBe(0);try{unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);}catch(error){finalizeError=error;}expect(attempts).toBe(1);expect(Object.isFrozen(edits)).toBe(true);expect(mutationError).toBeInstanceOf(TypeError);expect(finalizeError).toBe(mutationError);expect(edits).toEqual([a]);expect(completions).toBe(0);expect(installed.size).toBe(0);expect(source.inspect().rows).toBe(0);}finally{off();source.dispose();}
+ });
+-it('recipient finalizer mutation diagnostic proves accepted stale native endpoint',()=>{
+- const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();
+- const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){edits.push(edit(99));}};},complete(){}});
+- try{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})})!;unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);expect(edits.map(e=>e.after)).toEqual([{x:7},{x:99}]);expect(installed.get('accepted')).toBe(7);off();let observed:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{observed=s!.before(1,'x').value;return undefined;}});expect(observed).toBe(7);}finally{off();source.dispose();}
++it('regression: denied finalizer append cannot pair changed packet with stale native endpoint',()=>{
++ const source=new EntityPublicationSource();const a=edit(7),edits=[a];const installed=new Map<string,number>();let attempts=0,completions=0;
++ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){attempts++;expect(Object.isFrozen(edits)).toBe(true);expect(Reflect.set(edits,1,edit(99))).toBe(false);expect(edits).toEqual([a]);}};},complete(){completions++;}});
++ try{const unit=source.prepare({owner:1,id:{},meta:undefined,ordinary:edits,physical:[a],prepareResponsibility:()=>({writes:[{map:installed,key:'accepted',value:7}],adds:[]})})!;expect(installed.size).toBe(0);expect(source.inspect().rows).toBe(0);unit.finalize?.();installTerminalRecord(unit.record);source.complete(unit.completion);expect([attempts,completions]).toEqual([1,1]);expect(edits.map(e=>e.after)).toEqual([{x:7}]);expect(installed.get('accepted')).toBe(7);off();let observed:unknown;source.prepare({owner:1,id:{},meta:undefined,ordinary:[],physical:[],prepareResponsibility:s=>{observed=s!.before(1,'x').value;return undefined;}});expect(observed).toBe(7);expect(source.inspect().rows).toBe(1);}finally{off();source.dispose();}
+ });
+ 
+ it('duplicate step and edit identities preserve reverse-find oracle and restored endpoint priority',()=>{

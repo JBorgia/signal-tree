@@ -1,0 +1,35 @@
+{
+  "running": null,
+  "completed": [
+    {
+      "name": "source-types",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "spec-types",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "angular",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "react",
+      "exit": 1,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "vue",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "solid",
+      "exit": 1,
+      "manifestMismatchesAfter": []
+    }
+  ]
+}

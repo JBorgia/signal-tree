@@ -1,0 +1,27 @@
+{
+  "CARVER-COORDINATION.md": {
+    "sha256": "319be9e8ea05252da70aa2932c5838a5fb4f3563060658c947ffa88947716b08",
+    "archive": "CARVER-COORDINATION.md",
+    "archiveSha256": "319be9e8ea05252da70aa2932c5838a5fb4f3563060658c947ffa88947716b08"
+  },
+  "CARVER-HANDOFF.md": {
+    "sha256": "d6ce5f8b0671a2fd01247fa26d1c49d500fcdbb8ad96d0bbd4aea78acf06ae94",
+    "archive": "CARVER-HANDOFF.md",
+    "archiveSha256": "d6ce5f8b0671a2fd01247fa26d1c49d500fcdbb8ad96d0bbd4aea78acf06ae94"
+  },
+  "DESIGN.md": {
+    "sha256": "1cbe0464630c7a8dce9917e1ea5743999d19f9acc5c9311a085d084b94574f4d",
+    "archive": "DESIGN.md",
+    "archiveSha256": "1cbe0464630c7a8dce9917e1ea5743999d19f9acc5c9311a085d084b94574f4d"
+  },
+  "INITIAL-DRAFT.md": {
+    "sha256": "0ca94cedde664a76bfd81427c06401f7f39d8eb5b8b864d6a87ebb54174b8e23",
+    "archive": "INITIAL-DRAFT.md",
+    "archiveSha256": "0ca94cedde664a76bfd81427c06401f7f39d8eb5b8b864d6a87ebb54174b8e23"
+  },
+  "INPUTS.json": {
+    "sha256": "9d5e2e23ac4de9a5ba07660f5dd89ce0073563a46308d81856f71105180766f5",
+    "archive": "INPUTS.json",
+    "archiveSha256": "9d5e2e23ac4de9a5ba07660f5dd89ce0073563a46308d81856f71105180766f5"
+  }
+}

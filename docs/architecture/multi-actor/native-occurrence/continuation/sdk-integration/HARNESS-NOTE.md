@@ -1,0 +1,1 @@
+The first git apply --check ran from /private/tmp and failed with missing relative paths. It changed no files. The corrected check from candidate passed before application. No patch hunk or reviewed source was altered.

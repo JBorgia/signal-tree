@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "runtime.mjs"
+  ],
+  "cwd": "/private/tmp/st-c23-public-packed-proof/consumer",
+  "noProgressSeconds": 180
+}

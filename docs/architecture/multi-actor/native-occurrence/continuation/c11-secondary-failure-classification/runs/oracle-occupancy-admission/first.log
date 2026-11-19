@@ -1,0 +1,35 @@
+
+> nx run kernel:test independent-occupancy-admission.spec.ts --testNamePattern=sparse --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-occupancy-admission.spec.ts --testNamePattern=sparse --maxWorkers=1
+
+(node:30121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30142) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/oracle/packages/kernel
+
+(node:30156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 4 skipped (5)
+   Start at  10:29:23
+   Duration  2.64s (transform 1.36s, setup 0ms, import 1.61s, tests 27ms, environment 827ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

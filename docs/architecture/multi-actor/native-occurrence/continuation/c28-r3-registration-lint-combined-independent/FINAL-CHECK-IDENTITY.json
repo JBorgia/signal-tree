@@ -1,0 +1,80 @@
+{
+  "manifest": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84",
+  "verifiedFiles": 3119,
+  "mismatches": [],
+  "runtimeComposition": {
+    "packages/kernel/src/enhancers/transactions/transactions.ts": {
+      "hash": "92deeefb0619b5660c08c859b24cf33cc8c5affd65b5c991270192d9c611e5c5",
+      "matchesLint": true,
+      "matchesRegistration": false
+    },
+    "packages/kernel/src/lib/experimental-publication/entity.ts": {
+      "hash": "f213cf2f1f7095a9e6881416a3dd685714bb678a68dd31929d6871817d7557c6",
+      "matchesLint": false,
+      "matchesRegistration": false
+    },
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+      "hash": "aff08b7c247d874d2a0e88c9d97869bb8fb4fd6dd576956f7e89923c02dca743",
+      "matchesLint": true,
+      "matchesRegistration": false
+    },
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts": {
+      "hash": "710b751727410e74b8f7e7f3a93eefa8054cab995fa017870f7c9b6eeba7ba5f",
+      "matchesLint": true,
+      "matchesRegistration": false
+    },
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+      "hash": "f19efd213bf286743864bc0b32211ca152997c2c713c1cc5e64f7e2661a2f88e",
+      "matchesLint": true,
+      "matchesRegistration": false
+    },
+    "packages/kernel/src/lib/link.ts": {
+      "hash": "a413b304b5f989af64620795ccefcbf3061285f9def16086f93cfccbb90cbba5",
+      "matchesLint": false,
+      "matchesRegistration": true
+    }
+  },
+  "graphRoots": {
+    "kernel": "packages/kernel",
+    "react": "packages/react"
+  },
+  "evidence": {
+    "runs/lint-local-fixtures/first.log": "34cba378ddf71e7c526dad2aa4873e8fb38c829166d3c22245149e28deed50dc",
+    "runs/lint-local-fixtures/data/project-graph.json": "a1c7d8dee606b9d6bdb9300179209d0b8fe554e4ead63daa455cc4af8732e9f5",
+    "runs/spec-types-relocated/first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "runs/entity-relocated-first/first.log": "a36126b9e4291be2dda458f2dcd94f8b26060e04fdf67d697a6b966d1c510cf3",
+    "main-independent-replay/RESULTS.json": "0a1b52f69702f3f43f3b53440745792a03d87d90ce2b719e1549584d32d187d3",
+    "BUILD-RESULT.json": "4dd4f11b14adfb495eb2297409c72b76439b14d978cf6a6f858442c5b7a2e581"
+  },
+  "mainReplayArtifactsMatch": {
+    "production8": true,
+    "production-lifecycle6": true,
+    "production-receipts6": true,
+    "production-no-link": true
+  },
+  "cases.mjsUnchanged": true,
+  "lifecycle.mjsUnchanged": true,
+  "runSourceAgreement": {
+    "lint-local-fixtures": {
+      "tracked": 1040,
+      "differing": []
+    },
+    "entity-relocated-first": {
+      "tracked": 1040,
+      "differing": []
+    },
+    "spec-types-relocated": {
+      "tracked": 1040,
+      "differing": []
+    },
+    "source-types-relocated": {
+      "tracked": 1040,
+      "differing": []
+    },
+    "public-types-relocated": {
+      "tracked": 1040,
+      "differing": []
+    }
+  },
+  "buildSourceMatchesManifest": true
+}

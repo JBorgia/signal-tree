@@ -1,0 +1,368 @@
+{
+  "snapshotSha256": "41ef5af291b8cb669ca2e91b4725693b43c4f6c9ec647c927068def2747b4531",
+  "verifiedArtifactEntries": 43,
+  "verifiedUnchangedBaselineFiles": 3066,
+  "phaseCount": 36,
+  "rows": [
+    {
+      "arm": "baseline",
+      "mode": "paired",
+      "n": 3,
+      "phase": "jumpTo0",
+      "total": 9,
+      "index": 0,
+      "destroyed": 0,
+      "row": 9
+    },
+    {
+      "arm": "baseline",
+      "mode": "paired",
+      "n": 3,
+      "phase": "jumpTo1",
+      "total": 37,
+      "index": 1,
+      "destroyed": 0,
+      "row": 36
+    },
+    {
+      "arm": "baseline",
+      "mode": "paired",
+      "n": 32,
+      "phase": "jumpTo0",
+      "total": 96,
+      "index": 0,
+      "destroyed": 0,
+      "row": 96
+    },
+    {
+      "arm": "baseline",
+      "mode": "paired",
+      "n": 32,
+      "phase": "jumpTo1",
+      "total": 385,
+      "index": 1,
+      "destroyed": 0,
+      "row": 384
+    },
+    {
+      "arm": "baseline",
+      "mode": "paired",
+      "n": 256,
+      "phase": "jumpTo0",
+      "total": 768,
+      "index": 0,
+      "destroyed": 0,
+      "row": 768
+    },
+    {
+      "arm": "baseline",
+      "mode": "paired",
+      "n": 256,
+      "phase": "jumpTo1",
+      "total": 3073,
+      "index": 1,
+      "destroyed": 0,
+      "row": 3072
+    },
+    {
+      "arm": "baseline",
+      "mode": "large-sequence",
+      "n": 3,
+      "phase": "jumpTo0",
+      "total": 10,
+      "index": 0,
+      "destroyed": 1,
+      "row": 9
+    },
+    {
+      "arm": "baseline",
+      "mode": "large-sequence",
+      "n": 3,
+      "phase": "jumpTo1",
+      "total": 38,
+      "index": 1,
+      "destroyed": 1,
+      "row": 36
+    },
+    {
+      "arm": "baseline",
+      "mode": "large-sequence",
+      "n": 32,
+      "phase": "jumpTo0",
+      "total": 97,
+      "index": 0,
+      "destroyed": 1,
+      "row": 96
+    },
+    {
+      "arm": "baseline",
+      "mode": "large-sequence",
+      "n": 32,
+      "phase": "jumpTo1",
+      "total": 386,
+      "index": 1,
+      "destroyed": 1,
+      "row": 384
+    },
+    {
+      "arm": "baseline",
+      "mode": "large-sequence",
+      "n": 256,
+      "phase": "jumpTo0",
+      "total": 769,
+      "index": 0,
+      "destroyed": 1,
+      "row": 768
+    },
+    {
+      "arm": "baseline",
+      "mode": "large-sequence",
+      "n": 256,
+      "phase": "jumpTo1",
+      "total": 3074,
+      "index": 1,
+      "destroyed": 1,
+      "row": 3072
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "paired",
+      "n": 3,
+      "phase": "jumpTo0",
+      "total": 18,
+      "index": 0,
+      "destroyed": 0,
+      "row": 18
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "paired",
+      "n": 3,
+      "phase": "jumpTo1",
+      "total": 37,
+      "index": 1,
+      "destroyed": 0,
+      "row": 36
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "paired",
+      "n": 32,
+      "phase": "jumpTo0",
+      "total": 192,
+      "index": 0,
+      "destroyed": 0,
+      "row": 192
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "paired",
+      "n": 32,
+      "phase": "jumpTo1",
+      "total": 385,
+      "index": 1,
+      "destroyed": 0,
+      "row": 384
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "paired",
+      "n": 256,
+      "phase": "jumpTo0",
+      "total": 1536,
+      "index": 0,
+      "destroyed": 0,
+      "row": 1536
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "paired",
+      "n": 256,
+      "phase": "jumpTo1",
+      "total": 3073,
+      "index": 1,
+      "destroyed": 0,
+      "row": 3072
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "large-sequence",
+      "n": 3,
+      "phase": "jumpTo0",
+      "total": 19,
+      "index": 0,
+      "destroyed": 1,
+      "row": 18
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "large-sequence",
+      "n": 3,
+      "phase": "jumpTo1",
+      "total": 38,
+      "index": 1,
+      "destroyed": 1,
+      "row": 36
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "large-sequence",
+      "n": 32,
+      "phase": "jumpTo0",
+      "total": 193,
+      "index": 0,
+      "destroyed": 1,
+      "row": 192
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "large-sequence",
+      "n": 32,
+      "phase": "jumpTo1",
+      "total": 386,
+      "index": 1,
+      "destroyed": 1,
+      "row": 384
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "large-sequence",
+      "n": 256,
+      "phase": "jumpTo0",
+      "total": 1537,
+      "index": 0,
+      "destroyed": 1,
+      "row": 1536
+    },
+    {
+      "arm": "mutant-validation",
+      "mode": "large-sequence",
+      "n": 256,
+      "phase": "jumpTo1",
+      "total": 3074,
+      "index": 1,
+      "destroyed": 1,
+      "row": 3072
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "paired",
+      "n": 3,
+      "phase": "jumpTo0",
+      "total": 9,
+      "index": 0,
+      "destroyed": 0,
+      "row": 9
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "paired",
+      "n": 3,
+      "phase": "jumpTo1",
+      "total": 61,
+      "index": 1,
+      "destroyed": 0,
+      "row": 60
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "paired",
+      "n": 32,
+      "phase": "jumpTo0",
+      "total": 96,
+      "index": 0,
+      "destroyed": 0,
+      "row": 96
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "paired",
+      "n": 32,
+      "phase": "jumpTo1",
+      "total": 641,
+      "index": 1,
+      "destroyed": 0,
+      "row": 640
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "paired",
+      "n": 256,
+      "phase": "jumpTo0",
+      "total": 768,
+      "index": 0,
+      "destroyed": 0,
+      "row": 768
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "paired",
+      "n": 256,
+      "phase": "jumpTo1",
+      "total": 5121,
+      "index": 1,
+      "destroyed": 0,
+      "row": 5120
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "large-sequence",
+      "n": 3,
+      "phase": "jumpTo0",
+      "total": 10,
+      "index": 0,
+      "destroyed": 1,
+      "row": 9
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "large-sequence",
+      "n": 3,
+      "phase": "jumpTo1",
+      "total": 62,
+      "index": 1,
+      "destroyed": 1,
+      "row": 60
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "large-sequence",
+      "n": 32,
+      "phase": "jumpTo0",
+      "total": 97,
+      "index": 0,
+      "destroyed": 1,
+      "row": 96
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "large-sequence",
+      "n": 32,
+      "phase": "jumpTo1",
+      "total": 642,
+      "index": 1,
+      "destroyed": 1,
+      "row": 640
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "large-sequence",
+      "n": 256,
+      "phase": "jumpTo0",
+      "total": 769,
+      "index": 0,
+      "destroyed": 1,
+      "row": 768
+    },
+    {
+      "arm": "mutant-snapshot",
+      "mode": "large-sequence",
+      "n": 256,
+      "phase": "jumpTo1",
+      "total": 5122,
+      "index": 1,
+      "destroyed": 1,
+      "row": 5120
+    }
+  ]
+}

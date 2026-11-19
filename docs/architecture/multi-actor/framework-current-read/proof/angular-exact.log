@@ -1,0 +1,38 @@
+
+> nx run angular:test original-public-current -t public callback discriminator --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular original-public-current -t "public callback discriminator" --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:34772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34812) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/angular
+
+(node:34819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 1 skipped (2)
+   Start at  13:12:51
+   Duration  3.85s (transform 1.29s, setup 763ms, import 1.54s, tests 39ms, environment 1.30s)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      7.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    7.6s

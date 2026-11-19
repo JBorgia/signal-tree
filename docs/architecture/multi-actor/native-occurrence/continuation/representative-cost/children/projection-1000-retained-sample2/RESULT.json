@@ -1,0 +1,21 @@
+{
+  "id": "projection-1000-retained-sample2",
+  "ordinal": 31,
+  "profile": "projection",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample2",
+  "exit": 0,
+  "pid": 70223,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.9323927500518039,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1064960,
+  "minimumObservedHostFreePercentage": 40.0,
+  "attempts": 1
+}

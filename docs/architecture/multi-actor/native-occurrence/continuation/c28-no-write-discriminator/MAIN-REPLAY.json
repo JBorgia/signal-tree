@@ -1,0 +1,11 @@
+{
+  "records": 20,
+  "rawObservationsEqual": true,
+  "command": "ST_TWO_HISTORY_OUTPUT=/private/tmp/st-c28-no-write-discriminator/MAIN-OBSERVATIONS.jsonl python3 /private/tmp/st-c28-no-write-discriminator/run-focused.py main-independent test kernel two-history-public.spec.ts --skip-nx-cache --maxWorkers=1",
+  "result": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "outputSha256": "e9a28696103f8affb2f11bb8c57e45b6ddabaa9e3bca15880ad54c0b44980dc1"
+}

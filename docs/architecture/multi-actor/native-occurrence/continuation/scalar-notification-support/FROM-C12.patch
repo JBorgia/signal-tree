@@ -1,0 +1,380 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -472,19 +472,40 @@
+  * It can use the existing conservative gate, never an active declaration or
+  * an older installed unit's permission. Prepared source units reduce separately.
+  */
++// Observation uncertainty cannot replace installed native or recipient support.
++// Reuse one wrapper per selected requirement; repeated notifications add no depth.
++const observationRequirements=new WeakMap<lifecycle.NativeRequirement,lifecycle.NativeRequirement>();
++const observationWrapped=new WeakSet<lifecycle.NativeRequirement>();
++const observationUnknown=requirementOf({owners:[],unknown:true,invalid:false});
++function observationRequirement(selected:lifecycle.NativeRequirement):lifecycle.NativeRequirement {
++ if(observationWrapped.has(selected))return selected;
++ let wrapped=observationRequirements.get(selected);
++ if(!wrapped){wrapped=lifecycle.combineNativeRequirements([selected,observationUnknown]);observationRequirements.set(selected,wrapped);observationWrapped.add(wrapped);}
++ return wrapped;
++}
+ export function project(channel:object,_meta:unknown,payload:unknown,relative?:readonly string[]):Fact|undefined{
+  const b=bindings.get(channel);if(!b||b.pending.size)return undefined;
+- const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);
+- const unknownProof={owners:[],unknown:true,invalid:false};proofs.set(fact,unknownProof);ownProofs.set(fact,unknownProof);
+- const requirement=requirementOf(unknownProof);
++ const makeFact=():Fact=>{const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);return fact;};
++ const replaceContribution=(node:object,previous:Fact|undefined):Fact=>{
++  const selected=previous&&factRequirements.get(previous);
++  if(!selected)throw Error('Observed scalar has no selected publication requirement');
++  const contribution=makeFact();installFact(b,node,'value',contribution,observationRequirement(selected));return contribution;
++ };
+  if(b.aggregate){
+   const field=relative&&fieldAt(b.fieldTrie,relative)?.field;
++  if(relative?.length&&!field)throw Error('Observed scalar has no enrolled publication field');
+   const fields=field?[field]:[...b.completedFields.keys()];
+-  for(const node of fields){installFact(b,node,'value',fact,requirement);b.completedFields.set(node,fact);b.fieldFacts.set(node,fact);}
+- }else if(b.source)installFact(b,b.source,'value',fact,requirement);
+- b.valuePayload=payload;b.valueFact=fact;b.completedValueFact=fact;
++  for(const node of fields){const contribution=replaceContribution(node,b.completedFields.get(node));b.completedFields.set(node,contribution);b.fieldFacts.set(node,contribution);}
++ }else if(b.source){const contribution=replaceContribution(b.source,b.completedValueFact);b.valueFact=contribution;b.completedValueFact=contribution;}
++ // The outgoing aggregate has its own fact; contributor readiness callbacks
++ // must never overwrite its proof with just the final field's requirement.
++ const fact=makeFact(),support=projectionSupport(b);
++ const proof=combineProofs([support.proof,lifecycle.nativeProof(observationUnknown)]);
++ proofs.set(fact,proof);ownProofs.set(fact,proof);
++ lifecycle.observeRevision(channel,fact,proof,b.index.unresolved()!==0);
++ b.valuePayload=payload;
+  if(b.current)lifecycle.supersede(channel,b.current);
+- b.current=fact;b.projected=Object.freeze({fact,payload:b.aggregate?maskPayload(b):payload,changed:true});
++ b.current=fact;b.projected=Object.freeze({fact,payload:support.present?(b.aggregate?maskPayload(b):payload):undefined,changed:true});
+  return fact;
+ }
+ export function refreshSource(channel:object):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined{const b=bindings.get(channel);if(b)ready(channel,b);return b?.projected&&b.projected.fact===b.current?b.projected:undefined;}
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -416,6 +416,14 @@
+ 
+ export function completeDeclarationContext(channel:object):boolean{return stack.some(f=>f.channel===channel)&&stack.every(f=>f.declaredOwners!==undefined&&!frameUnknown(f));}
+ 
++/** A notification selects existing support, never a declaration or a new window.
++ * Track its exact dependencies through the same wake/retire/dispose lifecycle. */
++export function observeRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending:boolean):void {
++ const c=connections.get(channel);if(!c||c.disposed)return;
++ if(c.ops.has(revision))throw Error('Observed revision already registered');
++ const op:Operation={recipientWindow:[],incomplete:false,projectionPending,coverageUnknown:false,channel,dependencies:new Set(),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map(),proof};
++ c.ops.set(revision,op);projectRevision(channel,revision,proof,projectionPending);
++}
+ export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending=false):Readonly<Proof>{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return proof;
+  const selected=recipientProof(op,proof);op.projectionPending=projectionPending;op.proof=selected;
+--- /dev/null
++++ b/packages/kernel/src/lib/scalar-native-support.spec.ts
+@@ -0,0 +1,295 @@
++import { expect, it, vi } from 'vitest';
++import { link, signalTree, transactions } from '../index';
++import { getPathNotifier } from './path-notifier';
++import { getPositionRegistry } from './internals/position-registry';
++import { getOwnedPositionIds } from './internals/owned-mutation';
++import { RecipientOccurrences } from './experimental-publication/recipient-occurrence';
++import * as life from './experimental-publication/lifecycle';
++import { diagnostics } from './experimental-publication/private';
++type C = ReturnType<typeof link> & {
++  declare(input: unknown, work: () => unknown): unknown;
++};
++const flush = async () => {
++  getPathNotifier().flushSync();
++  for (let i = 0; i < 120; i++) await Promise.resolve();
++};
++function setup() {
++  const tree = signalTree(
++    { pair: { x: 0, y: 0 } },
++    { enhancers: [transactions()] }
++  );
++  const foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const parent = link(tree.$.pair, { set: () => {} }) as C;
++  const sent: unknown[] = [];
++  const q = foreign.transact(() => foreign.$.z(7));
++  let child: C | undefined;
++  return {
++    tree,
++    foreign,
++    parent,
++    sent,
++    q,
++    get child() {
++      return child!;
++    },
++    fail(cause: 'throw' | 'contradiction') {
++      expect(() =>
++        parent.declare({ kind: 'independent' }, () => {
++          tree.$.pair.x(7);
++          child = link(tree.$.pair, {
++            set: (v) => {
++              sent.push(v);
++            },
++          }) as C;
++          if (cause === 'throw') throw Error('parent invalid');
++          parent.declare({ kind: 'dependent', owners: [q] }, () =>
++            tree.$.pair.y(1)
++          );
++        })
++      ).toThrow(cause === 'throw' ? 'parent invalid' : 'contradiction');
++    },
++    destroy() {
++      child?.dispose();
++      parent.dispose();
++      q.confirm();
++      tree.destroy();
++      foreign.destroy();
++    },
++  };
++}
++for (const cause of ['throw', 'contradiction'] as const)
++  it(`late enrollment preserves ${cause} and useful settlement`, async () => {
++    const s = setup();
++    try {
++      s.fail(cause);
++      s.child.declare({ kind: 'independent' }, () => s.tree.$.pair.y(8));
++      await flush();
++      expect(s.tree.$.pair()).toEqual({ x: 7, y: 8 });
++      expect(s.sent).toEqual([]);
++      s.q.confirm();
++      await flush();
++      expect(s.sent).toEqual([{ x: 7, y: 8 }]);
++      await s.child.settled();
++    } finally {
++      s.destroy();
++    }
++  });
++for (const equal of [false, true])
++  it(`fresh literal replaces failed scalar support equal=${equal}`, async () => {
++    const s = setup();
++    try {
++      s.fail('throw');
++      s.child.declare({ kind: 'independent' }, () => s.tree.$.pair.y(8));
++      await flush();
++      expect(s.sent).toEqual([]);
++      s.child.declare({ kind: 'independent' }, () =>
++        s.tree.$.pair.x(equal ? 7 : 9)
++      );
++      await flush();
++      expect(s.sent).toEqual([{ x: equal ? 7 : 9, y: 8 }]);
++      expect(s.foreign.$.z()).toBe(7);
++    } finally {
++      s.destroy();
++    }
++  });
++it('derived write cannot cleanse failed shared validation', async () => {
++  const s = setup();
++  try {
++    s.fail('contradiction');
++    s.child.declare({ kind: 'independent' }, () => s.tree.$.pair.y(8));
++    expect(() =>
++      s.child.declare({ kind: 'independent' }, () =>
++        s.tree.$.pair.x((x) => x + 1)
++      )
++    ).toThrow('contradiction');
++    await flush();
++    expect(s.tree.$.pair()).toEqual({ x: 8, y: 8 });
++    expect(s.sent).toEqual([]);
++    s.q.confirm();
++    await flush();
++    expect(s.sent).toEqual([{ x: 8, y: 8 }]);
++  } finally {
++    s.destroy();
++  }
++});
++it('late native-only possible window survives uncovered notification', async () => {
++  const tree = signalTree({ x: 0 }),
++    foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const q = foreign.transact(() => foreign.$.z(7));
++  const sent: unknown[] = [];
++  const anchor = link(tree.$, { set: () => {} });
++  tree.$.x(7);
++  const c = link(tree.$, {
++    set: (v) => {
++      sent.push(v);
++    },
++  });
++  try {
++    await flush();
++    expect(sent).toEqual([]);
++    q.confirm();
++    await flush();
++    expect(sent).toEqual([{ x: 7 }]);
++  } finally {
++    c.dispose();
++    anchor.dispose();
++    q.confirm();
++    tree.destroy();
++    foreign.destroy();
++  }
++});
++it('newer authored scalar and sibling suppress only stale contribution', async () => {
++  const s = setup();
++  try {
++    s.fail('throw');
++    s.child.declare({ kind: 'independent' }, () => {
++      s.tree.$.pair.x(9);
++      s.tree.$.pair.y(8);
++    });
++    await flush();
++    expect(s.tree.$.pair()).toEqual({ x: 9, y: 8 });
++    expect(s.sent).toEqual([{ x: 9, y: 8 }]);
++  } finally {
++    s.destroy();
++  }
++});
++it('private repeated uncovered observations retain one wrapper and release subscriptions', async () => {
++  await flush();
++  const before = diagnostics();
++  const original = RecipientOccurrences.prototype.replace;
++  const indices = new Set<RecipientOccurrences>();
++  const selected: life.NativeRequirement[] = [];
++  const spy = vi
++    .spyOn(RecipientOccurrences.prototype, 'replace')
++    .mockImplementation(function (this: RecipientOccurrences, ...args) {
++      indices.add(this);
++      if (
++        [...indices].indexOf(this) === 1 &&
++        args[2]?.components?.some((r) => life.nativeProof(r).invalid)
++      )
++        selected.push(args[2]);
++      return original.apply(this, args);
++    });
++  const s = setup();
++  try {
++    s.fail('throw');
++    s.child.declare({ kind: 'independent' }, () => s.tree.$.pair.y(8));
++    await flush();
++    for (let i = 0; i < 4; i++) {
++      getPathNotifier().notify(
++        'pair.x',
++        8 + i,
++        7,
++        'pair.x',
++        undefined,
++        getOwnedPositionIds(s.tree.$.pair.x),
++        undefined,
++        getPositionRegistry(s.tree.$)!.id
++      );
++      await flush();
++      expect(s.sent).toEqual([]);
++    }
++    const wrappers = selected.filter((r) =>
++      r.components?.some(
++        (c) => life.nativeProof(c).unknown && !life.nativeProof(c).invalid
++      )
++    );
++    expect(wrappers.length).toBeGreaterThan(1);
++    expect(new Set(wrappers).size).toBe(1);
++  } finally {
++    s.destroy();
++    spy.mockRestore();
++  }
++  await flush();
++  for (const index of indices) expect(index.inspect().subscriptions).toBe(0);
++  expect(diagnostics()).toEqual(before);
++});
++
++// Private completion protocol trigger; the writes and Link are real runtime routes.
++import { preparePublicationMutations } from './internals/intrinsic-mutation';
++it('newer author completion reentry cannot replay outer scalar payload', async () => {
++  const tree = signalTree({ pair: { x: 0, y: 0 } }),
++    sent: unknown[] = [];
++  const parent = link(tree.$.pair, { set: () => {} }) as C;
++  let child: C | undefined,
++    entered = false;
++  const off = preparePublicationMutations(
++    tree.$.pair.x,
++    () => ({ record: { writes: [], adds: [] }, completion: {} }),
++    () => {
++      if (entered) return;
++      entered = true;
++      child = link(tree.$.pair, {
++        set: (v) => {
++          sent.push(v);
++        },
++      }) as C;
++      child.declare({ kind: 'independent' }, () => {
++        tree.$.pair.x(9);
++        tree.$.pair.y(8);
++      });
++    }
++  )!;
++  try {
++    parent.declare({ kind: 'independent' }, () => tree.$.pair.x(7));
++    await flush();
++    expect(entered).toBe(true);
++    expect(tree.$.pair()).toEqual({ x: 9, y: 8 });
++    expect(sent).toEqual([{ x: 9, y: 8 }]);
++  } finally {
++    off();
++    child?.dispose();
++    parent.dispose();
++    tree.destroy();
++  }
++});
++it('private repeated fallback retains unfinished native validation until close', async () => {
++  await flush();
++  const before = diagnostics();
++  const tree = signalTree({ x: 0 }),
++    foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
++  const parent = link(tree.$, { set: () => {} }) as C;
++  const sent: unknown[] = [];
++  const q = foreign.transact(() => foreign.$.z(7));
++  let child: C | undefined;
++  try {
++    expect(() =>
++      parent.declare({ kind: 'independent' }, () => {
++        tree.$.x(7);
++        child = link(tree.$, {
++          set: (v) => {
++            sent.push(v);
++          },
++        }) as C;
++        for (let i = 0; i < 3; i++) {
++          getPathNotifier().notify(
++            'x',
++            8 + i,
++            7,
++            'x',
++            undefined,
++            getOwnedPositionIds(tree.$.x),
++            undefined,
++            getPositionRegistry(tree.$)!.id
++          );
++          getPathNotifier().flushSync();
++          expect(sent).toEqual([]);
++        }
++        throw Error('close invalid');
++      })
++    ).toThrow('close invalid');
++    await flush();
++    expect(sent).toEqual([]);
++    q.confirm();
++    await flush();
++    expect(sent).toEqual([{ x: 10 }]);
++  } finally {
++    child?.dispose();
++    parent.dispose();
++    q.confirm();
++    tree.destroy();
++    foreign.destroy();
++  }
++  await flush();
++  expect(diagnostics()).toEqual(before);
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts
+@@ -0,0 +1,12 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++import {getPathNotifier} from './path-notifier';
++type C=ReturnType<typeof link>&{declare(input:unknown,work:()=>unknown):unknown};
++it('actual parent declaration contradiction must not publish inherited scalar through late enrollment',async()=>{
++ const tree=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const foreign=signalTree({z:0},{enhancers:[transactions()]});const parent=link(tree.$.pair,{set:()=>{}}) as C;const sent:unknown[]=[];let child:C|undefined;const q=foreign.transact(()=>foreign.$.z(7));
++ try{let failure:unknown;try{parent.declare({kind:'independent'},()=>{tree.$.pair.x(7);child=link(tree.$.pair,{set:v=>{sent.push(v);}}) as C;parent.declare({kind:'dependent',owners:[q]},()=>tree.$.pair.y(1));});}catch(error){failure=error;}
++ expect(failure).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',reason:'contradiction'});
++ child!.declare({kind:'independent'},()=>tree.$.pair.y(8));getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();
++ expect(tree.$.pair()).toEqual({x:7,y:8});expect(foreign.$.z()).toBe(7);expect(sent).toEqual([]);
++ }finally{child?.dispose();parent.dispose();q.confirm();tree.destroy();foreign.destroy();}
++});

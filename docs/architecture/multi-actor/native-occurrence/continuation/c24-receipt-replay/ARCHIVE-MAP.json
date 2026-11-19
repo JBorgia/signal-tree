@@ -1,0 +1,260 @@
+[
+  {
+    "source": "vue-supervisor.log",
+    "archive": "vue-supervisor.log",
+    "sourceSha256": "7e7b897b8af92d2668b15c7f0ff47b4a941ffd42279b21dbe1f6cc1ce9a3a2c7",
+    "archiveSha256": "7e7b897b8af92d2668b15c7f0ff47b4a941ffd42279b21dbe1f6cc1ce9a3a2c7"
+  },
+  {
+    "source": "run-focused.py",
+    "archive": "run-focused.py",
+    "sourceSha256": "599bf145d326f3cf595284fee1acccd0b7518652bd70cb738e6549374d47e088",
+    "archiveSha256": "599bf145d326f3cf595284fee1acccd0b7518652bd70cb738e6549374d47e088"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "6eeb045725c006182d13c9f1c3ba03ed0fdc0f9ef4d5b84a317e614a0fd7ec68",
+    "archiveSha256": "6eeb045725c006182d13c9f1c3ba03ed0fdc0f9ef4d5b84a317e614a0fd7ec68"
+  },
+  {
+    "source": "RUNTIME-UNCHANGED.json",
+    "archive": "RUNTIME-UNCHANGED.json",
+    "sourceSha256": "58a75f180550c8b8c424d6a443d1897006002ec5d2b5698b396f75cdfc5973de",
+    "archiveSha256": "58a75f180550c8b8c424d6a443d1897006002ec5d2b5698b396f75cdfc5973de"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "cb54add521dafd9ec875b87d6c19f85de38e4b56d0c79c147a7c3c3e41306bcd",
+    "archiveSha256": "e6343a745e3be7337ce673705b12682965ee22ca9345a994368be762336aded7"
+  },
+  {
+    "source": "solid-supervisor.log",
+    "archive": "solid-supervisor.log",
+    "sourceSha256": "18a0b70ad273d3d4318efa6fd844f6f5f57db2ebf8344383c688c6f3ccd3cce4",
+    "archiveSha256": "18a0b70ad273d3d4318efa6fd844f6f5f57db2ebf8344383c688c6f3ccd3cce4"
+  },
+  {
+    "source": "kernel-timing-supervisor.log",
+    "archive": "kernel-timing-supervisor.log",
+    "sourceSha256": "df208504276e180a362639094bb08f211e40e58309776204b8c21877786b1034",
+    "archiveSha256": "df208504276e180a362639094bb08f211e40e58309776204b8c21877786b1034"
+  },
+  {
+    "source": "COUNTERPARTS.json",
+    "archive": "COUNTERPARTS.json",
+    "sourceSha256": "471d6d274a11eb2ad983b0b92b2376527a8907ff8945ec0fc51f5ece232165bc",
+    "archiveSha256": "471d6d274a11eb2ad983b0b92b2376527a8907ff8945ec0fc51f5ece232165bc"
+  },
+  {
+    "source": "runs/vue/RESULT.json",
+    "archive": "runs/vue/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "runs/vue/first.log",
+    "archive": "runs/vue/first.log",
+    "sourceSha256": "28a17abdc18f18b5f4c0d9a78dc7e17eeb8d67d1eba9dc73200f11029e2216cb",
+    "archiveSha256": "28a17abdc18f18b5f4c0d9a78dc7e17eeb8d67d1eba9dc73200f11029e2216cb"
+  },
+  {
+    "source": "runs/vue/SOURCE.json",
+    "archive": "runs/vue/SOURCE.json.gz",
+    "sourceSha256": "1589322ff3c34ce79bbd35de2c7b226db45c06b8a4cd788dc3d8980fe8708154",
+    "archiveSha256": "fb02015ba8da726afbcb7f9b769c145896aae46fedbd10a9d798a35c8d08106c"
+  },
+  {
+    "source": "runs/vue/COMMAND.json",
+    "archive": "runs/vue/COMMAND.json",
+    "sourceSha256": "90a1bc43a9134e246fbfc6562d70526016fedcf1a5ee7aa48e88e60f9d05d1bc",
+    "archiveSha256": "90a1bc43a9134e246fbfc6562d70526016fedcf1a5ee7aa48e88e60f9d05d1bc"
+  },
+  {
+    "source": "runs/vue/PROCESS.json",
+    "archive": "runs/vue/PROCESS.json",
+    "sourceSha256": "1c77d93166dfc312b8da446d09f4d0b9e4d18ad6fcc67e5fd807456e9add5532",
+    "archiveSha256": "1c77d93166dfc312b8da446d09f4d0b9e4d18ad6fcc67e5fd807456e9add5532"
+  },
+  {
+    "source": "runs/angular/RESULT.json",
+    "archive": "runs/angular/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "runs/angular/first.log",
+    "archive": "runs/angular/first.log",
+    "sourceSha256": "674c4e481e7b7aaffd582a7ae7ebaee9a262502b2fb03f78ccd8eb3be2dc494f",
+    "archiveSha256": "674c4e481e7b7aaffd582a7ae7ebaee9a262502b2fb03f78ccd8eb3be2dc494f"
+  },
+  {
+    "source": "runs/angular/SOURCE.json",
+    "archive": "runs/angular/SOURCE.json.gz",
+    "sourceSha256": "59ae3556e7108dc7582b54270606c60be6147104d433c10705bc58c6cec0cb29",
+    "archiveSha256": "23d2306adbf655756505228d3731d8a9b14a5d176d798586e459228a6deaa76f"
+  },
+  {
+    "source": "runs/angular/COMMAND.json",
+    "archive": "runs/angular/COMMAND.json",
+    "sourceSha256": "19e7212554631c0ebe34f2c82caf39c716880871226c9138425f13462b44b769",
+    "archiveSha256": "19e7212554631c0ebe34f2c82caf39c716880871226c9138425f13462b44b769"
+  },
+  {
+    "source": "runs/angular/PROCESS.json",
+    "archive": "runs/angular/PROCESS.json",
+    "sourceSha256": "e82b1340826c922b5a5bfc78005ec3be3367bf146d10388c094079a7f649bbad",
+    "archiveSha256": "e82b1340826c922b5a5bfc78005ec3be3367bf146d10388c094079a7f649bbad"
+  },
+  {
+    "source": "runs/ancestor-observation/RESULT.json",
+    "archive": "runs/ancestor-observation/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "runs/ancestor-observation/first.log",
+    "archive": "runs/ancestor-observation/first.log",
+    "sourceSha256": "6166bbd899a42bd56b86d690b12d388f59d57bbbc8fd3b3077cb595947708319",
+    "archiveSha256": "6166bbd899a42bd56b86d690b12d388f59d57bbbc8fd3b3077cb595947708319"
+  },
+  {
+    "source": "runs/ancestor-observation/SOURCE.json",
+    "archive": "runs/ancestor-observation/SOURCE.json.gz",
+    "sourceSha256": "33a1f8abf6812aab914946f06a916d9f42bfbf3456e7bf9a21c4863961136741",
+    "archiveSha256": "554eaaaab55009b00c3352886d462b19a68b36cd98c5c2dd3c3cffaf3ef98e18"
+  },
+  {
+    "source": "runs/ancestor-observation/COMMAND.json",
+    "archive": "runs/ancestor-observation/COMMAND.json",
+    "sourceSha256": "759f44dc36a8e956707705db325b67beafaacf9e38b33d879af43b99a36cca23",
+    "archiveSha256": "759f44dc36a8e956707705db325b67beafaacf9e38b33d879af43b99a36cca23"
+  },
+  {
+    "source": "runs/ancestor-observation/PROCESS.json",
+    "archive": "runs/ancestor-observation/PROCESS.json",
+    "sourceSha256": "8b7c816a23a568d9bd0114eef5ca94e3f5b273b34cca8ec531710cdf6ed7e333",
+    "archiveSha256": "8b7c816a23a568d9bd0114eef5ca94e3f5b273b34cca8ec531710cdf6ed7e333"
+  },
+  {
+    "source": "runs/solid/RESULT.json",
+    "archive": "runs/solid/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "runs/solid/first.log",
+    "archive": "runs/solid/first.log",
+    "sourceSha256": "8d2229823c15376e92ed4339c047081b3ba1e616a7b7f4cbf8a3ff9747cdce4a",
+    "archiveSha256": "8d2229823c15376e92ed4339c047081b3ba1e616a7b7f4cbf8a3ff9747cdce4a"
+  },
+  {
+    "source": "runs/solid/SOURCE.json",
+    "archive": "runs/solid/SOURCE.json.gz",
+    "sourceSha256": "1589322ff3c34ce79bbd35de2c7b226db45c06b8a4cd788dc3d8980fe8708154",
+    "archiveSha256": "fb02015ba8da726afbcb7f9b769c145896aae46fedbd10a9d798a35c8d08106c"
+  },
+  {
+    "source": "runs/solid/COMMAND.json",
+    "archive": "runs/solid/COMMAND.json",
+    "sourceSha256": "f5c1ce8bfa9bcf84ae5c71f2fdb5bc9b1b72397e1aaa7de5dbac907d6b0d18b2",
+    "archiveSha256": "f5c1ce8bfa9bcf84ae5c71f2fdb5bc9b1b72397e1aaa7de5dbac907d6b0d18b2"
+  },
+  {
+    "source": "runs/solid/PROCESS.json",
+    "archive": "runs/solid/PROCESS.json",
+    "sourceSha256": "e510fdf449bf1ebe53e26cf2a9e685e4ddda5e923d514e07aaee95c2199e1246",
+    "archiveSha256": "e510fdf449bf1ebe53e26cf2a9e685e4ddda5e923d514e07aaee95c2199e1246"
+  },
+  {
+    "source": "runs/kernel-timing/RESULT.json",
+    "archive": "runs/kernel-timing/RESULT.json",
+    "sourceSha256": "bd2867867f5b9854444486f9490f673f9b95bc4c1a1764f05846038f2cc29d72",
+    "archiveSha256": "bd2867867f5b9854444486f9490f673f9b95bc4c1a1764f05846038f2cc29d72"
+  },
+  {
+    "source": "runs/kernel-timing/first.log",
+    "archive": "runs/kernel-timing/first.log",
+    "sourceSha256": "ee3c5be961eb77720ae6be368ca60790b89648df665385cef3b829613669bcad",
+    "archiveSha256": "ee3c5be961eb77720ae6be368ca60790b89648df665385cef3b829613669bcad"
+  },
+  {
+    "source": "runs/kernel-timing/SOURCE.json",
+    "archive": "runs/kernel-timing/SOURCE.json.gz",
+    "sourceSha256": "1589322ff3c34ce79bbd35de2c7b226db45c06b8a4cd788dc3d8980fe8708154",
+    "archiveSha256": "fb02015ba8da726afbcb7f9b769c145896aae46fedbd10a9d798a35c8d08106c"
+  },
+  {
+    "source": "runs/kernel-timing/COMMAND.json",
+    "archive": "runs/kernel-timing/COMMAND.json",
+    "sourceSha256": "995bdbaaa14b80d9e532a4221613b6fdbc61431a8bd77d69a423a167680cd362",
+    "archiveSha256": "995bdbaaa14b80d9e532a4221613b6fdbc61431a8bd77d69a423a167680cd362"
+  },
+  {
+    "source": "runs/kernel-timing/PROCESS.json",
+    "archive": "runs/kernel-timing/PROCESS.json",
+    "sourceSha256": "b02ccc93aabf4f635bdbbde9ba4dd4c8ab6f9e8c7763f8dc964d35b986050f79",
+    "archiveSha256": "b02ccc93aabf4f635bdbbde9ba4dd4c8ab6f9e8c7763f8dc964d35b986050f79"
+  },
+  {
+    "source": "runs/react/RESULT.json",
+    "archive": "runs/react/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "runs/react/first.log",
+    "archive": "runs/react/first.log",
+    "sourceSha256": "d2812cd2996c8000a470245c599bb662fd2aaa6c1e4af611182347cb541048d7",
+    "archiveSha256": "d2812cd2996c8000a470245c599bb662fd2aaa6c1e4af611182347cb541048d7"
+  },
+  {
+    "source": "runs/react/SOURCE.json",
+    "archive": "runs/react/SOURCE.json.gz",
+    "sourceSha256": "59ae3556e7108dc7582b54270606c60be6147104d433c10705bc58c6cec0cb29",
+    "archiveSha256": "23d2306adbf655756505228d3731d8a9b14a5d176d798586e459228a6deaa76f"
+  },
+  {
+    "source": "runs/react/COMMAND.json",
+    "archive": "runs/react/COMMAND.json",
+    "sourceSha256": "b8d6c778c094409dbc0d78647d90b0ca007b416115fd54ac930da6135df2ace7",
+    "archiveSha256": "b8d6c778c094409dbc0d78647d90b0ca007b416115fd54ac930da6135df2ace7"
+  },
+  {
+    "source": "runs/react/PROCESS.json",
+    "archive": "runs/react/PROCESS.json",
+    "sourceSha256": "41d0d0ee53936ebd5071078acdac54b70ef229c6b72b11f30061c3dee897ac0a",
+    "archiveSha256": "41d0d0ee53936ebd5071078acdac54b70ef229c6b72b11f30061c3dee897ac0a"
+  },
+  {
+    "source": "runs/kernel/RESULT.json",
+    "archive": "runs/kernel/RESULT.json",
+    "sourceSha256": "bd2867867f5b9854444486f9490f673f9b95bc4c1a1764f05846038f2cc29d72",
+    "archiveSha256": "bd2867867f5b9854444486f9490f673f9b95bc4c1a1764f05846038f2cc29d72"
+  },
+  {
+    "source": "runs/kernel/first.log",
+    "archive": "runs/kernel/first.log",
+    "sourceSha256": "ddc15beb2bb2aeacaefea65335e65d9b8a5fcc129da6f803ee21a387853d1f16",
+    "archiveSha256": "ddc15beb2bb2aeacaefea65335e65d9b8a5fcc129da6f803ee21a387853d1f16"
+  },
+  {
+    "source": "runs/kernel/SOURCE.json",
+    "archive": "runs/kernel/SOURCE.json.gz",
+    "sourceSha256": "59ae3556e7108dc7582b54270606c60be6147104d433c10705bc58c6cec0cb29",
+    "archiveSha256": "23d2306adbf655756505228d3731d8a9b14a5d176d798586e459228a6deaa76f"
+  },
+  {
+    "source": "runs/kernel/COMMAND.json",
+    "archive": "runs/kernel/COMMAND.json",
+    "sourceSha256": "6e0d053a427371f606759facb98a8389729d7e7dcf005ae1b5d6749773084e79",
+    "archiveSha256": "6e0d053a427371f606759facb98a8389729d7e7dcf005ae1b5d6749773084e79"
+  },
+  {
+    "source": "runs/kernel/PROCESS.json",
+    "archive": "runs/kernel/PROCESS.json",
+    "sourceSha256": "8f6ff251e4572e23fa07d9682446f176bc5d8b5339422056d517acfb7cbf9ae1",
+    "archiveSha256": "8f6ff251e4572e23fa07d9682446f176bc5d8b5339422056d517acfb7cbf9ae1"
+  }
+]

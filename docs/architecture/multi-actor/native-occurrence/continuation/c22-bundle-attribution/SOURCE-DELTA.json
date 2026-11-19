@@ -1,0 +1,347 @@
+[
+  {
+    "path": "packages/kernel/forwarding-retention.config.ts",
+    "baseline": null,
+    "C22": "0c877cd8feeb60b8feba31e0246b2892fe2554b01c113a57eddac53bf506850b"
+  },
+  {
+    "path": "packages/kernel/retention-probe.config.ts",
+    "baseline": null,
+    "C22": "d9868ae1643dde8891ad25a1b18f930027fd32e0e68ae2dd921d6b4880da4d94"
+  },
+  {
+    "path": "packages/kernel/src/adapter.ts",
+    "baseline": "e99cc57221d867942fcb276fb48136ebd5b5620663436d7a2ed756c75a7d6fa9",
+    "C22": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts",
+    "baseline": "f86b63862d73df0a64e0b11ddb4ae11380c350710e739e265109dc334594537a",
+    "C22": "100d9028bb73442b9d6280dfda9d6c2cb4d07f3ba6d3151b3b2098b72697f004"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/restoration/restoration.ts",
+    "baseline": "c8eff760937ac975de308013ca891afe2ebedb3249a20ed5e735dffe9f8eef7a",
+    "C22": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/occupancy-composition.ts",
+    "baseline": null,
+    "C22": "921c83c65cf73836dbb4411686e18163f7f178052abcccedeaf71333bf4762ce"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "baseline": "487b4e2a693395b37572991484a66a3cd36f5748098e5d4ab21b2673c85bd536",
+    "C22": "7c4b9d481e481db43fba92f1e32789c36300bcbda2a3cf0316f437c41f291fff"
+  },
+  {
+    "path": "packages/kernel/src/lib/entity-signal.ts",
+    "baseline": "4459d2ad9dfdf690388ce38f8421234ae8bb3a10266b65125287388cc674aebc",
+    "C22": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d"
+  },
+  {
+    "path": "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "baseline": null,
+    "C22": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8"
+  },
+  {
+    "path": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "baseline": null,
+    "C22": "a621673bb7a4df5aca0113e59b1ec40c8b5a1d5cd2dfef7299e59642a7f57ad2"
+  },
+  {
+    "path": "packages/kernel/src/lib/experimental-publication/private.ts",
+    "baseline": null,
+    "C22": "e7e036c669e7a4b4014db1d3af3fa11ead56fe0976363dcd1a63a0fe66cf4b25"
+  },
+  {
+    "path": "packages/kernel/src/lib/experimental-publication/projection.ts",
+    "baseline": null,
+    "C22": "33cfe705972c05942f906ca0b1005428b1298e0c185e650d2931a95849d667a3"
+  },
+  {
+    "path": "packages/kernel/src/lib/experimental-publication/proof-retirement.ts",
+    "baseline": null,
+    "C22": "e94f688db30bfa63224286c4436668734fa7864a04ecd9d2383ab64edfb9faf4"
+  },
+  {
+    "path": "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts",
+    "baseline": null,
+    "C22": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts",
+    "baseline": null,
+    "C22": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.ts",
+    "baseline": "6b70aaeec9d3c6355f144d26e671460af30484e933e47a829bf6e30f7f707e83",
+    "C22": "cbeb44226cb42a1e8b35afa6111fee96de5f0c907f4d55e84b68e9875ce728a9"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.ts",
+    "baseline": "3912c42c51186907cfdc9201d26200930c0afb8478c7dd9779bcd825424a214f",
+    "C22": "b771ca23a54ee61ceec87e90075c0029b2a7a6890f501573623fcce8dac15252"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/target-transition.ts",
+    "baseline": "f9dbf57611f70c3e41ca8b5d0163bf62cea2d0bfbd0ffbbf419d6f993f7e0e8a",
+    "C22": "e228da77ea01b06cc008f8884d2e7a3ff04fd2806f87dca5afb516257157b88d"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "baseline": "c3fec9f52a71aba93314cb1715003b27084548cf4f9914b4deb548299e2faea0",
+    "C22": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/construction-allocation.ts",
+    "baseline": null,
+    "C22": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/entity-egress-projection.ts",
+    "baseline": "f071541ff79537b0fde69d4d85554b37c1a586942964a26cdcdd816bb111a115",
+    "C22": "b5e5e6009112701abe83f93582c78c1d5b362f08163b059f34894f236b319e13"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/entity-membership-inventory.ts",
+    "baseline": "f04d2e639d67a923f88e69091d61f629ecaaf17be4d6aceb3d3cfcbc95afdd89",
+    "C22": "82c306630ab0b1be88111a21bda76ed769c275240030e9f8e90bf1d9862bcf3e"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/entity-membership-source.ts",
+    "baseline": "099b2d5ad23ae5f7a75f691577bf45221aa18c1276d09ca1dacf2324b3eb6dc1",
+    "C22": "0c1df9a0ec396539566f82a671b2a643631e148a4e0a5cddd21fcd4b77080aa2"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/entity-publication.ts",
+    "baseline": null,
+    "C22": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/entity-value-transition.ts",
+    "baseline": null,
+    "C22": "3592cb9441dff5538b69f8cadddffdb95940b164bd2cb94d8841d69527cdbd84"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intercept-leaf-signals.ts",
+    "baseline": "164c87dc9405b74f52a1d3eb08dd899745492fb141bfdcf9010f88b22383584c",
+    "C22": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+    "baseline": "b813247b331d44cd6cb0566b572118ab1bac4fb774deb7ad7b35dd95837103fd",
+    "C22": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/location-runtime.ts",
+    "baseline": "0b97cf252ea781e365cdc9a8d8202c4cc1076805fd4ba3fac3bcaeb98a44b5a6",
+    "C22": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/materialize-markers.ts",
+    "baseline": "67c7bf8e90248c56427abc2690f746f7d7f437631f3bcc2986ac49976e9e1235",
+    "C22": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/member-membership.ts",
+    "baseline": "e748154443c4769a66572cf7eff6f4224ba7e1619f2d542fe301ebaf64283906",
+    "C22": "b15765f0b0dbb5a8f5f37aecd9eef87ef450e95df919e8ee1cfc5da004c68ff7"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "baseline": "3f2621c3d489d6cb04356bb6cac3b68b46f9587ea82a380316f56098e9a1c88b",
+    "C22": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-field-selection.ts",
+    "baseline": null,
+    "C22": "29d02197f19a11912ff6967ac770e17c28f56c7e7776e8df06deeafee07413a6"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-location-realization.ts",
+    "baseline": "7a148240fe9a0f307c4a2a61d1a5839ec3fed66fdd27d4a14ff12c0c05d65a7c",
+    "C22": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-occurrence.ts",
+    "baseline": null,
+    "C22": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "baseline": "4c2077142cd3f69c475221abe0a0a45f605f14d304d73ef256980a2c661da876",
+    "C22": "2845404e89069c33f5131e2b2aa6404ebdbb88ade92173371bbc98f590862d55"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/observation-adapter.ts",
+    "baseline": "cc505e5d8951e6b25a17b6741cdcd9d9070fe76bdcf73e3ceabb2c028efd1016",
+    "C22": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/observation-substrate.ts",
+    "baseline": "2db4780106eb7faa09c33fd04e2f56a96476b2e178d998471039cac8c3349026",
+    "C22": "75bdd60bc568aff5460af61616a6896fb0e16c9c0ed6ee0f0150e88d4f150dab"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/ordinary-entity-entries.ts",
+    "baseline": null,
+    "C22": "ca270fc464492372cbd43b1c0c753d6e9a55a04ba69f8972dc13f18f9d49b5c3"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/owned-mutation.ts",
+    "baseline": "8491afa231ffef3734a5be76bbb541631913dbc77cd81b02578af2b22080ca24",
+    "C22": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "baseline": "4116ebdd4e7d300bf47e6f14260c914e6698116f6fbae3a30279fd7aceec12d7",
+    "C22": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/position-registry.ts",
+    "baseline": "e86ed017e11d69ee5cdf625082309bef976b2528227367f652a762998f0f89b6",
+    "C22": "205a6893bee3c03ae3d100848a2faa3e9f42fc8f42f4aaefc344ee9bbd5059eb"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/prepared-entity-structure.ts",
+    "baseline": null,
+    "C22": "eb3e9e920fbb16c2171f64057fb44a96049118b9ff555224a01c32ab116b4d3a"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/publication-preparation.ts",
+    "baseline": null,
+    "C22": "6b23eb5da6e1fe52fa6f18c57c226430ed59eb0cbb8b9290346c629569493587"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/scalar-publication-coverage.ts",
+    "baseline": null,
+    "C22": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/selected-entity-disposition.ts",
+    "baseline": null,
+    "C22": "5c475f94b1300471a861c317e1ba2f97bd02eb36fc53daa6ad274d024352f82f"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/selected-write-operation.ts",
+    "baseline": null,
+    "C22": "78815e18810cb50b39e18436fd0822dd3207f75a95bf1821f4bcd8a990603111"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/snapshot-authority.ts",
+    "baseline": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954",
+    "C22": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/snapshot-installation.ts",
+    "baseline": null,
+    "C22": "02ffc94a1b4150bb108a5ed4bd01e3bfd36bbef86af2c1bf96552d7e41f67a7b"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/source-mutation.ts",
+    "baseline": "cc24db10b21def186cca62d23a27224e09edb7ffe8991bdd8e8ebb094b8b5a87",
+    "C22": "bcbd565abcaff9a09912b10e43e1568d2c46162c309f901b8a625cc05e930518"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "baseline": "d03cd01b1b0037756027daad3c10961596626ae41bf2eebe7dd00d5b9e3e2030",
+    "C22": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+    "baseline": "4581209ac479bc50b0ee6dc2ee8b8bcf15dae6596636a3fb1694c42f26fbdfa9",
+    "C22": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "baseline": "3d609a913f82055ea18bdc03e10af7a07f3de38c09e5ea229ec8a4cd44b623df",
+    "C22": "2954b77e477ed7177b2580ce2d7ea55caa07d88e374adb5191f6ed5676c1a01c"
+  },
+  {
+    "path": "packages/kernel/src/lib/link.ts",
+    "baseline": "d16e5f14cd4ad52d2b4b4f22466208004d73e7f464318cc910adfa7889bd6901",
+    "C22": "70761a483700db2af8102cd3dd8379fcdfb667654ed715fb365168bd98268f65"
+  },
+  {
+    "path": "packages/kernel/src/lib/markers/entity-map.ts",
+    "baseline": "dcd89d2b8f2afc3931dcce3ddf935578d9c98dc1762f1b4a49041e1b275d182e",
+    "C22": "de4db2c626f8175e0f0e7f69560e68441cc217c50b69c90aec02b7bae8216f88"
+  },
+  {
+    "path": "packages/kernel/src/lib/path-notifier.ts",
+    "baseline": "016d3ad005ce360c8e3ae83520a064cff99fd2e4dbbabb077fb2ba075c0e8799",
+    "C22": "4eb722fc5f83f79431160d1aeaf36e6a7e7734be6925181e5a940ad2d9e62cde"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "baseline": "d18cda629dca7ada76b2a7f9b5d621bd2b5f04acd3b229487d50230b59d4c4d6",
+    "C22": "a6a7e4d289d967dbf2b042bfe8ba22a6656934d430cb330e6514a64251aad38f"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+    "baseline": null,
+    "C22": "d66cfb6b8476877c44c64532a3d62328ac8b184d1fd3ea4053f00a849d09144b"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/entity-placement-stage.ts",
+    "baseline": null,
+    "C22": "350e86c0a987bd86629d359a56488e49b062a6e3ad47869db7367f377f200e48"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/entity-value-store.ts",
+    "baseline": "f6400264ea2fc4f54091f13c1c0004cca68b75eb40cd011ee4e4f85efe264e6f",
+    "C22": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/order-restores-for-placement.ts",
+    "baseline": null,
+    "C22": "feac30bdf14ac20edc19200d0c8a69953512340c4a2edb997dff39a045ae580c"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/ordinary-key-evidence.ts",
+    "baseline": null,
+    "C22": "55506941297e26fa1cc40728edb40509c4d6823fd1af9ac07fb33faa56b2a3f2"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/ordinary-restoration-placement.ts",
+    "baseline": null,
+    "C22": "3c969806c5a5bb72e935ad5a0ea8b12687fd6ca47bef702c144c17f484e891c0"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/prepare-entity-target.ts",
+    "baseline": "5eb02667ae8e30e5b7d450bc2f4b376c83ed592d3b941d49f49be698061c1cce",
+    "C22": "d0d52d5f0a54f902e72826358896cbead8a282a9bbba2490bff8b1efee1407db"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/prepared-placement-visibility.ts",
+    "baseline": null,
+    "C22": "9fad616ecfedf8152958e76df0388dc4e3bf703d30974c8a818fb821e0112c28"
+  },
+  {
+    "path": "packages/kernel/src/lib/physical/structural-store.ts",
+    "baseline": "36d7005b9c44bc98776c1b05e4b381a2fcc4e9777caf552ca23514412204243a",
+    "C22": "1895bdd43895296a255eb4fc9ae86e339a687c60ee051da797a94e24a1ff0353"
+  },
+  {
+    "path": "packages/kernel/src/lib/signal-tree.ts",
+    "baseline": "28c6016585c4f3f260df9ce4adef53a53f6573a7304961af6afdfad54d6814e4",
+    "C22": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee"
+  },
+  {
+    "path": "packages/kernel/src/lib/utils.ts",
+    "baseline": "3a631f9381e564a964474e7e86c0eeac5809c5da8b4658c6f105927828d89e53",
+    "C22": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232"
+  },
+  {
+    "path": "packages/kernel/vitest.config.ts",
+    "baseline": "76f5676437b9d8e8236e7b3a48e47c42b326458dcf1f712407a97ceac447b566",
+    "C22": "d1e247e5f0f90050b96daa1b889a09301e94ac338597b425127395351e0d3fdd"
+  },
+  {
+    "path": "packages/kernel/vitest.retention.config.ts",
+    "baseline": "90b6c446f93bc3acd15511f214a15a6c39b7159798cf523433882ddfbe2c1d37",
+    "C22": "30f6a25ac7bd1890913636b5428ad51721f15c354ee558b3dc91504a844e4336"
+  }
+]

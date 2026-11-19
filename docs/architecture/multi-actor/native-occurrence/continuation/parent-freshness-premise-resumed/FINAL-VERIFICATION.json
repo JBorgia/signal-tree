@@ -1,0 +1,11 @@
+{
+  "allC7aFilesUnchanged": true,
+  "predecessorUnchanged": true,
+  "files": 2996,
+  "addedTests": [
+    "packages/kernel/src/lib/construction-completion-snapshot-review.spec.ts",
+    "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts",
+    "packages/angular/src/lib/parent-snapshot-currentness.spec.ts"
+  ],
+  "originalDiagnosticUnchanged": true
+}

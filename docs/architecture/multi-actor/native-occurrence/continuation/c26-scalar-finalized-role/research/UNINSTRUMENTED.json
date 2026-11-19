@@ -1,0 +1,6 @@
+{
+  "lib/experimental-publication/private.ts": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647",
+  "lib/experimental-publication/lifecycle.ts": "f4db202e29469d3de41a69ec01d23cb5eb30f6c3d69cebfa6ef33896f549c823",
+  "lib/internals/native-scalar-selection.ts": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+  "enhancers/transactions/transactions.ts": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d"
+}

@@ -1,0 +1,674 @@
+[
+  {
+    "source": "NPM-QUALIFICATION.json",
+    "archive": "NPM-QUALIFICATION.json",
+    "sourceSha256": "4509df63c6ddb1f12bc329e44185cc1dd2ffdb3b43bb4994b6d5750a6c76c43b",
+    "archiveSha256": "4509df63c6ddb1f12bc329e44185cc1dd2ffdb3b43bb4994b6d5750a6c76c43b"
+  },
+  {
+    "source": "tmpdir-preflight-result.json",
+    "archive": "tmpdir-preflight-result.json",
+    "sourceSha256": "8ef199e2ba32edcf45464649ce4dae0f2106f394db6f819c55faa6df8200c959",
+    "archiveSha256": "8ef199e2ba32edcf45464649ce4dae0f2106f394db6f819c55faa6df8200c959"
+  },
+  {
+    "source": "registry-blindness-positive-command.json",
+    "archive": "registry-blindness-positive-command.json",
+    "sourceSha256": "a90b0f6d9a2b67c383dc594733fe9ec5b69d7124000617b545d34587557f31bb",
+    "archiveSha256": "a90b0f6d9a2b67c383dc594733fe9ec5b69d7124000617b545d34587557f31bb"
+  },
+  {
+    "source": "tmpdir-preflight.log",
+    "archive": "tmpdir-preflight.log",
+    "sourceSha256": "4ab130523c612c2b86b388e000652615ee04c51faefa610201f038875ddc2db1",
+    "archiveSha256": "4ab130523c612c2b86b388e000652615ee04c51faefa610201f038875ddc2db1"
+  },
+  {
+    "source": "npm-11.21.1-install.log",
+    "archive": "npm-11.21.1-install.log",
+    "sourceSha256": "260b81283a0da65e0d8dfcf98575e940ede1f863ed00bc5c0ec5bd2f838907e1",
+    "archiveSha256": "260b81283a0da65e0d8dfcf98575e940ede1f863ed00bc5c0ec5bd2f838907e1"
+  },
+  {
+    "source": "registry-offline-negative-command.json",
+    "archive": "registry-offline-negative-command.json",
+    "sourceSha256": "2a28dbfa43809082e70ce929a499b642962592751580d7e96124ae614cd84b9f",
+    "archiveSha256": "2a28dbfa43809082e70ce929a499b642962592751580d7e96124ae614cd84b9f"
+  },
+  {
+    "source": "correct.py",
+    "archive": "correct.py",
+    "sourceSha256": "44f12985a9778eed228024537cd4aeec01dde147a96e262520051794b9853499",
+    "archiveSha256": "44f12985a9778eed228024537cd4aeec01dde147a96e262520051794b9853499"
+  },
+  {
+    "source": "format.log",
+    "archive": "format.log",
+    "sourceSha256": "f97073e1e461fdf6a33762d63b18ff2ac363dcfc3b4d07a7fd2c3c71eafe31e1",
+    "archiveSha256": "f97073e1e461fdf6a33762d63b18ff2ac363dcfc3b4d07a7fd2c3c71eafe31e1"
+  },
+  {
+    "source": "focused.py",
+    "archive": "focused.py",
+    "sourceSha256": "9f2b45f66ad1ef3f4e237088874ac27607786f35b7df7f329109d202ac482ea3",
+    "archiveSha256": "9f2b45f66ad1ef3f4e237088874ac27607786f35b7df7f329109d202ac482ea3"
+  },
+  {
+    "source": "PATCH-RECORD.json",
+    "archive": "PATCH-RECORD.json",
+    "sourceSha256": "97d608bdac7f289a2518d7362692cb400cc0a30bf2aaa7e4636d4ddc0e863e8a",
+    "archiveSha256": "97d608bdac7f289a2518d7362692cb400cc0a30bf2aaa7e4636d4ddc0e863e8a"
+  },
+  {
+    "source": "EVIDENCE-INDEX.json",
+    "archive": "EVIDENCE-INDEX.json",
+    "sourceSha256": "68c21c60c1dbbac0f8bcb54ac7aebe8f2948d7d7219f026e1c5dd4a732b29474",
+    "archiveSha256": "68c21c60c1dbbac0f8bcb54ac7aebe8f2948d7d7219f026e1c5dd4a732b29474"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "d92f675081d8ff95f3cfe9e1a8e71bad63efd5e7c31e6d1b9b503e6e11364c78",
+    "archiveSha256": "d92f675081d8ff95f3cfe9e1a8e71bad63efd5e7c31e6d1b9b503e6e11364c78"
+  },
+  {
+    "source": "BASE-IDENTITIES.json",
+    "archive": "BASE-IDENTITIES.json",
+    "sourceSha256": "9c091790467f31f2f6e78255998eabadd38c56706890034c3e3d2dbcffa0fe43",
+    "archiveSha256": "9c091790467f31f2f6e78255998eabadd38c56706890034c3e3d2dbcffa0fe43"
+  },
+  {
+    "source": "registry-blindness-positive.log",
+    "archive": "registry-blindness-positive.log",
+    "sourceSha256": "71d4c183df5c59f96cfc4f80ed2ebbc6535083ce3bef752636841f43cfbace74",
+    "archiveSha256": "71d4c183df5c59f96cfc4f80ed2ebbc6535083ce3bef752636841f43cfbace74"
+  },
+  {
+    "source": "MAIN-DISPOSITION.md",
+    "archive": "MAIN-DISPOSITION.md",
+    "sourceSha256": "d5c8699d6b761e28d998792eef371330753366974ba78b8e6e7950b0d363c7b6",
+    "archiveSha256": "d5c8699d6b761e28d998792eef371330753366974ba78b8e6e7950b0d363c7b6"
+  },
+  {
+    "source": "STATUS.md",
+    "archive": "STATUS.md",
+    "sourceSha256": "b190bbaaf850203ca07334d1219eeb1004b1e1eca68bb4b84efec5241ef7e073",
+    "archiveSha256": "b190bbaaf850203ca07334d1219eeb1004b1e1eca68bb4b84efec5241ef7e073"
+  },
+  {
+    "source": "42280bba-MANIFEST.json",
+    "archive": "42280bba-MANIFEST.json.gz",
+    "sourceSha256": "42280bba7bc92b75ae3f252742de5b7f78e4cce0b61c1d935212d7e438f2baf1",
+    "archiveSha256": "f1226a0b64d3335ce180f0270602035a1d90aea52129b0fc673fe96f48e9c695"
+  },
+  {
+    "source": "full-tooling.patch",
+    "archive": "full-tooling.patch",
+    "sourceSha256": "a25c15af4659d7bf06e19d251a7c3d4a34a950e913f7946b818060ca657ae8f0",
+    "archiveSha256": "a25c15af4659d7bf06e19d251a7c3d4a34a950e913f7946b818060ca657ae8f0"
+  },
+  {
+    "source": "npm-11.21.1-smoke.log",
+    "archive": "npm-11.21.1-smoke.log",
+    "sourceSha256": "9d0d9ca7c10ec43cacd04a7b04a99525a8e76131c19165fdf0581eeb307d8854",
+    "archiveSha256": "9d0d9ca7c10ec43cacd04a7b04a99525a8e76131c19165fdf0581eeb307d8854"
+  },
+  {
+    "source": "PACKET-HASHES.json",
+    "archive": "PACKET-HASHES.json",
+    "sourceSha256": "0a9c6dab0eba42384887ad3fb99911a7726a97b027e0f36dc941ff0892f6ea1d",
+    "archiveSha256": "0a9c6dab0eba42384887ad3fb99911a7726a97b027e0f36dc941ff0892f6ea1d"
+  },
+  {
+    "source": "publish-npm-range.json",
+    "archive": "publish-npm-range.json",
+    "sourceSha256": "a22a55f05e6f9f0e51c6ccc779e5cd76ef408fe1a8704d64040627c58d16b693",
+    "archiveSha256": "a22a55f05e6f9f0e51c6ccc779e5cd76ef408fe1a8704d64040627c58d16b693"
+  },
+  {
+    "source": "NPM-WORKFLOW-INPUTS.json",
+    "archive": "NPM-WORKFLOW-INPUTS.json",
+    "sourceSha256": "eb61de9610cbef61a34c3ba0552e2f8961c0c4cf35da44d8c29db0295fdb0a9a",
+    "archiveSha256": "eb61de9610cbef61a34c3ba0552e2f8961c0c4cf35da44d8c29db0295fdb0a9a"
+  },
+  {
+    "source": "npm-11.21.1-smoke-command.json",
+    "archive": "npm-11.21.1-smoke-command.json",
+    "sourceSha256": "a5f395c1ac94140bec13a07c6230ebf70b0c67ec484493cc97bf0fb2a7401061",
+    "archiveSha256": "a5f395c1ac94140bec13a07c6230ebf70b0c67ec484493cc97bf0fb2a7401061"
+  },
+  {
+    "source": "tmpdir-preflight-command.json",
+    "archive": "tmpdir-preflight-command.json",
+    "sourceSha256": "4807b4313854289a2c853a4d1c77ff557a6b598a5c7266fe2a581b5541037ea3",
+    "archiveSha256": "4807b4313854289a2c853a4d1c77ff557a6b598a5c7266fe2a581b5541037ea3"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "15a48b30e13d25a88d8d97b223a6c15f66b3a89eb280b9b2daa7448857b60fc0",
+    "archiveSha256": "15a48b30e13d25a88d8d97b223a6c15f66b3a89eb280b9b2daa7448857b60fc0"
+  },
+  {
+    "source": "npm-smoke.py",
+    "archive": "npm-smoke.py",
+    "sourceSha256": "266345169804d83f99240afd75301d6932bc42424f07d7c23e2fddd013474252",
+    "archiveSha256": "266345169804d83f99240afd75301d6932bc42424f07d7c23e2fddd013474252"
+  },
+  {
+    "source": "publish-npm-range.stderr",
+    "archive": "publish-npm-range.stderr",
+    "sourceSha256": "8b22227c521544a71523b8d7606cdd8d665d4f9de10b92371ccbaa60b15e0a34",
+    "archiveSha256": "8b22227c521544a71523b8d7606cdd8d665d4f9de10b92371ccbaa60b15e0a34"
+  },
+  {
+    "source": "F1-correction.patch",
+    "archive": "F1-correction.patch",
+    "sourceSha256": "c2f78333eed4547bd72eb5c81af19478764560b9364eeac7741bb04a2c7285c0",
+    "archiveSha256": "c2f78333eed4547bd72eb5c81af19478764560b9364eeac7741bb04a2c7285c0"
+  },
+  {
+    "source": "MANIFEST.json",
+    "archive": "MANIFEST.json.gz",
+    "sourceSha256": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+    "archiveSha256": "94ba95d2f11c6df5340fbf9093d758ef66d54b27cd16f55c3bc7645b3084eb25"
+  },
+  {
+    "source": "CI-NODE-RELEASE.json",
+    "archive": "CI-NODE-RELEASE.json",
+    "sourceSha256": "da62fcee9cf2a2e5c3cc0c5f09006e9f2df5c49d372e7e3f3dd02726099d4b3b",
+    "archiveSha256": "da62fcee9cf2a2e5c3cc0c5f09006e9f2df5c49d372e7e3f3dd02726099d4b3b"
+  },
+  {
+    "source": "registry-offline-negative.log",
+    "archive": "registry-offline-negative.log",
+    "sourceSha256": "bccba5846cc0a2d088e6b816a877981f128677946357da32fd237dd06106c1de",
+    "archiveSha256": "bccba5846cc0a2d088e6b816a877981f128677946357da32fd237dd06106c1de"
+  },
+  {
+    "source": "MAIN-DIAGNOSTIC-ARTIFACT-COMPARISON.json",
+    "archive": "MAIN-DIAGNOSTIC-ARTIFACT-COMPARISON.json",
+    "sourceSha256": "46c2eb6e3cca8329b9031d3f1a351b2c36b4b8e8df4f225546cd37e39a40f4aa",
+    "archiveSha256": "46c2eb6e3cca8329b9031d3f1a351b2c36b4b8e8df4f225546cd37e39a40f4aa"
+  },
+  {
+    "source": "26193d77-MANIFEST.json",
+    "archive": "26193d77-MANIFEST.json.gz",
+    "sourceSha256": "26193d775b3e3f9c0ecc859de029dc20a1a591638730846ac0413bc1e89b6c1e",
+    "archiveSha256": "61fe4e41f3e94e565bdb488c6938a17ee14123f1062bd55e52825013f7e8c967"
+  },
+  {
+    "source": "registry-normal-command.json",
+    "archive": "registry-normal-command.json",
+    "sourceSha256": "ab730dbb0a8897289d5af3b899dad8db69f6d4759062a8b767356b7824483d50",
+    "archiveSha256": "ab730dbb0a8897289d5af3b899dad8db69f6d4759062a8b767356b7824483d50"
+  },
+  {
+    "source": "UNCHANGED-RUNTIME-HASHES.json",
+    "archive": "UNCHANGED-RUNTIME-HASHES.json.gz",
+    "sourceSha256": "c366f2183f87549472b9d40ceb12ecbfb6e00b14cb89302dfc6a83587c172b2b",
+    "archiveSha256": "7d3732c7777a3aa01b140a1b730beb626cdd05d00604f7acd4724d2c10e869db"
+  },
+  {
+    "source": "registry-offline-negative-result.json",
+    "archive": "registry-offline-negative-result.json",
+    "sourceSha256": "8ef199e2ba32edcf45464649ce4dae0f2106f394db6f819c55faa6df8200c959",
+    "archiveSha256": "8ef199e2ba32edcf45464649ce4dae0f2106f394db6f819c55faa6df8200c959"
+  },
+  {
+    "source": "node-dist-index.json",
+    "archive": "node-dist-index.json.gz",
+    "sourceSha256": "6b27fe5766e87929d16ccdde05c516cbdd12200eab62b28d4b2f31d34e21481a",
+    "archiveSha256": "7e5cdf1f3fdb4e6e965f0fd8f79b8aa4caf2f96050a14640801439b922a34c34"
+  },
+  {
+    "source": "registry-blindness-positive-result.json",
+    "archive": "registry-blindness-positive-result.json",
+    "sourceSha256": "5bc232b82de377a5655a39a2af9d7ae0fc868de5b9df957e18905cb914606c88",
+    "archiveSha256": "5bc232b82de377a5655a39a2af9d7ae0fc868de5b9df957e18905cb914606c88"
+  },
+  {
+    "source": "registry-normal.log",
+    "archive": "registry-normal.log",
+    "sourceSha256": "e0d8d07fde9bba4dd94b3d270055c54c336d95ab8628477eaec435a13a018139",
+    "archiveSha256": "e0d8d07fde9bba4dd94b3d270055c54c336d95ab8628477eaec435a13a018139"
+  },
+  {
+    "source": "registry-normal-result.json",
+    "archive": "registry-normal-result.json",
+    "sourceSha256": "5bc232b82de377a5655a39a2af9d7ae0fc868de5b9df957e18905cb914606c88",
+    "archiveSha256": "5bc232b82de377a5655a39a2af9d7ae0fc868de5b9df957e18905cb914606c88"
+  },
+  {
+    "source": "npm-11.21.1-smoke-result.json",
+    "archive": "npm-11.21.1-smoke-result.json",
+    "sourceSha256": "116483df4927973489706a11696f02a48be8edb2cdce21dda4f99ac066e99a8a",
+    "archiveSha256": "116483df4927973489706a11696f02a48be8edb2cdce21dda4f99ac066e99a8a"
+  },
+  {
+    "source": "FOCUSED-RESULTS.json",
+    "archive": "FOCUSED-RESULTS.json",
+    "sourceSha256": "dd92cf299f1d371e2a79a8545418e2911fc380b9e7bbcbc2d9260f2377f3f46f",
+    "archiveSha256": "dd92cf299f1d371e2a79a8545418e2911fc380b9e7bbcbc2d9260f2377f3f46f"
+  },
+  {
+    "source": "evidence/offline-negative.json",
+    "archive": "evidence/offline-negative.json",
+    "sourceSha256": "e4f0666a4c4db41a759281ab5e33943d8ed8175b19565ccfb6859b59186520c1",
+    "archiveSha256": "e4f0666a4c4db41a759281ab5e33943d8ed8175b19565ccfb6859b59186520c1"
+  },
+  {
+    "source": "evidence/normal-gate.json",
+    "archive": "evidence/normal-gate.json",
+    "sourceSha256": "652bea0b195c288926ee87fb079dc00ef753cb4a4e3ea5ef74a4ddbe69b7e3a4",
+    "archiveSha256": "652bea0b195c288926ee87fb079dc00ef753cb4a4e3ea5ef74a4ddbe69b7e3a4"
+  },
+  {
+    "source": "evidence/blindness-positive.json",
+    "archive": "evidence/blindness-positive.json.gz",
+    "sourceSha256": "c1f994ddae15064a79426657bee200caad245a82d5ac1216cff1fd9377682652",
+    "archiveSha256": "f5d6140ebf736766924039e09eaf9a7ad53b525c62c26c27099a44598e26c431"
+  },
+  {
+    "source": "evidence/normal-recovery.json",
+    "archive": "evidence/normal-recovery.json.gz",
+    "sourceSha256": "23b6b4cc71c78ee17e17a10cc7782f6a90d3d1583fd386864e14d8668b9e52d2",
+    "archiveSha256": "ce92dae58601940cbc30444fe401dab3ca2c6951e5214d615f184daace4e608c"
+  },
+  {
+    "source": "evidence/publish-npm-smoke.json",
+    "archive": "evidence/publish-npm-smoke.json",
+    "sourceSha256": "78cdf8f6bba27af2cab04c0a31d5d6b0df99cfe4b51888e92a769b60e8e1dbcb",
+    "archiveSha256": "78cdf8f6bba27af2cab04c0a31d5d6b0df99cfe4b51888e92a769b60e8e1dbcb"
+  },
+  {
+    "source": "evidence/normal-gate/013-baseline-ci.stderr",
+    "archive": "evidence/normal-gate/013-baseline-ci.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-gate/013-baseline-ci.stdout",
+    "archive": "evidence/normal-gate/013-baseline-ci.stdout",
+    "sourceSha256": "8130f25f044239806c68a7bb0ae175be27627e99c6f3594f26f8d833d7472673",
+    "archiveSha256": "8130f25f044239806c68a7bb0ae175be27627e99c6f3594f26f8d833d7472673"
+  },
+  {
+    "source": "evidence/normal-gate/013-baseline-ci.json",
+    "archive": "evidence/normal-gate/013-baseline-ci.json",
+    "sourceSha256": "21d6e53c758ad1d63cbbc3a08e0b349e97f93c9a89e137d1c10783c12a211f8f",
+    "archiveSha256": "21d6e53c758ad1d63cbbc3a08e0b349e97f93c9a89e137d1c10783c12a211f8f"
+  },
+  {
+    "source": "evidence/publish-npm-smoke/013-baseline-ci.stderr",
+    "archive": "evidence/publish-npm-smoke/013-baseline-ci.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/publish-npm-smoke/013-baseline-ci.stdout",
+    "archive": "evidence/publish-npm-smoke/013-baseline-ci.stdout",
+    "sourceSha256": "38361b69b3f63fd08d34ca5b11b142d9fd58323fb368d31d7f63500f73819ae3",
+    "archiveSha256": "38361b69b3f63fd08d34ca5b11b142d9fd58323fb368d31d7f63500f73819ae3"
+  },
+  {
+    "source": "evidence/publish-npm-smoke/013-baseline-ci.json",
+    "archive": "evidence/publish-npm-smoke/013-baseline-ci.json",
+    "sourceSha256": "e53a9bed577718c42cc9297b282461266b175b2cbc9bab8b7446550c06d5d457",
+    "archiveSha256": "e53a9bed577718c42cc9297b282461266b175b2cbc9bab8b7446550c06d5d457"
+  },
+  {
+    "source": "evidence/blindness-positive/046-mutant-production-no-link.stdout",
+    "archive": "evidence/blindness-positive/046-mutant-production-no-link.stdout",
+    "sourceSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89",
+    "archiveSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89"
+  },
+  {
+    "source": "evidence/blindness-positive/044-mutant-production-lifecycle-consumer.stderr",
+    "archive": "evidence/blindness-positive/044-mutant-production-lifecycle-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/013-baseline-ci.stderr",
+    "archive": "evidence/blindness-positive/013-baseline-ci.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/044-mutant-production-lifecycle-consumer.json",
+    "archive": "evidence/blindness-positive/044-mutant-production-lifecycle-consumer.json",
+    "sourceSha256": "27c18835048ce3a44d1e9a1109451030ebfe5268bbbef1d5a06456b7fb30490f",
+    "archiveSha256": "27c18835048ce3a44d1e9a1109451030ebfe5268bbbef1d5a06456b7fb30490f"
+  },
+  {
+    "source": "evidence/blindness-positive/040-mutant-installed-lifecycle-consumer.stdout",
+    "archive": "evidence/blindness-positive/040-mutant-installed-lifecycle-consumer.stdout",
+    "sourceSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1",
+    "archiveSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1"
+  },
+  {
+    "source": "evidence/blindness-positive/040-mutant-installed-lifecycle-consumer.stderr",
+    "archive": "evidence/blindness-positive/040-mutant-installed-lifecycle-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/043-mutant-production-consumer.json",
+    "archive": "evidence/blindness-positive/043-mutant-production-consumer.json",
+    "sourceSha256": "7d36941201ad474b85859c0f4d707b38af1fa2bc7c01e7d2e66d2185c979decc",
+    "archiveSha256": "7d36941201ad474b85859c0f4d707b38af1fa2bc7c01e7d2e66d2185c979decc"
+  },
+  {
+    "source": "evidence/blindness-positive/013-baseline-ci.stdout",
+    "archive": "evidence/blindness-positive/013-baseline-ci.stdout",
+    "sourceSha256": "92a80c43bd841c2893dd5815e3bbaa81b517f3facb3fc16b2b3e81dd37e1bd6b",
+    "archiveSha256": "92a80c43bd841c2893dd5815e3bbaa81b517f3facb3fc16b2b3e81dd37e1bd6b"
+  },
+  {
+    "source": "evidence/blindness-positive/044-mutant-production-lifecycle-consumer.stdout",
+    "archive": "evidence/blindness-positive/044-mutant-production-lifecycle-consumer.stdout",
+    "sourceSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1",
+    "archiveSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1"
+  },
+  {
+    "source": "evidence/blindness-positive/046-mutant-production-no-link.stderr",
+    "archive": "evidence/blindness-positive/046-mutant-production-no-link.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/043-mutant-production-consumer.stdout",
+    "archive": "evidence/blindness-positive/043-mutant-production-consumer.stdout",
+    "sourceSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6",
+    "archiveSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6"
+  },
+  {
+    "source": "evidence/blindness-positive/042-mutant-installed-no-link.stdout",
+    "archive": "evidence/blindness-positive/042-mutant-installed-no-link.stdout",
+    "sourceSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89",
+    "archiveSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89"
+  },
+  {
+    "source": "evidence/blindness-positive/045-mutant-production-receipt-consumer.stderr",
+    "archive": "evidence/blindness-positive/045-mutant-production-receipt-consumer.stderr.gz",
+    "sourceSha256": "5a7e1faf65c784781811381edb1d28cd849c1b56b00873b8c0628f3c4841a717",
+    "archiveSha256": "28025bc270ec5af8c9c89c9d090e3e75fed15c96980c8aecf5b2977e3ad04e1d"
+  },
+  {
+    "source": "evidence/blindness-positive/039-mutant-installed-consumer.stdout",
+    "archive": "evidence/blindness-positive/039-mutant-installed-consumer.stdout",
+    "sourceSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6",
+    "archiveSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6"
+  },
+  {
+    "source": "evidence/blindness-positive/013-baseline-ci.json",
+    "archive": "evidence/blindness-positive/013-baseline-ci.json",
+    "sourceSha256": "d52c5c93483250125a3feedbf52892e1536e2aa12c4f123d4c0dfc9cf22c8c7a",
+    "archiveSha256": "d52c5c93483250125a3feedbf52892e1536e2aa12c4f123d4c0dfc9cf22c8c7a"
+  },
+  {
+    "source": "evidence/blindness-positive/041-mutant-installed-receipt-consumer.stdout",
+    "archive": "evidence/blindness-positive/041-mutant-installed-receipt-consumer.stdout",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/042-mutant-installed-no-link.json",
+    "archive": "evidence/blindness-positive/042-mutant-installed-no-link.json",
+    "sourceSha256": "a920f48160c81910776ab3c9139892a83e3ec0a31845b1dce15f465d6462f1f5",
+    "archiveSha256": "a920f48160c81910776ab3c9139892a83e3ec0a31845b1dce15f465d6462f1f5"
+  },
+  {
+    "source": "evidence/blindness-positive/045-mutant-production-receipt-consumer.json",
+    "archive": "evidence/blindness-positive/045-mutant-production-receipt-consumer.json",
+    "sourceSha256": "c2d8a8c36628e9bc54c971ccf81dafaf8a27f58f65bde40e0d0c25af1c1b2617",
+    "archiveSha256": "c2d8a8c36628e9bc54c971ccf81dafaf8a27f58f65bde40e0d0c25af1c1b2617"
+  },
+  {
+    "source": "evidence/blindness-positive/046-mutant-production-no-link.json",
+    "archive": "evidence/blindness-positive/046-mutant-production-no-link.json",
+    "sourceSha256": "8f3bf8a192ba4da406b6d1738e94638576fa1d6aa159609bfc2d0f968b4b3dd3",
+    "archiveSha256": "8f3bf8a192ba4da406b6d1738e94638576fa1d6aa159609bfc2d0f968b4b3dd3"
+  },
+  {
+    "source": "evidence/blindness-positive/039-mutant-installed-consumer.json",
+    "archive": "evidence/blindness-positive/039-mutant-installed-consumer.json",
+    "sourceSha256": "dfa7480cae62bfc52dcc33fdb016d4d827b1cb0d370f7605592cc10614eb6811",
+    "archiveSha256": "dfa7480cae62bfc52dcc33fdb016d4d827b1cb0d370f7605592cc10614eb6811"
+  },
+  {
+    "source": "evidence/blindness-positive/039-mutant-installed-consumer.stderr",
+    "archive": "evidence/blindness-positive/039-mutant-installed-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/041-mutant-installed-receipt-consumer.stderr",
+    "archive": "evidence/blindness-positive/041-mutant-installed-receipt-consumer.stderr",
+    "sourceSha256": "eb5a8cfb89b012221b940a6b8631a15be5aa12fe5f94a8ab785eae7492af8f36",
+    "archiveSha256": "eb5a8cfb89b012221b940a6b8631a15be5aa12fe5f94a8ab785eae7492af8f36"
+  },
+  {
+    "source": "evidence/blindness-positive/045-mutant-production-receipt-consumer.stdout",
+    "archive": "evidence/blindness-positive/045-mutant-production-receipt-consumer.stdout",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/040-mutant-installed-lifecycle-consumer.json",
+    "archive": "evidence/blindness-positive/040-mutant-installed-lifecycle-consumer.json",
+    "sourceSha256": "dbd71c58baef4a6ffa23d05d6bd21f427f5a2204626139c2333bb580185f92c9",
+    "archiveSha256": "dbd71c58baef4a6ffa23d05d6bd21f427f5a2204626139c2333bb580185f92c9"
+  },
+  {
+    "source": "evidence/blindness-positive/041-mutant-installed-receipt-consumer.json",
+    "archive": "evidence/blindness-positive/041-mutant-installed-receipt-consumer.json",
+    "sourceSha256": "fb0b212d58c8b59db3081cd375670b6f7b4b1c3169be4b84013c815ee4a6005f",
+    "archiveSha256": "fb0b212d58c8b59db3081cd375670b6f7b4b1c3169be4b84013c815ee4a6005f"
+  },
+  {
+    "source": "evidence/blindness-positive/043-mutant-production-consumer.stderr",
+    "archive": "evidence/blindness-positive/043-mutant-production-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/blindness-positive/042-mutant-installed-no-link.stderr",
+    "archive": "evidence/blindness-positive/042-mutant-installed-no-link.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/046-mutant-production-no-link.stdout",
+    "archive": "evidence/normal-recovery/046-mutant-production-no-link.stdout",
+    "sourceSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89",
+    "archiveSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89"
+  },
+  {
+    "source": "evidence/normal-recovery/044-mutant-production-lifecycle-consumer.stderr",
+    "archive": "evidence/normal-recovery/044-mutant-production-lifecycle-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/013-baseline-ci.stderr",
+    "archive": "evidence/normal-recovery/013-baseline-ci.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/044-mutant-production-lifecycle-consumer.json",
+    "archive": "evidence/normal-recovery/044-mutant-production-lifecycle-consumer.json",
+    "sourceSha256": "53e0c918f05aad5482ecebea16a55e3eb4c61e6b6ea9ef71910faf5e8211122f",
+    "archiveSha256": "53e0c918f05aad5482ecebea16a55e3eb4c61e6b6ea9ef71910faf5e8211122f"
+  },
+  {
+    "source": "evidence/normal-recovery/040-mutant-installed-lifecycle-consumer.stdout",
+    "archive": "evidence/normal-recovery/040-mutant-installed-lifecycle-consumer.stdout",
+    "sourceSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1",
+    "archiveSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1"
+  },
+  {
+    "source": "evidence/normal-recovery/040-mutant-installed-lifecycle-consumer.stderr",
+    "archive": "evidence/normal-recovery/040-mutant-installed-lifecycle-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/043-mutant-production-consumer.json",
+    "archive": "evidence/normal-recovery/043-mutant-production-consumer.json",
+    "sourceSha256": "ddd7bf1a149c231e67db0b212229331640e947d3cb0769b82c68230def30b4e2",
+    "archiveSha256": "ddd7bf1a149c231e67db0b212229331640e947d3cb0769b82c68230def30b4e2"
+  },
+  {
+    "source": "evidence/normal-recovery/013-baseline-ci.stdout",
+    "archive": "evidence/normal-recovery/013-baseline-ci.stdout",
+    "sourceSha256": "0d7ec46d6b85cd0ae166ce34a5e78af3bab89480fe7fefd5cf7aab25f381e4a8",
+    "archiveSha256": "0d7ec46d6b85cd0ae166ce34a5e78af3bab89480fe7fefd5cf7aab25f381e4a8"
+  },
+  {
+    "source": "evidence/normal-recovery/044-mutant-production-lifecycle-consumer.stdout",
+    "archive": "evidence/normal-recovery/044-mutant-production-lifecycle-consumer.stdout",
+    "sourceSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1",
+    "archiveSha256": "78a5d5fb38b877fdebe3a80e1271ecb0532e00a81b6af4d55aa5737aa8821ee1"
+  },
+  {
+    "source": "evidence/normal-recovery/046-mutant-production-no-link.stderr",
+    "archive": "evidence/normal-recovery/046-mutant-production-no-link.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/043-mutant-production-consumer.stdout",
+    "archive": "evidence/normal-recovery/043-mutant-production-consumer.stdout",
+    "sourceSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6",
+    "archiveSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6"
+  },
+  {
+    "source": "evidence/normal-recovery/042-mutant-installed-no-link.stdout",
+    "archive": "evidence/normal-recovery/042-mutant-installed-no-link.stdout",
+    "sourceSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89",
+    "archiveSha256": "16712b17684a0730117a91373d8b3e80031b886dbf20bd01e615679227451f89"
+  },
+  {
+    "source": "evidence/normal-recovery/045-mutant-production-receipt-consumer.stderr",
+    "archive": "evidence/normal-recovery/045-mutant-production-receipt-consumer.stderr.gz",
+    "sourceSha256": "10ed6da4ca32cb411c2b63d19694b08a971bf1c7a612e86d98a3688ab213d259",
+    "archiveSha256": "b2af263ff84c77ef49afdf3ee045d2ac4a3c19c8767841795948df637a4091b7"
+  },
+  {
+    "source": "evidence/normal-recovery/039-mutant-installed-consumer.stdout",
+    "archive": "evidence/normal-recovery/039-mutant-installed-consumer.stdout",
+    "sourceSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6",
+    "archiveSha256": "374d1c5ca7913311a720a77c55ddc378da50a2563a029c42f75f6c0668e736c6"
+  },
+  {
+    "source": "evidence/normal-recovery/013-baseline-ci.json",
+    "archive": "evidence/normal-recovery/013-baseline-ci.json",
+    "sourceSha256": "17cc579489708436ad21b73455bf28dd82ac6bf42501cfa9ac9f21e921ad2418",
+    "archiveSha256": "17cc579489708436ad21b73455bf28dd82ac6bf42501cfa9ac9f21e921ad2418"
+  },
+  {
+    "source": "evidence/normal-recovery/041-mutant-installed-receipt-consumer.stdout",
+    "archive": "evidence/normal-recovery/041-mutant-installed-receipt-consumer.stdout",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/042-mutant-installed-no-link.json",
+    "archive": "evidence/normal-recovery/042-mutant-installed-no-link.json",
+    "sourceSha256": "48e74067b0886d0c130dc8a6689b22368a12fcfc7c6efbbb6948fe22673d9f7c",
+    "archiveSha256": "48e74067b0886d0c130dc8a6689b22368a12fcfc7c6efbbb6948fe22673d9f7c"
+  },
+  {
+    "source": "evidence/normal-recovery/045-mutant-production-receipt-consumer.json",
+    "archive": "evidence/normal-recovery/045-mutant-production-receipt-consumer.json",
+    "sourceSha256": "302a7529972573e00571f13f38ab677dccbe41f428491a36c648dbc0b99057fe",
+    "archiveSha256": "302a7529972573e00571f13f38ab677dccbe41f428491a36c648dbc0b99057fe"
+  },
+  {
+    "source": "evidence/normal-recovery/046-mutant-production-no-link.json",
+    "archive": "evidence/normal-recovery/046-mutant-production-no-link.json",
+    "sourceSha256": "0ebebea8bf04c1f8b52b41764c6aa504a3d972c4c60925f11ef4159b84f7c8ed",
+    "archiveSha256": "0ebebea8bf04c1f8b52b41764c6aa504a3d972c4c60925f11ef4159b84f7c8ed"
+  },
+  {
+    "source": "evidence/normal-recovery/039-mutant-installed-consumer.json",
+    "archive": "evidence/normal-recovery/039-mutant-installed-consumer.json",
+    "sourceSha256": "c10144ee647d7fbaed7b11ddaae361841c1d4dd1d897686681e23ca217d897fe",
+    "archiveSha256": "c10144ee647d7fbaed7b11ddaae361841c1d4dd1d897686681e23ca217d897fe"
+  },
+  {
+    "source": "evidence/normal-recovery/039-mutant-installed-consumer.stderr",
+    "archive": "evidence/normal-recovery/039-mutant-installed-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/041-mutant-installed-receipt-consumer.stderr",
+    "archive": "evidence/normal-recovery/041-mutant-installed-receipt-consumer.stderr",
+    "sourceSha256": "29115cf16165f01847f7186841301fbe3a55d47f3e00ffbad8bb443fa01d1945",
+    "archiveSha256": "29115cf16165f01847f7186841301fbe3a55d47f3e00ffbad8bb443fa01d1945"
+  },
+  {
+    "source": "evidence/normal-recovery/045-mutant-production-receipt-consumer.stdout",
+    "archive": "evidence/normal-recovery/045-mutant-production-receipt-consumer.stdout",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/040-mutant-installed-lifecycle-consumer.json",
+    "archive": "evidence/normal-recovery/040-mutant-installed-lifecycle-consumer.json",
+    "sourceSha256": "b37c430098dcf9320bc92587f8b3437a902e8d40d0f61ee66267baa08ed078d0",
+    "archiveSha256": "b37c430098dcf9320bc92587f8b3437a902e8d40d0f61ee66267baa08ed078d0"
+  },
+  {
+    "source": "evidence/normal-recovery/041-mutant-installed-receipt-consumer.json",
+    "archive": "evidence/normal-recovery/041-mutant-installed-receipt-consumer.json",
+    "sourceSha256": "d377f9626258d12dd3cab2a45e084e77e2398ab889cd346fdc7ecfe9d1e810ab",
+    "archiveSha256": "d377f9626258d12dd3cab2a45e084e77e2398ab889cd346fdc7ecfe9d1e810ab"
+  },
+  {
+    "source": "evidence/normal-recovery/043-mutant-production-consumer.stderr",
+    "archive": "evidence/normal-recovery/043-mutant-production-consumer.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/normal-recovery/042-mutant-installed-no-link.stderr",
+    "archive": "evidence/normal-recovery/042-mutant-installed-no-link.stderr",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/offline-negative/013-baseline-ci.stderr",
+    "archive": "evidence/offline-negative/013-baseline-ci.stderr",
+    "sourceSha256": "183f364189bbaf759db48f40f247f16eec05886af130fe27b7f49a3f62d17ec8",
+    "archiveSha256": "183f364189bbaf759db48f40f247f16eec05886af130fe27b7f49a3f62d17ec8"
+  },
+  {
+    "source": "evidence/offline-negative/013-baseline-ci.stdout",
+    "archive": "evidence/offline-negative/013-baseline-ci.stdout",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "evidence/offline-negative/013-baseline-ci.json",
+    "archive": "evidence/offline-negative/013-baseline-ci.json",
+    "sourceSha256": "9fb963e1ff3a0783dc827fad1fced217a8594a69e7ab6857e3d32df8d9cf01b2",
+    "archiveSha256": "9fb963e1ff3a0783dc827fad1fced217a8594a69e7ab6857e3d32df8d9cf01b2"
+  },
+  {
+    "source": "npm-11.21.1/package-lock.json",
+    "archive": "npm-11.21.1/package-lock.json",
+    "sourceSha256": "662d634158c36ca8665bd506908cd64f7a465bf5e01987a68a70b0c8977d5960",
+    "archiveSha256": "662d634158c36ca8665bd506908cd64f7a465bf5e01987a68a70b0c8977d5960"
+  },
+  {
+    "source": "npm-11.21.1/package.json",
+    "archive": "npm-11.21.1/package.json",
+    "sourceSha256": "dcd56e01d50193130a41f522a201882af075296c5c01ab2c4aea600eec5b5116",
+    "archiveSha256": "dcd56e01d50193130a41f522a201882af075296c5c01ab2c4aea600eec5b5116"
+  }
+]

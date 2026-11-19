@@ -1,0 +1,7 @@
+{
+  "frozen": "/private/tmp/st-occurrence-successor",
+  "scratch": "/private/tmp/st-fixture-types-aj63tgdb/candidate",
+  "fixture": "packages/kernel/src/lib/core-independent-review.spec.ts",
+  "beforeSha256": "a784b59acac28fb58c22f661b53e7e02f10854ba9b2e1478147502a2fd14a512",
+  "afterSha256": "d12118e4058f597958b06084b79b98fe68c5f6b6ff9e779217433b1f329b03a3"
+}

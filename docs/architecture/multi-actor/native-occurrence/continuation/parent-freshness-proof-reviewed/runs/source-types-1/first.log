@@ -1,0 +1,2 @@
+packages/kernel/src/lib/internals/member-membership.ts(776,22): error TS2345: Argument of type 'string | symbol' is not assignable to parameter of type 'string'.
+  Type 'symbol' is not assignable to type 'string'.

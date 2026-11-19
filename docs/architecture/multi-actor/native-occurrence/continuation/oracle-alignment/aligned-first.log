@@ -1,0 +1,76 @@
+
+> nx run kernel:test --testFile=entity-egress-footprint.spec.ts branch-omission-correctness.spec.ts link-commit-ordering.spec.ts link-commit-boundary-carrier.spec.ts derive-footprint.spec.ts entity-semantic-transition.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=entity-egress-footprint.spec.ts branch-omission-correctness.spec.ts link-commit-ordering.spec.ts link-commit-boundary-carrier.spec.ts derive-footprint.spec.ts entity-semantic-transition.spec.ts --maxWorkers=1
+
+(node:81609) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-oracle-alignment/candidate/packages/kernel
+
+(node:81637) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/branch-omission-correctness.spec.ts (35 tests | 1 failed) 308ms
+     × same-turn removal and reintroduction ends absent at Link 22ms
+(node:82154) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82263) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82293) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82299) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:82700) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
++   "age": 8,
+    "name": "Ada",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:255:33
+    253|         await nextTask();
+    254|         await relation.settled();
+    255|         expect(received.at(-1)).toStrictEqual(
+       |                                 ^
+    256|           end === 'present' ? { name: 'Ada', age: undefined } : { name…
+    257|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 87 passed (88)
+   Start at  16:59:16
+   Duration  21.40s (transform 5.36s, setup 0ms, import 8.66s, tests 791ms, environment 9.29s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=entity-egress-footprint.spec.ts branch-omission-correctness.spec.ts link-commit-ordering.spec.ts link-commit-boundary-carrier.spec.ts derive-footprint.spec.ts entity-semantic-transition.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      22.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     22.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    22.8s

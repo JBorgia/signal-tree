@@ -1,0 +1,17 @@
+{
+  "inputs": {
+    "base": {
+      "files": 2974,
+      "unchanged": true
+    },
+    "ours": {
+      "files": 2986,
+      "unchanged": true
+    },
+    "theirs": {
+      "files": 2982,
+      "unchanged": true
+    }
+  },
+  "C6ManifestUnchanged": true
+}

@@ -1,0 +1,9 @@
+{
+  "baseManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "candidateManifestSha256": "4aad3b2ab21df45928abbc0a6a4671a46402c524a8bb0c807783f43723218450",
+  "patchSha256": "63be7260b6e49eb168b16f7f6c1ae7857426a407d293fd46bb780822ff8578bd",
+  "runtimeUnchanged": true,
+  "allOriginalSpecsUnchanged": true,
+  "frozen": true,
+  "independentReviewPending": true
+}

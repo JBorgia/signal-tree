@@ -1,0 +1,8 @@
+📦 Packing SignalTree packages and type-checking a real consumer
+
+  installing tarball...
+  ✅ framework facade runtime identities
+  ✅ moduleResolution: bundler
+  ✅ moduleResolution: node16
+
+✅ Consumer type-check passed under both bundler and node16 resolution.

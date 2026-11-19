@@ -1,0 +1,140 @@
+--- /private/tmp/st-native-combined-b/candidate/packages/kernel/src/lib/experimental-publication/entity.ts
++++ /private/tmp/st-packet-index-admission-r1/allocation-final/baseline-b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,3 +1,4 @@
++import {AllocationMap,countedArray} from '../allocation-diagnostic';
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+@@ -16,14 +17,14 @@
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+ registerEntityPublicationFactory(() => {
+-  const fields=new Map<number,Map<string,NativeFieldEndpoint>>();
+-  const members=new Map<number,Member>();
+-  const placements=new Map<number,Requirement>();
+-  const views=new Map<number,Map<string,View>>();
+-  const visible=new Map<number,View>();
+-  const placementViews=new Map<number,View>();
+-  const mappings=new Map<number,Requirement>();
+-  const mappingViews=new Map<number,View>();
++  const fields=new AllocationMap<number,Map<string,NativeFieldEndpoint>>("entity.ts:19:16");
++  const members=new AllocationMap<number,Member>("entity.ts:20:17");
++  const placements=new AllocationMap<number,Requirement>("entity.ts:21:20");
++  const views=new AllocationMap<number,Map<string,View>>("entity.ts:22:15");
++  const visible=new AllocationMap<number,View>("entity.ts:23:17");
++  const placementViews=new AllocationMap<number,View>("entity.ts:24:24");
++  const mappings=new AllocationMap<number,Requirement>("entity.ts:25:18");
++  const mappingViews=new AllocationMap<number,View>("entity.ts:26:22");
+   const missing=unavailable();
+   const evidence=(ordinaryFields:Lookup<Map<string,NativeFieldEndpoint>>=fields,physicalFields:Lookup<Map<string,View>>=views,ordinaryMembers:Lookup<Member>=members,physicalMembers:Lookup<View>=visible,ordinaryPlacements:Lookup<Requirement>=placements,physicalPlacements:Lookup<View>=placementViews,ordinaryMappings:Lookup<Requirement>=mappings,physicalMappings:Lookup<View>=mappingViews):EntityPublicationEvidence=>({
+     member:(id,view)=>view==='ordinary'?ordinaryMembers.get(id)?.requirement??missing:physicalMembers.get(id)?.requirement??missing,
+@@ -47,7 +48,7 @@
+   return {
+     captureViews:physicalViews,
+     evidence:()=>({...evidence(),exclusions:()=>{
+-      const result=new Map<number,object>();
++      const result=new AllocationMap<number,object>("entity.ts:50:20");
+       for(const [id,member]of members)if(!member.present)result.set(id,member.requirement);
+       for(const [id,view]of visible)if(view.present===false)result.set(id,view.requirement);
+       return [...result];
+@@ -62,38 +63,38 @@
+       const inputs=[...currentNativePublicationInputs(),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])];
+       const prepared=inspection?undefined:lifecycle.prepareNativeRequirement(owner?[owner]:[],!valid||meta?.origin!==undefined,inputs);
+       const requirement=prepared?.requirement??unavailable();
+-      const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
++      const selectedFields=new AllocationMap<number,Map<string,NativeFieldEndpoint>>("entity.ts:65:28");
+       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
+       const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
+-        const edit=[...entityPublicationOrdinary(packet)].reverse().find(edit=>edit.subject===subject);
++        const edit=countedArray('proposal-copy', [...entityPublicationOrdinary(packet)]).reverse().find(edit=>edit.subject===subject);
+         if(!edit)throw new Error('Missing admitted field publication');
+         return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
+       };
+       const selections:NativeFieldSelections={before:beforeField,proposed:proposal,choose(subject,key,value){
+-        let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new Map());row.set(key,value);
++        let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new AllocationMap("entity.ts:73:84"));row.set(key,value);
+       }};
+       const responsibility=packet.prepareResponsibility?.(selections);
+       const chosen=(edit:EntityPublicationEdit,key:string):NativeFieldEndpoint=>edit.restoredFields?.get(key)??selectedFields.get(edit.subject)?.get(key)??proposal(edit.subject,key);
+       const writes:TerminalRecordPlan['writes'][number][]=[];
+       const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+-      const nextFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+-      const nextViews=new Map<number,Map<string,View>>();
+-      const nextMembers=new Map<number,Member>();
+-      const nextPlacements=new Map<number,Requirement>();
++      const nextFields=new AllocationMap<number,Map<string,NativeFieldEndpoint>>("entity.ts:79:24");
++      const nextViews=new AllocationMap<number,Map<string,View>>("entity.ts:80:23");
++      const nextMembers=new AllocationMap<number,Member>("entity.ts:81:25");
++      const nextPlacements=new AllocationMap<number,Requirement>("entity.ts:82:28");
+       const removed=new Set<number>();
+-      const nextMappings=new Map<number,Requirement>(),nextMappingViews=new Map<number,View>();
+-      const physicalMembers=new Map<number,View>(),physicalPlacements=new Map<number,View>();
+-      const paired=new Map<EntityPublicationEdit,EntityPublicationEdit>();
++      const nextMappings=new AllocationMap<number,Requirement>("entity.ts:84:26"),nextMappingViews=new AllocationMap<number,View>("entity.ts:84:73");
++      const physicalMembers=new AllocationMap<number,View>("entity.ts:85:29"),physicalPlacements=new AllocationMap<number,View>("entity.ts:85:71");
++      const paired=new AllocationMap<EntityPublicationEdit,EntityPublicationEdit>("entity.ts:86:20");
+       for(const step of packet.steps??[]) for(const edit of [...step.ordinary,...(step.authoredRemoval?[step.authoredRemoval]:[])]) {
+         const physical=step.physical?.find(value=>value.subject===edit.subject);
+         if(physical)paired.set(edit,physical);
+       }
+       // Packets with no explicit steps are one point unit, never a flattened multi-step unit.
+       if(!packet.steps)for(const edit of packet.ordinary){const physical=packet.physical.find(value=>value.subject===edit.subject);if(physical)paired.set(edit,physical);}
+-      const physicalAt=new Map<EntityPublicationEdit,Map<string,View>>();
+-      const selectedAt=new Map<EntityPublicationEdit,EntityPublicationEvidence>();
+-      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new Map(fields.get(id)));return row;};
+-      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new Map(views.get(id)));return row;};
++      const physicalAt=new AllocationMap<EntityPublicationEdit,Map<string,View>>("entity.ts:93:24");
++      const selectedAt=new AllocationMap<EntityPublicationEdit,EntityPublicationEvidence>("entity.ts:94:24");
++      const rowFields=(id:number):Map<string,NativeFieldEndpoint>=>{let row=nextFields.get(id);if(!row)nextFields.set(id,row=new AllocationMap("entity.ts:95:126",fields.get(id)));return row;};
++      const rowViews=(id:number):Map<string,View>=>{let row=nextViews.get(id);if(!row)nextViews.set(id,row=new AllocationMap("entity.ts:96:108",views.get(id)));return row;};
+       // Physical support is distinct from ordinary eligibility. Inspection
+       // changes only the physical certificate, including negative membership.
+       for(const edit of packet.physical){
+@@ -106,7 +107,7 @@
+         const row=rowViews(edit.subject);
+         const keys=edit.fields===null?[...new Set([...row.keys(),...Object.keys(edit.after??{})])]:edit.fields;
+         for(const key of keys)row.set(key,{requirement,present:own(edit.after,key)});
+-        physicalAt.set(edit,new Map(row));
++        physicalAt.set(edit,new AllocationMap("entity.ts:109:29",row));
+         if(edit.structural?.kind==='add'){nextMappingViews.set(edit.subject,{requirement});physicalMembers.set(edit.subject,{requirement,present:true});physicalPlacements.set(edit.subject,{requirement});}
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+@@ -138,7 +139,7 @@
+           }else view.set(key,{requirement:fieldRequirement,present:own(physical?.after??edit.after,key)});
+           acquisitions++;
+         }
+-        const ordinaryRow=new Map(row),physicalRow=new Map(physical&&physicalAt.get(physical)||view);
++        const ordinaryRow=new AllocationMap("entity.ts:141:27",row),physicalRow=new AllocationMap("entity.ts:141:52",physical&&physicalAt.get(physical)||view);
+         for(const key of keys)physicalRow.set(key,{requirement:row.get(key)!.requirement as Requirement,present:own(physical?.after??edit.after,key)});
+         const member=nextMembers.get(edit.subject)??members.get(edit.subject),placement=nextPlacements.get(edit.subject)??placements.get(edit.subject);
+         const ordinaryKey=nextMappings.get(edit.subject)??mappings.get(edit.subject)??missing,physicalKey=nextMappingViews.get(edit.subject)?.requirement??mappingViews.get(edit.subject)?.requirement??missing;
+@@ -161,7 +162,7 @@
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+         const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...entityPublicationOrdinary(packet).map(edit=>edit.subject)])]:[subject];
+-        if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
++        if(subject===undefined){const order=new AllocationMap("entity.ts:164:45",placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+         for(const id of selected){
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+           if(member?.present===false)continue;
+--- /private/tmp/st-native-combined-b/candidate/packages/kernel/src/lib/internals/entity-publication.ts
++++ /private/tmp/st-packet-index-admission-r1/allocation-final/baseline-b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -1,3 +1,4 @@
++import {countedArray} from '../allocation-diagnostic';
+ import type { EntityProjectionSeedEntry } from './entity-projection-seed';
+ import type { WriteMetadata } from '../mutation-types';
+ import { combineTerminalRecords, installTerminalRecord, type PreparedPublicationUnit } from './intrinsic-mutation';
+@@ -26,11 +27,11 @@
+ /** Preserve authored tombstones even when source ordinary membership was absent. */
+ export function entityPublicationOrdinary(packet: EntityPublicationPacket): readonly EntityPublicationEdit[] {
+   if (!packet.steps) return packet.ordinary;
+-  return packet.steps.flatMap(step => {
++  return countedArray('ordinary-flatMap', packet.steps.flatMap(step => {
+     const removal = step.authoredRemoval;
+     return removal && !step.ordinary.some(edit => edit.subject === removal.subject && edit.structural?.kind === 'remove')
+       ? [...step.ordinary, removal] : step.ordinary;
+-  });
++  }));
+ }
+ export interface EntityPublicationPacket {
+   readonly prepareResponsibility?: (fields?:import('./native-field-selection').NativeFieldSelections)=>import('./intrinsic-mutation').TerminalRecordPlan|undefined;

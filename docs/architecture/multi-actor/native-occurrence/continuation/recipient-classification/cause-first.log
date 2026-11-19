@@ -1,0 +1,37 @@
+
+> nx run kernel:test recipient-cause-classification.spec.ts aggregate-installed-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-cause-classification.spec.ts aggregate-installed-publication.spec.ts --maxWorkers=1
+
+(node:94143) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-recipient-window-classification-successor/candidate/packages/kernel
+
+(node:94159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:94160) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  19:30:30
+   Duration  1.08s (transform 421ms, setup 0ms, import 569ms, tests 64ms, environment 304ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.5s

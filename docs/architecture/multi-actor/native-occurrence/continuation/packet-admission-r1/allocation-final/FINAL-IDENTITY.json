@@ -1,0 +1,14 @@
+{
+  "baseline-b": {
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "1c918089881a7c43fc98319adcca77be5cd316eb814ad2fd744ac35db3243bba",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "7430b90202a970c16b2280e05227ea98abb5c0b191d3d0c24b67cc8aa6363ddf",
+    "packages/kernel/src/lib/allocation-diagnostic.ts": "88580d57b10cded2e2230d66559919ab77862234704829ba248dfc29b95a6de3",
+    "packages/kernel/src/lib/allocation-diagnostic.spec.ts": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7"
+  },
+  "optimized": {
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "a63e6736d5fddf58d829835f50c9dd1bc0d1dcc8fea9ac2083f18ab124589671",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "18c0f53de800019863f3a73694c343106852b1611f07d44d2ed2c66a53d93340",
+    "packages/kernel/src/lib/allocation-diagnostic.ts": "40eb81bc7175d657e6148c223375a8bd532f4c13c211463a5179ccbe3e9c574f",
+    "packages/kernel/src/lib/allocation-diagnostic.spec.ts": "5239ef4962bb110b4e622cc0d0193e5666785f8bec8cf40e3b9d32ab4f1183c7"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "apps/demo/src/app/version.ts": {
+    "inputSha256": "d94c62498c6809dfb3239e549a796abc8595fa1e4080abab91c06c28338dff03",
+    "finalSha256": "d94c62498c6809dfb3239e549a796abc8595fa1e4080abab91c06c28338dff03",
+    "unchanged": true
+  },
+  "apps/demo/src/app/library-versions.ts": {
+    "inputSha256": "84d0e065ad71c298f604d39ceb08506d727ad4f6e6b2823926fbb06a426bf2dd",
+    "finalSha256": "84d0e065ad71c298f604d39ceb08506d727ad4f6e6b2823926fbb06a426bf2dd",
+    "unchanged": true
+  }
+}

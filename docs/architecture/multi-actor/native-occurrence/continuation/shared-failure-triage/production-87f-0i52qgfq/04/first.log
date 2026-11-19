@@ -1,0 +1,56 @@
+
+> nx run kernel:test link-absent-locations.spec.ts --testNamePattern=Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs link-absent-locations.spec.ts --testNamePattern="Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling" --reporter=verbose --maxWorkers=1
+
+(node:38590) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38597) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate/packages/kernel
+
+(node:38604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > no enhancers > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > transactions(), restoration() > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > transactions(), restoration() > undo, redo and jumpTo across the omission and the re-adds
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > transactions(), restoration() > rollback of transactions that re-add the location, a sibling and the rows
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > restoration(), transactions() > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > restoration(), transactions() > undo, redo and jumpTo across the omission and the re-adds
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a leaf' > restoration(), transactions() > rollback of transactions that re-add the location, a sibling and the rows
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > no enhancers > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > transactions(), restoration() > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > transactions(), restoration() > undo, redo and jumpTo across the omission and the re-adds
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > transactions(), restoration() > rollback of transactions that re-add the location, a sibling and the rows
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > restoration(), transactions() > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > restoration(), transactions() > undo, redo and jumpTo across the omission and the re-adds
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a branch' > restoration(), transactions() > rollback of transactions that re-add the location, a sibling and the rows
+ ✓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling 9ms
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > undo, redo and jumpTo across the omission and the re-adds
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > transactions(), restoration() > rollback of transactions that re-add the location, a sibling and the rows
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > an omission, and re-adds of the location and of a sibling
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > undo, redo and jumpTo across the omission and the re-adds
+ ↓ src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > restoration(), transactions() > rollback of transactions that re-add the location, a sibling and the rows
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 20 skipped (21)
+   Start at  16:40:35
+   Duration  783ms (transform 423ms, setup 0ms, import 512ms, tests 10ms, environment 176ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

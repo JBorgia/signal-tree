@@ -1,0 +1,46 @@
+Creating project graph nodes with 2 plugins
+  - @nx/eslint/plugin
+  - @nx/vitest
+Creating project graph nodes with @nx/vitest
+
+
+> nx run kernel:test recipient-progress-positive-counterparts.spec.ts publication-enrollment-adjudicated.spec.ts recipient-source-permission.spec.ts recipient-window-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-progress-positive-counterparts.spec.ts publication-enrollment-adjudicated.spec.ts recipient-source-permission.spec.ts recipient-window-independent.spec.ts --maxWorkers=1
+
+(node:95262) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95271) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c21-recipient-positive-counterparts/candidate/packages/kernel
+
+(node:95291) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:95816) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96051) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  4 passed (4)
+      Tests  46 passed (46)
+   Start at  13:57:21
+   Duration  21.45s (transform 7.45s, setup 0ms, import 10.57s, tests 522ms, environment 8.52s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      24.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     24.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    24.5s

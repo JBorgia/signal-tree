@@ -1,0 +1,17 @@
+{
+  "status": "Frozen composition; focused qualification pending",
+  "manifestSha256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "compositionPatchSha256": "0bbac8c869abf413f8ab0f3483fdb59e93ae2f54271fac0064517d26d3927c69",
+  "changedFromC26": [
+    "packages/kernel/src/index.ts",
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/link-declaration-public.spec.ts",
+    "packages/kernel/src/lib/link-declaration.typing.spec.ts",
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/publication-declaration.ts",
+    "packages/kernel/src/lib/tree-error-public-contract.spec.ts"
+  ],
+  "merge": "All three reviewed patches applied without conflict; no manual merge/source edits",
+  "activation": "No activation/default-gating edits; inherited C26 behavior retained"
+}

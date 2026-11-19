@@ -1,0 +1,32 @@
+
+> nx run kernel:test independent-structural-probe.spec.ts --testNamePattern=ordinary-only remove plus member --reporter=json --outputFile=/private/tmp/st-structural-admission-independent/mixed-vitest.json --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-structural-probe.spec.ts --testNamePattern="ordinary-only remove plus member" --reporter=json --outputFile=/private/tmp/st-structural-admission-independent/mixed-vitest.json --maxWorkers=1
+
+(node:85221) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85233) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85249) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+JSON report written to /private/tmp/st-structural-admission-independent/mixed-vitest.json
+Warning: command "node tools/run-core-vitest.mjs independent-structural-probe.spec.ts --testNamePattern="ordinary-only remove plus member" --reporter=json --outputFile=/private/tmp/st-structural-admission-independent/mixed-vitest.json --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    6.4s

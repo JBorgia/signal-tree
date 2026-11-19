@@ -1,0 +1,38 @@
+[
+  {
+    "source": "81780c4e.txt",
+    "archive": "81780c4e.txt",
+    "sourceSha256": "5ad37920e32a63f50b87fa4c2893745a674c3b81a14171e63d714a6d719b81d0",
+    "archiveSha256": "5ad37920e32a63f50b87fa4c2893745a674c3b81a14171e63d714a6d719b81d0"
+  },
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "12b7216fc188441db0ae5250e57828f198d21fee624b6ef359d2822d98f71228",
+    "archiveSha256": "12b7216fc188441db0ae5250e57828f198d21fee624b6ef359d2822d98f71228"
+  },
+  {
+    "source": "c76814e0.txt",
+    "archive": "c76814e0.txt",
+    "sourceSha256": "d509e4ef9ceedd142cba0c479696f41c2e81182d5e90b0a58ef86b27b2784e10",
+    "archiveSha256": "d509e4ef9ceedd142cba0c479696f41c2e81182d5e90b0a58ef86b27b2784e10"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "84eaa3199432903f103b9db2e71ec10f0f0e00f6478d5523a82a98cb62718214",
+    "archiveSha256": "84eaa3199432903f103b9db2e71ec10f0f0e00f6478d5523a82a98cb62718214"
+  },
+  {
+    "source": "CALLSITES.txt",
+    "archive": "CALLSITES.txt",
+    "sourceSha256": "03a96a279020ef6784cb477b92acac8a4d105d36c6be530f4013672877314e03",
+    "archiveSha256": "03a96a279020ef6784cb477b92acac8a4d105d36c6be530f4013672877314e03"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "83ae9ea48f6b51564cb69f7710c7162b59c58f0bf0d28eb6c9afa61f12fb6f52",
+    "archiveSha256": "83ae9ea48f6b51564cb69f7710c7162b59c58f0bf0d28eb6c9afa61f12fb6f52"
+  }
+]

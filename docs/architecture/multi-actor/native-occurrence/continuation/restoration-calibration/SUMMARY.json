@@ -1,0 +1,448 @@
+{
+  "baseline": {
+    "result": {
+      "exit": 0,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "failures": [],
+    "observations": [
+      {
+        "n": 256,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 769,
+            "writes": 256,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 3074,
+            "tombstones": 256,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 10,
+            "writes": 3,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 38,
+            "tombstones": 3,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 97,
+            "writes": 32,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 386,
+            "tombstones": 32,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 256,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 768,
+            "writes": 256,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 3073,
+            "tombstones": 256,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 9,
+            "writes": 3,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 37,
+            "tombstones": 3,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 96,
+            "writes": 32,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 385,
+            "tombstones": 32,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      }
+    ],
+    "allSemanticAssertionsCompleted": true
+  },
+  "mutant-validation": {
+    "result": {
+      "exit": 1,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "f88835726039771224104e0a83faeb35bcbc8e91ea9e19ac3bd72cd311a2da54"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "failures": [
+      "AssertionError: large-sequence N=3 jumpTo0 calibrated work: expected 19 to be less than or equal to 10",
+      "AssertionError: large-sequence N=3 jumpTo0 calibrated work: expected 19 to be less than or equal to 10",
+      "AssertionError: row work without attributed singleton: expected 18 to be less than or equal to 9",
+      "AssertionError: large-sequence N=32 jumpTo0 calibrated work: expected 193 to be less than or equal to 97",
+      "AssertionError: large-sequence N=32 jumpTo0 calibrated work: expected 193 to be less than or equal to 97",
+      "AssertionError: row work without attributed singleton: expected 192 to be less than or equal to 96",
+      "AssertionError: large-sequence N=256 jumpTo0 calibrated work: expected 1537 to be less than or equal to 769",
+      "AssertionError: large-sequence N=256 jumpTo0 calibrated work: expected 1537 to be less than or equal to 769",
+      "AssertionError: row work without attributed singleton: expected 1536 to be less than or equal to 768",
+      "AssertionError: paired N=3 jumpTo0 calibrated work: expected 18 to be less than or equal to 9",
+      "AssertionError: paired N=3 jumpTo0 calibrated work: expected 18 to be less than or equal to 9",
+      "AssertionError: row work without attributed singleton: expected 18 to be less than or equal to 9",
+      "AssertionError: paired N=32 jumpTo0 calibrated work: expected 192 to be less than or equal to 96",
+      "AssertionError: paired N=32 jumpTo0 calibrated work: expected 192 to be less than or equal to 96",
+      "AssertionError: row work without attributed singleton: expected 192 to be less than or equal to 96",
+      "AssertionError: paired N=256 jumpTo0 calibrated work: expected 1536 to be less than or equal to 768",
+      "AssertionError: paired N=256 jumpTo0 calibrated work: expected 1536 to be less than or equal to 768",
+      "AssertionError: row work without attributed singleton: expected 1536 to be less than or equal to 768"
+    ],
+    "observations": [
+      {
+        "n": 256,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 1537,
+            "writes": 256,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 3074,
+            "tombstones": 256,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 19,
+            "writes": 3,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 38,
+            "tombstones": 3,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 193,
+            "writes": 32,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 386,
+            "tombstones": 32,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 256,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 1536,
+            "writes": 256,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 3073,
+            "tombstones": 256,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 18,
+            "writes": 3,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 37,
+            "tombstones": 3,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 192,
+            "writes": 32,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 385,
+            "tombstones": 32,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      }
+    ],
+    "allSemanticAssertionsCompleted": true
+  },
+  "mutant-snapshot": {
+    "result": {
+      "exit": 1,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "2b6fd7a978bfbfe3410793998a759afbd6072cc7ed9b1ac8e70a51188ad03209"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "failures": [
+      "AssertionError: large-sequence N=3 jumpTo1 calibrated work: expected 62 to be less than or equal to 38",
+      "AssertionError: large-sequence N=3 jumpTo1 calibrated work: expected 62 to be less than or equal to 38",
+      "AssertionError: row work without attributed singleton: expected 60 to be less than or equal to 36",
+      "AssertionError: large-sequence N=32 jumpTo1 calibrated work: expected 642 to be less than or equal to 386",
+      "AssertionError: large-sequence N=32 jumpTo1 calibrated work: expected 642 to be less than or equal to 386",
+      "AssertionError: row work without attributed singleton: expected 640 to be less than or equal to 384",
+      "AssertionError: large-sequence N=256 jumpTo1 calibrated work: expected 5122 to be less than or equal to 3074",
+      "AssertionError: large-sequence N=256 jumpTo1 calibrated work: expected 5122 to be less than or equal to 3074",
+      "AssertionError: row work without attributed singleton: expected 5120 to be less than or equal to 3072",
+      "AssertionError: paired N=3 jumpTo1 calibrated work: expected 61 to be less than or equal to 37",
+      "AssertionError: paired N=3 jumpTo1 calibrated work: expected 61 to be less than or equal to 37",
+      "AssertionError: row work without attributed singleton: expected 60 to be less than or equal to 36",
+      "AssertionError: paired N=32 jumpTo1 calibrated work: expected 641 to be less than or equal to 385",
+      "AssertionError: paired N=32 jumpTo1 calibrated work: expected 641 to be less than or equal to 385",
+      "AssertionError: row work without attributed singleton: expected 640 to be less than or equal to 384",
+      "AssertionError: paired N=256 jumpTo1 calibrated work: expected 5121 to be less than or equal to 3073",
+      "AssertionError: paired N=256 jumpTo1 calibrated work: expected 5121 to be less than or equal to 3073",
+      "AssertionError: row work without attributed singleton: expected 5120 to be less than or equal to 3072"
+    ],
+    "observations": [
+      {
+        "n": 256,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 769,
+            "writes": 256,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 5122,
+            "tombstones": 256,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 10,
+            "writes": 3,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 62,
+            "tombstones": 3,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "mode": "large-sequence",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 97,
+            "writes": 32,
+            "currentIndexReads": 0,
+            "destroyedReads": 1
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 642,
+            "tombstones": 32,
+            "currentIndexReads": 1,
+            "destroyedReads": 1
+          }
+        ]
+      },
+      {
+        "n": 256,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 768,
+            "writes": 256,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 5121,
+            "tombstones": 256,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 9,
+            "writes": 3,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 61,
+            "tombstones": 3,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "mode": "paired",
+        "phases": [
+          {
+            "phase": "jumpTo0",
+            "reads": 96,
+            "writes": 32,
+            "currentIndexReads": 0,
+            "destroyedReads": 0
+          },
+          {
+            "phase": "jumpTo1",
+            "reads": 641,
+            "tombstones": 32,
+            "currentIndexReads": 1,
+            "destroyedReads": 0
+          }
+        ]
+      }
+    ],
+    "allSemanticAssertionsCompleted": true
+  }
+}

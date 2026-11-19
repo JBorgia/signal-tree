@@ -1,0 +1,12 @@
+{
+  "exit": -15,
+  "watchdog": {
+    "reason": "startup-or-no-progress",
+    "cases": [],
+    "ownedPgid": 88896,
+    "at": 1793652584.9882722
+  },
+  "caseStartsObserved": 0,
+  "unclosedCases": [],
+  "ownedGroupStillPresent": false
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "file": "core-independent-review.spec.ts",
+    "sameEmission": true
+  },
+  {
+    "file": "native-equal-inverse-diagnostic.spec.ts",
+    "sameEmission": true
+  },
+  {
+    "file": "native-netzero-diagnostic.spec.ts",
+    "sameEmission": true
+  }
+]

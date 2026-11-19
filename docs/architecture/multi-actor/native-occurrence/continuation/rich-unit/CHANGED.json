@@ -1,0 +1,14 @@
+[
+  "packages/kernel/src/enhancers/restoration/restoration.ts",
+  "packages/kernel/src/enhancers/transactions/transactions.ts",
+  "packages/kernel/src/lib/entity-signal.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+  "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+  "packages/kernel/src/lib/internals/prepared-entity-structure.ts",
+  "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+  "packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts",
+  "packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts",
+  "packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts",
+  "packages/kernel/src/lib/rich-unit-source-group.spec.ts"
+]

@@ -1,0 +1,95 @@
+{
+  "facade": "angular",
+  "calls": 4,
+  "events": [
+    {
+      "name": "nested-child",
+      "kind": "return",
+      "value": {
+        "n": 0
+      },
+      "before": 1,
+      "after": 1
+    },
+    {
+      "name": "first-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "before": 0,
+      "after": 1
+    },
+    {
+      "name": "immediate-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "before": 1,
+      "after": 1
+    },
+    {
+      "name": "collection-write",
+      "kind": "return",
+      "value": 3,
+      "before": 1,
+      "after": 1
+    },
+    {
+      "name": "post-write-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 3,
+              "n": 3
+            }
+          ]
+        }
+      },
+      "before": 1,
+      "after": 4
+    }
+  ]
+}

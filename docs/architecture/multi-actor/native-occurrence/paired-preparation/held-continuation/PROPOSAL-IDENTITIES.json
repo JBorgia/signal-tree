@@ -1,0 +1,10 @@
+{
+  "manifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+  "files": {
+    "packages/kernel/src/lib/internals/selected-write-operation.ts": "d64a7133312b68abbcf69d650fac25071623c140a529d9f6f5721be0660ba657",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "fa7daf822019e06ef9f94c2cc64d89fa5350a0905718e2a502bc71b38b3e2978",
+    "packages/kernel/src/lib/internals/native-location-realization.ts": "44aea31dfcbdff580ac68cf90f8d60d89a5ba31adfdd8962f9f533134058dddf",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "a29b0d5eb41a492a118ed146f33162e6f15ac7aca7203d009cac4e5c9fb65117"
+  },
+  "basisRetentionArchive": "f3fef6c98bc37c16d5272e3205b21c92cc3ec1bbe2f8a26ebf8c626a6506ba19"
+}

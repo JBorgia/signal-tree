@@ -1,0 +1,37 @@
+{
+  "BASELINE.json": {
+    "sha256": "c4d3a355a1748c6fc307bb4b21ef5faf0db04ea192cf51d497f8820c0a42600a",
+    "archive": "BASELINE.json.gz",
+    "archiveSha256": "1cdfe24780d14fe5885b489f8dc9853829e1f5c4499ecb547f86a6f938666c17"
+  },
+  "IDENTITIES.json": {
+    "sha256": "bbc87fb48f3d86fb7a30df9bae01ce1cc5df32c2e224f598b866022174248291",
+    "archive": "IDENTITIES.json",
+    "archiveSha256": "bbc87fb48f3d86fb7a30df9bae01ce1cc5df32c2e224f598b866022174248291"
+  },
+  "RESULTS.md": {
+    "sha256": "723cf0eb69cc3f85a87b32352337a2f30c257223be8e2e58acbe356908cf89e2",
+    "archive": "RESULTS.md",
+    "archiveSha256": "723cf0eb69cc3f85a87b32352337a2f30c257223be8e2e58acbe356908cf89e2"
+  },
+  "first-run.log": {
+    "sha256": "d40800afe99669e025d44ccaf3c43ff4873661f1e528c104c80107cd9f44cf1f",
+    "archive": "first-run.log",
+    "archiveSha256": "d40800afe99669e025d44ccaf3c43ff4873661f1e528c104c80107cd9f44cf1f"
+  },
+  "fixture-only.patch": {
+    "sha256": "ee0c9677610af016b20c37091f3846c4e826132cd4d16c1078944a2856f364eb",
+    "archive": "fixture-only.patch",
+    "archiveSha256": "ee0c9677610af016b20c37091f3846c4e826132cd4d16c1078944a2856f364eb"
+  },
+  "focused-types-first.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archive": "focused-types-first.log",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "reviewed-move.patch": {
+    "sha256": "e7980c8e737df50861b9334cf13d972833b30898168a82c8c3413f8f2467385a",
+    "archive": "reviewed-move.patch",
+    "archiveSha256": "e7980c8e737df50861b9334cf13d972833b30898168a82c8c3413f8f2467385a"
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "arm": "hold-proceed",
+    "scenario": "success",
+    "exit": 0
+  },
+  {
+    "arm": "hold-proceed",
+    "scenario": "skip",
+    "exit": 0
+  },
+  {
+    "arm": "hold-proceed",
+    "scenario": "caught",
+    "exit": 0
+  },
+  {
+    "arm": "drop-proceed",
+    "scenario": "success",
+    "exit": 0
+  },
+  {
+    "arm": "drop-proceed",
+    "scenario": "skip",
+    "exit": 0
+  },
+  {
+    "arm": "drop-proceed",
+    "scenario": "caught",
+    "exit": 0
+  },
+  {
+    "arm": "hold-value",
+    "scenario": "success",
+    "exit": 0
+  },
+  {
+    "arm": "hold-value",
+    "scenario": "skip",
+    "exit": 0
+  },
+  {
+    "arm": "hold-value",
+    "scenario": "caught",
+    "exit": 0
+  }
+]

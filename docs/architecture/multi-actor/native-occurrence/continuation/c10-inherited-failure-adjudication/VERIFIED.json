@@ -1,0 +1,75 @@
+{
+  "candidate": {
+    "unchangedManifestFiles": 3042,
+    "mismatches": []
+  },
+  "oracle": {
+    "unchangedManifestFiles": 3031,
+    "mismatches": []
+  },
+  "sourceComparison": {
+    "packages/kernel/src/lib/tree-error-public-contract.spec.ts": {
+      "c10": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+      "c8a": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+      "identical": true
+    },
+    "packages/kernel/src/lib/occurrence-successor.spec.ts": {
+      "c10": "feebabd398390ddbb5aef123409fb35cfe8c83c5fb4bacd3f88fd45985d6795d",
+      "c8a": "feebabd398390ddbb5aef123409fb35cfe8c83c5fb4bacd3f88fd45985d6795d",
+      "identical": true
+    },
+    "packages/kernel/src/lib/entity-tap-reads.spec.ts": {
+      "c10": "92a7d6cf3878d6787f8c703ee76e7f3fbbc478a5924aa58a1b6f7db28b45ad5e",
+      "c8a": "92a7d6cf3878d6787f8c703ee76e7f3fbbc478a5924aa58a1b6f7db28b45ad5e",
+      "identical": true
+    },
+    "packages/kernel/src/lib/link.ts": {
+      "c10": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+      "c8a": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+      "identical": true
+    },
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "c10": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+      "c8a": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+      "identical": true
+    },
+    "packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts": {
+      "c10": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+      "c8a": "defff14a8e70456cdeea0f8c49134ec7f4654fd0c64762fb631e9658cc1cb327",
+      "identical": true
+    },
+    "packages/kernel/src/lib/internals/native-occurrence.ts": {
+      "c10": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+      "c8a": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+      "identical": true
+    },
+    "packages/kernel/src/lib/joint-readiness.spec.ts": {
+      "c10": "a23e192e2146c99cda5b7048185709df4954e527aa46f0d471c11bd9e3c6a86e",
+      "c8a": "a23e192e2146c99cda5b7048185709df4954e527aa46f0d471c11bd9e3c6a86e",
+      "identical": true
+    }
+  },
+  "runResults": {
+    "public-installation-c10": {
+      "exit": 0
+    },
+    "public-setter-c10": {
+      "exit": 0
+    },
+    "public-setter-c8a": {
+      "exit": 0
+    },
+    "focused-c8a": {
+      "exit": 1
+    },
+    "focused-c10": {
+      "exit": 1
+    },
+    "completion-c10": {
+      "exit": 0
+    },
+    "completion-c8a": {
+      "exit": 0
+    }
+  }
+}

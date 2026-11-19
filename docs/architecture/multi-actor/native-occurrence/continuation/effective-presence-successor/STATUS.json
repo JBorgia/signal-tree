@@ -1,0 +1,8 @@
+{
+  "running": null,
+  "state": "frozen for independent review",
+  "manifestSha256": "47e05e6216bab9fd186dfbb66b656f4e33dc1f9d98a81a1ad096ee61b12181f9",
+  "sourceTypes": "pass",
+  "specTypes": "pass; initial fixture error preserved",
+  "noFurtherTestsPlanned": true
+}

@@ -1,0 +1,17 @@
+{
+  "cwd": "/private/tmp/st-c21-portable-reconstructed",
+  "argv": [
+    "pnpm",
+    "run",
+    "typecheck:source"
+  ],
+  "environmentOverrides": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c21-portable-types/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c21-portable-types/nx-data",
+    "ST_C21_DIAGNOSTIC_OUTPUT": "/private/tmp/st-c21-portable-types/recipient-traces.jsonl",
+    "NODE_OPTIONS": "--require \"/Users/jonathanborgia/code/signaltree/docs/architecture/multi-actor/native-occurrence/continuation/c21-portable-source/diagnostic-redirect.cjs\""
+  }
+}

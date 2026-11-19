@@ -1,0 +1,13 @@
+{
+  "manifestSha256": "4f828914a214bf556e16af6d44047a7f8b39ec1fa47eb231ca9981e564aec94d",
+  "patchSha256": "9e011c68223cc16402cf84e2f36bea874f767cca5f4caa62b0298491bdf4b10f",
+  "verifiedFiles": 3066,
+  "unchangedBaseline": 3064,
+  "changed": [
+    "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "packages/kernel/src/lib/recipient-cause-classification.spec.ts"
+  ],
+  "originalBodiesByteExact": true,
+  "retainedClassifierAssertionsExact": true,
+  "ninePermissionGuardsByteExact": true
+}

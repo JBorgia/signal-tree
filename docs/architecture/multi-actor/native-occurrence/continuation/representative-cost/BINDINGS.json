@@ -1,0 +1,135 @@
+{
+  "boundAt": "2026-11-03T18:34:14.403Z",
+  "retainedCommit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "sources": {
+    "retained": {
+      "root": "/private/tmp/st-v16-representative-cost/retained",
+      "manifest": "/private/tmp/st-v16-representative-cost/RETAINED-MANIFEST.json",
+      "manifestSha256": "d70c495c62b7dbc9bd636202230664bf4656f8e07e67b6a4e71f68b4657cfb26",
+      "files": 2517,
+      "mismatches": []
+    },
+    "selected": {
+      "root": "/private/tmp/st-v16-integration-candidate",
+      "manifest": "/private/tmp/st-v16-representative-cost/SELECTED-MANIFEST.json",
+      "manifestSha256": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+      "files": 3127,
+      "mismatches": []
+    }
+  },
+  "artifacts": {
+    "retained": {
+      "root": "/private/tmp/st-v16-representative-cost/retained",
+      "packages": [
+        "kernel"
+      ],
+      "seal": "sha256-cbdf4271ff2df1ea1c03c5852e59f937985b5825149509533f39d72f78f89d9f",
+      "manifest": "/private/tmp/st-v16-representative-cost/RETAINED-ARTIFACTS.json",
+      "manifestSha256": "1587be0abae3bc703d354f9e7c5efd8b298a0c221b5b6395690a8d147ae54f04",
+      "files": 111
+    },
+    "selected": {
+      "root": "/private/tmp/st-v16-integration-candidate",
+      "packages": [
+        "kernel",
+        "angular",
+        "react",
+        "vue",
+        "solid"
+      ],
+      "seal": "sha256-4e10ab551ba731818b9ab68941f7da013cd79c33920518c6eff2d8b501c8d012",
+      "manifest": "/private/tmp/st-v16-representative-cost/SELECTED-ARTIFACTS.json",
+      "manifestSha256": "caee65afc67749781a9febfa37d0076d814fe937f66c9524db77c762ac516383",
+      "files": 193
+    }
+  },
+  "layout": {
+    "retained": {
+      "runtimeRoot": "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+      "index": "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist/index.js",
+      "indexSha256": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+      "transactionModule": "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+      "transactionModuleSha256": "8892dffc2903564c39d97300c5982daffe4e7d29b217b37900a12ad93be63b0c",
+      "helper": "peekInternalTransactionRuntime(tree).getPendingTurnCount()",
+      "meaning": "peek existing internal runtime; count pending authority map; no fallback or source alias",
+      "probeAdaptation": false
+    },
+    "selected": {
+      "runtimeRoot": "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+      "index": "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist/index.js",
+      "indexSha256": "77ecf6d8f685069a3620b8f54119dd33df27d417782c40ca79fb2145ae1f0559",
+      "transactionModule": "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist/enhancers/transactions/transactions.js",
+      "transactionModuleSha256": "5d8d8e5163d024492c4ac8295f49beb0be6fcb50b4bfcffc68c312b7837b96cd",
+      "helper": "peekInternalTransactionRuntime(tree).getPendingTurnCount()",
+      "meaning": "peek existing internal runtime; count pending authority map; no fallback or source alias",
+      "probeAdaptation": false
+    }
+  },
+  "dependencies": {
+    "realNodeModules": "/Users/jonathanborgia/code/signaltree/node_modules",
+    "sameInstalledTree": true,
+    "versions": {
+      "node": "v24.15.0",
+      "pnpm": "10.17.0",
+      "typescript": "6.0.3",
+      "esbuild": "0.25.12",
+      "rollup": "4.62.2",
+      "nx": "23.1.0",
+      "@nx/rollup": "23.1.0",
+      "tslib": "2.8.1"
+    },
+    "hashes": {
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/lock.yaml": "bfb59363fcda0de5508bdb837555dd1729455a5e7a216fb8e39c411d5986284b",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.modules.yaml": "fb7f00ead6f79b3f168b05223aa6157c2e50098179b9161b824288301e973e21",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/typescript@6.0.3/node_modules/typescript/package.json": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/package.json": "cb7d5b1fe478f8cbaae566a86031b6fdf5f7d444354f35d1cb3cba9adf6d2935",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/rollup@4.62.2/node_modules/rollup/package.json": "f4c43bde641711b4e7cda761bf681dd6b694e58e10cb02bc8a4f691f39f2a8a4",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/nx@23.1.0_@swc-node+register@1.12.1_@swc+core@1.15.17_@swc+helpers@0.5.23__@swc+types@0_82d5463b3335b686c663679688918a9b/node_modules/nx/package.json": "1ece57bedcaaa587f62e81194878fa9859e69af0ab830a68769a8b316785afed",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@nx+rollup@23.1.0_@babel+core@7.29.7_@babel+traverse@7.29.7_@swc-node+register@1.12.1_@_e1553ea56b8ca650a7dfbd2ea0a0262c/node_modules/@nx/rollup/package.json": "e1e6b2bfc64eea04c11e3a911847f11813b2c33b117b39973675d6dcca39ca1d",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/package.json": "f02b4851df316f29bdfcd404aa1eb41e4e216b5859015f81fcd3e91caf8be931"
+    }
+  },
+  "buildReceipts": {
+    "retained": {
+      "command": "/private/tmp/st-v16-representative-cost/runs/retained-kernel-build/COMMAND.json",
+      "result": "/private/tmp/st-v16-representative-cost/runs/retained-kernel-build/RESULT.json",
+      "commandSha256": "4ff27a8f9c3640d79895b4602bec5f911d0f8518c08723e6b5681b20a0066a32",
+      "resultSha256": "9408bc2ca89bc551a45ceee963c57ae3d173e43d64b504d532af963b58f999f1"
+    },
+    "selected": {
+      "command": "/private/tmp/st-v16-integration-evidence/runs/canonical-five-build/COMMAND.json",
+      "result": "/private/tmp/st-v16-integration-evidence/runs/canonical-five-build/RESULT.json",
+      "commandSha256": "c2b222f2f3a14f08279340aa5f92b4bf49f932e37c00e5139d45b2ec22f6dcda",
+      "resultSha256": "001d4cb292a857e16e61d7b7ad8a9057587ee031cee860d804e71787ca7af3a4"
+    }
+  },
+  "integrityImplementation": {
+    "path": "/private/tmp/st-v16-integration-candidate/scripts/publish-artifact-integrity.mjs",
+    "sha256": "54bf8e8a9d886f681546c7c7c175eddcc8fdaf135d4fccf8ddd168b01d00dc11"
+  },
+  "host": {
+    "platform": "darwin",
+    "release": "25.2.0",
+    "arch": "arm64",
+    "totalmem": 34359738368,
+    "cpus": [
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4",
+      "Apple M4"
+    ],
+    "load": [
+      15.01513671875,
+      17.60986328125,
+      18.80908203125
+    ],
+    "freemem": 289849344
+  },
+  "costChildrenLaunched": 0
+}

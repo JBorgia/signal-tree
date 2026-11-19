@@ -1,0 +1,54 @@
+--- R3/packages/react/src/branch-declaration-qualification.spec.tsx
++++ composed/packages/react/src/branch-declaration-qualification.spec.tsx
+@@ -28,12 +28,12 @@
+   expect(source()).toEqual(value(7));expect(ui()).toBe(7);expect(notifications).toBe(0);expect(pending.inspect()).toEqual(before);expect(owned?source.x():owner.$.z()).toBe(7);
+   if(!receipt)throw Error('missing receipt');
+   expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(receipt.read())).toBe(true);
+-  if(owned){expect(sent).toEqual([]);expect(['held','conservative']).toContain(receipt.read().state);}else{expect(sent).toEqual([value(7)]);expect(receipt.read().state).toBe('started');}
++  if(owned){expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});}else{expect(sent).toEqual([value(7)]);expect(receipt.read().state).toBe('started');}
+   const initialStatus=receipt.read();let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(!owned);
+   await step(()=>pending[terminal]());
+   const final=owned&&terminal==='rollback'?0:7;
+   expect(source()).toEqual(value(final));expect(ui()).toBe(final);expect(sent).toEqual([value(final)]);expect(settled).toBe(true);await wait;
+-  expect(receipt.read().state).toBe('started');if(!owned)expect(receipt.read()).toEqual(initialStatus);
++  expect(receipt.read().state).toBe(owned?'no-write':'started');expect(receipt.read()).toEqual(initialStatus);
+   const terminalStatus=receipt.read();expect(Reflect.set(terminalStatus,'state','forged')).toBe(false);
+   c.dispose();
+   await step(()=>source.x(99));expect(ui()).toBe(99);
+@@ -53,14 +53,31 @@
+   expect(calls).toBe(0);await step(()=>{});expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});
+  }finally{c.dispose();unmount();tree.destroy();owner.destroy();}
+ });
+-it('React branch disposed held receipt releases waiter without settling owner',async()=>{
++it('React branch no-write receipt retains older pending work until disposal',async()=>{
+  const {tree,source,owner,sent,c,unmount}=await setup();let receipt:Receipt|undefined;
+  try{
+   let pending!:ReturnType<typeof tree.transact>;await step(()=>{pending=tree.transact(()=>source.x(7));});const before=pending.inspect();
+   await step(()=>{receipt=c.declare({kind:'independent'},()=>source(value(7)));});
+-  expect(sent).toEqual([]);if(!receipt)throw Error('missing receipt');expect(['held','conservative']).toContain(receipt.read().state);
++  expect(sent).toEqual([]);if(!receipt)throw Error('missing receipt');expect(receipt.read()).toEqual({state:'no-write'});
+   let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(false);
+-  c.dispose();await step(()=>{});expect(settled).toBe(true);await wait;expect(receipt.read()).toEqual({state:'disposed'});expect(pending.inspect()).toEqual(before);expect(source.x()).toBe(7);
+-  await step(()=>pending.rollback());expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});
+- }finally{console.info('DECLARATION-QUALIFICATION',JSON.stringify({case:'React branch/held-dispose',sent,receipt:receipt?.read()}));c.dispose();unmount();tree.destroy();owner.destroy();}
++  c.dispose();await step(()=>{});expect(settled).toBe(true);await wait;expect(receipt.read()).toEqual({state:'no-write'});expect(pending.inspect()).toEqual(before);expect(source.x()).toBe(7);
++  await step(()=>pending.rollback());expect(source()).toEqual(value(0));expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'no-write'});
++ }finally{console.info('DECLARATION-QUALIFICATION',JSON.stringify({case:'React branch/no-write-dispose',sent,receipt:receipt?.read()}));c.dispose();unmount();tree.destroy();owner.destroy();}
+ });
++it('React genuinely authored dependent branch receipt disposes while native UI stays current',async()=>{
++ const tree=signalTree({pair:{x:0,y:0},z:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(tree.$.pair,{set:v=>{sent.push(v);}});const hook=renderHook(()=>useSignalTree(tree,$=>$.pair.x()));
++ try{
++  let p!:ReturnType<typeof tree.transact>;await step(()=>{p=tree.transact(()=>tree.$.z(7));});const before=p.inspect();
++  let calls=0;let receipt:ReturnType<typeof c.declare>|undefined;
++  await step(()=>{receipt=c.declare({kind:'dependent',owners:[p]},()=>{calls++;tree.$.pair({x:tree.$.z(),y:0});});});
++  if(!receipt)throw Error('missing authored receipt');
++  expect(calls).toBe(1);expect(tree.$()).toEqual({pair:value(7),z:7});expect(hook.result.current).toBe(7);expect(p.inspect()).toEqual(before);expect(sent).toEqual([]);
++  const held=receipt.read();expect(held).toEqual({state:'held',reason:'pending-dependency'});expect(Object.isFrozen(receipt)).toBe(true);expect(Object.isFrozen(held)).toBe(true);
++  let settled=false;const wait=c.settled().then(()=>{settled=true;});await step(()=>{});expect(settled).toBe(false);
++  c.dispose();await step(()=>{});await wait;expect(settled).toBe(true);expect(receipt.read()).toEqual({state:'disposed'});expect(Object.isFrozen(receipt.read())).toBe(true);
++  expect(held).toEqual({state:'held',reason:'pending-dependency'});expect(p.inspect()).toEqual(before);expect(tree.$()).toEqual({pair:value(7),z:7});expect(hook.result.current).toBe(7);expect(sent).toEqual([]);
++  await step(()=>p.rollback());expect(tree.$()).toEqual({pair:value(7),z:0});expect(hook.result.current).toBe(7);expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});
++  await step(()=>tree.$.pair.x(9));expect(hook.result.current).toBe(9);await step(()=>{});expect(sent).toEqual([]);expect(receipt.read()).toEqual({state:'disposed'});
++ }finally{c.dispose();hook.unmount();tree.destroy();}
++});

@@ -1,0 +1,61 @@
+[
+  {
+    "id": "@signal-tree/react@16.0.0-dev",
+    "name": "@signal-tree/react",
+    "version": "16.0.0-dev",
+    "size": 11907,
+    "unpackedSize": 31724,
+    "shasum": "77de2780ee23ba1cbdc3fb2010fc32ad49b4d27e",
+    "integrity": "sha512-btfk0uwPDCiLmlGRD1Kr/U2+ZDZyQjzupDPVgtDYYXQ1CKXotwIyNruWsBoWnqrDR9FD90AnjIX2oE1dNu2Kog==",
+    "filename": "signal-tree-react-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 5278,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 91,
+        "mode": 420
+      },
+      {
+        "path": "dist/use-signal-tree.js",
+        "size": 397,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 917,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 473,
+        "mode": 420
+      },
+      {
+        "path": "src/use-signal-tree.d.ts",
+        "size": 637,
+        "mode": 420
+      }
+    ],
+    "entryCount": 9,
+    "bundled": []
+  }
+]

@@ -1,0 +1,90 @@
+
+> nx run kernel:test structural-admission-controls.spec.ts structural-admission-sequence.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs structural-admission-controls.spec.ts structural-admission-sequence.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:65926) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65935) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-structural-admission-successor/candidate/packages/kernel
+
+(node:65945) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history 24ms
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey external, scalarFirst=true: whole unit, delivery and history 3ms
+ ✓ src/lib/structural-admission-controls.spec.ts > external rekey refusal preserves exact source support and revision, scalarFirst=true 7ms
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history 4ms
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey external, scalarFirst=false: whole unit, delivery and history 3ms
+ ✓ src/lib/structural-admission-controls.spec.ts > external rekey refusal preserves exact source support and revision, scalarFirst=false 11ms
+(node:65973) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordinary destination occupancy survives inspection-only physical vacancy 16ms
+ ✓ src/lib/structural-admission-sequence.spec.ts > physical occupied destination still refuses after semantic vacancy succeeds 8ms
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening 16ms
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordinary duplicate add refuses even when inspection removed its physical lifetime 4ms
+ × src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority 14ms
+   → expected { known: [], unknown: false, …(5) } not to be { known: [], unknown: false, …(5) } // Object.is equality
+ ✓ src/lib/structural-admission-sequence.spec.ts > ordinary absent physical present add uses original semantic absence before transfer 8ms
+ × src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys 25ms
+   → Cannot change id to 2: already in use
+ ✓ src/lib/structural-admission-sequence.spec.ts > prepared semantic admission is invalid after independent installation 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority
+AssertionError: expected { known: [], unknown: false, …(5) } not to be { known: [], unknown: false, …(5) } // Object.is equality
+
+Compared values have no visual difference.
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:34:417
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys
+Error: Cannot change id to 2: already in use
+ ❯ Proxy.planRekey src/lib/entity-signal.ts:1829:13
+    1827|     }
+    1828|     if (structuralStore.hasActiveKey(to)) {
+    1829|       throw new Error(`Cannot change id to ${String(to)}: already in u…
+       |             ^
+    1830|     }
+    1831|
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1426:26
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:603:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:412:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:685:9
+ ❯ src/lib/structural-admission-sequence.spec.ts:40:163
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 12 passed (14)
+   Start at  16:51:56
+   Duration  3.68s (transform 1.14s, setup 0ms, import 1.70s, tests 150ms, environment 1.42s)
+
+Warning: command "node tools/run-core-vitest.mjs structural-admission-controls.spec.ts structural-admission-sequence.spec.ts --reporter=verbose --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.7s

@@ -1,0 +1,19 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -593,3 +593,7 @@
+  return selectedReceipt(channel);
+ }
+ 
++
++// Independent read-only owner-history diagnostics.
++export function __historyRoots(node:object){return {endpoint:nativeValues.get(node),view:nativeViews.get(node),bindings:[...bindings.values()]};}
++export function __historyFactRoot(value:object){return factRequirements.get(value as Fact);}
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -491,3 +491,6 @@
+  refresh(op);return selected;
+ }
+ 
++
++// Expose only existing weak edges for the diagnostic graph walker.
++export function __historyWeakRoots(value:object){return [finalizedRetirements.get(value as NativeRequirement),requirementListeners.get(value as NativeRequirement),ownerTransitionObservers.get(value as OwnerCell)];}

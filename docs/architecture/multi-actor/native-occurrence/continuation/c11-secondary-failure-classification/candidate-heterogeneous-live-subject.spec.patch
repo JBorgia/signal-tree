@@ -1,0 +1,11 @@
+--- /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts
++++ /private/tmp/st-parent-freshness-implementation-independent/c11-second-classification/candidate/packages/kernel/src/lib/internals/causal-runtime/independent-heterogeneous-live-subject.spec.ts
+@@ -186,7 +186,7 @@
+           return result;
+         });
+       try {
+-        expect(() => t.undo()).toThrow(mode === 'throw' ? sentinel : /stale/);
++        expect(() => t.undo()).toThrow(mode === 'throw' ? sentinel : 'Joint preparation reentered installation');
+       } finally {
+         spy.mockRestore();
+       }

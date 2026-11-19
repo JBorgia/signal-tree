@@ -1,0 +1,68 @@
+[
+  {
+    "phase": "successor",
+    "name": "controls",
+    "cwd": "/private/tmp/st-singleton-ordinary-row-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "singleton-row-reuse.spec.ts",
+      "singleton-row-allocation.spec.ts",
+      "packet-index-adversarial.spec.ts",
+      "packet-index-review.spec.ts",
+      "packet-admission-r1.spec.ts",
+      "admission-refusal.spec.ts",
+      "independent-refusal-branches.spec.ts",
+      "point-admission-followup.spec.ts",
+      "native-admission-handoff.spec.ts",
+      "native-invocation-handoff.spec.ts",
+      "entity-publication-work-lifetime.spec.ts",
+      "publication-retirement-acceptance.spec.ts",
+      "--maxWorkers=1"
+    ],
+    "exit": 0
+  },
+  {
+    "phase": "successor",
+    "name": "point",
+    "cwd": "/private/tmp/st-singleton-ordinary-row-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "entity-granular-reactivity.spec.ts",
+      "--testNamePattern=a single-entity update does not rebuild",
+      "--maxWorkers=1"
+    ],
+    "exit": 1
+  },
+  {
+    "phase": "successor",
+    "name": "source-types",
+    "cwd": "/private/tmp/st-singleton-ordinary-row-successor/candidate",
+    "argv": [
+      "corepack",
+      "pnpm",
+      "run",
+      "typecheck:source"
+    ],
+    "exit": 0
+  },
+  {
+    "phase": "successor",
+    "name": "spec-types",
+    "cwd": "/private/tmp/st-singleton-ordinary-row-successor/candidate",
+    "argv": [
+      "node",
+      "tools/check-spec-types.mjs"
+    ],
+    "exit": 0
+  }
+]

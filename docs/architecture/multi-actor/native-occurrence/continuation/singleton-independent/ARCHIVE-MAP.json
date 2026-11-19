@@ -1,0 +1,104 @@
+[
+  {
+    "source": "successor-controls.log",
+    "archive": "successor-controls.log",
+    "sourceSha256": "c63c3bab25277df57625072df20205d4b78b5814c8cc324c246aea573b3e8b0b",
+    "archiveSha256": "c63c3bab25277df57625072df20205d4b78b5814c8cc324c246aea573b3e8b0b"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "63fcb86e46c3fdb9ca9a4ad4b8e1cdda6a00b342efc6906643c3ce16fe68e750",
+    "archiveSha256": "63fcb86e46c3fdb9ca9a4ad4b8e1cdda6a00b342efc6906643c3ce16fe68e750"
+  },
+  {
+    "source": "successor-commands.json",
+    "archive": "successor-commands.json",
+    "sourceSha256": "25ce54d42d1656c9599f629936b782f46c277309ddbeec89a5531823c5b00a97",
+    "archiveSha256": "25ce54d42d1656c9599f629936b782f46c277309ddbeec89a5531823c5b00a97"
+  },
+  {
+    "source": "ALLOCATION-COMPARISON.json",
+    "archive": "ALLOCATION-COMPARISON.json",
+    "sourceSha256": "4dfb76c1a418ec9850df42dc0d23bdfff80e8b391f7c96363e6938a32c599daa",
+    "archiveSha256": "4dfb76c1a418ec9850df42dc0d23bdfff80e8b391f7c96363e6938a32c599daa"
+  },
+  {
+    "source": "COMMANDS.md",
+    "archive": "COMMANDS.md",
+    "sourceSha256": "3b65789c81604f44ce543b57df0d0d38860557d1b3136f0b5fd18404ea3730e7",
+    "archiveSha256": "3b65789c81604f44ce543b57df0d0d38860557d1b3136f0b5fd18404ea3730e7"
+  },
+  {
+    "source": "BASE-SOURCE-SHA256.json",
+    "archive": "BASE-SOURCE-SHA256.json.gz",
+    "sourceSha256": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+    "archiveSha256": "78fd950759790d0e50830cb4363c59635a2292b8c20e6ae3ab113463c970f0c5"
+  },
+  {
+    "source": "SOURCE-SHA256.json",
+    "archive": "SOURCE-SHA256.json.gz",
+    "sourceSha256": "c2fd0a2e27a3a0e80601e2909d0b7ad4720d1bfca8ee1dda0053fea7503af9f0",
+    "archiveSha256": "8e9ac3750fcbe0217e1ec8894786f9e8b817ca792872e027eadfc674dd145c9b"
+  },
+  {
+    "source": "runtime.patch",
+    "archive": "runtime.patch",
+    "sourceSha256": "e2fe023d694793b1225ac95c290dda8e5d52785b907bd45df2737c33bd23fbfd",
+    "archiveSha256": "e2fe023d694793b1225ac95c290dda8e5d52785b907bd45df2737c33bd23fbfd"
+  },
+  {
+    "source": "baseline-allocation.jsonl",
+    "archive": "baseline-allocation.jsonl",
+    "sourceSha256": "843c8d99d3a429778d2f4f750d4564607d18b2b4f4f0b9f8502db7d1f0d651c3",
+    "archiveSha256": "843c8d99d3a429778d2f4f750d4564607d18b2b4f4f0b9f8502db7d1f0d651c3"
+  },
+  {
+    "source": "successor-point.log",
+    "archive": "successor-point.log",
+    "sourceSha256": "fe53301f44e8bda15fc98f8f976bfab86dba4ad649a88255b37525aaaa818f58",
+    "archiveSha256": "fe53301f44e8bda15fc98f8f976bfab86dba4ad649a88255b37525aaaa818f58"
+  },
+  {
+    "source": "successor-allocation.jsonl",
+    "archive": "successor-allocation.jsonl",
+    "sourceSha256": "bb50a975b58f2eb9c3341ac74b1031435ba5fe90b7420f7a8ad8c73e823d91c8",
+    "archiveSha256": "bb50a975b58f2eb9c3341ac74b1031435ba5fe90b7420f7a8ad8c73e823d91c8"
+  },
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "54c150e5c9e42ed69a7df0a56801fda7e5e9df22aa3345f62a82a3597d57984c",
+    "archiveSha256": "54c150e5c9e42ed69a7df0a56801fda7e5e9df22aa3345f62a82a3597d57984c"
+  },
+  {
+    "source": "baseline-point.log",
+    "archive": "baseline-point.log",
+    "sourceSha256": "b4728d6f58b0064093988a060d1b8b0dc7b3192a2b0f50a3a7e55530c887b997",
+    "archiveSha256": "b4728d6f58b0064093988a060d1b8b0dc7b3192a2b0f50a3a7e55530c887b997"
+  },
+  {
+    "source": "baseline-commands.json",
+    "archive": "baseline-commands.json",
+    "sourceSha256": "255858c8c4b13642ef79a0792d905636fb50d2da2ab183c4e93b8ce2371f8daa",
+    "archiveSha256": "255858c8c4b13642ef79a0792d905636fb50d2da2ab183c4e93b8ce2371f8daa"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "e5672f1f2a42dc8f3a63da9de273d25fae08690b4969aad74d3b9fae008ec8c3",
+    "archiveSha256": "e5672f1f2a42dc8f3a63da9de273d25fae08690b4969aad74d3b9fae008ec8c3"
+  },
+  {
+    "source": "FREEZE.json",
+    "archive": "FREEZE.json",
+    "sourceSha256": "85de10b7a0554353a99ece8e2820838d3bc8e55a36d2b2355d1d8c94c74c82c0",
+    "archiveSha256": "85de10b7a0554353a99ece8e2820838d3bc8e55a36d2b2355d1d8c94c74c82c0"
+  },
+  {
+    "source": "baseline-controls.log",
+    "archive": "baseline-controls.log",
+    "sourceSha256": "3476d8dc45904d9cb392f185d52786ba8c6666c2bd10ccb62c8bcb93c01263d6",
+    "archiveSha256": "3476d8dc45904d9cb392f185d52786ba8c6666c2bd10ccb62c8bcb93c01263d6"
+  }
+]

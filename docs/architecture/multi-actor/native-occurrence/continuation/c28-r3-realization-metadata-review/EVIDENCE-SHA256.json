@@ -1,0 +1,23 @@
+{
+  "/private/tmp/st-c28-r3-realization-metadata-design/PLAN.md": "ec0d14a8617a26f5d9e6c6e173f5c5f5603b00b9b7b9b226efc3b98f0a649f50",
+  "/private/tmp/st-c28-r3-comparator/MANIFEST.json": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "/private/tmp/st-c28-r3-state-repair/runtime.patch": "d82886f6eea6aa5b8f5036f43197d321e6b4817c2079ca6ad1e0feaba119f645",
+  "/private/tmp/st-c28-r3-state-repair/runs/repaired-two-first/first.log": "fba1746f3196f728ae0df3d6fe0a25ec3d8a4efd15c01cb4cd4e7699fc6061af",
+  "/private/tmp/st-c28-r3-state-repair/runs/baseline-stale-first/first.log": "4573022391494303ea0e2ba758fe048b6e809374102851613b3c3a3c651a93e0",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "83e9d1a6fc724b32912f7ca18a3b6514e8a952906e35c67704ab5610ca88a335",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/plain-branch-membership.ts": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/enhancers/transactions/transactions.ts": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/enhancers/restoration/restoration.ts": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/experimental-publication/private.ts": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/lib/undoable.ts": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/adapter.ts": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+  "/private/tmp/st-c28-r3-comparator/candidate/packages/kernel/src/index.ts": "08f93fa7aa7f67281f26f8d7e7591cd9c294b29e44ed04f176da804943c5f790"
+}

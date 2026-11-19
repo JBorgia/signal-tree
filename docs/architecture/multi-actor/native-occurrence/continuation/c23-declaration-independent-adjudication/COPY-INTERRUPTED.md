@@ -1,0 +1,1 @@
+Initial source-only copy stopped using its owned exec session interrupt, exit130, at approximately2100/3069 files. No test had started. Incomplete candidate is not used. Author confirmed original candidate frozen, no runs and no mutations planned. Reuse frozen source with isolated run outputs/cache.

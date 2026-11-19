@@ -1,0 +1,12 @@
+Independent final review requested by the human. Read-only; do not edit any file or send messages elsewhere. Return concrete blockers/corrections with file/line citations, or explicitly no blockers within stated limits. Maximum 20 tool calls, 6 minutes. Stop when you can give grounded findings; do not browse the internet. On HTTP 403 use another source, never retry the same fetch, never spoof browser identity or bypass a bot check; report blocked.
+
+Task: assess a real installed-artifact Angular full-AOT DOM workflow with one narrow AG-UI adapter and explicit in-browser backend stand-in. User requires public facade .set, no JIT workaround/private imports, button review/apply/reject, independent fields, stale input versions, errors/uncertain outcomes, disposal, actual browser falsifiers. This is only Angular and not full four-facade/release qualification. Native runtime remains exact5727cd8f; B and native recurrence stop stay closed. Do not infer permission or business authority from local consent, streamed tool events or Link completion. Private Studio is excluded.
+
+Read these exact files under /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations:
+- installed/browser/app.ts, main.ts, run.mjs, checks.mjs, ag-ui.d.mts
+- coordinator.mjs, dispatch-fixture.mjs, protocol/ag-ui.mjs
+- installed/coordinator.d.mts, dispatch-fixture.d.mts
+Raw executed evidence: /private/tmp/st-p4-browser-ppqWcN/manifest.json, browser-results.json, logs/aot.log, consumer/tsconfig.json, bundle-metafile.json (targeted searches only; huge).
+The exact protocol/controller copies used by that run are under /private/tmp/st-p4-browser-ppqWcN/consumer/browser/ag-ui.mjs and /private/tmp/st-p4-browser-ppqWcN/consumer/{coordinator,dispatch-fixture}.mjs. Compare if relevant because other workers may update originals.
+
+Assess authority/approval binding, error/settlement state handling, disposal and late callbacks, protocol boundaries, whether tests could falsely pass, installed/AOT integrity and scope of evidence. No other reviewer verdict is supplied. Do not read unrelated review reports. For any concerns distinguish exercised workflow defects from additional unclaimed capability. Do not propose an architecture replacement. Return findings to stdout only.

@@ -1,0 +1,49 @@
+
+/private/tmp/st-native-combined-c18/candidate/packages/kernel/src/lib/entity-signal.ts
+   439:7    error    'snapshotIdentity' is never reassigned. Use 'const' instead  prefer-const
+   637:22   warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+   638:5    warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+   680:216  warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+   680:216  warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+  1450:28   warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+  1534:26   warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+  1538:31   warning  Forbidden non-null assertion                                 @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-native-combined-c18/candidate/packages/kernel/src/lib/experimental-publication/private.ts
+   72:136  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   81:62   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   84:114  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  132:136  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  148:19   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  157:204  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  157:384  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  200:89   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  229:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  244:16   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  326:381  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  352:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  368:2    warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  374:63   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  415:17   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  441:89   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  455:42   warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-native-combined-c18/candidate/packages/kernel/src/lib/link.ts
+  588:31  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  588:55  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  610:24  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-native-combined-c18/candidate/packages/kernel/src/lib/native-authored-footprint.spec.ts
+  9:131  error  Unexpected empty method 'complete'  @typescript-eslint/no-empty-function
+
+/private/tmp/st-native-combined-c18/candidate/packages/kernel/src/lib/value-work-handoff.spec.ts
+  21:101  error  Unexpected empty method 'set'                 @typescript-eslint/no-empty-function
+  38:2    error  'c' is never reassigned. Use 'const' instead  prefer-const
+
+/private/tmp/st-native-combined-c18/candidate/packages/kernel/src/lib/whole-bounded-qualification.spec.ts
+  12:380  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  35:276  error  Unexpected empty method 'set'    @typescript-eslint/no-empty-function
+  40:224  error  Unexpected empty method 'set'    @typescript-eslint/no-empty-function
+
+✖ 34 problems (7 errors, 27 warnings)
+

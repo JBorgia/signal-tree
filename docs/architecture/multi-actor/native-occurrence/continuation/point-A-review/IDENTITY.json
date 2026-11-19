@@ -1,0 +1,29 @@
+{
+  "arms": {
+    "baseline": {
+      "manifest": "a6bf36567994a35e14a16b748d331a41aad8468f773f05b18db799315c96cd9a",
+      "count": 3068,
+      "changedFromC21": [],
+      "added": [
+        "packages/kernel/src/lib/point-work-attribution.spec.ts",
+        "packages/kernel/src/lib/singleton-input-controls.spec.ts"
+      ]
+    },
+    "A": {
+      "manifest": "9375f98e076c48aa7c4885d09067a5d7308b7c93d9fc821d9d9c37f86f56f0ce",
+      "count": 3068,
+      "changedFromC21": [
+        "packages/kernel/src/lib/experimental-publication/private.ts"
+      ],
+      "added": [
+        "packages/kernel/src/lib/point-work-attribution.spec.ts",
+        "packages/kernel/src/lib/singleton-input-controls.spec.ts"
+      ]
+    }
+  },
+  "files": {
+    "FREEZE.json": "c70f02e922742b963f2a143a4f5833d74fc6499449626f2b0bb06323dc2fa843",
+    "A-runtime.patch": "4f306f1a002afc0281c1141447cb8d87522fa5f4d8909bfcea55a1b7c40769b1",
+    "REPORT.md": "9b9025646ba28b783cbf3a68add2963ea81e40a495e44d0d48817c34e4f36dde"
+  }
+}

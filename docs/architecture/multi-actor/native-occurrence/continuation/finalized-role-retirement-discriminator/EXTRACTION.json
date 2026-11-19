@@ -1,0 +1,42 @@
+{
+  "sources": {
+    "lifecycle.ts": {
+      "path": "/private/tmp/st-c25-equal-owner/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "sha256": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6"
+    },
+    "entity.ts": {
+      "path": "/private/tmp/st-c25-equal-owner/candidate/packages/kernel/src/lib/experimental-publication/entity.ts",
+      "sha256": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8"
+    }
+  },
+  "chunks": {
+    "proof-type": {
+      "sha256": "a55b64892e27b36dbd89697b76b1bccb3f9eaf979838682c8d3b97c8b2fbc184",
+      "startLine": 82
+    },
+    "combine-proof": {
+      "sha256": "b94315685aae0e38180a4ef79e24f45ed1975d445003e6ca6a4773acf51b2e47",
+      "startLine": 98
+    },
+    "requirement-types": {
+      "sha256": "61c26f86d1e9442dea5b12771d6c8ba847ae2b82a1228d80025d11a50381cc6d",
+      "startLine": 112
+    },
+    "readiness-and-composite": {
+      "sha256": "f7d924be3e96b7ce97153fed08346a8dbbe045368c89469f730968f4fd605358",
+      "startLine": 118
+    },
+    "native-proof": {
+      "sha256": "1e20b7d9cb8e2e7013536e7734f144440fdc2d25187f8139fff2119c72b4dd7a",
+      "startLine": 156
+    },
+    "owner-transition-check": {
+      "sha256": "9f815d734176e52ecd95101881a84465e30e73e95eddc6418167b83d629aa4e7",
+      "startLine": 31
+    },
+    "retirement-predicate": {
+      "sha256": "634356131d7b6cd44d3a717b68a4c7a6d162470840f3d9b15e356c2b217a8157",
+      "startLine": 247
+    }
+  }
+}

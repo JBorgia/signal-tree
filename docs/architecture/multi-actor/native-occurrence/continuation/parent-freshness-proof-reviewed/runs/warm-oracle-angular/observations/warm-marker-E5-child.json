@@ -1,0 +1,79 @@
+{
+  "facade": "angular",
+  "calls": 4,
+  "written": true,
+  "reached": false,
+  "events": [
+    {
+      "name": "warm-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "probe": "marker-output"
+      },
+      "before": 0,
+      "after": 1
+    },
+    {
+      "name": "nested-child",
+      "kind": "return",
+      "value": {
+        "n": 1
+      },
+      "before": 2,
+      "after": 2
+    },
+    {
+      "name": "action-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "probe": "marker-output"
+      },
+      "before": 1,
+      "after": 2
+    },
+    {
+      "name": "immediate-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 1
+        },
+        "probe": "marker-output"
+      },
+      "before": 2,
+      "after": 3
+    },
+    {
+      "name": "installed-child",
+      "kind": "return",
+      "value": 1,
+      "before": 3,
+      "after": 3
+    },
+    {
+      "name": "later-write",
+      "kind": "return",
+      "value": null,
+      "before": 3,
+      "after": 3
+    },
+    {
+      "name": "after-write-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 9
+        },
+        "probe": "marker-output"
+      },
+      "before": 3,
+      "after": 4
+    }
+  ]
+}

@@ -1,0 +1,179 @@
+--- C27/packages/kernel/src/lib/experimental-publication/private.ts
++++ working-C28/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -21,7 +21,7 @@
+ type Fact=Readonly<{revision:number;clean:boolean;blockers:readonly Cell[];unknown:boolean}>;
+ type Slot=Readonly<{branch:object;key:string;child:object;address?:readonly string[]}>;
+ type Presence=Readonly<{present:boolean;fact:Fact}>;
+-type Unit={collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;invocation?:lifecycle.NativeRequirement;releaseInvocation?:()=>void;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
++type Unit={relevance?:lifecycle.CurrentRelevance;collection?:{key:object;edits:readonly EntityContributorEdit[];acquired?:boolean};selected?:lifecycle.NativeRequirement;native?:lifecycle.NativeRequirement;invocation?:lifecycle.NativeRequirement;releaseInvocation?:()=>void;coverageUnknown?:boolean;fact:Fact;previous?:Fact;payload:unknown;changed:boolean;inputs:readonly Fact[];field?:object;relative?:readonly string[];presence?:{slot:Slot;state:Presence;ordinary?:MembershipPublicationEdit['ordinary']};complete:boolean;resolve:()=>void;promise:Promise<void>};
+ type SlotTrie={children:Map<string,SlotTrie>;slots:Map<object,Slot>};
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+@@ -174,10 +174,11 @@
+    // Only an independently supplied retaining literal has no newly consumed input.
+    // Keep derived/branch/entity input evidence on the established admission path.
+    const exact=!!restoration||!admitted&&literal&&retained.owner!==undefined;
+-   const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted?prepared.requirement:lifecycle.combineScalarNativeRequirements([retained.requirement as lifecycle.NativeRequirement,prepared.requirement]);
+-   const endpoint=exact||admitted?retained:Object.freeze({...retained,requirement});
+-   const view=mutation.changed||mutation.physicalChanged||!existingView?{requirement}:existingView;
+-   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view},...(view===existingView&&existingView?[{map:{set:(_key:unknown,value:unknown)=>{existingView.requirement=value as lifecycle.NativeRequirement;}},key:node,value:requirement}]:[])],adds:[]})!,completion:{requirement,activation:prepared.requirement},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
++   const relevance=exact?undefined:lifecycle.currentRelevance(retained.requirement as lifecycle.NativeRequirement,prepared.requirement);
++   const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted&&!relevance?.size?prepared.requirement:lifecycle.combineScalarNativeRequirements(admitted?[prepared.requirement]:[retained.requirement as lifecycle.NativeRequirement,prepared.requirement],relevance);
++   const endpoint=requirement===retained.requirement?retained:Object.freeze({...retained,requirement});
++   const view=mutation.changed||mutation.physicalChanged||!existingView||existingView.requirement!==requirement?{requirement}:existingView;
++   return {record:combineTerminalRecords(prepared.record,selection?.record,{writes:[{map:nativeValues,key:node,value:endpoint},{map:nativeViews,key:node,value:view}],adds:[]})!,completion:{requirement,activation:prepared.requirement,relevance},finalize:()=>lifecycle.finalizeNativeRequirement(prepared.requirement),validate:()=>{if(nativeValues.get(node)!==predecessor||nativeViews.get(node)!==existingView||existingView?.requirement!==physicalRequirement)throw new Error('Scalar publication selection changed before installation');}};
+   },
+   complete:(completion)=>{const unit=completion as {activation?:lifecycle.NativeRequirement;requirement?:lifecycle.NativeRequirement};lifecycle.completeScalarNativeRequirement(unit.requirement,unit.activation??unit.requirement);},
+  };
+@@ -296,7 +297,7 @@
+   unit.releaseInvocation?.();unit.releaseInvocation=undefined;
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+-  const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(proof),...(unit.native?[unit.native]:[])]);
++  const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(lifecycle.currentObligations(proof,unit.relevance)),...(unit.native?[unit.native]:[])]);
+   const authoredProof=lifecycle.nativeProof(authoredRequirement);ownProofs.set(unit.fact,authoredProof);
+   if(unit.collection){
+    const collection=b.collections.get(unit.collection.key);
+@@ -337,7 +338,7 @@
+   const support=projectionSupport(b);const effective=unit.selected?combineProofs([support.proof,lifecycle.nativeProof(unit.selected)]):support.proof;
+   proofs.set(unit.fact,lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0));
+   const prior=unit.previous&&proofs.get(unit.previous);
+-  const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior,effective);
++  const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior&&lifecycle.currentObligations(prior,unit.relevance),lifecycle.currentObligations(effective,unit.relevance));
+   if(noop){
+    lifecycle.noWrite(channel,unit.fact);
+    const predecessor=effectivePredecessor(unit.previous);noopPredecessors.set(unit.fact,predecessor);
+@@ -379,8 +380,9 @@
+  const unknown=!!(uncertainty.invalidAttribution||uncertainty.unobservedOrigin||uncertainty.uncapturedUpdaterInput||uncertainty.recipientDomain);
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);scalarFacts.add(fact);mutation.publicationPredecessors?.set(channel,fact);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+- const unit:Unit={native,invocation:(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
+- const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,uncertainty,fact.blockers,native,b.aggregate,(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation??native);
++ const relevance=(nativeUnit as {relevance?:lifecycle.CurrentRelevance}|undefined)?.relevance;
++ const unit:Unit={relevance,native,invocation:(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
++ const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,uncertainty,fact.blockers,native,b.aggregate,(nativeUnit as {activation?:lifecycle.NativeRequirement}|undefined)?.activation??native,relevance);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+  return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined},finalize:plan.finalize,coveredRecipients:[channel]};
+--- C27/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ working-C28/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -79,7 +79,7 @@
+ type View = {value:State};
+ type Connection={report:(error:unknown)=>void;wake:()=>void;supported:boolean;ops:Map<object,Operation>;disposed:boolean};
+ type Horizon={frames:Set<Frame>;requirements:Set<NativeRequirement>;open:number};
+-type Frame={channel:object;connection:Connection;parents:readonly Frame[];horizon:Horizon;declaredOwners?:readonly OwnerCell[];owners:OwnerCell[];unknown:boolean;invalid:boolean;view:View;last?:object;ops:Set<Operation>;installedOwners:Set<OwnerCell>};
++type Frame={channel:object;connection:Connection;parents:readonly Frame[];horizon:Horizon;declaredOwners?:readonly OwnerCell[];owners:OwnerCell[];unknown:boolean;invalid:boolean;view:View;last?:object;ops:Set<Operation>;installedOwners:Set<OwnerCell>;protectedOwners:Set<OwnerCell>};
+ export type Proof={
+  readonly owners:readonly OwnerCell[];
+  /** D gates delivery; it is promoted to I only when a source input is consumed. */
+@@ -155,9 +155,35 @@
+  Object.defineProperty(requirement,'proof',{value:proof,writable:true,configurable:true,enumerable:true});
+  Reflect.deleteProperty(requirement,'components');
+ }
++/** Admission-local confirmed history, never a settlement-time filter. */
++export type CurrentRelevance=ReadonlySet<OwnerCell>;
++export function currentRelevance(retained:NativeRequirement,invocation:NativeRequirement):CurrentRelevance {
++ const protectedOwners=new Set(invocation.inputs.flatMap(input=>input.owners));
++ for(const frame of invocation.frames)for(const cell of frame.protectedOwners)protectedOwners.add(cell);
++ const parts=[nativeProof(retained),nativeProof(invocation)];
++ return new Set(parts.flatMap(part=>[...(part.input??[]),...(part.validation??[])])
++  .filter(cell=>cell.outcome==='confirmed'&&!protectedOwners.has(cell)));
++}
++export function currentObligations(proof:Readonly<Proof>,relevance:CurrentRelevance|undefined):Proof {
++ if(!relevance?.size)return proof;
++ const classified=new Set([...(proof.destination??[]),...(proof.input??[]),...(proof.validation??[])]);
++ const protectedOwners=new Set([...(proof.destination??[]),...(proof.possible??[]),...proof.owners.filter(cell=>!classified.has(cell))]);
++ const keep=(cell:OwnerCell)=>!relevance.has(cell)||protectedOwners.has(cell);
++ const input=Object.freeze((proof.input??[]).filter(keep)),validation=Object.freeze((proof.validation??[]).filter(keep));
++ return {...proof,input,validation,owners:Object.freeze(proof.owners.filter(keep))};
++}
++function reconcileCurrentDependencies(op:Operation,proof:Readonly<Proof>,relevance:CurrentRelevance|undefined):void {
++ if(!relevance?.size)return;
++ const retained=new Set([...proof.owners,...(proof.possible??[])]);
++ for(const cell of op.dependencies)if(relevance.has(cell)&&cell.outcome==='confirmed'&&!retained.has(cell)){
++  op.dependencies.delete(cell);cell.dependents.delete(op);
++ }
++}
+ /** Scalar-only construction; never installs listeners during preparation. */
+-export function combineScalarNativeRequirements(parts:readonly NativeRequirement[]):NativeRequirement {
+- const requirement=combineNativeRequirements(parts);scalarComposites.add(requirement);
++export function combineScalarNativeRequirements(parts:readonly NativeRequirement[],relevance?:CurrentRelevance):NativeRequirement {
++ const requirement=combineNativeRequirements(parts);
++ if(relevance?.size)Object.defineProperty(requirement,'proof',{get:()=>currentObligations(combineProofs(parts.map(nativeProof)),relevance),configurable:true,enumerable:true});
++ scalarComposites.add(requirement);
+  normalizeScalar(requirement);return requirement;
+ }
+ /** Called only by installed scalar native completion. Outstanding synchronous
+@@ -240,6 +266,7 @@
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+  for(const frame of active){
++  for(const owner of inputs.flatMap(input=>input.owners))adds.push({set:frame.protectedOwners,value:owner});
+   for(const owner of [...(evidence.input??[]),...(evidence.validation??[])])adds.push({set:frame.installedOwners,value:owner});
+   if(frame.declaredOwners!==undefined&&((evidence.terminalRejectedRoles??0)!==0||[...(evidence.input??[]),...(evidence.validation??[])].some(owner=>!frame.declaredOwners!.includes(owner))))adds.push({set:invalidFrames,value:frame});
+   if(evidence.unknown)adds.push({set:unknownFrames,value:frame});
+@@ -263,7 +290,7 @@
+  if(!requirement||!unactivatedRequirements.delete(requirement))return;
+  if(nativeRequirementReady(requirement))notifyRequirement(requirement);
+ }
+-type Operation={declared:boolean;recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
++type Operation={relevance?:CurrentRelevance;declared:boolean;recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+ const stack:Frame[]=[];
+ const installedLast=new Map<Frame,object>();
+@@ -302,7 +329,7 @@
+  recipientDomain?:boolean;
+ }>;
+ /** Snapshot declaration responsibility before native installation, never at delivery. */
+-export function prepareRevision(channel:object,revision:object,known:readonly OwnerCell[],uncertainty:RecipientUncertainty={},blockers:readonly OwnerCell[]=[],native?:NativeRequirement,projectionPending=false,invocation:NativeRequirement|undefined=native):TerminalRecordPlan & {finalize?:()=>void} {
++export function prepareRevision(channel:object,revision:object,known:readonly OwnerCell[],uncertainty:RecipientUncertainty={},blockers:readonly OwnerCell[]=[],native?:NativeRequirement,projectionPending=false,invocation:NativeRequirement|undefined=native,relevance?:CurrentRelevance):TerminalRecordPlan & {finalize?:()=>void} {
+  const c=connections.get(channel);
+  const writes:TerminalRecordPlan['writes'][number][]=[];
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+@@ -319,7 +346,7 @@
+  const required=uniqueOwners([...active.flatMap(frameOwners),...(invocationEvidence?.input??[]),...(invocationEvidence?.validation??[])]);
+  // Native support is source evidence, not this recipient's declaration permission.
+  // Without a native requirement retain the conservative enrollment window.
+- const op:Operation={declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
++ const op:Operation={relevance,declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+  if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:unknown||!native,invalid:false};
+  writes.push({map:c.ops,key:revision,value:op});
+  for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+@@ -413,7 +440,8 @@
+  }
+  for(const op of operations){
+   const proofs=[...op.frames].map(effective);if(op.native)proofs.push(nativeProof(op.native));
+-  op.proof=recipientProof(op,{...combineProofs(proofs),unknown:op.coverageUnknown||proofs.some(p=>p.unknown)});
++  op.proof=currentObligations(recipientProof(op,{...combineProofs(proofs),unknown:op.coverageUnknown||proofs.some(p=>p.unknown)}),op.relevance);
++  reconcileCurrentDependencies(op,op.proof,op.relevance);
+   for(const cell of [...op.proof.owners,...(op.proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+   op.frames.clear();refresh(op);wake(op.channel);
+  }
+@@ -430,7 +458,7 @@
+  // This closure captures only a detached status cell, never connection/frame.
+  const receipt=makeReceipt(view);
+  const h=stack.at(-1)?.horizon??{frames:new Set<Frame>(),requirements:new Set<NativeRequirement>(),open:0};
+- const frame:Frame={channel,connection:c,parents:[...stack],horizon:h,owners:[],unknown:true,invalid:false,view,ops:new Set(),installedOwners:new Set()};
++ const frame:Frame={channel,connection:c,parents:[...stack],horizon:h,owners:[],unknown:true,invalid:false,view,ops:new Set(),installedOwners:new Set(),protectedOwners:new Set()};
+  h.frames.add(frame);h.open++;stack.push(frame);
+  let stage:'before-callback'|'after-callback'='before-callback';let thrown=false;let primary:unknown;let exitingError=false;let completionFailed=false;let completionError:unknown;
+  try{
+@@ -443,6 +471,7 @@
+    for(const handle of list){const cell=handle&&typeof handle==='object'?authentic.get(handle):undefined;if(!cell||cell.outcome==='rolled-back'||cell.outcome==='abandoned')throw new SignalTreePublicationError(stage,'unavailable-owner');owners.push(cell);}
+   }
+   frame.declaredOwners=kind==='unknown'?undefined:Object.freeze([...new Set(owners)]);
++  for(const cell of owners)if(cell.outcome!=='confirmed')frame.protectedOwners.add(cell);
+   frame.owners=[...new Set([...frame.owners,...owners])];// Input-validation writes cannot become independent retroactively.
+   frame.unknown=kind==='unknown'||frame.ops.size>0;
+   stage='after-callback';let result:unknown;
+@@ -487,7 +516,9 @@
+ }
+ export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending=false):Readonly<Proof>{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return proof;
+- const selected=recipientProof(op,proof);op.projectionPending=projectionPending;op.proof=selected;
++ const selected=currentObligations(recipientProof(op,proof),op.relevance);
++ reconcileCurrentDependencies(op,selected,op.relevance);op.relevance=undefined;
++ op.projectionPending=projectionPending;op.proof=selected;
+  for(const cell of [...selected.owners,...(selected.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+  refresh(op);return selected;
+ }

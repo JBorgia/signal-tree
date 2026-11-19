@@ -1,0 +1,1 @@
+{"cases":2,"outcome":"PASS","evidence":"AOT standalone component class and Angular computed runtime; no bootstrap/DOM claim"}

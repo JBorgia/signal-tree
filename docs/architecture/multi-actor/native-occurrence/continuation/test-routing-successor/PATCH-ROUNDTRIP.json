@@ -1,0 +1,45 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/st-test-routing-successor/FROM-C11.patch"
+      ],
+      "cwd": "/private/tmp/st-test-routing-successor/patch-check",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "/private/tmp/st-test-routing-successor/FROM-C11.patch"
+      ],
+      "cwd": "/private/tmp/st-test-routing-successor/patch-check",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "matches": {
+    "packages/kernel/project.json": true,
+    "packages/kernel/vitest.config.ts": true,
+    "packages/kernel/vitest.retention.config.ts": true,
+    "tools/verify-gates.mjs": true,
+    "tsconfig.typecheck-specs.json": true,
+    "vitest.config.ts": true,
+    "tools/check-forwarding-retention.mjs": true,
+    "tools/experiments/native-publication-diagnostics/README.md": true,
+    "tools/experiments/native-publication-diagnostics/native-equal-inverse-diagnostic.replay.ts": true,
+    "tools/experiments/native-publication-diagnostics/native-netzero-diagnostic.replay.ts": true,
+    "tools/experiments/native-publication-diagnostics/replay.config.ts": true,
+    "tools/experiments/native-publication-diagnostics/run.mjs": true
+  },
+  "deletedPathsAbsent": [
+    "packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts",
+    "packages/kernel/src/lib/native-netzero-diagnostic.spec.ts"
+  ]
+}

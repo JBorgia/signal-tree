@@ -1,0 +1,21 @@
+{
+  "id": "rollback-1000-selected-sample4",
+  "ordinal": 60,
+  "profile": "rollback",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample4",
+  "exit": 0,
+  "pid": 70920,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 1.795459125074558,
+  "telemetrySamples": 2,
+  "maxObservedOwnedRssBytes": 57737216,
+  "minimumObservedHostFreePercentage": 37.0,
+  "attempts": 1
+}

@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel scalar-frame-publication transaction-observer-failure transaction-safety tree-realization-adapter rich-source-completion-boundary native-group-error-boundary native-adapter-flush-error native-epoch-error-drain realization-admission-metadata scalar-responsibility-lifecycle initializer-owned-cleanup initializer-attachment-independent dynamic-realization-composition-independent scalar-native-support effective-presence-install-reentry --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:30:32.271Z",
+    "endTime": "2026-11-03T05:30:54.820Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "1602267908640513356",
+      "startTime": "2026-11-03T05:30:32.473Z",
+      "endTime": "2026-11-03T05:30:54.817Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

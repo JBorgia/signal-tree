@@ -1,0 +1,26 @@
+{
+  "status": "standalone experiment; independent review pending; point gate red",
+  "files": {
+    "ALLOCATION-COMPARISON.json": "e5b19c9606f5776143beb7739a71d61f29b6dfc5b15a2a8940f7f518376d1718",
+    "BASE-SOURCE-SHA256.json": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+    "BASE-entity.ts": "9772819a9f3d0a31bb1e5bff2f8d62c63cfa9445b2528ac5cf0e2fcca14a8f30",
+    "PREREGISTERED.md": "8386fa5a4499cc98a12fc414333a82eab5515c64666a7ae8ff9107ccef63b75e",
+    "RESULTS.md": "ab82e7a4257b970df4df6b69cc7fb86717c2f9bb0d118c3a50bc5de9f750ba08",
+    "REVIEW-REQUEST.md": "8c5bffe64a094a883f3404498c4e6a223a0616d3e7e46170c0b37e303ae3bc31",
+    "SOURCE-SHA256.json": "c2fd0a2e27a3a0e80601e2909d0b7ad4720d1bfca8ee1dda0053fea7503af9f0",
+    "VERIFICATION.json": "a32a494b675570212b8842fcfc655e8c47cbd9dffdb16b514cc3fc7a1e5da44b",
+    "baseline-allocation.jsonl": "843c8d99d3a429778d2f4f750d4564607d18b2b4f4f0b9f8502db7d1f0d651c3",
+    "baseline-commands.json": "c79630f19241f064b993dddbe4458587cb3780c2b8a6fd3b3ed96b740c60bfe9",
+    "baseline-controls.log": "901326688261a8250587989b9955b9c1355f8817cc48164bd2e69c1b0c603a0c",
+    "baseline-point.log": "c238f8da4758b38a8c075bbba88a46143484549e163c4371847c0d7d6e486fa2",
+    "run.py": "74a0ca3441ceda17ba09dc70a0dbd46af1d5523fef8eef91e94fdcd6bdf5e191",
+    "runtime.patch": "e2fe023d694793b1225ac95c290dda8e5d52785b907bd45df2737c33bd23fbfd",
+    "successor-allocation.jsonl": "bb50a975b58f2eb9c3341ac74b1031435ba5fe90b7420f7a8ad8c73e823d91c8",
+    "successor-commands.json": "2254fe434e496179f3ad1dd765d4f46b36a1526bd0772fe1b51d970fd8f24f8d",
+    "successor-controls.log": "688903a13290f40e23025f3d31bef46655d8eee5b9d979209930b45b1d4dfc92",
+    "successor-point.log": "021d1031a7408b62c96665ddab2a6872fb844acf7b71454fc954f7eb3d503b60",
+    "successor-source-types.log": "a276894fdf53ab7b359af6bdb35171ef5653c7834ebfea45a9e516ab1078496a",
+    "successor-spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "tests.patch": "48a1d08dcb14db0d1f710b7fbdfedf81ea82deac59feb35e4afc42bf0d588575"
+  }
+}

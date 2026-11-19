@@ -1,0 +1,44 @@
+
+ NX   Running target build for project demo and 2 tasks it depends on:
+
+
+
+> nx run demo:generate-versions
+
+
+> nx run demo:generate-deep-typing-proofs
+
+demo: ✔ Wrote versions to apps/demo/src/app/version.ts: kernel=16.0.0-dev
+demo: ✔ Wrote demo library versions to apps/demo/src/app/library-versions.ts
+demo: Generated deep-typing proofs for depths 1-40.
+demo: (node:93531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+demo: (Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run demo:build:production
+
+demo: (node:93538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+demo: (Use `node --trace-warnings ...` to show where the warning was created)
+demo: [33m❯[39m Building...
+demo: (node:93538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+demo: (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+
+ NX   Running target build for project demo and 2 tasks it depends on failed
+
+Failed tasks:
+
+- demo:build:production
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.5s (2 tasks)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        demo:build:production                6.2s
+        demo:generate-deep-typing-proofs    309ms

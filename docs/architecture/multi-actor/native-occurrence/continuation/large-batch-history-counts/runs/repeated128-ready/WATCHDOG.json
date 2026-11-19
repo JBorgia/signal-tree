@@ -1,0 +1,7 @@
+{
+  "action": "SIGKILL owned subprocess group",
+  "pgid": 51106,
+  "elapsedSeconds": 60.01372233394068,
+  "phaseEvidence": "tmp/phases.jsonl",
+  "logEvidence": "first.log"
+}

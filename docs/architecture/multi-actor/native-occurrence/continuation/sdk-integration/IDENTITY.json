@@ -1,0 +1,6 @@
+{
+  "manifest": "f3bb2ef22fce1d0890cd791e599ac9284288f58e28c6406167547a870c9f0e79",
+  "files": 2955,
+  "parent": "45f6d1d91c7a51bd51a1d715d2fe7514b5b2158e846bf7a97439c265ba9b4574",
+  "sdk": "exact reviewed approved-sdk.patch"
+}

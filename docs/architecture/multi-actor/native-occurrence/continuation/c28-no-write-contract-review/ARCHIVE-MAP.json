@@ -1,0 +1,26 @@
+[
+  {
+    "source": "AB-RAW-CHECK.json",
+    "archive": "AB-RAW-CHECK.json",
+    "sourceSha256": "83b6618a57b749ba33c556abea420af59a5b59c3b9c0d1b4507dfe3163994306",
+    "archiveSha256": "83b6618a57b749ba33c556abea420af59a5b59c3b9c0d1b4507dfe3163994306"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "3f5c520fa5f3a0dcd7cc2c0b00d8946ea066dcac8484c5d275f4244738af2b8b",
+    "archiveSha256": "3f5c520fa5f3a0dcd7cc2c0b00d8946ea066dcac8484c5d275f4244738af2b8b"
+  },
+  {
+    "source": "AB-ADDENDUM.md",
+    "archive": "AB-ADDENDUM.md",
+    "sourceSha256": "d35ff5c3a26c9abbca898629063c2859f860e6630514c85133384dcd19bbd810",
+    "archiveSha256": "d35ff5c3a26c9abbca898629063c2859f860e6630514c85133384dcd19bbd810"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "a3fd6a4e70d58b3736abf4f21f207875381f21edf517fe74c85e48f3bca563c3",
+    "archiveSha256": "a3fd6a4e70d58b3736abf4f21f207875381f21edf517fe74c85e48f3bca563c3"
+  }
+]

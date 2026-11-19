@@ -1,0 +1,42 @@
+{
+  "registeredAt": "2026-11-03T18:04:30.537718+00:00",
+  "identity": {
+    "candidate": "/private/tmp/st-v16-integration-candidate",
+    "candidateManifest": "8bd6920bb81f676466a1c7d12d61395766694d881fcf2aa8c2dcdd35b5dce670",
+    "screen": "/private/tmp/st-large-qualification/screen-candidate",
+    "screenManifest": "69d5bcd26e5cf8cc1c3884dba159436ee23b386eeace2c8046a667550905d459",
+    "delta": [
+      "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts"
+    ],
+    "originalsUntouched": true
+  },
+  "sequence": [
+    "graph-screen",
+    "four screen cases individually; stop at first nonqualified result",
+    "graph-original only after four passing screens and current guard headroom",
+    "four original cases individually; stop at first nonqualified result"
+  ],
+  "limits": {
+    "graphWallSeconds": 180,
+    "invocationWallSeconds": 360,
+    "structuredNoProgressSeconds": 180,
+    "ownedRssBytes": 2147483648,
+    "hostMemoryBytes": 34359738368,
+    "hostFreePercentageFloor": 12.5,
+    "telemetryPollSeconds": 0.5,
+    "telemetryUnavailable": "stop",
+    "testTimeouts": "unchanged source 60000/120000ms"
+  },
+  "resourcePolicy": "operational abort guards, not measured library budget; memory_pressure -Q percentage metric, not independently measured available bytes",
+  "reuse": "birth-matched subprocess supervision from existing run.py/run-r1.py, structured full-reporter callbacks; no heap samples/instrumented workload",
+  "smallPartition": "I4 nine selected cases already pass; do not repeat",
+  "attempts": "at most four screen and four original fresh workers; no retries",
+  "sourceEdits": "screen two LARGE constants only; selected candidate immutable",
+  "toolHashes": {
+    "run.py": "c670d540b3e47c232efdc7f0f267c520266d2e67c841aac1002e80dce4273f33",
+    "reporter.mjs": "ac85bd84552f9a2997071061a1afb7bff2057875850650ee6da49f99a6400761",
+    "COMMANDS.json": "3ef957e9a68486ad374fea87aea51eea51ff0e3c809c73a9bd34c7bd84c5a4cb",
+    "screen.patch": "627d580a5886602d72bd0852dd77861786ed0b30a4a99287091585d24d1bc13b"
+  }
+}

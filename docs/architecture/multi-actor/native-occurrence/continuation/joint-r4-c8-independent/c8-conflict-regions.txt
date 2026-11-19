@@ -1,0 +1,60 @@
+
+FILE packages/kernel/src/lib/entity-signal.ts
+LEFT
+import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+RIGHT
+import { PublicationPreparation } from './internals/publication-preparation';
+import { reportContainedObserverError } from './internals/error-reporter';
+import type { EntityStructureOperation, PreparedEntityStructure } from './internals/prepared-entity-structure';
+
+
+FILE packages/kernel/src/lib/experimental-publication/lifecycle.ts
+LEFT
+ const requirement:NativeRequirement={retirementOwnWindowOnly:!unknown&&known.length===0&&inputs.length===0&&active.length===0,known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+ unfinishedRequirements.add(requirement);
+RIGHT
+ const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+ unfinishedRequirements.add(requirement);unactivatedRequirements.add(requirement);
+
+
+FILE packages/kernel/src/lib/experimental-publication/private.ts
+LEFT
+ const record=combineTerminalRecords(...(inspection?[{writes:viewWrites,deletes:edit.present?[{map:viewDomain,key:edit.child}]:[],adds:[]},...enrollments.map(value=>value.record)]:records));return record?{record,completion:{parts,enrollments},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
+}
+function completeMembership(completion:object):void{
+ const state=completion as {parts:{channel:object;unit:Unit}[];enrollments?:{activate():void}[]};
+ for(const enrollment of state.enrollments??[])enrollment.activate();
+ state.enrollments=undefined;
+ for(const {channel,unit}of state.parts)completeScalar({channel,unit});
+RIGHT
+ const record=combineTerminalRecords(...records);return record?{record,completion:{parts,native:native.requirement},finalize:()=>{lifecycle.finalizeNativeRequirement(native.requirement);for(const finalize of finalizeRecipients)finalize();}}:undefined;
+}
+function completeMembership(completion:object):void{
+ const {parts,native}=completion as {parts:{channel:object;unit:Unit}[];native:lifecycle.NativeRequirement};
+ let failed=false,first:unknown;const run=(work:()=>void)=>{try{work();}catch(error){if(!failed){failed=true;first=error;}}};
+ run(()=>lifecycle.deliverNativeRequirementReady(native));for(const part of parts)run(()=>completeScalar(part));if(failed)throw first;
+
+
+FILE packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+LEFT
+import type {ConstructionAllocation} from './construction-allocation';
+RIGHT
+import { PublicationPreparation } from './publication-preparation';
+import { completeScalarFrame } from './tree-scalar-slot-runtime';
+import { reportContainedObserverError as reportFrameError } from './error-reporter';
+
+
+FILE packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+LEFT
+import type {ConstructionAllocation} from './construction-allocation';
+RIGHT
+import { PublicationPreparation } from './publication-preparation';
+import { completeScalarFrame } from './tree-scalar-slot-runtime';
+import { reportContainedObserverError as reportFrameError } from './error-reporter';
+
+
+FILE packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+LEFT
+import type {ConstructionAllocation} from './construction-allocation';
+RIGHT
+import { PublicationPreparation } from './publication-preparation';

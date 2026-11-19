@@ -1,0 +1,44 @@
+[
+  {
+    "source": "partition-COMMAND.json",
+    "archive": "partition-COMMAND.json",
+    "sourceSha256": "f1e87942c014e495dd38b79b4b41902b217a220ecc975176c020032e1fcbdbac",
+    "archiveSha256": "f1e87942c014e495dd38b79b4b41902b217a220ecc975176c020032e1fcbdbac"
+  },
+  {
+    "source": "partition-FAILURE-STACKS.txt",
+    "archive": "partition-FAILURE-STACKS.txt",
+    "sourceSha256": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a",
+    "archiveSha256": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a"
+  },
+  {
+    "source": "partition-REVIEW.md",
+    "archive": "partition-REVIEW.md",
+    "sourceSha256": "ff4e87d1c67c5b7983766d3c8da83980534037be94beeaf8f28f726b436aa068",
+    "archiveSha256": "ff4e87d1c67c5b7983766d3c8da83980534037be94beeaf8f28f726b436aa068"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "eb2a4c22914b83ed966fa99dd3c8239762b8290ed0eae359f085f0aa871c2bd8",
+    "archiveSha256": "eb2a4c22914b83ed966fa99dd3c8239762b8290ed0eae359f085f0aa871c2bd8"
+  },
+  {
+    "source": "partition-RESULT.json",
+    "archive": "partition-RESULT.json",
+    "sourceSha256": "1ce7bf82677cbb71bac2f8298e4da7334fae09504c9499ecd51b375a50b6412b",
+    "archiveSha256": "1ce7bf82677cbb71bac2f8298e4da7334fae09504c9499ecd51b375a50b6412b"
+  },
+  {
+    "source": "RAW-RELEVANT-OUTPUT.txt",
+    "archive": "RAW-RELEVANT-OUTPUT.txt",
+    "sourceSha256": "dab05019d6e3b191897707a6cf13e4318055b9fdc4473da522f48f83920bbdaa",
+    "archiveSha256": "dab05019d6e3b191897707a6cf13e4318055b9fdc4473da522f48f83920bbdaa"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "3675d3048fb30b62d8b53def99c242b2718ddc881d5aa79d6db299824757fe07",
+    "archiveSha256": "3675d3048fb30b62d8b53def99c242b2718ddc881d5aa79d6db299824757fe07"
+  }
+]

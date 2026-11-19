@@ -1,0 +1,7 @@
+bare                                   leafObservable=NO 
+batching()                             leafObservable=NO 
+transactions()                         leafObservable=YES
+restoration()                          leafObservable=YES
+transactions()+restoration()           leafObservable=YES
+capabilities:[causal-runtime]          leafObservable=YES
+VERDICT: capability implies observability -> structural predicate is SAFE

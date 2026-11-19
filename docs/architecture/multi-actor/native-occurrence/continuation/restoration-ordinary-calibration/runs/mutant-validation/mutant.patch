@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -2479,6 +2479,8 @@
+     preparedSubjectScope(tree, descriptors, structuralOwnerPaths)
+   );
+   for (const effect of effects) {
++    // TEST MUTANT: repeat actual per-effect validation and discard its result.
++    canApplyEffect(tree, descriptors, structuralOwnerPaths, scalarSlotRuntime, effect, preparedContext);
+     if (
+       !canApplyEffect(
+         tree,

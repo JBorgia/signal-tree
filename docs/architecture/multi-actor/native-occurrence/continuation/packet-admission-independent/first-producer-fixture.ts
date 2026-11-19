@@ -1,0 +1,68 @@
+import { appendFileSync } from 'node:fs';
+import { expect,it,vi } from 'vitest';
+import { signalTree,entityMap,transactions } from '../index';
+import { EntityPublicationSource,getEntityPublicationBinding,entityPublicationOrdinary,type EntityPublicationPacket as Packet,type EntityPublicationEdit as Edit,type EntityPublicationEvidence as Evidence } from './internals/entity-publication';
+import { nativeProof,type NativeRequirement } from './experimental-publication/lifecycle';
+
+function record(value:unknown) { appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/producer-observations.jsonl', JSON.stringify(value)+'\n'); }
+function setup(){return signalTree({rows:entityMap<{id:string;x:number;y:number},string>()},{enhancers:[transactions()]});}
+
+it('actual source producers isolate descriptors before locking edits, including queued inverse fragments',()=>{
+ const tree=setup();const seen=new WeakSet<Edit>();
+ const entries:Array<{edit:Edit;frozen:boolean;structural:Edit['structural'];wasStructuralFrozen:boolean;fields:Edit['fields'];wasFieldsFrozen:boolean}>=[];
+ const inspect=(p:Packet)=>{const all=[...p.ordinary,...p.physical,...(p.steps??[]).flatMap(s=>[...s.ordinary,...(s.physical??[]),...(s.authoredRemoval?[s.authoredRemoval]:[])])];for(const edit of all)if(!seen.has(edit)){seen.add(edit);entries.push({edit,frozen:Object.isFrozen(edit),structural:edit.structural,wasStructuralFrozen:Object.isFrozen(edit.structural),fields:edit.fields,wasFieldsFrozen:Object.isFrozen(edit.fields)});}};
+ const prepare=EntityPublicationSource.prototype.prepare,point=EntityPublicationSource.prototype.preparePoint;
+ const spy=vi.spyOn(EntityPublicationSource.prototype,'prepare').mockImplementation(function(this:EntityPublicationSource,p){inspect(p);return prepare.call(this,p);});
+ const spyPoint=vi.spyOn(EntityPublicationSource.prototype,'preparePoint').mockImplementation(function(this:EntityPublicationSource,p){inspect(p);return point.call(this,p);});
+ try{
+  tree.$.rows.setAll([{id:'a',x:1,y:2},{id:'b',x:3,y:4}]);
+  const q=tree.transact(()=>{tree.$.rows.byIdOrFail('a').x(7);tree.$.rows.byIdOrFail('a').y(11);});q.rollback();
+  const r=tree.transact(()=>tree.$.rows.removeOne('a'));r.rollback();
+  tree.$.rows.prependMany([{id:'c',x:5,y:6}]);
+  expect(tree.$.rows.ids()).toEqual(['c','a','b']);
+  expect(tree.$.rows.byIdOrFail('a')()).toEqual({id:'a',x:1,y:2});
+  expect(entries.length).toBeGreaterThan(0);
+  expect(entries.filter(e=>e.structural).length).toBeGreaterThan(0);
+  expect(entries.filter(e=>e.frozen)).toHaveLength(0);
+  for(const e of entries){expect(Object.isFrozen(e.edit)).toBe(true);if(e.structural){expect(e.edit.structural).not.toBe(e.structural);expect(Object.isFrozen(e.structural)).toBe(e.wasStructuralFrozen);}if(e.fields)expect(Object.isFrozen(e.fields)).toBe(e.wasFieldsFrozen);}
+  record({case:'producer ownership',edits:entries.length,structural:entries.filter(e=>e.structural).length,firstSeenFrozen:entries.filter(e=>e.frozen).length});
+ }finally{spy.mockRestore();spyPoint.mockRestore();tree.destroy();}
+});
+
+for(const phase of ['prepare','finalize'] as const)it(`actual add ${phase} escaping metadata mutation refuses physical installation`,()=>{
+ const tree=setup();tree.$.rows.addOne({id:'a',x:1,y:2});const source=getEntityPublicationBinding(tree.$.rows)!.source;let calls=0;
+ const off=source.subscribe({prepare(p){const mutate=()=>{calls++;(p.ordinary as Edit[]).push(p.ordinary[0]);};if(phase==='prepare')mutate();return {record:{writes:[],adds:[]},completion:{},finalize:mutate};},complete(){throw Error('must not deliver');}});
+ try{expect(()=>tree.$.rows.addOne({id:'b',x:7,y:8})).toThrow(TypeError);expect(calls).toBe(1);expect(tree.$.rows.ids()).toEqual(['a']);expect(tree.$.rows.byIdOrFail('a')()).toEqual({id:'a',x:1,y:2});off();tree.$.rows.addOne({id:'b',x:7,y:8});expect(tree.$.rows.ids()).toEqual(['a','b']);}finally{off();tree.destroy();}
+});
+
+it('actual pending field admission preserves edit-specific proof identity through rollback',()=>{
+ const tree=setup();tree.$.rows.addOne({id:'a',x:1,y:2});const source=getEntityPublicationBinding(tree.$.rows)!.source;
+ let retained:NativeRequirement|undefined;let edits=0;let rejectedMutations=0;
+ const off=source.subscribe({prepare(p,native){const facts=(native as {facts:Evidence}).facts;for(const edit of entityPublicationOrdinary(p)){
+   if(edit.structural||!edit.fields?.includes('x'))continue;
+   const exact=facts.forEdit!(edit);expect(exact).not.toBe(facts);edits++;
+   if((edit.after as {x:number}).x===7){
+    expect(Reflect.set(edit,'subject',999)).toBe(false);expect(Reflect.set(edit,'subject',edit.subject)).toBe(false);rejectedMutations++;
+    retained=exact.field(edit.subject,'x','ordinary') as NativeRequirement;
+   }
+  }return undefined;},complete(){}});
+ try{const q=tree.transact(()=>tree.$.rows.byIdOrFail('a').x(7));expect(retained).toBeDefined();const requirement=retained!;const owner=nativeProof(requirement).owners.find(o=>o.outcome==='pending');expect(owner).toBeDefined();expect(Object.isFrozen(requirement)).toBe(false);q.rollback();expect(owner!.outcome).toBe('rolled-back');expect(nativeProof(requirement).owners).toContain(owner);expect(tree.$.rows.byIdOrFail('a').x()).toBe(1);expect(edits).toBeGreaterThan(0);expect(rejectedMutations).toBe(1);record({case:'held actual proof',edits,ownerOutcome:owner!.outcome});}finally{off();tree.destroy();}
+});
+
+it('ownership limit: a separately frozen private shell freezes its shared descriptor in place',()=>{
+ const source=new EntityPublicationSource();const descriptor={kind:'add' as const,subject:1};const edit:Edit=Object.freeze({subject:1,before:undefined,after:{x:7},fields:['x'],structural:descriptor});
+ try{expect(Object.isFrozen(descriptor)).toBe(false);source.prepare({owner:1,id:{},meta:undefined,ordinary:[edit],physical:[edit]});expect(edit.structural).toBe(descriptor);expect(Object.isFrozen(descriptor)).toBe(true);record({case:'private frozen shell ownership side effect',descriptorFrozen:true});}finally{source.dispose();}
+});
+
+it('actual add temporary structural mutation cannot split native and later recipient admission',()=>{
+ const tree=setup();const source=getEntityPublicationBinding(tree.$.rows)!.source;let first:Edit|undefined;let calls=0;
+ const a=source.subscribe({prepare(p){first=p.ordinary.find(e=>e.structural?.kind==='add');expect(first).toBeDefined();expect(Reflect.set(first!.structural!,'kind','remove')).toBe(false);expect(Reflect.set(first!.structural!,'kind','add')).toBe(false);return undefined;},complete(){}});
+ const b=source.subscribe({prepare(p,native){calls++;expect(p.ordinary.find(e=>e.structural?.kind==='add')).toBe(first);const facts=(native as {facts:Evidence}).facts;expect(facts.forEdit!(first!)).not.toBe(facts);return undefined;},complete(){}});
+ try{tree.$.rows.addOne({id:'a',x:7,y:8});expect(calls).toBe(1);expect(tree.$.rows.byIdOrFail('a')()).toEqual({id:'a',x:7,y:8});}finally{a();b();tree.destroy();}
+});
+
+it('actual source finalizer reentry refuses stale outer write while preserving nested truth',()=>{
+ const tree=setup();tree.$.rows.addOne({id:'a',x:1,y:2});const source=getEntityPublicationBinding(tree.$.rows)!.source;let nested=false;
+ const off=source.subscribe({prepare(){return {record:{writes:[],adds:[]},completion:{},finalize(){if(!nested){nested=true;tree.$.rows.byIdOrFail('a').x(99);}}};},complete(){}});
+ try{expect(()=>tree.$.rows.byIdOrFail('a').x(7)).toThrow('source changed during finalization');expect(nested).toBe(true);expect(tree.$.rows.byIdOrFail('a').x()).toBe(99);}finally{off();tree.destroy();}
+});

@@ -1,0 +1,69 @@
+{
+  "hashes": {
+    "two-history-public.spec.ts": "b11cd947609f6c4eb868449c22497d183f59edd37fda9519c822107c4f7224e5",
+    "OBSERVATIONS.jsonl": "e9a28696103f8affb2f11bb8c57e45b6ddabaa9e3bca15880ad54c0b44980dc1",
+    "REVIEW.md": "03ea72ac92bdc20956effa4dc32386b7099fae60e995a04bcd83152f43eb9c1d"
+  },
+  "rows": 20,
+  "checked": {
+    "A": {
+      "fresh-drained": {
+        "historical": {
+          "state": "conservative",
+          "reason": "unknown"
+        },
+        "fresh": {
+          "state": "no-write"
+        }
+      },
+      "p-confirmed": {
+        "historical": {
+          "state": "started",
+          "basis": "surviving"
+        },
+        "fresh": {
+          "state": "no-write"
+        }
+      },
+      "disposed": {
+        "historical": {
+          "state": "started",
+          "basis": "surviving"
+        },
+        "fresh": {
+          "state": "no-write"
+        }
+      }
+    },
+    "B": {
+      "fresh-drained": {
+        "historical": {
+          "state": "superseded"
+        },
+        "fresh": {
+          "state": "conservative",
+          "reason": "unknown"
+        }
+      },
+      "p-confirmed": {
+        "historical": {
+          "state": "superseded"
+        },
+        "fresh": {
+          "state": "started",
+          "basis": "surviving"
+        }
+      },
+      "disposed": {
+        "historical": {
+          "state": "superseded"
+        },
+        "fresh": {
+          "state": "started",
+          "basis": "surviving"
+        }
+      }
+    }
+  },
+  "independentTestRuns": 0
+}

@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel independent-occupancy-supported-inverse.spec.ts occupancy-successor-realization.spec.ts --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-02T17:47:46.978Z",
+    "endTime": "2026-11-02T17:47:53.850Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "6284205170669232726",
+      "startTime": "2026-11-02T17:47:47.043Z",
+      "endTime": "2026-11-02T17:47:53.847Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

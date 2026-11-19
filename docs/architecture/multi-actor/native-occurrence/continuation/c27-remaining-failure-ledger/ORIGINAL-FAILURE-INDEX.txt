@@ -1,0 +1,17 @@
+ FAIL  src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts > v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment before-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment during-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment before-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment during-pending
+ FAIL  src/lib/held-continuation-probe.spec.ts > sample held selected continuation after completed rollback and destroy
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; retry, writes=xy
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; confirm, writes=xy
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; retry, writes=yx
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; confirm, writes=yx
+ FAIL  src/lib/recipient-cause-classification.spec.ts > domain-only: distinct fixed-window treatment and useful confirm
+ FAIL  src/lib/recipient-cause-classification.spec.ts > domain-only: distinct fixed-window treatment and useful rollback
+ FAIL  src/lib/restoration-paired-work.spec.ts > paired restoration installs 3 physical rows once
+ FAIL  src/lib/restoration-paired-work.spec.ts > paired restoration installs 32 physical rows once
+ FAIL  src/lib/restoration-paired-work.spec.ts > paired restoration installs 256 physical rows once
+ FAIL  src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts > attempts later live lifetime invalidation after first installed row invalidation fails
+ FAIL  src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts > attempts mixed installed invalidation and delivery while preserving the first failure

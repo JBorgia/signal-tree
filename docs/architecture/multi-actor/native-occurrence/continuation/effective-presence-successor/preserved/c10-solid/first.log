@@ -1,0 +1,211 @@
+
+> nx run solid:test --maxWorkers=1
+
+> pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts --maxWorkers=1
+
+(node:16079) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:16356) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16533) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c10-promoted/candidate/packages/solid
+
+(node:16585) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/absent-collection.spec.ts > absent collection — Solid (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)
+computations created outside a `createRoot` or `render` will never be disposed
+
+stderr | src/lib/absent-collection.spec.ts > absent collection — Solid (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)
+computations created outside a `createRoot` or `render` will never be disposed
+
+ ❯ src/lib/absent-collection.spec.ts (14 tests | 8 failed) 120ms
+     × a row-adding write re-adds the path with only its row; undo omits it again 22ms
+     × a root holding only collections: omission, a re-adding write, undo (v16 8e review) 11ms
+     × a tap inside a whole value re-adds an absent member of the same tree (v16 8f) 7ms
+     × rollback of a re-adding write makes it absent again 4ms
+     × a row-adding write re-adds the path with only its row; undo omits it again 4ms
+     × a root holding only collections: omission, a re-adding write, undo (v16 8e review) 2ms
+     × a tap inside a whole value re-adds an absent member of the same tree (v16 8f) 5ms
+     × rollback of a re-adding write makes it absent again 2ms
+(node:16624) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16627) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16628) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16640) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16641) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16649) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16650) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16658) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16688) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16762) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16768) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16902) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16903) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again
+AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  [
+-   "{\"a\":{\"rows\":{\"all\":[{\"id\":\"z\",\"n\":9}]}},\"count\":0}",
++   "{\"a\":{\"rows\":{\"all\":[]}},\"count\":0}",
+    [
+      {
+        "id": "z",
+        "n": 9,
+      },
+
+ ❯ src/lib/absent-collection.spec.ts:124:24
+    122|         undoable(() => rows.addOne(Z));
+    123|         await flush();
+    124|         expect(view()).toEqual([
+       |                        ^
+    125|           '{"a":{"rows":{"all":[{"id":"z","n":9}]}},"count":0}',
+    126|           [Z],
+ ❯ inRoot src/lib/absent-collection.spec.ts:53:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)
+AssertionError: expected [ …(3) ] to deeply equal [ …(3) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  [
+-   "{\"users\":{\"all\":[{\"id\":\"z\",\"n\":9}]},\"orders\":{\"all\":[]}}",
++   "{\"users\":{\"all\":[]},\"orders\":{\"all\":[]}}",
+    [
+      {
+        "id": "z",
+        "n": 9,
+      },
+
+ ❯ src/lib/absent-collection.spec.ts:173:24
+    171|         undoable(() => users.addOne(Z));
+    172|         await flush();
+    173|         expect(view()).toEqual([
+       |                        ^
+    174|           '{"users":{"all":[{"id":"z","n":9}]},"orders":{"all":[]}}',
+    175|           [Z],
+ ❯ inRoot src/lib/absent-collection.spec.ts:53:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)
+AssertionError: expected [ …(2) ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  [
+-   "{\"a\":{\"rows\":{\"all\":[{\"id\":\"a\",\"n\":0},{\"id\":\"z\",\"n\":9}]},\"s\":0},\"b\":{\"rows\":{\"all\":[{\"id\":\"z\",\"n\":9}]},\"s\":5},\"count\":0}",
++   "{\"a\":{\"rows\":{\"all\":[{\"id\":\"a\",\"n\":0},{\"id\":\"z\",\"n\":9}]},\"s\":0},\"b\":{\"rows\":{\"all\":[]},\"s\":5},\"count\":0}",
+    [
+      {
+        "id": "z",
+        "n": 9,
+      },
+
+ ❯ src/lib/absent-collection.spec.ts:227:24
+    225|         await flush();
+    226|         expect(wrote).toBe(true);
+    227|         expect(view()).toEqual([
+       |                        ^
+    228|           '{"a":{"rows":{"all":[{"id":"a","n":0},{"id":"z","n":9}]},"s…
+    229|           [Z],
+ ❯ inRoot src/lib/absent-collection.spec.ts:53:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (transactions first) > rollback of a re-adding write makes it absent again
+ FAIL  src/lib/absent-collection.spec.ts > absent collection — Solid (restoration first) > rollback of a re-adding write makes it absent again
+AssertionError: expected [ …(4) ] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  [
+-   "{\"a\":{\"rows\":{\"all\":[{\"id\":\"z\",\"n\":9}]}},\"count\":0}",
++   "{\"a\":{\"rows\":{\"all\":[]}},\"count\":0}",
+    [
+      {
+        "id": "z",
+        "n": 9,
+      },
+
+ ❯ src/lib/absent-collection.spec.ts:274:24
+    272|         const pending = tree.transact(() => rows.addOne(Z));
+    273|         await flush();
+    274|         expect(view()).toEqual([
+       |                        ^
+    275|           '{"a":{"rows":{"all":[{"id":"z","n":9}]}},"count":0}',
+    276|           [Z],
+ ❯ inRoot src/lib/absent-collection.spec.ts:53:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+
+ Test Files  1 failed | 18 passed (19)
+      Tests  8 failed | 115 passed (123)
+   Start at  10:07:10
+   Duration  18.36s (transform 2.68s, setup 0ms, import 11.14s, tests 1.34s, environment 3ms)
+
+Warning: command "pnpm exec tsc --noEmit -p packages/solid/tsconfig.spec.json && npx vitest run --config packages/solid/vitest.config.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project solid failed
+
+Failed tasks:
+
+- solid:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      30.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     30.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        solid:test    30.5s

@@ -1,0 +1,37 @@
+
+> nx run kernel:test independent-occupancy-reverse-inverse.spec.ts independent-occupancy-remove-inverse.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-occupancy-reverse-inverse.spec.ts independent-occupancy-remove-inverse.spec.ts --maxWorkers=1
+
+(node:49966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:49974) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c11-occupancy-validity/candidate/packages/kernel
+
+(node:49981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:50068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  2 passed (2)
+   Start at  10:46:52
+   Duration  3.11s (transform 1.30s, setup 0ms, import 1.70s, tests 93ms, environment 974ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.9s

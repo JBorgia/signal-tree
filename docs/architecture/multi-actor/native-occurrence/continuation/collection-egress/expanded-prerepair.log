@@ -1,0 +1,149 @@
+
+> nx run kernel:test collection-natural-egress.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs collection-natural-egress.spec.ts --maxWorkers=1
+
+(node:87435) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87443) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-collection-egress-successor/candidate/packages/kernel
+
+(node:87451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/collection-natural-egress.spec.ts (12 tests | 6 failed) 104ms
+   × direct collection same-turn collection omit/readd keeps natural rows 10ms
+   × root and branch snapshots compose nested collection collection while direct Link keeps array 4ms
+   × collection collection/independent membership selection preserves receipt and pending-owner boundary 6ms
+   × collection collection/dependent membership selection preserves receipt and pending-owner boundary 3ms
+   × collection readd callback newer write survives completion, throws=false 3ms
+   × collection readd callback newer write survives completion, throws=true 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/collection-natural-egress.spec.ts > direct collection same-turn collection omit/readd keeps natural rows
+AssertionError: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]
+
+- Expected:
+[
+  {
+    "id": "s",
+    "n": 2,
+  },
+]
+
++ Received:
+{
+  "all": [],
+}
+
+ ❯ src/lib/collection-natural-egress.spec.ts:14:140
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/collection-natural-egress.spec.ts > root and branch snapshots compose nested collection collection while direct Link keeps array
+AssertionError: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]
+
+- Expected:
+[
+  {
+    "id": "s",
+    "n": 2,
+  },
+]
+
++ Received:
+{
+  "all": [],
+}
+
+ ❯ src/lib/collection-natural-egress.spec.ts:21:319
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/lib/collection-natural-egress.spec.ts > collection collection/independent membership selection preserves receipt and pending-owner boundary
+AssertionError: expected [ { all: [] } ] to deeply equal [ [ { id: 's', n: 2 } ] ]
+
+- Expected
++ Received
+
+  [
+-   [
+    {
+-       "id": "s",
+-       "n": 2,
++     "all": [],
+    },
+-   ],
+  ]
+
+ ❯ src/lib/collection-natural-egress.spec.ts:30:150
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/lib/collection-natural-egress.spec.ts > collection collection/dependent membership selection preserves receipt and pending-owner boundary
+AssertionError: expected [ { all: [] } ] to deeply equal [ [ { id: 's', n: 2 } ] ]
+
+- Expected
++ Received
+
+  [
+-   [
+    {
+-       "id": "s",
+-       "n": 2,
++     "all": [],
+    },
+-   ],
+  ]
+
+ ❯ src/lib/collection-natural-egress.spec.ts:31:34
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/lib/collection-natural-egress.spec.ts > collection readd callback newer write survives completion, throws=false
+ FAIL  src/lib/collection-natural-egress.spec.ts > collection readd callback newer write survives completion, throws=true
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/collection-natural-egress.spec.ts:39:138
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 6 passed (12)
+   Start at  17:01:09
+   Duration  2.94s (transform 1.43s, setup 0ms, import 1.73s, tests 104ms, environment 811ms)
+
+Warning: command "node tools/run-core-vitest.mjs collection-natural-egress.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.3s

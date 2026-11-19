@@ -1,0 +1,12 @@
+{"framework":"angular","control":"candidate-lazy-readonly-tracking-switch-disposal-identity","result":"PASS"}
+{"framework":"angular","variant":"native-only-control","control":"held-ABA-new-consumer","observed":"C","correctValue":"X","knownBad":true}
+{"framework":"angular","variant":"tracked-source-control","control":"held-ABA-new-consumer","observed":"X","correctValue":"X","knownBad":false}
+{"framework":"angular","variant":"candidate","control":"held-ABA-new-consumer","observed":"X","correctValue":"X","knownBad":false}
+{"framework":"angular","variant":"native-first-control","control":"cached-error-recovery","observed":"throws bad source","correctValue":"good","knownBad":true}
+{"framework":"angular","variant":"candidate","control":"cached-error-recovery","observed":"good","correctValue":"good","knownBad":false}
+{"framework":"vue","control":"candidate-lazy-readonly-tracking-switch-disposal-identity","result":"PASS"}
+{"framework":"vue","variant":"native-only-control","control":"held-ABA-new-consumer","observed":"C","correctValue":"X","knownBad":true}
+{"framework":"vue","variant":"tracked-source-control","control":"held-ABA-new-consumer","observed":"X","correctValue":"X","knownBad":false}
+{"framework":"vue","variant":"candidate","control":"held-ABA-new-consumer","observed":"X","correctValue":"X","knownBad":false}
+{"framework":"vue","variant":"native-first-control","control":"cached-error-recovery","observed":"good","correctValue":"good","knownBad":false}
+{"framework":"vue","variant":"candidate","control":"cached-error-recovery","observed":"good","correctValue":"good","knownBad":false}

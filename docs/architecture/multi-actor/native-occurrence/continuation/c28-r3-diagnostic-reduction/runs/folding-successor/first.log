@@ -1,0 +1,14 @@
+🔍 Verifying dev-only code folds when ngDevMode is defined false
+
+✅ signaltree-bare        20.16KB → 17.84KB gzip (−2.33KB)
+✅ signaltree-entities    46.51KB → 42.92KB gzip (−3.60KB)
+
+✅ Dev code is fully foldable — consumers defining ngDevMode=false reclaim ~2.96KB gzip per tree.
+Built-dist consumer guard probes (read-only; artifacts are not rebuilt).
+✓ kernel: explicit ngDevMode=false removes advisories; readable error retained
+✓ angular: explicit ngDevMode=false removes advisories; readable error retained
+✓ react: explicit ngDevMode=false removes advisories; readable error retained
+✓ vue: explicit ngDevMode=false removes advisories; readable error retained
+✓ solid: explicit ngDevMode=false removes advisories; readable error retained
+✓ neutral no-process runtime: dev advisory fires; production is quiet; both throw readable errors
+NODE_ENV-only automatic removal is not qualified by these explicit-define checks.

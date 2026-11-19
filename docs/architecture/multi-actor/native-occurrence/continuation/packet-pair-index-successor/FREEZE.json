@@ -1,0 +1,17 @@
+{
+  "baseManifest": "dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148",
+  "manifest": "e343560a23e2b5a7a445645d230e058ac62582ce7634fa99fd563e95666499eb",
+  "files": 3048,
+  "changedRuntime": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts"
+  ],
+  "newTests": [
+    "packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts",
+    "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts",
+    "packages/kernel/src/lib/packet-physical-pair-work.spec.ts"
+  ],
+  "runtimePatch": "ba3403e26099564c708f67a00402f90dfb7508e94bb38ec972b05d0b132b2381",
+  "testsPatch": "e151f8088aa04724ff5ecd8c0f873fe28f0453fd21552acfe6b333cfb1b95c10",
+  "combinedPatch": "af59475268a6def1b876d11b39b3cb05b87e0adfbc5d0c10d572eb4cde49181d",
+  "unchangedOriginalClearSpec": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56"
+}

@@ -1,0 +1,25 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -1,3 +1,4 @@
++import type { PublicationState } from '../publication-declaration';
+ import { isTraversableNode } from '../internals/node-shape';
+ import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ // Private native experiment; no package export. Publication authority only.
+@@ -74,7 +75,7 @@
+  if(owner!==undefined){const cell=ownerCell(owner,id);if(cell)authentic.set(handle,cell);}
+  return handle;
+ }
+-type State = Readonly<{state:string;reason?:string;basis?:string}>;
++type State = PublicationState;
+ type View = {value:State};
+ type Connection={report:(error:unknown)=>void;wake:()=>void;supported:boolean;ops:Map<object,Operation>;disposed:boolean};
+ type Horizon={frames:Set<Frame>;requirements:Set<NativeRequirement>;open:number};
+@@ -226,7 +227,7 @@
+ let reporting=false;
+ export class SignalTreePublicationError extends Error{
+  readonly code='SIGNALTREE_PUBLICATION_DECLARATION_INVALID';
+- constructor(readonly stage:'before-callback'|'after-callback',readonly reason:string,options?:{cause?:unknown}){super(`Declaration invalid: ${reason}; writes may remain`);if(options && 'cause' in options)Object.defineProperty(this,'cause',{value:options.cause,writable:true,configurable:true});}
++ constructor(readonly stage:'before-callback'|'after-callback',readonly reason:'malformed'|'unavailable-owner'|'contradiction'|'async-callback'|'validation-threw'|'disposed'|'unsupported-source',options?:{cause?:unknown}){super(`Declaration invalid: ${reason}; writes may remain`);if(options && 'cause' in options)Object.defineProperty(this,'cause',{value:options.cause,writable:true,configurable:true});}
+ }
+ export function registerConnection(channel:object,options:{report:(error:unknown)=>void;wake:()=>void;supported:boolean}):void{
+  if(connections.has(channel))throw Error('Publication connection already registered');

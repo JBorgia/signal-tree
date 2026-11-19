@@ -1,0 +1,19 @@
+{
+  "sha256": "e8c89f5e15fd01659ce9abf1eae02c5fb065395225b76c6d78c2c4f4a3e7b04f",
+  "entries": [
+    {
+      "path": "docs/guides/composition-recipes.md",
+      "sha256": "396c77d7ed5618a357ed55e5d88c321619e39f4ff08935000381a56de870f59a",
+      "bytes": 30856,
+      "mode": "0o644",
+      "requiredBy": "apps/demo/project.json build.options.assets"
+    },
+    {
+      "path": "docs/guides/persistence-guide.md",
+      "sha256": "17feb80922e459e185bd433b64ed27220276f529bff7f620a68d3be058df69ba",
+      "bytes": 3649,
+      "mode": "0o644",
+      "requiredBy": "apps/demo/project.json build.options.assets"
+    }
+  ]
+}

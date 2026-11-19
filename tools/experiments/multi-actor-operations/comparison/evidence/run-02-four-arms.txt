@@ -1,0 +1,44 @@
+✔ C0 ordinary: immutable proposal, exact approval, successful apply (1.0945ms)
+✔ C0 ordinary: revised proposal rejects old review and accepts fresh review (0.244417ms)
+✔ C0 ordinary: stale backend version and ABA are refused (0.8615ms)
+✔ C0 ordinary: independent agent and human progress survives proposal rejection (0.56925ms)
+✔ C0 ordinary: declared external input changes invalidate approval (0.234166ms)
+✔ C0 ordinary: lost ack retries exact command without duplicate effect (0.258666ms)
+✔ C0 ordinary: failed persistence installs nothing and is terminal (0.140167ms)
+✔ C0 ordinary: async out-of-order receipts stay correlated; UI actor unknown (0.155708ms)
+✔ C0 ordinary: foreign acknowledgment cannot become success (0.099666ms)
+✔ C1 installed SignalTree public package: immutable proposal, exact approval, successful apply (2.682917ms)
+✔ C1 installed SignalTree public package: revised proposal rejects old review and accepts fresh review (0.435916ms)
+✔ C1 installed SignalTree public package: stale backend version and ABA are refused (0.428542ms)
+✔ C1 installed SignalTree public package: independent agent and human progress survives proposal rejection (0.397291ms)
+✔ C1 installed SignalTree public package: declared external input changes invalidate approval (0.319333ms)
+✔ C1 installed SignalTree public package: lost ack retries exact command without duplicate effect (0.249208ms)
+✔ C1 installed SignalTree public package: failed persistence installs nothing and is terminal (0.208208ms)
+✔ C1 installed SignalTree public package: async out-of-order receipts stay correlated; UI actor unknown (0.247542ms)
+✔ C1 installed SignalTree public package: foreign acknowledgment cannot become success (0.176125ms)
+✔ C2 existing coordinator (no ST integration): immutable proposal, exact approval, successful apply (0.393917ms)
+✔ C2 existing coordinator (no ST integration): revised proposal rejects old review and accepts fresh review (0.121542ms)
+✔ C2 existing coordinator (no ST integration): stale backend version and ABA are refused (0.230334ms)
+✔ C2 existing coordinator (no ST integration): independent agent and human progress survives proposal rejection (0.200791ms)
+✔ C2 existing coordinator (no ST integration): declared external input changes invalidate approval (0.138333ms)
+✔ C2 existing coordinator (no ST integration): lost ack retries exact command without duplicate effect (0.127625ms)
+✔ C2 existing coordinator (no ST integration): failed persistence installs nothing and is terminal (0.087583ms)
+✔ C2 existing coordinator (no ST integration): async out-of-order receipts stay correlated; UI actor unknown (0.101625ms)
+✔ C2 existing coordinator (no ST integration): foreign acknowledgment cannot become success (0.061583ms)
+✔ C3 TanStack DB 1.0.0-rc.1: immutable proposal, exact approval, successful apply (4.646583ms)
+✔ C3 TanStack DB 1.0.0-rc.1: revised proposal rejects old review and accepts fresh review (0.822708ms)
+✔ C3 TanStack DB 1.0.0-rc.1: stale backend version and ABA are refused (0.81375ms)
+✔ C3 TanStack DB 1.0.0-rc.1: independent agent and human progress survives proposal rejection (0.609792ms)
+✔ C3 TanStack DB 1.0.0-rc.1: declared external input changes invalidate approval (0.503958ms)
+✔ C3 TanStack DB 1.0.0-rc.1: lost ack retries exact command without duplicate effect (0.396958ms)
+✔ C3 TanStack DB 1.0.0-rc.1: failed persistence installs nothing and is terminal (1.079084ms)
+✔ C3 TanStack DB 1.0.0-rc.1: async out-of-order receipts stay correlated; UI actor unknown (0.562333ms)
+✔ C3 TanStack DB 1.0.0-rc.1: foreign acknowledgment cannot become success (0.314ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 149.505042

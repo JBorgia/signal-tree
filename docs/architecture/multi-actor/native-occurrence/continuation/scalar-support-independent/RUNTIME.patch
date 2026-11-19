@@ -1,0 +1,67 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -472,19 +472,40 @@
+  * It can use the existing conservative gate, never an active declaration or
+  * an older installed unit's permission. Prepared source units reduce separately.
+  */
++// Observation uncertainty cannot replace installed native or recipient support.
++// Reuse one wrapper per selected requirement; repeated notifications add no depth.
++const observationRequirements=new WeakMap<lifecycle.NativeRequirement,lifecycle.NativeRequirement>();
++const observationWrapped=new WeakSet<lifecycle.NativeRequirement>();
++const observationUnknown=requirementOf({owners:[],unknown:true,invalid:false});
++function observationRequirement(selected:lifecycle.NativeRequirement):lifecycle.NativeRequirement {
++ if(observationWrapped.has(selected))return selected;
++ let wrapped=observationRequirements.get(selected);
++ if(!wrapped){wrapped=lifecycle.combineNativeRequirements([selected,observationUnknown]);observationRequirements.set(selected,wrapped);observationWrapped.add(wrapped);}
++ return wrapped;
++}
+ export function project(channel:object,_meta:unknown,payload:unknown,relative?:readonly string[]):Fact|undefined{
+  const b=bindings.get(channel);if(!b||b.pending.size)return undefined;
+- const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);
+- const unknownProof={owners:[],unknown:true,invalid:false};proofs.set(fact,unknownProof);ownProofs.set(fact,unknownProof);
+- const requirement=requirementOf(unknownProof);
++ const makeFact=():Fact=>{const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);return fact;};
++ const replaceContribution=(node:object,previous:Fact|undefined):Fact=>{
++  const selected=previous&&factRequirements.get(previous);
++  if(!selected)throw Error('Observed scalar has no selected publication requirement');
++  const contribution=makeFact();installFact(b,node,'value',contribution,observationRequirement(selected));return contribution;
++ };
+  if(b.aggregate){
+   const field=relative&&fieldAt(b.fieldTrie,relative)?.field;
++  if(relative?.length&&!field)throw Error('Observed scalar has no enrolled publication field');
+   const fields=field?[field]:[...b.completedFields.keys()];
+-  for(const node of fields){installFact(b,node,'value',fact,requirement);b.completedFields.set(node,fact);b.fieldFacts.set(node,fact);}
+- }else if(b.source)installFact(b,b.source,'value',fact,requirement);
+- b.valuePayload=payload;b.valueFact=fact;b.completedValueFact=fact;
++  for(const node of fields){const contribution=replaceContribution(node,b.completedFields.get(node));b.completedFields.set(node,contribution);b.fieldFacts.set(node,contribution);}
++ }else if(b.source){const contribution=replaceContribution(b.source,b.completedValueFact);b.valueFact=contribution;b.completedValueFact=contribution;}
++ // The outgoing aggregate has its own fact; contributor readiness callbacks
++ // must never overwrite its proof with just the final field's requirement.
++ const fact=makeFact(),support=projectionSupport(b);
++ const proof=combineProofs([support.proof,lifecycle.nativeProof(observationUnknown)]);
++ proofs.set(fact,proof);ownProofs.set(fact,proof);
++ lifecycle.observeRevision(channel,fact,proof,b.index.unresolved()!==0);
++ b.valuePayload=payload;
+  if(b.current)lifecycle.supersede(channel,b.current);
+- b.current=fact;b.projected=Object.freeze({fact,payload:b.aggregate?maskPayload(b):payload,changed:true});
++ b.current=fact;b.projected=Object.freeze({fact,payload:support.present?(b.aggregate?maskPayload(b):payload):undefined,changed:true});
+  return fact;
+ }
+ export function refreshSource(channel:object):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined{const b=bindings.get(channel);if(b)ready(channel,b);return b?.projected&&b.projected.fact===b.current?b.projected:undefined;}
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -416,6 +416,14 @@
+ 
+ export function completeDeclarationContext(channel:object):boolean{return stack.some(f=>f.channel===channel)&&stack.every(f=>f.declaredOwners!==undefined&&!frameUnknown(f));}
+ 
++/** A notification selects existing support, never a declaration or a new window.
++ * Track its exact dependencies through the same wake/retire/dispose lifecycle. */
++export function observeRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending:boolean):void {
++ const c=connections.get(channel);if(!c||c.disposed)return;
++ if(c.ops.has(revision))throw Error('Observed revision already registered');
++ const op:Operation={recipientWindow:[],incomplete:false,projectionPending,coverageUnknown:false,channel,dependencies:new Set(),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map(),proof};
++ c.ops.set(revision,op);projectRevision(channel,revision,proof,projectionPending);
++}
+ export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending=false):Readonly<Proof>{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return proof;
+  const selected=recipientProof(op,proof);op.projectionPending=projectionPending;op.proof=selected;

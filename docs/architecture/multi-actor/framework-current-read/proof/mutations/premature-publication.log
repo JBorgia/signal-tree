@@ -1,0 +1,73 @@
+
+> nx run angular:test selected-callback-facade -t keeps ordinary selected observation granular --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade -t "keeps ordinary selected observation granular" --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:69684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69706) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/angular
+
+(node:69713) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/selected-callback-facade.spec.ts (6 tests | 1 failed | 5 skipped) 18ms
+   × keeps ordinary selected observation granular and native computations cached during the callback 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-callback-facade.spec.ts > keeps ordinary selected observation granular and native computations cached during the callback
+AssertionError: expected 'A' to be 'X' // Object.is equality
+
+Expected: "X"
+Received: "A"
+
+ ❯ Object.onRemove src/lib/selected-callback-facade.spec.ts:138:31
+    136|       const before = runs;
+    137|       const beforeSelection = selectionRuns;
+    138|       expect(selectionView()).toBe('X');
+       |                               ^
+    139|       expect(view()).toBe(1);
+    140|       // Reading the fresh library facade must not invalidate the app'…
+ ❯ emitTap ../kernel/src/lib/entity-signal.ts:2055:24
+ ❯ Object.publish ../kernel/src/lib/entity-signal.ts:1526:9
+ ❯ ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1204:26
+ ❯ run ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1199:51
+ ❯ Object.publish ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1204:11
+ ❯ ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:700:33
+ ❯ run ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:694:55
+ ❯ Object.publish ../kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:700:9
+ ❯ installPreparedCompensation ../kernel/src/enhancers/transactions/transactions.ts:2704:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  13:25:09
+   Duration  841ms (transform 382ms, setup 136ms, import 444ms, tests 18ms, environment 163ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade -t "keeps ordinary selected observation granular" --maxWorkers=2" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    1.3s

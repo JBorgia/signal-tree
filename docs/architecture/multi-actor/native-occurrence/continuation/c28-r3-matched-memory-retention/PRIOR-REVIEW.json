@@ -1,0 +1,66 @@
+[
+  {
+    "sample": "baseline-128-r1",
+    "worker": 61447,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 61599176,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "baseline-2048-r1",
+    "worker": 63121,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 196933696,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "baseline-512-r1",
+    "worker": 62593,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 81496992,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "baseline-512-r2",
+    "worker": 63402,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 89945752,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "indexed-128-r1",
+    "worker": 62177,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 69758456,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "indexed-2048-r1",
+    "worker": 63206,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 179019208,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "indexed-512-r1",
+    "worker": 62357,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 82324880,
+    "sourceAndTwoCasesVerified": true
+  },
+  {
+    "sample": "indexed-512-r2",
+    "worker": 63309,
+    "limit": 4496293888,
+    "rows": 30,
+    "maxHeap": 81381256,
+    "sourceAndTwoCasesVerified": true
+  }
+]

@@ -1,0 +1,41 @@
+import { expect } from '@playwright/test';
+export async function browserChecks(page, url, evidence) {
+ const results=[];
+ const errors=[];page.on('pageerror',error=>errors.push(String(error)));
+ const button=name=>page.getByRole('button',{name,exact:true});
+ const field=name=>page.getByTestId(name);
+ const propose=async()=>{await button('Propose via AG-UI').click();await expect(field('phase')).toHaveText('draft');};
+ const review=async()=>{await button('Review').click();await expect(field('phase')).toHaveText('reviewed');};
+ const apply=async()=>button('Apply reviewed').click();
+ async function check(name,body){
+  const before=errors.length;
+  try{await page.goto(url);await expect(field('phase')).toHaveText('idle');await body();expect(errors.slice(before)).toEqual([]);results.push({name,outcome:'PASS'});}
+  catch(error){await page.screenshot({path:`${evidence}/${results.length}-failure.png`,fullPage:true}).catch(()=>{});results.push({name,outcome:'FAIL',error:String(error),pageErrors:errors.slice(before)});}
+ }
+ await check('AG-UI draft needs review/apply; server receipt and native settlement remain separate',async()=>{
+  await expect(button('Apply reviewed')).toBeDisabled();await propose();
+  await expect(field('route')).toHaveText('west');await expect(field('server-route')).toHaveText('north');await expect(field('commits')).toHaveText('0');await expect(field('actor')).toHaveText('unknown');await expect(field('pending')).not.toBeEmpty();await expect(button('Apply reviewed')).toBeDisabled();
+  await review();await expect(field('review')).toContainText('"capacity":0');await expect(field('commits')).toHaveText('0');await apply();
+  await expect(field('phase')).toHaveText('succeeded');await expect(field('server-route')).toHaveText('west');await expect(field('commits')).toHaveText('1');await expect(field('pending')).toBeEmpty();await expect(button('Apply reviewed')).toBeDisabled();
+  await page.screenshot({path:`${evidence}/accepted.png`,fullPage:true});
+ });
+ await check('rejecting a reviewed proposal preserves an independent note without server execution',async()=>{
+  await propose();await review();await page.getByLabel('Independent note').fill('keep human note');await button('Reject proposal').click();await expect(field('phase')).toHaveText('rejected');await expect(field('route')).toHaveText('north');await expect(field('note')).toHaveText('keep human note');await expect(field('server-route')).toHaveText('north');await expect(field('commits')).toHaveText('0');await expect(field('pending')).toBeEmpty();
+ });
+ await check('stale authoritative input version rejects ABA after review and preserves note',async()=>{
+  await propose();await review();await page.getByLabel('Independent note').fill('keep on conflict');await button('External capacity ABA').click();await expect(field('server-version')).toHaveText('2');await expect(field('capacity')).toHaveText('10');await expect(button('Apply reviewed')).toBeEnabled();await apply();await expect(field('phase')).toHaveText('failed');await expect(field('message')).toContainText('conflict');await expect(field('route')).toHaveText('north');await expect(field('note')).toHaveText('keep on conflict');await expect(field('commits')).toHaveText('2');await expect(field('pending')).toBeEmpty();
+ });
+ await check('definitive persistence error rolls back locally without a server commit',async()=>{
+  await propose();await review();await button('Fail next persistence').click();await apply();await expect(field('phase')).toHaveText('failed');await expect(field('message')).toContainText('persistence');await expect(field('route')).toHaveText('north');await expect(field('server-route')).toHaveText('north');await expect(field('commits')).toHaveText('0');await expect(field('pending')).toBeEmpty();
+ });
+ await check('lost acknowledgment retains authority; disposal refuses; retry commits once',async()=>{
+  await propose();await review();const pending=await field('pending').textContent();expect(pending).not.toBe('');await button('Lose next acknowledgment').click();await apply();await expect(field('phase')).toHaveText('uncertain');await expect(field('pending')).toHaveText(pending);await expect(field('commits')).toHaveText('1');await expect(field('server-route')).toHaveText('west');await button('Dispose session').click();await expect(field('phase')).toHaveText('uncertain');await expect(field('message')).toContainText('Resolve');await expect(field('destroyed')).toHaveText('Tree cleanup callbacks: 0');await button('Retry receipt').click();await expect(field('phase')).toHaveText('succeeded');await expect(field('commits')).toHaveText('1');await expect(field('pending')).toBeEmpty();
+ });
+ await check('disposing an unsent draft rejects it and destroys tree exactly once',async()=>{
+  await propose();await button('Dispose session').click();await expect(field('phase')).toHaveText('disposed');await expect(field('pending')).toBeEmpty();await expect(field('destroyed')).toHaveText('Tree cleanup callbacks: 1');await expect(field('commits')).toHaveText('0');await expect(button('Propose via AG-UI')).toBeDisabled();await expect(button('Dispose session')).toBeDisabled();await expect(page.getByLabel('Independent note')).toHaveCount(0);
+ });
+ await check('settled session disposes without erasing accepted server state',async()=>{
+  await propose();await review();await apply();await expect(field('phase')).toHaveText('succeeded');await button('Dispose session').click();await expect(field('phase')).toHaveText('disposed');await expect(field('destroyed')).toHaveText('Tree cleanup callbacks: 1');await expect(field('server-route')).toHaveText('west');await expect(field('commits')).toHaveText('1');
+ });
+ return {results,pageErrors:errors};
+}

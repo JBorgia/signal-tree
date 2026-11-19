@@ -1,0 +1,21 @@
+{
+  "id": "projection-1000-selected-sample3",
+  "ordinal": 33,
+  "profile": "projection",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample3",
+  "exit": 0,
+  "pid": 70262,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.8387609580531716,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1114112,
+  "minimumObservedHostFreePercentage": 39.0,
+  "attempts": 1
+}

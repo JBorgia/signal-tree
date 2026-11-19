@@ -1,0 +1,23 @@
+--- a/packages/kernel/src/lib/core-independent-review.spec.ts
++++ b/packages/kernel/src/lib/core-independent-review.spec.ts
+@@ -1,5 +1,5 @@
+ import { expect, it } from 'vitest';
+-import { entityMap, link, signalTree, transactions } from '../index';
++import { entityMap, link, signalTree, transactions, type TreeNode } from '../index';
+ import { getPathNotifier } from './path-notifier';
+ 
+ type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'}|{kind:'dependent';owners:readonly object[]},work:()=>unknown):{read():unknown}};
+@@ -35,8 +35,11 @@
+  const initial={branch:{rows:entityMap<{id:string;x:number},string>()},other:0};
+  const tree=signalTree(initial as {branch?:typeof initial.branch;other:number},{enhancers:[transactions()]});
+  const foreign=signalTree({x:0},{enhancers:[transactions()]});
+- const rows=tree.$.branch!.rows;rows.addOne({id:'a',x:0});await flush();
+- const sent:unknown[]=[];const c=link(tree.$,{set:v=>{sent.push(v);}}) as Experimental;
++ // The supplied initial branch exists here; later omission is the behavior under test.
++ const rows=(tree.$.branch as typeof tree.$.branch & TreeNode<typeof initial.branch>).rows;rows.addOne({id:'a',x:0});await flush();
++ // Internal runtime regression: explicit snapshot-reader shape does not expand
++ // public Link admission for collection-containing construction roots.
++ const sent:unknown[]=[];const c=link<() => ReturnType<typeof tree.$>>(tree.$,{set:v=>{sent.push(v);}}) as Experimental;
+  const q=foreign.transact(()=>foreign.$.x(7));
+  try{
+   c.declare({kind:'dependent',owners:[q]},()=>rows.updateOne('a',{x:7}));await flush();expect(sent).toEqual([]);

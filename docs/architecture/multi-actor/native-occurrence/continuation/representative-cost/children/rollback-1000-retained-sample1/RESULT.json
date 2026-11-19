@@ -1,0 +1,21 @@
+{
+  "id": "rollback-1000-retained-sample1",
+  "ordinal": 54,
+  "profile": "rollback",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample1",
+  "exit": 0,
+  "pid": 70808,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.7398271659621969,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1048576,
+  "minimumObservedHostFreePercentage": 41.0,
+  "attempts": 1
+}

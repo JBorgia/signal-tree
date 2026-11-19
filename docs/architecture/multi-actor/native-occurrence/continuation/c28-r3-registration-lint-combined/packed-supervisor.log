@@ -1,0 +1,1042 @@
+[
+  {
+    "id": "@signal-tree/kernel@16.0.0-dev",
+    "name": "@signal-tree/kernel",
+    "version": "16.0.0-dev",
+    "size": 265320,
+    "unpackedSize": 1073679,
+    "shasum": "daa144b7c280c8db188888531f638da6b5f3ee5c",
+    "integrity": "sha512-kJiNxtBzNa5ZyxdMDQ6Ox49DyisGc33w2xOPTePKoJ8JxgltHN9KjdXMH1JahvxWvjl9TuVoAEliRD8eMGViaA==",
+    "filename": "signal-tree-kernel-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 25007,
+        "mode": 420
+      },
+      {
+        "path": "dist/_adapter-Cp5WVkcj.d.ts",
+        "size": 65866,
+        "mode": 420
+      },
+      {
+        "path": "dist/_position-registry-D8dCXLAS.d.ts",
+        "size": 1205,
+        "mode": 420
+      },
+      {
+        "path": "dist/adapter.d.ts",
+        "size": 697,
+        "mode": 420
+      },
+      {
+        "path": "dist/adapter.js",
+        "size": 1864,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/batching/batching.js",
+        "size": 6083,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/devtools/devtools-impl.js",
+        "size": 30363,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/devtools/devtools.js",
+        "size": 538,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/index.js",
+        "size": 2177,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/restoration/order-boundary-evidence.js",
+        "size": 5702,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/restoration/restoration.js",
+        "size": 89431,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/transactions/occupancy-composition.js",
+        "size": 1222,
+        "mode": 420
+      },
+      {
+        "path": "dist/enhancers/transactions/transactions.js",
+        "size": 96769,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.d.ts",
+        "size": 35822,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 802,
+        "mode": 420
+      },
+      {
+        "path": "dist/internals.d.ts",
+        "size": 31782,
+        "mode": 420
+      },
+      {
+        "path": "dist/internals.js",
+        "size": 2563,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/constants.js",
+        "size": 581,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/enhancer-types.js",
+        "size": 78,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/entity-signal.js",
+        "size": 107213,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/experimental-publication/entity.js",
+        "size": 16105,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/experimental-publication/lifecycle.js",
+        "size": 26809,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/experimental-publication/private.js",
+        "size": 43459,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/experimental-publication/projection.js",
+        "size": 712,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/experimental-publication/recipient-occurrence.js",
+        "size": 5483,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/external.js",
+        "size": 819,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/canonical-snapshot.js",
+        "size": 220,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/applied-turn-projection.js",
+        "size": 5631,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/ordinary-realization.js",
+        "size": 1428,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/pending-rollback.js",
+        "size": 9093,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/post-application-failure.js",
+        "size": 852,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/realization-context.js",
+        "size": 2386,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/scoped-value-addressing.js",
+        "size": 222,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/target-transition.js",
+        "size": 21998,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/transaction-lifecycle.js",
+        "size": 1922,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/transient-rows.js",
+        "size": 1448,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/tree-realization-adapter.js",
+        "size": 65981,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/causal-runtime/turn-store.js",
+        "size": 7142,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/cell-identity.js",
+        "size": 301,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/commit-consequence.js",
+        "size": 3490,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/confirmed-turn-view.js",
+        "size": 386,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/construction-allocation.js",
+        "size": 770,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/construction-branch.js",
+        "size": 406,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-egress-projection.js",
+        "size": 10500,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-membership-inventory.js",
+        "size": 5330,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-membership-source.js",
+        "size": 825,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-membership-view.js",
+        "size": 4566,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-projection-seed.js",
+        "size": 805,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-publication.js",
+        "size": 9828,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/entity-value-transition.js",
+        "size": 1824,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/error-reporter.js",
+        "size": 2229,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/exposed-publication.js",
+        "size": 452,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/intercept-leaf-signals.js",
+        "size": 6832,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/intrinsic-mutation.js",
+        "size": 8061,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/link-state-source.js",
+        "size": 559,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/link-state-view.js",
+        "size": 2458,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/location-runtime.js",
+        "size": 14469,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/materialize-markers.js",
+        "size": 10274,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/member-membership.js",
+        "size": 14744,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/merge-derived.js",
+        "size": 1607,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/mutation-capture-runtime.js",
+        "size": 3025,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/native-field-selection.js",
+        "size": 551,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/native-location-realization.js",
+        "size": 5486,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/native-occurrence.js",
+        "size": 3834,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/native-scalar-selection.js",
+        "size": 702,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/native-tree-scalar-leaf-runtime.js",
+        "size": 8967,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/node-shape.js",
+        "size": 620,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/observation-adapter.js",
+        "size": 211,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/observation-substrate.js",
+        "size": 2862,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/ordinary-entity-entries.js",
+        "size": 544,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/owned-metadata.js",
+        "size": 979,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/owned-mutation.js",
+        "size": 3555,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/owner-invalidation-port.js",
+        "size": 428,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/owner-invalidation.js",
+        "size": 2428,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/path-observation-port.js",
+        "size": 935,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/physical-commit-clock.js",
+        "size": 727,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/physical-rows.js",
+        "size": 164,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/plain-branch-membership.js",
+        "size": 22385,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/position-registry.js",
+        "size": 2236,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/production-substrate-stats.prod.js",
+        "size": 98,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/publication-preparation.js",
+        "size": 507,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/restoration-eligibility.js",
+        "size": 1220,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/restoration-reader.js",
+        "size": 2597,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/restoration-source.js",
+        "size": 468,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/root-source.js",
+        "size": 495,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/runtime-tree-plan.js",
+        "size": 310,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/scalar-admission-metadata.js",
+        "size": 210,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/scalar-publication-coverage.js",
+        "size": 1537,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/scalar-responsibility-attachment.js",
+        "size": 1338,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/selected-entity-disposition.js",
+        "size": 466,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/selected-write-operation.js",
+        "size": 1348,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/snapshot-authority.js",
+        "size": 3192,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/snapshot-installation.js",
+        "size": 863,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/source-mutation.js",
+        "size": 1875,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/state-location-view.js",
+        "size": 2562,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/subject-reclamation-sink.js",
+        "size": 1348,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/subject-restoration-claims.js",
+        "size": 2317,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/tooling-tree.js",
+        "size": 101,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/transaction-lifecycle-source.js",
+        "size": 264,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/transaction-lifecycle-view.js",
+        "size": 2927,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/tree-capabilities.js",
+        "size": 2167,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/tree-scalar-leaf-runtime.js",
+        "size": 4815,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/tree-scalar-slot-port.js",
+        "size": 529,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/tree-scalar-slot-runtime.js",
+        "size": 9027,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/utilities/append-all.js",
+        "size": 105,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/utilities/deep-clone.js",
+        "size": 1907,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/utilities/deep-equal.js",
+        "size": 1973,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/utilities/is-built-in-object.js",
+        "size": 1433,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/visit-tree.js",
+        "size": 645,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/write-observation-scope.js",
+        "size": 1516,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/internals/write-observation.js",
+        "size": 528,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/leaf.js",
+        "size": 521,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/link.js",
+        "size": 18847,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/markers/entity-map.js",
+        "size": 3554,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/path-notifier.js",
+        "size": 13239,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/entity-handle-resolution.js",
+        "size": 479,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/entity-mutation-frame.js",
+        "size": 7627,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/entity-ordinary-topology.js",
+        "size": 2548,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/entity-placement-stage.js",
+        "size": 2785,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/entity-value-store.js",
+        "size": 4016,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/order-restores-for-placement.js",
+        "size": 1929,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/ordinary-key-evidence.js",
+        "size": 349,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/ordinary-restoration-placement.js",
+        "size": 1311,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/prepare-entity-target.js",
+        "size": 6117,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/prepare-structural-target.js",
+        "size": 1969,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/prepared-placement-visibility.js",
+        "size": 2517,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/physical/structural-store.js",
+        "size": 10622,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/readonly.js",
+        "size": 69,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/signal-tree.js",
+        "size": 33556,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/types.js",
+        "size": 345,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/undoable.js",
+        "size": 171,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/utils.js",
+        "size": 5821,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/write-context.js",
+        "size": 251,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/write-participation.js",
+        "size": 270,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 1317,
+        "mode": 420
+      }
+    ],
+    "entryCount": 138,
+    "bundled": []
+  }
+]
+[
+  {
+    "id": "@signal-tree/angular@16.0.0-dev",
+    "name": "@signal-tree/angular",
+    "version": "16.0.0-dev",
+    "size": 17183,
+    "unpackedSize": 47608,
+    "shasum": "63fba4e628000bfd60339bfd56bf348a807dc63b",
+    "integrity": "sha512-n2Kx3ernZF4kaZmx4AyFnl1ohWQrP6yRy43b3aKmhNaQ+4D2AxMv4sikRZSmVOxAXicZyWAQpmkR0r9XyNvGZw==",
+    "filename": "signal-tree-angular-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 7233,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 671,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/construction-input.js",
+        "size": 1015,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/define-store.js",
+        "size": 718,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/observation-adapter.js",
+        "size": 1575,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/to-writable-signal.js",
+        "size": 1059,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 942,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 1631,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/carrier.d.ts",
+        "size": 435,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/construction-input.d.ts",
+        "size": 517,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/define-store.d.ts",
+        "size": 4720,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/observation-adapter.d.ts",
+        "size": 204,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/to-writable-signal.d.ts",
+        "size": 2957,
+        "mode": 420
+      }
+    ],
+    "entryCount": 16,
+    "bundled": []
+  }
+]
+[
+  {
+    "id": "@signal-tree/react@16.0.0-dev",
+    "name": "@signal-tree/react",
+    "version": "16.0.0-dev",
+    "size": 11907,
+    "unpackedSize": 31724,
+    "shasum": "77de2780ee23ba1cbdc3fb2010fc32ad49b4d27e",
+    "integrity": "sha512-btfk0uwPDCiLmlGRD1Kr/U2+ZDZyQjzupDPVgtDYYXQ1CKXotwIyNruWsBoWnqrDR9FD90AnjIX2oE1dNu2Kog==",
+    "filename": "signal-tree-react-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 5278,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 91,
+        "mode": 420
+      },
+      {
+        "path": "dist/use-signal-tree.js",
+        "size": 397,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 917,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 473,
+        "mode": 420
+      },
+      {
+        "path": "src/use-signal-tree.d.ts",
+        "size": 637,
+        "mode": 420
+      }
+    ],
+    "entryCount": 9,
+    "bundled": []
+  }
+]
+[
+  {
+    "id": "@signal-tree/vue@16.0.0-dev",
+    "name": "@signal-tree/vue",
+    "version": "16.0.0-dev",
+    "size": 13034,
+    "unpackedSize": 35154,
+    "shasum": "b84561a34ad67b05717d559a0ff89243570193ee",
+    "integrity": "sha512-S+aFSG3ZKHajD4yc/ROgMVQ6nsvgqSVT475bgH08MlpiAbaxqo4++zYkwaDeklHnEbepolSFK2ymxxI+gc3Qcg==",
+    "filename": "signal-tree-vue-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 3523,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 493,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/construction-input.js",
+        "size": 1027,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/vue-observation.js",
+        "size": 2723,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 897,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 1570,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/carrier.d.ts",
+        "size": 346,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/construction-input.d.ts",
+        "size": 497,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/vue-observation.d.ts",
+        "size": 147,
+        "mode": 420
+      }
+    ],
+    "entryCount": 12,
+    "bundled": []
+  }
+]
+[
+  {
+    "id": "@signal-tree/solid@16.0.0-dev",
+    "name": "@signal-tree/solid",
+    "version": "16.0.0-dev",
+    "size": 13039,
+    "unpackedSize": 34911,
+    "shasum": "d77acbe36a13937ccc4c00ef1676a6cfafaabcc4",
+    "integrity": "sha512-h3SYs5tQMamAe0vcKp23bKkN4aJvWeK78/tVZmnYazOkMRN1GBYOtzqU2596KRcYi+kZVkt9+YrkFM1r5kolWg==",
+    "filename": "signal-tree-solid-16.0.0-dev.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 11046,
+        "mode": 420
+      },
+      {
+        "path": "NOTICE",
+        "size": 534,
+        "mode": 420
+      },
+      {
+        "path": "README.md",
+        "size": 3592,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 632,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/construction-input.js",
+        "size": 724,
+        "mode": 420
+      },
+      {
+        "path": "dist/lib/solid-observation.js",
+        "size": 1659,
+        "mode": 420
+      },
+      {
+        "path": "llms.txt",
+        "size": 12351,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 908,
+        "mode": 420
+      },
+      {
+        "path": "src/index.d.ts",
+        "size": 1608,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/carrier.d.ts",
+        "size": 585,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/construction-input.d.ts",
+        "size": 514,
+        "mode": 420
+      },
+      {
+        "path": "src/lib/solid-observation.d.ts",
+        "size": 758,
+        "mode": 420
+      }
+    ],
+    "entryCount": 12,
+    "bundled": []
+  }
+]
+
+added 37 packages in 2s
+{"name":"field independent useful9","route":"field","sent":[9],"phase":"complete","receiptAtReturn":{"state":"eligible","basis":"declared"},"receiptBeforeConfirm":{"state":"started","basis":"declared"},"sentBeforeConfirm":[9],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"row independent useful9","route":"row","sent":[{"id":"r","x":9}],"phase":"complete","receiptAtReturn":{"state":"eligible","basis":"declared"},"receiptBeforeConfirm":{"state":"started","basis":"declared"},"sentBeforeConfirm":[{"id":"r","x":9}],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"collection independent useful9","route":"collection","sent":[[{"id":"r","x":9}]],"phase":"complete","receiptAtReturn":{"state":"validating"},"receiptBeforeConfirm":{"state":"started","basis":"declared"},"sentBeforeConfirm":[[{"id":"r","x":9}]],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"field independent foreign window","route":"field","sent":[9],"phase":"complete","receiptAtReturn":{"state":"eligible","basis":"declared"},"receiptBeforeConfirm":{"state":"started","basis":"declared"},"sentBeforeConfirm":[9],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"collection independent foreign window","route":"collection","sent":[[{"id":"r","x":9}]],"phase":"complete","receiptAtReturn":{"state":"validating"},"receiptBeforeConfirm":{"state":"started","basis":"declared"},"sentBeforeConfirm":[[{"id":"r","x":9}]],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"field dependent foreign input","route":"field","sent":[9],"phase":"complete","receiptAtReturn":{"state":"held","reason":"pending-dependency"},"receiptBeforeConfirm":{"state":"held","reason":"pending-dependency"},"sentBeforeConfirm":[],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"row dependent foreign input","route":"row","sent":[{"id":"r","x":9}],"phase":"complete","receiptAtReturn":{"state":"held","reason":"pending-dependency"},"receiptBeforeConfirm":{"state":"held","reason":"pending-dependency"},"sentBeforeConfirm":[],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"name":"collection dependent foreign input","route":"collection","sent":[[{"id":"r","x":9}]],"phase":"complete","receiptAtReturn":{"state":"validating"},"receiptBeforeConfirm":{"state":"held","reason":"pending-dependency"},"sentBeforeConfirm":[],"receiptAfterConfirm":{"state":"started","basis":"declared"},"settled":true,"pass":true}
+{"summary":true,"passed":8,"total":8}
+{"name":"pre-Link pending field confirm","sent":[9],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending field rollback","sent":[0],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending collection confirm","sent":[[{"id":"r","x":9}]],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending collection rollback","sent":[[{"id":"r","x":0}]],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"late collection multiple Links confirm","sent":[[{"id":"r","x":7}]],"second":[{"id":"r","x":7}],"third":[7],"phase":"complete","pass":true}
+{"name":"late collection multiple Links rollback","sent":[[{"id":"r","x":0}]],"second":[{"id":"r","x":0}],"third":[0],"phase":"complete","pass":true}
+{"passed":6,"total":6}
+{"name":"field changed receipt / independent","pass":true}
+{"name":"field changed receipt / dependent","pass":true}
+{"name":"row changed receipt / independent","pass":true}
+{"name":"row changed receipt / dependent","pass":true}
+{"name":"collection changed receipt / independent","pass":true}
+{"name":"collection changed receipt / dependent","pass":true}
+{"passed":6,"total":6}
+{"scope":"separate production no-Link entity transactions","confirmed":7,"rolledBack":7,"passed":true}
+five facade imports share Link/error; private factory absent from public barrel

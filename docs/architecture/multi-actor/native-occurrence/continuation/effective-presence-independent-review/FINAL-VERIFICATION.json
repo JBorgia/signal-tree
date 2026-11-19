@@ -1,0 +1,40 @@
+{
+  "author_manifest_sha256": "47e05e6216bab9fd186dfbb66b656f4e33dc1f9d98a81a1ad096ee61b12181f9",
+  "candidate_files_verified_unchanged": 3050,
+  "C11_files_verified_unchanged": 3045,
+  "author_preserved_files_hash_verified": 10,
+  "own_runs": {
+    "independent-fixed": {
+      "exit": 0,
+      "elapsedSeconds": 23.217002040939406,
+      "source_unchanged": true
+    },
+    "angular": {
+      "exit": 0,
+      "elapsedSeconds": 26.92260350007564,
+      "source_unchanged": true
+    },
+    "source-types": {
+      "exit": 0,
+      "elapsedSeconds": 16.652533457963727,
+      "source_unchanged": true
+    },
+    "spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 26.326649124966934,
+      "source_unchanged": true
+    },
+    "kernel": {
+      "exit": 1,
+      "elapsedSeconds": 14.342063499963842,
+      "source_unchanged": true
+    }
+  },
+  "baseline_run": {
+    "exit": 1,
+    "elapsedSeconds": 17.497614459018223,
+    "source_unchanged": true
+  },
+  "runtime_edits": [],
+  "own_added_test_sha256": "3e3234d6f9d2b131e4d50036d9f1d655d2eb9b5039b3212c4f114f531b4d6247"
+}

@@ -1,0 +1,1 @@
+Reviewer AST fixture first attempt failed before evaluating controller predicates: copy.deepcopy(math module) raised TypeError: cannot pickle module object. Fixed only reviewer fixture to inject math after deep-copying synthetic data. No controller import or measurement invocation.

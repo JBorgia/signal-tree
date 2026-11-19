@@ -1,0 +1,202 @@
+{
+  "work": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId",
+  "freshness": "prebuilt artifacts; caller owns build provenance",
+  "runs": [
+    {
+      "label": "npm-version",
+      "argv": [
+        "npm",
+        "--version"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "verify-artifacts",
+      "argv": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "scripts/prepare-publish-artifacts.mjs",
+        "--verify-only"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "pack-clean-tarballs-kernel",
+      "argv": [
+        "npm",
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/dist/packages/kernel",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "extract-clean-tarballs-kernel",
+      "argv": [
+        "tar",
+        "-xzf",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+        "-C",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/kernel"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "pack-clean-tarballs-angular",
+      "argv": [
+        "npm",
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/dist/packages/angular",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "extract-clean-tarballs-angular",
+      "argv": [
+        "tar",
+        "-xzf",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/signal-tree-angular-16.0.0-dev.tgz",
+        "-C",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/angular"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "pack-clean-tarballs-react",
+      "argv": [
+        "npm",
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/dist/packages/react",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "extract-clean-tarballs-react",
+      "argv": [
+        "tar",
+        "-xzf",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/signal-tree-react-16.0.0-dev.tgz",
+        "-C",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/react"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "pack-clean-tarballs-vue",
+      "argv": [
+        "npm",
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/dist/packages/vue",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "extract-clean-tarballs-vue",
+      "argv": [
+        "tar",
+        "-xzf",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/signal-tree-vue-16.0.0-dev.tgz",
+        "-C",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/vue"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "pack-clean-tarballs-solid",
+      "argv": [
+        "npm",
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/dist/packages/solid",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "extract-clean-tarballs-solid",
+      "argv": [
+        "tar",
+        "-xzf",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/signal-tree-solid-16.0.0-dev.tgz",
+        "-C",
+        "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/clean-tarballs/solid"
+      ],
+      "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "status": 0,
+      "signal": null
+    },
+    {
+      "label": "baseline-ci",
+      "argv": [
+        "npm",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "cwd": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/baseline",
+      "status": 1,
+      "signal": null
+    }
+  ],
+  "arms": [],
+  "before": {
+    "integrity": "sha256-f349d92ace4237eedf6822b515ceda8273acf3a3f0fbdaa6bb7df9d4fc496e1f",
+    "inputs": {
+      "packages/kernel/tests/entity-registration/cases.mjs": "6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71",
+      "packages/kernel/tests/entity-registration/lifecycle.mjs": "e9528a1b3d53c4d14cba76a468227eafe77ad04a31c379e466e0ba3a41f3ee8b",
+      "packages/kernel/tests/entity-registration/receipt-cases.ts": "b8ff2181f2a9c13d510eccd9fdb949f3875924425179c1b4ff1db3547ae3f99a",
+      "tools/experiments/entity-registration/consumer.mjs": "a004e0d462a1ad66a101ce8831a91c94310e62d898a0e2729449a3c644bbd686",
+      "tools/experiments/entity-registration/lifecycle-consumer.mjs": "ef7fb6c77428c46b7b0db6273c5f1cf545e96a67fa22a41df487e146bc432820",
+      "tools/experiments/entity-registration/receipt-consumer.mjs": "9ad61a067e03a47c7b682bcce781409c4c9ea84ff84fedd6ed693c45336d9ae2",
+      "tools/experiments/entity-registration/no-link.mjs": "45164b36d733020355e3e568fe24ca1790a50a12dd55607e3ada817f42ade0a7",
+      "tools/experiments/entity-registration/facade-imports.mjs": "801490e414f258dbb5d8a8dce42cc78640551d266395638f991deb518a332937",
+      "tools/experiments/entity-registration/build-consumers.mjs": "55fd3e67212a214cbb57ac358f7957dec85b178ff05bc7285cfcc6c1b769b6b8",
+      "tools/fixtures/entity-registration-consumer/package.json": "9c855d591ba371aa59681dd6de40786621d4cfdc2c8f625044b5d3f3b522c9cc",
+      "tools/fixtures/entity-registration-consumer/package-lock.json": "c5fdab1fe0a645eb4ea89cf9630d7827aee5489f9fe91faf963a02425364a55f",
+      "tools/verify-entity-registration-artifacts.mjs": "f1366eefd1906d898fc1bf0105bfe08ac4c11cc6061d5577fb27e325b726410b",
+      "tools/verify-gates.mjs": "c5ce068a0c54d8b3353a6451bffcb5346d885639f68f58ce746dc8a35fb02ef9",
+      "pnpm-lock.yaml": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+      "package.json": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+      ".nvmrc": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d"
+    }
+  },
+  "node": "v24.15.0",
+  "npm": "11.12.1",
+  "passed": false,
+  "error": "Error: baseline-ci failed during setup/control (see 013-baseline-ci)\n    at command (file:///private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/tools/verify-entity-registration-artifacts.mjs:318:13)\n    at replay (file:///private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/tools/verify-entity-registration-artifacts.mjs:422:3)\n    at file:///private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/tools/verify-entity-registration-artifacts.mjs:610:3\n    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)\n    at async node:internal/modules/esm/loader:639:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)",
+  "inputsUnchanged": true
+}

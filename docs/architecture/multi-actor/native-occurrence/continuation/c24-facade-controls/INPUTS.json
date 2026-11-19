@@ -1,0 +1,23 @@
+{
+  "baseManifestSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "files": {
+    "/private/tmp/st-native-combined-c23/candidate/packages/angular/project.json": "7172e10b8b948315898255fb5f8b598699813ce142fda78bb08e9906f1d3f07d",
+    "/private/tmp/st-native-combined-c23/candidate/packages/angular/tsconfig.spec.json": "e6cc23ebf3ba9936649ce91c6dcd1d3bdc1b73f650d6c5d3f959fe54be6392ce",
+    "/private/tmp/st-native-combined-c23/candidate/packages/angular/src/index.ts": "f9ac2cf8cfbcd92dcdce4e7cd356257ae4c434b786d5c0dc9754af21c2736c2a",
+    "/private/tmp/st-native-combined-c23/candidate/packages/vue/project.json": "0cf439251f5826306e96e0e18ff8ca90bf82796c4275d1b628470c08052eadff",
+    "/private/tmp/st-native-combined-c23/candidate/packages/vue/tsconfig.spec.json": "5a44526b3bcf129f7eb8f8e7490a8307ec0e1cb460db35c41da45b778914a955",
+    "/private/tmp/st-native-combined-c23/candidate/packages/vue/src/index.ts": "8181620ec1b332c43cc6af5389dfe7c8bb92c039916fbc2e8965efe694cf3b44",
+    "/private/tmp/st-native-combined-c23/candidate/packages/solid/project.json": "d0277610993120bc0f5490830079821b242d57dc726a9b31919e8c12e6d43dac",
+    "/private/tmp/st-native-combined-c23/candidate/packages/solid/tsconfig.spec.json": "5a44526b3bcf129f7eb8f8e7490a8307ec0e1cb460db35c41da45b778914a955",
+    "/private/tmp/st-native-combined-c23/candidate/packages/solid/src/index.ts": "5d1f65a551281f437154f764f0f9344b59ab2a6653fee469e677b4e0e1783882",
+    "/private/tmp/st-native-combined-c23/candidate/packages/react/project.json": "b882d1918fd2b5510fa4b8916be32630cd69e4bfcf5b9fcde893023aeb850e36",
+    "/private/tmp/st-native-combined-c23/candidate/packages/react/tsconfig.spec.json": "693101e79315f689ffa107dc0a4550b2b3993a66c15eaab4b4718209a82f75ee",
+    "/private/tmp/st-native-combined-c23/candidate/packages/react/src/index.ts": "060b5beb7c52888e2450a0d07afae589a65c5201cfcc99dcc1629b68f1f15448",
+    "/private/tmp/st-native-combined-c23/candidate/packages/vue/src/lib/parent-freshness-counterparts.spec.ts": "8cdac84212260f1dea2964c75b96927b70476248dd62a858a5ab7e762767f073",
+    "/private/tmp/st-native-combined-c23/candidate/packages/solid/src/lib/parent-freshness-counterparts.spec.ts": "9be14e49e2849f084e61384034d5919695b2c8c5478204bcc4dd44cee454f126",
+    "/private/tmp/st-native-combined-c23/candidate/packages/react/src/parent-freshness-counterparts.spec.tsx": "2431b05bc5dfb20caf5dc9fc070e372961fc52d3bb6231172fd1aa26c8e87596",
+    "/private/tmp/st-native-combined-c23/candidate/packages/angular/src/lib/scalar-frame-publication.spec.ts": "ba2248b29c58917b874efe4878784253d61fb07c844b808c8394aac98ddf860f",
+    "/private/tmp/st-native-combined-c23/candidate/packages/kernel/src/enhancers/transactions/transactions.types.ts": "54da27b77edd640d19bc134a53966b999db869efc79fd65995f35e0e28d3de14",
+    "/private/tmp/st-c23-row-react-declaration-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx": "cd36a24864157eb9de9c805a45d46dd5b5f1ed985b0a9df58e1b3adece91b461"
+  }
+}

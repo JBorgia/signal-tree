@@ -1,0 +1,87 @@
+
+> nx run angular:test selected-callback-facade -t realizes fresh tap reads --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade -t "realizes fresh tap reads" --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:69788) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69810) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/angular
+
+(node:69819) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/selected-callback-facade.spec.ts (6 tests | 1 failed | 5 skipped) 16ms
+   × realizes fresh tap reads and preserves later callback writes 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/selected-callback-facade.spec.ts > realizes fresh tap reads and preserves later callback writes
+AssertionError: expected { id: 'A', active: 1, …(8) } to deeply equal { id: 'C', active: 9, …(8) }
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  {
+-   "active": 9,
++   "active": 1,
+    "all": [
+      {
+        "id": "A",
+        "n": 1,
+      },
+@@ -12,11 +12,11 @@
+    ],
+    "count": 2,
+    "empty": false,
+    "found": 1,
+    "hasA": true,
+-   "id": "C",
++   "id": "A",
+    "ids": [
+      "A",
+      "C",
+    ],
+    "map": [
+
+ ❯ src/lib/selected-callback-facade.spec.ts:102:24
+    100|       },
+    101|     ]);
+    102|     expect(snapshot()).toEqual(frames[1]);
+       |                        ^
+    103|   } finally {
+    104|     stop();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  13:25:14
+   Duration  829ms (transform 375ms, setup 138ms, import 438ms, tests 16ms, environment 161ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular selected-callback-facade -t "realizes fresh tap reads" --maxWorkers=2" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    1.3s

@@ -1,0 +1,21 @@
+{
+  "parentManifest": "b226c1d39c85e49265446b2bf83d3e5bdb64c2dae1ade93a466baceac1641e0a",
+  "patches": [
+    {
+      "path": "/private/tmp/st-structural-admission-successor/source.patch",
+      "sha256": "36b8479649d0ecd38ecbb2d1e5b41cd77a1fbbd501817c9dee11624458ff1c76"
+    },
+    {
+      "path": "/private/tmp/st-structural-admission-successor/tests.patch",
+      "sha256": "2413452bd4a4769f4e2c9a48e6e9db093cba619baa1b1010df7962c42584bceb"
+    },
+    {
+      "path": "/private/tmp/st-structural-completeness-successor/source.patch",
+      "sha256": "6d89cb7159fd0aea9fe4a3ca44e717cfb689aa1a299756ccc343dba7468e0996"
+    },
+    {
+      "path": "/private/tmp/st-structural-completeness-successor/tests.patch",
+      "sha256": "3aeab67c8a1611662ea1b5bccee4160bc888b42861d1d75b19e50115d75001fc"
+    }
+  ]
+}

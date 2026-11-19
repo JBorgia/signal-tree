@@ -1,0 +1,12 @@
+{
+  "baseManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "candidateManifestSha256": "10c10112f0f3d4c2ef0397f482e367427b904276427ad98fbc82541a5364dae2",
+  "patchSha256": "a6f43d31fbdc3c51b7cc6549487256e6aad3daa691aa057e1347225f30961c63",
+  "changed": [
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts"
+  ],
+  "assertionLinesUnchanged": true,
+  "runtimeChanged": false,
+  "frozen": true
+}

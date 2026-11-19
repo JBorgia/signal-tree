@@ -1,0 +1,196 @@
+[
+  {
+    "physical": [
+      {
+        "subject": 1,
+        "before": {
+          "id": "a",
+          "x": 7,
+          "y": 11,
+          "z": 99
+        },
+        "after": {
+          "id": "a",
+          "x": 7,
+          "y": 0,
+          "z": 99
+        },
+        "fields": [
+          "y"
+        ]
+      }
+    ],
+    "ordinary": [
+      {
+        "subject": 1,
+        "before": {
+          "id": "a",
+          "x": 7,
+          "y": 11,
+          "z": 7
+        },
+        "after": {
+          "id": "a",
+          "x": 7,
+          "y": 0,
+          "z": 7
+        },
+        "path": "rows.a",
+        "restoredFields": {},
+        "fields": [
+          "y"
+        ]
+      }
+    ],
+    "steps": [
+      {
+        "ordinal": 0,
+        "authoredFootprint": {
+          "kind": "fields",
+          "fields": [
+            "y"
+          ]
+        },
+        "ordinary": [
+          {
+            "subject": 1,
+            "before": {
+              "id": "a",
+              "x": 7,
+              "y": 11,
+              "z": 7
+            },
+            "after": {
+              "id": "a",
+              "x": 7,
+              "y": 0,
+              "z": 7
+            },
+            "path": "rows.a",
+            "restoredFields": {},
+            "fields": [
+              "y"
+            ]
+          }
+        ],
+        "physical": [
+          {
+            "subject": 1,
+            "before": {
+              "id": "a",
+              "x": 7,
+              "y": 11,
+              "z": 99
+            },
+            "after": {
+              "id": "a",
+              "x": 7,
+              "y": 0,
+              "z": 99
+            },
+            "fields": [
+              "y"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "physical": [
+      {
+        "subject": 1,
+        "before": {
+          "id": "a",
+          "x": 7,
+          "y": 0,
+          "z": 99
+        },
+        "after": {
+          "id": "a",
+          "x": 0,
+          "y": 0,
+          "z": 99
+        },
+        "fields": [
+          "x"
+        ]
+      }
+    ],
+    "ordinary": [
+      {
+        "subject": 1,
+        "before": {
+          "id": "a",
+          "x": 7,
+          "y": 0,
+          "z": 7
+        },
+        "after": {
+          "id": "a",
+          "x": 0,
+          "y": 0,
+          "z": 7
+        },
+        "path": "rows.a",
+        "restoredFields": {},
+        "fields": [
+          "x"
+        ]
+      }
+    ],
+    "steps": [
+      {
+        "ordinal": 0,
+        "authoredFootprint": {
+          "kind": "fields",
+          "fields": [
+            "x"
+          ]
+        },
+        "ordinary": [
+          {
+            "subject": 1,
+            "before": {
+              "id": "a",
+              "x": 7,
+              "y": 0,
+              "z": 7
+            },
+            "after": {
+              "id": "a",
+              "x": 0,
+              "y": 0,
+              "z": 7
+            },
+            "path": "rows.a",
+            "restoredFields": {},
+            "fields": [
+              "x"
+            ]
+          }
+        ],
+        "physical": [
+          {
+            "subject": 1,
+            "before": {
+              "id": "a",
+              "x": 7,
+              "y": 0,
+              "z": 99
+            },
+            "after": {
+              "id": "a",
+              "x": 0,
+              "y": 0,
+              "z": 99
+            },
+            "fields": [
+              "x"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]

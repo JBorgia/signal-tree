@@ -1,0 +1,1 @@
+{"kind":"case-start","at":"2026-11-02T19:33:28.837Z","file":"/private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts","name":"entity batches larger than the argument limit > setAll, replace and clear with membership observed"}

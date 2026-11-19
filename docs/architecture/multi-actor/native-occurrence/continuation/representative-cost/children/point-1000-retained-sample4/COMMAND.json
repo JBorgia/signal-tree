@@ -1,0 +1,18 @@
+{
+  "ordinal": 23,
+  "id": "point-1000-retained-sample4",
+  "profile": "point",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample4",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--expose-gc",
+    "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+    "/private/tmp/st-v16-representative-cost/retained/dist/packages/kernel/dist",
+    "point",
+    "1000"
+  ],
+  "cwd": "/private/tmp/st-v16-representative-cost/harness",
+  "childTimeoutSeconds": 180
+}

@@ -1,0 +1,366 @@
+diff --git a/packages/kernel/src/lib/absent-introduction-diagnostic.spec.ts b/packages/kernel/src/lib/absent-introduction-diagnostic.spec.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/kernel/src/lib/absent-introduction-diagnostic.spec.ts
+@@ -0,0 +1,176 @@
++import { afterEach, describe, expect, it } from 'vitest';
++
++import { createReactiveTestRealization } from '../reactive-test-realization';
++import {
++  entityMap,
++  restoration,
++  signalTree,
++  transactions,
++  undoable,
++} from '../index';
++import { getEntityProjectionSeed } from './internals/entity-projection-seed';
++import {
++  beginStructuralWrite,
++  endStructuralWrite,
++  structuralWrites,
++} from './internals/member-membership';
++import { createSignalTreeFactory } from './signal-tree';
++import type { InterceptHandlers, TapHandlers } from './types';
++
++/**
++ * v16 integration slice 8e (2): an entity collection under an omitted member.
++ *
++ * Owner decision (2026-10-07): the same rules as plain values.
++ * - Reads: a collection under an omitted member reads as an absent, empty
++ *   collection (`all()` is [], `byId()` undefined, `count()` 0, ...), and held
++ *   consumers follow the omission and a re-add.
++ * - Writes: a row-adding write re-adds the path, carrying only the written
++ *   rows; retained rows never resurface. A write that names a row refuses,
++ *   as on an empty collection.
++ * - Reversal: undo, redo, jumpTo and rollback make it absent again.
++ *
++ * Laws: "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE"
++ * (`whole-value-membership.spec.ts` 18); "a write must not vanish silently"
++ * (`nested-absence-independent.spec.ts`). Before 8e the collection's own
++ * methods read and wrote its retained rows (README, 8d: "Not yet for entity
++ * collections").
++ */
++
++const trees: Array<{ destroy(): void }> = [];
++afterEach(() => {
++  for (const tree of trees.splice(0)) tree.destroy();
++});
++const flush = async () => {
++  for (let i = 0; i < 8; i++) await Promise.resolve();
++};
++const realization = createReactiveTestRealization();
++const reactiveTree = createSignalTreeFactory(realization);
++const computed = realization.locations.createDerived;
++
++type Row = { id: string; n: number };
++type Cell<T> = () => T;
++type Node = {
++  (): Row | undefined;
++  (value: Row | ((row: Row) => Row)): void;
++  n: { (): number | undefined; (value: number): void };
++};
++type Rows = {
++  all: Cell<Row[]>;
++  count: Cell<number>;
++  ids: Cell<string[]>;
++  asMap: Cell<ReadonlyMap<string, Row>>;
++  empty: Cell<boolean>;
++  activeEntity: Cell<Row | undefined>;
++  has(id: string): Cell<boolean>;
++  where(predicate: (row: Row) => boolean): Cell<Row[]>;
++  find(predicate: (row: Row) => boolean): Cell<Row | undefined>;
++  byId(id: string): Node | undefined;
++  byIdOrFail(id: string): Node;
++  setActiveId(id: string | undefined): void;
++  addOne(row: Row): string;
++  prependOne(row: Row): string;
++  addMany(
++    rows: Row[],
++    opts?: { mode?: 'strict' | 'skip' | 'overwrite' }
++  ): string[];
++  prependMany(rows: Row[]): string[];
++  upsertOne(row: Row): string;
++  upsertMany(rows: Row[]): string[];
++  setAll(rows: Row[]): void;
++  clear(): void;
++  updateOne(id: string, changes: Partial<Row>): void;
++  replaceOne(id: string, row: Row): void;
++  updateMany(ids: string[], changes: Partial<Row>): void;
++  updateWhere(predicate: (row: Row) => boolean, changes: Partial<Row>): number;
++  removeOne(id: string): void;
++  removeMany(ids: string[]): void;
++  removeWhere(predicate: (row: Row) => boolean): number;
++  changeId(from: string, to: string): void;
++  tap(handlers: TapHandlers<Row, string>): () => void;
++  intercept(handlers: InterceptHandlers<Row, string>): () => void;
++};
++type Tree = {
++  $: ((value?: unknown) => unknown) & {
++    count: (value?: number) => number;
++    a: ((value?: unknown) => unknown) & {
++      rows: Rows;
++      s: (v?: number) => number;
++    };
++  };
++  undo(): void;
++  redo(): void;
++  jumpTo(index: number): void;
++  getCurrentIndex(): number;
++  transact(run: () => void): { rollback(): void };
++  destroy(): void;
++};
++
++const A = { id: 'a', n: 0 };
++const B = { id: 'b', n: 1 };
++const Z = { id: 'z', n: 9 };
++const build = (enhancers: unknown[] = [], reactive = false): Tree => {
++  const make = reactive ? reactiveTree : signalTree;
++  // Positions give the collection the transition source `stored` reads.
++  const tree = make(
++    { a: { rows: entityMap<Row, string>(), s: 0 }, count: 0 },
++    {
++      enhancers: enhancers as never,
++      capabilities: ['causal-runtime', 'position-topology'] as never,
++    }
++  ) as unknown as Tree;
++  trees.push(tree);
++  tree.$.a.rows.setAll([A, B]);
++  return tree;
++};
++/** Omit `a`, and the collection with it, by an ordinary whole value. */
++const omit = (tree: Tree) => tree.$({ count: tree.$.count() });
++/** What the collection physically holds, whatever its presence. */
++const stored = (rows: Rows) =>
++  (
++    rows as unknown as {
++      __prepareTransitionTarget: {
++        readSource(): { subjects: readonly { value: unknown }[] };
++      };
++    }
++  ).__prepareTransitionTarget
++    .readSource()
++    .subjects.map(({ value }) => value);
++const byN = (row: Row) => row.n >= 0;
++
++const reads = (rows: Rows) => ({
++  all: rows.all(),
++  count: rows.count(),
++  ids: rows.ids(),
++  asMap: [...rows.asMap()],
++  empty: rows.empty(),
++  has: rows.has('a')(),
++  where: rows.where(byN)(),
++  find: rows.find(byN)(),
++  byId: rows.byId('a'),
++  activeEntity: rows.activeEntity(),
++});
++const ABSENT = {
++  all: [],
++  count: 0,
++  ids: [],
++  asMap: [],
++  empty: true,
++  has: false,
++  where: [],
++  find: undefined,
++  byId: undefined,
++  activeEntity: undefined,
++};
++
++
++import { MATERIALIZED } from './internals/snapshot-installation';
++import { snapshotNodeKey } from './internals/node-shape';
++it('diagnostic original held re-add sequence', () => {
++ const tree=build([],true), rows=tree.$.a.rows;
++ const whole=computed(()=>JSON.stringify(tree.$())); const all=computed(()=>rows.all());
++ const trace=(phase:string)=>console.log(JSON.stringify({phase,records:[tree.$,tree.$.a,rows].map(x=>{const s=MATERIALIZED.get(snapshotNodeKey(x as object));return s?{generation:s.generation,cache:s.cache}:null;})}));
++ omit(tree); console.log('omitted',whole(),all());trace('before-add');
++ rows.addOne(Z);trace('after-add-before-demand');
++ console.log('after',JSON.stringify({whole:whole(),all:all(),direct:tree.$(),directAll:rows.all()}));trace('after-demand');
++ expect([whole(),all()]).toEqual(['{"a":{"rows":{"all":[{"id":"z","n":9}]}},"count":0}',[Z]]);
++});
+diff --git a/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts b/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts
+new file mode 100644
+--- /dev/null
++++ b/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts
+@@ -0,0 +1,180 @@
++import { afterEach, describe, expect, it } from 'vitest';
++
++import { createReactiveTestRealization } from '../reactive-test-realization';
++import {
++  entityMap,
++  restoration,
++  signalTree,
++  transactions,
++  undoable,
++} from '../index';
++import { getEntityProjectionSeed } from './internals/entity-projection-seed';
++import {
++  beginStructuralWrite,
++  endStructuralWrite,
++  structuralWrites,
++} from './internals/member-membership';
++import { createSignalTreeFactory } from './signal-tree';
++import type { InterceptHandlers, TapHandlers } from './types';
++
++/**
++ * v16 integration slice 8e (2): an entity collection under an omitted member.
++ *
++ * Owner decision (2026-10-07): the same rules as plain values.
++ * - Reads: a collection under an omitted member reads as an absent, empty
++ *   collection (`all()` is [], `byId()` undefined, `count()` 0, ...), and held
++ *   consumers follow the omission and a re-add.
++ * - Writes: a row-adding write re-adds the path, carrying only the written
++ *   rows; retained rows never resurface. A write that names a row refuses,
++ *   as on an empty collection.
++ * - Reversal: undo, redo, jumpTo and rollback make it absent again.
++ *
++ * Laws: "DORMANT STORAGE MUST NOT SUPPLY THE REACTIVATED VALUE"
++ * (`whole-value-membership.spec.ts` 18); "a write must not vanish silently"
++ * (`nested-absence-independent.spec.ts`). Before 8e the collection's own
++ * methods read and wrote its retained rows (README, 8d: "Not yet for entity
++ * collections").
++ */
++
++const trees: Array<{ destroy(): void }> = [];
++afterEach(() => {
++  for (const tree of trees.splice(0)) tree.destroy();
++});
++const flush = async () => {
++  for (let i = 0; i < 8; i++) await Promise.resolve();
++};
++const realization = createReactiveTestRealization();
++const reactiveTree = createSignalTreeFactory(realization);
++const computed = realization.locations.createDerived;
++
++type Row = { id: string; n: number };
++type Cell<T> = () => T;
++type Node = {
++  (): Row | undefined;
++  (value: Row | ((row: Row) => Row)): void;
++  n: { (): number | undefined; (value: number): void };
++};
++type Rows = {
++  all: Cell<Row[]>;
++  count: Cell<number>;
++  ids: Cell<string[]>;
++  asMap: Cell<ReadonlyMap<string, Row>>;
++  empty: Cell<boolean>;
++  activeEntity: Cell<Row | undefined>;
++  has(id: string): Cell<boolean>;
++  where(predicate: (row: Row) => boolean): Cell<Row[]>;
++  find(predicate: (row: Row) => boolean): Cell<Row | undefined>;
++  byId(id: string): Node | undefined;
++  byIdOrFail(id: string): Node;
++  setActiveId(id: string | undefined): void;
++  addOne(row: Row): string;
++  prependOne(row: Row): string;
++  addMany(
++    rows: Row[],
++    opts?: { mode?: 'strict' | 'skip' | 'overwrite' }
++  ): string[];
++  prependMany(rows: Row[]): string[];
++  upsertOne(row: Row): string;
++  upsertMany(rows: Row[]): string[];
++  setAll(rows: Row[]): void;
++  clear(): void;
++  updateOne(id: string, changes: Partial<Row>): void;
++  replaceOne(id: string, row: Row): void;
++  updateMany(ids: string[], changes: Partial<Row>): void;
++  updateWhere(predicate: (row: Row) => boolean, changes: Partial<Row>): number;
++  removeOne(id: string): void;
++  removeMany(ids: string[]): void;
++  removeWhere(predicate: (row: Row) => boolean): number;
++  changeId(from: string, to: string): void;
++  tap(handlers: TapHandlers<Row, string>): () => void;
++  intercept(handlers: InterceptHandlers<Row, string>): () => void;
++};
++type Tree = {
++  $: ((value?: unknown) => unknown) & {
++    count: (value?: number) => number;
++    a: ((value?: unknown) => unknown) & {
++      rows: Rows;
++      s: (v?: number) => number;
++    };
++  };
++  undo(): void;
++  redo(): void;
++  jumpTo(index: number): void;
++  getCurrentIndex(): number;
++  transact(run: () => void): { rollback(): void };
++  destroy(): void;
++};
++
++const A = { id: 'a', n: 0 };
++const B = { id: 'b', n: 1 };
++const Z = { id: 'z', n: 9 };
++const build = (enhancers: unknown[] = [], reactive = false): Tree => {
++  const make = reactive ? reactiveTree : signalTree;
++  // Positions give the collection the transition source `stored` reads.
++  const tree = make(
++    { a: { rows: entityMap<Row, string>(), s: 0 }, count: 0 },
++    {
++      enhancers: enhancers as never,
++      capabilities: ['causal-runtime', 'position-topology'] as never,
++    }
++  ) as unknown as Tree;
++  trees.push(tree);
++  tree.$.a.rows.setAll([A, B]);
++  return tree;
++};
++/** Omit `a`, and the collection with it, by an ordinary whole value. */
++const omit = (tree: Tree) => tree.$({ count: tree.$.count() });
++/** What the collection physically holds, whatever its presence. */
++const stored = (rows: Rows) =>
++  (
++    rows as unknown as {
++      __prepareTransitionTarget: {
++        readSource(): { subjects: readonly { value: unknown }[] };
++      };
++    }
++  ).__prepareTransitionTarget
++    .readSource()
++    .subjects.map(({ value }) => value);
++const byN = (row: Row) => row.n >= 0;
++
++const reads = (rows: Rows) => ({
++  all: rows.all(),
++  count: rows.count(),
++  ids: rows.ids(),
++  asMap: [...rows.asMap()],
++  empty: rows.empty(),
++  has: rows.has('a')(),
++  where: rows.where(byN)(),
++  find: rows.find(byN)(),
++  byId: rows.byId('a'),
++  activeEntity: rows.activeEntity(),
++});
++const ABSENT = {
++  all: [],
++  count: 0,
++  ids: [],
++  asMap: [],
++  empty: true,
++  has: false,
++  where: [],
++  find: undefined,
++  byId: undefined,
++  activeEntity: undefined,
++};
++
++
++import { MATERIALIZED } from './internals/snapshot-installation';
++import { snapshotNodeKey } from './internals/node-shape';
++it('diagnostic original held re-add sequence', () => {
++ const tree=build([],true), rows=tree.$.a.rows;
++ const whole=computed(()=>JSON.stringify(tree.$())); const all=computed(()=>rows.all());
++ const trace=(phase:string)=>console.log(JSON.stringify({phase,records:[tree.$,tree.$.a,rows].map(x=>{const s=MATERIALIZED.get(snapshotNodeKey(x as object));return s?{generation:s.generation,cache:s.cache}:null;})}));
++ omit(tree); console.log('omitted',whole(),all());trace('before-add');
++ const record=MATERIALIZED.get(snapshotNodeKey(rows as object))!;
++ let cache=record.cache, generation=record.generation;
++ Object.defineProperty(record,'cache',{configurable:true,get:()=>cache,set:(next)=>{console.log('CACHE-WRITE',JSON.stringify(next),new Error().stack);cache=next;}});
++ Object.defineProperty(record,'generation',{configurable:true,get:()=>generation,set:(next)=>{console.log('GENERATION',next,new Error().stack);generation=next;}});
++ rows.addOne(Z);trace('after-add-before-demand');
++ console.log('after',JSON.stringify({whole:whole(),all:all(),direct:tree.$(),directAll:rows.all()}));trace('after-demand');
++ expect([whole(),all()]).toEqual(['{"a":{"rows":{"all":[{"id":"z","n":9}]}},"count":0}',[Z]]);
++});

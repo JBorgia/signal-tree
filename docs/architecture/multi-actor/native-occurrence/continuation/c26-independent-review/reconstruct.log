@@ -1,0 +1,6 @@
+patching file 'packages/kernel/src/lib/experimental-publication/private.ts'
+patching file 'packages/kernel/src/lib/experimental-publication/lifecycle.ts'
+patching file 'packages/kernel/src/lib/internals/native-scalar-selection.ts'
+patching file 'packages/kernel/src/enhancers/transactions/transactions.ts'
+patching file 'packages/kernel/src/lib/scalar-finalized-derived-roots.spec.ts'
+patching file 'packages/kernel/src/lib/scalar-finalized-lifecycle.spec.ts'

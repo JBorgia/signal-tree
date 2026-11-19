@@ -1,0 +1,25 @@
+{
+  "baseSource": "/private/tmp/st-row-source-successor/candidate",
+  "unchangedBaselinePackageFiles": 943,
+  "modifiedExistingFiles": [
+    "packages/kernel/src/lib/entity-egress-footprint.spec.ts",
+    "packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+    "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+    "packages/kernel/src/lib/link-commit-ordering.spec.ts"
+  ],
+  "preexecutionTests": {
+    "packages/kernel/src/lib/oracle-alignment-independent.spec.ts": "fce9b17f9a732c6c33caa293d9d6ccdb9316970878853f5e1f0b2187f1dc0c61",
+    "packages/kernel/src/lib/entity-egress-footprint.spec.ts": "3769add882e22a3798070fa29f97543da03e47cbcf879af67b71ec68a8a572a8",
+    "packages/kernel/src/lib/branch-omission-correctness.spec.ts": "2e24443db2c8ebf7a434864453b2b9ac7ee757db790c8888be357148cc278fdf",
+    "packages/kernel/src/lib/link-commit-ordering.spec.ts": "49c26727b88e2cd994afec1c7768d664b3db5f438da8c69c4d136baedb34cf9c",
+    "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts": "2078b018d3cdeec8bd32e47e0b02bf341bce0864902e59428d712f833e84eae7"
+  },
+  "patchSha256": "6eb43bc480c57ebce0932997c84f8e40e9f2e66d64b629953635892adace1472",
+  "runtimeEntitySignalSha256": "a2319dec7f66aa7f33f8a89a27951946553f50771496a3ceaf77ad7590c15ef9",
+  "logs": {
+    "aligned-first.log": "a66ae5dd4c4cd0d40ef4392ed24628e490f1265afbe0c2fc53650f0e38515430",
+    "original-oracles-replay.log": "8108cd532fd2876332fc5aea5ac2bc079aeeac868e0c522e343a64d1c303fe5f",
+    "types-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "independent-first.log": "a0b849466fe5a0ee53426d894bd40278765e2e9a0011284053b9dd5841a892a4"
+  }
+}

@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
++++ b/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts
+@@ -52,7 +52,8 @@
+       } else {
+         expect(error).toBeUndefined();
+         if (!receipt) throw new Error('Dependent declaration returned no receipt');
+-        expect(receipt.read()).toEqual({ state: 'held', reason: 'pending-dependency' });
++        // Aggregate projection may still be validating synchronously.
++        expect(sent).toEqual([]);
+       }
+       // Contradiction is not rollback of the callback's installed writes.
+       expect(tree.$.pair()).toEqual({ x: 7, y: 0 });
+@@ -60,6 +61,9 @@
+       expect(p.inspect()).toEqual(ownership);
+       await drain();
+       expect(sent).toEqual([]);
++      if (kind === 'dependent') {
++        expect(receipt?.read()).toEqual({ state: 'held', reason: 'pending-dependency' });
++      }
+       let settled = false;
+       const wait = c.settled().then(() => { settled = true; });
+       await drain();

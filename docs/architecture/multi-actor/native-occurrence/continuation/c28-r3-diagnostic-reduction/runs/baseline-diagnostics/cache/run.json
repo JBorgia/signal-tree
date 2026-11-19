@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel entity-predicate-churn entity-wrong-method-guard --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T14:40:48.098Z",
+    "endTime": "2026-11-03T14:40:50.579Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "14363168716444444712",
+      "startTime": "2026-11-03T14:40:48.143Z",
+      "endTime": "2026-11-03T14:40:50.579Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

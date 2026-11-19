@@ -1,0 +1,50 @@
+[
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "0416d0fd5841b2dc507ecabc2554a00ccc9dad47298116f3521d8a98d6f98361",
+    "archiveSha256": "0416d0fd5841b2dc507ecabc2554a00ccc9dad47298116f3521d8a98d6f98361"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "8c6b700b2b6715162d5295d70e5946735bc0e2f15b1556a7392f51d03eb3928c",
+    "archiveSha256": "8c6b700b2b6715162d5295d70e5946735bc0e2f15b1556a7392f51d03eb3928c"
+  },
+  {
+    "source": "root-contracts/RELEASE-CURRENT.md",
+    "archive": "root-contracts/RELEASE-CURRENT.md.gz",
+    "sourceSha256": "b83dbabe02abd7105b6c4a387fe56e554658c6852f4d761887ab110fbce4c8a0",
+    "archiveSha256": "419c1177da236dc091c40545046ecbe2b2e0d40cb42376d937f131533ae164df"
+  },
+  {
+    "source": "root-contracts/docs/review-contract.md",
+    "archive": "root-contracts/docs/review-contract.md.gz",
+    "sourceSha256": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+    "archiveSha256": "ce357ec095cd842314952afed8884061ab0dc056638dea91c8bb2916f516a65b"
+  },
+  {
+    "source": "root-contracts/docs/contributor-contracts.md",
+    "archive": "root-contracts/docs/contributor-contracts.md.gz",
+    "sourceSha256": "0211a2851f9f5724182555a3ff2c2ebdf89c43f88a6123d5e09fc505b8bd51d2",
+    "archiveSha256": "9a95654c9185a07de6fe5e7495929014d09e7a976c92db7af1757822334a4728"
+  },
+  {
+    "source": "root-contracts/docs/support-policy.md",
+    "archive": "root-contracts/docs/support-policy.md.gz",
+    "sourceSha256": "b65aac2d81986a940c6259404eae344fbe77d3ca5466fc326b203d31499c04bd",
+    "archiveSha256": "bc2ae2f441b0337495b997c039ff96273ed73437b83cd7edd063939d26356537"
+  },
+  {
+    "source": "root-contracts/docs/architecture/multi-actor/PLAN.md",
+    "archive": "root-contracts/docs/architecture/multi-actor/PLAN.md.gz",
+    "sourceSha256": "8d1746835c158580713e4e0696c75296fbc962fd2197edd547834a536d70fa91",
+    "archiveSha256": "4c621dead3297a04d79e05a5526e536dc561d16464749231408ea112db9eec51"
+  },
+  {
+    "source": "root-contracts/docs/architecture/multi-actor/native-occurrence/continuation/recipient-classification/authority/247cfec7-PROPOSAL.md",
+    "archive": "root-contracts/docs/architecture/multi-actor/native-occurrence/continuation/recipient-classification/authority/247cfec7-PROPOSAL.md.gz",
+    "sourceSha256": "abe39cc508e5aa4f5bdd37ded8bcba6d793c430ab76685b2c72ee4fc3e249c6f",
+    "archiveSha256": "026bf5635eee7c6c67018a3ef7d076ee5dcb9ba40b97c7469a35e8f0b618a3ce"
+  }
+]

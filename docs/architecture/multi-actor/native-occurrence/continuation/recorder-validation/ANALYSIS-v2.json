@@ -1,0 +1,268 @@
+{
+  "resolved": {
+    "kind": "resolved-config",
+    "at": 1793652864601,
+    "pid": 92753,
+    "projects": [
+      {
+        "name": "",
+        "pool": "forks",
+        "isolate": true,
+        "maxWorkers": 1,
+        "execArgv": [],
+        "environment": "happy-dom",
+        "env": {
+          "CI": null,
+          "VITEST_MAX_WORKERS": null,
+          "NODE_OPTIONS": null,
+          "NODE_ENV": null,
+          "NODE_COMPILE_CACHE": null,
+          "UV_THREADPOOL_SIZE": null
+        }
+      }
+    ],
+    "files": [
+      "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts",
+      "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts"
+    ]
+  },
+  "effectiveCoordinatorEnv": {
+    "CI": null,
+    "VITEST_MAX_WORKERS": null,
+    "NODE_OPTIONS": "--require=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/diagnostic-redirect.cjs --require=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/record-startup.cjs",
+    "NODE_ENV": "test",
+    "NODE_COMPILE_CACHE": null,
+    "UV_THREADPOOL_SIZE": null
+  },
+  "caseStarts": 14,
+  "caseEnds": 14,
+  "observedStarts": 14,
+  "modules": [
+    {
+      "kind": "module-start",
+      "at": 1793652907674,
+      "pid": 92753,
+      "file": "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts",
+      "coordinatorMemory": {
+        "rss": 152846336,
+        "heapTotal": 100286464,
+        "heapUsed": 35909656,
+        "external": 26754427,
+        "arrayBuffers": 2005056
+      },
+      "heapLimit": 4496293888
+    },
+    {
+      "kind": "module-end",
+      "at": 1793652908066,
+      "pid": 92753,
+      "file": "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts",
+      "coordinatorMemory": {
+        "rss": 154812416,
+        "heapTotal": 100876288,
+        "heapUsed": 37275352,
+        "external": 27068546,
+        "arrayBuffers": 2319040
+      }
+    },
+    {
+      "kind": "module-start",
+      "at": 1793652921308,
+      "pid": 92753,
+      "file": "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts",
+      "coordinatorMemory": {
+        "rss": 107036672,
+        "heapTotal": 101466112,
+        "heapUsed": 41051232,
+        "external": 27578978,
+        "arrayBuffers": 2787857
+      },
+      "heapLimit": 4496293888
+    },
+    {
+      "kind": "module-end",
+      "at": 1793652921741,
+      "pid": 92753,
+      "file": "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/candidate/packages/kernel/src/lib/internals/location-runtime.spec.ts",
+      "coordinatorMemory": {
+        "rss": 109723648,
+        "heapTotal": 101777408,
+        "heapUsed": 42426360,
+        "external": 27889849,
+        "arrayBuffers": 3098593
+      }
+    }
+  ],
+  "workers": [
+    {
+      "kind": "node-start",
+      "at": 1793652864891,
+      "pid": 92789,
+      "ppid": 92753,
+      "argv": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+      ],
+      "execArgv": [
+        "--experimental-import-meta-resolve",
+        "--require",
+        "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+        "--conditions",
+        "node",
+        "--conditions",
+        "development"
+      ],
+      "node": "v24.15.0",
+      "heapLimit": 4496293888,
+      "memory": {
+        "rss": 47677440,
+        "heapTotal": 6275072,
+        "heapUsed": 4524424,
+        "external": 1804900,
+        "arrayBuffers": 22975
+      },
+      "env": {
+        "CI": null,
+        "VITEST_MAX_WORKERS": null,
+        "VITEST_POOL_ID": null,
+        "VITEST_WORKER_ID": null,
+        "NODE_OPTIONS": "--require=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/diagnostic-redirect.cjs --require=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/record-startup.cjs",
+        "NODE_ENV": "test",
+        "NODE_COMPILE_CACHE": null,
+        "UV_THREADPOOL_SIZE": null,
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "NX_TUI": "false",
+        "NX_NO_CLOUD": null,
+        "ST_VERIFY_PROGRESS": "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/run-small-v2/progress"
+      },
+      "pgid": 92708
+    },
+    {
+      "kind": "node-start",
+      "at": 1793652908349,
+      "pid": 93118,
+      "ppid": 92753,
+      "argv": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+      ],
+      "execArgv": [
+        "--experimental-import-meta-resolve",
+        "--require",
+        "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs",
+        "--conditions",
+        "node",
+        "--conditions",
+        "development"
+      ],
+      "node": "v24.15.0",
+      "heapLimit": 4496293888,
+      "memory": {
+        "rss": 47628288,
+        "heapTotal": 6275072,
+        "heapUsed": 4524424,
+        "external": 1804900,
+        "arrayBuffers": 22975
+      },
+      "env": {
+        "CI": null,
+        "VITEST_MAX_WORKERS": null,
+        "VITEST_POOL_ID": null,
+        "VITEST_WORKER_ID": null,
+        "NODE_OPTIONS": "--require=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/diagnostic-redirect.cjs --require=/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/record-startup.cjs",
+        "NODE_ENV": "test",
+        "NODE_COMPILE_CACHE": null,
+        "UV_THREADPOOL_SIZE": null,
+        "NX_DAEMON": "false",
+        "NX_ISOLATE_PLUGINS": "false",
+        "NX_TUI": "false",
+        "NX_NO_CLOUD": null,
+        "ST_VERIFY_PROGRESS": "/private/tmp/st-parent-freshness-implementation-independent/c21-recorder-validation/run-small-v2/progress"
+      },
+      "pgid": 92708
+    }
+  ],
+  "boundaryCensuses": [
+    {
+      "kind": "module-start",
+      "at": 1793652907900,
+      "workers": [
+        {
+          "pid": 92789,
+          "ppid": 92753,
+          "pgid": 92708,
+          "state": "S",
+          "cpu": 2.7,
+          "rssKiB": 84672,
+          "elapsed": "00:43",
+          "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+        }
+      ],
+      "ownedProcessCount": 8
+    },
+    {
+      "kind": "module-end",
+      "at": 1793652908215,
+      "workers": [
+        {
+          "pid": 92789,
+          "ppid": 92753,
+          "pgid": 92708,
+          "state": "S",
+          "cpu": 4.4,
+          "rssKiB": 84720,
+          "elapsed": "00:44",
+          "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+        }
+      ],
+      "ownedProcessCount": 8
+    },
+    {
+      "kind": "module-start",
+      "at": 1793652921465,
+      "workers": [
+        {
+          "pid": 93118,
+          "ppid": 92753,
+          "pgid": 92708,
+          "state": "S",
+          "cpu": 21.8,
+          "rssKiB": 101312,
+          "elapsed": "00:13",
+          "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+        }
+      ],
+      "ownedProcessCount": 8
+    },
+    {
+      "kind": "module-end",
+      "at": 1793652921879,
+      "workers": [
+        {
+          "pid": 93118,
+          "ppid": 92753,
+          "pgid": 92708,
+          "state": "S",
+          "cpu": 5.7,
+          "rssKiB": 101328,
+          "elapsed": "00:13",
+          "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+        }
+      ],
+      "ownedProcessCount": 8
+    }
+  ],
+  "maxObservedForkProcesses": 1,
+  "periodicCensusSamples": 171,
+  "allFinalRows": [],
+  "sourceVerification": {
+    "exit": 0,
+    "watchdog": null,
+    "caseStartsObserved": 14,
+    "unclosedCases": [],
+    "ownedGroupStillPresent": false,
+    "sourceUnchanged": true,
+    "has14Passed": true
+  }
+}

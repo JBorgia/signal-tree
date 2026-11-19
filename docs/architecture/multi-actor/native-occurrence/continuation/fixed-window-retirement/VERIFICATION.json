@@ -1,0 +1,16 @@
+{
+  "baseManifestSha256": "bac3ad33b8eee7bd0e5851461de9b95fd3144d26e3f6db70d84193a70c76179f",
+  "baseFiles": 2974,
+  "baseMismatches": [],
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts"
+  ],
+  "originalsUnchanged": {
+    "publication-retirement-acceptance.spec.ts": true,
+    "publication-retirement-boundaries.spec.ts": true,
+    "entity-negative-publication-retirement.spec.ts": true
+  }
+}

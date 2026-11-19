@@ -1,0 +1,7 @@
+{
+  "projectCount": 10,
+  "completeProjectTargetContractsEqual": true,
+  "dependencyEdgesEqual": true,
+  "beforeWarningCount": 5,
+  "afterWarningCount": 0
+}

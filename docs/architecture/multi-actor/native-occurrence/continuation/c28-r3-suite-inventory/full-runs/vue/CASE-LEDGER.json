@@ -1,0 +1,1571 @@
+[
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (transactions first) > reads it absent and empty, held reads too",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (transactions first) > a row-adding write re-adds the path with only its row; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (transactions first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (transactions first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (transactions first) > a tap inside transact reads the collection as it is (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (transactions first) > rollback of a re-adding write makes it absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (restoration first) > reads it absent and empty, held reads too",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (restoration first) > a row-adding write re-adds the path with only its row; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (restoration first) > a root holding only collections: omission, a re-adding write, undo (v16 8e review)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (restoration first) > a tap inside a whole value re-adds an absent member of the same tree (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (restoration first) > a tap inside transact reads the collection as it is (v16 8f)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue (restoration first) > rollback of a re-adding write makes it absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue sync effects (v16 8e) > a sync effect that throws on one collection does not starve the next",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue sync effects (v16 8e) > a collection woken twice in one reversal re-runs a sync effect once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue sync effects (v16 8e) > an omission nested in a whole value wakes sync effects only after it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-collection.spec.ts",
+    "name": "absent collection \u2014 Vue sync effects (v16 8e) > a rollback writing hidden rows runs no effect that could see them",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > review-empty: rollback observers see scalar, all, count, and empty restored",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > review-active: rollback observers see direct and active row restored",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for add rollback (unprimed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for remove rollback (unprimed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for field rollback (unprimed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for selection rollback (unprimed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for add rollback (primed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for remove rollback (primed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for field rollback (primed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > coheres all owned reads for selection rollback (primed)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > preserves projection identities during unchanged-value settlement",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > retains cached projections inside reentrant authored writes and publishes their result",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-projection-publication.spec.ts",
+    "name": "Vue entity projection publication > publishes marker-computed slices and sorted projection chains coherently",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > retains native readonly ref identity and watch/effect interoperability",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > publishes rollback with both owned collections coherent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > preserves held and native caches inside a reentrant authored group",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > tracks switched dependencies and stops observers without unrelated delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > does not evaluate an already refreshed native getter twice for the same read",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > preserves the first body Error while delivering sibling invalidations",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > preserves the first body undefined while delivering sibling invalidations",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > preserves the first observer Error while delivering sibling invalidations",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > retains native Vue handling of observer throw undefined",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/settlement-publication.spec.ts",
+    "name": "Vue owned collection publication > memoizes allocating readonly getters across unrelated publication",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > resolves initially absent selection when its row is inserted",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > resolves restored membership to the same held lifetime after rollback",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > retargets key-based selection but never a held row to a new lifetime at the same key",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > tracks selection changes while absent and ignores arrivals at the old selected key",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > moves selected key on rekey while retaining the selected lifetime",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > retains memo identity across unrelated writes and cleans up switched and stopped observation",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > preserves independent replay-tap selection across rekey rollback (mixed scalar: true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > preserves independent replay-tap selection across rekey rollback (mixed scalar: false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-selection-lifetime.spec.ts",
+    "name": "Vue entity selection lifetime > preserves ABA replay-tap selection of the now absent rekey destination",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: C",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: C-then-X",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: C-then-A",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: nestedwrites",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: callbackthrows",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: callbackthrows-undefined",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > preserves callback contribution, complete disposition, and coherent delivery: removedselectedrows",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/prepared-selection-publication.spec.ts",
+    "name": "prepared selection publication > stages both collection publications before a cross-collection callback throws",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-callback-facade.spec.ts",
+    "name": "realizes fresh tap reads and preserves later callback writes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-callback-facade.spec.ts",
+    "name": "keeps ordinary selected observation granular and native computations cached during the callback",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-callback-facade.spec.ts",
+    "name": "preserves a callback selection followed by rekey",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-callback-facade.spec.ts",
+    "name": "preserves a callback selection followed by clear",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-callback-facade.spec.ts",
+    "name": "retains coherent native metadata on one callback-acquired reader",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-callback-facade.spec.ts",
+    "name": "current-read real tap queries evaluate each recipe once across held ABA writes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > tracks native ref reads while kernel snapshots remain canonical",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > does not recompute a Vue consumer for an unrelated location",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > observes one kernel-owned derived location",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > realizes EntityMap queries and fields as native refs",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > interoperates with Vue ref consumers despite its internal callable bridge",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > keeps writable ref identity in a type-only readonly view",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > publishes one coherent root replacement to synchronous watchers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > publishes one coherent transaction to synchronous watchers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > does not invalidate unrelated derived carriers for a grouped write",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > publishes one coherent EntityMap replacement to synchronous watchers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > publishes one coherent undo to synchronous watchers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > flushes nested invalidations while preserving the mutation error",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.spec.ts",
+    "name": "@signal-tree/vue observation > does not subscribe a watchEffect to a location it only writes",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/current-read-capability.spec.ts",
+    "name": "current-read source-linked producer preserves held/ABA, counts, identity, cleanup and errors",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/current-read-capability.spec.ts",
+    "name": "current-read nested invocation markers recover from direct nested throws",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/current-read-capability.spec.ts",
+    "name": "current-read native-only first dependency recovers with native publication error timing",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/current-read-capability.spec.ts",
+    "name": "current-read preserves a fresh pre-recipe dependency-poll error",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'leaf' / actual-owned=true / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'leaf' / actual-owned=true / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'leaf' / actual-owned=false / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'leaf' / actual-owned=false / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'whole' / actual-owned=true / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'whole' / actual-owned=true / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'whole' / actual-owned=false / 'confirm'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "name": "vue equal 'whole' / actual-owned=false / 'rollback'",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (transactions first) > held consumers read absent; a held leaf write re-adds only its path",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (transactions first) > a held branch write re-adds with its whole value; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (transactions first) > a held leaf updater receives undefined and re-adds with its result",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (transactions first) > undo of a designated omission brings back every held reader below it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (transactions first) > undo of a turn that omits the branch and writes under it is exact",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (transactions first) > rollback of a re-adding write makes the branch absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (restoration first) > held consumers read absent; a held leaf write re-adds only its path",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (restoration first) > a held branch write re-adds with its whole value; undo omits it again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (restoration first) > a held leaf updater receives undefined and re-adds with its result",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (restoration first) > undo of a designated omission brings back every held reader below it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (restoration first) > undo of a turn that omits the branch and writes under it is exact",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (restoration first) > rollback of a re-adding write makes the branch absent again",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/absent-path-write.spec.ts",
+    "name": "absent-path writes \u2014 Vue (no enhancers) > a held leaf updater under an omitted member receives undefined",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/parent-freshness-counterparts.spec.ts",
+    "name": "installed parent freshness and retained native dependencies (false / false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/parent-freshness-counterparts.spec.ts",
+    "name": "installed parent freshness and retained native dependencies (false / true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/parent-freshness-counterparts.spec.ts",
+    "name": "installed parent freshness and retained native dependencies (true / true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/tooling-admission.spec.ts",
+    "name": "tooling admits public Vue trees directly > reads native carriers and enforces destruction (restoration first=false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/tooling-admission.spec.ts",
+    "name": "tooling admits public Vue trees directly > reads native carriers and enforces destruction (restoration first=true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > undoes an atomic replacement with restoration alone",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > keeps ordinary branch children independently restorable",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
+    "name": "opaque leaves retain terminal topology through restoration > retains external undefined as terminal truth and refuses the whole undo",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 1 speculative publication \u2014 proposed values reach the native carrier before settlement",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 2 accept publication \u2014 the committed value stays visible through the SAME held reference",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 3 reject publication \u2014 the restored value republishes through the SAME held reference",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4 coherent mixed publication \u2014 accept exposes no torn scalar/structural frame",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4b coherent mixed publication \u2014 reject exposes no torn frame either",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4c coherent value settlement \u2014 own collection reads agree in native observers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4d owned projection settlement \u2014 add, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4d owned projection settlement \u2014 add, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4d owned projection settlement \u2014 remove, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4d owned projection settlement \u2014 remove, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4d owned projection settlement \u2014 field, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4d owned projection settlement \u2014 field, first read during delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 initial absence, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 initial absence, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 same lifetime restoration, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 same lifetime restoration, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 new lifetime at reused key, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 new lifetime at reused key, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selection while absent, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selection while absent, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selected rekey, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 selected rekey, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 unrelated writes and disposal, primed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 4e selection lifetime projections \u2014 unrelated writes and disposal, first read after change",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 5 lifetime preservation \u2014 a held reference never retargets to a reused business key",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/transaction-realization.spec.ts",
+    "name": "@signal-tree/vue \u2014 pending realization conformance > 5b lifetime preservation holds when the rename happens inside a pending",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/declared-publication-composition.spec.ts",
+    "name": "declared scalar independence progresses while two owners remain open; dependency waits",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/declared-publication-composition.spec.ts",
+    "name": "declared entity inspection adoption publishes ordinary authority through the facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/declared-publication-composition.spec.ts",
+    "name": "confirmed scalar input permits declared progress through the facade",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (no enhancers) > a membership-only removal is absent to ref, computed and branch readers, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (no enhancers) > re-adding with the retained value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (no enhancers) > re-adding with a new value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (no enhancers) > an identical whole-branch write does not rerun a consumer",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (no enhancers) > a removal two levels deep is absent to every reader (outer write)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (position-topology capability) > a membership-only removal is absent to ref, computed and branch readers, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (position-topology capability) > re-adding with the retained value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (position-topology capability) > re-adding with a new value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (position-topology capability) > an identical whole-branch write does not rerun a consumer",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (position-topology capability) > a removal two levels deep is absent to every reader (outer write)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (transactions()) > a membership-only removal is absent to ref, computed and branch readers, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (transactions()) > re-adding with the retained value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (transactions()) > re-adding with a new value is present to every reader, once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (transactions()) > an identical whole-branch write does not rerun a consumer",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/plain-member-absence-observation.spec.ts",
+    "name": "plain-member absence observation \u2014 Vue (transactions()) > a removal two levels deep is absent to every reader (outer write)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "name": "publishes newly supplied ordinary keys through the vue facade",
+    "state": "failed",
+    "expectedFailure": false,
+    "mode": "run",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at cell.set (/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.ts:80:31)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/whole-value-new-keys.spec.ts:30:14"
+      }
+    ],
+    "classification": "unclassified first failure; no runtime/fixture causality inferred"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "name": "keeps failed transaction observations coherent (seeded=false)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "name": "keeps failed transaction observations coherent (seeded=true)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects existing reactive values before derived initialization",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > rejects native leaves produced by another tree",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > preserves explicit reactive data and an independent snapshot",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > keeps terminal contents opaque and ordinary callable data valid",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > preserves the kernel diagnostic for unregistered symbol markers",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/construction-input.spec.ts",
+    "name": "vue construction input ownership > validates class branches and reads accessor-backed definitions once",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Vue (transactions first) > undo, redo and jumpTo restore the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Vue (transactions first) > rollback restores the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Vue (transactions first) > a row-naming write to the omitted collection refuses; undo still restores it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Vue (restoration first) > undo, redo and jumpTo restore the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Vue (restoration first) > rollback restores the collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/designated-collection-omission.spec.ts",
+    "name": "designated collection omission \u2014 Vue (restoration first) > a row-naming write to the omitted collection refuses; undo still restores it",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "name": "registered terminals \u2014 Vue (transactions first) > undo and redo replace a Map terminal as one value",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "name": "registered terminals \u2014 Vue (transactions first) > undo re-adds an ordinarily omitted terminal with its pre-image",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "name": "registered terminals \u2014 Vue (transactions first) > an external omission refuses undo and the reader reports it refused",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "name": "registered terminals \u2014 Vue (restoration first) > undo and redo replace a Map terminal as one value",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "name": "registered terminals \u2014 Vue (restoration first) > undo re-adds an ordinarily omitted terminal with its pre-image",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "name": "registered terminals \u2014 Vue (restoration first) > an external omission refuses undo and the reader reports it refused",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct source completion reads the installed row leaf and collection",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct replace source completion sees coherent row and membership",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct many source completion sees coherent row and membership",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct upsert source completion sees coherent row and membership",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct setAll source completion sees coherent row and membership",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct remove source completion sees coherent row and membership",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct clear source completion sees coherent row and membership",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-probe.spec.ts",
+    "name": "direct completion drains exact error and leaves installed native truth useful",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-native-obligation-composition.spec.ts",
+    "name": "entity input ownership through facade, mode=pending-independent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-native-obligation-composition.spec.ts",
+    "name": "entity input ownership through facade, mode=pending-dependent",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/entity-native-obligation-composition.spec.ts",
+    "name": "entity input ownership through facade, mode=confirmed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/ownership.spec.ts",
+    "name": "Vue tree ownership > destroys a scope-owned tree when its owning scope stops",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/ownership.spec.ts",
+    "name": "Vue tree ownership > stops borrowed observation without destroying the shared owner",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/ownership.spec.ts",
+    "name": "Vue tree ownership > isolates explicitly owned request trees",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/terminal-carriers.spec.ts",
+    "name": "terminal carrier identity > keeps built-ins, typed functions and constructors in terminal refs",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/terminal-carriers.spec.ts",
+    "name": "terminal carrier identity > unwraps optional and union leaf definitions in locations and root snapshots",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/selected-active-id-preparation.spec.ts",
+    "name": "public callback discriminator sees restored library selection before choosing newer C",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/audit-observation-lifecycle.spec.ts",
+    "name": "audited native observation lifecycle > completes cleanup once even when a destruction watcher throws",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/audit-observation-lifecycle.spec.ts",
+    "name": "audited native observation lifecycle > observes dormant ref reactivation to 1",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/audit-observation-lifecycle.spec.ts",
+    "name": "audited native observation lifecycle > observes dormant ref reactivation to 2",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-rich-publication.spec.ts",
+    "name": "rich committed-entity capture sees the complete selected mixed inverse before authoring newer truth",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-independent.spec.ts",
+    "name": "direct update completion coherent; throws=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-independent.spec.ts",
+    "name": "direct update completion coherent; throws=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-independent.spec.ts",
+    "name": "direct replace completion coherent; throws=false",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-independent.spec.ts",
+    "name": "direct replace completion coherent; throws=true",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-direct-independent.spec.ts",
+    "name": "direct completion nested write remains final truth",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/scalar-frame-publication.spec.ts",
+    "name": "scalar frame rejected branch adoption preserves ordinary payload (vue)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/scalar-frame-publication.spec.ts",
+    "name": "same-turn scalar membership omission does not replay stale covered age (vue)",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/audit-native-tooling.spec.ts",
+    "name": "vue audit tooling and terminal values > observes tree identity and history lifetime",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/audit-native-tooling.spec.ts",
+    "name": "vue audit tooling and terminal values > Date fields expose native carrier access",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-native-frontier.spec.ts",
+    "name": "first synchronous Vue observer and detached completion see the installed mixed unit",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/link-native-address.spec.ts",
+    "name": "vue native entity Link address > bare omission and later authored value progress",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/link-native-address.spec.ts",
+    "name": "vue native entity Link address > enhanced omission and later authored value progress",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/joint-rollback-frontier.spec.ts",
+    "name": "structural rollback source completion follows all native readers and grouped delivery",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  {
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/batching-dynamic-field.spec.ts",
+    "name": "vue dynamic entity batching > uses native writes without escaping coalesce",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  }
+]

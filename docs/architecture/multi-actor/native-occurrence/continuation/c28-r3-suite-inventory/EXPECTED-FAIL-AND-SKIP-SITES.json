@@ -1,0 +1,52 @@
+[
+  {
+    "path": "packages/kernel/src/lib/benchmarks.spec.ts",
+    "line": 26,
+    "text": "const timingDescribe = describe.runIf(RUN_TIMING);"
+  },
+  {
+    "path": "packages/kernel/src/lib/nested-structural-rollback-1.spec.ts",
+    "line": 231,
+    "text": "    const runner = stillRed ? it.fails : it;"
+  },
+  {
+    "path": "packages/kernel/src/lib/open-key-reachability.spec.ts",
+    "line": 17,
+    "text": "  it.fails('a promised arbitrary descendant is a usable location', () => {"
+  },
+  {
+    "path": "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts",
+    "line": 25,
+    "text": "const timingDescribe = describe.runIf(RUN_TIMING);"
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/derived.spec.ts",
+    "line": 939,
+    "text": "  describe.runIf(process.env['ST_PERF'] === '1')("
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "line": 110,
+    "text": "  it.fails("
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "line": 155,
+    "text": "  it.fails("
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "line": 248,
+    "text": "  it.fails("
+  },
+  {
+    "path": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
+    "line": 266,
+    "text": "  it.fails("
+  },
+  {
+    "path": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
+    "line": 41,
+    "text": "describe.runIf(RUN_TIMING)('Benchmark: neutral kernel vs raw Angular signal()', () => {"
+  }
+]

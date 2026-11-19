@@ -1,0 +1,21 @@
+{
+  "calls": 1,
+  "packetCount": 1,
+  "after": {
+    "x": false,
+    "y": true,
+    "undefinedY": true
+  },
+  "images": {
+    "ordinaryBeforeY": true,
+    "ordinaryAfterY": true,
+    "physicalBeforeY": false,
+    "physicalAfterY": true
+  },
+  "ordinarySupportRetained": false,
+  "final": {
+    "y": true,
+    "undefinedY": true,
+    "supportRestored": true
+  }
+}

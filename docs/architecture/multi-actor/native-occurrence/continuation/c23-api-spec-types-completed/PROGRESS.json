@@ -1,0 +1,10 @@
+[
+  {
+    "stage": "compiler-running",
+    "outputBytes": 0,
+    "ownedProcesses": [
+      "50094 49871 50094 /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node tools/check-spec-types.mjs",
+      "50096 50094 50094 /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /private/tmp/st-c23-declare-public-successor/candidate/node_modules/typescript/bin/tsc --noEmit --pretty false -p tsconfig.typecheck-specs.json"
+    ]
+  }
+]

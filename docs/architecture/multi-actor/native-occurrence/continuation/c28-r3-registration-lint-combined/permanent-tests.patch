@@ -1,0 +1,450 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/entity-registration-lifecycle.spec.ts
+@@ -0,0 +1,4 @@
++import {it,expect} from 'vitest';
++import * as api from '../index';
++import {lifecycleCases,runLifecycle} from '../../tests/entity-registration/lifecycle.mjs';
++for(const test of lifecycleCases)it(test.name,async()=>{const result=await runLifecycle(api,test);expect(result.pass,JSON.stringify(result)).toBe(true);});
+--- /dev/null
++++ b/packages/kernel/src/lib/entity-registration-original.spec.ts
+@@ -0,0 +1,4 @@
++import {it,expect} from 'vitest';
++import * as api from '../index';
++import {cases,runCase} from '../../tests/entity-registration/cases.mjs';
++for(const test of cases)it(test.name,async()=>{const result=await runCase(api,test);expect(result.pass,JSON.stringify(result)).toBe(true);});
+--- /dev/null
++++ b/packages/kernel/src/lib/entity-registration-receipts.spec.ts
+@@ -0,0 +1,4 @@
++import { it } from 'vitest';
++import * as api from '../index';
++import { receiptCases, runReceiptCase } from '../../tests/entity-registration/receipt-cases';
++for (const test of receiptCases) it(test.name, () => runReceiptCase(api, test));
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/dynamic-realization-composition-independent.spec.ts
+@@ -0,0 +1,72 @@
++import { describe, expect, it } from 'vitest';
++import { signalTree, createSignalTreeFactory } from '../signal-tree';
++import { transactions } from '../../enhancers/transactions/transactions';
++import { getPathNotifier } from '../path-notifier';
++import { getActiveWriteContext, withWriteContext } from '../write-context';
++import type { WriteMetadata } from '../types';
++import { createTreeScalarLeafRuntime } from './tree-scalar-leaf-runtime';
++import { createNativeTreeScalarLeafRuntime } from './native-tree-scalar-leaf-runtime';
++import { prepareTerminalMutations, preparePublicationMutations } from './intrinsic-mutation';
++import { replaceLocation } from './location-runtime';
++import type { ObservationAdapter } from './observation-adapter';
++import type { WritableCell } from './cell-runtime';
++import { scalarAdmissionMetadata } from './scalar-admission-metadata';
++import { getTreeScalarSlotRuntime } from './tree-scalar-slot-port';
++import { getOwnedPositionIds } from './owned-mutation';
++
++// Existing a1-publication-installation pattern: actual native kernel carrier,
++// controlled observation adapter; not a claim about framework UI scheduling.
++const observation: ObservationAdapter = {
++  createToken: () => ({ observe: () => undefined, invalidate: () => undefined }),
++  runInvalidationGroup: run => run(),
++  createWritableCell: <T>(read: () => T) => {
++    const cell: WritableCell<T> = Object.assign(() => read(), {
++      set: (_value: T) => undefined,
++      update: (_fn: (current: T) => T) => undefined,
++      asReadonly: () => read,
++    });
++    return { cell, peek: read, token: { observe: () => undefined, invalidate: () => undefined } };
++  },
++};
++const nativeTree = createSignalTreeFactory(observation, clock => createNativeTreeScalarLeafRuntime(clock, observation));
++const ambient: WriteMetadata = { transactionId: 73, transactionOwner: {}, participation: 'authored' };
++
++
++// Added composition controls: sources are created AFTER enhancer enrollment.
++for (const native of [false,true]) {
++ for (const method of ['prepareCommit','commit'] as const) it(`dynamic exact attempt ${native}/${method}`,()=>{
++  const tree=(native?nativeTree:signalTree)({a:0,rows:{} as Record<string,number>,c:0},{enhancers:[transactions()]});
++  tree.$.rows({b:0});
++  const b=tree.$.rows.b as import('./cell-runtime').Location<number>;
++  expect(typeof b).toBe('function');
++  const flags:Array<string|undefined>=[];
++  const off=preparePublicationMutations(b,m=>{flags.push(m.admissionParticipation);return undefined;},()=>undefined)!;
++  try{
++   const runtime=getTreeScalarSlotRuntime(tree.$)!;const slot=runtime.resolveScalarSlot(getOwnedPositionIds(b)![0])!;
++   const pending=tree.transact(()=>{
++    replaceLocation(tree.$.a,1);const context=getActiveWriteContext();
++    const frame=runtime.beginFrame();frame.set(slot,2);
++    if(method==='prepareCommit')frame.prepareCommit!({admissionParticipation:'realized'})();else frame.commit({admissionParticipation:'realized'});
++    expect(getActiveWriteContext()).toBe(context);replaceLocation(tree.$.c,3);
++   });
++   getPathNotifier().flushSync();expect(tree.$()).toEqual({a:1,rows:{b:2},c:3});expect(flags).toEqual(['realized']);
++   pending.rollback();getPathNotifier().flushSync();expect(tree.$()).toEqual({a:0,rows:{b:2},c:0});expect(tree.$.rows.b).toBe(b);
++   const next=tree.transact(()=>replaceLocation(b,4));expect(b()).toBe(4);expect(flags.at(-1)).toBeUndefined();next.rollback();getPathNotifier().flushSync();expect(b()).toBe(2);
++  }finally{off();tree.destroy();}
++ });
++ for (const same of [false,true]) it(`dynamic reentrant write retains its own authored attempt ${native}/${same}`,()=>{
++  const tree=(native?nativeTree:signalTree)({a:0,rows:{} as Record<string,number>,c:0},{enhancers:[transactions()]});tree.$.rows({b:0,d:0});
++  const b=tree.$.rows.b as import('./cell-runtime').Location<number>,d=tree.$.rows.d as import('./cell-runtime').Location<number>;expect(typeof b).toBe('function');expect(typeof d).toBe('function');
++  let entered=0;const flags:Array<string|undefined>=[];
++  const off=preparePublicationMutations(b,m=>{flags.push(m.admissionParticipation);if(m.after===7){entered++;replaceLocation(same?b:d,9);}return undefined;},()=>undefined)!;
++  try{
++   const runtime=getTreeScalarSlotRuntime(tree.$)!;const slot=runtime.resolveScalarSlot(getOwnedPositionIds(b)![0])!;
++   const pending=tree.transact(()=>{
++    replaceLocation(tree.$.a,1);const context=getActiveWriteContext();const frame=runtime.beginFrame();frame.set(slot,7);
++    expect(()=>frame.prepareCommit!({admissionParticipation:'realized'})).toThrow('Reentrant scalar preparation');expect(getActiveWriteContext()).toBe(context);replaceLocation(tree.$.c,3);
++   });
++   expect(entered).toBe(1);expect(flags).toEqual(same?['realized',undefined]:['realized']);getPathNotifier().flushSync();
++   expect(tree.$()).toEqual({a:1,rows:{b:same?9:0,d:same?0:9},c:3});pending.rollback();getPathNotifier().flushSync();expect(tree.$()).toEqual({a:0,rows:{b:0,d:0},c:0});expect(tree.$.rows.b).toBe(b);
++  }finally{off();tree.destroy();}
++ });
++}
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/scalar-completion-precedence.spec.ts
+@@ -0,0 +1,77 @@
++import { expect, it, vi } from 'vitest';
++import { createTreeScalarLeafRuntime } from './tree-scalar-leaf-runtime';
++import { createNativeTreeScalarLeafRuntime } from './native-tree-scalar-leaf-runtime';
++import { createLocationRuntime, replaceLocation, deriveLocation } from './location-runtime';
++import { preparePublicationMutations } from './intrinsic-mutation';
++import type { ObservationAdapter } from './observation-adapter';
++import * as errors from './error-reporter';
++
++const primary = new Error('primary');
++const secondary = new Error('completion');
++const reporter = new Error('reporter');
++const scenarios = [
++  { name: 'success', p: false, c: false },
++  { name: 'primary object', p: true, c: false, pe: primary },
++  { name: 'primary primitive', p: true, c: false, pe: 'primary string' },
++  { name: 'primary undefined', p: true, c: false, pe: undefined },
++  { name: 'completion object', p: false, c: true, ce: secondary },
++  { name: 'completion undefined', p: false, c: true, ce: undefined },
++  { name: 'primary undefined and completion', p: true, c: true, pe: undefined, ce: secondary },
++  { name: 'primary and completion undefined', p: true, c: true, pe: primary, ce: undefined },
++  { name: 'reporter throws', p: true, c: true, pe: primary, ce: secondary, reportThrows: true },
++  { name: 'completion reentry under primary', p: true, c: false, pe: primary, reentry: true },
++];
++for (const route of ['neutral-frame', 'native-frame', 'native-replace', 'native-derive']) {
++  for (const s of scenarios) it(`${route}: ${s.name} keeps completion and exact precedence`, () => {
++    let armed = true, complete = 0, notified = 0;
++    const reports: unknown[] = [];
++    const invalidate = () => { notified++; if (armed && s.p) throw s.pe; };
++    const token = () => ({ observe() { /* No dependency tracking in this boundary fixture. */ }, invalidate });
++    const adapter: ObservationAdapter = {
++      createToken: token, runInvalidationGroup: run => run(),
++      createWritableCell: <T>(read: () => T) => {
++        const cell = Object.assign(() => read(), {
++          set(_v: T) { /* Actual writes go through kernel location binding. */ },
++          update(_fn: (v: T) => T) { /* Actual updates go through kernel location binding. */ },
++          asReadonly: () => read,
++        });
++        return { cell, peek: read, token: token() };
++      },
++    };
++    const locations = createLocationRuntime(adapter);
++    const publish = vi.spyOn(locations, 'publish').mockImplementation(invalidate);
++    const runtime = route === 'neutral-frame'
++      ? createTreeScalarLeafRuntime(undefined, locations)
++      : createNativeTreeScalarLeafRuntime(undefined, adapter);
++    const a = runtime.createLeaf<number>(0, Object.is), b = runtime.createLeaf<number>(0, Object.is);
++    const report = vi.spyOn(errors, 'reportContainedObserverError').mockImplementation(event => {
++      reports.push(event.error); if (s.reportThrows) throw reporter;
++    });
++    const off = preparePublicationMutations(a,
++      () => ({ record: { writes: [], adds: [] }, completion: {} }),
++      () => {
++        complete++;
++        if (armed && s.reentry) {
++          armed = false; replaceLocation(b, 9); armed = true;
++        }
++        if (armed && s.c) throw s.ce;
++      })!;
++    const write = () => {
++      if (route.endsWith('frame')) {
++        const frame = runtime.beginFrame(); frame.set(0, a() + 1); frame.commit();
++      } else if (route === 'native-replace') replaceLocation(a, a() + 1);
++      else deriveLocation(a, current => current + 1);
++    };
++    try {
++      let caught = false, error: unknown;
++      try { write(); } catch (e) { caught = true; error = e; }
++      expect(caught).toBe(s.p || s.c);
++      expect(error).toBe(s.reportThrows ? reporter : s.p ? s.pe : s.c ? s.ce : undefined);
++      expect(a()).toBe(1); expect(complete).toBe(1); expect(notified).toBe(s.reentry && route !== 'neutral-frame' ? 2 : 1);
++      expect(reports).toEqual(s.p && s.c ? [s.ce] : []);
++      expect(b()).toBe(s.reentry ? 9 : 0);
++      armed = false; write(); expect(a()).toBe(2); expect(complete).toBe(2);
++      expect(reports).toEqual(s.p && s.c ? [s.ce] : []);
++    } finally { off(); report.mockRestore(); publish.mockRestore(); }
++  });
++}
+--- /dev/null
++++ b/packages/kernel/tests/entity-registration/cases.d.mts
+@@ -0,0 +1,19 @@
++/** Types for the standalone JS qualification harness; no public API augmentation. */
++export interface PublicCase {
++  readonly name: string;
++  readonly kind: 'field' | 'row' | 'collection';
++  readonly foreign: boolean;
++  readonly dependent: boolean;
++}
++export interface CaseObservation {
++  readonly name: string;
++  readonly pass: boolean;
++  readonly phase: string;
++  readonly sent: readonly unknown[];
++  readonly error?: { readonly name?: string; readonly message?: string };
++}
++export declare const cases: readonly PublicCase[];
++export declare function runCase(
++  api: typeof import('../../src/index'),
++  test: PublicCase
++): Promise<CaseObservation>;
+--- /dev/null
++++ b/packages/kernel/tests/entity-registration/cases.mjs
+@@ -0,0 +1,53 @@
++const flush = async () => { for (let i=0;i<60;i++) await Promise.resolve(); };
++const copy = value => JSON.parse(JSON.stringify(value));
++export const cases = [
++ {name:'field independent useful9',kind:'field',foreign:false,dependent:false},
++ {name:'row independent useful9',kind:'row',foreign:false,dependent:false},
++ {name:'collection independent useful9',kind:'collection',foreign:false,dependent:false},
++ {name:'field independent foreign window',kind:'field',foreign:true,dependent:false},
++ {name:'collection independent foreign window',kind:'collection',foreign:true,dependent:false},
++ {name:'field dependent foreign input',kind:'field',foreign:true,dependent:true},
++ {name:'row dependent foreign input',kind:'row',foreign:true,dependent:true},
++ {name:'collection dependent foreign input',kind:'collection',foreign:true,dependent:true},
++];
++export async function runCase(api, test) {
++ const observation={name:test.name,route:test.kind,sent:[],phase:'setup'};
++ const check=(condition,message)=>{if(!condition)throw Error(message);};
++ let tree,q,connection,owner,confirmed=false;
++ try {
++  tree=api.signalTree({rows:api.entityMap()});
++  tree.$.rows.setAll([{id:'r',x:0}]);
++  q=api.signalTree({x:0},{enhancers:[api.transactions()]});
++  const row=tree.$.rows.byIdOrFail('r');
++  const source=test.kind==='field'?row.x:test.kind==='row'?row:tree.$.rows;
++  const expected=test.kind==='field'?9:test.kind==='row'?{id:'r',x:9}:[{id:'r',x:9}];
++  connection=api.link(source,{set:value=>{observation.sent.push(copy(value));}});
++  await flush();observation.sent.length=0;
++  if(test.foreign)owner=q.transact(()=>q.$.x(7));
++  const before=owner?copy(owner.inspect()):undefined;
++  observation.phase='declare';
++  const receipt=connection.declare(test.dependent?{kind:'dependent',owners:[owner]}:{kind:'independent'},()=>{
++   const value=test.dependent?q.$.x()+2:9;
++   if(test.kind==='field')row.x(value);
++   else if(test.kind==='row')row({id:'r',x:value});
++   else tree.$.rows.setAll([{id:'r',x:value}]);
++  });
++  observation.receiptAtReturn=copy(receipt.read());
++  observation.phase='pre-confirm';await flush();
++  observation.receiptBeforeConfirm=copy(receipt.read());observation.sentBeforeConfirm=copy(observation.sent);
++  check(row.x()===9,'physical field must be9');
++  if(owner){check(q.$.x()===7,'foreign value changed');check(JSON.stringify(owner.inspect())===JSON.stringify(before),'foreign inspection changed');}
++  if(test.dependent)check(observation.sent.length===0,'premature dependent publication while foreign owner pending');
++  else check(JSON.stringify(observation.sent)===JSON.stringify([expected]),'independent useful9 must deliver exactly once');
++  observation.phase='confirm';if(owner){owner.confirm();confirmed=true;}
++  await flush();observation.receiptAfterConfirm=copy(receipt.read());
++  check(JSON.stringify(observation.sent)===JSON.stringify([expected]),'confirmation must yield exact useful9 once');
++  let settled=false;const completion=connection.settled().then(()=>{settled=true;});await flush();
++  check(settled,'settled must resolve after useful delivery');await completion;
++  await flush();check(observation.sent.length===1,'duplicate delivery');
++  check(row.x()===9,'terminal physical state changed');
++  observation.settled=true;observation.phase='complete';observation.pass=true;
++ } catch(error) {observation.pass=false;observation.error={name:error?.name,message:error?.message,code:error?.code,stage:error?.stage,reason:error?.reason};}
++ finally {connection?.dispose();if(owner&&!confirmed){try{owner.confirm();}catch{}}tree?.destroy();q?.destroy();}
++ return observation;
++}
+--- /dev/null
++++ b/packages/kernel/tests/entity-registration/lifecycle.d.mts
+@@ -0,0 +1,21 @@
++/** Types for the standalone JS qualification harness; no public API augmentation. */
++export interface LifecycleCase {
++  readonly name: string;
++  readonly kind: 'field' | 'collection';
++  readonly terminal: 'confirm' | 'rollback';
++  readonly late: boolean;
++}
++export interface LifecycleObservation {
++  readonly name: string;
++  readonly pass: boolean;
++  readonly phase: string;
++  readonly sent: readonly unknown[];
++  readonly second: readonly unknown[];
++  readonly third: readonly unknown[];
++  readonly error?: { readonly name?: string; readonly message?: string };
++}
++export declare const lifecycleCases: readonly LifecycleCase[];
++export declare function runLifecycle(
++  api: typeof import('../../src/index'),
++  test: LifecycleCase
++): Promise<LifecycleObservation>;
+--- /dev/null
++++ b/packages/kernel/tests/entity-registration/lifecycle.mjs
+@@ -0,0 +1,39 @@
++const flush=async()=>{for(let i=0;i<60;i++)await Promise.resolve();};
++const copy=v=>JSON.parse(JSON.stringify(v));
++const check=(v,m)=>{if(!v)throw Error(m);};
++export const lifecycleCases=[];
++for(const kind of ['field','collection'])for(const terminal of ['confirm','rollback'])lifecycleCases.push({name:`pre-Link pending ${kind} ${terminal}`,kind,terminal,late:false});
++for(const terminal of ['confirm','rollback'])lifecycleCases.push({name:`late collection multiple Links ${terminal}`,kind:'collection',terminal,late:true});
++export async function runLifecycle(api,test){
++ const r={name:test.name,sent:[],second:[],third:[],phase:'setup'};let tree,pending,settled=false;const links=[];
++ try{
++  // API module has already evaluated; none of these trees/collections existed then.
++  tree=api.signalTree({rows:api.entityMap()},{enhancers:[api.transactions()]});
++  tree.$.rows.setAll([{id:'r',x:0}]);await flush();const row=tree.$.rows.byIdOrFail('r');
++  if(test.late){
++   links.push(api.link(tree.$.rows,{set:v=>r.sent.push(copy(v))}));
++   links.push(api.link(row,{set:v=>r.second.push(copy(v))}));
++   links.push(api.link(row.x,{set:v=>r.third.push(copy(v))}));
++   await flush();r.sent.length=0;r.second.length=0;r.third.length=0;
++  }
++  pending=tree.transact(()=>row.x(7));const inspection=copy(pending.inspect());
++  if(!test.late)links.push(api.link(test.kind==='field'?row.x:tree.$.rows,{set:v=>r.sent.push(copy(v))}));
++  r.phase='pending';await flush();check(r.sent.length===0&&r.second.length===0&&r.third.length===0,'must hold while actual owner pending');
++  check(row.x()===7,'pending physical7');check(JSON.stringify(pending.inspect())===JSON.stringify(inspection),'Link enrollment changed pending inspection');
++  r.phase=test.terminal;pending[test.terminal]();settled=true;await flush();let x=test.terminal==='confirm'?7:0;
++  if(!test.late&&test.terminal==='confirm'){
++   // Enrollment adopts current value; confirmation alone is not an initial send.
++   check(r.sent.length===0,'confirmation of adopted baseline is not a new value write');
++   links[0].declare({kind:'independent'},()=>row.x(9));await flush();x=9;
++  }
++  const expected=test.kind==='field'?x:[{id:'r',x}];
++  check(JSON.stringify(r.sent)===JSON.stringify([expected]),'useful terminal output exactly once');
++  if(test.late)check(JSON.stringify(r.second)===JSON.stringify([{id:'r',x}]),'second Link useful terminal output exactly once');
++  if(test.late)check(JSON.stringify(r.third)===JSON.stringify([x]),'field Link useful terminal output exactly once');
++  check(row.x()===x,'terminal physical state');
++  for(const link of links){let done=false;const promise=link.settled().then(()=>{done=true;});await flush();check(done,'settled resolves');await promise;}
++  await flush();check(r.sent.length===1&&(!test.late||r.second.length===1&&r.third.length===1),'no duplicate terminal output');r.pass=true;r.phase='complete';
++ }catch(error){r.pass=false;r.error={name:error?.name,message:error?.message};}
++ finally{for(const link of links)link.dispose();if(pending&&!settled){try{pending.confirm();}catch{}}tree?.destroy();}
++ return r;
++}
+--- /dev/null
++++ b/packages/kernel/tests/entity-registration/receipt-cases.ts
+@@ -0,0 +1,59 @@
++import type * as Kernel from '../../src/index';
++export const receiptCases = ['field', 'row', 'collection'].flatMap(kind =>
++  [false, true].map(dependent => ({ kind, dependent, name: `${kind} changed receipt / ${dependent ? 'dependent' : 'independent'}` }))
++);
++const drain = async () => { for (let i = 0; i < 60; i++) await Promise.resolve(); };
++const check = (value: boolean, message: string) => { if (!value) throw new Error(message); };
++const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
++export async function runReceiptCase(api: typeof Kernel, test: typeof receiptCases[number]): Promise<void> {
++  const tree = api.signalTree({ rows: api.entityMap<{ id: string; x: number }>() });
++  const foreign = api.signalTree({ x: 0 }, { enhancers: [api.transactions()] });
++  tree.$.rows.setAll([{ id: 'r', x: 0 }]);
++  const row = tree.$.rows.byIdOrFail('r');
++  const sent: unknown[] = [];
++  const target = { set: (value: unknown) => { sent.push(JSON.parse(JSON.stringify(value))); } };
++  const relation = test.kind === 'field' ? api.link(row.x, target)
++    : test.kind === 'row' ? api.link(row, target) : api.link(tree.$.rows, target);
++  let ownerSettled = false;
++  let owner: ReturnType<typeof foreign.transact> | undefined;
++  const expected = (x: number) => test.kind === 'field' ? x : test.kind === 'row' ? { id: 'r', x } : [{ id: 'r', x }];
++  const write = (x: number) => {
++    if (test.kind === 'field') row.x(x);
++    else if (test.kind === 'row') row({ id: 'r', x });
++    else tree.$.rows.setAll([{ id: 'r', x }]);
++  };
++  try {
++    await drain(); sent.length = 0;
++    owner = foreign.transact(() => foreign.$.x(7));
++    const inspection = JSON.stringify(owner.inspect());
++    const receipt = relation.declare(test.dependent ? { kind: 'dependent', owners: [owner] } : { kind: 'independent' },
++      () => write(test.dependent ? foreign.$.x() + 2 : 9));
++    check(row.x() === 9, 'actual changed physical9');
++    check(receipt.read().state !== 'no-write', 'changed write must not return no-write');
++    check(JSON.stringify(owner.inspect()) === inspection && foreign.$.x() === 7, 'foreign ownership unchanged');
++    await drain();
++    check(receipt.read().state !== 'no-write', 'changed write must not settle as no-write');
++    if (test.dependent) {
++      check(same(receipt.read(), { state: 'held', reason: 'pending-dependency' }), 'dependent receipt held before confirm');
++      check(sent.length === 0, 'dependent has no early transport');
++      let settled = false; const wait = relation.settled().then(() => { settled = true; });
++      await drain(); check(!settled, 'dependent settled remains pending');
++      owner.confirm(); ownerSettled = true; await drain(); await wait;
++      check(settled, 'dependent settles after confirmation');
++    } else {
++      check(same(sent, [expected(9)]), 'independent useful9 while foreign pending');
++      owner.confirm(); ownerSettled = true; await drain();
++    }
++    check(same(sent, [expected(9)]), 'exact useful9 once');
++    check(receipt.read().state === 'started', 'useful transport terminal receipt');
++    const earlier = JSON.stringify(receipt.read());
++    const next = relation.declare({ kind: 'independent' }, () => write(11));
++    await drain(); await relation.settled();
++    check(next.read().state !== 'no-write', 'second actual changed write');
++    check(same(sent, [expected(9), expected(11)]), 'two exact useful transports');
++    check(JSON.stringify(receipt.read()) === earlier, 'earlier receipt stays terminal after newer write');
++    relation.dispose(); await drain();
++    check(JSON.stringify(receipt.read()) === earlier, 'earlier terminal receipt survives disposal');
++    check(same(sent, [expected(9), expected(11)]), 'no duplicate after settlement/disposal');
++  } finally { relation.dispose(); if (!ownerSettled) owner?.confirm(); tree.destroy(); foreign.destroy(); }
++}
+--- /dev/null
++++ b/tools/experiments/entity-registration/README.md
+@@ -0,0 +1,9 @@
++# Entity registration regression checks
++
++The original eight transport cases and six source-matched lifecycle cases are shared byte-for-byte between ordinary source specs and installed/bundled probes. Receipt states in original eight are observations, not exact oracles. receipt-cases.ts separately asserts actual changed writes are not no-write, dependent pending hold and earlier terminal receipt stability.
++
++Source wrappers under packages/kernel/src/lib/entity-registration-*.spec.ts use relative imports within the kernel project. Shared fixtures are under packages/kernel/tests/entity-registration. Run through Nx. The TypeScript receipt harness is covered by source/spec imports; .d.mts declarations type the unchanged JS harness boundary (not a claim that JS implementation is statically typechecked).
++
++Artifact replay: build canonical packages through Nx, prepare package artifacts, npm pack/install all five fresh tarballs plus pinned peers into a new isolated consumer. Copy cases.mjs, lifecycle.mjs, receipt-cases.ts from packages/kernel/tests/entity-registration and the four consumer entry files plus facade-imports.mjs into that directory. Under pinned Node24 run consumer.mjs (8), lifecycle-consumer.mjs (6), receipt-consumer.mjs (6), no-link.mjs and facade-imports.mjs. Then from the repository run `node tools/experiments/entity-registration/build-consumers.mjs /absolute/isolated/consumer`; run all four resulting *.production.mjs programs. Retain commands/logs, source/tarball/installed hashes and metafiles. No aliases to source, sideEffects overrides or private activation.
++
++Do not execute staged consumers without installing fresh tarballs. These scripts are manual bounded artifact regression checks, not newly registered automatic release gates. The namespace harness retains optional enhancers and is not a minimal size workload. Genuinely late FIRST registration is unqualified; pre-Link pending controls assume module evaluation already happened. Current cost/large/budget failures are not waived by these cases.
+--- /dev/null
++++ b/tools/experiments/entity-registration/build-consumers.mjs
+@@ -0,0 +1,12 @@
++import { build } from 'esbuild';
++import { writeFileSync } from 'node:fs';
++import { resolve } from 'node:path';
++const supplied = process.argv[2];
++if (!supplied) throw new Error('Pass the isolated consumer directory containing freshly installed package tarballs.');
++const root = resolve(supplied);
++for (const name of ['consumer', 'lifecycle-consumer', 'receipt-consumer', 'no-link']) {
++  const result = await build({ bundle: true, minify: true, format: 'esm', platform: 'browser', treeShaking: true,
++    define: { ngDevMode: 'false', 'process.env.NODE_ENV': '"production"' }, external: ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'],
++    metafile: true, logLevel: 'info', entryPoints: [root + '/' + name + '.mjs'], outfile: root + '/' + name + '.production.mjs' });
++  writeFileSync(root + '/' + name + '.metafile.json', JSON.stringify(result.metafile, null, 2));
++}
+--- /dev/null
++++ b/tools/experiments/entity-registration/consumer.mjs
+@@ -0,0 +1,6 @@
++import * as api from '@signal-tree/kernel';
++import {cases,runCase} from './cases.mjs';
++const results=[];
++for(const test of cases){const result=await runCase(api,test);results.push(result);console.log(JSON.stringify(result));}
++console.log(JSON.stringify({summary:true,passed:results.filter(x=>x.pass).length,total:results.length}));
++if(results.some(x=>!x.pass))process.exitCode=1;
+--- /dev/null
++++ b/tools/experiments/entity-registration/facade-imports.mjs
+@@ -0,0 +1,2 @@
++import * as k from '@signal-tree/kernel';
++for(const name of ['angular','react','vue','solid']){const a=await import('@signal-tree/'+name);if(a.link!==k.link)throw Error(name+' duplicate Link');if(a.SignalTreePublicationError!==k.SignalTreePublicationError)throw Error(name+' duplicate error');}if('createEntityPublicationParticipant' in k)throw Error('private factory leaked publicly');console.log('five facade imports share Link/error; private factory absent from public barrel');
+--- /dev/null
++++ b/tools/experiments/entity-registration/lifecycle-consumer.mjs
+@@ -0,0 +1,3 @@
++import * as api from '@signal-tree/kernel';
++import {lifecycleCases,runLifecycle} from './lifecycle.mjs';
++const results=[];for(const test of lifecycleCases){const result=await runLifecycle(api,test);results.push(result);console.log(JSON.stringify(result));}console.log(JSON.stringify({passed:results.filter(r=>r.pass).length,total:results.length}));if(results.some(r=>!r.pass))process.exitCode=1;
+--- /dev/null
++++ b/tools/experiments/entity-registration/no-link.mjs
+@@ -0,0 +1,11 @@
++import {signalTree,entityMap,transactions} from '@signal-tree/kernel';
++const check=(v,m)=>{if(!v)throw Error(m);};
++const t=signalTree({rows:entityMap()},{enhancers:[transactions()]});
++try{
++ t.$.rows.setAll([{id:'r',x:0}]);const row=t.$.rows.byIdOrFail('r');
++ const first=t.transact(()=>row.x(7));check(row.x()===7,'pending7');check(first.inspect().changes.length>0,'first actual inspection contribution');
++ first.confirm();check(row.x()===7,'confirmed7');
++ const second=t.transact(()=>row.x(9));check(row.x()===9,'pending9');check(second.inspect().changes.length>0,'second actual inspection contribution');
++ second.rollback();check(row.x()===7,'rollback7');check(JSON.stringify(t.$.rows.all())===JSON.stringify([{id:'r',x:7}]),'whole collection rollback7');
++ console.log(JSON.stringify({scope:'separate production no-Link entity transactions',confirmed:7,rolledBack:7,passed:true}));
++}finally{t.destroy();}
+--- /dev/null
++++ b/tools/experiments/entity-registration/receipt-consumer.mjs
+@@ -0,0 +1,4 @@
++import * as api from '@signal-tree/kernel';
++import {receiptCases,runReceiptCase} from './receipt-cases.ts';
++for(const test of receiptCases){await runReceiptCase(api,test);console.log(JSON.stringify({name:test.name,pass:true}));}
++console.log(JSON.stringify({passed:receiptCases.length,total:receiptCases.length}));

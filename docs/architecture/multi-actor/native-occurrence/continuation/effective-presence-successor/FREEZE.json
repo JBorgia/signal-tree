@@ -1,0 +1,35 @@
+{
+  "manifest": "/private/tmp/st-effective-presence-successor/SNAPSHOT.json",
+  "manifestSha256": "47e05e6216bab9fd186dfbb66b656f4e33dc1f9d98a81a1ad096ee61b12181f9",
+  "files": 3050,
+  "baseManifestSha256": "dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148",
+  "runtimeChanged": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/member-membership.ts"
+  ],
+  "newTests": [
+    "packages/angular/src/lib/effective-presence-install-reentry.spec.ts",
+    "packages/angular/src/lib/effective-presence-successor.spec.ts",
+    "packages/kernel/src/lib/effective-presence-install-reentry.spec.ts",
+    "packages/kernel/src/lib/effective-presence-reentry.spec.ts",
+    "packages/kernel/src/lib/effective-presence-successor.spec.ts"
+  ],
+  "patches": {
+    "RUNTIME.patch": "90685c0ce124a3c3c0f89a75f9ae036772f84bab2dee527b19bdfa1bf2cee629",
+    "FROM-C11.patch": "0725b8266625a21bcd14ca91f301c5124511f980eb3bf6bae988511cf0ecfdc1"
+  },
+  "sourceTypes": "pass",
+  "specTypes": "pass after type-only fixture repair; first failure preserved",
+  "finalNewControls": {
+    "kernel": 17,
+    "angular": 13
+  },
+  "unchangedReplay": {
+    "kernel": 122,
+    "angular": 26,
+    "reactAbsent": 12,
+    "solidAbsent": 14
+  },
+  "frozenC11VerifiedUnchanged": true,
+  "scope": "bounded shared correction; independent review pending"
+}

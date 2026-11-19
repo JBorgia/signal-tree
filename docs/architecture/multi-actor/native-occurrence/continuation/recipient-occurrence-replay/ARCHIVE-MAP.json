@@ -1,0 +1,74 @@
+[
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "3d32dea3ca0bcb232e9458134fa0a6c1b88d76542006167eb0c5641c54195ce4",
+    "archiveSha256": "3d32dea3ca0bcb232e9458134fa0a6c1b88d76542006167eb0c5641c54195ce4"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+    "archiveSha256": "6fbbaa30ff83a44060094802bde8d641f8b28fe986418e571df6cff3db31e027"
+  },
+  {
+    "source": "recipient-traces.jsonl",
+    "archive": "recipient-traces.jsonl",
+    "sourceSha256": "e067a576b2558d4475a84cc6a03a1e3f809dbbb2047b6c4a4c3c38e5d471005c",
+    "archiveSha256": "e067a576b2558d4475a84cc6a03a1e3f809dbbb2047b6c4a4c3c38e5d471005c"
+  },
+  {
+    "source": "diagnostic-redirect.cjs",
+    "archive": "diagnostic-redirect.cjs",
+    "sourceSha256": "867fae39fd9adcf5fdc2de6e22cb6f142770c95c8be1502c54d2a5987146713a",
+    "archiveSha256": "867fae39fd9adcf5fdc2de6e22cb6f142770c95c8be1502c54d2a5987146713a"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "36a5a7d74d869df04cb13af4c785498186a9bf127b4d70447c3c545ae8d74c51",
+    "archiveSha256": "36a5a7d74d869df04cb13af4c785498186a9bf127b4d70447c3c545ae8d74c51"
+  },
+  {
+    "source": "EVIDENCE-SNAPSHOT.json",
+    "archive": "EVIDENCE-SNAPSHOT.json",
+    "sourceSha256": "6b1fef78ca61a381993eed3e772a8cbe6ff34d52772bd9fa5dbe9260dde196e5",
+    "archiveSha256": "6b1fef78ca61a381993eed3e772a8cbe6ff34d52772bd9fa5dbe9260dde196e5"
+  },
+  {
+    "source": "FIRST-FAILURE-STACKS.txt",
+    "archive": "FIRST-FAILURE-STACKS.txt",
+    "sourceSha256": "884c6191dc1d8f906a2320841006e92fc2f11a8784f1253baab54e0fc39fce68",
+    "archiveSha256": "884c6191dc1d8f906a2320841006e92fc2f11a8784f1253baab54e0fc39fce68"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "579ef9e0512f9d89a16577ce2cfbf2857c429961e67d151d60f5371240fc1161",
+    "archiveSha256": "579ef9e0512f9d89a16577ce2cfbf2857c429961e67d151d60f5371240fc1161"
+  },
+  {
+    "source": "runs/exact25/RESULT.json",
+    "archive": "runs/exact25/RESULT.json",
+    "sourceSha256": "a151390b29036762da1e686580a91f6b107667d22ec84ba7bf1f6650f8fae115",
+    "archiveSha256": "a151390b29036762da1e686580a91f6b107667d22ec84ba7bf1f6650f8fae115"
+  },
+  {
+    "source": "runs/exact25/first.log",
+    "archive": "runs/exact25/first.log",
+    "sourceSha256": "b063b71ab105d9eb3533c42b5206602cadd0c601c1c5c65a70167a9973e29e17",
+    "archiveSha256": "b063b71ab105d9eb3533c42b5206602cadd0c601c1c5c65a70167a9973e29e17"
+  },
+  {
+    "source": "runs/exact25/SOURCE-BEFORE.json",
+    "archive": "runs/exact25/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "0fb4f1ca4bc35e152885c925c5abda766ca626836aa4bec4df5daea8a981a3c0",
+    "archiveSha256": "cb1cb5ccaf901730c004bd306baaaee593dc593e301a2ebeb9a0cc64d550fa06"
+  },
+  {
+    "source": "runs/exact25/COMMAND.json",
+    "archive": "runs/exact25/COMMAND.json",
+    "sourceSha256": "157de2c868c1ae35e83783e2dac2286e43e36b99e1b5fa6d70cd95c7c69cdec8",
+    "archiveSha256": "157de2c868c1ae35e83783e2dac2286e43e36b99e1b5fa6d70cd95c7c69cdec8"
+  }
+]

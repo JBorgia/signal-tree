@@ -1,0 +1,13 @@
+{
+  "extends": "/private/tmp/st-c28-r3-realization-metadata-repair/candidate/tsconfig.typecheck-all.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "declarationMap": false,
+    "outDir": "/private/tmp/st-c28-r3-realization-metadata-repair/gate-declarations/candidate"
+  },
+  "include": [
+    "/private/tmp/st-c28-r3-realization-metadata-repair/candidate/packages/kernel/src/**/*.ts"
+  ]
+}

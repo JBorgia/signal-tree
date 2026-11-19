@@ -1,0 +1,177 @@
+
+> nx run angular:test parent-snapshot-currentness.spec.ts --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular parent-snapshot-currentness.spec.ts --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:52429) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:52467) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-snapshot-c8-controls/candidate/packages/angular
+
+(node:52474) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/parent-snapshot-currentness.spec.ts
+SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts (5 tests | 3 failed) 25ms
+   × fresh read-derived completion retains a and nested b: ordinary 17ms
+   × fresh ancestor and sibling identity during completion; no repeated-read churn 1ms
+   × warmed Angular computed preserves notification timing while direct held reader is current 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/parent-snapshot-currentness.spec.ts > fresh read-derived completion retains a and nested b: ordinary
+AssertionError: expected {} to deeply equal { a: { n: 1 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 1,
+-   },
+- }
++ {}
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts:29:68
+
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/parent-snapshot-currentness.spec.ts > fresh read-derived completion retains a and nested b: ordinary
+AssertionError: expected { b: { n: 2 } } to deeply equal { a: { n: 1 }, b: { n: 2 } }
+
+- Expected
++ Received
+
+  {
+-   "a": {
+-     "n": 1,
+-   },
+    "b": {
+      "n": 2,
+    },
+  }
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts:29:109
+
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  src/lib/parent-snapshot-currentness.spec.ts > fresh read-derived completion retains a and nested b: ordinary
+AssertionError: expected { b: { n: 2 } } to deeply equal { a: { n: 1 }, b: { n: 2 } }
+
+- Expected
++ Received
+
+  {
+-   "a": {
+-     "n": 1,
+-   },
+    "b": {
+      "n": 2,
+    },
+  }
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts:29:155
+
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  src/lib/parent-snapshot-currentness.spec.ts > fresh ancestor and sibling identity during completion; no repeated-read churn
+AssertionError: expected {} to deeply equal { a: { n: 1 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 1,
+-   },
+- }
++ {}
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts:38:62
+
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  src/lib/parent-snapshot-currentness.spec.ts > fresh ancestor and sibling identity during completion; no repeated-read churn
+AssertionError: expected {} to deeply equal { a: { n: 1 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 1,
+-   },
+- }
++ {}
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts:38:106
+
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  src/lib/parent-snapshot-currentness.spec.ts > warmed Angular computed preserves notification timing while direct held reader is current
+AssertionError: expected {} to deeply equal { a: { n: 1 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 1,
+-   },
+- }
++ {}
+
+ ❯ src/lib/parent-snapshot-currentness.spec.ts:49:391
+
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../../../../../Users/jonathanborgia/code/signaltree/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 2 passed (5)
+   Start at  08:56:11
+   Duration  1.17s (transform 564ms, setup 190ms, import 658ms, tests 25ms, environment 184ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular parent-snapshot-currentness.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    1.7s

@@ -1,0 +1,80 @@
+
+> nx run kernel:test native-structural-composition-gates.spec.ts
+
+> node tools/run-core-vitest.mjs native-structural-composition-gates.spec.ts
+
+(node:1538) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:1545) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-reviewed-successor/baseline-control/packages/kernel
+
+(node:1552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts (3 tests | 1 failed) 30ms
+     × keeps compound inspection membership and order consistent with inspect and ordinary Link rejection 11ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/enhancers/transactions/native-structural-composition-gates.spec.ts > slice2 structural consumer composition gates > keeps compound inspection membership and order consistent with inspect and ordinary Link rejection
+AssertionError: expected [ { id: 'b', n: 4 }, …(2) ] to deeply equal [ { id: 'a', n: 1 }, …(2) ]
+
+- Expected
++ Received
+
+  [
+    {
+-     "id": "a",
+-     "n": 1,
+-   },
+-   {
+      "id": "b",
+      "n": 4,
+    },
+    {
+      "id": "c",
+      "n": 3,
++   },
++   {
++     "id": "a",
++     "n": 1,
+    },
+  ]
+
+ ❯ src/enhancers/transactions/native-structural-composition-gates.spec.ts:79:65
+     77|       expect(rows.ids()).toEqual(['a','b','c']); expect(rows.byIdOrFai…
+     78|       expect(freshA()).toBeUndefined(); expect(x()).toBeUndefined();
+     79|       expect(rows.all()).toEqual(baseline); expect(sent.at(-1)).toEqua…
+       |                                                                 ^
+     80|       expect(sent.some(value=>value.some(row=>row.id==='x'||row.n===9)…
+     81|       rows.updateOne('b',{n:5}); await tick(); await connection.settle…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  13:46:56
+   Duration  956ms (transform 517ms, setup 0ms, import 624ms, tests 30ms, environment 203ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-structural-composition-gates.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

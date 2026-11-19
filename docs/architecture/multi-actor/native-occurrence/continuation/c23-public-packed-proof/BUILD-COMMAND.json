@@ -1,0 +1,19 @@
+{
+  "cwd": "/private/tmp/st-c23-declare-public-successor/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "run-many",
+    "-t",
+    "build",
+    "--projects=kernel,angular,react,vue,solid",
+    "--parallel=1",
+    "--skip-nx-cache",
+    "--output-style=stream"
+  ],
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "noOutputWatchdogSeconds": 180,
+  "manifestSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa"
+}

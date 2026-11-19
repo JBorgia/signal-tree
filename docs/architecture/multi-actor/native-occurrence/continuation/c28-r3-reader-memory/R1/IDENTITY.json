@@ -1,0 +1,36 @@
+{
+  "registeredAt": "2026-11-03T16:17:04.766258+00:00",
+  "campaign": "R1",
+  "controller": "1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344",
+  "commands": "a11bfdd08521ba216d6e7d0ce8bec8ee10e868d5396d976d548b8ef08600bd60",
+  "inputs": {
+    "baseline": {
+      "frozenPath": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+      "frozenManifest": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+      "frozenFiles": 3124,
+      "measurementPath": "/private/tmp/st-c28-r3-reader-memory/baseline/candidate",
+      "selectedFiles": 3124,
+      "selectedManifest": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+      "excluded": []
+    },
+    "reader": {
+      "frozenPath": "/private/tmp/st-c28-r3-cold-row-responsibility/candidate",
+      "frozenManifest": "812a3ad5d6843e95a791aaf001927d54f67738626360a50afb9f7871fdfcd302",
+      "frozenFiles": 3127,
+      "measurementPath": "/private/tmp/st-c28-r3-reader-memory/reader/candidate",
+      "selectedFiles": 3125,
+      "selectedManifest": "42b24d55377490c7c51cf552004cd9141584d8ec8bfad075e2724afd6a55cfed",
+      "excluded": [
+        "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+        "packages/kernel/src/lib/preparation-reader-comparison.spec.ts"
+      ]
+    }
+  },
+  "originalTest": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+  "template": "eead720778660ef1e0b0270299e5d19c1c464bedc2e1462759c7d8d6bbff38dd",
+  "reporter": "7139f0a808104be6cd10b49c92889026925d08840f014cd1c65d6f43f633c977",
+  "reviewVerdict": "654e8495f01e01d93b2f5f6d3d35cf23e01ee9200ff1092e9c9a00f762e174e7",
+  "independentChecks": "f0f48dde528598efc4135dea15de3753d34ab8a80d2473adce5c04e72bfd7671",
+  "priorCampaign": "C0: one command administratively cancelled; zero test events and memory samples; preserved, not retried",
+  "maximumInvocations": 8
+}

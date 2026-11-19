@@ -1,0 +1,1 @@
+First public fixture used removed map() accessor. Both production and patched candidate fail four controls with TypeError; original three pass on both. Corrected to declared asMap() accessor only; assertions unchanged. First fixture and all first logs preserved.

@@ -1,0 +1,15 @@
+{
+  "cwd": "/private/tmp/st-collection-egress-successor/branch-trace",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "branch-omission-correctness.spec.ts",
+    "--testNamePattern=same-turn removal and reintroduction ends absent",
+    "--maxWorkers=1"
+  ],
+  "exit": 1
+}

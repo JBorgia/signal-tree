@@ -1,0 +1,59 @@
+
+> nx run kernel:test independent-dynamic-enrollment.spec.ts --testNamePattern=repeated preinstall refusal --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-dynamic-enrollment.spec.ts --testNamePattern="repeated preinstall refusal" --maxWorkers=1
+
+(node:35079) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:35086) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-enrollment-independent/C0/candidate/packages/kernel
+
+(node:35093) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-dynamic-enrollment.spec.ts (7 tests | 1 failed | 6 skipped) 8ms
+   × repeated preinstall refusal leaves no child observer and no scalar slot growth 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-dynamic-enrollment.spec.ts > repeated preinstall refusal leaves no child observer and no scalar slot growth
+AssertionError: expected 3 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 3
+
+ ❯ src/lib/independent-dynamic-enrollment.spec.ts:56:104
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 skipped (7)
+   Start at  20:13:55
+   Duration  792ms (transform 445ms, setup 0ms, import 532ms, tests 8ms, environment 178ms)
+
+Warning: command "node tools/run-core-vitest.mjs independent-dynamic-enrollment.spec.ts --testNamePattern="repeated preinstall refusal" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

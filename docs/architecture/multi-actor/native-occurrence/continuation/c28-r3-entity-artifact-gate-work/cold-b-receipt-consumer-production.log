@@ -1,0 +1,7 @@
+{"name":"field changed receipt / independent","pass":true}
+{"name":"field changed receipt / dependent","pass":true}
+{"name":"row changed receipt / independent","pass":true}
+{"name":"row changed receipt / dependent","pass":true}
+{"name":"collection changed receipt / independent","pass":true}
+{"name":"collection changed receipt / dependent","pass":true}
+{"passed":6,"total":6}

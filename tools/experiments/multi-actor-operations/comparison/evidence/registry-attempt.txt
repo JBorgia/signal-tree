@@ -1,0 +1,11 @@
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm error code ENOTFOUND
+npm error syscall getaddrinfo
+npm error errno ENOTFOUND
+npm error network request to https://registry.npmjs.org/@tanstack%2fdb failed, reason: getaddrinfo ENOTFOUND registry.npmjs.org
+npm error network This is a problem related to network connectivity.
+npm error network In most cases you are behind a proxy or have bad network settings.
+npm error network
+npm error network If you are behind a proxy, please make sure that the 'proxy' config is set properly.  See: 'npm help config'
+npm error A complete log of this run can be found in: /private/tmp/multi-actor-comparison-npm-cache/_logs/2026-10-29T18_26_09_718Z-debug-0.log

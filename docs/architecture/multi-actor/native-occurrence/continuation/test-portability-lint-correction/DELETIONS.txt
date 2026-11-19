@@ -1,0 +1,1 @@
+tools/testing/optional-diagnostic.ts

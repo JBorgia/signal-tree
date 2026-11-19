@@ -1,0 +1,16 @@
+{
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "472604e60240ae135f77c11968669d6e0f8321df4137399fd8fb685eb54569f1",
+  "packages/kernel/src/lib/internals/native-scalar-selection.ts": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "88d1b29e6b8503fb7cb3f004a47eb8f80533fc5739aa71702d34de8f7288b270",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "83e9d1a6fc724b32912f7ca18a3b6514e8a952906e35c67704ab5610ca88a335",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+  "packages/kernel/src/lib/internals/plain-branch-membership.ts": "6b44f83bb5a697029f28a10bb4e3a55f3a2f99a21e068c9c4756e16a671eb2fe",
+  "packages/kernel/src/lib/experimental-publication/private.ts": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+  "packages/kernel/src/lib/experimental-publication/entity.ts": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "097f45acbce6dea82c4e984464780ac1ce1bb2539a6731df11c338a01ba73dc7",
+  "packages/kernel/src/enhancers/restoration/restoration.ts": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+  "packages/kernel/src/lib/undoable.ts": "c77dc84b015f025a4b83b79d63bf33e0e706078ff555e0913989de78c34c47db"
+}

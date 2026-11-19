@@ -1,0 +1,66 @@
+
+> nx run kernel:test branch-omission-correctness.spec.ts --testNamePattern=same-turn removal and reintroduction ends absent --maxWorkers=1
+
+> node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts --testNamePattern="same-turn removal and reintroduction ends absent" --maxWorkers=1
+
+(node:96667) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:96675) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-collection-egress-successor/branch-trace/packages/kernel
+
+(node:96682) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/branch-omission-correctness.spec.ts (35 tests | 1 failed | 34 skipped) 49ms
+     × same-turn removal and reintroduction ends absent at Link 47ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
++   "age": 8,
+    "name": "Ada",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:255:33
+    253|         await nextTask();
+    254|         await relation.settled();
+    255|         expect(received.at(-1)).toStrictEqual(
+       |                                 ^
+    256|           end === 'present' ? { name: 'Ada', age: undefined } : { name…
+    257|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 34 skipped (35)
+   Start at  17:03:31
+   Duration  2.38s (transform 1.20s, setup 0ms, import 1.46s, tests 49ms, environment 558ms)
+
+Warning: command "node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts --testNamePattern="same-turn removal and reintroduction ends absent" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.4s

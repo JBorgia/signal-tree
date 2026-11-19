@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "absent-collection.spec.ts",
+    "--testNamePattern=a rollback compensating hidden rows re-runs no consumer",
+    "--reporter=json",
+    "--outputFile=/private/tmp/st-native-broad-differential/predecessor/kernel-hidden-focused/vitest.json",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-broad-differential/predecessor/candidate",
+  "fixtureSha256": "b217969571e40fa6839759e5fd5f24b9093ba5d5796e0004a762b11dec63d047"
+}

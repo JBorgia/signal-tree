@@ -1,0 +1,178 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts
+
+(node:16385) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16392) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-admission-successor/trace-copy/packages/kernel
+
+(node:16399) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff equal preserves q destination until its actual rejection
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2479:15)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2626:20)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff equal preserves q destination until its actual rejection
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3146:11)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3203:20)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":0,"after":7,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3136:16)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3203:20)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3204:16)","    at Array.map (<anonymous>)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":7,"after":0,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":7,"after":0,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3205:12)","    at Array.map (<anonymous>)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3146:11)","    at Array.map (<anonymous>)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":0,"after":7,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3136:16)","    at Array.map (<anonymous>)"]}
+
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff inverse preserves q destination until its actual rejection
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2479:15)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2626:20)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff inverse preserves q destination until its actual rejection
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"before":7,"after":11,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2479:15)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2626:20)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3146:11)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3203:20)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":7,"after":11,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":7,"after":11,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3136:16)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3203:20)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3204:16)","    at Array.map (<anonymous>)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":11,"after":7,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":11,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3205:12)","    at Array.map (<anonymous>)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3146:11)","    at Array.map (<anonymous>)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":7,"after":11,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":7,"after":11,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3136:16)","    at Array.map (<anonymous>)"]}
+
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff netzero preserves q destination until its actual rejection
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2479:15)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2626:20)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff netzero preserves q destination until its actual rejection
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"before":7,"after":11,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2479:15)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2626:20)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":11,"after":7},"present":true,"before":11,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2479:15)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:1992:28)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2623:9)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":11,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:1992:66)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2623:9)"]}
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":7},"present":true,"before":7,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2007:25)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2623:9)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at Object.sourceCaptureRuntime.prepareEntityResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2626:20)","    at Object.unit.prepareResponsibility (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/entity-signal.ts:2048:241)"]}
+ENDPOINT-READ {"effect":{"kind":"set","path":"rows.x","ownerPath":"rows","position":2,"subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":false,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:1992:28)","    at captureEffects (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2154:9)"]}
+ENDPOINT-READ {"effect":{"kind":"set","path":"rows.x","ownerPath":"rows","position":2,"subject":1,"subjectFieldSegments":["x"],"before":11,"after":7},"present":false,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:1992:66)","    at captureEffects (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2154:9)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":11},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:1992:28)","    at foldOperationDisposition (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2717:9)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":11,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:1992:66)","    at foldOperationDisposition (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2717:9)"]}
+ENDPOINT-BIND {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":7,"after":7},"present":true,"before":7,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at enqueueEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2007:25)","    at foldOperationDisposition (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:2717:9)"]}
+
+stderr | src/lib/native-admission-handoff.spec.ts > native handoff netzero preserves q destination until its actual rejection
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3146:11)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3203:20)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":0,"after":7,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3136:16)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3203:20)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3204:16)","    at Array.map (<anonymous>)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":7,"after":0,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":7,"after":0,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toRollbackEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3205:12)","    at Array.map (<anonymous>)"]}
+ENDPOINT-READ {"effect":{"kind":"set","position":2,"ownerPath":"rows","path":"rows.a.x","subject":1,"subjectFieldSegments":["x"],"before":0,"after":7},"present":true,"stack":["    at fieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:16:188)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3146:11)","    at Array.map (<anonymous>)"]}
+ENDPOINT-BIND {"effect":{"owner":2,"before":0,"after":7,"subjectId":1,"subjectFieldSegments":["x"],"path":"rows.a.x","ownerPath":"rows"},"present":true,"before":0,"after":7,"stack":["    at bindFieldEndpoints (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/lib/internals/native-field-selection.ts:18:127)","    at toCausalEffect (/private/tmp/st-native-admission-successor/trace-copy/packages/kernel/src/enhancers/transactions/transactions.ts:3136:16)","    at Array.map (<anonymous>)"]}
+
+ ❯ src/lib/native-admission-handoff.spec.ts (4 tests | 3 failed) 46ms
+   × native handoff equal preserves q destination until its actual rejection 32ms
+   × native handoff inverse preserves q destination until its actual rejection 5ms
+   × native handoff netzero preserves q destination until its actual rejection 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-admission-handoff.spec.ts > native handoff equal preserves q destination until its actual rejection
+AssertionError: expected [ { owner: 1, id: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "dependents": Set {},
++     "id": 1,
++     "outcome": "rolled-back",
++     "owner": 1,
++   },
++ ]
+
+ ❯ src/lib/native-admission-handoff.spec.ts:19:102
+     17|   else {r=tree.transact(()=>{rows.updateOne('a',{x:11});if(mode==='net…
+     18|   await flush();expect(row.x()).toBe(7);expect(life.nativeProof(req())…
+     19|   q.rollback();await flush();expect(row.x()).toBe(0);expect(life.nativ…
+       |                                                                                                      ^
+     20|  }finally{c.dispose();tree.destroy();}
+     21| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/native-admission-handoff.spec.ts > native handoff inverse preserves q destination until its actual rejection
+AssertionError: expected [ { owner: 2, id: 2, …(2) } ] to deeply equal [ { owner: 2, id: 1, …(2) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "dependents": Set {},
+-     "id": 1,
+-     "outcome": "pending",
++     "id": 2,
++     "outcome": "rolled-back",
+      "owner": 2,
+    },
+  ]
+
+ ❯ src/lib/native-admission-handoff.spec.ts:18:85
+     16|   if(mode==='equal')c.declare({kind:'independent'},()=>rows.updateOne(…
+     17|   else {r=tree.transact(()=>{rows.updateOne('a',{x:11});if(mode==='net…
+     18|   await flush();expect(row.x()).toBe(7);expect(life.nativeProof(req())…
+       |                                                                                     ^
+     19|   q.rollback();await flush();expect(row.x()).toBe(0);expect(life.nativ…
+     20|  }finally{c.dispose();tree.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/native-admission-handoff.spec.ts > native handoff netzero preserves q destination until its actual rejection
+AssertionError: expected [ { owner: 3, id: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "dependents": Set {},
++     "id": 1,
++     "outcome": "rolled-back",
++     "owner": 3,
++   },
++ ]
+
+ ❯ src/lib/native-admission-handoff.spec.ts:19:102
+     17|   else {r=tree.transact(()=>{rows.updateOne('a',{x:11});if(mode==='net…
+     18|   await flush();expect(row.x()).toBe(7);expect(life.nativeProof(req())…
+     19|   q.rollback();await flush();expect(row.x()).toBe(0);expect(life.nativ…
+       |                                                                                                      ^
+     20|  }finally{c.dispose();tree.destroy();}
+     21| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  13:55:54
+   Duration  861ms (transform 434ms, setup 0ms, import 514ms, tests 46ms, environment 217ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-admission-handoff.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

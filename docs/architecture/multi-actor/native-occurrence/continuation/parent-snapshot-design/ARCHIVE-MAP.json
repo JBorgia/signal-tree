@@ -1,0 +1,32 @@
+[
+  {
+    "source": "DISCRIMINATORS.md",
+    "archive": "DISCRIMINATORS.md",
+    "sourceSha256": "63bf6e6cae2e3cf932c2d79a2dedb3a1e90c46ae12f4175732a32f97ded447c5",
+    "archiveSha256": "63bf6e6cae2e3cf932c2d79a2dedb3a1e90c46ae12f4175732a32f97ded447c5"
+  },
+  {
+    "source": "SOURCE-READS.json",
+    "archive": "SOURCE-READS.json",
+    "sourceSha256": "f0a228c0c89bfb15414bd6d1a7da9bb9c53a2184ba66b2451653779ae9064a45",
+    "archiveSha256": "f0a228c0c89bfb15414bd6d1a7da9bb9c53a2184ba66b2451653779ae9064a45"
+  },
+  {
+    "source": "MANIFEST.json",
+    "archive": "MANIFEST.json",
+    "sourceSha256": "2225acc16e34a444855ed481a1ec70b18ac9d3b6bd28c07b6a96b3dac6290dda",
+    "archiveSha256": "2225acc16e34a444855ed481a1ec70b18ac9d3b6bd28c07b6a96b3dac6290dda"
+  },
+  {
+    "source": "DESIGN.md",
+    "archive": "DESIGN.md",
+    "sourceSha256": "3ac66414c2f8fcf17ac9bd3c815696bbfa19f6abf197af4d8a7f4228b7cef473",
+    "archiveSha256": "3ac66414c2f8fcf17ac9bd3c815696bbfa19f6abf197af4d8a7f4228b7cef473"
+  },
+  {
+    "source": "HEISENBERG-HANDOFF.md",
+    "archive": "HEISENBERG-HANDOFF.md",
+    "sourceSha256": "fa249c0b4d99cd5c1075a4ee62d8b8f9b7d245f4f4d8652e38095fd209c47f46",
+    "archiveSha256": "fa249c0b4d99cd5c1075a4ee62d8b8f9b7d245f4f4d8652e38095fd209c47f46"
+  }
+]

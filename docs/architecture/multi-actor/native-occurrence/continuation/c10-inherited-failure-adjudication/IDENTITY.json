@@ -1,0 +1,18 @@
+{
+  "candidate": {
+    "source": "/private/tmp/st-native-combined-c10-promoted/candidate",
+    "manifest": "/private/tmp/st-native-combined-c10-promoted/SNAPSHOT.json",
+    "manifestSha256": "de88e207c66e65a1a191d05ab4f2b5b2a4deeead71a06f239f278e28dee70dc4",
+    "verifiedFiles": 3042,
+    "dependencies": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules",
+    "lockSHA256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+  },
+  "oracle": {
+    "source": "/private/tmp/st-native-combined-c8a/candidate",
+    "manifest": "/private/tmp/st-native-combined-c8a/SNAPSHOT-C8a.json",
+    "manifestSha256": "04ba51dec86f537921521cf0a8ef5276c788e48b9a4e4abc24c7c5d14eda9652",
+    "verifiedFiles": 3031,
+    "dependencies": "/private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules",
+    "lockSHA256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+  }
+}

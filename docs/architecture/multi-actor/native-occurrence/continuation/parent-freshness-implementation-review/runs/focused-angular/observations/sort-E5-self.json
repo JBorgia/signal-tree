@@ -1,0 +1,142 @@
+{
+  "facade": "angular",
+  "seam": "sort",
+  "scenario": "E5-self",
+  "callsBeforeDemand": 0,
+  "calls": 4,
+  "afterWrite": false,
+  "sentinelReached": false,
+  "events": [
+    {
+      "name": "action-enter",
+      "calls": 1
+    },
+    {
+      "name": "first-root",
+      "kind": "throw",
+      "sameSentinel": false,
+      "sameTripwire": false,
+      "error": {
+        "name": "Error",
+        "message": "NG0600: Writing to signals is not allowed in a `computed`",
+        "stack": "Error: NG0600: Writing to signals is not allowed in a `computed`\n    at file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12685:11\n    at throwInvalidWriteToSignalError (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:326:3)\n    at signalSetFn (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:360:5)\n    at getter.set (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:345:27)\n    at publishChanged (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:201:7)\n    at getter.replace [as set] (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:272:9)\n    at setChild (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:22:42)\n    at action (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:30:5)\n    at callback (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:18:98)\n    at sortComparer (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:21:94)"
+      },
+      "callsBefore": 0,
+      "callsAfter": 1
+    },
+    {
+      "name": "immediate-root-1",
+      "kind": "throw",
+      "sameSentinel": false,
+      "sameTripwire": false,
+      "error": {
+        "name": "Error",
+        "message": "NG0600: Writing to signals is not allowed in a `computed`",
+        "stack": "Error: NG0600: Writing to signals is not allowed in a `computed`\n    at file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12685:11\n    at throwInvalidWriteToSignalError (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:326:3)\n    at signalSetFn (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:360:5)\n    at getter.set (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:345:27)\n    at publishChanged (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:201:7)\n    at getter.replace [as set] (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:272:9)\n    at setChild (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:22:42)\n    at action (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:30:5)\n    at callback (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:18:98)\n    at sortComparer (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:21:94)"
+      },
+      "callsBefore": 1,
+      "callsAfter": 1
+    },
+    {
+      "name": "immediate-root-2",
+      "kind": "throw",
+      "sameSentinel": false,
+      "sameTripwire": false,
+      "error": {
+        "name": "Error",
+        "message": "NG0600: Writing to signals is not allowed in a `computed`",
+        "stack": "Error: NG0600: Writing to signals is not allowed in a `computed`\n    at file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:12685:11\n    at throwInvalidWriteToSignalError (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:326:3)\n    at signalSetFn (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:360:5)\n    at getter.set (file:///private/tmp/st-parent-freshness-implementation-independent/candidate/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core/fesm2022/_effect-chunk.mjs:345:27)\n    at publishChanged (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:201:7)\n    at getter.replace [as set] (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:272:9)\n    at setChild (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:22:42)\n    at action (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:30:5)\n    at callback (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:18:98)\n    at sortComparer (/private/tmp/st-parent-freshness-implementation-independent/candidate/packages/angular/src/lib/bounded-reentry-baseline.spec.ts:21:94)"
+      },
+      "callsBefore": 1,
+      "callsAfter": 1
+    },
+    {
+      "name": "installed-child",
+      "kind": "return",
+      "value": 0,
+      "callsBefore": 1,
+      "callsAfter": 1
+    },
+    {
+      "name": "recovery-write",
+      "kind": "return",
+      "value": null,
+      "callsBefore": 1,
+      "callsAfter": 1
+    },
+    {
+      "name": "post-write-root-1",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 9
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 4,
+              "n": 4
+            }
+          ]
+        }
+      },
+      "callsBefore": 1,
+      "callsAfter": 4
+    },
+    {
+      "name": "post-write-root-2",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 9
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            },
+            {
+              "id": 4,
+              "n": 4
+            }
+          ]
+        }
+      },
+      "callsBefore": 4,
+      "callsAfter": 4
+    },
+    {
+      "name": "post-write-all",
+      "kind": "return",
+      "value": [
+        {
+          "id": 2,
+          "n": 1
+        },
+        {
+          "id": 1,
+          "n": 2
+        },
+        {
+          "id": 4,
+          "n": 4
+        }
+      ],
+      "callsBefore": 4,
+      "callsAfter": 4
+    }
+  ]
+}

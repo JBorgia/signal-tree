@@ -1,0 +1,7 @@
+{
+  "cwd": "/private/tmp/st-c21-fixture-corrections/candidate",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "tools/check-spec-types.mjs"
+  ]
+}

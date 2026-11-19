@@ -1,0 +1,67 @@
+{
+  "sourceManifestSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+  "promote": [
+    "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-entity.spec.ts",
+    "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
+    "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+    "packages/angular/src/lib/parent-freshness-entity.spec.ts"
+  ],
+  "researchOnly": [
+    "packages/angular/src/lib/bounded-reentry-baseline.spec.ts",
+    "packages/angular/src/lib/bounded-reentry-targeted.spec.ts",
+    "packages/angular/src/lib/parent-freshness-callbacks.spec.ts",
+    "packages/angular/src/lib/parent-freshness-grouped.spec.ts",
+    "packages/kernel/src/lib/bounded-reentry-baseline.spec.ts",
+    "packages/kernel/src/lib/bounded-reentry-targeted.spec.ts",
+    "packages/kernel/src/lib/construction-completion-snapshot-review.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-callbacks.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-grouped.spec.ts"
+  ],
+  "checks": [
+    {
+      "path": "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts",
+      "originalSha256": "93273e3668f2e1ef1d78fbc4c93a415e16949e0f273f5eb0f033cb809d6200d4",
+      "promotedSha256": "93273e3668f2e1ef1d78fbc4c93a415e16949e0f273f5eb0f033cb809d6200d4",
+      "onlyOptionalOutputHelperChanged": false,
+      "allOtherBytesUnchanged": true
+    },
+    {
+      "path": "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
+      "originalSha256": "1d97d23ad2cc3652e01b2b8f26a15997ef2a070c061718b9b81be30a244e987a",
+      "promotedSha256": "c31ab537a83917af1211f5ae863d4847f393032f480c50296fddc20ab9d6ba72",
+      "onlyOptionalOutputHelperChanged": true,
+      "allOtherBytesUnchanged": true
+    },
+    {
+      "path": "packages/kernel/src/lib/parent-freshness-entity.spec.ts",
+      "originalSha256": "7e224cb7c28f9b2f6878a30a1c9c33d60a726717573892e4c513cac0f8a85bc3",
+      "promotedSha256": "7e224cb7c28f9b2f6878a30a1c9c33d60a726717573892e4c513cac0f8a85bc3",
+      "onlyOptionalOutputHelperChanged": false,
+      "allOtherBytesUnchanged": true
+    },
+    {
+      "path": "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
+      "originalSha256": "db3835be6a83b6f2191eb2c5c68bf3895b749b7f1a582e8a3b85d6364cdd93ec",
+      "promotedSha256": "db3835be6a83b6f2191eb2c5c68bf3895b749b7f1a582e8a3b85d6364cdd93ec",
+      "onlyOptionalOutputHelperChanged": false,
+      "allOtherBytesUnchanged": true
+    },
+    {
+      "path": "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+      "originalSha256": "4c6e3c8600df6ae96980eb6d9dca1ae6967c63b526d870a8d82af24c293b1c3a",
+      "promotedSha256": "af32a888645ffde5cfeb47758109bbb22fe20dd10cef17e6d01dd5529e4b3794",
+      "onlyOptionalOutputHelperChanged": true,
+      "allOtherBytesUnchanged": true
+    },
+    {
+      "path": "packages/angular/src/lib/parent-freshness-entity.spec.ts",
+      "originalSha256": "6237c55ebbcf910b70bb43c266d4ffbfdf410241093b615ddaa5195a1fec36d4",
+      "promotedSha256": "6237c55ebbcf910b70bb43c266d4ffbfdf410241093b615ddaa5195a1fec36d4",
+      "onlyOptionalOutputHelperChanged": false,
+      "allOtherBytesUnchanged": true
+    }
+  ],
+  "runtimeChanged": false
+}

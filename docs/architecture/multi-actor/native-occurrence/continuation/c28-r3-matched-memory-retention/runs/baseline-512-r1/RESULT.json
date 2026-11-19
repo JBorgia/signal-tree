@@ -1,0 +1,28 @@
+{
+  "arm": "baseline",
+  "size": 512,
+  "replicate": 1,
+  "exit": 0,
+  "watchdog": null,
+  "counts": {
+    "passed": 2,
+    "skipped": 9
+  },
+  "workerPids": [
+    79258
+  ],
+  "heapSizeLimits": [
+    4496293888
+  ],
+  "maxSampledHeapUsed": 85120608,
+  "firstSampleHeapUsed": 44204952,
+  "sampledPositiveGrowth": 40915656,
+  "steepGrowthStop": false,
+  "validTwoCasesAndFreshWorker": true,
+  "remainingOwned": [],
+  "runtimeMismatches": [],
+  "testUnchanged": true,
+  "attempts": 1,
+  "gcAvailableAllSamples": true,
+  "finalGcCalls": 3
+}

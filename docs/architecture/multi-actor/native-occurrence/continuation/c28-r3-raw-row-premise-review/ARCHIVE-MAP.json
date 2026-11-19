@@ -1,0 +1,14 @@
+[
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "83ea42c8495b713155ebab8a1ef402ef0ba12158730d94253e75c1129653c763",
+    "archiveSha256": "83ea42c8495b713155ebab8a1ef402ef0ba12158730d94253e75c1129653c763"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "564db648ca17a91ef8005b3d37a78ead36d9abe0b931f77a34d1bdd09f37f05b",
+    "archiveSha256": "564db648ca17a91ef8005b3d37a78ead36d9abe0b931f77a34d1bdd09f37f05b"
+  }
+]

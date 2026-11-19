@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/occurrence-successor.spec.ts
++++ b/packages/kernel/src/lib/occurrence-successor.spec.ts
+@@ -9,7 +9,7 @@
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
+ const asLink=(source:object,sent:unknown[])=>link(source as never,{set:(v:unknown)=>{sent.push(v);}} as never) as Experimental;
+ 
+-for(const kind of ['scalar','empty','collection','mixed'] as const)it(`first omission enrolls clean ${kind} ancestry`,async()=>{
++for(const kind of ['scalar','empty','collection','mixed'] as const)for(const outcome of ['confirm','rollback'] as const)it(`first omission ${kind}: undeclared child waits then delivers after ${outcome}`,async()=>{
+  const tree=signalTree({branch:{rows:entityMap<{id:string;x:number},string>(),x:0},other:0},{enhancers:[transactions()]});
+  const foreign=signalTree({z:0},{enhancers:[transactions()]});
+  if(kind!=='empty')tree.$.branch.rows.addOne({id:'a',x:0});await flush();
+@@ -20,6 +20,10 @@
+   c.declare({kind:'dependent',owners:[q]},()=>kind==='scalar'?tree.$.branch.x(7):kind==='empty'?tree.$.branch.rows.addOne({id:'a',x:7}):tree.$.branch.rows.updateOne('a',{x:7}));
+   await flush();expect(sent).toEqual([]);
+   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await flush();expect(sent).toEqual([{other:1}]);
++  // A root declaration does not grant its undeclared child permission.
++  expect(nestedSent).toEqual([]);
++  q[outcome]();await flush();
++  expect(sent).toEqual([{other:1}]);
+   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:undefined]);
+  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy();}
+ });

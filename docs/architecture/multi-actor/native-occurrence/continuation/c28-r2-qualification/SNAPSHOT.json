@@ -1,0 +1,27 @@
+{
+  "status": "Stopped on repeated no-write second-admission recurrence; no runtime repair",
+  "frozenR2ManifestSha256": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "basePaths": 3093,
+  "frozenOriginalUnchanged": true,
+  "qualificationAllBasePathsUnchanged": true,
+  "results": {
+    "first19": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "invalid-derived-literal-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  },
+  "diagnosticResult": {
+    "exit": 1,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "diagnosticManifestSha256": "740817923a09015adf05e334c13e6646f303c0a8eb1d89c156867b307251c317",
+  "diagnosticOverlaySha256": "a83cf5e3850631e15482efbc7c60db95b086488f4d6f0e9a0173df671e5c0da8",
+  "preregisteredDiagnosticsUnchanged": true
+}

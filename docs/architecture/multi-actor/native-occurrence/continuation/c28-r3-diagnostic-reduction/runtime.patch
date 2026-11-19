@@ -1,0 +1,192 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { createPredicateChurnWarning } from './internals/predicate-churn-warning';
+ import { markSnapshotInstalled } from './internals/snapshot-installation';
+ import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
+ import { PublicationPreparation } from './internals/publication-preparation';
+@@ -1980,49 +1981,9 @@
+    * control produces one per interaction, which is orders of magnitude slower.
+    * Anything above ~6/second is a frame loop; nothing a user does reaches it.
+    */
+-  const predicateWindows = new Map<string, { count: number; start: number }>();
+-  const warnedPredicates = new Set<string>();
+-  /** Distinct identities within {@link PREDICATE_CHURN_WINDOW_MS} to accuse. */
+-  const PREDICATE_CHURN_THRESHOLD = 12;
+-  /** ~6 identities/second is well above user-driven, well below a frame loop. */
+-  const PREDICATE_CHURN_WINDOW_MS = 2000;
+-
+-  function warnOnPredicateChurn(
+-    method: 'where' | 'find',
+-    predicate: (entity: E) => boolean
+-  ): void {
+-    const source = String(predicate);
+-    // Guard against pathological state growth in a long dev session: the map is
+-    // only ever as large as the number of DISTINCT predicate sources.
+-    if (predicateWindows.size > 200 || warnedPredicates.has(source)) return;
+-
+-    const now =
+-      typeof performance !== 'undefined' ? performance.now() : Date.now();
+-    const window = predicateWindows.get(source);
+-    if (!window || now - window.start > PREDICATE_CHURN_WINDOW_MS) {
+-      // A fresh window, not an increment. This is what makes a slow drip of
+-      // legitimately-rebuilt predicates never accumulate to an accusation.
+-      predicateWindows.set(source, { count: 1, start: now });
+-      return;
+-    }
+-    window.count++;
+-    if (window.count < PREDICATE_CHURN_THRESHOLD) return;
+-
+-    warnedPredicates.add(source);
+-    const perSecond = Math.round(
+-      (window.count / Math.max(now - window.start, 1)) * 1000
+-    );
+-    console.warn(
+-      `SignalTree: \`${method}()\` received ${window.count} DIFFERENT functions ` +
+-        `with identical source in ${Math.round(now - window.start)}ms ` +
+-        `(~${perSecond}/second) — a rate only change detection produces. ` +
+-        `Results are memoised per predicate IDENTITY, so an inline arrow misses ` +
+-        `the cache every cycle and re-scans the collection: measured at 75x a ` +
+-        `hoisted predicate over 1,000 entities. Hoist it to a stable reference ` +
+-        `(a class field or module constant) and call ` +
+-        `\`${method}(thePredicate)()\`. Source: ${source.slice(0, 80)} [ST2026]`
+-    );
+-  }
++  // Initialize only when a development-only call is actually made. This also
++  // supports enabling diagnostics after a collection has been constructed.
++  let warnOnPredicateChurn: ReturnType<typeof createPredicateChurnWarning<E>> | undefined;
+ 
+   /** Subjects that have moved to a new key and must not fall back to the old one. */
+   const rekeyedSubjects = new Set<number>();
+@@ -4099,7 +4060,7 @@
+       if (cached) return cached;
+ 
+       if (typeof ngDevMode === 'undefined' || ngDevMode) {
+-        warnOnPredicateChurn('where', predicate);
++        (warnOnPredicateChurn ??= createPredicateChurnWarning<E>())('where', predicate);
+       }
+       // Filter DURING iteration rather than materialising `all` and discarding
+       // most of it. `allSignal()` builds an array of every entity; `.filter()`
+@@ -4147,7 +4108,7 @@
+       if (cached) return cached;
+ 
+       if (typeof ngDevMode === 'undefined' || ngDevMode) {
+-        warnOnPredicateChurn('find', predicate);
++        (warnOnPredicateChurn ??= createPredicateChurnWarning<E>())('find', predicate);
+       }
+       // Same bypass as `where`, and the win here is algorithmic rather than a
+       // constant factor: `allSignal().find()` builds the WHOLE array before
+@@ -5638,7 +5599,7 @@
+ 
+   // The Proxy only handles bracket notation access (signal[id])
+   // All methods are direct properties on api - no binding needed
+-  const warnedWrongMethods = new Set<string>();
++  let warnedWrongMethods: Set<string> | undefined;
+   const proxy = new Proxy(api as unknown as EntitySignal<E, K>, {
+     get: (target: EntitySignal<E, K>, prop: string | symbol) => {
+       // Handle string/number bracket access: signal[123] or signal['abc']
+@@ -5649,11 +5610,11 @@
+       // library → actionable hint instead of a later "undefined is not a
+       // function". Only fires for names that are NOT real api members.
+       if (
++        (typeof ngDevMode === 'undefined' || ngDevMode) &&
+         typeof prop === 'string' &&
+         !(prop in (target as object)) &&
+         WRONG_ENTITY_METHODS[prop] &&
+-        (typeof ngDevMode === 'undefined' || ngDevMode) &&
+-        !warnedWrongMethods.has(prop)
++        !(warnedWrongMethods ??= new Set<string>()).has(prop)
+       ) {
+         warnedWrongMethods.add(prop);
+         console.warn(
+--- a/packages/kernel/src/lib/constants.ts
++++ b/packages/kernel/src/lib/constants.ts
+@@ -33,36 +33,6 @@
+   // a runtime diagnostic giving advice that could not be followed.
+ } as const;
+ 
+-// Production messages use the same short readable strings as dev.
+-// The numeric-code approach was abandoned: bare integers ('0','1','2') are
+-// completely opaque in production stack traces and tooling. The dev strings
+-// are already concise (<25 chars each) so bundle impact is negligible.
+-const PROD_MESSAGES = DEV_MESSAGES;
+-
+-// Prefer Angular's compile-time `ngDevMode` flag. When `ngDevMode` is false
+-// in production builds, DEV_MESSAGES can be tree-shaken. Fallback to
+-// process.env when ngDevMode is not present.
+-declare const ngDevMode: boolean | undefined;
+-// Avoid referencing the bare `process` identifier to keep builds free of Node
+-// type assumptions; use globalThis to check env when available.
+-const _isProdByEnv = Boolean(
+-  typeof globalThis === 'object' &&
+-    globalThis !== null &&
+-    'process' in globalThis &&
+-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-    typeof (globalThis as any).process === 'object' &&
+-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-    'env' in (globalThis as any).process &&
+-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-    (globalThis as any).process.env.NODE_ENV === 'production'
+-);
+-
+-const _isDev =
+-  typeof ngDevMode !== 'undefined' ? Boolean(ngDevMode) : !_isProdByEnv;
+-
+-
+-export const SIGNAL_TREE_MESSAGES = Object.freeze(
+-  _isDev
+-    ? (DEV_MESSAGES as typeof DEV_MESSAGES)
+-    : (PROD_MESSAGES as typeof DEV_MESSAGES)
+-);
++// Production and development use the same readable, stable messages.
++// Selecting between aliases only introduced unnecessary environment reads.
++export const SIGNAL_TREE_MESSAGES = Object.freeze(DEV_MESSAGES);
+--- a/packages/kernel/src/lib/internals/predicate-churn-warning.ts
++++ b/packages/kernel/src/lib/internals/predicate-churn-warning.ts
+@@ -0,0 +1,46 @@
++/** Development-only predicate diagnostics. One closure per participating collection. */
++export function createPredicateChurnWarning<E>() {
++  const predicateWindows = new Map<string, { count: number; start: number }>();
++  const warnedPredicates = new Set<string>();
++  /** Distinct identities within {@link PREDICATE_CHURN_WINDOW_MS} to accuse. */
++  const PREDICATE_CHURN_THRESHOLD = 12;
++  /** ~6 identities/second is well above user-driven, well below a frame loop. */
++  const PREDICATE_CHURN_WINDOW_MS = 2000;
++
++  return function warnOnPredicateChurn(
++    method: 'where' | 'find',
++    predicate: (entity: E) => boolean
++  ): void {
++    const source = String(predicate);
++    // Guard against pathological state growth in a long dev session: the map is
++    // only ever as large as the number of DISTINCT predicate sources.
++    if (predicateWindows.size > 200 || warnedPredicates.has(source)) return;
++
++    const now =
++      typeof performance !== 'undefined' ? performance.now() : Date.now();
++    const window = predicateWindows.get(source);
++    if (!window || now - window.start > PREDICATE_CHURN_WINDOW_MS) {
++      // A fresh window, not an increment. This is what makes a slow drip of
++      // legitimately-rebuilt predicates never accumulate to an accusation.
++      predicateWindows.set(source, { count: 1, start: now });
++      return;
++    }
++    window.count++;
++    if (window.count < PREDICATE_CHURN_THRESHOLD) return;
++
++    warnedPredicates.add(source);
++    const perSecond = Math.round(
++      (window.count / Math.max(now - window.start, 1)) * 1000
++    );
++    console.warn(
++      `SignalTree: \`${method}()\` received ${window.count} DIFFERENT functions ` +
++        `with identical source in ${Math.round(now - window.start)}ms ` +
++        `(~${perSecond}/second) — a rate only change detection produces. ` +
++        `Results are memoised per predicate IDENTITY, so an inline arrow misses ` +
++        `the cache every cycle and re-scans the collection: measured at 75x a ` +
++        `hoisted predicate over 1,000 entities. Hoist it to a stable reference ` +
++        `(a class field or module constant) and call ` +
++        `\`${method}(thePredicate)()\`. Source: ${source.slice(0, 80)} [ST2026]`
++    );
++  };
++}

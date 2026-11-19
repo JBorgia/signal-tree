@@ -1,0 +1,107 @@
+
+> nx run kernel:test packet-index-adversarial.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts structural-admission-controls.spec.ts structural-admission-sequence.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts structural-admission-controls.spec.ts structural-admission-sequence.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts --maxWorkers=1
+
+(node:70754) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70762) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-index-successor/candidate/packages/kernel
+
+(node:70772) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/structural-admission-sequence.spec.ts (8 tests | 3 failed) 20ms
+   × ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening 3ms
+   × ordinary remove is admitted before physical omission and still completes ordinary authority 1ms
+   × semantic occupancy preserves numeric and string keys 1ms
+(node:70802) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70806) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70808) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71284) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:28:163
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:34:290
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:40:140
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  3 failed | 55 passed (58)
+   Start at  17:26:08
+   Duration  2.67s (transform 516ms, setup 0ms, import 1.01s, tests 191ms, environment 964ms)
+
+Warning: command "node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts structural-admission-controls.spec.ts structural-admission-sequence.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.1s

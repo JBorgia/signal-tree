@@ -1,0 +1,35 @@
+
+> nx run kernel:test forwarding-retention-probe --maxWorkers=1
+
+> node tools/run-core-vitest.mjs forwarding-retention-probe --maxWorkers=1
+
+(node:26510) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:26518) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c11/candidate/packages/kernel
+
+(node:26525) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:21:20
+   Duration  3.81s (transform 1.44s, setup 0ms, import 1.78s, tests 808ms, environment 868ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      5.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.1s

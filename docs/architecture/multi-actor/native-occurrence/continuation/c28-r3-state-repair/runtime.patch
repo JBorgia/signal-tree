@@ -1,0 +1,39 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -2852,7 +2852,10 @@
+       registry: getPositionRegistry(tree.$),
+     });
+     const recorded = resolveTransactionId(meta);
++    // Only authored notification replay duplicates an installed terminal record.
++    // Realized input retains an ambient transaction ID but is separate authority.
+     if (
++      getWriteParticipation(meta) !== 'realized' &&
+       recorded !== undefined &&
+       installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0])
+     )
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -636,7 +636,12 @@
+           )
+         : remainingValueEffects;
+       const detachedCompletions:Array<()=>void>=[];
+-      const apply = () => {
++      // Frame preparation now records ordinary authorship before notification.
++      // Classify the realization at that boundary while retaining the caller's
++      // origin/transaction context; withWriteContext restores it on return/throw.
++      const apply = () => withWriteContext(
++        { ...(getActiveWriteContext() ?? {}), intent: 'system', participation: 'realized' },
++        () => {
+         // Prepare the remaining frame before any member is installed. All member
+         // values and presence are installed before any effect is published.
+         const heterogeneousFrame = valueEffects.length || ordinaryRealization(effects)?.ordinary.some(effect => !!effect.structural)
+@@ -722,7 +727,8 @@
+           }
+         }
+         members?.publish();
+-      };
++        }
++      );
+ 
+       // Membership listeners run once the whole reversal is installed and
+       // published, in commit order, whatever throws on the way out.

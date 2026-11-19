@@ -1,0 +1,32 @@
+[
+  {
+    "source": "COMPOSITION.md",
+    "archive": "COMPOSITION.md",
+    "sourceSha256": "97257b05dbe6785994dee413c6a27a30e8d425d0bd45e6ce846bf56e0d5d3b5c",
+    "archiveSha256": "97257b05dbe6785994dee413c6a27a30e8d425d0bd45e6ce846bf56e0d5d3b5c"
+  },
+  {
+    "source": "COMPOSITION-LEDGER.json",
+    "archive": "COMPOSITION-LEDGER.json",
+    "sourceSha256": "52e96c17d10afdd97dcaf9e262e62a100ef219363a709fa97fdedbc97d76f0e3",
+    "archiveSha256": "52e96c17d10afdd97dcaf9e262e62a100ef219363a709fa97fdedbc97d76f0e3"
+  },
+  {
+    "source": "PACKET-VERIFICATION.json",
+    "archive": "PACKET-VERIFICATION.json",
+    "sourceSha256": "e1ca508306913ee419958d7b77dcd89d314c61aecd7e4c0c28b1afa2c69b4875",
+    "archiveSha256": "e1ca508306913ee419958d7b77dcd89d314c61aecd7e4c0c28b1afa2c69b4875"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "f2aec891e1346992485247a6ea08efb60f21a48868c695eeb9f9918595ff9b04",
+    "archiveSha256": "f2aec891e1346992485247a6ea08efb60f21a48868c695eeb9f9918595ff9b04"
+  },
+  {
+    "source": "ORACLE-REVIEW.md",
+    "archive": "ORACLE-REVIEW.md",
+    "sourceSha256": "b23a18dbcea60489514387701fa699f340f4e5cb644d05d1a562f04f1537bc51",
+    "archiveSha256": "b23a18dbcea60489514387701fa699f340f4e5cb644d05d1a562f04f1537bc51"
+  }
+]

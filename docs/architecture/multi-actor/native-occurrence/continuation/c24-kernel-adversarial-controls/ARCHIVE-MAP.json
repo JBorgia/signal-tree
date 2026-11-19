@@ -1,0 +1,50 @@
+[
+  {
+    "source": "EXPECTATIONS.md",
+    "archive": "EXPECTATIONS.md",
+    "sourceSha256": "e36491efdb0c0567312df72024aea0aabef19b250f41c16ac91d2be3218973e9",
+    "archiveSha256": "e36491efdb0c0567312df72024aea0aabef19b250f41c16ac91d2be3218973e9"
+  },
+  {
+    "source": "COMMANDS.md",
+    "archive": "COMMANDS.md",
+    "sourceSha256": "cdf563aff941b4437ad2bcfceaeb3a852a28f0e957c3d7c8d6d5275c6436c5f7",
+    "archiveSha256": "cdf563aff941b4437ad2bcfceaeb3a852a28f0e957c3d7c8d6d5275c6436c5f7"
+  },
+  {
+    "source": "ASSUMPTIONS.md",
+    "archive": "ASSUMPTIONS.md",
+    "sourceSha256": "90c0016c0f1e6ae25c03f394084d4df7ace7676dcee74567bfe8313f0b594ec2",
+    "archiveSha256": "90c0016c0f1e6ae25c03f394084d4df7ace7676dcee74567bfe8313f0b594ec2"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "ab9bb1e3d80f4ba658e0f46602948105415776cdb62268d0eae6678c0d07d25e",
+    "archiveSha256": "ab9bb1e3d80f4ba658e0f46602948105415776cdb62268d0eae6678c0d07d25e"
+  },
+  {
+    "source": "INPUTS.json",
+    "archive": "INPUTS.json",
+    "sourceSha256": "7a9090eafb331e32f57c5dbaa94dbc354d99b4cbc74da0cb8d73e3aa67e3f50b",
+    "archiveSha256": "7a9090eafb331e32f57c5dbaa94dbc354d99b4cbc74da0cb8d73e3aa67e3f50b"
+  },
+  {
+    "source": "FREEZE.json",
+    "archive": "FREEZE.json",
+    "sourceSha256": "14931ca98d4d4535de18ce6dd5f798022347062316e19f4f0b73afdb0f58927b",
+    "archiveSha256": "14931ca98d4d4535de18ce6dd5f798022347062316e19f4f0b73afdb0f58927b"
+  },
+  {
+    "source": "TESTS.patch",
+    "archive": "TESTS.patch",
+    "sourceSha256": "02e3091c05a580214ac19c17807ba5f7e563d5c20031792c91a5af9abe6cb3f0",
+    "archiveSha256": "02e3091c05a580214ac19c17807ba5f7e563d5c20031792c91a5af9abe6cb3f0"
+  },
+  {
+    "source": "files/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "archive": "files/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "sourceSha256": "8ebefaa05d0a47499c971b78295875a9d503db812db297689f71d69d45ead0fa",
+    "archiveSha256": "8ebefaa05d0a47499c971b78295875a9d503db812db297689f71d69d45ead0fa"
+  }
+]

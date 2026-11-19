@@ -1,0 +1,40 @@
+
+> nx run angular:test bounded-reentry-baseline.spec.ts bounded-reentry-targeted.spec.ts --testNamePattern=marker|sort E4 --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular bounded-reentry-baseline.spec.ts bounded-reentry-targeted.spec.ts --testNamePattern="marker|sort E4" --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:78547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78587) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/angular
+
+(node:78631) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  10 passed | 7 skipped (17)
+   Start at  09:20:44
+   Duration  3.09s (transform 1.07s, setup 510ms, import 1.35s, tests 47ms, environment 841ms)
+
+
+
+
+ NX   Successfully ran target test for project angular
+
+
+  Run duration:      4.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    4.1s

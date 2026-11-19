@@ -1,0 +1,20 @@
+{
+  "BASE-SOURCE-SHA256.json": "05daee5c1db9478e3cdad0bbda8216bbc7f6fd10305622d3c3f2cf895a2bd022",
+  "COMMAND-RESULTS.json": "93dcb2ab262d4df4f2820eb18d9a385603150c97a79253b51bd01c6f53635bb1",
+  "INTERFACE-HANDOFF.md": "7f6e158c79801535de1c78cb4ea88e4e03740881ffb8fd60f9bc5d87ecd83783",
+  "RESULTS.md": "9dd434cccb3e127223d7460851a622e9170031d974abc29dd0abfb1903f826f9",
+  "SOURCE-SHA256.json": "a22a4e603e3e28c2fbcc0d99d11e79f0b8f03eb0c762028896b8897b46fecc8e",
+  "VERIFICATION.json": "a5211e8105609a4effa0822066674db8d482b21ff91a45512d8f6727db1a1e6c",
+  "baseline-first.log": "c3e0c82c9ea3bb62d379a9c527a4f11f5850c9c026ad30410dc2d87fd1882692",
+  "corrected-first.log": "4aa9d1423ac07b20b4a840fe4951574256d74ba3fa0fbbceae41ad874bf2b3e3",
+  "final-runtime.log": "cee54603779ed2de8cb4d286ab90f1f8689aafe65ff93dafe94132b6d5dd0480",
+  "naive-negative.log": "703b51c218b79f28845619df23d66dd6c819ffedf0525000669c8d4cb47dcbab",
+  "output-redirect.patch": "eaa9258170d994545ed57d9b6ff55ad0c3af3c2ad55e210efa7acef27bd0019c",
+  "provenance-external.json": "95adf920ed5159c558c624dcfb7b710ad3c42a2598304cb55b8e3e19a28ee676",
+  "provenance-foreign-callback.json": "ecfaabe2d041e57d60171f54fda6399ef949f576a61ce4327279c57a9685dd7c",
+  "run-final.py": "f3c1aad7a41b74d99ff0fca50240a29ae1a81806b5fb4be7ef40e56165608646",
+  "runtime.patch": "7850303fc29921bfab5b0bc5a80dd219be9c822d0086200cf26daad0253c3c83",
+  "source-types.log": "309e348a04187a566bf124fc022f1b5215c4f74da884f1894260cf3446328375",
+  "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+  "tests.patch": "f9565c9465fbe667a93efda2205cc897128fe7431339667c4beb98740a967e8b"
+}

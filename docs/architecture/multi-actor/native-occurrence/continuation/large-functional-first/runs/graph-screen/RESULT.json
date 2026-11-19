@@ -1,0 +1,19 @@
+{
+  "id": "graph-screen",
+  "arm": "screen",
+  "exit": 0,
+  "qualified": true,
+  "classification": "graph-setup-pass",
+  "reason": null,
+  "cases": [],
+  "workerPids": [],
+  "remainingOwned": [],
+  "sourceMismatches": [],
+  "dependencyDrift": false,
+  "telemetrySamples": 19,
+  "maxObservedOwnedRssBytes": 371851264,
+  "minimumObservedHostFreePercentage": 32.0,
+  "elapsedSeconds": 104.52045595797244,
+  "attempts": 1,
+  "completedAt": "2026-11-03T18:07:00.676296+00:00"
+}

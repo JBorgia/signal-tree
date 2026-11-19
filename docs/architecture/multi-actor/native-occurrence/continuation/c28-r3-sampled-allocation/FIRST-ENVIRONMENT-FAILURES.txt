@@ -1,0 +1,3 @@
+Initial source discovery: zsh: no matches found: /Users/jonathanborgia/.nvm/versions/node/v24.15.0/include/node/*protocol*
+Initial sandbox protocol fetch: curl: (6) Could not resolve host: raw.githubusercontent.com
+The exact read-only fetch succeeded after network escalation. No workload had started.

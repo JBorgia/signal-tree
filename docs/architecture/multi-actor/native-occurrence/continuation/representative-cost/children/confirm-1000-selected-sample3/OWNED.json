@@ -1,0 +1,9 @@
+[
+  {
+    "pid": 70519,
+    "ppid": 69696,
+    "rssBytes": 1064960,
+    "birth": "Tue Nov 3 11:39:32 2026",
+    "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --expose-gc /private/tmp/st-v16-representative-cost/harness/child.mjs /private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist confirm 1000"
+  }
+]

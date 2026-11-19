@@ -1,0 +1,113 @@
+
+> nx run kernel:test structural-admission-sequence.spec.ts packet-index-review.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs structural-admission-sequence.spec.ts packet-index-review.spec.ts --maxWorkers=1
+
+(node:92313) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92320) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-index-independent/baseline-semantic/packages/kernel
+
+(node:92327) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/structural-admission-sequence.spec.ts (8 tests | 3 failed) 19ms
+   × ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening 3ms
+   × ordinary remove is admitted before physical omission and still completes ordinary authority 1ms
+   × semantic occupancy preserves numeric and string keys 1ms
+(node:92331) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-index-review.spec.ts (4 tests | 1 failed) 5ms
+   × recipient finalizer admission mutation must refuse before installation 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/packet-index-review.spec.ts > recipient finalizer admission mutation must refuse before installation
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/lib/packet-index-review.spec.ts:10:142
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordered semantic vacancy permits remove by subject then rekey without strict remove-key broadening
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:28:163
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > ordinary remove is admitted before physical omission and still completes ordinary authority
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:34:290
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/lib/structural-admission-sequence.spec.ts > semantic occupancy preserves numeric and string keys
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/structural-admission-sequence.spec.ts:40:140
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 8 passed (12)
+   Start at  17:32:16
+   Duration  1.03s (transform 437ms, setup 0ms, import 576ms, tests 24ms, environment 289ms)
+
+Warning: command "node tools/run-core-vitest.mjs structural-admission-sequence.spec.ts packet-index-review.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.4s

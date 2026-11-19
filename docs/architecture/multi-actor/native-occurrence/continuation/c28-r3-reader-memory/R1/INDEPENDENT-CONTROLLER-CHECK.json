@@ -1,0 +1,58 @@
+{
+  "controllerSha256": "1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344",
+  "exactTemplateStages": true,
+  "method": "Extract actual AST expressions; no import, process launch or measurement",
+  "cases": [
+    {
+      "case": "complete",
+      "accepted": true,
+      "stops": false
+    },
+    {
+      "case": "drift",
+      "accepted": true,
+      "stops": true
+    },
+    {
+      "case": "missing-first",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "single-final-wrong-size",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "wrong-size",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "reordered",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "duplicate",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "nonfinite",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "reused-worker",
+      "accepted": false,
+      "stops": true
+    },
+    {
+      "case": "wrong-case-order",
+      "accepted": false,
+      "stops": true
+    }
+  ],
+  "passed": true
+}

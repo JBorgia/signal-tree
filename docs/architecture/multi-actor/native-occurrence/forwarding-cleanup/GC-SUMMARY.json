@@ -1,0 +1,580 @@
+{
+  "baseline-held.json": {
+    "heldLast": {
+      "tree": true,
+      "row": false,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": "Error: Selected continuation cannot replay"
+  },
+  "explicit-value.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": true,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "extended-caught-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "extended-caught-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  "extended-skip-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "extended-skip-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  "extended-success-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "extended-success-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  "matched-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": null
+  },
+  "matched-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": "Error: Selected continuation cannot replay"
+  },
+  "matched-hold-row.json": {
+    "heldLast": {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": null
+  },
+  "typed-explicit-value.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": true,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "typed-extended-caught-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "typed-extended-caught-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  "typed-extended-skip-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "typed-extended-skip-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  },
+  "typed-extended-success-drop-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": []
+  },
+  "typed-extended-success-hold-proceed.json": {
+    "heldLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": true
+    },
+    "releasedLast": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "failure": false,
+      "operationValue": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldAllSamplesEqual": true,
+    "releasedAllSamplesEqual": true,
+    "samplesPerPhase": 12,
+    "staleErrors": [
+      "Error: Selected continuation cannot replay",
+      "Error: Selected continuation cannot replay"
+    ]
+  }
+}

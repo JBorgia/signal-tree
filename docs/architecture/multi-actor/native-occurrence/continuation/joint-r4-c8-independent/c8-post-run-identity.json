@@ -1,0 +1,25 @@
+{
+  "original": {
+    "verified_files": 3031,
+    "changed_manifest_files": []
+  },
+  "review": {
+    "verified_files": 3031,
+    "changed_manifest_files": []
+  },
+  "composition_ledger_inputs_match_manifests": true,
+  "conflict_files": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts"
+  ],
+  "added_specs": [
+    "packages/kernel/src/lib/c8-review-publication-retirement-boundaries.spec.ts",
+    "packages/kernel/src/lib/c8-review-singleton-row-reuse.spec.ts",
+    "packages/kernel/src/lib/c8-review-composition.spec.ts",
+    "packages/kernel/src/lib/c8-review-packet-index-review.spec.ts"
+  ]
+}

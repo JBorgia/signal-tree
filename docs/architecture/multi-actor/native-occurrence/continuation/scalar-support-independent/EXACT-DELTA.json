@@ -1,0 +1,18 @@
+{
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "base": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+    "candidate": "1d78b2bd0bf2baa50ec83ce44259aa62ce779b02f0730e2e74832a029c61a966"
+  },
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "base": "b5b6ba96c5c96c10e2c0bb8561b21b16ec75a377d8d60c015f149bece321539d",
+    "candidate": "0a0a1a53cb1dd07b2583d50acac4adc930b2cea347cca4ba6b876f0dbbd7b608"
+  },
+  "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts": {
+    "base": null,
+    "candidate": "6cb6c437149e80be2adb037fa683326df650c89c3ed4fa762d3b804cc15f908a"
+  },
+  "packages/kernel/src/lib/scalar-native-support.spec.ts": {
+    "base": null,
+    "candidate": "c273bda02a0c7c7c0600dcb33d2dd19cd3f785da8679dddc2b18f7ea64b6b9c6"
+  }
+}

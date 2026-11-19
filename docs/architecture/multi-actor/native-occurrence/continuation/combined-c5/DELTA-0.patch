@@ -1,0 +1,66 @@
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -151,13 +151,12 @@
+     physicalCommitClock?.revision() ?? revision;
+ 
+   const advanceRevision = (): number => {
+-    const nextRevision = physicalCommitClock?.advance();
+-    if (nextRevision !== undefined) {
+-      return nextRevision;
+-    }
+-
+-    revision += 1;
+-    return revision;
++    const nextRevision = physicalCommitClock?.advance() ?? ++revision;
++    // Count the actual clock advance, shared by recorded and prepared installs.
++    if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++      recordProductionSubstrateStat('revisionIncrements');
++    }
++    return nextRevision;
+   };
+ 
+   const assertSlotIndex = (slotIndex: SlotIndex): void => {
+@@ -197,6 +196,9 @@
+     for(const [slotIndex,nextValue] of staged){
+       const has=inspectionBaseline.has(slotIndex);
+       const before=has?inspectionBaseline.get(slotIndex):values[slotIndex];
++      if (has && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('equalityChecks');
++      }
+       const equal=has?equalities[slotIndex](before,nextValue):!physical.has(slotIndex);
+       const keep=inspection&&!equal;
+       if(keep!==has || keep&&!Object.is(inspectionBaseline.get(slotIndex),before))shadowPlans.push({slotIndex,keep,value:before});
+@@ -207,7 +209,12 @@
+       if(used)throw new Error('Prepared scalar commit already used');
+       if(getCommittedRevision()!==base)throw new Error('Stale prepared scalar commit');
+       used=true;
+-      for(const {slotIndex,nextValue}of changed)values[slotIndex]=nextValue;
++      for (const { slotIndex, nextValue } of changed) {
++        values[slotIndex] = nextValue;
++        if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++          recordProductionSubstrateStat('slotWrites');
++        }
++      }
+       for(const p of shadowPlans){if(p.keep)inspectionBaseline.set(p.slotIndex,p.value);else inspectionBaseline.delete(p.slotIndex);}
+       const revision=(changed.length||shadowPlans.length)&&options?.advanceRevision!==false?advanceRevision():getCommittedRevision();
+       return {revision,changedSlots:changed.map(x=>x.slotIndex)};
+@@ -262,6 +269,9 @@
+       const inspection=getActiveWriteContext()?.participation==='inspection';
+       const shadowed=inspectionBaseline.has(slotIndex);
+       const ordinaryBefore=shadowed?inspectionBaseline.get(slotIndex):values[slotIndex];
++      if (shadowed && PRODUCTION_SUBSTRATE_STATS_ENABLED) {
++        recordProductionSubstrateStat('equalityChecks');
++      }
+       const authorityEqual=shadowed?equalities[slotIndex](ordinaryBefore,value):equal;
+       if(getCommittedRevision()!==base)throw new Error('Scalar authority equality reentered installation');
+       const semanticChanged=inspection?!equal:!authorityEqual;
+@@ -287,9 +297,6 @@
+         installTerminalRecord(plan);
+       }
+       advanceRevision();
+-      if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+-        recordProductionSubstrateStat('revisionIncrements');
+-      }
+       return {changed:semanticChanged,physicalChanged:!equal};
+     },
+     commitSlot<T>(slotIndex: SlotIndex, value: T): SingleSlotCommitResult {

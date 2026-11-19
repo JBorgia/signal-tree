@@ -1,0 +1,70 @@
+--- a/packages/kernel/src/lib/cached-current-input.spec.ts
++++ b/packages/kernel/src/lib/cached-current-input.spec.ts
+@@ -53,7 +53,7 @@
+     await Promise.all([c.settled(), savedLink.settled()]);
+     await drain();
+     const describe = (error: unknown) => error instanceof Error
+-      ? { name: error.name, message: error.message, ...error } : error ?? null;
++      ? Object.assign({ name: error.name, message: error.message }, error) : error ?? null;
+     const observation = { authorCalls, freshCalls, savedCalls, sameSnapshot, ownerUnchanged,
+       freshError: describe(freshError), savedError: describe(savedError),
+       before, savedBefore, after: sent, savedAfter: savedSent, saved };
+--- a/packages/kernel/src/lib/current-capture-r1.spec.ts
++++ b/packages/kernel/src/lib/current-capture-r1.spec.ts
+@@ -1,10 +1,11 @@
+ import {expect,it} from 'vitest';
+ import {leaf,link,signalTree,transactions} from '../index';
+ const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++// recursive is internal runtime grammar, NOT supported public typed input.
+ const routes=['callable','recursive','report'] as const;
+ type Route=typeof routes[number];
+ const catchError=(work:()=>void)=>{try{work();}catch(error){return error;}return undefined;};
+-for(const route of routes)it(`fresh current pending input: ${route}`,async()=>{
++for(const route of routes)it(`fresh current pending input: ${route==='recursive'?'internal-runtime recursive':route}`,async()=>{
+  const source=signalTree({pair:{x:7}}),foreign=signalTree({q:0},{enhancers:[transactions()]}),target=signalTree({y:0});
+  const sent:number[]=[];const c=link(target.$.y,{set:v=>{sent.push(v);}});
+  try{
+@@ -13,7 +14,10 @@
+   const consume=(v:{x:number})=>{calls++;expect(v).toEqual({x:7});target.$.y(v.x);};
+   const error=catchError(()=>c.declare({kind:'independent'},()=>{
+    if(route==='callable')source.$.pair(v=>{consume(v);return v;});
+-   else if(route==='recursive')source.updateAndReport({pair:(v:{x:number})=>{consume(v);return v;}});
++   else if(route==='recursive'){
++    // @ts-expect-error TS2322: nested updater is internal runtime grammar, not public Partial<T>.
++    source.updateAndReport({pair:(v:{x:number})=>{consume(v);return v;}});
++   }
+    else source.updateAndReport(v=>{consume(v.pair);return {};});
+   }));await drain();
+   expect.soft(calls).toBe(1);expect.soft(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'after-callback',reason:'contradiction'});
+@@ -21,7 +25,7 @@
+   q.confirm();await drain();await c.settled();await drain();expect(sent).toEqual([7]);c.dispose();target.$.y(9);await drain();expect(sent).toEqual([7]);
+  }finally{c.dispose();source.destroy();foreign.destroy();target.destroy();}
+ });
+-for(const route of routes)for(const claim of ['r','s','both'] as const)it(`opaque payload and current location: ${route}/${claim}`,async()=>{
++for(const route of routes)for(const claim of ['r','s','both'] as const)it(`opaque payload and current location: ${route==='recursive'?'internal-runtime recursive':route}/${claim}`,async()=>{
+  const source=signalTree({pair:{x:0}},{enhancers:[transactions()]});
+  const r=source.transact(()=>source.$.pair.x(7));const saved=source.$.pair();
+  const holder=signalTree({pair:{input:leaf({x:0})}},{enhancers:[transactions()]});
+@@ -32,7 +36,10 @@
+   const consume=(v:{input:{x:number}})=>{calls++;expect(v.input).toBe(saved);target.$.y(v.input.x);};
+   const error=catchError(()=>c.declare({kind:'dependent',owners:claim==='r'?[r]:claim==='s'?[s]:[r,s]},()=>{
+    if(route==='callable')holder.$.pair(v=>{consume(v);return v;});
+-   else if(route==='recursive')holder.updateAndReport({pair:(v:{input:{x:number}})=>{consume(v);return v;}});
++   else if(route==='recursive'){
++    // @ts-expect-error TS2322: nested updater is internal runtime grammar, not public Partial<T>.
++    holder.updateAndReport({pair:(v:{input:{x:number}})=>{consume(v);return v;}});
++   }
+    else holder.updateAndReport(v=>{consume(v.pair);return {};});
+   }));await drain();expect(calls).toBe(1);expect(holder.$.pair.input()).toBe(saved);expect(r.inspect()).toEqual(rBefore);expect(s.inspect()).toEqual(sBefore);
+   if(claim==='both')expect.soft(error).toBeUndefined();else expect.soft(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'after-callback',reason:'contradiction'});
+--- a/packages/kernel/src/lib/opaque-current-input.spec.ts
++++ b/packages/kernel/src/lib/opaque-current-input.spec.ts
+@@ -3,7 +3,7 @@
+ import { leaf, link, signalTree, transactions } from '../index';
+ const drain = async () => { for (let i = 0; i < 120; i++) await Promise.resolve(); };
+ const errorRecord = (error: unknown) => error instanceof Error
+-  ? { message: error.message, ...error } : error ?? null;
++  ? Object.assign({ message: error.message }, error) : error ?? null;
+ const record = (value: unknown) => {
+   if (process.env.ST_OPAQUE_INPUT_OUTPUT) appendFileSync(process.env.ST_OPAQUE_INPUT_OUTPUT, JSON.stringify(value) + '\n');
+ };

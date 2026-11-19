@@ -1,0 +1,161 @@
+
+> nx run kernel:test core-independent-review.spec.ts collection-contributor-core.spec.ts
+
+> node tools/run-core-vitest.mjs core-independent-review.spec.ts collection-contributor-core.spec.ts
+
+(node:98276) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98457) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-projection-certificate-successor/packages/kernel
+
+(node:98622) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/core-independent-review.spec.ts > review seed created during open horizon retains later invalidation and its fixed window
+REVIEW-OPEN-SEED {"sent":[[{"id":"a","x":7,"y":8}]],"receipt":{"state":"started","basis":"declared"},"rows":[{"id":"a","x":7,"y":8}],"pending":{"changes":[{"path":"x","address":["x"],"status":"current"}]}}
+
+stdout | src/lib/core-independent-review.spec.ts > review omitted ancestor removes nested collection contributors from outgoing support
+REVIEW-OMITTED-COLLECTION {"sent":[],"receipt":{"state":"held","reason":"pending-dependency"},"value":{"other":1}}
+
+ ❯ src/lib/core-independent-review.spec.ts (2 tests | 2 failed) 27ms
+   × review seed created during open horizon retains later invalidation and its fixed window 21ms
+   × review omitted ancestor removes nested collection contributors from outgoing support 5ms
+ ❯ src/lib/collection-contributor-core.spec.ts (11 tests | 2 failed) 58ms
+   × incoming full replacement has local support and does not certify another recipient 6ms
+   × incoming equal replacement has local support and does not certify another recipient 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/collection-contributor-core.spec.ts > incoming full replacement has local support and does not certify another recipient
+AssertionError: expected [ [ { id: 'a', x: 10, y: 11 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "a",
++       "x": 10,
++       "y": 11,
++     },
++   ],
++ ]
+
+ ❯ src/lib/collection-contributor-core.spec.ts:81:45
+     79|   const q=tree.transact(()=>tree.$.branch.rows.updateOne('a',{x:7}));a…
+     80|   const x=equal?7:10,y=equal?0:11;incoming([{id:'a',x,y}]);await flush…
+     81|   expect(sent).toEqual([]);expect(peerSent).toEqual([]);
+       |                                             ^
+     82|   const before=q.inspect();const receipt=c.declare({kind:'independent'…
+     83|   expect(sent).toEqual([[{id:'a',x,y:8}]]);expect(receipt.read()).toMa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/collection-contributor-core.spec.ts > incoming equal replacement has local support and does not certify another recipient
+AssertionError: expected [ [ { id: 'a', x: 7, y: +0 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "a",
++       "x": 7,
++       "y": 0,
++     },
++   ],
++ ]
+
+ ❯ src/lib/collection-contributor-core.spec.ts:81:45
+     79|   const q=tree.transact(()=>tree.$.branch.rows.updateOne('a',{x:7}));a…
+     80|   const x=equal?7:10,y=equal?0:11;incoming([{id:'a',x,y}]);await flush…
+     81|   expect(sent).toEqual([]);expect(peerSent).toEqual([]);
+       |                                             ^
+     82|   const before=q.inspect();const receipt=c.declare({kind:'independent'…
+     83|   expect(sent).toEqual([[{id:'a',x,y:8}]]);expect(receipt.read()).toMa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/core-independent-review.spec.ts > review seed created during open horizon retains later invalidation and its fixed window
+AssertionError: expected [ [ { id: 'a', x: 7, y: 8 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "a",
++       "x": 7,
++       "y": 8,
++     },
++   ],
++ ]
+
+ ❯ src/lib/core-independent-review.spec.ts:28:16
+     26|   console.info('REVIEW-OPEN-SEED',JSON.stringify({sent,receipt:receipt…
+     27|   expect(tree.$.rows.all()).toEqual([{id:'a',x:7,y:8}]);
+     28|   expect(sent).toEqual([]);
+       |                ^
+     29|   q.confirm();await flush();
+     30|   expect(sent).toEqual([[{id:'a',x:7,y:8}]]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/lib/core-independent-review.spec.ts > review omitted ancestor removes nested collection contributors from outgoing support
+AssertionError: expected [] to deeply equal [ { other: 1 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "other": 1,
+-   },
+- ]
++ []
+
+ ❯ src/lib/core-independent-review.spec.ts:46:16
+     44|   console.info('REVIEW-OMITTED-COLLECTION',JSON.stringify({sent,receip…
+     45|   expect(tree.$()).toEqual({other:1});
+     46|   expect(sent).toEqual([{other:1}]);
+       |                ^
+     47|  }finally{c.dispose();tree.destroy();foreign.destroy();}
+     48| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 9 passed (13)
+   Start at  12:29:16
+   Duration  1.02s (transform 922ms, setup 0ms, import 1.12s, tests 85ms, environment 587ms)
+
+Warning: command "node tools/run-core-vitest.mjs core-independent-review.spec.ts collection-contributor-core.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.5s

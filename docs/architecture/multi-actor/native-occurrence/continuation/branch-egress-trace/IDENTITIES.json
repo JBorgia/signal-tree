@@ -1,0 +1,36 @@
+{
+  "unchangedCandidateFiles": 948,
+  "diagnosticOnlyChangedFiles": [
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "packages/kernel/src/lib/internals/member-membership.ts"
+  ],
+  "source": {
+    "packages/kernel/src/lib/link.ts": "1e9b0a856eb980edaf0f07afe2d0189b3cdcf2d3e636e33c2faa07cf6c340dc4",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "79d7a077ff92c33d07438843d291e41e8e16bc91b5e92eb00e81f492d6178da7",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "766a3f606b3f2ff59492c45a0748f69b07739262e213cbd9baa91eb10b3b9165",
+    "packages/kernel/src/lib/internals/member-membership.ts": "bfad0d5f63050e5c774d0a903783f5472b44a9e74259e94ce5c09ff80262183b"
+  },
+  "diagnostic": {
+    "packages/kernel/src/lib/link.ts": "3c676896ef4038f4b17386596342da8e4092bd565255f45fd8e48855ce146168",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "056c7e2b61c3e0ef2107bc2f0a532dad07ed307b0c7b55d2361d4599d2915090",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "5a9ec2778019d94a04fe87a19818dccdd6d5aa25037355112562127cd80b6bd4",
+    "packages/kernel/src/lib/internals/member-membership.ts": "d694360e6c3a5834a932af57af66769e5821388eb341d6468f841e9092295f4a"
+  },
+  "tests": {
+    "packages/kernel/src/lib/branch-omission-correctness.spec.ts": "2e24443db2c8ebf7a434864453b2b9ac7ee757db790c8888be357148cc278fdf",
+    "packages/kernel/src/lib/oracle-alignment-independent.spec.ts": "fce9b17f9a732c6c33caa293d9d6ccdb9316970878853f5e1f0b2187f1dc0c61"
+  },
+  "evidence": {
+    "instrumented-trace-retry.log": "03db0febb22ff5f923bd1bc88cb4cd31b9cb49166b1fd8c1067b6d21a8ba7291",
+    "instrumented-proof.log": "ca255161dbf85c87e65bd3c69332a3f85541c90cdd72e6617f063fb344032d08",
+    "initial-old-cwd-uninstrumented-replay.log": "406ee6884338338bcf4107d88a556afd2395122ee9c9e6152519329ad186ce93",
+    "uninstrumented-first.log": "8ac2f05fcd96b76d24fb068ff6aa40b38f859b47ae05cbaa249bc744e02912d6",
+    "instrumented-boundary.log": "a22fc5d25031b1fe6833023c93e1b8d827713afa2d5e0f112ee385f9f9e46f17",
+    "instrumented-final.log": "6a541b30de04fd38839278b6b7fcd28a5e37a00ff6a731e514991e428f770883",
+    "extra-uninstrumented-replay.log": "4fa12b7375a20e2f89349b169da090d2f8a9271361fab303d5cc0af78a663fbc",
+    "logging-only.patch": "87feb44a0d9cfc89967061c6a7e1eedf6bc07aa4f55b06b9877accbcc601a0b5",
+    "instrumented-trace-first.log": "50577513426ac90fd551532504bef3a90c0c5602735411624826632c3eac6712"
+  }
+}

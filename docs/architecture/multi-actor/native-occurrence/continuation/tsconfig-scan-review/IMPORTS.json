@@ -1,0 +1,218 @@
+[
+  {
+    "file": "packages/react/src/absent-collection.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/absent-collection.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/absent-collection.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/absent-path-write.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/absent-path-write.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/absent-path-write.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/designated-collection-omission.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/designated-collection-omission.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/designated-collection-omission.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/index.ts",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/joint-native-frontier.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/joint-native-frontier.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/joint-rich-publication.spec.ts",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/lib/declared-publication-composition.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/lib/entity-native-obligation-composition.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/lib/link-native-address.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/opaque-leaf-restoration.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/ownership.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/ownership.spec.tsx",
+    "specifier": "react"
+  },
+  {
+    "file": "packages/react/src/ownership.spec.tsx",
+    "specifier": "react-dom/server"
+  },
+  {
+    "file": "packages/react/src/ownership.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/parent-freshness-counterparts.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/parent-freshness-counterparts.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/pending-turn-realization.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/pending-turn-realization.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/pending-turn-realization.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/plain-member-absence-observation.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/plain-member-absence-observation.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/plain-member-absence-observation.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/scalar-frame-publication.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/selected-callback-facade.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/transaction-realization.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/transaction-realization.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/transaction-realization.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.spec.tsx",
+    "specifier": "react"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.spec.tsx",
+    "specifier": "react-dom/server"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.spec.tsx",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.ts",
+    "specifier": "react"
+  },
+  {
+    "file": "packages/react/src/use-signal-tree.ts",
+    "specifier": "@signal-tree/kernel/adapter"
+  },
+  {
+    "file": "packages/react/src/whole-value-new-keys.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "packages/react/src/whole-value-new-keys.spec.tsx",
+    "specifier": "vitest"
+  },
+  {
+    "file": "apps/react-reference/src/app/app.spec.tsx",
+    "specifier": "@testing-library/react"
+  },
+  {
+    "file": "apps/react-reference/src/app/app.spec.tsx",
+    "specifier": "react"
+  },
+  {
+    "file": "apps/react-reference/src/app/app.spec.tsx",
+    "specifier": "@signal-tree/react"
+  },
+  {
+    "file": "apps/react-reference/src/app/app.tsx",
+    "specifier": "@signal-tree/react"
+  },
+  {
+    "file": "apps/react-reference/src/app/reference-store.spec.ts",
+    "specifier": "@signal-tree/kernel/adapter"
+  },
+  {
+    "file": "apps/react-reference/src/app/reference-store.ts",
+    "specifier": "@signal-tree/kernel"
+  },
+  {
+    "file": "apps/react-reference/src/main.tsx",
+    "specifier": "react"
+  },
+  {
+    "file": "apps/react-reference/src/main.tsx",
+    "specifier": "react-dom/client"
+  },
+  {
+    "file": "packages/kernel/src/transaction-realization-contract.ts",
+    "specifier": "vitest"
+  }
+]

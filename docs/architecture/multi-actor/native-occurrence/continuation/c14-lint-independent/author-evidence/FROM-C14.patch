@@ -1,0 +1,175 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -1,3 +1,4 @@
++import { isTraversableNode } from '../internals/node-shape';
+ import type { TerminalRecordPlan } from '../internals/intrinsic-mutation';
+ // Private native experiment; no package export. Publication authority only.
+ export type Outcome = 'pending' | 'confirmed' | 'rolled-back' | 'abandoned';
+@@ -125,7 +126,7 @@
+  return {components:sources,get proof(){return combineProofs(sources.map(nativeProof));},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};
+ }
+ export function onNativeRequirementReady(requirement:NativeRequirement,callback:()=>void):()=>void {
+- if(nativeRequirementReady(requirement)&&!unactivatedRequirements.has(requirement)){callback();return ()=>{};}
++ if(nativeRequirementReady(requirement)&&!unactivatedRequirements.has(requirement)){callback();return ()=>{/* Already ready; no subscription to release. */};}
+  let active=true;
+  const releases:(()=>void)[]=[];
+  const release=()=>{active=false;for(const off of releases)off();releases.length=0;};
+@@ -300,7 +301,7 @@
+   possible:uniqueOwners([...(proof.possible??[]),...op.recipientWindow])};
+ }
+ /** Old notification admission is deliberately not a declaration authority. */
+-export function attachRevision(_channel:object,_revision:object,_known:readonly OwnerCell[],_unknown=false):void {}
++export function attachRevision(_channel:object,_revision:object,_known:readonly OwnerCell[],_unknown=false):void {/* Notification admission is intentionally inert. */}
+ export function proof(channel:object,revision:object):Readonly<Proof>|undefined {
+  const op=connections.get(channel)?.ops.get(revision);
+  if(!op||op.frames.size)return undefined;
+@@ -374,7 +375,7 @@
+  h.frames.add(frame);h.open++;stack.push(frame);
+  let stage:'before-callback'|'after-callback'='before-callback';let thrown=false;let primary:unknown;let exitingError=false;
+  try{
+-  if(!input||typeof input!=='object'||typeof work!=='function')throw new SignalTreePublicationError(stage,'malformed');
++  if(!isTraversableNode(input)||typeof input==='function'||typeof work!=='function')throw new SignalTreePublicationError(stage,'malformed');
+   const d=input as {kind?:unknown;owners?:unknown};const kind=d.kind;
+   if(kind!=='independent'&&kind!=='dependent'&&kind!=='unknown')throw new SignalTreePublicationError(stage,'malformed');
+   const owners:OwnerCell[]=[];
+@@ -387,7 +388,7 @@
+   frame.unknown=kind==='unknown'||frame.ops.size>0;
+   stage='after-callback';let result:unknown;
+   try{result=work();}catch(error){thrown=true;primary=error;}
+-  if(result!==null&&(typeof result==='object'||typeof result==='function'))if(typeof(result as {then?:unknown}).then==='function')throw new SignalTreePublicationError(stage,'async-callback');
++  if(isTraversableNode(result))if(typeof(result as {then?:unknown}).then==='function')throw new SignalTreePublicationError(stage,'async-callback');
+   if(frameInvalid(frame))throw new SignalTreePublicationError(stage,'contradiction');
+   if(thrown)throw primary;
+   return receipt;
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -49,24 +49,19 @@
+ const sameProof=(a:Proof|undefined,b:Proof|undefined):boolean=>!!a&&!!b&&a.unknown===b.unknown&&a.invalid===b.invalid&&!!a.unavailableInput===!!b.unavailableInput&&!!a.historicalWindow===!!b.historicalWindow&&(a.terminalRejectedRoles??0)===(b.terminalRejectedRoles??0)&&(['owners','destination','input','validation','possible'] as const).every(role=>sameOwners(a[role],b[role]));
+ type Trie={children:Map<string,Trie>;channels:Set<object>};
+ const tries=new WeakMap<object,Trie>();
+-let indexedBindings=0;
+ function slotFor(branch:object,key:string,child:object):Slot{return Object.freeze({branch,key,child,address:getNodeAddress(branch)?[...getNodeAddress(branch)!,key]:undefined});}
+ function removeIndex(registry:object,address:readonly string[],channel:object):void{const root=tries.get(registry);if(!root)return;const path:{parent:Trie;key:string;node:Trie}[]=[];let node=root;for(const key of address){const child=node.children.get(key);if(!child)return;path.push({parent:node,key,node:child});node=child;}node.channels.delete(channel);for(let i=path.length-1;i>=0;i--){const part=path[i];if(part.node.channels.size||part.node.children.size)break;part.parent.children.delete(part.key);}if(!root.channels.size&&!root.children.size)tries.delete(registry);}
+ function trieFor(registry:object,address:readonly string[],create:boolean):Trie|undefined{let node=tries.get(registry);if(!node&&create)tries.set(registry,node={children:new Map(),channels:new Set()});for(const key of address){let next=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),channels:new Set()});node=next;}return node;}
+ function collect(node:Trie|undefined,result:object[]):void{if(!node)return;result.push(...node.channels);for(const child of node.children.values())collect(child,result);}
+-function reaches(child:object,suffix:readonly string[],source:object):boolean{let node:unknown=child;for(const key of suffix){if((typeof node!=='object'||node===null)&&typeof node!=='function')return false;const descriptor=Object.getOwnPropertyDescriptor(node,key);if(!descriptor||!('value'in descriptor))return false;node=descriptor.value;}return node===source;}
++function reaches(child:object,suffix:readonly string[],source:object):boolean{let node:unknown=child;for(const key of suffix){if(!isTraversableNode(node))return false;const descriptor=Object.getOwnPropertyDescriptor(node,key);if(!descriptor||!('value'in descriptor))return false;node=descriptor.value;}return node===source;}
+ const combineProofs=lifecycle.combineProofs;
+-function own(fact:Fact,channel:object):Proof|undefined{return ownProofs.get(fact)??lifecycle.proof(factChannels.get(fact)??channel,fact);}
+ function fieldAt(root:FieldTrie,path:readonly string[],create=false):FieldTrie|undefined{let node:FieldTrie|undefined=root;for(const key of path){let next:FieldTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map()});node=next;}return node;}
+ function fieldNodes(node:FieldTrie|undefined,out:object[]):void{if(!node)return;if(node.field)out.push(node.field);for(const child of node.children.values())fieldNodes(child,out);}
+ function slotNode(b:Binding,address:readonly string[],create=false):SlotTrie|undefined{let node:SlotTrie|undefined=b.slotTrie;for(const key of address){let next:SlotTrie|undefined=node?.children.get(key);if(!next&&create&&node)node.children.set(key,next={children:new Map(),slots:new Map()});node=next;}return node;}
+ function indexSlot(b:Binding,slot:Slot):void{if(slot.address)slotNode(b,slot.address,true)!.slots.set(slot.child,slot);}
+ function slotsAlong(b:Binding,address:readonly string[]):Slot[]{const result:Slot[]=[];let node:SlotTrie|undefined=b.slotTrie;const add=()=>{for(const slot of node?.slots.values()??[])if(b.presence.has(slot))result.push(slot);};add();for(const key of address){node=node?.children.get(key);if(!node)break;add();}return result;}
+ 
+-function descendantSlots(node:SlotTrie|undefined,out:Slot[]):void{if(!node)return;out.push(...node.slots.values());for(const child of node.children.values())descendantSlots(child,out);}
+ function presenceForField(b:Binding,address:readonly string[]):Presence[]{return slotsAlong(b,address).map(slot=>b.presence.get(slot)!).filter(Boolean);}
+-function exposed(b:Binding,address:readonly string[],except?:Slot):boolean{return slotsAlong(b,address).every(slot=>slot===except||b.completedPresence.get(slot)?.present!==false);}
+-function internalSlot(b:Binding,slot:Slot):boolean{return !!slot.address&&relativeSourceAddress(b.address??[],slot.address)!==undefined;}
+ function pathValue(value:unknown,path:readonly string[]):{present:boolean;value:unknown}{for(const key of path){if(value===null||typeof value!=='object'||!Object.prototype.hasOwnProperty.call(value,key))return {present:false,value:undefined};value=(value as Record<string,unknown>)[key];}return {present:true,value};}
+ function maskPayload(b:Binding):unknown{let result=b.valuePayload;for(const [slot,state]of b.completedPresence){if(state.present||!slot.address)continue;const relative=relativeSourceAddress(b.address??[],slot.address);if(!relative?.length)continue;const omit=(value:unknown,depth:number):unknown=>{if(value===null||typeof value!=='object')return value;const row={...value};const key=relative[depth];if(depth===relative.length-1)delete(row as Record<string,unknown>)[key];else if(Object.prototype.hasOwnProperty.call(row,key))Object.defineProperty(row,key,{value:omit((row as Record<string,unknown>)[key],depth+1),enumerable:true,configurable:true,writable:true});return row;};result=omit(result,0);}return result;}
+ 
+@@ -381,7 +376,7 @@
+  if(cleanIngress)cleanIngress.consumed=true;
+  unit.complete=true;wakeChannel(channel);
+ }
+-export function bindSource(channel:object,owner:number,position:number,identity:Parameters<typeof projection.bindSource>[3],report:(error:unknown)=>void=()=>{},source?:object,context?:{registry:object;address:readonly string[];value:unknown;aggregate?:boolean;presence:readonly {parent:object;key:string;child:object;present:boolean}[]}):void{
++export function bindSource(channel:object,owner:number,position:number,identity:Parameters<typeof projection.bindSource>[3],report:(error:unknown)=>void=()=>{/* No reporter was supplied. */},source?:object,context?:{registry:object;address:readonly string[];value:unknown;aggregate?:boolean;presence:readonly {parent:object;key:string;child:object;present:boolean}[]}):void{
+  projection.bindSource(channel,owner,position,identity);
+  lifecycle.registerConnection(channel,{supported:identity.supported,report,wake:()=>{const b=bindings.get(channel);if(b)ready(channel,b);callbacks.get(channel)?.();}});
+  const baseline:Fact=Object.freeze({revision:++serial,clean:false,blockers:[],unknown:false});facts.add(baseline);
+@@ -391,7 +386,6 @@
+   const fact=Object.freeze({...baseline,revision:++serial});const proof=lifecycle.nativeProof(requirement);
+   proofs.set(fact,proof);ownProofs.set(fact,proof);factRequirements.set(fact,requirement);return fact;
+  };
+- let binding!:Binding;
+  const index=new RecipientOccurrences(()=>{
+   if(bindings.get(channel)?.index!==index)return;
+   const current=bindings.get(channel)!;
+@@ -406,7 +400,7 @@
+   if(!binding.presence.has(slot))binding.presence.set(slot,state);if(!binding.completedPresence.has(slot))binding.completedPresence.set(slot,state);indexSlot(binding,slot);
+   return proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);};
+  });
+- binding={legacyScalars:[],index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
++ const binding:Binding={legacyScalars:[],index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
+  if(identity.supported&&source){
+   const enroll=(node:object)=>{const occurrence=index.enroll(node);binding.occurrences.set(node,occurrence);return occurrence;};
+   enroll(source);
+@@ -434,16 +428,16 @@
+    binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));
+   }
+  }
+- if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);indexedBindings++;}
++ if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);}
+ }
+ export function onEligibility(_owner:number,cb:()=>void,channel:object):()=>void{callbacks.set(channel,cb);return()=>{callbacks.delete(channel);};}
+ export function acquire(channel:object,work:()=>void):void{const prev=ingress;ingress={channel,consumed:false,collections:new Set()};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}
+ /** Notification metadata no longer admits publication responsibility. */
+ export function annotate(meta:WriteMetadata|undefined,_owner:number|undefined,_positions:number[]|undefined,_authored:boolean,_payload:unknown):WriteMetadata{return stampScalarNotification(meta,_payload,serial);}
+ export function evidence(_meta:unknown):Fact|undefined{return undefined;}
+-export function complete(_meta:unknown):void{}
++export function complete(_meta:unknown):void{/* Notification metadata does not complete publication responsibility. */}
+ export function refresh():undefined{return undefined;}
+-function decision(fact:Fact|undefined,channel:object):{early:boolean;pending:boolean}{
++function decision(fact:Fact|undefined,_channel:object):{early:boolean;pending:boolean}{
+  if(!fact)return {early:false,pending:false};
+  const p=proofs.get(fact);if(!p)return {early:false,pending:true};
+  return {early:!p.invalid&&!p.unknown&&!p.terminalRejectedRoles&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+@@ -464,7 +458,7 @@
+  original({...r,run:()=>{if(fact){let set=grants.get(fact);if(!set)grants.set(fact,set=new Set());set.add(channel);}r.run();}});return true;
+ }
+ export function started(fact:Fact|undefined,channel:object):void{if(fact)lifecycle.started(channel,fact,grants.get(fact)?.has(channel)?'surviving':'declared');}
+-export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}if(b)b.legacyScalars.length=0;for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
++export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);}if(b)b.legacyScalars.length=0;for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
+ export function heldCount():number{return lifecycle.diagnostics().operations;}
+ export function diagnostics(){return {...lifecycle.diagnostics(),...projection.projectionCounts(),listeners:callbacks.size,latest:bindings.size};}
+ export function declare(channel:object,_owner:number,_position:number,input:unknown,work:()=>unknown,_disposed:()=>boolean){return lifecycle.runDeclaration(channel,input,work);}
+--- a/packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts
++++ b/packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts
+@@ -3,7 +3,7 @@
+ import {getPathNotifier} from './path-notifier';
+ type C=ReturnType<typeof link>&{declare(input:unknown,work:()=>unknown):unknown};
+ it('actual parent declaration contradiction must not publish inherited scalar through late enrollment',async()=>{
+- const tree=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const foreign=signalTree({z:0},{enhancers:[transactions()]});const parent=link(tree.$.pair,{set:()=>{}}) as C;const sent:unknown[]=[];let child:C|undefined;const q=foreign.transact(()=>foreign.$.z(7));
++ const tree=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const foreign=signalTree({z:0},{enhancers:[transactions()]});const parent=link(tree.$.pair,{set:()=>{/* Intentionally discard destination values in this proof fixture. */}}) as C;const sent:unknown[]=[];let child:C|undefined;const q=foreign.transact(()=>foreign.$.z(7));
+  try{let failure:unknown;try{parent.declare({kind:'independent'},()=>{tree.$.pair.x(7);child=link(tree.$.pair,{set:v=>{sent.push(v);}}) as C;parent.declare({kind:'dependent',owners:[q]},()=>tree.$.pair.y(1));});}catch(error){failure=error;}
+  expect(failure).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',reason:'contradiction'});
+  child!.declare({kind:'independent'},()=>tree.$.pair.y(8));getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();
+--- a/packages/kernel/src/lib/scalar-native-support.spec.ts
++++ b/packages/kernel/src/lib/scalar-native-support.spec.ts
+@@ -19,7 +19,7 @@
+     { enhancers: [transactions()] }
+   );
+   const foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
+-  const parent = link(tree.$.pair, { set: () => {} }) as C;
++  const parent = link(tree.$.pair, { set: () => {/* Intentionally discard destination values in this proof fixture. */} }) as C;
+   const sent: unknown[] = [];
+   const q = foreign.transact(() => foreign.$.z(7));
+   let child: C | undefined;
+@@ -117,7 +117,7 @@
+     foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
+   const q = foreign.transact(() => foreign.$.z(7));
+   const sent: unknown[] = [];
+-  const anchor = link(tree.$, { set: () => {} });
++  const anchor = link(tree.$, { set: () => {/* Intentionally discard destination values in this proof fixture. */} });
+   tree.$.x(7);
+   const c = link(tree.$, {
+     set: (v) => {
+@@ -210,7 +210,7 @@
+ it('newer author completion reentry cannot replay outer scalar payload', async () => {
+   const tree = signalTree({ pair: { x: 0, y: 0 } }),
+     sent: unknown[] = [];
+-  const parent = link(tree.$.pair, { set: () => {} }) as C;
++  const parent = link(tree.$.pair, { set: () => {/* Intentionally discard destination values in this proof fixture. */} }) as C;
+   let child: C | undefined,
+     entered = false;
+   const off = preparePublicationMutations(
+@@ -248,7 +248,7 @@
+   const before = diagnostics();
+   const tree = signalTree({ x: 0 }),
+     foreign = signalTree({ z: 0 }, { enhancers: [transactions()] });
+-  const parent = link(tree.$, { set: () => {} }) as C;
++  const parent = link(tree.$, { set: () => {/* Intentionally discard destination values in this proof fixture. */} }) as C;
+   const sent: unknown[] = [];
+   const q = foreign.transact(() => foreign.$.z(7));
+   let child: C | undefined;

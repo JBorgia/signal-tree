@@ -1,0 +1,10 @@
+{
+  "label": "mutant-installed-lifecycle-consumer",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "lifecycle-consumer.mjs"
+  ],
+  "cwd": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-2oKvj7/mutant",
+  "status": 1,
+  "signal": null
+}

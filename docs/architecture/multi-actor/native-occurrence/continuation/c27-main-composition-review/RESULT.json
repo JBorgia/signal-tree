@@ -1,0 +1,39 @@
+{
+  "typescript": "6.0.3",
+  "inputs": [
+    {
+      "root": "/private/tmp/st-c26-scalar-finalized-role",
+      "manifest": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+      "files": 3083,
+      "mismatches": 0
+    },
+    {
+      "root": "/private/tmp/st-c27-public-composition",
+      "manifest": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+      "files": 3086,
+      "mismatches": 0
+    }
+  ],
+  "emission": [
+    {
+      "file": "packages/kernel/src/lib/link.ts",
+      "sha256": "558cd2c6b7d4bfcfe8dcef9f9a2d50796bbcede27545770c12555d38692478d9",
+      "identical": true,
+      "options": {
+        "target": 9,
+        "module": 99,
+        "removeComments": true
+      }
+    },
+    {
+      "file": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "sha256": "977d3fcda083afba204a5a46c88de1e532cb2773c855861356ec549f161ca4ee",
+      "identical": true,
+      "options": {
+        "target": 9,
+        "module": 99,
+        "removeComments": true
+      }
+    }
+  ]
+}

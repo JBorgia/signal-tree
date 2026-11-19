@@ -1,0 +1,2 @@
+packages/kernel/src/lib/link-declaration.typing.spec.ts(5,39): error TS2307: Cannot find module '@signal-tree/vue' or its corresponding type declarations.
+packages/kernel/src/lib/link-declaration.typing.spec.ts(6,41): error TS2307: Cannot find module '@signal-tree/solid' or its corresponding type declarations.

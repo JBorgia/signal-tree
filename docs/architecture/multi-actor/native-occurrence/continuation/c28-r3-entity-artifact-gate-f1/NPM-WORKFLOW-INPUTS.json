@@ -1,0 +1,18 @@
+{
+  ".nvmrc": {
+    "sha256": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "currentRootMatches": true
+  },
+  ".github/workflows/validate.yml": {
+    "sha256": "5702741f2e095aec26d8570df21a537d854174ea68b4ca8929b80bcb4bf3a5e2",
+    "currentRootMatches": true
+  },
+  ".github/workflows/release.yml": {
+    "sha256": "133c33178455a06bfdf2d0f72c0cc6131023beee993a5c30862ab8cf45381d14",
+    "currentRootMatches": true
+  },
+  ".github/workflows/publish.yml": {
+    "sha256": "0b1bb8b436ed108d646a2ee3a62bfabad5d165f43b98c6cbd250db55cc176f9f",
+    "currentRootMatches": true
+  }
+}

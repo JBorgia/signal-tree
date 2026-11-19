@@ -1,0 +1,6 @@
+{
+  "previous": "/private/tmp/v16-transition-qualification/node_modules",
+  "reason": "Archived dependency directory contains dangling package links and no Nx executable. Initial source typecheck failed before compilation.",
+  "replacement": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "rootAndCandidateLockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239"
+}

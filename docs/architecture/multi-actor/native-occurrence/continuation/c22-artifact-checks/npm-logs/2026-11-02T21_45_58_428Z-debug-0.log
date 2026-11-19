@@ -1,0 +1,19 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/consumer/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm exec tsc -p tsconfig.node16.json
+8 verbose argv "exec" "--" "tsc" "-p" "tsconfig.node16.json"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_45_58_428Z-
+10 verbose logfile /private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_45_58_428Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 verbose cwd /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-4rIuzi/consumer
+14 verbose os Darwin 25.2.0
+15 verbose node v24.15.0
+16 verbose npm  v11.12.1
+17 verbose exit 0
+18 info ok

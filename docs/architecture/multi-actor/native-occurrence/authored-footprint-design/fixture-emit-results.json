@@ -1,0 +1,8 @@
+{
+  "typescript": "6.0.3",
+  "esbuild": "0.25.12",
+  "tscIdentical": true,
+  "esbuildIdentical": true,
+  "tscSha256": "acadd93174578e41f3e7524019a978e5de67e780201e11f057e369c79c12724d",
+  "esbuildSha256": "4662a5bf11f33b256b9e7a3a1311e717ddef13b9c4c74c5f559b858ea1838c50"
+}

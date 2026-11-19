@@ -1,0 +1,394 @@
+packages/kernel/src/enhancers/batching/batching.spec.ts(31,7): error TS18046: 'enhanced.$' is of type 'unknown'.
+packages/kernel/src/enhancers/batching/batching.spec.ts(41,7): error TS18046: 'enhanced.$' is of type 'unknown'.
+packages/kernel/src/enhancers/batching/batching.spec.ts(52,7): error TS18046: 'enhanced.$' is of type 'unknown'.
+packages/kernel/src/enhancers/batching/batching.spec.ts(65,7): error TS18046: 'enhanced.$' is of type 'unknown'.
+packages/kernel/src/enhancers/devtools/devtools.spec.ts(91,5): error TS18046: 'enhanced.$' is of type 'unknown'.
+packages/kernel/src/enhancers/devtools/devtools.spec.ts(344,7): error TS2349: This expression is not callable.
+  Type 'never' has no call signatures.
+packages/kernel/src/enhancers/devtools/devtools.spec.ts(426,7): error TS2349: This expression is not callable.
+  Type 'never' has no call signatures.
+packages/kernel/src/enhancers/devtools/devtools.spec.ts(530,7): error TS2349: This expression is not callable.
+  Type 'never' has no call signatures.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(63,28): error TS2339: Property 'cause' does not exist on type 'SignalTreeRollbackError'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(2768,44): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(2935,44): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(2944,44): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(2988,39): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(2996,44): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(3133,29): error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(3499,8): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(3530,45): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(3536,44): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(3542,45): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4396,8): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4404,47): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4425,8): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4437,50): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4462,8): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4474,50): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/restoration/restoration.spec.ts(4697,8): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(22,28): error TS2339: Property 'cause' does not exist on type 'SignalTreeRollbackError'.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(27,19): error TS2352: Conversion of type 'ISignalTreeOf<{ count: number; }, "location", TreeNodeOf<{ count: number; }, "location">> & TransactionMethods' to type 'Record<string, unknown>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Index signature for type 'string' is missing in type 'ISignalTreeOf<{ count: number; }, "location", TreeNodeOf<{ count: number; }, "location">> & TransactionMethods'.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(63,21): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(205,23): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(211,43): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(246,19): error TS2352: Conversion of type 'ISignalTreeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<string, never>>; }, "location", TreeNodeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<...>>; }, "location">> & TransactionMethods' to type '{ $: { count: () => number; rows: { addOne(row: { id: string; name: string; }): void; removeOne(id: string): void; changeId(from: string, to: string): void; ids(): string[]; }; }; transact: (fn: () => void) => { ...; }; __transactions: { ...; }; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property '__transactions' is missing in type 'ISignalTreeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<string, never>>; }, "location", TreeNodeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<...>>; }, "location">> & TransactionMethods' but required in type '{ $: { count: () => number; rows: { addOne(row: { id: string; name: string; }): void; removeOne(id: string): void; changeId(from: string, to: string): void; ids(): string[]; }; }; transact: (fn: () => void) => { ...; }; __transactions: { ...; }; }'.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(289,23): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(299,28): error TS2339: Property 'cause' does not exist on type 'SignalTreeRollbackError'.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(330,19): error TS2352: Conversion of type 'ISignalTreeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<string, never>>; }, "location", TreeNodeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<...>>; }, "location">> & TransactionMethods' to type '{ (): { count: number; rows: { all: { id: string; name: string; }[]; }; }; $: { count: () => number; rows: { addOne(row: { id: string; name: string; }): void; removeOne(id: string): void; changeId(from: string, to: string): void; ids(): string[]; byIdOrFail(id: string): { ...; }; }; }; transact: (fn: () => void) => ...' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Property '__transactions' is missing in type 'ISignalTreeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<string, never>>; }, "location", TreeNodeOf<{ count: number; rows: EntityMapBuilder<{ id: string; name: string; }, string, Record<...>>; }, "location">> & TransactionMethods' but required in type '{ (): { count: number; rows: { all: { id: string; name: string; }[]; }; }; $: { count: () => number; rows: { addOne(row: { id: string; name: string; }): void; removeOne(id: string): void; changeId(from: string, to: string): void; ids(): string[]; byIdOrFail(id: string): { ...; }; }; }; transact: (fn: () => void) => ...'.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(369,21): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(373,41): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/enhancers/transactions/transactions.spec.ts(394,18): error TS2349: This expression is not callable.
+  Type '{ count: () => number; rows: { addOne(row: { id: string; name: string; }): void; removeOne(id: string): void; changeId(from: string, to: string): void; ids(): string[]; byIdOrFail(id: string): { ...; }; }; }' has no call signatures.
+packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts(31,15): error TS2724: '"../index"' has no exported member named 'ISignalTree'. Did you mean 'SignalTree'?
+packages/kernel/src/lib/entity-array-diagnostic.spec.ts(25,47): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-array-diagnostic.spec.ts(26,40): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-array-diagnostic.spec.ts(32,31): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-array-diagnostic.spec.ts(38,34): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-array-diagnostic.spec.ts(47,29): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-granular-reactivity.spec.ts(333,10): error TS2339: Property 'setAll' does not exist on type 'InternalHandleRows'.
+packages/kernel/src/lib/entity-granular-reactivity.spec.ts(338,10): error TS2339: Property 'setAll' does not exist on type 'InternalHandleRows'.
+packages/kernel/src/lib/entity-granular-reactivity.spec.ts(341,12): error TS2349: This expression is not callable.
+  Type '{ v: () => number | undefined; }' has no call signatures.
+packages/kernel/src/lib/entity-missing-id-guard.spec.ts(17,27): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-predicate-churn.spec.ts(171,42): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-predicate-churn.spec.ts(182,23): error TS2304: Cannot find name 'Row'.
+packages/kernel/src/lib/entity-predicate-churn.spec.ts(194,29): error TS2304: Cannot find name 'Row'.
+packages/kernel/src/lib/entity-predicate-churn.spec.ts(204,29): error TS2304: Cannot find name 'Row'.
+packages/kernel/src/lib/entity-predicate-churn.spec.ts(215,29): error TS2304: Cannot find name 'Row'.
+packages/kernel/src/lib/entity-predicate-churn.spec.ts(219,29): error TS2304: Cannot find name 'Row'.
+packages/kernel/src/lib/entity-signal.spec.ts(333,11): error TS2344: Type '((subjectId: number) => unknown) | undefined' does not satisfy the constraint '(...args: any) => any'.
+  Type 'undefined' is not assignable to type '(...args: any) => any'.
+packages/kernel/src/lib/entity-signal.spec.ts(1764,31): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(1765,29): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(1766,30): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(1767,30): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(1830,31): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(1831,29): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(1832,30): error TS2353: Object literal may only specify known properties, and 'active' does not exist in type 'Item'.
+packages/kernel/src/lib/entity-signal.spec.ts(2112,13): error TS2352: Conversion of type 'undefined' to type 'string' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/entity-signal.spec.ts(2112,18): error TS2493: Tuple type '[]' of length '0' has no element at index '0'.
+packages/kernel/src/lib/entity-signal.spec.ts(2113,23): error TS2493: Tuple type '[]' of length '0' has no element at index '3'.
+packages/kernel/src/lib/entity-signal.spec.ts(2114,24): error TS2493: Tuple type '[]' of length '0' has no element at index '4'.
+packages/kernel/src/lib/entity-signal.spec.ts(2115,25): error TS2493: Tuple type '[]' of length '0' has no element at index '5'.
+packages/kernel/src/lib/entity-signal.spec.ts(2376,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2379,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2380,23): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2410,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2412,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2413,23): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2419,5): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2420,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-signal.spec.ts(2434,12): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+packages/kernel/src/lib/entity-wrong-method-guard.spec.ts(29,27): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/entity-wrong-method-guard.spec.ts(52,31): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(16,132): error TS2322: Type '(v: { rows: { [x: string]: { deep: { x: number; y: number; }; other: number; }; }; }) => number' is not assignable to type '(value: { rows: { [x: string]: { deep: { x: number; y: number; }; other: number; }; }; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(18,3): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(19,3): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(24,126): error TS2322: Type '(v: { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }) => number' is not assignable to type '(value: { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(25,19): error TS2769: No overload matches this call.
+  Overload 1 of 3, '(value: { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }): void', gave the following error.
+    Type 'void' is not assignable to type 'number'.
+  Overload 2 of 3, '(updater: (current: { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }) => { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }): void', gave the following error.
+    Object literal may only specify known properties, and 'fresh' does not exist in type '(current: { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }) => { trigger: { x: number; }[]; fresh?: { n: number; } | undefined; }'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(26,14): error TS2339: Property 'n' does not exist on type 'Location<{ n: number; } | undefined>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(31,133): error TS2322: Type '(v: { rows: { [x: string]: unknown; }; kept: { [x: string]: number; }; }) => number' is not assignable to type '(value: { rows: { [x: string]: unknown; }; kept: { [x: string]: number; }; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(34,3): error TS18046: 't.$.kept.saved' is of type 'unknown'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(39,108): error TS2322: Type '(v: { [x: string]: { n: number; }; }) => number' is not assignable to type '(value: { [x: string]: { n: number; }; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(47,174): error TS2322: Type '(v: { [x: string]: { n: number; }; }) => number' is not assignable to type '(value: { [x: string]: { n: number; }; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(48,50): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(54,108): error TS2322: Type '(v: { [x: string]: { n: number; }; }) => number' is not assignable to type '(value: { [x: string]: { n: number; }; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts(63,10): error TS2352: Conversion of type '{ other: number; }' to type '(current: { branch: { rows: { all: { id: string; n: number; }[]; }; s: number; }; other: number; }) => { branch: { rows: { id: string; n: number; }[] | { all: { id: string; n: number; }[]; }; s: number; }; other: number; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ other: number; }' provides no match for the signature '(current: { branch: { rows: { all: { id: string; n: number; }[]; }; s: number; }; other: number; }): { branch: { rows: { id: string; n: number; }[] | { all: { id: string; n: number; }[]; }; s: number; }; other: number; }'.
+packages/kernel/src/lib/independent-enrollment-diagnostics.spec.ts(12,211): error TS2345: Argument of type '{ (): { branch: { rows: { all: { id: string; n: number; }[]; }; s: number; }; other: number; }; (value: { branch: { rows: { id: string; n: number; }[] | { all: { id: string; n: number; }[]; }; s: number; }; other: number; }): void; (updater: (current: { ...; }) => { ...; }): void; } & NodeConstruction<...> & TreeChi...' is not assignable to parameter of type 'never'.
+packages/kernel/src/lib/independent-enrollment-diagnostics.spec.ts(13,10): error TS2352: Conversion of type '{ other: number; }' to type '(current: { branch: { rows: { all: { id: string; n: number; }[]; }; s: number; }; other: number; }) => { branch: { rows: { id: string; n: number; }[] | { all: { id: string; n: number; }[]; }; s: number; }; other: number; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ other: number; }' provides no match for the signature '(current: { branch: { rows: { all: { id: string; n: number; }[]; }; s: number; }; other: number; }): { branch: { rows: { id: string; n: number; }[] | { all: { id: string; n: number; }[]; }; s: number; }; other: number; }'.
+packages/kernel/src/lib/independent-enrollment-diagnostics.spec.ts(22,108): error TS2322: Type '(v: { [x: string]: { n: number; }; }) => number' is not assignable to type '(value: { [x: string]: { n: number; }; }) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-enrollment-diagnostics.spec.ts(24,337): error TS18046: 't.$.rows.a' is of type 'unknown'.
+packages/kernel/src/lib/independent-occurrence-terminal.spec.ts(9,69): error TS2345: Argument of type '{ (): { branch: { rows: { all: { id: string; x: number; }[]; }; x: number; }; other: number; }; (value: { branch: { rows: { id: string; x: number; }[] | { all: { id: string; x: number; }[]; }; x: number; }; other: number; }): void; (updater: (current: { ...; }) => { ...; }): void; } & NodeConstruction<...> & TreeChi...' is not assignable to parameter of type 'never'.
+packages/kernel/src/lib/independent-occurrence-terminal.spec.ts(9,215): error TS2322: Type '(v: unknown) => number' is not assignable to type '(value: never) => void | Promise<void>'.
+  Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/independent-occurrence-terminal.spec.ts(11,45): error TS2352: Conversion of type '{ other: number; }' to type '(current: { branch: { rows: { all: { id: string; x: number; }[]; }; x: number; }; other: number; }) => { branch: { rows: { id: string; x: number; }[] | { all: { id: string; x: number; }[]; }; x: number; }; other: number; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ other: number; }' provides no match for the signature '(current: { branch: { rows: { all: { id: string; x: number; }[]; }; x: number; }; other: number; }): { branch: { rows: { id: string; x: number; }[] | { all: { id: string; x: number; }[]; }; x: number; }; other: number; }'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(35,3): error TS2344: Type '{ readonly kind: "outside-boundary"; } | { readonly kind: "prefix-blocked"; } | { readonly kind: "turn-evicted"; }' does not satisfy the constraint 'ReversalRefusal'.
+  Type '{ readonly kind: "prefix-blocked"; }' is not assignable to type 'ReversalRefusal'.
+    Type '{ readonly kind: "prefix-blocked"; }' is not assignable to type '{ readonly kind: "not-found"; }'.
+      Types of property 'kind' are incompatible.
+        Type '"prefix-blocked"' is not assignable to type '"not-found"'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(68,37): error TS2339: Property 'refusal' does not exist on type 'UndoResult'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(74,37): error TS2339: Property 'refusal' does not exist on type 'RedoResult'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1145,39): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1149,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1180,39): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1184,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1260,39): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1264,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1286,39): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1290,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1782,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1787,11): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1818,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1824,11): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1856,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1861,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1918,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(1922,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2210,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2215,11): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2251,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2257,11): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2294,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2299,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2354,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts(2358,9): error TS2322: Type 'Mock<void>' is not assignable to type '((effects: readonly ReversalEffect[]) => void) | undefined'.
+  Type 'Mock<void>' is not assignable to type '(effects: readonly ReversalEffect[]) => void'.
+    Types of parameters 'args' and 'effects' are incompatible.
+      Type '[effects: readonly ReversalEffect[]]' is not assignable to type 'never'.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts(46,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts(89,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts(211,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts(237,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts(399,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts(499,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts(858,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts(65,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts(111,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts(239,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts(350,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/effect-applier.spec.ts(48,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/effect-applier.spec.ts(135,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1087,14): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1091,19): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1143,14): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1144,14): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1188,14): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1193,14): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1198,14): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1304,22): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1310,27): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1351,27): error TS2349: This expression is not callable.
+  Type 'String' has no call signatures.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1664,42): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1758,42): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1923,32): error TS2739: Type '{ before: string; }' is missing the following properties from type 'ReversalEffect': owner, after
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1925,30): error TS2739: Type '{ before: string; }' is missing the following properties from type 'ReversalEffect': owner, after
+packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts(1955,42): error TS2554: Expected 0 arguments, but got 1.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(303,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(417,29): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(439,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(526,29): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(544,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(647,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts(753,29): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts(227,27): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(iterable?: Iterable<readonly [number, string]> | null | undefined): Map<number, string>', gave the following error.
+    Argument of type '([number, string] | [number, boolean])[]' is not assignable to parameter of type 'Iterable<readonly [number, string]>'.
+      The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+        Type 'IteratorResult<[number, string] | [number, boolean], undefined>' is not assignable to type 'IteratorResult<readonly [number, string], any>'.
+          Type 'IteratorYieldResult<[number, string] | [number, boolean]>' is not assignable to type 'IteratorResult<readonly [number, string], any>'.
+            Type 'IteratorYieldResult<[number, string] | [number, boolean]>' is not assignable to type 'IteratorYieldResult<readonly [number, string]>'.
+              Type '[number, string] | [number, boolean]' is not assignable to type 'readonly [number, string]'.
+                Type '[number, boolean]' is not assignable to type 'readonly [number, string]'.
+                  Type at position 1 in source is not compatible with type at position 1 in target.
+                    Type 'boolean' is not assignable to type 'string'.
+  Overload 2 of 4, '(entries?: readonly (readonly [number, string])[] | null | undefined): Map<number, string>', gave the following error.
+    Type 'boolean' is not assignable to type 'string'.
+packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts(278,27): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(iterable?: Iterable<readonly [number, string]> | null | undefined): Map<number, string>', gave the following error.
+    Argument of type '([number, string] | [number, boolean])[]' is not assignable to parameter of type 'Iterable<readonly [number, string]>'.
+      The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+        Type 'IteratorResult<[number, string] | [number, boolean], undefined>' is not assignable to type 'IteratorResult<readonly [number, string], any>'.
+          Type 'IteratorYieldResult<[number, string] | [number, boolean]>' is not assignable to type 'IteratorResult<readonly [number, string], any>'.
+            Type 'IteratorYieldResult<[number, string] | [number, boolean]>' is not assignable to type 'IteratorYieldResult<readonly [number, string]>'.
+              Type '[number, string] | [number, boolean]' is not assignable to type 'readonly [number, string]'.
+                Type '[number, boolean]' is not assignable to type 'readonly [number, string]'.
+                  Type at position 1 in source is not compatible with type at position 1 in target.
+                    Type 'boolean' is not assignable to type 'string'.
+  Overload 2 of 4, '(entries?: readonly (readonly [number, string])[] | null | undefined): Map<number, string>', gave the following error.
+    Type 'boolean' is not assignable to type 'string'.
+packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts(346,27): error TS2769: No overload matches this call.
+  Overload 1 of 4, '(iterable?: Iterable<readonly [number, string]> | null | undefined): Map<number, string>', gave the following error.
+    Argument of type '([number, string] | [number, boolean])[]' is not assignable to parameter of type 'Iterable<readonly [number, string]>'.
+      The types returned by '[Symbol.iterator]().next(...)' are incompatible between these types.
+        Type 'IteratorResult<[number, string] | [number, boolean], undefined>' is not assignable to type 'IteratorResult<readonly [number, string], any>'.
+          Type 'IteratorYieldResult<[number, string] | [number, boolean]>' is not assignable to type 'IteratorResult<readonly [number, string], any>'.
+            Type 'IteratorYieldResult<[number, string] | [number, boolean]>' is not assignable to type 'IteratorYieldResult<readonly [number, string]>'.
+              Type '[number, string] | [number, boolean]' is not assignable to type 'readonly [number, string]'.
+                Type '[number, boolean]' is not assignable to type 'readonly [number, string]'.
+                  Type at position 1 in source is not compatible with type at position 1 in target.
+                    Type 'boolean' is not assignable to type 'string'.
+  Overload 2 of 4, '(entries?: readonly (readonly [number, string])[] | null | undefined): Map<number, string>', gave the following error.
+    Type 'boolean' is not assignable to type 'string'.
+packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts(527,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts(604,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts(711,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts(784,35): error TS2558: Expected 0-1 type arguments, but got 2.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(84,9): error TS2741: Property '__listSubjectReclamationCandidates' is missing in type '{ __prepareSubjectReclamation: Mock<Procedure>; __applyPreparedSubjectReclamation: Mock<Procedure>; }' but required in type 'SubjectReclamationPhysicalOwner'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(114,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(153,29): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(175,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(181,11): error TS2741: Property '__listSubjectReclamationCandidates' is missing in type '{ __prepareSubjectReclamation: (candidate: number, options: EntitySubjectReclamationPlanningOptions) => any; __applyPreparedSubjectReclamation: (prepared: PreparedEntitySubjectReclamation) => void; }' but required in type 'SubjectReclamationPhysicalOwner'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(220,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(253,9): error TS2322: Type '{ getTurns: () => never[]; getPendingTurns: () => { id: number; effects: { owner: PositionId; before: string; after: string; subjectId: any; }[]; }[]; }' is not assignable to type 'Pick<TurnStore, "getTurns" | "getPendingTurns">'.
+  The types returned by 'getPendingTurns()' are incompatible between these types.
+    Type '{ id: number; effects: { owner: number; before: string; after: string; subjectId: any; }[]; }[]' is not assignable to type 'readonly CausalTurn[]'.
+      Type '{ id: number; effects: { owner: number; before: string; after: string; subjectId: any; }[]; }' is missing the following properties from type 'CausalTurn': participants, state
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(278,29): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(294,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(327,9): error TS2322: Type '{ getTurns: () => never[]; getPendingTurns: () => { id: number; effects: { owner: PositionId; before: string; after: string; subjectId: number; }[]; }[]; }' is not assignable to type 'Pick<TurnStore, "getTurns" | "getPendingTurns">'.
+  The types returned by 'getPendingTurns()' are incompatible between these types.
+    Type '{ id: number; effects: { owner: number; before: string; after: string; subjectId: number; }[]; }[]' is not assignable to type 'readonly CausalTurn[]'.
+      Type '{ id: number; effects: { owner: number; before: string; after: string; subjectId: number; }[]; }' is missing the following properties from type 'CausalTurn': participants, state
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(345,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(389,29): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(408,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(409,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(470,28): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(483,28): error TS2339: Property '__positionIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(528,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(529,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(599,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts(649,32): error TS2339: Property '__subjectIds' does not exist on type 'Location<string>'.
+packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts(74,9): error TS2322: Type 'Mock<() => string>' is not assignable to type '() => GreenfieldTransactionLifecycle'.
+  Type 'string' is not assignable to type 'GreenfieldTransactionLifecycle'.
+packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts(23,18): error TS2352: Conversion of type 'ISignalTreeOf<{ profile: { name: string; }; enabled: boolean; }, "location", TreeNodeOf<{ profile: { name: string; }; enabled: boolean; }, "location">>' to type 'ISignalTree<{ profile: { name: { (): string; set(value: string): void; }; }; enabled: { (): boolean; set(value: boolean): void; }; }>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property '$' are incompatible.
+    Type '{ (): { profile: { name: string; }; enabled: boolean; }; (value: { profile: { name: string; }; enabled: boolean; }): void; (updater: (current: { profile: { name: string; }; enabled: boolean; }) => { profile: { name: string; }; enabled: boolean; }): void; } & NodeConstruction<...> & TreeChildrenOf<...>' is not comparable to type '{ (): { profile: { name: { (): string; set(value: string): void; }; }; enabled: { (): boolean; set(value: boolean): void; }; }; (value: { profile: { name: { (): string; set(value: string): void; }; }; enabled: { ...; }; }): void; (updater: (current: { ...; }) => { ...; }): void; } & NodeConstruction<...> & TreeChild...'.
+      Type '{ (): { profile: { name: string; }; enabled: boolean; }; (value: { profile: { name: string; }; enabled: boolean; }): void; (updater: (current: { profile: { name: string; }; enabled: boolean; }) => { profile: { name: string; }; enabled: boolean; }): void; } & NodeConstruction<...> & TreeChildrenOf<...>' is not comparable to type '{ (): { profile: { name: { (): string; set(value: string): void; }; }; enabled: { (): boolean; set(value: boolean): void; }; }; (value: { profile: { name: { (): string; set(value: string): void; }; }; enabled: { ...; }; }): void; (updater: (current: { ...; }) => { ...; }): void; }'.
+        Call signature return types '{ profile: { name: string; }; enabled: boolean; }' and '{ profile: { name: { (): string; set(value: string): void; }; }; enabled: { (): boolean; set(value: boolean): void; }; }' are incompatible.
+          The types of 'profile.name' are incompatible between these types.
+            Type 'string' is not comparable to type '{ (): string; set(value: string): void; }'.
+packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts(37,18): error TS2352: Conversion of type 'ISignalTreeOf<{ a: string; b: string; }, "location", TreeNodeOf<{ a: string; b: string; }, "location">>' to type 'ISignalTree<{ a: { (): string; set(value: string): void; }; b: { (): string; set(value: string): void; }; }>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property '$' are incompatible.
+    Type '{ (): { a: string; b: string; }; (value: { a: string; b: string; }): void; (updater: (current: { a: string; b: string; }) => { a: string; b: string; }): void; } & NodeConstruction<{ a: string; b: string; }> & TreeChildrenOf<...>' is not comparable to type '{ (): { a: { (): string; set(value: string): void; }; b: { (): string; set(value: string): void; }; }; (value: { a: { (): string; set(value: string): void; }; b: { (): string; set(value: string): void; }; }): void; (updater: (current: { ...; }) => { ...; }): void; } & NodeConstruction<...> & TreeChildrenOf<...>'.
+      Type '{ (): { a: string; b: string; }; (value: { a: string; b: string; }): void; (updater: (current: { a: string; b: string; }) => { a: string; b: string; }): void; } & NodeConstruction<{ a: string; b: string; }> & TreeChildrenOf<...>' is not comparable to type '{ (): { a: { (): string; set(value: string): void; }; b: { (): string; set(value: string): void; }; }; (value: { a: { (): string; set(value: string): void; }; b: { (): string; set(value: string): void; }; }): void; (updater: (current: { ...; }) => { ...; }): void; }'.
+        Call signature return types '{ a: string; b: string; }' and '{ a: { (): string; set(value: string): void; }; b: { (): string; set(value: string): void; }; }' are incompatible.
+          The types of 'a' are incompatible between these types.
+            Type 'string' is not comparable to type '{ (): string; set(value: string): void; }'.
+packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts(87,18): error TS2352: Conversion of type 'ISignalTreeOf<{ a: string; }, "location", TreeNodeOf<{ a: string; }, "location">>' to type 'ISignalTree<{ a: { (): string; set(value: string): void; }; }>' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property '$' are incompatible.
+    Type '{ (): { a: string; }; (value: { a: string; }): void; (updater: (current: { a: string; }) => { a: string; }): void; } & NodeConstruction<{ a: string; }> & TreeChildrenOf<{ a: string; }, "location">' is not comparable to type '{ (): { a: { (): string; set(value: string): void; }; }; (value: { a: { (): string; set(value: string): void; }; }): void; (updater: (current: { a: { (): string; set(value: string): void; }; }) => { a: { (): string; set(value: string): void; }; }): void; } & NodeConstruction<...> & TreeChildrenOf<...>'.
+      Type '{ (): { a: string; }; (value: { a: string; }): void; (updater: (current: { a: string; }) => { a: string; }): void; } & NodeConstruction<{ a: string; }> & TreeChildrenOf<{ a: string; }, "location">' is not comparable to type '{ (): { a: { (): string; set(value: string): void; }; }; (value: { a: { (): string; set(value: string): void; }; }): void; (updater: (current: { a: { (): string; set(value: string): void; }; }) => { a: { (): string; set(value: string): void; }; }): void; }'.
+        Call signature return types '{ a: string; }' and '{ a: { (): string; set(value: string): void; }; }' are incompatible.
+          The types of 'a' are incompatible between these types.
+            Type 'string' is not comparable to type '{ (): string; set(value: string): void; }'.
+packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts(108,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(value: never): void', gave the following error.
+    Argument of type '"A"' is not assignable to parameter of type 'never'.
+  Overload 2 of 5, '(update: (current: { (): string; set(value: string): void; }) => { (): string; set(value: string): void; }): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '(current: { (): string; set(value: string): void; }) => { (): string; set(value: string): void; }'.
+  Overload 3 of 5, '(value: LeafDefinition<{ (): string; set(value: string): void; }>): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'LeafDefinition<{ (): string; set(value: string): void; }>'.
+packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts(114,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(value: never): void', gave the following error.
+    Argument of type '"A2"' is not assignable to parameter of type 'never'.
+  Overload 2 of 5, '(update: (current: { (): string; set(value: string): void; }) => { (): string; set(value: string): void; }): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '(current: { (): string; set(value: string): void; }) => { (): string; set(value: string): void; }'.
+  Overload 3 of 5, '(value: LeafDefinition<{ (): string; set(value: string): void; }>): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'LeafDefinition<{ (): string; set(value: string): void; }>'.
+packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts(23,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(value: "A"): void', gave the following error.
+    Argument of type '"B"' is not assignable to parameter of type '"A"'.
+  Overload 2 of 5, '(update: (current: "A") => "A"): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '(current: "A") => "A"'.
+  Overload 3 of 5, '(value: LeafDefinition<never>): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'LeafDefinition<never>'.
+packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts(24,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(value: "A"): void', gave the following error.
+    Argument of type '"B"' is not assignable to parameter of type '"A"'.
+  Overload 2 of 5, '(update: (current: "A") => "A"): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '(current: "A") => "A"'.
+  Overload 3 of 5, '(value: LeafDefinition<never>): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'LeafDefinition<never>'.
+packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts(25,5): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(value: "A"): void', gave the following error.
+    Argument of type '(value: "A") => "A2"' is not assignable to parameter of type '"A"'.
+  Overload 2 of 5, '(update: (current: "A") => "A"): void', gave the following error.
+    Type '"A2"' is not assignable to type '"A"'.
+  Overload 3 of 5, '(value: LeafDefinition<never>): void', gave the following error.
+    Argument of type '(value: "A") => "A2"' is not assignable to parameter of type 'LeafDefinition<never>'.
+packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts(27,14): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(value: "A"): void', gave the following error.
+    Argument of type '"C"' is not assignable to parameter of type '"A"'.
+  Overload 2 of 5, '(update: (current: "A") => "A"): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type '(current: "A") => "A"'.
+  Overload 3 of 5, '(value: LeafDefinition<never>): void', gave the following error.
+    Argument of type 'string' is not assignable to parameter of type 'LeafDefinition<never>'.
+packages/kernel/src/lib/markers/marker-contract.spec.ts(36,26): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/markers/marker-contract.spec.ts(36,52): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/kernel/src/lib/mut-participation.spec.ts(149,7): error TS2322: Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/mut-participation.spec.ts(213,7): error TS2322: Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/mut-participation.spec.ts(231,7): error TS2322: Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/mut-participation.spec.ts(249,7): error TS2322: Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/mut-participation.spec.ts(322,12): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/mut-participation.spec.ts(345,7): error TS2322: Type 'number' is not assignable to type 'void | Promise<void>'.
+packages/kernel/src/lib/noop-copy-write.spec.ts(21,47): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/noop-copy-write.spec.ts(22,42): error TS7006: Parameter 'm' implicitly has an 'any' type.
+packages/kernel/src/lib/noop-write-warning.spec.ts(29,32): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/noop-write-warning.spec.ts(39,32): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/noop-write-warning.spec.ts(48,32): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts(131,49): error TS2339: Property 'projection' does not exist on type '{ valueStore: EntityValueStore<Item>; structuralStore: StructuralStore<number>; frame: EntityMutationFrame<number, Item>; }'.
+packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts(179,49): error TS2339: Property 'projection' does not exist on type '{ valueStore: EntityValueStore<Item>; structuralStore: StructuralStore<number>; frame: EntityMutationFrame<number, Item>; }'.
+packages/kernel/src/lib/restoration-scoped-capture.spec.ts(32,42): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/snapshot-builder.spec.ts(4,22): error TS2306: File '/private/tmp/st-dynamic-enrollment-independent/candidate/packages/kernel/src/lib/markers/index.ts' is not a module.
+packages/kernel/src/lib/snapshot-builder.spec.ts(33,28): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/snapshot-builder.spec.ts(117,37): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/traversal-diagnostics.spec.ts(58,40): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/traversal-diagnostics.spec.ts(69,40): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/traversal-diagnostics.spec.ts(84,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/traversal-diagnostics.spec.ts(102,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+packages/kernel/src/lib/types-schema.spec.ts(68,41): error TS2345: Argument of type '"subscribe"' is not assignable to parameter of type 'keyof ISignalTree<{ x: number; }>'.
+packages/kernel/src/lib/update-and-report.spec.ts(14,7): error TS2741: Property 'name' is missing in type '{ age: number; }' but required in type '{ name: string; age: number; }'.

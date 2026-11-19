@@ -1,0 +1,25 @@
+{
+  "manifests": {
+    "/private/tmp/st-c28-r3-composition": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+    "/private/tmp/st-c28-r3-entity-registration-successor": "b0e09d16858ce67143ed08b3b2d159831ab96ddcb1d989a1d50d5ce880d04b2d",
+    "/private/tmp/st-c28-r3-lint-repair": "39c757521770c5ae4f567310713f557b84bed08d0f7374f94eb31b9169283100"
+  },
+  "registrationDelta": {
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "d4d90edf1ffca7316cf814c3decb229760ea7f49e937638dcf286d0cd86fd177",
+    "packages/kernel/src/lib/link.ts": "a413b304b5f989af64620795ccefcbf3061285f9def16086f93cfccbb90cbba5",
+    "packages/kernel/src/lib/entity-registration-original.spec.ts": "d5b23e93bcbf93198f87eabf69d561faa986f0ddcb03d4a5196be59445934a10",
+    "packages/kernel/src/lib/entity-registration-lifecycle.spec.ts": "b992c6fc6500cd7c208e111a15bddb42ce5c74cf2d7aea792e691d4119527039"
+  },
+  "lintDelta": {
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "92deeefb0619b5660c08c859b24cf33cc8c5affd65b5c991270192d9c611e5c5",
+    "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts": "d179fc14670ff177ac25d90b7acc8f3e301ff481c4cbf20ec0560bc0cb24a6d3",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "aff08b7c247d874d2a0e88c9d97869bb8fb4fd6dd576956f7e89923c02dca743",
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts": "710b751727410e74b8f7e7f3a93eefa8054cab995fa017870f7c9b6eeba7ba5f",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "f19efd213bf286743864bc0b32211ca152997c2c713c1cc5e64f7e2661a2f88e",
+    "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts": "86094fe555b8efc1ef4879531573246ad9ba76a5e71ff25f2162dde4ce3d09e5",
+    "packages/react/src/branch-declaration-qualification.spec.tsx": "4aa10e7f5f5eb2c9eda1c4dfe409d528de6984d83235570e427dcfd9b74c3efd",
+    "packages/kernel/src/lib/internals/scalar-completion-precedence.spec.ts": "652fa5e84cbfad0eace257dbd7b3add830d7cd6e2473195f697dc6d383ddaf6a",
+    "packages/kernel/src/lib/internals/dynamic-realization-composition-independent.spec.ts": "1469e3995f95ac634e1b29c2520fbde84b3d05aa5309b6360fa1b459da7256c8"
+  },
+  "overlap": []
+}

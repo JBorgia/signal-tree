@@ -1,0 +1,6 @@
+{
+  "packages/kernel/src/lib/link.ts": {
+    "before": "6a5f67b2fe97dd276ccf2fef98c231704357125a249aa13d06267c17348fb51f",
+    "after": "1e9b0a856eb980edaf0f07afe2d0189b3cdcf2d3e636e33c2faa07cf6c340dc4"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "manifestSha256": "89711d0f17704e7b1ac92bd5076fec4e115d45be0571c441c2a8555538846a67",
+  "files": 3033,
+  "changed": [
+    "packages/kernel/src/lib/entity-membership-view-v16-controls.spec.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/entity-membership-inventory.ts",
+    "packages/kernel/src/lib/internals/entity-membership-source.ts",
+    "packages/kernel/src/lib/membership-prepared-order.spec.ts",
+    "packages/kernel/src/lib/prepend-review-lifetime-replay.spec.ts"
+  ],
+  "runtimeScope": "private physical order endpoint handoff only"
+}

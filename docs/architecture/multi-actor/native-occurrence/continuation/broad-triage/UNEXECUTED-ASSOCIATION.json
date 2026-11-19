@@ -1,0 +1,100 @@
+{
+  "currentAssociation": "plausible prior same-file candidate, NOT established by current text log",
+  "priorAssertions": [
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "entity batches larger than the argument limit undo and redo of a setAll that replaced every row",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work counts predicate visits and restores instrumentation even on failure",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work plain tree replacing every id (256 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work plain tree replacing every id (1024 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work plain tree clearing with setAll([]) (256 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work plain tree clearing with setAll([]) (1024 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work observed tree replacing every id (256 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work observed tree replacing every id (1024 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work observed tree clearing with setAll([]) (256 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    },
+    {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "fullName": "setAll removal neighbour search work observed tree clearing with setAll([]) (1024 rows)",
+      "duplicateOrdinal": 1,
+      "status": "pending",
+      "failureMessages": [],
+      "fixtureClass": "unchanged"
+    }
+  ],
+  "sourceHashes": {
+    "current": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+    "priorPredecessor": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db",
+    "priorSuccessor": "f86ba3abf20e04a3cfddd5443ab8e567155f8423cfdc31ed68ed5583215a17db"
+  }
+}

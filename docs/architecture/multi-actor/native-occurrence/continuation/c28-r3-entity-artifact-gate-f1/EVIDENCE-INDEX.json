@@ -1,0 +1,60 @@
+[
+  {
+    "label": "blindness-positive",
+    "result": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/evidence/blindness-positive.json",
+    "original": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-2oKvj7/result.json",
+    "sha256": "c1f994ddae15064a79426657bee200caad245a82d5ac1216cff1fd9377682652",
+    "npm": "11.12.1",
+    "passed": false,
+    "mutationProof": {
+      "kind": "entity-registration-classifier-blindness-v1",
+      "token": "3123db84-93b3-4afb-a2ed-03f7ac9e17d9",
+      "baseline": "passed",
+      "mutant": "behavioral-failures-both-modes",
+      "controls": "passed",
+      "recovery": "passed",
+      "inputs": "unchanged"
+    },
+    "inputsUnchanged": true
+  },
+  {
+    "label": "normal-gate",
+    "result": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/evidence/normal-gate.json",
+    "original": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-d3NzhJ/result.json",
+    "sha256": "652bea0b195c288926ee87fb079dc00ef753cb4a4e3ea5ef74a4ddbe69b7e3a4",
+    "npm": "11.12.1",
+    "passed": true,
+    "mutationProof": null,
+    "inputsUnchanged": true
+  },
+  {
+    "label": "normal-recovery",
+    "result": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/evidence/normal-recovery.json",
+    "original": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-kxYC90/result.json",
+    "sha256": "23b6b4cc71c78ee17e17a10cc7782f6a90d3d1583fd386864e14d8668b9e52d2",
+    "npm": "11.12.1",
+    "passed": true,
+    "mutationProof": null,
+    "inputsUnchanged": true
+  },
+  {
+    "label": "offline-negative",
+    "result": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/evidence/offline-negative.json",
+    "original": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId/result.json",
+    "sha256": "e4f0666a4c4db41a759281ab5e33943d8ed8175b19565ccfb6859b59186520c1",
+    "npm": "11.12.1",
+    "passed": false,
+    "mutationProof": null,
+    "inputsUnchanged": true
+  },
+  {
+    "label": "publish-npm-smoke",
+    "result": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/evidence/publish-npm-smoke.json",
+    "original": "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-VhXMvW/result.json",
+    "sha256": "78cdf8f6bba27af2cab04c0a31d5d6b0df99cfe4b51888e92a769b60e8e1dbcb",
+    "npm": "11.21.1",
+    "passed": true,
+    "mutationProof": null,
+    "inputsUnchanged": true
+  }
+]

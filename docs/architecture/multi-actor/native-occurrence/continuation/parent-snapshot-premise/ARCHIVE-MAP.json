@@ -1,0 +1,26 @@
+[
+  {
+    "source": "PREMISE-SOURCE-IDENTITY.json",
+    "archive": "PREMISE-SOURCE-IDENTITY.json",
+    "sourceSha256": "e2aa45148bdf6113587dd75d25ad98a839d9769a17ec11dcada3596cf3386db1",
+    "archiveSha256": "e2aa45148bdf6113587dd75d25ad98a839d9769a17ec11dcada3596cf3386db1"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "f59a02d9772b6f70519f676802335ebc4f29492d35fb3f66633133e1b3d7761d",
+    "archiveSha256": "f59a02d9772b6f70519f676802335ebc4f29492d35fb3f66633133e1b3d7761d"
+  },
+  {
+    "source": "RAW-SHA256.json",
+    "archive": "RAW-SHA256.json",
+    "sourceSha256": "4e1de9d08572233b5ca50e4b989a29b38d5d2932e6335620bbc16ec7bffde4e6",
+    "archiveSha256": "4e1de9d08572233b5ca50e4b989a29b38d5d2932e6335620bbc16ec7bffde4e6"
+  },
+  {
+    "source": "HANDOFF.md",
+    "archive": "HANDOFF.md",
+    "sourceSha256": "c75f22b11530e392e768ff554b7469de84388dc8b5912ff3561146ed7fefcefc",
+    "archiveSha256": "c75f22b11530e392e768ff554b7469de84388dc8b5912ff3561146ed7fefcefc"
+  }
+]

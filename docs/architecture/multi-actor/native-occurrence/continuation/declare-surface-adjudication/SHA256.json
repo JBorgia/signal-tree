@@ -1,0 +1,17 @@
+{
+  "ADJUDICATION.md": "d2513f66165f8f4caa22c26ff761216679ef69b8bfa780366e8f937a336398b1",
+  "IDENTITY.json": "1869b99a5f21ac12388ac0804459b1765c48b124f1d6873a65612db3e1232143",
+  "candidate-evidence/RELEASE-CURRENT.md": "22619dc9ef9f7b069579d493075f1cfee225a2025daf80e52c5d5d7350fd1e44",
+  "candidate-evidence/docs/audits/2026-10-17-incumbent-readiness/link-api-proposal/PROPOSAL.md": "abe39cc508e5aa4f5bdd37ded8bcba6d793c430ab76685b2c72ee4fc3e249c6f",
+  "candidate-evidence/docs/audits/2026-10-17-incumbent-readiness/link-declared-native/README.md": "7af5dba877f7f311e0291f64a97502473415ab9581fb6adf172dfdaf896ea83e",
+  "candidate-evidence/packages/kernel/src/lib/experimental-publication/lifecycle.ts": "a2b6b8822f2ba538cef0982467d688f23f9a4201702c50830bdc0444ec774f5b",
+  "candidate-evidence/packages/kernel/src/lib/experimental-publication/private.ts": "b5b6ba96c5c96c10e2c0bb8561b21b16ec75a377d8d60c015f149bece321539d",
+  "candidate-evidence/packages/kernel/src/lib/link.ts": "5faf5848df13813267aaf6590716df48bb40ed9758b32548a278248097dfc8c9",
+  "candidate-evidence/packages/kernel/src/lib/tree-error-public-contract.spec.ts": "17c42cdf5bf47162c041b5c3f326540aef20c54605f48d6d5c469ef31a198514",
+  "root-authority/docs/architecture/multi-actor/IMPLEMENTATION.md": "5152f1b591b297bd3e069bad7aea1632ec40c45dbca079d5216eb8e7fdd7dde0",
+  "root-authority/docs/architecture/multi-actor/PLAN.md": "8d1746835c158580713e4e0696c75296fbc962fd2197edd547834a536d70fa91",
+  "root-authority/docs/architecture/multi-actor/native-occurrence/EXPLICIT-HANDOFF.md": "9031581bcbd60f05d4c23dd74cdd19d5f17be1844a166a1da94f3595ed1e7449",
+  "root-authority/docs/architecture/multi-actor/native-occurrence/continuation/README.md": "a84ec12420bdce5783c9308b8db157ffe857f697624dc0ab832174cc401c5384",
+  "root-authority/docs/architecture/v15-production-surface-audit.md": "3bda4188e2e4485ceac6ce303ce47dfa731346111d6543d0a9c7c73285f355f7",
+  "root-authority/docs/audits/2026-10-29-multi-actor-product/README.md": "2bb0b1f2664760cdd49ea95912468c147b6802bd8048ef11f131e1ed92de4eb8"
+}

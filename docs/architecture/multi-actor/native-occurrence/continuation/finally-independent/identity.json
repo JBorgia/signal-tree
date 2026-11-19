@@ -1,0 +1,25 @@
+{
+  "freeze": {
+    "manifestSha256": "76dc7e600928ee36331a15674baa9a25960a78b2f97bee637dd693cac28fcb28",
+    "runtimePatchSha256": "acf6f4b98434f743721fe1311b3aaeb1af9d3d27b315cecbced62c539daeaf92",
+    "patchSha256": "617a4cf605d9473c211139c9bd038a2fc1e9c8096c16a51acb92630ec17e20ba",
+    "independentReview": "pending",
+    "composition": "not performed",
+    "predecessorUnchanged": true
+  },
+  "baseManifest": "4b48ad0640fa4b480c072f0f8c05a72898422a5c3067d90e7a9bc40ccb701e30",
+  "counts": [
+    3059,
+    3060
+  ],
+  "changed": {
+    "packages/kernel/src/lib/declaration-finally-precedence.spec.ts": {
+      "base": null,
+      "candidate": "0f1f563cdf04df7d6f92af7a83474835e7deb503ee017852332f35be3fe2e3ca"
+    },
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "base": "7c024f1fc84721e5d42d0f20ac4860fd8426b5d5cab6bd831abc33ef7d591114",
+      "candidate": "2c4a98173d299a30087678d31ba4aa547712cb235e3a5144361d7e2a54fb5b79"
+    }
+  }
+}

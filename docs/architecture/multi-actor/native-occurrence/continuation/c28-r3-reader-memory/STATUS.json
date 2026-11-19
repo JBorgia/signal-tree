@@ -1,0 +1,20 @@
+{
+  "phase": "R1-stopped-report-complete",
+  "C0": "one administrative command cancellation; zero events/samples; preserved",
+  "R1CommandsStarted": 5,
+  "R1AcceptedInvocations": 4,
+  "R1SelectedCaseExecutionsPassed": 8,
+  "R1Stop": "baseline-2048-r1: no-progress180s, exit -15, no events/samples",
+  "unstarted": [
+    "reader-2048-r1",
+    "reader-512-r2",
+    "baseline-512-r2"
+  ],
+  "remainingOwned": [],
+  "frozenSourceMismatches": {
+    "baseline": [],
+    "reader": []
+  },
+  "report": "REPORT.md",
+  "noRetry": true
+}

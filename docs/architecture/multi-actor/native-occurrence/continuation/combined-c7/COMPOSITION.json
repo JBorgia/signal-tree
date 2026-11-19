@@ -1,0 +1,11 @@
+{
+  "base": "C6",
+  "baseManifestSha256": "925bd916560115e5fffd9c761e2eeca6a170f43dab0c8214aa5c7177315b69b4",
+  "runtime": "singleton ordinary-row reuse only",
+  "review": "/private/tmp/st-singleton-ordinary-row-independent/REVIEW.md",
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/singleton-row-allocation.spec.ts",
+    "packages/kernel/src/lib/singleton-row-reuse.spec.ts"
+  ]
+}

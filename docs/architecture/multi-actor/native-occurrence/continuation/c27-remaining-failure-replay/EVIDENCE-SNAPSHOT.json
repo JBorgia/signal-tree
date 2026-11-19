@@ -1,0 +1,18 @@
+{
+  "BASE-MANIFEST.json": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "REPORT.md": "b365a21ea7306180a847ff211ac334410f28ea1c50850f36f4642cc36e97d522",
+  "TEST-IDENTITIES.json": "981be04074c0db189aaed610183da7fe4f9598c18ddb1700b5e2b8ecc15986b4",
+  "diagnostic-redirect.cjs": "70deb48d98c0a5e0a789dea6a53d37ebc0f4bff73c671ebe17e923b3e14975db",
+  "replay.py": "695752ae5bd958b16e1c3f2548df265580a6020b1c4e42ee8d5cd77eb6ed5274",
+  "runs/composition/COMMAND.json": "1c79c2d6e08fda2b062df894b4dbc6f3781e47c41476267165705bb8aa3923ca",
+  "runs/composition/GROUP-AFTER.json": "320bd6516e39effdba871140ce28e0634fcb8918587e634cbd00fec2d3415c1b",
+  "runs/composition/PROCESS.json": "8e7adc40efa168ce873b19b5e03d978f67ebb78092cce9766085552bd9c844a2",
+  "runs/composition/RESULT.json": "1cfe7120d505d6c1ceea0fc303adf7eca73d45707402fc7a68c9e27904a0ba21",
+  "runs/composition/SOURCE-AFTER.json": "822c6ed59b247c576d2ca2bc214233280b71da8b55055dd15c8d48b7fbee127c",
+  "runs/composition/SOURCE-BEFORE.json": "69ad69749027da85d50499a8bad7b6c470aada51fb1ed95489b962a01811bc75",
+  "runs/composition/first.log": "041f661ac63c1e48b49360c52a537d6af047cdb9f2d601ac7e3477c03355017b",
+  "runs/composition/public-observations/xy-confirm.json": "c1c0540c8c182d89a120cab09b483d75b3f574abfd1d6220cd86c17cd961ebcc",
+  "runs/composition/public-observations/xy-retry.json": "7f16cf267941636fde5ab18bd0315bac28917da3c406374cdeb8c2ef8ad7879b",
+  "runs/composition/public-observations/yx-confirm.json": "4c12b4f019f33a0421e4ee262392b60bc94e269216384ad9e2199f8dab189129",
+  "runs/composition/public-observations/yx-retry.json": "8c682dc6a2a389bd1edfc7332a046689051a45fbb848e7ccefb23827d58d0c40"
+}

@@ -1,0 +1,14 @@
+import type {ComputedRef, Ref} from 'vue';
+import {signalTree,entityMap} from '@signal-tree/vue';
+import type {ObservationAdapter} from '@signal-tree/kernel/adapter';
+type Equal<A,B>=(<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
+type Assert<T extends true>=T;
+const tree=signalTree({count:1,rows:entityMap<{id:string;n:number},string>()});
+const id: ComputedRef<string|undefined>=tree.$.rows.activeId;
+const all: ComputedRef<readonly {id:string;n:number}[]>=tree.$.rows.all;
+const query: ComputedRef<readonly {id:string;n:number}[]>=tree.$.rows.where(row=>row.n>0);
+type ExactId=Assert<Equal<typeof tree.$.rows.activeId,ComputedRef<string|undefined>>>;
+const writable: Ref<number>=tree.$.count; writable.value=2;
+const capability: NonNullable<ObservationAdapter['createCurrentReadonlyCell']>=<T>(read:()=>T)=>()=>read();
+const result:number=capability(()=>1)();
+void id;void all;void query;void result;tree.destroy();

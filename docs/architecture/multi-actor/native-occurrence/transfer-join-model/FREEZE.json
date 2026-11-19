@@ -1,0 +1,14 @@
+{
+  "sourceRoot": "/private/tmp/st-occurrence-successor",
+  "sourceFiles": {
+    "packages/kernel/src/enhancers/transactions/transactions.ts": "84e7e708de73a295ad6749a238762281a1add2fe27980c8ad8651c405fadd1c9",
+    "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c",
+    "packages/kernel/src/lib/internals/entity-egress-projection.ts": "381f1a8dbb515c6d29af62cac6a3f77c94c4a131ec755bc7fbed031bc2c4aa42"
+  },
+  "artifacts": {
+    "test.log": "6874e3350ec245f54b16edf41c759f204208b90def9f432e33b69a9ba7956f59",
+    "model.test.mjs": "e30028c8afb9ba3681cdae0ffb8ba85faa4dab5f13a4bc47a162f8cc8dd09deb",
+    "SOURCE-MAPPING.md": "c1b4d459d66e91b19b1cf0d9717923e73d98db566ec53aabd2811dc1096c9659",
+    "model.mjs": "85c22119da1aed646cda5faeb399572310739862d47d501cdec98292e08de332"
+  }
+}

@@ -1,0 +1,73 @@
+
+> nx run kernel:test link-absent-locations.spec.ts --testNamePattern=a collection.*no enhancers.*an omission --maxWorkers=1
+
+> node tools/run-core-vitest.mjs link-absent-locations.spec.ts --testNamePattern="a collection.*no enhancers.*an omission" --maxWorkers=1
+
+(node:76559) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:76566) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-membership-egress-trace/instrumented/packages/kernel
+
+(node:76573) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/link-absent-locations.spec.ts (21 tests | 1 failed | 20 skipped) 25ms
+       × an omission, and re-adds of the location and of a sibling 24ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]
+
+- Expected:
+[
+  {
+    "id": "s",
+    "n": 2,
+  },
+]
+
++ Received:
+{
+  "all": [],
+}
+
+ ❯ expectExposed src/lib/link-absent-locations.spec.ts:144:66
+    142|     if (!held) {
+    143|       await connection.settled();
+    144|       expect(endpoint, `${source.name} endpoint after ${label}`).toEqu…
+       |                                                                  ^
+    145|         location.present ? source.exposed(tree) : source.absent
+    146|       );
+ ❯ step src/lib/link-absent-locations.spec.ts:174:7
+ ❯ src/lib/link-absent-locations.spec.ts:192:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 skipped (21)
+   Start at  16:57:06
+   Duration  1.13s (transform 630ms, setup 0ms, import 760ms, tests 25ms, environment 234ms)
+
+Warning: command "node tools/run-core-vitest.mjs link-absent-locations.spec.ts --testNamePattern="a collection.*no enhancers.*an omission" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

@@ -1,0 +1,287 @@
+
+> nx run kernel:test scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+(node:58429) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58439) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:58446) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (21 tests | 1 failed) 32ms
+   × mixed contribution protocol does not replay covered payload or suppress unrelated uncovered work: uncovered-last 5ms
+(node:58452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/oracle-alignment-independent.spec.ts (9 tests | 5 failed) 35ms
+   × undeclared hold then fresh confirm wake; later owner=false 4ms
+   × undeclared hold then fresh confirm wake; later owner=true 2ms
+   × undeclared hold then fresh reject wake; later owner=false 3ms
+   × undeclared hold then fresh reject wake; later owner=true 1ms
+   × settling one of two captured owners cannot release; final rejection wakes useful surviving value 1ms
+(node:58934) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/a1-installed-publication.spec.ts (20 tests | 7 failed) 33ms
+     × publishes an independent existing value while unrelated owner remains pending 11ms
+     × holds a declared dependent copy then publishes after authentic confirmation 2ms
+     × true equal/equal-support and a declaration without setter stay no-write, no duplicate send 1ms
+     × explicitly complete outer dependency preserves nested writes and confirms usefully 1ms
+     × retains authentic confirmed outcome after owner source destroy 1ms
+     × unresolved destroyed owner stays conservative rather than becoming confirmed 1ms
+     × unknown outer context stays conservative without asserting an empty owner set 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > publishes an independent existing value while unrelated owner remains pending
+AssertionError: expected [] to deeply equal [ 8 ]
+
+- Expected
++ Received
+
+- [
+-   8,
+- ]
++ []
+
+ ❯ src/lib/a1-installed-publication.spec.ts:28:21
+     26|       const receipt = c.declare({ kind: 'independent' }, () => tree.$.…
+     27|       await flush();
+     28|       expect(sends).toEqual([8]); expect(receipt.read()).toMatchObject…
+       |                     ^
+     29|       expect(tree.$.x()).toBe(7); expect(tree.$.y()).toBe(8);
+     30|       p.rollback(); expect(tree.$.x()).toBe(0); expect(tree.$.y()).toB…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > holds a declared dependent copy then publishes after authentic confirmation
+AssertionError: expected { state: 'superseded' } to match object { state: 'held' }
+
+- Expected
++ Received
+
+  {
+-   "state": "held",
++   "state": "superseded",
+  }
+
+ ❯ src/lib/a1-installed-publication.spec.ts:40:72
+     38|     try {
+     39|       const receipt = c.declare({ kind: 'dependent', owners: [p] }, ()…
+     40|       await flush(); expect(sends).toEqual([]); expect(receipt.read())…
+       |                                                                        ^
+     41|       p.confirm(); await flush(); expect(sends).toEqual([7]);
+     42|       expect(receipt.read()).toMatchObject({ state: 'started' });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > true equal/equal-support and a declaration without setter stay no-write, no duplicate send
+AssertionError: expected { Object (state, basis) } to match object { state: 'no-write' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "state": "no-write",
++   "state": "eligible",
+  }
+
+ ❯ src/lib/a1-installed-publication.spec.ts:75:42
+     73|       const noop = c.declare({ kind: 'independent' }, () => tree.$.y(7…
+     74|       const empty = c.declare({ kind: 'independent' }, () => undefined…
+     75|       await flush(); expect(noop.read()).toMatchObject({ state: 'no-wr…
+       |                                          ^
+     76|       expect(empty.read()).toMatchObject({ state: 'no-write' }); expec…
+     77|       await c.settled();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > explicitly complete outer dependency preserves nested writes and confirms usefully
+AssertionError: expected { state: 'superseded' } to match object { state: 'held' }
+
+- Expected
++ Received
+
+  {
+-   "state": "held",
++   "state": "superseded",
+  }
+
+ ❯ src/lib/a1-installed-publication.spec.ts:105:72
+    103|         c.declare({ kind: 'dependent', owners: [p] }, () => tree.$.y(7…
+    104|       });
+    105|       await flush(); expect(sends).toEqual([]); expect(receipt.read())…
+       |                                                                        ^
+    106|       p.confirm(); await flush(); expect(sends).toEqual([8]); expect(t…
+    107|     } finally { c.dispose(); tree.destroy(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > retains authentic confirmed outcome after owner source destroy
+AssertionError: expected [] to deeply equal [ 7 ]
+
+- Expected
++ Received
+
+- [
+-   7,
+- ]
++ []
+
+ ❯ src/lib/a1-installed-publication.spec.ts:129:36
+    127|     try {
+    128|       const receipt = c.declare({ kind: 'dependent', owners: [p] }, ()…
+    129|       await flush(); expect(sends).toEqual([7]); expect(receipt.read()…
+       |                                    ^
+    130|       expect(tree.$.z()).toBe(9); q.rollback(); expect(tree.$.y()).toB…
+    131|     } finally { c.dispose(); owner.destroy(); tree.destroy(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > unresolved destroyed owner stays conservative rather than becoming confirmed
+AssertionError: expected [ 7 ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   7,
++ ]
+
+ ❯ src/lib/a1-installed-publication.spec.ts:140:64
+    138|     try {
+    139|       const receipt = c.declare({ kind: 'dependent', owners: [p] }, ()…
+    140|       await flush(); expect(tree.$.y()).toBe(7); expect(sends).toEqual…
+       |                                                                ^
+    141|       expect(['held', 'conservative']).toContain(receipt.read().state);
+    142|     } finally { c.dispose(); owner.destroy(); tree.destroy(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯
+
+ FAIL  src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > unknown outer context stays conservative without asserting an empty owner set
+AssertionError: expected { state: 'superseded' } to match object { state: 'conservative', …(1) }
+
+- Expected
++ Received
+
+  {
+-   "reason": "unknown",
+-   "state": "conservative",
++   "state": "superseded",
+  }
+
+ ❯ src/lib/a1-installed-publication.spec.ts:209:72
+    207|         c.declare({ kind: 'dependent', owners: [p] }, () => tree.$.y(8…
+    208|       });
+    209|       await flush(); expect(sends).toEqual([]); expect(receipt.read())…
+       |                                                                        ^
+    210|       p.confirm(); await flush(); expect(sends).toEqual([8]); await c.…
+    211|     } finally { c.dispose(); tree.destroy(); }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯
+
+ FAIL  src/lib/oracle-alignment-independent.spec.ts > undeclared hold then fresh confirm wake; later owner=false
+ FAIL  src/lib/oracle-alignment-independent.spec.ts > undeclared hold then fresh confirm wake; later owner=true
+ FAIL  src/lib/oracle-alignment-independent.spec.ts > undeclared hold then fresh reject wake; later owner=false
+ FAIL  src/lib/oracle-alignment-independent.spec.ts > undeclared hold then fresh reject wake; later owner=true
+AssertionError: expected [ { a: 'MINE', b: 'b0' } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "a": "MINE",
++     "b": "b0",
++   },
++ ]
+
+ ❯ src/lib/oracle-alignment-independent.spec.ts:41:63
+     39|  // No flush between authorship and late owner: proves admission-time …
+     40|  const q=lateOwner?late.transact(()=>late.$.a('LATE')):undefined;const…
+     41|  await flush();expect(target.$.a()).toBe('MINE');expect(sent).toEqual(…
+       |                                                               ^
+     42|  let done=false;const wait=c.settled().then(()=>{done=true;});await fl…
+     43|  if(terminal==='confirm')p.confirm();else p.rollback();await flush();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯
+
+ FAIL  src/lib/oracle-alignment-independent.spec.ts > settling one of two captured owners cannot release; final rejection wakes useful surviving value
+AssertionError: expected [ { a: 'MINE', b: 'b0' } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "a": "MINE",
++     "b": "b0",
++   },
++ ]
+
+ ❯ src/lib/oracle-alignment-independent.spec.ts:51:150
+     49| it('settling one of two captured owners cannot release; final rejectio…
+     50|  const a=make(),b=make(),target=make();const sent:unknown[]=[];const c…
+     51|  try{await flush();sent.length=0;const p=a.transact(()=>a.$.a('P'));co…
+       |                                                                                                                                                      ^
+     52|  let done=false;const wait=c.settled().then(()=>{done=true;});p.confir…
+     53|  q.rollback();await flush();expect(b.$.a()).toBe('a0');expect(sent.len…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > mixed contribution protocol does not replay covered payload or suppress unrelated uncovered work: uncovered-last
+AssertionError: expected { x: 2, y: +0 } to deeply equal { x: 9, y: +0 }
+
+- Expected
++ Received
+
+  {
+-   "x": 9,
++   "x": 2,
+    "y": 0,
+  }
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:105:36
+    103|  const uncovered=()=>getPathNotifier().notify('x',9,0,'x',undefined,ge…
+    104|  try{if(order==='uncovered-first'){uncovered();tree.$.x(2);}else if(or…
+    105|  await flush();expect(sent.at(-1)).toEqual(order==='uncovered-first'?{…
+       |                                    ^
+    106|  }finally{c.dispose();tree.destroy();}
+    107| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯
+
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  13 failed | 72 passed (85)
+   Start at  17:24:15
+   Duration  1.84s (transform 482ms, setup 0ms, import 777ms, tests 183ms, environment 593ms)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

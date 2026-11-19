@@ -1,0 +1,30 @@
+{
+  "manifestSha256": "9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02",
+  "freezeArtifactMismatches": [],
+  "instrumentedFiles": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "restoredMatchesFreeze": true,
+      "actualMatchesFreeze": true,
+      "instrumentedArchiveMatchesRun": true
+    },
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "restoredMatchesFreeze": true,
+      "actualMatchesFreeze": true,
+      "instrumentedArchiveMatchesRun": true
+    },
+    "packages/kernel/src/lib/internals/native-scalar-selection.ts": {
+      "restoredMatchesFreeze": true,
+      "actualMatchesFreeze": true,
+      "instrumentedArchiveMatchesRun": true
+    },
+    "packages/kernel/src/enhancers/transactions/transactions.ts": {
+      "restoredMatchesFreeze": true,
+      "actualMatchesFreeze": true,
+      "instrumentedArchiveMatchesRun": true
+    }
+  },
+  "otherKernelRuntimeRunVsFreezeMismatches": [],
+  "derivedSpecMatchesRun": true,
+  "allChangedFilesMatchManifest": true,
+  "reconstructedInstrumentationMatchesExactPatch": true
+}

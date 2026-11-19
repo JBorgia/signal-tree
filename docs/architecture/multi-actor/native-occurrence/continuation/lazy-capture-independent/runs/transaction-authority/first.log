@@ -1,0 +1,45 @@
+
+> nx run kernel:test transactions.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts entity-realization-handoff.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs transactions.spec.ts native-foreign-disposition-matrix.spec.ts rollback-refusal-scope.spec.ts recovery-handle-0.spec.ts entity-realization-handoff.spec.ts --maxWorkers=1
+
+(node:17828) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:17966) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-lazy-capture-independent-review/candidate/packages/kernel
+
+(node:18159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18725) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18763) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18766) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18769) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  6 passed (6)
+      Tests  62 passed (62)
+   Start at  19:40:11
+   Duration  2.55s (transform 633ms, setup 0ms, import 1.07s, tests 167ms, environment 860ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.0s

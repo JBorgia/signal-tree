@@ -1,0 +1,4 @@
+{
+  "NODE_OPTIONS": "--expose-gc",
+  "scope": "explicit launch environment; inherited by run.py and Nx children"
+}

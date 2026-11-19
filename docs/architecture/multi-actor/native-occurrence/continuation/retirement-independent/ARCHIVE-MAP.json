@@ -1,0 +1,57 @@
+{
+  "IDENTITY.json": {
+    "sha256": "952adaa7bcc2fa7eb7ede30a0056f938332d3623d957a57da699933fa84f3561",
+    "archive": "IDENTITY.json",
+    "archiveSha256": "952adaa7bcc2fa7eb7ede30a0056f938332d3623d957a57da699933fa84f3561"
+  },
+  "REVIEW.md": {
+    "sha256": "5f35f6b9019f289e0a5d407cb8fc121762288f84970ee40b851edda9590b2725",
+    "archive": "REVIEW.md",
+    "archiveSha256": "5f35f6b9019f289e0a5d407cb8fc121762288f84970ee40b851edda9590b2725"
+  },
+  "controls.log": {
+    "sha256": "be748f48226579e49999111d026b362f6f103d4b92bf9a179413a7c545dc5bb7",
+    "archive": "controls.log",
+    "archiveSha256": "be748f48226579e49999111d026b362f6f103d4b92bf9a179413a7c545dc5bb7"
+  },
+  "independent-controls.log": {
+    "sha256": "873fe742e0ca606aba5cd64b2fefd4993089587e8fec0c759ad567fc54c38457",
+    "archive": "independent-controls.log",
+    "archiveSha256": "873fe742e0ca606aba5cd64b2fefd4993089587e8fec0c759ad567fc54c38457"
+  },
+  "independent-final.log": {
+    "sha256": "4d5aef0e54f0d74bee6dc78635c3131602ba12392a49c6f1cfd5edaf01c7009b",
+    "archive": "independent-final.log",
+    "archiveSha256": "4d5aef0e54f0d74bee6dc78635c3131602ba12392a49c6f1cfd5edaf01c7009b"
+  },
+  "independent-first.log": {
+    "sha256": "873fe742e0ca606aba5cd64b2fefd4993089587e8fec0c759ad567fc54c38457",
+    "archive": "independent-first.log",
+    "archiveSha256": "873fe742e0ca606aba5cd64b2fefd4993089587e8fec0c759ad567fc54c38457"
+  },
+  "independent-first.spec.ts": {
+    "sha256": "b0e583375dbb8ffa05bbc5c0ebec3a9f9589a223991def2c922c1bf7de52d05d",
+    "archive": "independent-first.spec.ts",
+    "archiveSha256": "b0e583375dbb8ffa05bbc5c0ebec3a9f9589a223991def2c922c1bf7de52d05d"
+  },
+  "independent-tests.patch": {
+    "sha256": "17a97b2d70298d04edab5ec1943c33846986e41d95bc655f81d3516c8ae92166",
+    "archive": "independent-tests.patch",
+    "archiveSha256": "17a97b2d70298d04edab5ec1943c33846986e41d95bc655f81d3516c8ae92166"
+  },
+  "naive-mutation.log": {
+    "sha256": "f62e3f5ae369bcbdc22c280943898cbf7a321e27c14038ab6e30320760e4118f",
+    "archive": "naive-mutation.log",
+    "archiveSha256": "f62e3f5ae369bcbdc22c280943898cbf7a321e27c14038ab6e30320760e4118f"
+  },
+  "spec-types-final.log": {
+    "sha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archive": "spec-types-final.log",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  "spec-types.log": {
+    "sha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archive": "spec-types.log",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  }
+}

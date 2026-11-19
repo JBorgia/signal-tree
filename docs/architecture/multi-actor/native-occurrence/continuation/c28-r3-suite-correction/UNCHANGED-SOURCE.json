@@ -1,0 +1,12 @@
+{
+  "baselineManifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "checked": 3095,
+  "changedOnly": [
+    "packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "packages/react/src/branch-declaration-qualification.spec.tsx"
+  ],
+  "unchangedPaths": 3092,
+  "frozenR3AllPathsUnchanged": true,
+  "originalsBytePreserved": true
+}

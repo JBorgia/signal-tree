@@ -1,0 +1,211 @@
+
+> nx run kernel:test /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-order-interference.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-segment-compilation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-source-notification-pairing.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-structural-composition-gates.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/occupancy-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/occupancy-inspection-chronology.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/paired-order-witness.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/probe-char.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/proposal-0-kernel.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/proposal-facade-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/proposal-inspection-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/proposal-inspection-safety.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/proposal-rejection-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/proposal-review-surface-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/queued-inspection-review.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/r6-liveness-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/r8-overlap-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/recovery-handle-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/reentrant-order-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/rekey-occupancy-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/rekey-supersession-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/rekeyed-rollback-defect.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/retired-backing-ownership-null.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/rollback-refusal-legibility.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/rollback-refusal-scope.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/semantics-authority-selftest.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/semantics-authority-trace-selftest.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/semantics-composition-selftest.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/semantics-current.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/semantics-supplemental-selftest.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/settlement-inspection-terminality.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/studio-unused-cost.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions-entity-field-rollback.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/turn-feed-0-1-identity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/turn-feed-0-2-reachability.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/turn-feed-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/tx-ledger-0-cases34.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/tx-ledger-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/tx-ledger-c3.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/tx-surface-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/update-then-remove-rollback.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/er-divergence-probe.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a1-independent-review.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a1-ingress.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a1-installed-publication.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a2-1-construction-materialisation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a2-2-tree-scoped-rehydration.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a2-3-1-rollback-cancellation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a2-3-settlement-placement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a2-4-drain-ownership.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/a3-tx-status-falsifier.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/absent-collection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/absent-path-write.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/accessor-store-coherence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/address-repair-1.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/admission-refusal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/after-commit-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/after-commit-1.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/aggregate-installed-publication.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/aggregate-native-input-default-control.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/aggregate-native-input-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/aggregate-owner-construction.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/apply-state-pollution.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/apply-state-unknown-key.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit-entity-boundaries.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit-entity-projection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit-native-tooling.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit-observation-lifecycle.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit-structured-realization.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit-structured-restoration-address.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/audit/audit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/authored-removal-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/authored-removal-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/authored-removal-obligations.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/batch-duplicate-ids.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/batch-duplicate-interceptors.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/benchmarks.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/bind-branch-0-acquisition-turn.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/branch-omission-correctness.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/cached-current-input.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/callable-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/canonical-snapshot-adapter.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/change-reporting.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/cold-row-responsibility.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/collection-contributor-core.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/collection-natural-egress.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/comparator-lifecycle-r3.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/comparison-full-state-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/complete-structural-sequence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/conforming-collection-prototype.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/construction-bound-realization.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/construction-resource-cleanup.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/core-independent-review.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/current-capture-r1.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-02.json
+
+kernel:  RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+kernel: stderr | src/lib/absent-path-write.spec.ts > writes under an omitted member re-add the path, siblings stay absent > a member added after an omission above it was first linked is absent too
+kernel: [SignalTree] registerMarkerProcessor() was called AFTER at least one signalTree() had already been constructed (15 trees so far). Existing trees will NOT pick up this marker — only trees built after this point will use it. To process your custom marker in existing trees, register it at module load time (before any signalTree() call), or rebuild the tree after registration.
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel:  ✓ src/lib/absent-path-write.spec.ts (77 tests) 216ms
+kernel:  ✓ src/lib/absent-collection.spec.ts (92 tests) 367ms
+kernel:  ✓ src/enhancers/transactions/transactions.spec.ts (14 tests) 110ms
+kernel:  ✓ src/lib/branch-omission-correctness.spec.ts (35 tests) 152ms
+kernel:  ✓ src/enhancers/transactions/proposal-rejection-0.spec.ts (16 tests) 86ms
+kernel:  ✓ src/lib/comparison-full-state-0.spec.ts (15 tests) 63ms
+kernel:  ✓ src/enhancers/transactions/transaction-lifecycle-view.spec.ts (17 tests) 56ms
+kernel: stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+kernel: A1-ORDINARY-PRESENCE {"withLink":false,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[]}
+kernel: stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+kernel: A1-ORDINARY-PRESENCE {"withLink":false,"phase":"rolled-back","branch":{"keep":9},"sends":[]}
+kernel: stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+kernel: A1-ORDINARY-PRESENCE {"withLink":true,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[null]}
+kernel: stdout | src/lib/a1-installed-publication.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+kernel: A1-ORDINARY-PRESENCE {"withLink":true,"phase":"rolled-back","branch":{"keep":9},"sends":[null]}
+kernel:  ✓ src/lib/a1-installed-publication.spec.ts (20 tests) 84ms
+kernel:  ✓ src/lib/change-reporting.spec.ts (27 tests) 37ms
+kernel:  ✓ src/lib/address-repair-1.spec.ts (14 tests) 98ms
+kernel:  ✓ src/enhancers/transactions/proposal-facade-0.spec.ts (20 tests) 111ms
+kernel:  ✓ src/lib/batch-duplicate-interceptors.spec.ts (62 tests) 277ms
+kernel: stderr | src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts > refused automatic compensation reports the retained transaction > a post-callback failure whose compensation is refused stays pending and staged
+kernel: SignalTree: transactions() cleanup failed during a post-callback step whose rollback was then refused. Error: capture release failed
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts:103:15
+kernel:     at Object.transaction [as transact] (/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4843:13)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts:111:12
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20
+kernel:     at new Promise (<anonymous>)
+kernel:     at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)
+kernel:     at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20
+kernel:     at new Promise (<anonymous>)
+kernel:  ✓ src/enhancers/transactions/transaction-lifecycle-view-v16-controls.spec.ts (9 tests) 55ms
+kernel:  ✓ src/enhancers/transactions/retired-backing-ownership-null.spec.ts (10 tests) 86ms
+kernel:  ✓ src/lib/a2-3-1-rollback-cancellation.spec.ts (6 tests) 36ms
+kernel:  ✓ src/enhancers/transactions/transaction-safety.spec.ts (23 tests) 111ms
+kernel:  ✓ src/lib/after-commit-0.spec.ts (10 tests) 40ms
+kernel:  ✓ src/lib/authored-removal-independent.spec.ts (8 tests) 77ms
+kernel:  ✓ src/lib/conforming-collection-prototype.spec.ts (7 tests) 39ms
+kernel:  ✓ src/enhancers/transactions/rekey-occupancy-0.spec.ts (10 tests) 74ms
+kernel:  ✓ src/lib/benchmarks.spec.ts (10 tests | 9 skipped) 30ms
+kernel:  ✓ src/lib/aggregate-installed-publication.spec.ts (15 tests) 79ms
+kernel:  ✓ src/enhancers/transactions/recovery-handle-0.spec.ts (7 tests) 69ms
+kernel:  ✓ src/enhancers/transactions/update-then-remove-rollback.spec.ts (108 tests) 658ms
+kernel:  ✓ src/enhancers/transactions/turn-feed-0-2-reachability.spec.ts (13 tests) 57ms
+kernel:  ✓ src/lib/batch-duplicate-ids.spec.ts (91 tests) 311ms
+kernel:  ✓ src/lib/bind-branch-0-acquisition-turn.spec.ts (6 tests) 27ms
+kernel:  ✓ src/lib/a1-ingress.spec.ts (9 tests) 52ms
+kernel:  ✓ src/enhancers/transactions/proposal-0-kernel.spec.ts (10 tests) 67ms
+kernel:  ✓ src/lib/collection-contributor-core.spec.ts (11 tests) 99ms
+kernel:  ✓ src/lib/after-commit-1.spec.ts (10 tests) 37ms
+kernel:  ✓ src/enhancers/transactions/native-order-interference.spec.ts (12 tests) 101ms
+kernel:  ✓ src/enhancers/transactions/turn-feed-0.spec.ts (8 tests) 65ms
+kernel: stdout | src/enhancers/transactions/semantics-current.spec.ts > TRANSACTION-SEMANTICS-2 — candidate A (current implementation) > reports semantic evidence and fails on execution errors
+kernel: TRANSACTION-SEMANTICS-2 / candidate A — current implementation
+kernel:   HELD        S01 one pending writer, rejected
+kernel:   HELD        S03 two pending, same location — reject OLDER
+kernel:   HELD        S04 THREE pending, same location — reject MIDDLE
+kernel:   HELD        S05 reject OLDEST then settle newer — newer must not be lost
+kernel:   HELD        S07 reject NEWEST — older pending value survives
+kernel:   HELD        S11 reject both — no rejected value may remain
+kernel:   HELD        S10 accept NEWER then accept OLDER — settlement must not reorder
+kernel:   UNSUPPORTED A1 unrelated snapshot advances canonical, P1 stays pending
+kernel:               Current implementation exposes no canonical/pending split
+kernel:   UNSUPPORTED A2 correlated ACCEPT settles the contribution
+kernel:               Current implementation has no correlated authority settlement input
+kernel:   HELD        A5 fresh snapshot, no relation — settlement must NOT be invented
+kernel:   UNSUPPORTED A6 stale versioned event must not regress canonical
+kernel:               Current implementation has no revision-ordering input
+kernel:   VIOLATED    F06 reject succeeds, then reject again
+kernel:               a second reject reported a fresh successful settlement
+kernel:   HELD        F07 reject succeeds, then accept must not resurrect
+kernel:   cases: 9 held, 1 violated, 3 unsupported, 0 error, 13 total
+kernel:   Held means this implemented case only; unsupported is not a pass or a law verdict.
+kernel:  ✓ src/enhancers/transactions/semantics-current.spec.ts (9 tests) 74ms
+kernel:  ✓ src/lib/a3-tx-status-falsifier.spec.ts (3 tests) 25ms
+kernel:  ✓ src/enhancers/transactions/reentrant-order-v16-controls.spec.ts (6 tests) 58ms
+kernel:  ✓ src/enhancers/transactions/reentrant-order-bookkeeping.spec.ts (9 tests) 85ms
+kernel:  ✓ src/lib/cold-row-responsibility.spec.ts (2 tests) 106ms
+kernel:  ✓ src/lib/a2-3-settlement-placement.spec.ts (4 tests) 28ms
+kernel:  ✓ src/enhancers/transactions/r6-liveness-0.spec.ts (7 tests) 61ms
+kernel:  ✓ src/enhancers/transactions/semantics-authority-trace-selftest.spec.ts (13 tests) 19ms
+kernel:  ✓ src/enhancers/transactions/tx-ledger-c3.spec.ts (7 tests) 62ms
+kernel:  ✓ src/enhancers/transactions/semantics-authority-selftest.spec.ts (28 tests) 11ms
+kernel:  ✓ src/lib/audit-entity-boundaries.spec.ts (9 tests) 56ms
+kernel:  ✓ src/enhancers/transactions/proposal-review-surface-0.spec.ts (3 tests) 33ms
+kernel:  ✓ src/enhancers/transactions/proposal-inspection-0.spec.ts (6 tests) 36ms
+kernel:  ✓ src/enhancers/transactions/turn-feed-0-1-identity.spec.ts (4 tests) 33ms
+kernel:  ✓ src/lib/construction-resource-cleanup.spec.ts (7 tests) 50ms
+kernel:  ✓ src/lib/apply-state-pollution.spec.ts (8 tests) 16ms
+kernel:  ✓ src/enhancers/transactions/r8-overlap-0.spec.ts (9 tests) 49ms
+kernel:  ✓ src/lib/a2-4-drain-ownership.spec.ts (3 tests) 27ms
+kernel:  ✓ src/enhancers/transactions/transactions-entity-field-rollback.spec.ts (5 tests) 51ms
+kernel:  ✓ src/enhancers/transactions/rekey-supersession-0.spec.ts (5 tests) 61ms
+kernel:  ✓ src/enhancers/transactions/native-segment-compilation.spec.ts (7 tests) 182ms
+kernel: stderr | src/lib/accessor-store-coherence.spec.ts
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel:  ✓ src/lib/accessor-store-coherence.spec.ts (5 tests) 18ms
+kernel:  ✓ src/enhancers/transactions/queued-inspection-review.spec.ts (10 tests) 116ms
+kernel:  ✓ src/enhancers/transactions/rekeyed-rollback-defect.spec.ts (4 tests) 36ms
+kernel:  ✓ src/enhancers/transactions/semantics-supplemental-selftest.spec.ts (9 tests) 47ms
+kernel:  ✓ src/lib/construction-bound-realization.spec.ts (4 tests) 23ms
+kernel:  ✓ src/enhancers/transactions/rollback-refusal-scope.spec.ts (4 tests) 46ms
+kernel:  ✓ src/enhancers/transactions/settlement-inspection-terminality.spec.ts (3 tests) 128ms
+kernel:  ✓ src/enhancers/transactions/rollback-refusal-legibility.spec.ts (2 tests) 83ms
+kernel:  ✓ src/lib/a2-1-construction-materialisation.spec.ts (3 tests) 18ms
+kernel:  ✓ src/enhancers/transactions/tx-surface-0.spec.ts (5 tests) 70ms
+kernel:  ✓ src/lib/complete-structural-sequence.spec.ts (8 tests) 43ms
+kernel:  ✓ src/enhancers/transactions/native-structural-composition-gates.spec.ts (3 tests) 72ms
+kernel:  ✓ src/lib/admission-refusal.spec.ts (7 tests) 12ms
+kernel:  ✓ src/enhancers/transactions/proposal-inspection-safety.spec.ts (9 tests) 55ms
+kernel:  ✓ src/enhancers/transactions/tx-ledger-0-cases34.spec.ts (3 tests) 27ms
+kernel:  ✓ src/enhancers/transactions/paired-order-witness.spec.ts (2 tests) 36ms
+kernel:  ✓ src/lib/comparator-lifecycle-r3.spec.ts (5 tests) 7ms
+kernel:  ✓ src/lib/collection-natural-egress.spec.ts (12 tests) 93ms
+kernel:  ✓ src/lib/a2-2-tree-scoped-rehydration.spec.ts (2 tests) 20ms
+kernel:  ✓ src/enhancers/transactions/tx-ledger-0.spec.ts (3 tests) 41ms
+kernel:  ✓ src/lib/callable-contract.spec.ts (8 tests) 11ms
+kernel:  ✓ src/lib/audit-structured-realization.spec.ts (3 tests) 26ms
+kernel:  ✓ src/lib/apply-state-unknown-key.spec.ts (4 tests) 11ms
+kernel:  ✓ src/lib/authored-removal-obligations.spec.ts (5 tests) 64ms
+kernel: stderr | src/lib/current-capture-r1.spec.ts > opaque payload and current location: callable/r
+kernel: SignalTree: write at "input" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+kernel: stderr | src/lib/current-capture-r1.spec.ts > opaque payload and current location: internal-runtime recursive/r
+kernel: SignalTree: write at "pair.input" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+kernel:  ✓ src/lib/current-capture-r1.spec.ts (12 tests) 56ms
+kernel:  ✓ src/enhancers/transactions/semantics-composition-selftest.spec.ts (6 tests) 25ms
+kernel:  ✓ src/enhancers/transactions/studio-unused-cost.spec.ts (5 tests) 20ms
+kernel:  ✓ src/lib/cached-current-input.spec.ts (1 test) 38ms
+kernel:  ✓ src/lib/audit-entity-projection.spec.ts (4 tests) 13ms
+kernel: stderr | src/enhancers/transactions/native-source-notification-pairing.spec.ts > exact source-to-notification admission pairing > hands the actual prepared ordinary fact objects to notifier enqueue
+kernel: SignalTree: enqueue observation failed. AssertionError: expected false to be true // Object.is equality
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/transactions/native-source-notification-pairing.spec.ts:79:42
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:346:47
+kernel:     at withoutWriteObservationScopes (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)
+kernel:     at PathNotifier.notify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/path-notifier.ts:346:11)
+kernel:     at Object.notify (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)
+kernel:     at Object.publish (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-signal.ts:2111:22)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1728:22
+kernel:     at run (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1706:9)
+kernel:     at publish (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1728:7)
+kernel:     at commitAndPublish (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts:1783:11) {
+kernel:   actual: false,
+kernel:   expected: true,
+kernel:   showDiff: true,
+kernel:   operator: 'strictEqual'
+kernel: }
+kernel:  ✓ src/enhancers/transactions/native-source-notification-pairing.spec.ts (2 tests) 56ms
+kernel:  ✓ src/lib/authored-removal-contract.spec.ts (8 tests) 53ms
+kernel:  ✓ src/lib/audit-structured-restoration-address.spec.ts (7 tests) 60ms
+kernel: stdout | src/lib/core-independent-review.spec.ts > review seed created during open horizon retains later invalidation and its fixed window
+kernel: REVIEW-OPEN-SEED {"sent":[],"receipt":{"state":"conservative","reason":"invalid-declaration"},"rows":[{"id":"a","x":7,"y":8}],"pending":{"changes":[{"path":"x","address":["x"],"status":"current"}]}}
+kernel: stdout | src/lib/core-independent-review.spec.ts > review omitted ancestor removes nested collection contributors from outgoing support
+kernel: REVIEW-OMITTED-COLLECTION {"sent":[{"other":1}],"receipt":{"state":"started","basis":"declared"},"value":{"other":1}}
+kernel:  ✓ src/lib/core-independent-review.spec.ts (2 tests) 47ms
+kernel:  ✓ src/enhancers/transactions/occupancy-inspection-chronology.spec.ts (3 tests) 47ms
+kernel:  ✓ src/lib/a1-independent-review.spec.ts (4 tests) 19ms
+kernel:  ✓ src/lib/aggregate-owner-construction.spec.ts (2 tests) 22ms
+kernel:  ✓ src/enhancers/transactions/occupancy-composition.spec.ts (8 tests) 4ms
+kernel:  ✓ src/lib/authored-held-receipt-disposal.spec.ts (1 test) 25ms
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=false rekey+remove : {"ids":["a"],"a":"Alpha"}
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=false rekey+update : {"ids":["a"],"a":"Alpha"}
+kernel:  ✓ src/er-divergence-probe.spec.ts (3 tests) 23ms
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=false rekey only   : {"ids":["a"],"a":"Alpha"}
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=false remove only  : {"ids":["a"],"a":"Alpha"}
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=true rekey+remove : {"ids":["a"],"a":"Alpha"}
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=true rekey+update : {"ids":["a"],"a":"Alpha"}
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=true rekey only   : {"ids":["a"],"a":"Alpha"}
+kernel: stdout | src/enhancers/transactions/probe-char.spec.ts > characterise > all four
+kernel: flush=true remove only  : {"ids":["a"],"a":"Alpha"}
+kernel:  ✓ src/enhancers/transactions/probe-char.spec.ts (1 test) 51ms
+kernel:  ✓ src/lib/aggregate-native-input-independent.spec.ts (1 test) 31ms
+kernel:  ✓ src/lib/audit-native-tooling.spec.ts (2 tests) 25ms
+kernel:  ✓ src/lib/canonical-snapshot-adapter.spec.ts (2 tests) 9ms
+kernel:  ✓ src/lib/audit/audit.spec.ts (1 test) 8ms
+kernel:  ✓ src/lib/audit-observation-lifecycle.spec.ts (1 test) 8ms
+kernel:  ✓ src/lib/aggregate-native-input-default-control.spec.ts (1 test) 20ms
+kernel:  Test Files  100 passed (100)
+kernel:       Tests  1147 passed | 9 skipped (1156)
+kernel:    Start at  12:27:08
+kernel:    Duration  40.43s (transform 3.68s, setup 0ms, import 18.05s, tests 6.71s, environment 40.33s)
+kernel: JSON report written to /private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-02.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      41.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     41.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    41.7s

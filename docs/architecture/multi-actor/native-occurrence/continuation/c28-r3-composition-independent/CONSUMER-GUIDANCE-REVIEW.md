@@ -1,0 +1,17 @@
+# Consumer guidance draft review
+
+Core no-write explanation agrees with approved C28 authority: equality alone is insufficient; obsolete confirmed history may be irrelevant only while current ownership/publication/validation remain unchanged; earlier receipts/evidence remain intact. Hidden-input responsibility and no receipt-as-acknowledgment are correctly stated. No new source/API authority or activation is granted by this review. Draft/root unchanged; source/contract reading only.
+
+Before promotion, make four material boundaries explicit:
+
+1. **Fresh inputs are still validated** (draft13–17,27–34). C28-AUTHORITY.md requires normal validation of freshly supplied confirmed handles and says input captured pending does not become obsolete because it confirms during the operation. “Already-confirmed history” without that boundary can be read as permission to omit or disregard such inputs. State it directly. Dependent should cover every possible contributor, including saved/control inputs; unknown gives no early declaration permission. Do not imply callers may omit a declared contributor solely because it has now confirmed.
+
+2. **Delivery completion is not success** (36–38). Name `settled()` and `onTreeError`; existing public Link contract says rejected set is reported and settled resolves rather than throwing (frozen composition link.ts120–123). Replace “wait for delivery” with waiting for Link's delivery work to settle, with errors reported through onTreeError; endpoint/backend acknowledgment remains its own contract. Also state `started` means endpoint invocation began. Draft already rejects receipt acknowledgments, but should not imply settled is a successful save acknowledgment instead.
+
+3. **Synchronous declaration is not rollback** (8,16–19). CURRENT-SPEC explicitly rejects asynchronous/thenable callback results, and writes may already be installed when validation/declaration fails. A callback throw returns no receipt. A short sentence that declaration failure does not undo already-installed writes prevents a material atomicity misconception. “An asynchronous continuation needs its own declaration” alone does not make returning a Promise from the current callback valid.
+
+4. **Scope and eventual-send qualification** (8,29–30). This applies only to existing supported owned Link sources; it does not admit foreign/computed sources or previously rejected marker-bearing aggregate roots. Add one scope sentence/link. “Earlier receipt continues to represent its eventual send” is accurate for the approved unchanged A/B scenario, not a delivery guarantee despite later supersession/disposal/failure. Prefer “the earlier receipt still represents the existing publication work; a fresh no-write receipt does not promise that work will be delivered.”
+
+Evidence: continuation/C28-AUTHORITY.md (approved question plus scope invariants); declare-api-scope-review/AUTHORITY.md (existing-owned-source authorization only); CURRENT-SPEC.md (source boundary, synchronous/errors, receipt states); frozen public Link comments/types. No research representation is used as consumer policy. Promotion still needs the separately authorized qualification/activation disposition; integration or this review alone grants neither.
+
+No need to teach internal cutoffs, proof graphs or capture machinery. These additions can stay consumer-facing and brief. The draft is sound as a working summary, with the above clarifications required before treating it as complete integration guidance.

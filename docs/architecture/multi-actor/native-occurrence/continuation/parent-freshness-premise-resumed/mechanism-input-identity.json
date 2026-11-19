@@ -1,0 +1,33 @@
+{
+  "manifest_sha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+  "files": {
+    "packages/kernel/src/lib/entity-signal.ts": {
+      "sha256": "d6b3ec2c4ef3a8ecb1e8e46dc98082c3924837ce183d078eb832976ce0b79bd4",
+      "matches_C8_manifest": true,
+      "same_as_C7a": false
+    },
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+      "sha256": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954",
+      "matches_C8_manifest": true,
+      "same_as_C7a": true
+    },
+    "packages/kernel/src/lib/utils.ts": {
+      "sha256": "307f39dfe11febe766c3d1b30bc30c9f9dec8d93cdf59c1f717479966e95b460",
+      "matches_C8_manifest": true,
+      "same_as_C7a": true
+    },
+    "packages/kernel/src/lib/internals/native-location-realization.ts": {
+      "sha256": "6a85bce4173de5889f649cbde90a0ca0d8351debf2dcf87bc99512e157573dd0",
+      "matches_C8_manifest": true,
+      "same_as_C7a": true
+    },
+    "packages/angular/src/lib/observation-adapter.ts": {
+      "sha256": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+      "matches_C8_manifest": true,
+      "same_as_C7a": true
+    }
+  },
+  "DESIGN.md": "967f245b55fadcb152e6c7370752ca04ef0cc0f14cbd092b10dff88c950940da",
+  "HOOKS.md": "fbc3bcfad250fc6778d17dfca3b95fe48334c5cb09640b1054f8e92748356da5",
+  "REENTRY-CACHE-RULES.md": "5274297976e4ebbfaa2889dceb3ffd968b0063fdfa4e81ced24f85e16fbfaead"
+}

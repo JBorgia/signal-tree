@@ -1,0 +1,6 @@
+{
+  "manifestSHA256": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "overlays": {
+    "packages/kernel/src/lib/equal-refresh-protected-paths.spec.ts": "af5a2df6ea0eec7197b121ca09c812e801c36bcb2b531a47ebfdd65b85617759"
+  }
+}

@@ -1,0 +1,359 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -155,7 +155,7 @@
+           else if(row)sources.push(...row.values());
+         }
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+-        return {get proof(){return lifecycle.combineProofs(sources.map(lifecycle.nativeProof));},known:[],unknown:false,possible:[],captureWindow:false,frames:[],inputs:[]};
++        return lifecycle.combineNativeRequirements(sources);
+       };
+       return {record:combineTerminalRecords(prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
+     },
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -73,7 +73,36 @@
+ }
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+ export type NativeInput={readonly requirement:NativeRequirement;readonly owners:readonly OwnerCell[];readonly terminalRejectedRoles?:number};
+-export type NativeRequirement={proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
++export type NativeRequirement={readonly components?:readonly NativeRequirement[];proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
++// Readiness is independent of proof presence: composite proofs are live views.
++const unfinishedRequirements=new WeakSet<NativeRequirement>();
++const requirementListeners=new WeakMap<NativeRequirement,Set<()=>void>>();
++export function nativeRequirementReady(requirement:NativeRequirement):boolean {
++ return !unfinishedRequirements.has(requirement)&&(requirement.components??[]).every(nativeRequirementReady);
++}
++export function combineNativeRequirements(components:readonly NativeRequirement[]):NativeRequirement {
++ const sources=Object.freeze([...new Set(components)]);
++ return {components:sources,get proof(){return combineProofs(sources.map(nativeProof));},inputs:[],frames:[],known:[],unknown:false,possible:[],captureWindow:false};
++}
++export function onNativeRequirementReady(requirement:NativeRequirement,callback:()=>void):()=>void {
++ if(nativeRequirementReady(requirement)){callback();return ()=>{};}
++ let active=true;
++ const releases:(()=>void)[]=[];
++ const release=()=>{active=false;for(const off of releases)off();releases.length=0;};
++ const check=()=>{if(active&&nativeRequirementReady(requirement)){release();callback();}};
++ const visit=(part:NativeRequirement)=>{
++  if(unfinishedRequirements.has(part)){
++   let listeners=requirementListeners.get(part);if(!listeners)requirementListeners.set(part,listeners=new Set());
++   listeners.add(check);releases.push(()=>{listeners!.delete(check);if(!listeners!.size)requirementListeners.delete(part);});
++  }
++  for(const child of part.components??[])visit(child);
++ };
++ visit(requirement);return release;
++}
++function notifyRequirement(requirement:NativeRequirement):void {
++ const callbacks=requirementListeners.get(requirement);requirementListeners.delete(requirement);
++ for(const callback of [...callbacks??[]])callback();
++}
+ /** Capture before user code: later confirmation cannot rewrite consumed input.
+  * Keep the source requirement for uncertainty and unfinished validation; only
+  * already-confirmed actual owners are discharged from this new consumption. */
+@@ -113,6 +142,7 @@
+  const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined)
+   ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);
+  const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
++ unfinishedRequirements.add(requirement);
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+  for(const frame of active){
+@@ -132,7 +162,7 @@
+  const destination=new Set(requirement.known);
+  requirement.possible=Object.freeze([...pending].filter(owner=>!destination.has(owner)&&!actualInputs.has(owner)));
+  // Source inputs are immutable snapshots; only the not-yet-installed unit's own window is refreshed.
+- if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];}
++ if(requirement.frames.length===0){requirement.proof=nativeProof(requirement);requirement.inputs=[];requirement.known=[];unfinishedRequirements.delete(requirement);notifyRequirement(requirement);}
+ }
+ type Operation={projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+@@ -239,6 +269,9 @@
+ function finish(h:Horizon):void{
+  for(const requirement of h.requirements){requirement.proof=nativeProof(requirement);}
+  for(const requirement of h.requirements){requirement.inputs=[];requirement.frames=[];requirement.known=[];}
++ // All sources close before any recipient recomposes its selected support.
++ for(const requirement of h.requirements)unfinishedRequirements.delete(requirement);
++ for(const requirement of h.requirements)notifyRequirement(requirement);
+  h.requirements.clear();
+  const operations=new Set<Operation>();
+  for(const f of h.frames){
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -22,11 +22,12 @@
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+ type Summary={rejected:Map<number,number>;unavailableInput:number;historicalWindow:number;owners:Map<Cell,number>;destination:Map<Cell,number>;input:Map<Cell,number>;validation:Map<Cell,number>;possible:Map<Cell,number>;unknown:number;invalid:number};
+-type CollectionSupport={relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>;summary:Summary};
+-type Binding={collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
++type CollectionSupport={payload:unknown;relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>;summary:Summary};
++type Binding={watches:Map<object,()=>void>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;summary:Summary;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+ const ownProofs=new WeakMap<Fact,Proof>();
++const factRequirements=new WeakMap<Fact,lifecycle.NativeRequirement>();
+ const factChannels=new WeakMap<Fact,object>();
+ const noopPredecessors=new WeakMap<Fact,Fact|undefined>();
+ function effectivePredecessor(fact:Fact|undefined):Fact|undefined{while(fact&&noopPredecessors.has(fact))fact=noopPredecessors.get(fact);return fact;}
+@@ -34,7 +35,7 @@
+ const grants=new WeakMap<Fact,Set<object>>();
+ const callbacks=new Map<object,()=>void>();
+ const consumedIngress=new Set<object>();
+-let serial=0;let ingress:{owner:number;position:number;consumed:boolean;collections:Set<object>}|undefined;
++let serial=0;let ingress:{channel:object;consumed:boolean;collections:Set<object>}|undefined;
+ export const stamp=Symbol('unused notification publication stamp');
+ export const receipts:unknown[]=[];export let enabled=true;
+ export function mode(value:boolean):void{enabled=value;}
+@@ -154,7 +155,43 @@
+ function endBranchInput(token:object):void{if(branchInputs.at(-1)!==token)throw new Error('Branch publication input scope mismatch');branchInputs.pop();}
+ const emptySummary=():Summary=>({rejected:new Map(),owners:new Map(),destination:new Map(),input:new Map(),validation:new Map(),possible:new Map(),unknown:0,invalid:0,unavailableInput:0,historicalWindow:0});
+ const summaryProof=(summary:Summary):Proof=>({terminalRejectedRoles:[...summary.rejected.keys()].reduce((all,bit)=>all|bit,0),owners:[...summary.owners.keys()],destination:[...summary.destination.keys()],input:[...summary.input.keys()],validation:[...summary.validation.keys()],possible:[...summary.possible.keys()],unknown:summary.unknown>0,invalid:summary.invalid>0,unavailableInput:summary.unavailableInput>0,historicalWindow:summary.historicalWindow>0});
+-function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base=combineProofs([summaryProof(b.summary),...[...b.collections.values()].map(value=>summaryProof(value.summary))]);const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
++function rebuildEnrollmentSummary(channel:object,b:Binding):void {
++ b.summary=emptySummary();
++ for(const [field,fact]of b.completedFields)if(exposed(b,b.fields.get(field)!.address))adjust(b.summary,own(fact,channel),1);
++ for(const [slot,state]of b.completedPresence)if(internalSlot(b,slot)&&exposed(b,slot.address!,slot))adjust(b.summary,own(state.fact,channel),1);
++}
++function watchFact(channel:object,b:Binding,fact:Fact):void {
++ const requirement=factRequirements.get(fact);if(!requirement||lifecycle.nativeRequirementReady(requirement)||b.watches.has(fact))return;
++ const off=lifecycle.onNativeRequirementReady(requirement,()=>{
++  b.watches.delete(fact);if(bindings.get(channel)?.watches!==b.watches)return;
++  const proof=lifecycle.nativeProof(requirement);ownProofs.set(fact,proof);proofs.set(fact,proof);
++  rebuildEnrollmentSummary(channel,bindings.get(channel)!);wakeChannel(channel);
++ });b.watches.set(fact,off);
++}
++function collectionSelected(b:Binding,collection:CollectionSupport):boolean {
++ const relative=collection.relative??[];
++ return exposed(b,[...(b.address??[]),...relative])&&(!relative.length||pathValue(b.valuePayload,relative).present);
++}
++function setCollectionEntry(channel:object,b:Binding,collection:CollectionSupport,key:string,requirement?:lifecycle.NativeRequirement):void {
++ const old=collection.entries.get(key);if(old){b.watches.get(old)?.();b.watches.delete(old);adjust(collection.summary,old.proof,-1);}
++ if(!requirement){collection.entries.delete(key);return;}
++ const entry={requirement,proof:lifecycle.nativeProof(requirement)};collection.entries.set(key,entry);adjust(collection.summary,entry.proof,1);
++ if(!lifecycle.nativeRequirementReady(requirement)){
++  const off=lifecycle.onNativeRequirementReady(requirement,()=>{
++   b.watches.delete(entry);if(bindings.get(channel)?.watches!==b.watches||collection.entries.get(key)!==entry)return;
++   adjust(collection.summary,entry.proof,-1);entry.proof=lifecycle.nativeProof(requirement);adjust(collection.summary,entry.proof,1);wakeChannel(channel);
++  });b.watches.set(entry,off);
++ }
++}
++function selectedReady(b:Binding):boolean {
++ const ready=(fact:Fact)=>{const requirement=factRequirements.get(fact);return !requirement||lifecycle.nativeRequirementReady(requirement);};
++ for(const [slot,state]of b.completedPresence)if(exposed(b,slot.address??[],slot)&&!ready(state.fact))return false;
++ for(const [field,fact]of b.completedFields)if(exposed(b,b.fields.get(field)!.address)&&!ready(fact))return false;
++ if(!b.aggregate&&!ready(b.completedValueFact))return false;
++ for(const collection of b.collections.values())if(collectionSelected(b,collection))for(const entry of collection.entries.values())if(!lifecycle.nativeRequirementReady(entry.requirement))return false;
++ return true;
++}
++function projectionSupport(b:Binding):{proof:Proof;present:boolean}{if(b.aggregate){const base=combineProofs([summaryProof(b.summary),...[...b.collections.values()].filter(value=>collectionSelected(b,value)).map(value=>summaryProof(value.summary))]);const parent=slotsAlong(b,b.address??[]).map(slot=>b.completedPresence.get(slot)).filter((state):state is Presence=>state!==undefined);const absent=parent.filter(state=>!state.present);return {proof:absent.length?combineProofs(absent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))):combineProofs([base,ownProofs.get(b.baselineStructure)??proofs.get(b.baselineStructure),...parent.map(state=>ownProofs.get(state.fact)??proofs.get(state.fact))]),present:absent.length===0};}const absent=[...b.completedPresence.values()].filter(state=>!state.present);const contributing=absent.length?absent.map(state=>state.fact):[b.baselineStructure,b.completedValueFact,...[...b.completedPresence.values()].map(state=>state.fact)];return {proof:combineProofs(contributing.map(fact=>ownProofs.get(fact)??proofs.get(fact))),present:absent.length===0};}
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+@@ -183,17 +220,17 @@
+ function completeMembership(completion:object):void{for(const {channel,unit}of(completion as {parts:{channel:object;unit:Unit}[]}).parts)completeScalar({channel,unit});}
+ function ready(channel:object,b:Binding):void{
+  for(const unit of b.pending){
+-  if(!unit.complete)break;
++  if(!unit.complete||!selectedReady(b)||unit.selected&&!lifecycle.nativeRequirementReady(unit.selected))break;
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+   const authoredProof=combineProofs([proof,...(unit.native?[lifecycle.nativeProof(unit.native)]:[])]);ownProofs.set(unit.fact,authoredProof);
+   if(unit.collection){
+    const collection=b.collections.get(unit.collection.key);
+    if(collection){for(const edit of unit.collection.edits){
+-     const old=collection.entries.get(edit.key);if(old)adjust(collection.summary,old.proof,-1);
+-     if(edit.after){const requirement=edit.after as lifecycle.NativeRequirement;const proof=lifecycle.nativeProof(requirement);collection.entries.set(edit.key,{requirement,proof});adjust(collection.summary,proof,1);}else collection.entries.delete(edit.key);
++     setCollectionEntry(channel,b,collection,edit.key,edit.after as lifecycle.NativeRequirement|undefined);
+    }
+-   b.valuePayload=collection.relative?applyAtRelativePath(b.valuePayload,collection.relative,{all:unit.payload}):unit.payload;}
++   collection.payload=unit.payload;
++   if(collectionSelected(b,collection))b.valuePayload=collection.relative?applyAtRelativePath(b.valuePayload,collection.relative,{all:unit.payload}):unit.payload;}
+   }else if(unit.presence){
+    const slot=unit.presence.slot;const relative=slot.address&&relativeSourceAddress(b.address??[],slot.address);const affected:object[]=[];if(b.aggregate&&relative!==undefined)fieldNodes(fieldAt(b.fieldTrie,relative),affected);
+    for(const field of affected){const info=b.fields.get(field)!;if(exposed(b,info.address))adjust(b.summary,own(b.completedFields.get(field)!,channel),-1);}
+@@ -201,6 +238,14 @@
+    for(const dependent of affectedSlots){const old=b.completedPresence.get(dependent);if(old&&internalSlot(b,dependent)&&exposed(b,dependent.address!,dependent))adjust(b.summary,own(old.fact,channel),-1);}
+    b.completedPresence.set(slot,unit.presence.state);
+    const after=unit.presence.ordinary?.after;
++   if(after?.present&&relative!==undefined){
++    for(const collection of b.collections.values()){
++     if(collection.relative&&relativeSourceAddress(relative,collection.relative)!==undefined&&exposed(b,[...(b.address??[]),...collection.relative])){
++      const below=relativeSourceAddress(relative,collection.relative)!;
++      if(pathValue(after.value,below).present)b.valuePayload=applyAtRelativePath(b.valuePayload,collection.relative,{all:collection.payload});
++     }
++    }
++   }
+    if(after?.present&&slot.address){
+     if(b.aggregate&&relative!==undefined){for(const field of affected){if(b.initialized.has(field))continue;const info=b.fields.get(field)!;const below=relativeSourceAddress(slot.address,info.address);const supplied=below&&pathValue(after.value,below);if(supplied?.present){b.valuePayload=applyAtRelativePath(b.valuePayload,info.relative,supplied.value);b.initialized.add(field);}}}
+     else if(!b.aggregate&&!b.valueInitialized&&b.address){const below=relativeSourceAddress(slot.address,b.address);const supplied=below&&pathValue(after.value,below);if(supplied?.present){b.valuePayload=supplied.value;b.valueInitialized=true;}}
+@@ -237,7 +282,7 @@
+ function prepareScalar(channel:object,mutation:IntrinsicMutation<unknown>,input?:object,field?:object,nativeUnit?:object):PreparedPublicationUnit|undefined{
+  const b=bindings.get(channel);if(!b)return;
+  const meta=getActiveWriteContext();if(meta?.participation==='inspection')return;
+- const clean=!!ingress&&!consumedIngress.has(ingress)&&ingress.owner===b.owner&&ingress.position===b.position;
++ const clean=!!ingress&&!consumedIngress.has(ingress)&&ingress.channel===channel;
+  const attributed=meta?.transactionId;
+  const known=typeof attributed==='number'?lifecycle.ownerCell(b.owner,attributed):undefined;
+  const valid=attributed===undefined||!!known&&meta?.transactionOwner===lifecycle.ownerToken(b.owner);
+@@ -256,7 +301,7 @@
+  return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined}};
+ }
+ export function acquiringCollection(channel:object,source:object):boolean {
+- const binding=bindings.get(channel);return !!ingress&&!!binding&&binding.owner===ingress.owner&&binding.position===ingress.position&&!ingress.collections.has(source);
++ const binding=bindings.get(channel);return !!ingress&&!!binding&&ingress.channel===channel&&!ingress.collections.has(source);
+ }
+ /** The acquisition certifies its own relationship baseline, not native input evidence. */
+ export function acquiredEntityEvidence():EntityPublicationEvidence {
+@@ -284,15 +329,15 @@
+  const cache=new Map<object,object>();
+  const baseline=(reference:object):object=>{let value=cache.get(reference);if(value)return value;
+   const requirement=reference as lifecycle.NativeRequirement,proof=lifecycle.nativeProof(requirement);
+-  const safe=!proof.invalid&&!proof.terminalRejectedRoles&&proof.owners.every(cell=>cell.outcome==='confirmed')&&(proof.possible??[]).every(cell=>cell.outcome==='confirmed'||cell.outcome==='rolled-back')&&!lifecycle.pendingOwners().some(cell=>cell.owner===owner);
++  const safe=lifecycle.nativeRequirementReady(requirement)&&!proof.invalid&&!proof.terminalRejectedRoles&&proof.owners.every(cell=>cell.outcome==='confirmed')&&(proof.possible??[]).every(cell=>cell.outcome==='confirmed'||cell.outcome==='rolled-back')&&!lifecycle.pendingOwners().some(cell=>cell.owner===owner);
+   value=safe?lifecycle.initialRequirement():requirement;cache.set(reference,value);return value;
+  };
+  return {exclusions:()=>source.exclusions?.().map(([id,fact])=>[id,baseline(fact)] as const)??[],member:(id,view)=>baseline(source.member(id,view)),field:(id,key,view)=>baseline(source.field(id,key,view)),placement:(id,view)=>baseline(source.placement(id,view)),keyMapping:(id,view)=>baseline(source.keyMapping(id,view))};
+ }
+-export function registerCollectionProjection(channel:object,key:object,relative:readonly string[]|undefined,initial:ReadonlyMap<string,object>):void {
++export function registerCollectionProjection(channel:object,key:object,relative:readonly string[]|undefined,initial:ReadonlyMap<string,object>,payload:unknown):void {
+  const b=bindings.get(channel);if(!b)return;
+- const support:CollectionSupport={relative,entries:new Map(),summary:emptySummary()};
+- for(const [slot,reference]of initial){const requirement=reference as lifecycle.NativeRequirement;const proof=lifecycle.nativeProof(requirement);support.entries.set(slot,{requirement,proof});adjust(support.summary,proof,1);}
++ const support:CollectionSupport={payload,relative,entries:new Map(),summary:emptySummary()};
++ for(const [slot,reference]of initial)setCollectionEntry(channel,b,support,slot,reference as lifecycle.NativeRequirement);
+  b.collections.set(key,support);
+ }
+ export function completeSourceProjection(completion:object):void { completeScalar(completion); }
+@@ -310,10 +355,10 @@
+  const nativeFact=(requirement:lifecycle.NativeRequirement|undefined):Fact=>{
+   if(!requirement)return baseline;
+   const fact=Object.freeze({...baseline,revision:++serial});const proof=lifecycle.nativeProof(requirement);
+-  proofs.set(fact,proof);ownProofs.set(fact,proof);return fact;
++  proofs.set(fact,proof);ownProofs.set(fact,proof);factRequirements.set(fact,requirement);return fact;
+  };
+  const presence=new Map<Slot,Presence>();for(const entry of context?.presence??[])presence.set(slotFor(entry.parent,entry.key,entry.child),{present:entry.present,fact:nativeFact(nativeMembers.get(entry.child))});
+- const binding:Binding={collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:emptySummary(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
++ const binding:Binding={watches:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:[...presence.values()].every(state=>state.present),slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),summary:emptySummary(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence,completedPresence:new Map(presence),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);for(const slot of presence.keys())indexSlot(binding,slot);if(context)slotNode(binding,context.address,true);
+  if(identity.supported&&source){
+   // Membership has native identity even when it predates every recipient.
+   // Seed only this source's retained paths; never infer from another binding.
+@@ -329,13 +374,14 @@
+    }
+   };
+   if(binding.aggregate){
+-   const seen=new Set<object>();const visit=(candidate:unknown):void=>{if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);enrollMembership(candidate);if(getEntityPublicationBinding(candidate))return;if(isWritableLocation(candidate)){const address=getNodeAddress(candidate);const relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)return;slotNode(binding,address,true);binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);const requirement=nativeValues.get(candidate);const nativeProof=requirement&&lifecycle.nativeProof(requirement);const fieldFact=nativeProof?Object.freeze({...baseline,revision:++serial}):baseline;if(nativeProof){proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);}binding.fieldFacts.set(candidate,fieldFact);binding.completedFields.set(candidate,fieldFact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;if(exposed(binding,address))adjust(binding.summary,nativeProof??baselineProof,1);const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;}const storage=nodeStoreOf(candidate)??candidate;for(const key of Object.getOwnPropertyNames(storage)){const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor&&isTraversableNode(descriptor.value))visit(descriptor.value);}};visit(source);
+-  }else {const requirement=nativeValues.get(source);if(requirement){const nativeProof=lifecycle.nativeProof(requirement);const fieldFact=Object.freeze({...baseline,revision:++serial});proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);binding.valueFact=fieldFact;binding.completedValueFact=fieldFact;}binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));}
+- }
++   const seen=new Set<object>();const visit=(candidate:unknown):void=>{if(!isTraversableNode(candidate)||seen.has(candidate))return;seen.add(candidate);enrollMembership(candidate);if(getEntityPublicationBinding(candidate))return;if(isWritableLocation(candidate)){const address=getNodeAddress(candidate);const relative=address&&context?relativeSourceAddress(context.address,address):undefined;if(!address||relative===undefined)return;slotNode(binding,address,true);binding.fields.set(candidate,{address,relative});if(pathValue(binding.valuePayload,relative).present)binding.initialized.add(candidate);const requirement=nativeValues.get(candidate);const nativeProof=requirement&&lifecycle.nativeProof(requirement);const fieldFact=nativeProof?Object.freeze({...baseline,revision:++serial}):baseline;if(nativeProof){proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);factRequirements.set(fieldFact,requirement!);}binding.fieldFacts.set(candidate,fieldFact);binding.completedFields.set(candidate,fieldFact);fieldAt(binding.fieldTrie,relative,true)!.field=candidate;if(exposed(binding,address))adjust(binding.summary,nativeProof??baselineProof,1);const release=preparePublicationMutations(candidate,(m,input,native)=>prepareScalar(channel,m,input,candidate,native),completeScalar,()=>captureValueInput(channel,candidate));if(release)binding.releases.push(release);return;}const storage=nodeStoreOf(candidate)??candidate;for(const key of Object.getOwnPropertyNames(storage)){const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(descriptor&&'value'in descriptor&&isTraversableNode(descriptor.value))visit(descriptor.value);}};visit(source);
++  }else {const requirement=nativeValues.get(source);if(requirement){const nativeProof=lifecycle.nativeProof(requirement);const fieldFact=Object.freeze({...baseline,revision:++serial});proofs.set(fieldFact,nativeProof);ownProofs.set(fieldFact,nativeProof);factRequirements.set(fieldFact,requirement);binding.valueFact=fieldFact;binding.completedValueFact=fieldFact;}binding.release=preparePublicationMutations(source,(m,input,native)=>prepareScalar(channel,m,input,undefined,native),completeScalar,()=>captureValueInput(channel));}
++ }
++ for(const fact of new Set([binding.completedValueFact,...binding.completedFields.values(),...[...binding.completedPresence.values()].map(state=>state.fact)]))watchFact(channel,binding,fact);
+  if(identity.supported&&context&&source){trieFor(context.registry,context.address,true)!.channels.add(channel);indexedBindings++;}
+ }
+ export function onEligibility(_owner:number,cb:()=>void,channel:object):()=>void{callbacks.set(channel,cb);return()=>{callbacks.delete(channel);};}
+-export function acquire(owner:number,position:number,work:()=>void):void{const prev=ingress;ingress={owner,position,consumed:false,collections:new Set()};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}
++export function acquire(channel:object,work:()=>void):void{const prev=ingress;ingress={channel,consumed:false,collections:new Set()};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}
+ /** Notification metadata no longer admits publication responsibility. */
+ export function annotate(meta:WriteMetadata|undefined,_owner:number|undefined,_positions:number[]|undefined,_authored:boolean,_payload:unknown):WriteMetadata{return {...meta};}
+ export function evidence(_meta:unknown):Fact|undefined{return undefined;}
+@@ -362,7 +408,7 @@
+  original({...r,run:()=>{if(fact){let set=grants.get(fact);if(!set)grants.set(fact,set=new Set());set.add(channel);}r.run();}});return true;
+ }
+ export function started(fact:Fact|undefined,channel:object):void{if(fact)lifecycle.started(channel,fact,grants.get(fact)?.has(channel)?'surviving':'declared');}
+-export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
++export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();for(const release of b?.watches.values()??[])release();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
+ export function heldCount():number{return lifecycle.diagnostics().operations;}
+ export function diagnostics(){return {...lifecycle.diagnostics(),...projection.projectionCounts(),listeners:callbacks.size,latest:bindings.size};}
+ export function declare(channel:object,_owner:number,_position:number,input:unknown,work:()=>unknown,_disposed:()=>boolean){return lifecycle.runDeclaration(channel,input,work);}
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -541,7 +541,7 @@
+     // authoritative for this relationship — it is not inspection, and it is not
+     // an authored mutation to be reduced.
+     if(!entityProjection)eligible = value;
+-    research.acquire(registry.id, publicationPosition, () =>
++    research.acquire(consequenceKey, () =>
+       external(() => write(value))
+     );
+     // ⚠️ AND THE SUBJECT SHADOW IS RESEEDED, not reduced. Applying inbound truth
+@@ -575,7 +575,7 @@
+   const ownEntitySource=getEntityPublicationBinding(x);
+   const registerEntityRecipient=(node:unknown,projection:EntityEgressProjection|undefined,nested?:NestedCollection):void=>{
+     const binding=getEntityPublicationBinding(node); if(!binding)return;
+-    if(projection)research.registerCollectionProjection(consequenceKey,node as object,nested?.relativeAddress,projection.support());
++    if(projection)research.registerCollectionProjection(consequenceKey,node as object,nested?.relativeAddress,projection.support(),projection.value());
+     releaseEntityPublications.push(binding.source.subscribe({
+       seedRequested:()=>!!projection&&research.acquiringCollection(consequenceKey,node as object),
+       prepare(packet,native){
+@@ -637,6 +637,7 @@
+       const membership = plainBranchMembershipChange(meta);
+       if (membership) {
+         if (entityLocation || isInspectionWrite(meta)) return;
++        if(research.enabled){dirty=true;observeLink();return;}
+         const address = getNodeAddress(membership.branch);
+         const relative =
+           sourceAddress !== undefined && address !== undefined
+--- /dev/null
++++ b/packages/kernel/src/lib/native-certificate-successor.spec.ts
+@@ -0,0 +1,63 @@
++import { expect, it } from 'vitest';
++import { entityMap, link, signalTree, transactions } from '../index';
++import { getPathNotifier } from './path-notifier';
++import * as lifecycle from './experimental-publication/lifecycle';
++import { installTerminalRecord } from './internals/intrinsic-mutation';
++
++type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):{read():{state:string}}};
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++
++it('composite readiness follows parent finalization without a recipient operation',()=>{
++ const channel={};lifecycle.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});
++ let requirement!:lifecycle.NativeRequirement, composite!:lifecycle.NativeRequirement;
++ const seen:boolean[]=[];const sentinel=new Error('parent');
++ try{
++  expect(()=>lifecycle.runDeclaration(channel,{kind:'independent'},()=>{
++   const prepared=lifecycle.prepareNativeRequirement([],false,[]);requirement=prepared.requirement;
++   installTerminalRecord(prepared.record);lifecycle.finalizeNativeRequirement(requirement);
++   composite=lifecycle.combineNativeRequirements([requirement,lifecycle.initialRequirement()]);
++   expect(lifecycle.nativeRequirementReady(composite)).toBe(false);
++   lifecycle.onNativeRequirementReady(composite,()=>seen.push(lifecycle.nativeProof(composite).invalid));
++   throw sentinel;
++  })).toThrow(sentinel);
++  expect(lifecycle.nativeRequirementReady(composite)).toBe(true);expect(seen).toEqual([true]);
++ }finally{lifecycle.disposeConnection(channel);}
++});
++
++it('released readiness listener does not run at close',()=>{
++ const channel={};lifecycle.registerConnection(channel,{supported:true,report:()=>{},wake:()=>{}});let calls=0;
++ try{lifecycle.runDeclaration(channel,{kind:'independent'},()=>{
++  const p=lifecycle.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);lifecycle.finalizeNativeRequirement(p.requirement);
++  lifecycle.onNativeRequirementReady(p.requirement,()=>calls++)();
++ });expect(calls).toBe(0);}finally{lifecycle.disposeConnection(channel);}
++});
++
++for(const membership of [false,true])it(`enrollment retains parent invalidation for ${membership?'membership':'scalar'} support`,async()=>{
++ const tree=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});
++ const foreign=signalTree({z:0},{enhancers:[transactions()]});const parent=link(tree.$.pair,{set:()=>{}}) as Experimental;
++ const sent:unknown[]=[];let child:Experimental|undefined;const q=foreign.transact(()=>foreign.$.z(7));
++ try{
++  expect(()=>parent.declare({kind:'independent'},()=>{
++   if(membership)tree.$.pair({y:0} as {x:number;y:number});else tree.$.pair.x(7);
++   child=link(tree.$.pair,{set:v=>{sent.push(v);}}) as Experimental;
++   throw new Error('parent invalid');
++  })).toThrow('parent invalid');
++  child!.declare({kind:'independent'},()=>tree.$.pair.y(8));await flush();expect(sent).toEqual([]);
++  q.confirm();await flush();expect(sent).toEqual([membership?{y:8}:{x:7,y:8}]);
++ }finally{child?.dispose();parent.dispose();tree.destroy();foreign.destroy();}
++});
++
++it('omission then restored retained collection selects matching payload and support',async()=>{
++ const initial={branch:{rows:entityMap<{id:string;x:number},string>()},other:0};
++ // Runtime branch omission is exercised through the existing internal cast boundary.
++ const tree=signalTree(initial,{enhancers:[transactions()]});
++ const foreign=signalTree({z:0},{enhancers:[transactions()]});const rows=tree.$.branch!.rows;
++ rows.addOne({id:'a',x:0});await flush();const sent:unknown[]=[];const c=link(tree.$ as never,{set:(v:unknown)=>{sent.push(v);}} as never) as Experimental;
++ const q=foreign.transact(()=>foreign.$.z(7));
++ try{
++  rows.updateOne('a',{x:7});await flush();expect(sent).toEqual([]);
++  c.declare({kind:'independent'},()=>tree.$({other:1} as never));await flush();expect(sent).toEqual([{other:1}]);
++  c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a',x:7}]}},other:2} as never));await flush();
++  expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},other:2});
++ }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
++});

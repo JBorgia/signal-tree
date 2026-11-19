@@ -1,0 +1,37 @@
+Creating project graph nodes with @nx/vitest
+
+
+> nx run kernel:test large-batch-cleanup-count-probe.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs large-batch-cleanup-count-probe.spec.ts --maxWorkers=1
+
+(node:46809) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46823) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c19-large-batch-cleanup-counts/candidate/packages/kernel
+
+(node:46835) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  12:55:07
+   Duration  12.49s (transform 5.34s, setup 0ms, import 6.87s, tests 405ms, environment 4.01s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      17.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     17.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    17.2s

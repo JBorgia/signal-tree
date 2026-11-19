@@ -1,0 +1,19 @@
+{
+  "kind": "entity",
+  "history": "clean",
+  "calls": 1,
+  "before": {
+    "state": "eligible",
+    "basis": "declared"
+  },
+  "beforeSettlement": [
+    7
+  ],
+  "after": {
+    "state": "started",
+    "basis": "declared"
+  },
+  "sent": [
+    7
+  ]
+}

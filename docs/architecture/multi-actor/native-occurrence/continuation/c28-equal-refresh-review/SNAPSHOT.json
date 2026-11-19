@@ -1,0 +1,23 @@
+{
+  "status": "source review; four probes unexecuted",
+  "files": {
+    "SOURCE-IDENTITY.json": "2783fddb251887b35f0477e63869dff569d598ca7329094b2b5174b0400dfed1",
+    "REVIEW.md": "cb195c6566dc51c85dc60484c7a5d2256a6924c7d93e2f02c5d466069e318852",
+    "TESTS.patch": "81df77c23087884899e73893e4fcac9ab1e44db680c4cc2dcc0bcf93d9be43d0",
+    "inputs/C28-AUTHORITY.md": "a7ba3c21b9d49c938d2f6f45a28429b5faa6385419bdf6add5aa354cab3ad87f",
+    "inputs/SNAPSHOT-C27.json": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+    "inputs/packages/kernel/src/lib/publication-role-overlap-audit.spec.ts": "eae5c11466234782135259651fc610042b6334fbbbaf3287fe9167027bad6d5b",
+    "inputs/packages/kernel/src/lib/terminal-owner-possible-refresh.spec.ts": "ac0a34afd897db63761ea699cc9386d72a22e9837d3c55bb1cbb3443cc151171",
+    "inputs/packages/kernel/src/lib/terminal-owner-actual-contributor.spec.ts": "5daa8ac74fe590f173c1c7ddd52b24fef76f06aad2c9c7702403881b21982802",
+    "inputs/packages/kernel/src/lib/equal-owner-current-input.spec.ts": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3",
+    "inputs/packages/kernel/src/lib/inspection-egress-conformance.spec.ts": "a315ed554c8cafc5c31629b3300cc380ff97b444822b9dc5a5ead1b01dc1777d",
+    "inputs/packages/kernel/src/lib/saved-inspection-snapshot-isolation.spec.ts": "116237c9152374fe5ccbe7d41a04de52dd45b5ed74a4816a99b00cb229bba94f",
+    "inputs/packages/kernel/src/lib/scalar-frame-publication.spec.ts": "e8554d47371ca1891279bf17387418018b17993be9b843f5b7a50eb9516e1075",
+    "inputs/packages/kernel/src/lib/entity-obligation-matrix.spec.ts": "72d76ddfc858900d27e831d681c8c8b99f09a687b759b5075db4f1254fbd4a55",
+    "inputs/packages/kernel/src/lib/equal-owner-admission.spec.ts": "8028723fc87c052cea7ef2c256fd0fb87b3c9014cc73226b712e4477c61ac945",
+    "inputs/packages/kernel/src/lib/scalar-native-support.spec.ts": "74acda5f67e00ec0ad070b5ef1562b5f2e18bcc5eb18accb0d4124e99d52bfb1",
+    "inputs/packages/kernel/src/lib/experimental-publication/private.ts": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647",
+    "inputs/packages/kernel/src/lib/experimental-publication/lifecycle.ts": "f21f99f975a5ad9577c618ddb2593edf200faa4b00de1c0a8c2e484479405873",
+    "packet/packages/kernel/src/lib/equal-refresh-protected-paths.spec.ts": "af5a2df6ea0eec7197b121ca09c812e801c36bcb2b531a47ebfdd65b85617759"
+  }
+}

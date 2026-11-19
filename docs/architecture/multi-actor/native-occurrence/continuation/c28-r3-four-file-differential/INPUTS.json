@@ -1,0 +1,34 @@
+{
+  "arms": {
+    "r2": {
+      "source": "/private/tmp/st-c28-r2-cutoff/candidate",
+      "manifestSha256": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+      "paths": 3093,
+      "tests": {
+        "packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts": "37e5d73415832047863481084d1d0b8be7d8bdf16305973a18172de1b5070771",
+        "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1",
+        "packages/kernel/src/lib/whole-value-new-keys.spec.ts": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+        "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872"
+      }
+    },
+    "r3": {
+      "source": "/private/tmp/st-c28-r3-comparator/candidate",
+      "manifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+      "paths": 3095,
+      "tests": {
+        "packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts": "37e5d73415832047863481084d1d0b8be7d8bdf16305973a18172de1b5070771",
+        "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts": "4eb7b7bf8e87df32dc9c1af1ad438a83302ac2d71326735bb3b03a1653e1dae1",
+        "packages/kernel/src/lib/whole-value-new-keys.spec.ts": "5af582a90e3783871085fda5513baea975f31c57db467f92c6edc1c3e898bb11",
+        "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872"
+      }
+    }
+  },
+  "requestedPaths": [
+    "packages/kernel/src/enhancers/transactions/transaction-safety.spec.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts",
+    "packages/kernel/src/lib/whole-value-new-keys.spec.ts",
+    "packages/kernel/src/lib/entity-granular-reactivity.spec.ts"
+  ],
+  "outputEnv": "No process.env output requirements in the four selected specs; JSON reporter output is explicit per arm. Same pinned runner environment.",
+  "ledgerSha256": "84cc4aaadfcf63b2c180a7482bd3859370f119f9e4bb7a76fec6a0710353f1c1"
+}

@@ -1,0 +1,6 @@
+{
+  "base": "/private/tmp/st-native-combined-c16/candidate/packages/kernel/src/lib/recipient-source-permission.spec.ts",
+  "originalSha256": "90a8460e1a7bd75af1f545c3b713b1687d5438f5a0b1690c8799d3bb118f97d7",
+  "fixedSha256": "4bf0d63d3847e76d9cc7721bd9cb2cae7ebecf4d929513d26d2643e059f7e22a",
+  "firstAttempt": "Guard rejected mistaken method syntax before files were changed; corrected against actual arrow syntax."
+}

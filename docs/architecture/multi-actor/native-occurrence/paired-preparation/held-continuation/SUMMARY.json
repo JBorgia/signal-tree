@@ -1,0 +1,234 @@
+[
+  {
+    "file": "drop-proceed-1.json",
+    "mode": "drop-proceed",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": null
+  },
+  {
+    "file": "drop-proceed-2.json",
+    "mode": "drop-proceed",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": null
+  },
+  {
+    "file": "hold-proceed-1.json",
+    "mode": "hold-proceed",
+    "held": {
+      "tree": true,
+      "row": false,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": "Error: Selected continuation cannot replay"
+  },
+  {
+    "file": "hold-proceed-2.json",
+    "mode": "hold-proceed",
+    "held": {
+      "tree": true,
+      "row": false,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": "Error: Selected continuation cannot replay"
+  },
+  {
+    "file": "hold-row-1.json",
+    "mode": "hold-row",
+    "held": {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": null
+  },
+  {
+    "file": "hold-row-2.json",
+    "mode": "hold-row",
+    "held": {
+      "tree": true,
+      "row": true,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": null
+  },
+  {
+    "file": "nx-target-drop-proceed.json",
+    "mode": "drop-proceed",
+    "held": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": null
+  },
+  {
+    "file": "nx-target-hold-proceed.json",
+    "mode": "hold-proceed",
+    "held": {
+      "tree": true,
+      "row": false,
+      "leaf": true,
+      "publicationBinding": true,
+      "nativePublicationSource": true,
+      "transaction": false,
+      "baselineRequirement": true,
+      "negative": false,
+      "positive": true
+    },
+    "released": {
+      "tree": false,
+      "row": false,
+      "leaf": false,
+      "publicationBinding": false,
+      "nativePublicationSource": false,
+      "transaction": false,
+      "baselineRequirement": false,
+      "negative": false,
+      "positive": false
+    },
+    "heldStableAcross12": true,
+    "releasedStableAcross12": true,
+    "staleError": "Error: Selected continuation cannot replay"
+  }
+]

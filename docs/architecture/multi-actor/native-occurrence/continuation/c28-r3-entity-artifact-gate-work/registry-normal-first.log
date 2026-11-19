@@ -1,0 +1,10 @@
+
+· building packages — 2 gate(s) read dist/
+
+Running 2 gates
+
+  · entity-registration-artifacts pass ✓  (packed and production-bundled entity registration: original 8 + lifecycle 6 + receipt 6, with selective no-Link control)
+  · entity-registration-artifacts:self pass ✓  (missing built factory registration causes behavioral failures; clean recovery and no-Link isolation survive)
+
+──────────────────────────────────────────────────────────────────────────────
+2/2 passed, 0 failed, 0 known-red.

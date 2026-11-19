@@ -1,0 +1,37 @@
+
+> nx run kernel:test lazy-capture-independent.spec.ts native-admission-segments.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs lazy-capture-independent.spec.ts native-admission-segments.spec.ts --maxWorkers=1
+
+(node:25891) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-lazy-capture-independent-review/candidate/packages/kernel
+
+(node:25905) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25918) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  2 passed (2)
+      Tests  4 passed (4)
+   Start at  19:41:22
+   Duration  2.71s (transform 1.23s, setup 0ms, import 1.63s, tests 60ms, environment 733ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.2s

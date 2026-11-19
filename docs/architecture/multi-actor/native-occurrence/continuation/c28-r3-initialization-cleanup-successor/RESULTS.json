@@ -1,0 +1,52 @@
+{
+  "lifecycle-final": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "spec-types-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "public-types-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "focused-first": {
+    "exit": 1,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "source-types-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "vue-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "react-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "reviewer-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "solid-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "angular-first": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  }
+}

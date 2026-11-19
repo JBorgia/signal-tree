@@ -1,0 +1,22 @@
+[
+  {
+    "path": "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+    "originalSha256": "6e7e13999ac6161cec1065804521b5608ad2eb82d2d615c4943450ab63e75c35",
+    "candidateSha256": "e1b2631108d1c89e0c12000286709eda21dd486ab1ae1fcce641d7f7f9625b13"
+  },
+  {
+    "path": "packages/kernel/src/lib/transaction-observer-failure.spec.ts",
+    "originalSha256": "fb0021d35f1c1f645517c24756722237ae0f2764daad593ddaa451f2bb17d6b8",
+    "candidateSha256": "53b154fd9e2fc71909313f61de2e3b8415db243cc096af0c2c5ebd096efacac4"
+  },
+  {
+    "path": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "originalSha256": "3caf653470ce0136ecd912c60410eda76476c134dad711e6dab2ae63df0af5af",
+    "candidateSha256": "5e9ba0c6b3990a50322270073c26d9ba7c2e557935f6048343c2dde086a816a5"
+  },
+  {
+    "path": "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts",
+    "originalSha256": "9beb551de9a15e2585420c9b62f3aa5d36a62ca2e63071a535e9e36a171905c1",
+    "candidateSha256": "74220c38abc41437ea29b78073832fa8c3b64c7a5affab7d40e7c03271d150b7"
+  }
+]

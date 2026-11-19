@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel scalar-completion-precedence --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:27:49.835Z",
+    "endTime": "2026-11-03T05:27:50.948Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "637799676860213794",
+      "startTime": "2026-11-03T05:27:49.868Z",
+      "endTime": "2026-11-03T05:27:50.948Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

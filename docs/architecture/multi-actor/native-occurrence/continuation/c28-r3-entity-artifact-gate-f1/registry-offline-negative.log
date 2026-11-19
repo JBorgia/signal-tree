@@ -1,0 +1,20 @@
+
+· building packages — 2 gate(s) read dist/
+
+Gate self-test — each gate must FAIL against its own mutation
+
+  · entity-registration-artifacts awaiting validated entity-registration-artifacts:self
+  · entity-registration-artifacts:self mutating tools/verify-entity-registration-artifacts.mjs ... ERROR — no validated entity-registration-classifier-blindness-v1 witness (exit 1)
+Entity artifact evidence: /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId
+FAIL: Error: baseline-ci failed during setup/control (see 013-baseline-ci)
+    at command (file:///private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/tools/verify-entity-registration-artifacts.mjs:318:13)
+    at replay (file:///private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/tools/verify-entity-registration-artifacts.mjs:422:3)
+    at file:///private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate/tools/verify-entity-registration-artifacts.mjs:610:3
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+Evidence: /private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-eelcId
+  · entity-registration-artifacts ERROR — companion proof absent or invalid
+
+──────────────────────────────────────────────────────────────────────────────
+0/2 gates PROVEN able to fail (0 indirectly, via a companion self-test gate). 0 unproven, 0 vacuous, 0 blind, 2 errored.

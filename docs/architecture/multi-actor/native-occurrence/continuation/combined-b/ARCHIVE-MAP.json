@@ -1,0 +1,122 @@
+{
+  "BASELINE.json": {
+    "sha256": "9c0b5866de7f0b96df75dc12dff9ff7610a1ec52bfee8b207201b9a1e0266606",
+    "archive": "BASELINE.json",
+    "archiveSha256": "9c0b5866de7f0b96df75dc12dff9ff7610a1ec52bfee8b207201b9a1e0266606"
+  },
+  "RESULTS.md": {
+    "sha256": "ebdd41923e4693fdeb378314cc915e551a8822b059ebacf1180438cd5ebf1a8c",
+    "archive": "RESULTS.md",
+    "archiveSha256": "ebdd41923e4693fdeb378314cc915e551a8822b059ebacf1180438cd5ebf1a8c"
+  },
+  "SNAPSHOT-B.json": {
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "archive": "SNAPSHOT-B.json.gz",
+    "archiveSha256": "5829b6a62c5719298987d6e103ad247627fbcab9fb4b848bae473df730f00f22"
+  },
+  "run-gate.py": {
+    "sha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archive": "run-gate.py",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  "runs/compound-order/COMMAND.json": {
+    "sha256": "2ea92360ddbc7163637e561b6c60f6b682c82e021080c67ab0e8e80e33c4da03",
+    "archive": "runs/compound-order/COMMAND.json",
+    "archiveSha256": "2ea92360ddbc7163637e561b6c60f6b682c82e021080c67ab0e8e80e33c4da03"
+  },
+  "runs/compound-order/RESULT.json": {
+    "sha256": "90017f1052cd98977d5972a6522d75a7219d979171e41775dc71ca1a06042de8",
+    "archive": "runs/compound-order/RESULT.json",
+    "archiveSha256": "90017f1052cd98977d5972a6522d75a7219d979171e41775dc71ca1a06042de8"
+  },
+  "runs/compound-order/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/compound-order/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/compound-order/SOURCE-BEFORE.json": {
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "archive": "runs/compound-order/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "5829b6a62c5719298987d6e103ad247627fbcab9fb4b848bae473df730f00f22"
+  },
+  "runs/compound-order/first.log": {
+    "sha256": "a556befe0a81b95ee69210d4b31b97bc509fa220fdeaecd6d4c1df5e984a9b6a",
+    "archive": "runs/compound-order/first.log",
+    "archiveSha256": "a556befe0a81b95ee69210d4b31b97bc509fa220fdeaecd6d4c1df5e984a9b6a"
+  },
+  "runs/source-types/COMMAND.json": {
+    "sha256": "5e03246cec773142523b8b5d2c8eb30988d1ca2ee1c28cc8534aa9bd2bf1079b",
+    "archive": "runs/source-types/COMMAND.json",
+    "archiveSha256": "5e03246cec773142523b8b5d2c8eb30988d1ca2ee1c28cc8534aa9bd2bf1079b"
+  },
+  "runs/source-types/RESULT.json": {
+    "sha256": "9438f8aaef0760820b550a1e530c3494dbfdeb94db0882791cbf11cf23b16d89",
+    "archive": "runs/source-types/RESULT.json",
+    "archiveSha256": "9438f8aaef0760820b550a1e530c3494dbfdeb94db0882791cbf11cf23b16d89"
+  },
+  "runs/source-types/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/source-types/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/source-types/SOURCE-BEFORE.json": {
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "archive": "runs/source-types/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "5829b6a62c5719298987d6e103ad247627fbcab9fb4b848bae473df730f00f22"
+  },
+  "runs/source-types/first.log": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archive": "runs/source-types/first.log",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "runs/spec-types/COMMAND.json": {
+    "sha256": "9aa69cd6d00679ca0847d34c15e8b5a5249f9fef8cfd23e434a210cb3045ec0b",
+    "archive": "runs/spec-types/COMMAND.json",
+    "archiveSha256": "9aa69cd6d00679ca0847d34c15e8b5a5249f9fef8cfd23e434a210cb3045ec0b"
+  },
+  "runs/spec-types/RESULT.json": {
+    "sha256": "f88318cfab4183902a155dea747f11d805e880bb46e11745795ee7156dcfc52c",
+    "archive": "runs/spec-types/RESULT.json",
+    "archiveSha256": "f88318cfab4183902a155dea747f11d805e880bb46e11745795ee7156dcfc52c"
+  },
+  "runs/spec-types/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/spec-types/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/spec-types/SOURCE-BEFORE.json": {
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "archive": "runs/spec-types/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "5829b6a62c5719298987d6e103ad247627fbcab9fb4b848bae473df730f00f22"
+  },
+  "runs/spec-types/first.log": {
+    "sha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "archive": "runs/spec-types/first.log",
+    "archiveSha256": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  },
+  "runs/structural-composition/COMMAND.json": {
+    "sha256": "05291a7cfeb3b02222859e27ab4e161e5d66ff6f51c258b8fb57a61ab1e29ff4",
+    "archive": "runs/structural-composition/COMMAND.json",
+    "archiveSha256": "05291a7cfeb3b02222859e27ab4e161e5d66ff6f51c258b8fb57a61ab1e29ff4"
+  },
+  "runs/structural-composition/RESULT.json": {
+    "sha256": "9c956161b88ae36afd3611766185127344d1f336a880388682c369824812d5b0",
+    "archive": "runs/structural-composition/RESULT.json",
+    "archiveSha256": "9c956161b88ae36afd3611766185127344d1f336a880388682c369824812d5b0"
+  },
+  "runs/structural-composition/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/structural-composition/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/structural-composition/SOURCE-BEFORE.json": {
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "archive": "runs/structural-composition/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "5829b6a62c5719298987d6e103ad247627fbcab9fb4b848bae473df730f00f22"
+  },
+  "runs/structural-composition/first.log": {
+    "sha256": "1d6763def22fa90bcb02d31e72c719dfe630d44134293c207e522ac4fc32597c",
+    "archive": "runs/structural-composition/first.log",
+    "archiveSha256": "1d6763def22fa90bcb02d31e72c719dfe630d44134293c207e522ac4fc32597c"
+  }
+}

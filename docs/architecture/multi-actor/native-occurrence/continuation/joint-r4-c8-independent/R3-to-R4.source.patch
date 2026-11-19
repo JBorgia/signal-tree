@@ -1,0 +1,52 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -58,6 +58,7 @@
+ import { defineOwnedOwnerPath } from './internals/owned-mutation';
+ import {
+   defineEntityMembershipSource,
++  holdEntityMembershipDelivery,
+   MEMBERSHIP_CLOSE,
+   MEMBERSHIP_FACTS,
+   MEMBERSHIP_OPEN,
+@@ -1558,6 +1559,7 @@
+     let installed = false;
+     let consumed = false;
+     let completed = false;
++    let releaseMembership: (() => void) | undefined;
+     const observations: Array<() => void> = [];
+     const resultOf = (result: ReturnType<typeof frame.commit>) => ({
+       ...result, valueResults, valueResultsByStep,
+@@ -1578,6 +1580,12 @@
+           () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); installedReadRevision++; installed = true; }
+         );
+         if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
++        // Capture installed facts inside their actual bulk unit. Delivery belongs
++        // to detached completion, so sibling facts precede listener reentry.
++        if (membershipTap) {
++          releaseMembership = holdEntityMembershipDelivery(api);
++          membershipTap(MEMBERSHIP_FACTS, frame.mutations);
++        }
+         return resultOf(result);
+       },
+       complete() {
+@@ -1588,7 +1596,6 @@
+         try {
+           for (const delivery of observations) attempt(delivery);
+           attempt(() => { if (publication.unit) entityPublication.complete(publication.unit.completion); });
+-          attempt(() => { membershipTap?.(MEMBERSHIP_FACTS, frame.mutations); });
+           for (const mutation of frame.mutations) {
+             if (mutation.kind === 'retire-retained-value' && mutation.forgetLifetime) {
+               const subject = mutation.subjectId;
+@@ -1597,7 +1604,11 @@
+           }
+           const removed = [...new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId))];
+           attempt(() => reclaimRetiredSubjectsWithoutOwner(removed));
+-        } finally { observations.length = 0; }
++        } finally {
++          observations.length = 0;
++          attempt(() => releaseMembership?.());
++          releaseMembership = undefined;
++        }
+         if (failed) throw first;
+       },
+     };

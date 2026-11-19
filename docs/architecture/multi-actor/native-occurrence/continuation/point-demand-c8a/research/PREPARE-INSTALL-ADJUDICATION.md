@@ -1,0 +1,23 @@
+# Private prepareInstall injection: gate disposition
+
+The new monkeypatch reentry red is a research-only unsupported adversary for this bounded optimization, not a required production correctness gate. Preserve its original assertion, original failing runs, and raw outcome; do not delete, xfail, or reinterpret it as passing. The full experimental suite remains 73 pass/1 fail. This classification does not relax supported reentry contracts or grant performance acceptance.
+
+## Source basis
+
+`physical/entity-ordinary-topology.ts:42–78` prepares an interval, compares private ordinary/physical placement records, collects updates and returns an installation closure. It invokes no user interceptor, recipient, adapter, selector or observer. `prepareInterval` at 79–111 copies private placement records. The callable `stage.base` is not an application callback: its production provenance is `EntityOrdinaryTopology.preparePlacement` (private divergent-map lookup, otherwise physical.base), then `StructuralStore.preparePlacement:95–101` (private placementForSubject lookup). `EntityPlacementStage.read:28` reads its private patch or that base. Keys are string/number and placement records are kernel-produced; this method does not inspect row payload getters. The class is not exported by the public index or adapter barrel.
+
+The test at `point-result-demand.spec.ts:11–15` replaces the prototype method, calls the original preparation, then performs a nested update before returning the old plan. That mutation interval does not exist in the unpatched method. It artificially introduces a callback before the subsequent publication preparation captures its source revision. On a bare tree the optional physical clock does not supply a stale-source check there. Both baseline and successor therefore install outer7 over injected99; the preserved diagnostic says entered:true, error:null, value:7, sameHandle:true. This explains the experiment without blessing such an outcome at a real callback seam.
+
+The actual recipient callback boundary is later: `entity-signal.ts:2407–2479` prepares ordinary facts, invokes publication preparation, then installs. `internals/entity-publication.ts:227–239` captures source revision before recipient preparation and refuses a nested source change. The unchanged test at spec:20–24 exercises that boundary without replacing topology implementation: exact source-change error, nested99 survives, then normal11 succeeds.
+
+The option1 runtime.patch only omits unconsumed result indexes for the point consumer and preserves ordinary preparation/install. It does not introduce callbacks into the previously callback-free interval or change this stale-write behavior. Being private alone would not excuse a real defect; the decisive facts are actual callback provenance, unsupported prototype replacement, and unchanged baseline/successor behavior.
+
+## Observed verification and clean selection
+
+Read Main's supported-controls COMMAND.json, RESULT.json, first.log and SOURCE-AFTER.json. Nx reported 8 passed, 3 filtered/skipped across 11 tests, exit0, source unchanged. The pattern selects point adoption, rich inverse, actual recipient preparation, counter calibration and populated allocation controls. It excludes both monkeypatch modes and the raw outcome diagnostic. Relevant Main files match the frozen author files byte-for-byte; PREPARE-INSTALL-ADJUDICATION-IDENTITY.json records hashes. No new tests were run for this source adjudication.
+
+That named supported selection is legitimate bounded regression evidence, provided its exclusions remain explicit and nobody labels the full research file green. Keep the original monkeypatch throw control as useful optional fault-injection evidence (it passed baseline/successor), even though Main's pattern excludes it. Preserve the reentry assertion as an unsupported-seam research probe rather than requiring runtime defensive changes solely to satisfy it. No assertion edit or xfail is needed to run an explicit supported selection.
+
+Reopen this disposition if an unmodified supported route supplies a user callback in this exact pre-publication interval, if the optimization adds such a callback, or if an actual recipient/interceptor/native preparation reentry loses the nested write. Those would be production counterexamples. No such route was demonstrated here. This review is not a general proof of all point-write reentry behavior.
+
+The original allocation gate remains 14,400 against <2,000 and red. This test-scope adjudication neither changes that ceiling nor grants composition, integration, release, CPU or heap acceptance. Prior first failures and frozen runtime/specs remain untouched; only this additive review and identity receipt were written.

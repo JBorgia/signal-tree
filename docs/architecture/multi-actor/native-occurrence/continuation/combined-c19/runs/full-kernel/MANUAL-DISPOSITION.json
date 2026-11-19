@@ -1,0 +1,16 @@
+{
+  "status": "interrupted-incomplete",
+  "exit": 130,
+  "reason": "Synchronous first130k membership-observed setAll/replace/clear case exceeded its60second timeout; no test completion or aggregate totals claimed",
+  "lastProgress": {
+    "kind": "case-start",
+    "at": "2026-11-02T19:33:28.837Z",
+    "file": "/private/tmp/st-native-combined-c19/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "name": "entity batches larger than the argument limit > setAll, replace and clear with membership observed"
+  },
+  "recordedAt": "2026-11-02T19:39:09.872386+00:00",
+  "allManifestEntriesUnchanged": true,
+  "entries": 3065,
+  "sample": "../../large-batch-worker.sample.txt",
+  "sampleLimit": "Native sampled stacks show ArrayFilter, not a JavaScript callsite or causal CPU percentage. Sampling denied in sandbox then permitted for this exact worker."
+}

@@ -1,0 +1,126 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts
+
+(node:11637) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:11691) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-admission-successor/candidate/packages/kernel
+
+(node:11720) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-admission-handoff.spec.ts (4 tests | 3 failed) 60ms
+   × native handoff equal preserves q destination until its actual rejection 44ms
+   × native handoff inverse preserves q destination until its actual rejection 4ms
+   × native handoff netzero preserves q destination until its actual rejection 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-admission-handoff.spec.ts > native handoff equal preserves q destination until its actual rejection
+AssertionError: expected [ { owner: 1, id: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "dependents": Set {},
++     "id": 1,
++     "outcome": "rolled-back",
++     "owner": 1,
++   },
++ ]
+
+ ❯ src/lib/native-admission-handoff.spec.ts:19:102
+     17|   else {r=tree.transact(()=>{rows.updateOne('a',{x:11});if(mode==='net…
+     18|   await flush();expect(row.x()).toBe(7);expect(life.nativeProof(req())…
+     19|   q.rollback();await flush();expect(row.x()).toBe(0);expect(life.nativ…
+       |                                                                                                      ^
+     20|  }finally{c.dispose();tree.destroy();}
+     21| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/native-admission-handoff.spec.ts > native handoff inverse preserves q destination until its actual rejection
+AssertionError: expected [ { owner: 2, id: 2, …(2) } ] to deeply equal [ { owner: 2, id: 1, …(2) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "dependents": Set {},
+-     "id": 1,
+-     "outcome": "pending",
++     "id": 2,
++     "outcome": "rolled-back",
+      "owner": 2,
+    },
+  ]
+
+ ❯ src/lib/native-admission-handoff.spec.ts:18:85
+     16|   if(mode==='equal')c.declare({kind:'independent'},()=>rows.updateOne(…
+     17|   else {r=tree.transact(()=>{rows.updateOne('a',{x:11});if(mode==='net…
+     18|   await flush();expect(row.x()).toBe(7);expect(life.nativeProof(req())…
+       |                                                                                     ^
+     19|   q.rollback();await flush();expect(row.x()).toBe(0);expect(life.nativ…
+     20|  }finally{c.dispose();tree.destroy();}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/native-admission-handoff.spec.ts > native handoff netzero preserves q destination until its actual rejection
+AssertionError: expected [ { owner: 3, id: 1, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "dependents": Set {},
++     "id": 1,
++     "outcome": "rolled-back",
++     "owner": 3,
++   },
++ ]
+
+ ❯ src/lib/native-admission-handoff.spec.ts:19:102
+     17|   else {r=tree.transact(()=>{rows.updateOne('a',{x:11});if(mode==='net…
+     18|   await flush();expect(row.x()).toBe(7);expect(life.nativeProof(req())…
+     19|   q.rollback();await flush();expect(row.x()).toBe(0);expect(life.nativ…
+       |                                                                                                      ^
+     20|  }finally{c.dispose();tree.destroy();}
+     21| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  13:53:46
+   Duration  1.63s (transform 880ms, setup 0ms, import 1.06s, tests 60ms, environment 382ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-admission-handoff.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

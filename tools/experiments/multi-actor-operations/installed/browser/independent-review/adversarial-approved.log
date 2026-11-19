@@ -1,0 +1,66 @@
+Evidence directory: /Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/adversarial-pg4vXs
+{
+  "work": "/Users/jonathanborgia/code/signaltree/tools/experiments/multi-actor-operations/installed/browser/independent-review/adversarial-pg4vXs",
+  "results": [
+    {
+      "name": "lost rejection acknowledgment retries to definitive failure without a commit",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same-turn double apply sends one command",
+      "outcome": "FAIL",
+      "error": "Error: expect(locator).toHaveText(expected) failed\n\nLocator:  getByTestId('phase')\nExpected: \"succeeded\"\nReceived: \"reviewed\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for getByTestId('phase')\n    2 × locator resolved to <strong data-testid=\"phase\">draft</strong>\n      - unexpected value \"draft\"\n    7 × locator resolved to <strong data-testid=\"phase\">reviewed</strong>\n      - unexpected value \"reviewed\"\n",
+      "errors": [],
+      "snapshot": {
+        "phase": "reviewed",
+        "destroyed": 0,
+        "pending": "1",
+        "busy": false,
+        "message": "Review captured; backend will revalidate declared versions"
+      }
+    },
+    {
+      "name": "overlapping capacity service and apply preserve definitive rejection",
+      "outcome": "FAIL",
+      "error": "Error: expect(locator).toHaveText(expected) failed\n\nLocator:  getByTestId('phase')\nExpected: \"failed\"\nReceived: \"reviewed\"\nTimeout:  5000ms\n\nCall log:\n  - Expect \"to.have.text\" with timeout 5000ms\n  - waiting for getByTestId('phase')\n    9 × locator resolved to <strong data-testid=\"phase\">reviewed</strong>\n      - unexpected value \"reviewed\"\n",
+      "errors": [],
+      "snapshot": {
+        "phase": "reviewed",
+        "destroyed": 0,
+        "pending": "1",
+        "busy": false,
+        "message": "Capacity returned to 10; authoritative revision advanced twice"
+      }
+    },
+    {
+      "name": "Angular destruction of draft cleans owned tree",
+      "outcome": "PASS"
+    },
+    {
+      "name": "Angular destruction after lost acknowledgment must not orphan owned tree",
+      "outcome": "FAIL",
+      "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: 1\nReceived: 0",
+      "errors": [],
+      "snapshot": {
+        "phase": "uncertain",
+        "destroyed": 0,
+        "pending": "1",
+        "busy": false,
+        "message": "Resolve in-flight or uncertain work before disposal"
+      }
+    },
+    {
+      "name": "Angular destruction during delivery must not leave live tree after completion",
+      "outcome": "FAIL",
+      "error": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: \"succeeded\"\nReceived: \"disposed\"\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+      "errors": [],
+      "snapshot": {
+        "phase": "disposed",
+        "destroyed": 1,
+        "pending": "",
+        "busy": false,
+        "message": "Session disposed; no pending native authority"
+      }
+    }
+  ]
+}

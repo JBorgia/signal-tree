@@ -1,0 +1,37 @@
+# Combined SDK/native full-run logical regression census
+
+Read-only disposition, not a new execution or acceptance gate. **50 exact failed identities remain after separating 32 diagnostic-environment failures and two specialized-GC failures.** Of those 50, four have reviewed oracle corrections, seven have later combined unchanged-test passing evidence, two have separate-source structural repair evidence, and **37 remain open or require narrower contract adjudication**. These are evidence categories, not subtraction from a newly run green suite.
+
+No runtime, fixture, oracle, budget or source edits. This task read sources/logs, verified hashes and generated this census only. Main owns implementation/qualification. Exact case identities, source SHA256, assertion/log lines, obligations and proposed per-case Nx argv are in [CENSUS-50.json](CENSUS-50.json); [REPLAY-COMMANDS.txt](REPLAY-COMMANDS.txt) is a nonexecuted replay queue. The chart below includes every identity exactly once.
+
+## Source and generating command
+
+Original source: `/private/tmp/st-current-read-integration/candidate`. Manifest SHA256 `f3bb2ef22fce1d0890cd791e599ac9284288f58e28c6406167547a870c9f0e79`; independently rehashed all 2,955 manifest files here, zero mismatches (`IDENTITY.json`). This source does not include later structural admission, key, collection representation or retirement successors. Do not attribute later passes retroactively to it.
+
+Original generating command, from `runs/combined-full/COMMAND.json`:
+
+```sh
+# cwd /private/tmp/st-current-read-integration/candidate
+# Node24.15.0 PATH, NX_DAEMON=false NX_ISOLATE_PLUGINS=false NX_TUI=false
+# ST_PREPARED_REVIEW_OUTPUT=/private/tmp/st-current-read-integration/runs/combined-full/observations
+corepack pnpm nx run-many -t test --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache -- --maxWorkers=2
+```
+
+Exit1. `first.log:2220–2224`: kernel32 failed files/516 passed/549 total; 84 failed assertions, 6,439 passed, five expected failures, twelve skipped, 6,550 total. The arithmetic leaves ten unaccounted/unexecuted assertions and one noncompleted file. Framework reported passes: Angular259 (+3 skips), React88, Vue194, Solid119. This is a source-based suite, not installed package qualification; facade passes do not discharge failed shared-kernel obligations.
+
+`runs/diagnostic-harness-correction/RESULT.json` exit0 and the separate JSON/log record establish unchanged32 pass with required output environment. Those diagnostic cases sometimes record observations rather than assert full semantic correctness. The two GC failures occur at `typeof global.gc` expectations (`first.log:1624–1654`); use their specialized runner, not a skip or a presumed lifetime pass.
+
+## Reviewed work ledger and limits
+
+- **Seven later combined passes:** key case14; collection cases18–22; ordinary-retirement case17. Main's `st-native-combined-successor/runs/key-and-sdk` reports66 pass; `collection-combined`63 pass; `retirement-and-collection`158 pass. Commands/exits/log hashes are captured in `LATER-RECORDED-RUNS.json`. These overlapping run totals are not additive. Key patch `f1c1d7f26d8a8a255daa1f810a3303876596f088a0e5017b7409b72fc6192f76`; collection patch `8bfcadde9d93a4e10f41ebeb2c725dc7c1f0f8a5851904d8445b45a9b7e0efd9`; retirement runtime patch `97a4362ccc2dd08fdb6501eeb48838284fe9506a53ed81c8b74e4406dfb31c11`. This census reads those executions; it does not rerun them or claim the mutable combined directory is frozen at every historical run.
+- **Two structural refusal repairs on separate source:** cases26/47. Reviewed admission manifest `c5bc23c33106f0ba39223c9ac27665732dad087bf65f1342159c9c5093b77221`, then completeness `14be1df54242880b5a10aa8b0822da6fa999d4586ac51047eee1c1dcac2cefe2`; original67-test files pass there. `/private/tmp/st-structural-admission-independent/REVIEW.md` accepts the bounded semantic-before-lowering mechanism but exposes context-free ordinary-remove incompleteness. Later completeness uses authorized atomic refusal for incomplete recipes and separate complete-context positives. Its retained historical private sequence reds are not permission to waive public refusals or claim all structural order/callback behavior fixed. None of the three combined commands above includes these two original spec files.
+- **Exactly four superseded old oracles:** cases9/10/23/24. `/private/tmp/st-oracle-alignment/oracle-only.patch` SHA256 `6eb43bc480c57ebce0932997c84f8e40e9f2e66d64b629953635892adace1472`. Reviewed decisions: supplied branch leaf adoption; explicit row replacement adoption separate from identity-updater no-op; two foreign-owner immediate-send expectations replaced by fixed-window hold and fresh terminal wake. Tests must retain confirm/reject, remaining-owner, later-owner exclusion, useful publication, genuine no-op and rollback controls. Corrected oracle runs are not runtime repairs. Adjacent age42 remains unchanged. New rejected branch adoption leak is outside the original50 and remains a separate genuine obligation from `/private/tmp/st-branch-egress-trace/REPORT.md`.
+- **Retirement does not resolve cases15/16.** Their pending suppression, useful terminal surviving publication and unrelated later owner checks all pass before failure at negativePresence=0. Narrow retirement deliberately keeps unknown/possible/actual-role evidence and has no owner-settlement subscription. These are stronger draining expectations, not evidence of pending publication leakage and not silently superseded. The bounded review does not authorize deleting their unknown source exclusion to make the count zero.
+- **Enrollment is not framework setup or anchor identity.** Cases1–4/35–40 show the undeclared second recipient sends while the declared recipient correctly progresses. Case5 is wider ancestor-input provenance; case6 throws contradiction rather than returning the fixture's conservative receipt. Preserve these distinctions; no inference that the SDK current-read capability caused them or that a throw proves a leak.
+- **Authentic atomic rich callback remains open (50).** Actual subscribed committed-entity capture sees restored left plus stale right50/60, not right11/12, before it writes777. The assertion at line39 fails; later preservation of777 was not established. Retirement's all-completions-attempted behavior is not an entire mixed-inverse installation guarantee. Structural refusal and public selected-callback passes do not replace this exact callback boundary.
+- **Cost and timeouts remain evidence, not waivers.** Cases7/11/28–34 have explicit counters. 3N versus2N is still linear; equal work at2k/20k with excessive constant visits does not establish an O(N) point-update slope; zero slot reads versus expected one is not itself a performance regression. Cases12/42/43 time out, without an exact failing phase. Keep semantic/cost assertions and investigate; no machine-load excuse, increased limit, or generic asymptotic claim.
+
+## Fifty-case source chart
+
+All source links below target the unchanged original combined candidate. Log links target the failed broad run. “Command N” is the exact proposed file/name-filtered command in REPLAY-COMMANDS.txt and CENSUS-50.json; **not executed here**. Full original identity is retained, including suite and enhancer variants. “Repair” means recorded passing evidence on the specifically named later source, not this broad run.
+

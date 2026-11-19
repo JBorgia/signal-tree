@@ -1,0 +1,15 @@
+check-spec-types: 3 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/aggregate-installed-publication.spec.ts: 1 error(s), baseline allows 0
+  packages/kernel/src/lib/link-declaration-public.spec.ts: 1 error(s), baseline allows 0
+  packages/kernel/src/lib/link-declaration.typing.spec.ts: 2 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/aggregate-installed-publication.spec.ts(132,26): error TS2339: Property 'basis' does not exist on type 'PublicationState'.
+packages/kernel/src/lib/link-declaration-public.spec.ts(10,2): error TS4104: The type 'readonly ["collection" | "entity field" | "direct row", () => { destroy: () => void; connect: (set: (v: unknown) => void) => Link; write: () => void; expected: number | { id: string; n: number; } | { id: string; n: number; }[]; }]' is 'readonly' and cannot be assigned to the mutable type '[string, () => Case]'.
+packages/kernel/src/lib/link-declaration.typing.spec.ts(5,39): error TS2307: Cannot find module '@signal-tree/vue' or its corresponding type declarations.
+packages/kernel/src/lib/link-declaration.typing.spec.ts(6,41): error TS2307: Cannot find module '@signal-tree/solid' or its corresponding type declarations.

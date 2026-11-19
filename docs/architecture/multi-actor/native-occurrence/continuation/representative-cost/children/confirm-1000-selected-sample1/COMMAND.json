@@ -1,0 +1,18 @@
+{
+  "ordinal": 41,
+  "id": "confirm-1000-selected-sample1",
+  "profile": "confirm",
+  "size": 1000,
+  "arm": "selected",
+  "label": "sample1",
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "--expose-gc",
+    "/private/tmp/st-v16-representative-cost/harness/child.mjs",
+    "/private/tmp/st-v16-integration-candidate/dist/packages/kernel/dist",
+    "confirm",
+    "1000"
+  ],
+  "cwd": "/private/tmp/st-v16-representative-cost/harness",
+  "childTimeoutSeconds": 180
+}

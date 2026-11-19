@@ -1,0 +1,112 @@
+
+> nx run kernel:test branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts publication-enrollment-invariance.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts publication-enrollment-invariance.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+(node:28956) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28963) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:28970) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28974) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-enrollment-invariance.spec.ts (16 tests | 6 failed) 33ms
+   × enrollment invariance branch: before-pending 4ms
+   × enrollment invariance branch: during-pending 2ms
+   × enrollment invariance branch: enroll-in-updater 1ms
+   × enrollment invariance root: before-pending 1ms
+   × enrollment invariance root: during-pending 1ms
+   × enrollment invariance root: enroll-in-updater 1ms
+(node:28975) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28976) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: before-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance branch: enroll-in-updater
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: before-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: during-pending
+ FAIL  src/lib/publication-enrollment-invariance.spec.ts > enrollment invariance root: enroll-in-updater
+AssertionError: expected [ { pair: { x: +0, y: +0 }, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "pair": {
++       "x": 0,
++       "y": 0,
++     },
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/publication-enrollment-invariance.spec.ts:35:21
+     33|   expect(sent).toHaveLength(1);expect(sent[0]).toMatchObject({x:1,y:0}…
+     34|   expect(receipt.read()).toMatchObject({state:'started',basis:'declare…
+     35|   expect(otherSent).toEqual([]);expect(p.inspect()).toEqual(before);ex…
+       |                     ^
+     36|  }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.…
+     37| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  6 failed | 74 passed (80)
+   Start at  17:14:44
+   Duration  1.73s (transform 447ms, setup 0ms, import 720ms, tests 170ms, environment 562ms)
+
+Warning: command "node tools/run-core-vitest.mjs branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts publication-enrollment-invariance.spec.ts a1-installed-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.1s

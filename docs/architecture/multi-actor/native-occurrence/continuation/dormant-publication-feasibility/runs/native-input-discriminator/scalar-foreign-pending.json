@@ -1,0 +1,17 @@
+{
+  "kind": "scalar",
+  "history": "foreign-pending",
+  "calls": 1,
+  "before": {
+    "state": "conservative",
+    "reason": "unknown"
+  },
+  "beforeSettlement": [],
+  "after": {
+    "state": "started",
+    "basis": "surviving"
+  },
+  "sent": [
+    7
+  ]
+}

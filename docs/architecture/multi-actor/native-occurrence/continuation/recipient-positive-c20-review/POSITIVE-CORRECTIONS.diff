@@ -1,0 +1,86 @@
+--- /private/tmp/st-c19-recipient-positive-counterparts/candidate/packages/kernel/src/lib/recipient-positive-counterparts.spec.ts	2026-11-02 12:44:43
++++ /private/tmp/st-native-combined-c20/candidate/packages/kernel/src/lib/recipient-positive-counterparts.spec.ts	2026-11-02 12:57:10
+@@ -18,7 +18,12 @@
+   if (kind !== 'empty') tree.$.branch.rows.addOne({id: 'a', x: 0});
+   await flush();
+   const registrations = vi.spyOn(life, 'registerConnection');
+-  const starts = vi.spyOn(life, 'started');
++  const originalStarted = life.started;
++  const admissions: Array<{ channel: object; revision: object; declared: boolean }> = [];
++  const starts = vi.spyOn(life, 'started').mockImplementation((...args) => {
++    admissions.push({channel: args[0], revision: args[1], declared: life.hasDeclaration(args[0], args[1])});
++    return originalStarted(...args);
++  });
+   const sent: unknown[] = [], nestedSent: unknown[] = [];
+   const c = asLink(tree.$, sent);
+   const child = asLink(kind === 'scalar' ? tree.$.branch.x : kind === 'mixed' ? tree.$.branch : tree.$.branch.rows, nestedSent);
+@@ -42,10 +47,13 @@
+     expect(nestedSent).toEqual(expected);
+     expect(childStarts()).toHaveLength(1);
+     expect(childStarts()[0][2]).toBe('surviving');
+-    expect(life.hasDeclaration(childChannel, childStarts()[0][1])).toBe(false);
++    expect(admissions.find(entry => entry.channel === childChannel && entry.revision === childStarts()[0][1])?.declared).toBe(false);
+     expect(q.inspect()).toEqual(inspection);
+     expect(foreign.$.z()).toBe(7);
+     await child.settled();
++    expect(nestedSent).toEqual(expected); expect(sent).toEqual([{other: 1}]);
++    expect(childStarts()).toHaveLength(1); expect(q.inspect()).toEqual(inspection);
++    expect(tree.$()).toEqual({other: 1}); expect(foreign.$.z()).toBe(7);
+     q[outcome]();
+     await flush();
+     expect(tree.$()).toEqual({other: 1});
+@@ -54,6 +62,9 @@
+     expect(childStarts()).toHaveLength(1);
+     expect(foreign.$.z()).toBe(outcome === 'confirm' ? 7 : 0);
+     await child.settled();
++    expect(nestedSent).toEqual(expected); expect(sent).toEqual([{other: 1}]);
++    expect(childStarts()).toHaveLength(1); expect(tree.$()).toEqual({other: 1});
++    expect(foreign.$.z()).toBe(outcome === 'confirm' ? 7 : 0);
+   } finally {
+     c.dispose(); child.dispose(); tree.destroy(); foreign.destroy();
+     starts.mockRestore(); registrations.mockRestore();
+@@ -67,7 +78,12 @@
+   const tree = signalTree<{pair: {x: number; y?: number}}>({pair: {x: 0, y: 0}});
+   const left: unknown[] = [], right: unknown[] = [];
+   const registrations = vi.spyOn(life, 'registerConnection');
+-  const starts = vi.spyOn(life, 'started');
++  const originalStarted = life.started;
++  const admissions: Array<{ channel: object; revision: object; declared: boolean }> = [];
++  const starts = vi.spyOn(life, 'started').mockImplementation((...args) => {
++    admissions.push({channel: args[0], revision: args[1], declared: life.hasDeclaration(args[0], args[1])});
++    return originalStarted(...args);
++  });
+   const a = asLink(tree.$.pair, left), b = asLink(tree.$.pair, right);
+   const bChannel = registrations.mock.calls.at(-1)![0];
+   const p = foreign.transact(() => foreign.$.z(7));
+@@ -82,7 +98,7 @@
+     expect(left).toEqual([expected]); expect(right).toEqual([expected]);
+     expect(bStarts()).toHaveLength(1);
+     expect(bStarts()[0][2]).toBe('surviving');
+-    expect(life.hasDeclaration(bChannel, bStarts()[0][1])).toBe(false);
++    expect(admissions.find(entry => entry.channel === bChannel && entry.revision === bStarts()[0][1])?.declared).toBe(false);
+     let second: Receipt | undefined;
+     if (operation === 'equal-repeat') {
+       second = a.declare({kind: 'independent'}, () => tree.$.pair({x: 1, y: 0}));
+@@ -95,6 +111,10 @@
+     expect(p.inspect()).toEqual(inspection);
+     expect(foreign.$.z()).toBe(7);
+     await b.settled();
++    expect(left).toEqual([expected]); expect(right).toEqual([expected]);
++    expect(bStarts()).toHaveLength(1); expect(p.inspect()).toEqual(inspection);
++    expect(tree.$.pair()).toEqual(expected); expect(foreign.$.z()).toBe(7);
++    if (second) expect(second.read()).toMatchObject({state: 'no-write'});
+     p[outcome]();
+     await flush();
+     expect(tree.$.pair()).toEqual(expected);
+@@ -103,6 +123,10 @@
+     expect(foreign.$.z()).toBe(outcome === 'confirm' ? 7 : 0);
+     if (second) expect(second.read()).toMatchObject({state: 'no-write'});
+     await b.settled();
++    expect(left).toEqual([expected]); expect(right).toEqual([expected]);
++    expect(bStarts()).toHaveLength(1); expect(tree.$.pair()).toEqual(expected);
++    expect(foreign.$.z()).toBe(outcome === 'confirm' ? 7 : 0);
++    if (second) expect(second.read()).toMatchObject({state: 'no-write'});
+   } finally {
+     a.dispose(); b.dispose(); tree.destroy(); foreign.destroy();
+     starts.mockRestore(); registrations.mockRestore();

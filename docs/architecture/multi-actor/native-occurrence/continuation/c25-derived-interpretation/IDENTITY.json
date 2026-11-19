@@ -1,0 +1,82 @@
+{
+  "files": {
+    "C25-EXPECTATIONS.md": {
+      "origin": "/private/tmp/st-c25-equal-owner/EXPECTATIONS.md",
+      "sha256": "d164232edc696dd3eb2e36ccb8539e563c8c19ca9d299693d93d6b980094c550"
+    },
+    "ROOTS-DERIVED.jsonl": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/ROOTS-DERIVED.jsonl",
+      "sha256": "88a396b8fabb73b3dab3451079f3604438b2746888d4df1487f989510ada35c4"
+    },
+    "derived-fixture.ts": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/equal-owner-derived-roots.spec.ts",
+      "sha256": "f37542afc66d0ef3092b947e3132f8d9996673f90b9e79e9b159540f4469a7e9"
+    },
+    "instrumentation-final.patch": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/instrumentation-final.patch",
+      "sha256": "bf8f6361083e88203dc8729e73af020575ac50562e7e510abb450c8c958491b1"
+    },
+    "instrument-roots.py": {
+      "origin": "/private/tmp/st-c25-equal-owner/instrument-roots.py",
+      "sha256": "699194e280dcd0af6609e2ea556eb37f66248ae91ceddd054cc201268ac06928"
+    },
+    "derived-first.log": {
+      "origin": "/private/tmp/st-c25-equal-owner/runs/roots-derived/first.log",
+      "sha256": "2152717282bea2b735b64c713191b4c778ce15db2c1c4e804e9f4eecc7fd76e3"
+    },
+    "derived-COMMAND.json": {
+      "origin": "/private/tmp/st-c25-equal-owner/runs/roots-derived/COMMAND.json",
+      "sha256": "c9a5b2e59ccd477e38beeac9cf5487668d64cd472eb858f8b0852ec821bdf3f8"
+    },
+    "derived-RESULT.json": {
+      "origin": "/private/tmp/st-c25-equal-owner/runs/roots-derived/RESULT.json",
+      "sha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+    },
+    "derived-SOURCE.json": {
+      "origin": "/private/tmp/st-c25-equal-owner/runs/roots-derived/SOURCE.json",
+      "sha256": "5528578d343934c63631e548322ccc5c8b8761f0b058fd0c29de83ee040b88d3"
+    },
+    "C24-RETENTION-OBSERVATIONS.jsonl": {
+      "origin": "/private/tmp/st-c24-equal-owner/RETENTION-OBSERVATIONS.jsonl",
+      "sha256": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d"
+    },
+    "C24-fixture.ts": {
+      "origin": "/private/tmp/st-c24-equal-owner/research/equal-owner-retention-diagnostic.spec.ts",
+      "sha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f"
+    },
+    "literal-ROOTS-LARGE.jsonl": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/ROOTS-LARGE.jsonl",
+      "sha256": "9b8a1bcf8542bc08061359bd7c4773ac996880affa4967d6068cfdded39fc4f4"
+    },
+    "literal-fixture.ts": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/equal-owner-all-roots-final.spec.ts",
+      "sha256": "31520de0dbdd368c721c25a5fda71fe79e773ad436889516d9ae40a7da43a436"
+    },
+    "instrumented/lib/experimental-publication/private.ts": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/instrumented-final/lib/experimental-publication/private.ts",
+      "sha256": "7447a9cc5fae7989427183265611da7885cba2fb66023b934d2102b1480ded47"
+    },
+    "instrumented/lib/experimental-publication/lifecycle.ts": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/instrumented-final/lib/experimental-publication/lifecycle.ts",
+      "sha256": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23"
+    },
+    "instrumented/lib/internals/native-scalar-selection.ts": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/instrumented-final/lib/internals/native-scalar-selection.ts",
+      "sha256": "5fc14ca9ff02b7f433d62fa4372384c708022289369e0371852b571e76ae50ab"
+    },
+    "instrumented/enhancers/transactions/transactions.ts": {
+      "origin": "/private/tmp/st-c25-equal-owner/research/instrumented-final/enhancers/transactions/transactions.ts",
+      "sha256": "79e41d25b785b98daae85c58ef2f398cd0b7835230648b41fd2c9b7bf18cb32a"
+    }
+  },
+  "runSourceHashChecks": {
+    "lib/experimental-publication/private.ts": true,
+    "lib/experimental-publication/lifecycle.ts": true,
+    "lib/internals/native-scalar-selection.ts": true,
+    "enhancers/transactions/transactions.ts": true,
+    "derived-fixture.ts": true
+  },
+  "reviewerRanTests": false,
+  "authorFinalReportRead": false,
+  "otherReviewVerdictsRead": false
+}

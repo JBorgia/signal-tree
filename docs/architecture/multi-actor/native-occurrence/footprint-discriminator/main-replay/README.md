@@ -1,0 +1,1 @@
+Main replay ran the unchanged Nx fixture: 12 passed. The fixture appends to its fixed evidence path; this replay appended twelve byte-identical records to the frozen twelve. Combined output is preserved here; the original observations file was restored byte-for-byte after validating its recorded SHA-256. This is evidence-file hygiene, not a changed runtime result or assertion.

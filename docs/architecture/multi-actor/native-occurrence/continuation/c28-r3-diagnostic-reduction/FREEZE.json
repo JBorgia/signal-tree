@@ -1,0 +1,8 @@
+{
+  "sourceManifestSha256": "b4d66da31a7927e0d255add68c424b50a99b8ece3a21a594f6ef2ecb57c982e6",
+  "files": 3121,
+  "review": "/private/tmp/st-c28-r3-diagnostic-reduction-premise/FINAL.md",
+  "reviewSha256": "02bf5592eda2851a80665a2b01bfc56097a6da9ef69b55650986be5337e50778",
+  "reportSha256": "903e2ac94bdcf26c5900183ef235350ae51a2c4d2485a2ef7524b881755da516",
+  "disposition": "bounded diagnostic reduction accepted; release budgets failed; no activation"
+}

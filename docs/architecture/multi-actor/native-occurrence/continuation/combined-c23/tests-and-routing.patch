@@ -1,0 +1,662 @@
+--- a/packages/kernel/vitest.config.ts
++++ b/packages/kernel/vitest.config.ts
+@@ -65,6 +65,8 @@
+       '**/link-lifetime.spec.ts',
+       '**/location-runtime-retention.spec.ts',
+       '**/forwarding-retention-probe.spec.ts',
++      // All three unchanged arms are required by forwarding-retention-gc.
++      '**/held-continuation-probe.spec.ts',
+     ],
+     coverage: {
+       provider: 'v8',
+--- a/packages/kernel/vitest.retention.config.ts
++++ b/packages/kernel/vitest.retention.config.ts
+@@ -18,6 +18,7 @@
+       'src/lib/link-lifetime.spec.ts',
+       'src/lib/internals/location-runtime-retention.spec.ts',
+       'src/lib/forwarding-retention-probe.spec.ts',
++      'src/lib/held-continuation-probe.spec.ts',
+     ],
+   },
+   define: { __DEV__: true },
+--- a/tools/check-forwarding-retention.mjs
++++ b/tools/check-forwarding-retention.mjs
+@@ -4,9 +4,10 @@
+ import { join, relative } from 'node:path';
+ import { fileURLToPath } from 'node:url';
+ import { spawnSync } from 'node:child_process';
++import { retentionModes, validateRetentionSample, validateRetentionMatrix } from './lib/forwarding-retention-matrix.mjs';
+ 
+ const ROOT = fileURLToPath(new URL('../', import.meta.url));
+-if (process.argv.length !== 2) throw new Error('The forwarding retention gate requires all nine modes; no filters are accepted.');
++if (process.argv.length !== 2) throw new Error('The forwarding retention gate requires all twelve modes; no filters are accepted.');
+ const base = join(ROOT, 'artifacts/forwarding-retention');
+ mkdirSync(base, { recursive: true });
+ const output = mkdtempSync(join(base, 'run-'));
+@@ -23,35 +24,33 @@
+   }
+ }
+ hashRuntime(join(ROOT, 'packages/kernel/src'));
+-for (const name of ['tools/check-forwarding-retention.mjs', 'tools/lib/heap-quiescence.mjs', 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts', 'packages/kernel/vitest.retention.config.ts', '.nvmrc', 'package.json', 'pnpm-lock.yaml']) hashFile(join(ROOT, name));
++for (const name of ['tools/check-forwarding-retention.mjs', 'tools/lib/heap-quiescence.mjs', 'tools/lib/forwarding-retention-matrix.mjs', 'packages/kernel/src/lib/held-continuation-probe.spec.ts', 'packages/kernel/src/lib/forwarding-retention-probe.spec.ts', 'packages/kernel/vitest.retention.config.ts', '.nvmrc', 'package.json', 'pnpm-lock.yaml']) hashFile(join(ROOT, name));
+ save('SOURCE.json', sourceHashes);
+ console.log(`Forwarding retention artifacts: ${output}`);
+ const results = [];
+-for (const arm of ['hold-proceed', 'drop-proceed', 'hold-value']) {
+-  for (const scenario of ['success', 'skip', 'caught']) {
+-    const name = `${arm}-${scenario}`;
+-    const artifact = join(output, `${name}.json`);
+-    const env = { NODE_OPTIONS: '--expose-gc', ST_GC_ARM: arm, ST_GC_SCENARIO: scenario, ST_GC_OUTPUT: artifact };
+-    const argv = [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', '--root', 'packages/kernel', '--config', 'vitest.retention.config.ts', 'src/lib/forwarding-retention-probe.spec.ts', '--maxWorkers=1'];
+-    save(`${name}-COMMAND.json`, { executable: process.execPath, argv, cwd: ROOT, node: process.version, env });
+-    const run = spawnSync(process.execPath, argv, { cwd: ROOT, env: { ...process.env, ...env }, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+-    const raw = `${run.stdout ?? ''}${run.stderr ?? ''}`;
+-    writeFileSync(join(output, `${name}.log`), raw);
+-    const errors = [];
+-    if (run.error || run.signal || run.status !== 0) errors.push(run.error?.message ?? `child exit=${run.status} signal=${run.signal}`);
+-    try {
+-      const sample = JSON.parse(readFileSync(artifact, 'utf8'));
+-      if (sample.arm !== arm || sample.scenario !== scenario || sample.node !== process.version ||
+-          !Array.isArray(sample.held) || sample.held.length !== 12 ||
+-          !Array.isArray(sample.released) || sample.released.length !== 12)
+-        errors.push('Missing, mismatched or incomplete original sampling artifact');
+-    } catch (error) { errors.push(`Sampling output: ${error.message}`); }
+-    results.push({ arm, scenario, exit: errors.length ? 1 : 0, errors, artifact, log: join(output, `${name}.log`) });
+-    console.log(`${name}: ${errors.length ? 'FAIL' : 'PASS'}`);
+-    if (errors.length) process.stdout.write(raw);
+-  }
++for (const mode of retentionModes) {
++  const { name, kind, arm, scenario, file } = mode;
++  const artifact = join(output, `${name}.json`);
++  const env = { NODE_OPTIONS: '--expose-gc', ST_GC_ARM: arm, ST_GC_OUTPUT: artifact };
++  if (scenario !== undefined) env.ST_GC_SCENARIO = scenario;
++  const childEnv = { ...process.env, ...env };
++  if (scenario === undefined) delete childEnv.ST_GC_SCENARIO;
++  const argv = [join(ROOT, 'node_modules/vitest/vitest.mjs'), 'run', '--root', 'packages/kernel', '--config', 'vitest.retention.config.ts', file, '--maxWorkers=1'];
++  save(`${name}-COMMAND.json`, { executable: process.execPath, argv, cwd: ROOT, node: process.version, env });
++  const run = spawnSync(process.execPath, argv, { cwd: ROOT, env: childEnv, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
++  const raw = `${run.stdout ?? ''}${run.stderr ?? ''}`;
++  writeFileSync(join(output, `${name}.log`), raw);
++  const errors = [];
++  if (run.error || run.signal || run.status !== 0) errors.push(run.error?.message ?? `child exit=${run.status} signal=${run.signal}`);
++  try { validateRetentionSample(mode, JSON.parse(readFileSync(artifact, 'utf8')), process.version); }
++  catch (error) { errors.push(`Sampling output: ${error.message}`); }
++  results.push({ name, kind, arm, scenario, processExit: run.status, signal: run.signal, exit: errors.length ? 1 : 0, errors, artifact, log: join(output, `${name}.log`) });
++  console.log(`${name}: ${errors.length ? 'FAIL' : 'PASS'}`);
++  if (errors.length) process.stdout.write(raw);
+ }
+-const failed = results.length !== 9 || results.some(result => result.exit !== 0);
+-save('RESULT.json', { exit: failed ? 1 : 0, requiredModes: 9, executedModes: results.length, results, scope: 'Original nine-mode forwarding collectibility fixtures, not universal reclamation or heap cost.' });
+-console.log(`Forwarding retention: ${results.filter(result => !result.exit).length}/9 passed`);
++const matrixErrors = validateRetentionMatrix(results, result => JSON.parse(readFileSync(result.artifact, 'utf8')), process.version);
++const failed = matrixErrors.length !== 0;
++save('RESULT.json', { exit: failed ? 1 : 0, requiredModes: retentionModes.length, executedModes: results.length, matrixErrors, results, scope: 'Original nine forwarding and three held-continuation GC fixtures, not universal reclamation or heap cost.' });
++console.log(`Forwarding retention: ${results.filter(result => !result.exit).length}/${retentionModes.length} passed`);
++for (const error of matrixErrors) console.error(error);
+ process.exitCode = failed ? 1 : 0;
+--- /dev/null
++++ b/tools/lib/forwarding-retention-matrix.mjs
+@@ -0,0 +1,53 @@
++/** Exact required execution matrix; no filters or recording-only success. */
++export const retentionModes = Object.freeze([
++  ...['hold-proceed', 'drop-proceed', 'hold-value'].flatMap(arm =>
++    ['success', 'skip', 'caught'].map(scenario => Object.freeze({
++      name: `${arm}-${scenario}`, kind: 'forwarding', arm, scenario,
++      file: 'src/lib/forwarding-retention-probe.spec.ts',
++    }))),
++  ...['hold-proceed', 'drop-proceed', 'hold-row'].map(arm => Object.freeze({
++    name: `held-${arm}`, kind: 'held', arm,
++    file: 'src/lib/held-continuation-probe.spec.ts',
++  })),
++]);
++
++export function validateRetentionSample(mode, sample, node) {
++  if (!sample || sample.node !== node ||
++      (mode.kind === 'forwarding'
++        ? sample.arm !== mode.arm || sample.scenario !== mode.scenario
++        : sample.mode !== mode.arm) ||
++      !Array.isArray(sample.held) || sample.held.length !== 12 ||
++      !Array.isArray(sample.released) || sample.released.length !== 12)
++    throw new Error(`Missing, mismatched or incomplete sampling artifact: ${mode.name}`);
++  // The unchanged fixtures enforce behavior. This rejects malformed recording
++  // artifacts independently of process status; neither can replace the other.
++  for (const round of [...sample.held, ...sample.released]) {
++    if (!round || typeof round !== 'object' ||
++        !Object.hasOwn(round, 'positive') || !Object.hasOwn(round, 'negative') ||
++        !Object.values(round).every(value => typeof value === 'boolean'))
++      throw new Error(`Malformed sampling round: ${mode.name}`);
++  }
++}
++
++export function validateRetentionMatrix(results, readSample, node) {
++  const errors = [];
++  if (!Array.isArray(results)) return ['Missing execution matrix'];
++  if (results.length !== retentionModes.length) errors.push('Incomplete execution matrix');
++  const seen = new Set();
++  for (const result of results) {
++    const mode = retentionModes.find(item => item.name === result?.name);
++    if (!mode || seen.has(result.name)) {
++      errors.push(`Unexpected or duplicate mode: ${result?.name}`);
++      continue;
++    }
++    seen.add(result.name);
++    if (result.kind !== mode.kind || result.arm !== mode.arm || result.scenario !== mode.scenario ||
++        result.exit !== 0 || result.processExit !== 0 || result.signal != null ||
++        !Array.isArray(result.errors) || result.errors.length)
++      errors.push(`Failed or mismatched execution: ${mode.name}`);
++    try { validateRetentionSample(mode, readSample(result), node); }
++    catch (error) { errors.push(`${mode.name}: ${error.message}`); }
++  }
++  for (const mode of retentionModes) if (!seen.has(mode.name)) errors.push(`Missing mode: ${mode.name}`);
++  return errors;
++}
+--- a/tools/verify-gates.mjs
++++ b/tools/verify-gates.mjs
+@@ -1205,7 +1205,7 @@
+   {
+     name: 'forwarding-retention-gc',
+     covers:
+-      'nine forwarding GC fixtures: closed callbacks release sampled receivers/errors, explicit held values survive until release, with positive/negative controls',
++      'nine forwarding plus three held-continuation GC fixtures: closed callbacks refuse replay, sampled receivers/errors release, explicit held values/rows survive, with positive/negative controls',
+     cmd: ['node', 'tools/check-forwarding-retention.mjs'],
+     env: { NODE_OPTIONS: '--expose-gc' },
+     // Deliberately retain the destroyed receiver in the fixture, not runtime.
+--- a/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts
+@@ -1,3 +1,19 @@
++import type { EntityRealizationEdit, EntityValueTransition } from '../entity-value-transition';
++import type { PublicationPreparation } from '../publication-preparation';
++import type { SelectedInstallation, SelectedRowEdit } from '../selected-write-operation';
++type PointPort = {
++  __preparePointValues(
++    values: readonly {
++      subjectId: number;
++      key: string | number;
++      value: unknown;
++      edits: readonly EntityRealizationEdit[];
++      transition?: EntityValueTransition<{ id: string; n: number }>;
++    }[],
++    selectedSteps?: readonly SelectedRowEdit[],
++    publicationPhase?: PublicationPreparation
++  ): SelectedInstallation;
++};
+ import { expect, it, vi } from 'vitest';
+ import { entityMap, restoration, signalTree, undoable } from '../../../index';
+ it('attempts later live lifetime invalidation after first installed row invalidation fails', async () => {
+@@ -7,11 +23,11 @@
+   for(let i=0;i<32;i++)await Promise.resolve();
+   undoable(()=>{t.$.left.removeOne('a');t.$.right.byIdOrFail('a').n(50);t.$.right.byIdOrFail('b').n(60);});
+   for(let i=0;i<32;i++)await Promise.resolve();
+-  type Plan={install():void;invalidate():void;publish():void};
+-  const port=t.$.right as unknown as {__preparePointValues(values:readonly {subjectId:number}[]):Plan};
++  const port=t.$.right as unknown as PointPort;
+   const original=port.__preparePointValues;const attempts:number[]=[];const sentinel=new Error('controlled installed lifetime invalidation');
+-  const spy=vi.spyOn(port,'__preparePointValues').mockImplementation(function(values){
+-   const plan=original.call(port,values);
++  const spy=vi.spyOn(port,'__preparePointValues').mockImplementation(function(this: PointPort, ...args: Parameters<PointPort['__preparePointValues']>){
++   const [values] = args;
++   const plan=original.apply(this,args);
+    return {...plan,invalidate(){attempts.push(values[0]!.subjectId);plan.invalidate();if(attempts.length===1)throw sentinel;}};
+   });
+   try {expect(()=>t.undo()).toThrow(sentinel);}finally{spy.mockRestore();}
+--- a/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts
+@@ -1,3 +1,19 @@
++import type { EntityRealizationEdit, EntityValueTransition } from '../entity-value-transition';
++import type { PublicationPreparation } from '../publication-preparation';
++import type { SelectedInstallation, SelectedRowEdit } from '../selected-write-operation';
++type PointPort = {
++  __preparePointValues(
++    values: readonly {
++      subjectId: number;
++      key: string | number;
++      value: unknown;
++      edits: readonly EntityRealizationEdit[];
++      transition?: EntityValueTransition<{ id: string; n: number }>;
++    }[],
++    selectedSteps?: readonly SelectedRowEdit[],
++    publicationPhase?: PublicationPreparation
++  ): SelectedInstallation;
++};
+ import { expect, it, vi } from 'vitest';
+ import { entityMap, restoration, signalTree, undoable } from '../../../index';
+ import { getTreeScalarSlotRuntime } from '../tree-scalar-slot-port';
+@@ -28,16 +44,14 @@
+     const runtime = getTreeScalarSlotRuntime(tree.$)!;
+     expect(runtime).toBeDefined();
+     const scalar = vi.spyOn(runtime, 'publishPrepared');
+-    type Plan = { install(): void; invalidate(): void; publish(): void };
+-    const port = tree.$.right as unknown as {
+-      __preparePointValues(values: readonly { subjectId: number }[]): Plan;
+-    };
++    const port = tree.$.right as unknown as PointPort;
+     const original = port.__preparePointValues;
+     const attempts: number[] = [];
+     const first = new Error('first installed invalidation');
+     const second = new Error('second installed invalidation');
+-    const spy = vi.spyOn(port, '__preparePointValues').mockImplementation(function(values) {
+-      const plan = original.call(port, values);
++    const spy = vi.spyOn(port, '__preparePointValues').mockImplementation(function(this: PointPort, ...args: Parameters<PointPort['__preparePointValues']>) {
++      const [values] = args;
++      const plan = original.apply(this, args);
+       return { ...plan, invalidate() {
+         attempts.push(values[0]!.subjectId);
+         plan.invalidate();
+--- a/packages/kernel/src/lib/aggregate-independent-input.spec.ts
++++ /dev/null
+@@ -1,36 +0,0 @@
+-import { expect, it } from 'vitest';
+-import { link, signalTree, transactions } from '../index';
+-import { getPathNotifier } from './path-notifier';
+-type Receipt={read():Readonly<{state:string;reason?:string;basis?:string}>};
+-type Experimental=ReturnType<typeof link>&{declare(input:{kind:'independent'},work:()=>unknown):Receipt};
+-const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<48;i++)await Promise.resolve();};
+-for(const mode of ['branch','root'] as const)for(const enrollment of ['before-pending','during-pending'] as const)
+-it(`connection-local ${mode} updater retains useful progress with second enrollment ${enrollment}`,async()=>{
+- const owner=signalTree({z:0},{enhancers:[transactions()]});
+- const t=signalTree({pair:{x:0,y:0},x:0,y:0},{enhancers:[transactions()]});
+- const sent:unknown[]=[], otherSent:unknown[]=[];
+- const c=link(mode==='branch'?t.$.pair:t.$,{set:value=>{sent.push(value);}}) as Experimental;
+- let other:ReturnType<typeof link>|undefined;
+- const enroll=()=>link(mode==='branch'?t.$.pair:t.$,{set:value=>{otherSent.push(value);}});
+- if(enrollment==='before-pending')other=enroll();
+- const p=owner.transact(()=>owner.$.z(7));
+- if(enrollment==='during-pending')other=enroll();
+- try{
+-  await flush();
+-  const before=p.inspect();
+-  let receipt:Receipt|undefined,error:unknown;
+-  try{receipt=c.declare({kind:'independent'},()=>{
+-   if(mode==='branch')t.$.pair(input=>({x:input.x+1,y:input.y}));
+-   else t.$(input=>({...input,x:input.x+1}));
+-  });}catch(e){error=e;}
+-  await flush();
+-  console.info('INPUT-ENROLLMENT',JSON.stringify({mode,enrollment,error:error?{name:(error as Error).name,message:(error as Error).message,code:Reflect.get(error as object,'code'),reason:Reflect.get(error as object,'reason')}:undefined,receipt:receipt?.read(),sent,otherSent,physical:mode==='branch'?t.$.pair():t.$(),pendingOwner:owner.$.z()}));
+-  expect(error).toBeUndefined();
+-  expect(sent).toHaveLength(1);
+-  expect(sent[0]).toMatchObject({x:1,y:0});
+-  expect(receipt?.read()).toMatchObject({state:'started'});
+-  expect(otherSent).toEqual([]);
+-  expect(p.inspect()).toEqual(before);
+-  expect(owner.$.z()).toBe(7);
+- }finally{c.dispose();other?.dispose();p.rollback();t.destroy();owner.destroy();}
+-});
+--- a/packages/kernel/src/lib/recipient-cause-classification.spec.ts
++++ b/packages/kernel/src/lib/recipient-cause-classification.spec.ts
+@@ -6,7 +6,8 @@
+ type Receipt={read():Readonly<{state:string;basis?:string;reason?:string}>};
+ type Declared=ReturnType<typeof link>&{declare(input:{kind:'independent'|'unknown'},work:()=>unknown):Receipt};
+ const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<80;i++)await Promise.resolve();};
+-for(const cause of ['domain-only','external-origin','unknown-declaration'] as const)for(const terminal of ['confirm','rollback'] as const)it(`${cause}: distinct fixed-window treatment and useful ${terminal}`,async()=>{
++// Domain-only progress/terminal counterparts live in recipient-progress-positive-counterparts.spec.ts.
++for(const cause of ['external-origin','unknown-declaration'] as const)for(const terminal of ['confirm','rollback'] as const)it(`${cause}: distinct fixed-window treatment and useful ${terminal}`,async()=>{
+  const owner=signalTree({z:0},{enhancers:[transactions()]});const t=signalTree({x:0,pair:{x:0,y:0}});const sent:unknown[]=[],secondary:unknown[]=[];
+  const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as Declared;const other=link(t.$.pair,{set:v=>{secondary.push(v);}});const p=owner.transact(()=>owner.$.z(7));
+  const evidence:life.RecipientUncertainty[]=[];const proofs:life.Proof[]=[];const prepare=life.prepareRevision;const project=life.projectRevision;
+@@ -18,8 +19,7 @@
+  await flush();expect(t.$.pair()).toEqual({x:1,y:0});expect(p.inspect()).toEqual(ownership);expect(secondary).toEqual([]);
+  expect(evidence.some(e=>e.recipientDomain)).toBe(true);expect(evidence.some(e=>e.unobservedOrigin)).toBe(cause==='external-origin');expect(evidence.every(e=>!e.invalidAttribution&&!e.uncapturedUpdaterInput)).toBe(true);
+  expect(proofs.some(proof=>proof.unknown)).toBe(true);
+- if(cause==='domain-only'){expect(sent).toEqual([{x:1,y:0}]);expect(receipt.read()).toMatchObject({state:'started',basis:'surviving'});await c.settled();}
+- else{expect(sent).toEqual([]);expect(receipt.read()).toMatchObject({state:'conservative',reason:'unknown'});}
++ expect(sent).toEqual([]);expect(receipt.read()).toMatchObject({state:'conservative',reason:'unknown'});
+  later=owner.transact(()=>owner.$.z(8));later.confirm();later=undefined;
+  // A distinct pending owner authored later cannot extend either recipient window.
+  const lateOwner=signalTree({z:0},{enhancers:[transactions()]});const late=lateOwner.transact(()=>lateOwner.$.z(9));
+--- /dev/null
++++ b/packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts
+@@ -0,0 +1,297 @@
++import { expect, it, vi } from 'vitest';
++import { link, signalTree, transactions } from '../index';
++import * as lifecycle from './experimental-publication/lifecycle';
++import { getPathNotifier } from './path-notifier';
++
++type Receipt = {
++  read(): Readonly<{ state: string; basis?: string; reason?: string }>;
++};
++type Declared = ReturnType<typeof link> & {
++  declare(input: { kind: 'independent' }, work: () => unknown): Receipt;
++};
++const flush = async () => {
++  getPathNotifier().flushSync();
++  for (let i = 0; i < 100; i++) await Promise.resolve();
++};
++function admissionWitness() {
++  const registrations = vi.spyOn(lifecycle, 'registerConnection');
++  const original = lifecycle.started;
++  const admissions: Array<{
++    channel: object;
++    declared: boolean;
++    basis: string | undefined;
++  }> = [];
++  const starts = vi
++    .spyOn(lifecycle, 'started')
++    .mockImplementation((...args) => {
++      // Sample permission before started can retire the operation; preserve the real call.
++      admissions.push({
++        channel: args[0],
++        declared: lifecycle.hasDeclaration(args[0], args[1]),
++        basis: args[2],
++      });
++      return original(...args);
++    });
++  return {
++    channel: () => registrations.mock.calls.at(-1)![0],
++    forChannel: (channel: object) =>
++      admissions.filter((entry) => entry.channel === channel),
++    dispose: () => {
++      starts.mockRestore();
++      registrations.mockRestore();
++    },
++  };
++}
++
++// Separate counterparts: the original six first-failure bodies remain untouched.
++for (const mode of ['branch', 'root'] as const)
++  for (const enrollment of ['before-pending', 'during-pending'] as const)
++    for (const terminal of ['confirm', 'rollback'] as const)
++      it(`aggregate exact progress ${mode}/${enrollment}/${terminal}`, async () => {
++        const witness = admissionWitness();
++        const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++        const tree = signalTree(
++          { pair: { x: 0, y: 0 }, x: 0, y: 0 },
++          { enhancers: [transactions()] }
++        );
++        const sent: unknown[] = [],
++          secondary: unknown[] = [];
++        const source = mode === 'branch' ? tree.$.pair : tree.$;
++        const primary = link(source, {
++          set: (value) => {
++            sent.push(value);
++          },
++        }) as Declared;
++        const primaryChannel = witness.channel();
++        let other: ReturnType<typeof link> | undefined;
++        let secondaryChannel!: object;
++        const enroll = () => {
++          other = link(source, {
++            set: (value) => {
++              secondary.push(value);
++            },
++          });
++          secondaryChannel = witness.channel();
++        };
++        if (enrollment === 'before-pending') enroll();
++        const p = owner.transact(() => owner.$.z(7));
++        if (enrollment === 'during-pending') enroll();
++        try {
++          await flush();
++          expect(sent).toEqual([]);
++          expect(secondary).toEqual([]);
++          const before = p.inspect();
++          let calls = 0;
++          const receipt = primary.declare({ kind: 'independent' }, () => {
++            if (mode === 'branch')
++              tree.$.pair((input) => {
++                calls++;
++                return { x: input.x + 1, y: input.y };
++              });
++            else
++              tree.$((input) => {
++                calls++;
++                return { ...input, x: input.x + 1 };
++              });
++          });
++          const expected =
++            mode === 'branch'
++              ? { x: 1, y: 0 }
++              : { pair: { x: 0, y: 0 }, x: 1, y: 0 };
++          await flush();
++          expect(calls).toBe(1);
++          expect(source()).toEqual(expected);
++          expect(sent).toEqual([expected]);
++          expect(secondary).toEqual([expected]);
++          expect(receipt.read()).toEqual({
++            state: 'started',
++            basis: 'declared',
++          });
++          expect(witness.forChannel(primaryChannel)).toEqual([
++            { channel: primaryChannel, declared: true, basis: 'declared' },
++          ]);
++          expect(witness.forChannel(secondaryChannel)).toEqual([
++            { channel: secondaryChannel, declared: false, basis: 'surviving' },
++          ]);
++          expect(p.inspect()).toEqual(before);
++          expect(owner.$.z()).toBe(7);
++          await primary.settled();
++          await other!.settled();
++          p[terminal]();
++          await flush();
++          expect(owner.$.z()).toBe(terminal === 'confirm' ? 7 : 0);
++          expect(source()).toEqual(expected);
++          expect(sent).toEqual([expected]);
++          expect(secondary).toEqual([expected]);
++          expect(witness.forChannel(primaryChannel)).toHaveLength(1);
++          expect(witness.forChannel(secondaryChannel)).toHaveLength(1);
++          expect(receipt.read()).toEqual({
++            state: 'started',
++            basis: 'declared',
++          });
++          await primary.settled();
++          await other!.settled();
++        } finally {
++          primary.dispose();
++          other?.dispose();
++          tree.destroy();
++          owner.destroy();
++          witness.dispose();
++        }
++      });
++
++for (const nativeWindow of [false, true])
++  for (const terminal of ['confirm', 'rollback'] as const)
++    it(`${
++      nativeWindow ? 'actual native window' : 'domain-only'
++    } root input / branch output ${terminal}`, async () => {
++      const witness = admissionWitness();
++      const owner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++      const lateOwner = signalTree({ z: 0 }, { enhancers: [transactions()] });
++      const tree = signalTree({ x: 0, pair: { x: 0, y: 0 } });
++      const sent: unknown[] = [],
++        secondary: unknown[] = [];
++      const primary = link(tree.$.pair, {
++        set: (value) => {
++          sent.push(value);
++        },
++      }) as Declared;
++      const primaryChannel = witness.channel();
++      const other = link(tree.$.pair, {
++        set: (value) => {
++          secondary.push(value);
++        },
++      });
++      const secondaryChannel = witness.channel();
++      const p = owner.transact(() => owner.$.z(7));
++      const evidence: lifecycle.RecipientUncertainty[] = [],
++        proofs: lifecycle.Proof[] = [];
++      const prepare = lifecycle.prepareRevision,
++        project = lifecycle.projectRevision;
++      const preparation = vi
++        .spyOn(lifecycle, 'prepareRevision')
++        .mockImplementation((...args) => {
++          if (args[3]) evidence.push(args[3]);
++          return prepare(...args);
++        });
++      const projection = vi
++        .spyOn(lifecycle, 'projectRevision')
++        .mockImplementation((...args) => {
++          const proof = project(...args);
++          proofs.push(proof);
++          return proof;
++        });
++      let late: ReturnType<typeof lateOwner.transact> | undefined;
++      try {
++        if (nativeWindow) tree.$.x(7); // Capture genuine possible support in the root input, outside either recipient.
++        await flush();
++        expect(sent).toEqual([]);
++        expect(secondary).toEqual([]);
++        const ownership = p.inspect();
++        let calls = 0;
++        const receipt = primary.declare({ kind: 'independent' }, () =>
++          tree.$((input) => {
++            calls++;
++            return { ...input, pair: { x: input.x + 1, y: input.pair.y } };
++          })
++        );
++        const expected = { x: nativeWindow ? 8 : 1, y: 0 };
++        await flush();
++        expect(calls).toBe(1);
++        expect(tree.$.pair()).toEqual(expected);
++        expect(tree.$.x()).toBe(nativeWindow ? 7 : 0);
++        expect(p.inspect()).toEqual(ownership);
++        expect(owner.$.z()).toBe(7);
++        expect(evidence.some((entry) => entry.recipientDomain)).toBe(true);
++        expect(
++          evidence.every(
++            (entry) =>
++              !entry.unobservedOrigin &&
++              !entry.invalidAttribution &&
++              !entry.uncapturedUpdaterInput
++          )
++        ).toBe(true);
++        expect(proofs.some((proof) => proof.unknown)).toBe(true);
++        if (nativeWindow) {
++          expect(sent).toEqual([]);
++          expect(secondary).toEqual([]);
++          expect(witness.forChannel(primaryChannel)).toEqual([]);
++          expect(witness.forChannel(secondaryChannel)).toEqual([]);
++          expect(receipt.read()).toMatchObject({
++            state: 'conservative',
++            reason: 'unknown',
++          });
++          expect(
++            proofs.some((proof) =>
++              proof.possible?.some((cell) => cell.outcome === 'pending')
++            )
++          ).toBe(true);
++        } else {
++          expect(sent).toEqual([expected]);
++          expect(secondary).toEqual([expected]);
++          expect(receipt.read()).toEqual({
++            state: 'started',
++            basis: 'surviving',
++          });
++          expect(witness.forChannel(primaryChannel)).toEqual([
++            { channel: primaryChannel, declared: true, basis: 'surviving' },
++          ]);
++          expect(witness.forChannel(secondaryChannel)).toEqual([
++            { channel: secondaryChannel, declared: false, basis: 'surviving' },
++          ]);
++          await primary.settled();
++          await other.settled();
++        }
++        // Preserve the classifier's unrelated later operation and later pending-owner isolation.
++        const transient = owner.transact(() => owner.$.z(8));
++        transient.confirm();
++        late = lateOwner.transact(() => lateOwner.$.z(9));
++        const lateInspection = late.inspect();
++        let settled = false;
++        const wait = other.settled().then(() => {
++          settled = true;
++        });
++        await flush();
++        expect(settled).toBe(!nativeWindow);
++        expect(sent).toEqual(nativeWindow ? [] : [expected]);
++        expect(secondary).toEqual(nativeWindow ? [] : [expected]);
++        p[terminal]();
++        await flush();
++        expect(sent).toEqual([expected]);
++        expect(secondary).toEqual([expected]);
++        expect(tree.$.pair()).toEqual(expected);
++        expect(tree.$.x()).toBe(nativeWindow ? 7 : 0);
++        expect(receipt.read()).toEqual({
++          state: 'started',
++          basis: 'surviving',
++        });
++        expect(witness.forChannel(primaryChannel)).toEqual([
++          { channel: primaryChannel, declared: true, basis: 'surviving' },
++        ]);
++        expect(witness.forChannel(secondaryChannel)).toEqual([
++          { channel: secondaryChannel, declared: false, basis: 'surviving' },
++        ]);
++        expect(settled).toBe(true);
++        await wait;
++        await primary.settled();
++        expect(late.inspect()).toEqual(lateInspection);
++        expect(lateOwner.$.z()).toBe(9);
++        late.confirm();
++        late = undefined;
++        await flush();
++        expect(sent).toEqual([expected]);
++        expect(secondary).toEqual([expected]);
++        expect(witness.forChannel(primaryChannel)).toHaveLength(1);
++        expect(witness.forChannel(secondaryChannel)).toHaveLength(1);
++      } finally {
++        preparation.mockRestore();
++        projection.mockRestore();
++        primary.dispose();
++        other.dispose();
++        late?.confirm();
++        tree.destroy();
++        owner.destroy();
++        lateOwner.destroy();
++        witness.dispose();
++      }
++    });
+--- a/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
+@@ -24,6 +24,11 @@
+   for (let i = 0; i < 12; i++) await Promise.resolve();
+ };
+ const LARGE = 130_000;
++// The acquired restoration reader checks tree.destroyed once per operation,
++// even without subscribers. Redo also leaves the temporal view and reads
++// RestorationManager.currentIndex once. These constants are separate from row work.
++const READER_LIFECYCLE_READS = 1;
++const TEMPORAL_MANAGER_READS = 1;
+ 
+ describe('v16 restoration of turns larger than the argument limit', () => {
+   // The two restoration cases below use one large clear() turn rather than a
+@@ -60,7 +65,9 @@
+       try {
+         tree.jumpTo(0);
+         expect(stats.valueStoreWrites).toBe(LARGE);
+-        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(3 * LARGE);
++        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
++          3 * LARGE + READER_LIFECYCLE_READS
++        );
+         const ids = tree.$.rows.ids();
+         expect(ids.length).toBe(LARGE);
+         expect(ids[0]).toBe(0);
+@@ -70,7 +77,7 @@
+         tree.jumpTo(1);
+         expect(stats.structuralSubjectTombstones).toBe(LARGE);
+         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
+-          12 * LARGE
++          12 * LARGE + TEMPORAL_MANAGER_READS + READER_LIFECYCLE_READS
+         );
+         expect(tree.$.rows.count()).toBe(0);
+       } finally {
+--- a/packages/kernel/src/lib/restoration-paired-work.spec.ts
++++ b/packages/kernel/src/lib/restoration-paired-work.spec.ts
+@@ -9,6 +9,9 @@
+ const drain = async () => {
+   for (let i = 0; i < 12; i++) await Promise.resolve();
+ };
++// Leaving the temporal view reads RestorationManager.currentIndex once.
++// This fixture acquires no restoration reader, so it has no reader lifecycle read.
++const TEMPORAL_MANAGER_READS = 1;
+ for (const count of [3, 32, 256]) {
+   it(`paired restoration installs ${count} physical rows once`, async () => {
+     const tree = signalTree(
+@@ -33,7 +36,9 @@
+         resetProductionSubstrateStatsForTesting(stats);
+         tree.jumpTo(1);
+         expect(stats.structuralSubjectTombstones).toBe(count);
+-        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(12 * count);
++        expect(stats.publicationDependencyReads).toBeLessThanOrEqual(
++          12 * count + TEMPORAL_MANAGER_READS
++        );
+         expect(tree.$.rows.all()).toEqual([]);
+       } finally {
+         clearProductionSubstrateStatsForTesting();

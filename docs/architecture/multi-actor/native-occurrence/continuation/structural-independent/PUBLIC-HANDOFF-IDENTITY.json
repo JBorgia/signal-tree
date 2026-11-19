@@ -1,0 +1,9 @@
+{
+  "checked": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/structural-admission-sequence.spec.ts",
+    "packages/kernel/src/lib/structural-admission-controls.spec.ts"
+  ],
+  "mismatches": []
+}

@@ -1,0 +1,18 @@
+{
+  "entered": true,
+  "after": {
+    "x": 7,
+    "y": 11,
+    "z": 42
+  },
+  "sameX": true,
+  "sameY": true,
+  "sameZ": true,
+  "error": "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Stale scalar preparation [effect-validation-failed]",
+  "retryError": "undefined",
+  "final": {
+    "x": 0,
+    "y": 0,
+    "z": 42
+  }
+}

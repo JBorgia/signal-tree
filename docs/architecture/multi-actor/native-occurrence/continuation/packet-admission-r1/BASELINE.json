@@ -1,0 +1,14 @@
+{
+  "source": "/private/tmp/st-packet-index-successor/candidate",
+  "manifestSHA256": "5688501724309578e31b18cad1e67d37d775e3f679611ef631339ac88e5354e0",
+  "files": 2968,
+  "excludedDirectories": [
+    ".git",
+    ".nx",
+    "coverage",
+    "dist",
+    "node_modules"
+  ],
+  "fileSymlinks": {},
+  "git": "snapshot has no .git; no HEAD/branch available"
+}

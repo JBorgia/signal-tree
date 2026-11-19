@@ -1,0 +1,164 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -593,3 +593,7 @@
+  return selectedReceipt(channel);
+ }
+ 
++
++// C25 research-only structural roots; removed before runtime freeze.
++export function __c25SourceRoots(node:object,snapshots:readonly object[]){return {endpoint:nativeValues.get(node),view:nativeViews.get(node),snapshots:snapshots.map(value=>snapshotViews.get(value)),bindings:[...bindings.values()]};}
++export function __c25FactRoot(value:object){return factRequirements.get(value as Fact);}
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -491,3 +491,9 @@
+  refresh(op);return selected;
+ }
+ 
++
++// C25 research-only structural roots; removed before runtime freeze.
++export function __c25LifecycleRoots(){return {sources,pending,connections,stack,installedLast,unknownFrames,invalidFrames,queuedConnections};}
++export function __c25LifecycleWeakRoots(value:object){return [requirementListeners.get(value as NativeRequirement),ownerTransitionObservers.get(value as OwnerCell),finalizedRetirements.get(value as NativeRequirement)];}
++
++export function __c26NormalizationState(r:NativeRequirement){return {enrolled:normalizingScalars.has(r),listeners:requirementListeners.get(r)?.size??0};}
+--- a/packages/kernel/src/lib/internals/native-scalar-selection.ts
++++ b/packages/kernel/src/lib/internals/native-scalar-selection.ts
+@@ -10,3 +10,7 @@
+ export function withScalarSelections<T>(selections:ReadonlyMap<object,NativeFieldEndpoint>,work:()=>T):T{const previous=restored;restored=selections;try{return work();}finally{restored=previous;}}
+ export function restoredScalarSelection(node:object):NativeFieldEndpoint|undefined{return restored?.get(node);}
+ 
++
++const __c25RegistryRoots=new WeakMap<object,()=>object>();
++export function __c25RegisterRoots(registry:object,roots:()=>object):void{__c25RegistryRoots.set(registry,roots);}
++export function __c25ReadRoots(registry:object):object|undefined{return __c25RegistryRoots.get(registry)?.();}
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,4 +1,4 @@
+-import {registerScalarSelection} from '../../lib/internals/native-scalar-selection';
++import {registerScalarSelection,__c25RegisterRoots} from '../../lib/internals/native-scalar-selection';
+ import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+ import {
+@@ -2894,6 +2894,8 @@
+     bindFieldEndpoints(admission.operationEffect,{before,after});
+     return {endpoint};
+   }):undefined;
++
++  if(lifecycleRegistry)__c25RegisterRoots(lifecycleRegistry,()=>({installedOperations,pendingTransactions,expectedDispositions}));
+ 
+   const recordConfirmedBucket = (
+     bucket: CaptureBucket
+--- /dev/null
++++ b/packages/kernel/src/lib/scalar-finalized-derived-roots.spec.ts
+@@ -0,0 +1,57 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++import {__c25SourceRoots,__c25FactRoot,diagnostics} from './experimental-publication/private';
++import {__c25LifecycleRoots,__c25LifecycleWeakRoots,nativeProof,type NativeRequirement} from './experimental-publication/lifecycle';
++import {__c25ReadRoots} from './internals/native-scalar-selection';
++import {getPositionRegistry} from './internals/position-registry';
++type C=ReturnType<typeof link>&{declare(input:unknown,work:()=>unknown):unknown};
++const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++function graph(roots:unknown[]){
++ const seen=new Set<object>(),requirements=new Set<object>();let edges=0,roleEdges=0,frames=0,inputs=0,components=0;
++ const visit=(v:unknown)=>{if(!v||typeof v!=='object'&&typeof v!=='function'||seen.has(v))return;seen.add(v);
++  if(v instanceof Map){for(const [k,x]of v){edges+=2;visit(k);visit(x);}return;}if(v instanceof Set){for(const x of v){edges++;visit(x);}return;}
++  if(Object.hasOwn(v,'known')&&Object.hasOwn(v,'frames')&&Object.hasOwn(v,'inputs')){requirements.add(v);const req=v as NativeRequirement;frames+=req.frames.length;inputs+=req.inputs.length;components+=req.components?.length??0;roleEdges+=Object.values(nativeProof(req)).reduce<number>((n,x)=>n+(Array.isArray(x)?x.length:0),0);}
++  for(const key of Reflect.ownKeys(v)){if(typeof v==='function'&&['caller','callee','arguments','prototype','length','name'].includes(String(key)))continue;const d=Object.getOwnPropertyDescriptor(v,key);if(d&&'value'in d){edges++;visit(d.value);}}
++  visit(__c25FactRoot(v));for(const x of __c25LifecycleWeakRoots(v))visit(x);
++ };
++ roots.forEach(visit);return {objects:seen.size,edges,requirements:requirements.size,roleEdges,frames,inputs,components};
++}
++it('fixed p+q derived closed invocations: bounded diagnostic 1/2/4 only',async()=>{
++ const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});const sent:unknown[]=[];
++ const c=link(t.$.pair,{set:v=>{sent.push(v);}}) as C;let off=()=>{};
++ try{
++  const q=other.transact(()=>other.$.q(1));let p!:ReturnType<typeof t.transact>;
++  c.declare({kind:'dependent',owners:[q]},()=>{p=t.transact(()=>t.$.pair.x(7));});await drain();
++  const source=t.$.pair.x,snapshots=[t.$.pair()];let calls=0,notices=0;off=source.subscribe(()=>notices++);
++  const selected=__c25SourceRoots(source,snapshots).endpoint!;
++  const componentGraph=(root:NativeRequirement)=>{const seen=new Set<NativeRequirement>();let depth=0,visits=0;const visit=(v:NativeRequirement,d:number)=>{visits++;seen.add(v);depth=Math.max(depth,d);for(const child of v.components??[])visit(child,d+1);};visit(root,0);return {nodes:seen.size,depth,visits};};
++  const sample=(n:number)=>{const roots=__c25SourceRoots(source,snapshots),endpoint=roots.endpoint!;const requirement=endpoint.requirement as NativeRequirement;
++   const output=process.env['ST_ROOT_OUTPUT'];if(!output)throw Error('Research output required');
++   appendFileSync(output,JSON.stringify({n,endpointSame: endpoint===selected,requirementSame:endpoint.requirement===selected.requirement,source:componentGraph(requirement),allRoots:graph([roots,__c25LifecycleRoots(),__c25ReadRoots(getPositionRegistry(source)!)]),owners:new Set(nativeProof(requirement).owners).size,...diagnostics()})+'\n');
++   expect(new Set(nativeProof(requirement).owners).size).toBe(2);expect(requirement.components).toBeUndefined();expect(Object.getOwnPropertyDescriptor(requirement,'proof')?.get).toBeUndefined();};
++  sample(0);let completed=0;
++  for(const n of [1,2,4]){for(;completed<n;completed++){c.declare({kind:'dependent',owners:[p,q]},()=>t.$.pair(current=>{calls++;return {...current};}));await drain();}
++   sample(n);expect(calls).toBe(n);expect(notices).toBe(0);expect(t.$.pair()).toEqual({x:7,y:0});expect(sent).toEqual([]);expect(diagnostics().activeFrames).toBe(0);
++  }
++  p.confirm();await drain();expect(sent).toEqual([]);q.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{off();c.dispose();t.destroy();other.destroy();}
++});
++
++it('installed scalar closes with no recipient after disposal in open horizon',async()=>{
++ const t=signalTree({pair:{x:0,y:0}},{enhancers:[transactions()]});const other=signalTree({q:0},{enhancers:[transactions()]});
++ const c=link(t.$.pair,{set:()=>{throw Error('premature send');}}) as C;
++ let captured!:NativeRequirement;
++ try{
++  const q=other.transact(()=>other.$.q(1));let p!:ReturnType<typeof t.transact>;
++  c.declare({kind:'dependent',owners:[q]},()=>{p=t.transact(()=>t.$.pair.x(7));});await drain();
++  c.declare({kind:'dependent',owners:[p,q]},()=>{
++   t.$.pair(current=>({...current}));captured=__c25SourceRoots(t.$.pair.x,[]).endpoint!.requirement as NativeRequirement;
++   expect(captured.components).toBeDefined();c.dispose();
++  });
++  expect(captured.components).toBeUndefined();expect(Object.getOwnPropertyDescriptor(captured,'proof')?.get).toBeUndefined();
++  expect(__c25SourceRoots(t.$.pair.x,[]).endpoint!.requirement).toBe(captured);
++  expect(new Set(nativeProof(captured).owners).size).toBe(2);expect(t.$.pair()).toEqual({x:7,y:0});
++  p.confirm();q.confirm();await drain();
++ }finally{c.dispose();t.destroy();other.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/scalar-finalized-lifecycle.spec.ts
+@@ -0,0 +1,52 @@
++import {expect,it} from 'vitest';
++import * as l from './experimental-publication/lifecycle';
++import {installTerminalRecord} from './internals/intrinsic-mutation';
++const connection=()=>{const c={};l.registerConnection(c,{supported:true,report:()=>{},wake:()=>{}});return c;};
++const compact=(r:l.NativeRequirement)=>{expect(r.components).toBeUndefined();expect(Object.getOwnPropertyDescriptor(r,'proof')?.get).toBeUndefined();expect(l.__c26NormalizationState(r).enrolled).toBe(false);};
++for(const activationFirst of [true,false])it(`both barriers, same aliases, cleanup activationFirst=${activationFirst}`,()=>{
++ const c=connection();let leaf!:l.NativeRequirement,root!:l.NativeRequirement;const alias: l.NativeRequirement[]=[];
++ try{
++  l.runDeclaration(c,{kind:'independent'},()=>{
++   const p=l.prepareNativeRequirement([],false,[]);leaf=p.requirement;installTerminalRecord(p.record);l.finalizeNativeRequirement(leaf);
++   root=l.combineScalarNativeRequirements([leaf,l.initialRequirement()]);alias.push(root);
++   expect(l.nativeRequirementReady(root)).toBe(false);
++   if(activationFirst)l.completeScalarNativeRequirement(root,leaf);
++   expect(root.components).toBeDefined();
++  });
++  if(!activationFirst){expect(l.nativeRequirementReady(root)).toBe(false);expect(root.components).toBeDefined();l.completeScalarNativeRequirement(root,leaf);}
++  compact(root);expect(alias[0]).toBe(root);expect(l.nativeRequirementReady(root)).toBe(true);expect(l.__c26NormalizationState(leaf).listeners).toBe(0);
++ }finally{l.disposeConnection(c);}
++});
++it('uninstalled construction attaches no listeners; generic composites remain unchanged',()=>{
++ const p=l.prepareNativeRequirement([],false,[]);const root=l.combineScalarNativeRequirements([p.requirement]);
++ expect(l.__c26NormalizationState(p.requirement).listeners).toBe(0);expect(l.__c26NormalizationState(root).enrolled).toBe(false);
++ const generic=l.combineNativeRequirements([l.initialRequirement()]);expect(generic.components).toBeDefined();
++ l.completeScalarNativeRequirement(generic,undefined);expect(generic.components).toBeDefined();
++});
++it('throwing readiness callback still closes normalization and later listeners',()=>{
++ const p=l.prepareNativeRequirement([],false,[]);l.finalizeNativeRequirement(p.requirement);installTerminalRecord(p.record);
++ const root=l.combineScalarNativeRequirements([p.requirement]);const error=new Error('ready');let called=0;
++ l.onNativeRequirementReady(p.requirement,()=>{throw error;});l.onNativeRequirementReady(p.requirement,()=>called++);
++ expect(()=>l.completeScalarNativeRequirement(root,p.requirement)).toThrow(error);compact(root);expect(called).toBe(1);expect(l.__c26NormalizationState(p.requirement).listeners).toBe(0);
++});
++it('nested reentry and callback sentinel preserve invalidity and release registrations',()=>{
++ const c=connection();let root!:l.NativeRequirement;let inner!:l.NativeRequirement;const error=new Error('callback');
++ try{
++  expect(()=>l.runDeclaration(c,{kind:'independent'},()=>{
++   const p=l.prepareNativeRequirement([],false,[]);installTerminalRecord(p.record);l.finalizeNativeRequirement(p.requirement);
++   root=l.combineScalarNativeRequirements([p.requirement]);l.completeScalarNativeRequirement(root,p.requirement);
++   l.onNativeRequirementReady(p.requirement,()=>{
++    l.runDeclaration(c,{kind:'independent'},()=>{const q=l.prepareNativeRequirement([],false,[]);installTerminalRecord(q.record);l.finalizeNativeRequirement(q.requirement);inner=l.combineScalarNativeRequirements([q.requirement]);l.completeScalarNativeRequirement(inner,q.requirement);});
++   });throw error;
++  })).toThrow(error);
++  compact(root);compact(inner);expect(l.nativeProof(root).invalid).toBe(true);expect(l.nativeProof(inner).invalid).toBe(false);expect(l.diagnostics().activeFrames).toBe(0);
++ }finally{l.disposeConnection(c);}
++});
++it('all-ready scalar classification preserves role blockers and qualifying window identity',()=>{
++ const cell:l.OwnerCell={owner:987654,id:1,outcome:'confirmed',dependents:new Set()};
++ const leaf=l.initialRequirement();leaf.proof={owners:[],possible:[cell],unknown:true,invalid:false,historicalWindow:true};
++ Object.defineProperty(leaf,'retirementOwnWindowOnly',{value:true});
++ const r=l.combineScalarNativeRequirements([leaf,l.initialRequirement()]);compact(r);expect(l.finalizedRetirement(r)).toEqual({blocked:false,possible:[cell]});expect(r.retirementOwnWindowOnly).toBeUndefined();
++ const owned=l.initialRequirement();owned.proof={owners:[cell],destination:[cell],unknown:false,invalid:false};
++ const blocked=l.combineScalarNativeRequirements([r,owned]);compact(blocked);expect(l.finalizedRetirement(blocked)?.blocked).toBe(true);expect(l.nativeProof(blocked).destination?.[0]).toBe(cell);
++});

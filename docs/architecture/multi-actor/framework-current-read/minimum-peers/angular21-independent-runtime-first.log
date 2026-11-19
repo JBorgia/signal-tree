@@ -1,0 +1,10 @@
+✔ fresh native dependency error propagates exact sentinel and recovers inside real rollback tap (10.936333ms)
+✔ new native consumer born during callback ABA reaches final selection (1.204416ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 433.604334

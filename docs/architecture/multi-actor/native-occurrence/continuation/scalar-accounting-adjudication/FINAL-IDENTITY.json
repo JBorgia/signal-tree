@@ -1,0 +1,11 @@
+{
+  "manifestSHA256": "bac3ad33b8eee7bd0e5851461de9b95fd3144d26e3f6db70d84193a70c76179f",
+  "files": 2974,
+  "authorMismatches": [],
+  "copyMismatches": [],
+  "companions": {
+    "packages/kernel/src/lib/scalar-oracle-companion.spec.ts": "c1c2e3a2a141425045b2dcd4b5b9865d4a345c48ebb48c84affa978d9d4d7af8",
+    "packages/kernel/src/enhancers/restoration/omission-oracle-companion.spec.ts": "b58219f560ceedfefd792c87e8056593b14edeed63fd49d26b42d5247db6bfea"
+  },
+  "diagnostic": "55287f610ddb9f551751b5e9c97722a90e5e16710b38cfed1d133623cdf036de"
+}

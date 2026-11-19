@@ -1,0 +1,21 @@
+{
+  "runtimeManifest": "1edb39e668f2a370554f692d455b75fac08a9836003a150acd09e2326368a08c",
+  "runtimePatch": "e29e34f8b4a5043da4f984c104ad683ba65869c9b2da3a3d5c12bf22ce7db634",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "1fd0ec87c7c10e8f27fd424e48544b44164a5aff548344540a9e83e1f53b187b",
+      "matches": true
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+      "matches": true
+    }
+  },
+  "runtime.patch": "e29e34f8b4a5043da4f984c104ad683ba65869c9b2da3a3d5c12bf22ce7db634",
+  "RUNTIME-MANIFEST.json": "1edb39e668f2a370554f692d455b75fac08a9836003a150acd09e2326368a08c",
+  "MANIFEST.json": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "FIRST-GATE-RUNTIME.json": "a31a24d2096d4c77701158699b34d2e44d8121277e5074b46e11ca580d774ccd",
+  "runs/final-gate/first.log": "f4caa1792d0ad6811d75d65fb9014b0f5793a57722303bb8d192a2d58dede83d",
+  "runs/final-gate/result.json": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+  "runs/final-gate/command.json": "12f1da699172d29727bedb36ddf69fd8ab605ddb0ba70f9d09f849387744d4ff"
+}

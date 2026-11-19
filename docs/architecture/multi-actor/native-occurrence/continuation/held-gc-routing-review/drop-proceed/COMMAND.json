@@ -1,0 +1,26 @@
+{
+  "cwd": "/private/tmp/st-c21-held-gc/drop-proceed/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "run",
+    "held-continuation-probe:retention",
+    "--skip-nx-cache"
+  ],
+  "settings": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c21-held-gc/drop-proceed/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c21-held-gc/drop-proceed/nx-data",
+    "TMPDIR": "/private/tmp/st-c21-held-gc/drop-proceed/tmp",
+    "ST_VERIFY_PROGRESS": "/private/tmp/st-c21-held-gc/drop-proceed/progress",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-c21-held-gc/drop-proceed/observations",
+    "ST_GC_ARM": "drop-proceed",
+    "ST_GC_OUTPUT": "/private/tmp/st-c21-held-gc/drop-proceed/samples.json",
+    "NODE_OPTIONS": "--expose-gc --require=/private/tmp/st-c21-held-gc/drop-proceed/diagnostic-redirect.cjs"
+  },
+  "nodeBin": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin",
+  "noProgressSeconds": 180
+}

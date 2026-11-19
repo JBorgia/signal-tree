@@ -1,0 +1,16 @@
+{
+  "base": "/private/tmp/st-native-combined-c12/SNAPSHOT-C12.json",
+  "baseSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+  "candidate": "/private/tmp/st-c12-scalar-support-correction/candidate",
+  "manifest": "SNAPSHOT-SCALAR.json",
+  "manifestSha256": "d0b54e145b88a38015b3176000e0a8c23b74ebdc33be6f8eab0c122f2fb4b812",
+  "files": 3055,
+  "patches": {
+    "RUNTIME.patch": "57e4c3c50cfa30c605ac2fbc6995f81e16a1d961704e388d9cb19a42cca1a689",
+    "TESTS.patch": "aa3bc0ea6f4d7e30811392484574aa60488c1c77db3d60f69b9dfd6703b59ed7",
+    "FROM-C12.patch": "91c0452964f8b7773aca560567aca6337206bfdb5b345289cb0fc6030aec44d9"
+  },
+  "results": "RESULTS.md",
+  "reverseApplyCheck": 0,
+  "status": "frozen-for-independent-review-no-composition"
+}

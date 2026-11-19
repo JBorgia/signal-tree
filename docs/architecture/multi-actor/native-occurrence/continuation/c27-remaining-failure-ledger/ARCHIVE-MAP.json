@@ -1,0 +1,92 @@
+[
+  {
+    "source": "PACKET-SHA256.json",
+    "archive": "PACKET-SHA256.json",
+    "sourceSha256": "2e135b28cbdc1b252650b3f0aaf2271ab76093de7fbb262d56002a064dd1a439",
+    "archiveSha256": "2e135b28cbdc1b252650b3f0aaf2271ab76093de7fbb262d56002a064dd1a439"
+  },
+  {
+    "source": "ORIGINAL-FAILURE-STACKS.txt",
+    "archive": "ORIGINAL-FAILURE-STACKS.txt",
+    "sourceSha256": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a",
+    "archiveSha256": "2785455fafa18145fdd413c9816e79a5305c1c0ca3909f262fbb4efd36279f1a"
+  },
+  {
+    "source": "REPORT.md",
+    "archive": "REPORT.md",
+    "sourceSha256": "469d1e50c0827b566850c4b8600f2049faa4f43688637b2316c89a90a478bc00",
+    "archiveSha256": "469d1e50c0827b566850c4b8600f2049faa4f43688637b2316c89a90a478bc00"
+  },
+  {
+    "source": "ORIGINAL-FAILURE-INDEX.txt",
+    "archive": "ORIGINAL-FAILURE-INDEX.txt",
+    "sourceSha256": "635d7d156c67cc9601a82d4d7192a2fc90b5306bdb1350409e2b7d8c6fb878e2",
+    "archiveSha256": "635d7d156c67cc9601a82d4d7192a2fc90b5306bdb1350409e2b7d8c6fb878e2"
+  },
+  {
+    "source": "EVIDENCE-SHA256.json",
+    "archive": "EVIDENCE-SHA256.json",
+    "sourceSha256": "68ac08d8839df9066c1ed3c6464813b9d6133fbf29c83854e98a62b3c2a3e0bd",
+    "archiveSha256": "68ac08d8839df9066c1ed3c6464813b9d6133fbf29c83854e98a62b3c2a3e0bd"
+  },
+  {
+    "source": "reconcile.py",
+    "archive": "reconcile.py",
+    "sourceSha256": "53686470a16b87da33b8ee5b223d6aa41cf42a8ff47f6e34fa5b1795732ec9f3",
+    "archiveSha256": "53686470a16b87da33b8ee5b223d6aa41cf42a8ff47f6e34fa5b1795732ec9f3"
+  },
+  {
+    "source": "LEDGER.json",
+    "archive": "LEDGER.json",
+    "sourceSha256": "3847ab4ad9e50591a885417a7d6b0d7810b0ca5aa541177e2579471ca9d25dca",
+    "archiveSha256": "3847ab4ad9e50591a885417a7d6b0d7810b0ca5aa541177e2579471ca9d25dca"
+  },
+  {
+    "source": "originals/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "archive": "originals/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "sourceSha256": "223de1a18e26295983f10f860cee2a40f7e719cafecbacf644c3a03e7bf4315d",
+    "archiveSha256": "223de1a18e26295983f10f860cee2a40f7e719cafecbacf644c3a03e7bf4315d"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "sourceSha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+    "archiveSha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "sourceSha256": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c",
+    "archiveSha256": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "sourceSha256": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+    "archiveSha256": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "sourceSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "archiveSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "sourceSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "archiveSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "sourceSha256": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02",
+    "archiveSha256": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "sourceSha256": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544",
+    "archiveSha256": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544"
+  }
+]

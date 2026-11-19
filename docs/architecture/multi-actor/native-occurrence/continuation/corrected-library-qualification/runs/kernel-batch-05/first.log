@@ -1,0 +1,167 @@
+
+> nx run kernel:test /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/known-input-contract-review.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/leaf-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/legacy-payload.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-0-three-directions.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-1-relationship.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-2-public-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-absent-locations.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-address-lifecycle.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-async-settlement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-audit-regression.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-authority-carrier.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-bare-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-collection-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-collection-type-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-commit-ordering.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-declaration-public.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-drain-settlement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-inflight-settlement-audit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-materialized-value-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-native-address.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-nested-collection.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-order-audit-regression.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-order-rollback.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-overlapping-rollback.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-persistence-conformance.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-production-path.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-reactive-settlement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-root-source.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-same-turn-settlement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-snapshot-egress.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-state-view-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-state-view.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-structured-address-audit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-value-roundtrip.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/m3-conformance.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/m3-representation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/m3-uniform-rule.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/m4-decline-uniformity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/m4-reconstruction.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/main-invocation-scope.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/marker-location-grammar.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/marker-roundtrip.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/marker-snapshot-memo.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/markers/composed-acquisition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/markers/entity-map.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/markers/marker-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/membership-hot-paths.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/membership-input-contract.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/membership-prepared-order.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/mut-participation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-admission-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-anchor-diagnostic.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-authored-footprint.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-certificate-successor.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-explicit-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-invocation-handoff.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/native-window-preparation-audit.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/nested-absence-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/nested-structural-rollback-1.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/noop-copy-write.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/noop-write-warning.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/notifier-ownership-invariant.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/notifier-scope-0-identity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/notifier-scope-0-impact.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/observation-substrate-additions.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/observation-substrate.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/occupancy-successor-composition.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/occupancy-successor-point-work.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/occupancy-successor-realization.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/occurrence-successor.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/opaque-current-input.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/opaque-leaf-restoration.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/open-key-reachability.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/oracle-alignment-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-member-presence.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-member-publication-facts.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-order-indexed-work.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-order-owner-preparation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-order-source-boundaries.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-presence-discriminator.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-presence-independent.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/ordinary-restoration-placement.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/owner-invalidation-membership.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/owner-invalidation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/owner-location-0.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/owner-replay-1.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/owner-replay-2.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/owner-transition-cancellation.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/packet-admission-r1.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/packet-index-adversarial.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/packet-index-review.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/packet-physical-pair-work.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/parent-freshness-entity.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/parent-freshness-focused.spec.ts /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile=/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-05.json
+
+kernel:  RUN  v4.1.9 /private/tmp/st-v16-integration-candidate/packages/kernel
+kernel:  ✓ src/lib/mut-participation.spec.ts (28 tests) 141ms
+kernel:  ✓ src/lib/link-reactive-settlement.spec.ts (48 tests) 376ms
+kernel:  ✓ src/lib/link-1-relationship.spec.ts (15 tests) 159ms
+kernel:  ✓ src/lib/opaque-leaf-restoration-v16-controls.spec.ts (71 tests) 198ms
+kernel:  ✓ src/lib/packet-index-adversarial.spec.ts (25 tests) 20ms
+kernel:  ✓ src/lib/link-persistence-conformance.spec.ts (13 tests) 111ms
+kernel:  ✓ src/lib/link-state-view.spec.ts (26 tests) 57ms
+kernel: stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+kernel: A1-ORDINARY-PRESENCE {"withLink":false,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[]}
+kernel: stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=false)
+kernel: A1-ORDINARY-PRESENCE {"withLink":false,"phase":"rolled-back","branch":{"keep":9},"sends":[]}
+kernel: stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+kernel: A1-ORDINARY-PRESENCE {"withLink":true,"phase":"pending","exposed":7,"branch":{"y":7,"keep":9},"inspection":{"changes":[{"path":"a.y","address":["a","y"],"status":"current"}]},"sends":[null]}
+kernel: stdout | src/lib/ordinary-presence-discriminator.spec.ts > A1 installed scalar publication operations (prewritten contract) > ordinary readd after inspection captures existence for rollback (defaultLink=true)
+kernel: A1-ORDINARY-PRESENCE {"withLink":true,"phase":"rolled-back","branch":{"keep":9},"sends":[null]}
+kernel:  ✓ src/lib/ordinary-presence-discriminator.spec.ts (20 tests) 97ms
+kernel:  ✓ src/lib/link-authority-carrier.spec.ts (13 tests) 68ms
+kernel:  ✓ src/lib/link-overlapping-rollback.spec.ts (16 tests) 134ms
+kernel: stderr | src/lib/link-2-public-contract.spec.ts > LINK-2 case 3: a rejected outbound set() is observable > a listener that throws does not damage the link
+kernel: SignalTree: an onTreeError listener threw. The original error was still handled normally; this is the listener failing. [ST2025] Error: listener exploded
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link-2-public-contract.spec.ts:225:13
+kernel:     at reportTreeError (/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/error-reporter.ts:123:7)
+kernel:     at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/link.ts:1045:15
+kernel:     at processTicksAndRejections (node:internal/process/task_queues:104:5)
+kernel:  ✓ src/lib/link-2-public-contract.spec.ts (10 tests) 82ms
+kernel:  ✓ src/lib/owner-invalidation.spec.ts (22 tests) 64ms
+kernel:  ✓ src/lib/link-0-three-directions.spec.ts (12 tests) 57ms
+kernel:  ✓ src/lib/opaque-leaf-restoration.spec.ts (20 tests) 94ms
+kernel:  ✓ src/lib/nested-structural-rollback-1.spec.ts (15 tests) 77ms
+kernel:  ✓ src/lib/link-order-rollback.spec.ts (12 tests) 123ms
+kernel: stderr | src/lib/link-structured-address-audit.spec.ts
+kernel: SignalTree: a marker was registered without `snapshot` or `transient: true`. Its value will be DROPPED from every snapshot — tree.$(), persistence(), devtools, audit and undo/redo — silently, except for an ST2008 report at read time. Declare what of your marker is state: pass `{ snapshot, hydrate }`, or `{ transient: true }` if it deliberately has none. [ST2022]
+kernel:  ✓ src/lib/marker-location-grammar.spec.ts (9 tests) 38ms
+kernel:  ✓ src/lib/link-structured-address-audit.spec.ts (19 tests) 91ms
+kernel:  ✓ src/lib/observation-substrate.spec.ts (11 tests) 38ms
+kernel:  ✓ src/lib/markers/composed-acquisition.spec.ts (9 tests) 50ms
+kernel:  ✓ src/lib/link-collection-0.spec.ts (10 tests) 96ms
+kernel:  ✓ src/lib/owner-invalidation-membership.spec.ts (54 tests) 111ms
+kernel:  ✓ src/lib/link-nested-collection.spec.ts (10 tests) 65ms
+kernel:  ✓ src/lib/link-async-settlement.spec.ts (8 tests) 88ms
+kernel:  ✓ src/lib/ordinary-restoration-placement.spec.ts (13 tests) 68ms
+kernel:  ✓ src/lib/membership-input-contract.spec.ts (54 tests) 185ms
+kernel:  ✓ src/lib/ordinary-member-presence.spec.ts (8 tests) 64ms
+kernel:  ✓ src/lib/link-commit-ordering.spec.ts (7 tests) 83ms
+kernel:  ✓ src/lib/link-materialized-value-0.spec.ts (7 tests) 35ms
+kernel:  ✓ src/lib/link-absent-locations.spec.ts (21 tests) 363ms
+kernel:  ✓ src/lib/markers/entity-map.spec.ts (16 tests) 28ms
+kernel:  ✓ src/lib/link-inflight-settlement-audit.spec.ts (9 tests) 56ms
+kernel:  ✓ src/lib/parent-freshness-focused.spec.ts (7 tests) 32ms
+kernel:  ✓ src/lib/occurrence-successor.spec.ts (8 tests) 90ms
+kernel:  ✓ src/lib/link-snapshot-egress.spec.ts (6 tests) 38ms
+kernel:  ✓ src/lib/owner-replay-2.spec.ts (4 tests) 57ms
+kernel:  ✓ src/lib/notifier-scope-0-identity.spec.ts (4 tests) 20ms
+kernel:  ✓ src/lib/link-native-address.spec.ts (10 tests) 70ms
+kernel:  ✓ src/lib/packet-physical-pair-semantics.spec.ts (6 tests) 8ms
+kernel:  ✓ src/lib/ordinary-order-indexed-work.spec.ts (8 tests) 274ms
+kernel: stdout | src/lib/owner-location-0.spec.ts > OWNER-LOCATION-0: which node kinds name their owning tree? > ⚠️ the inventory across every materialisable node kind in core
+kernel: tree (root)          pos=Y ownerPath=Y registry=Y callable=n
+kernel: tree.$ (namespace)   pos=Y ownerPath=Y registry=Y callable=Y
+kernel: branch accessor      pos=Y ownerPath=Y registry=Y callable=Y
+kernel: leaf                 pos=Y ownerPath=Y registry=Y callable=Y
+kernel: nested leaf          pos=Y ownerPath=Y registry=Y callable=Y
+kernel: entityMap node       pos=Y ownerPath=Y registry=Y callable=n
+kernel: ADDRESSABLE-WITHOUT-OWNER: []
+kernel:  ✓ src/lib/owner-location-0.spec.ts (2 tests) 27ms
+kernel:  ✓ src/lib/membership-hot-paths.spec.ts (6 tests) 69ms
+kernel:  ✓ src/lib/link-root-source.spec.ts (8 tests) 56ms
+kernel:  ✓ src/lib/membership-prepared-order.spec.ts (7 tests) 172ms
+kernel:  ✓ src/lib/owner-replay-1.spec.ts (3 tests) 57ms
+kernel:  ✓ src/lib/ordinary-order-source-boundaries.spec.ts (5 tests) 93ms
+kernel:  ✓ src/lib/link-commit-boundary-carrier.spec.ts (5 tests) 43ms
+kernel:  ✓ src/lib/occupancy-successor-realization.spec.ts (5 tests) 69ms
+kernel:  ✓ src/lib/notifier-scope-0-impact.spec.ts (5 tests) 37ms
+kernel:  ✓ src/lib/packet-admission-r1.spec.ts (8 tests) 22ms
+kernel:  ✓ src/lib/link-audit-regression.spec.ts (8 tests) 45ms
+kernel:  ✓ src/lib/link-order-audit-regression.spec.ts (6 tests) 58ms
+kernel:  ✓ src/lib/notifier-ownership-invariant.spec.ts (3 tests) 35ms
+kernel:  ✓ src/lib/oracle-alignment-independent.spec.ts (9 tests) 100ms
+kernel:  ✓ src/lib/link-bare-contract.spec.ts (6 tests) 62ms
+kernel:  ✓ src/lib/packet-index-review.spec.ts (4 tests) 9ms
+kernel:  ✓ src/lib/native-window-preparation-audit.spec.ts (4 tests) 35ms
+kernel:  ✓ src/lib/opaque-current-input.spec.ts (4 tests) 48ms
+kernel:  ✓ src/lib/observation-substrate-additions.spec.ts (5 tests) 22ms
+kernel:  ✓ src/lib/marker-snapshot-memo.spec.ts (10 tests) 35ms
+kernel:  ✓ src/lib/native-invocation-handoff.spec.ts (5 tests) 46ms
+kernel:  ✓ src/lib/native-certificate-successor.spec.ts (5 tests) 58ms
+kernel:  ✓ src/lib/noop-copy-write.spec.ts (6 tests) 30ms
+kernel:  ✓ src/lib/link-collection-type-0.spec.ts (4 tests) 23ms
+kernel: stdout | src/lib/nested-absence-independent.spec.ts > nested-absence / held descendant after ancestor omission > records what a held descendant reads once its ancestor omits it
+kernel: [nested-absence] held child after omission = undefined; parent snapshot = {"sibling":2}
+kernel: stdout | src/lib/nested-absence-independent.spec.ts > nested-absence / held descendant after ancestor omission > records whether a write through a held, now-absent descendant is hidden
+kernel: [nested-absence] after write through absent descendant, parent = {"child":99,"sibling":2}
+kernel: stdout | src/lib/nested-absence-independent.spec.ts > nested-absence / held descendant after ancestor omission > CONTROL: a retired ENTITY subject reads undefined, per documented law
+kernel: [nested-absence] CONTROL retired entity read = undefined
+kernel:  ✓ src/lib/nested-absence-independent.spec.ts (3 tests) 19ms
+kernel: stderr | src/lib/opaque-terminal-snapshot.spec.ts > canonical snapshots preserve opaque terminal payloads > preserves callable properties and nested marker definitions through root round-trip
+kernel: SignalTree: write at "terminal" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+kernel: stderr | src/lib/opaque-terminal-snapshot.spec.ts > canonical snapshots preserve opaque terminal payloads > preserves terminal payload identity in branch/root reads and updater input
+kernel: SignalTree: write at "nested.terminal" was skipped — the value is reference-identical to the current value. If you mutated an object/array in place, create a NEW reference (spread/slice/map) so the change is observed. [ST2003]
+kernel:  ✓ src/lib/opaque-terminal-snapshot.spec.ts (7 tests) 22ms
+kernel: stdout | src/lib/main-invocation-scope.spec.ts > equality reentry after claim cannot install old lifetime baseline
+kernel: EQUALITY-LIFETIME {
+kernel:   entered: true,
+kernel:   failure: 'SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Selected replacement does not match intended source lifetime/field [effect-validation-failed]',
+kernel:   value: { v: 99 },
+kernel:   old: 1,
+kernel:   new: 2,
+kernel:   oldBaseline: false
+kernel: }
+kernel:  ✓ src/lib/link-state-view-v16-controls.spec.ts (3 tests) 50ms
+kernel:  ✓ src/lib/main-invocation-scope.spec.ts (3 tests) 76ms
+kernel:  ✓ src/lib/ordinary-presence-independent.spec.ts (3 tests) 39ms
+kernel:  ✓ src/lib/link-address-lifecycle.spec.ts (7 tests) 59ms
+kernel:  ✓ src/lib/m3-conformance.spec.ts (3 tests) 34ms
+kernel:  ✓ src/lib/native-explicit-handoff.spec.ts (3 tests) 34ms
+kernel:  ✓ src/lib/link-same-turn-settlement.spec.ts (3 tests) 43ms
+kernel:  ✓ src/lib/link-declaration-public.spec.ts (9 tests) 84ms
+kernel:  ✓ src/lib/occupancy-successor-composition.spec.ts (4 tests) 149ms
+kernel:  ✓ src/lib/packet-physical-pair-work.spec.ts (3 tests) 388ms
+kernel:  ✓ src/lib/ordinary-member-publication-facts.spec.ts (3 tests) 39ms
+kernel:  ✓ src/lib/ordinary-order-owner-preparation.spec.ts (2 tests) 60ms
+kernel:  ✓ src/lib/leaf-contract.spec.ts (5 tests) 12ms
+kernel:  ✓ src/lib/m4-reconstruction.spec.ts (1 test) 19ms
+kernel:  ✓ src/lib/markers/marker-contract.spec.ts (3 tests) 5ms
+kernel:  ✓ src/lib/native-admission-handoff.spec.ts (4 tests) 67ms
+kernel:  ✓ src/lib/packet-physical-pair-singleton.spec.ts (2 tests) 7ms
+kernel:  ✓ src/lib/link-value-roundtrip.spec.ts (2 tests) 39ms
+kernel:  ✓ src/lib/m3-uniform-rule.spec.ts (2 tests) 15ms
+kernel:  ✓ src/lib/link-production-path.spec.ts (4 tests) 38ms
+kernel:  ✓ src/lib/owner-transition-cancellation.spec.ts (5 tests) 20ms
+kernel:  ✓ src/lib/link-drain-settlement.spec.ts (2 tests) 36ms
+kernel:  ✓ src/lib/marker-roundtrip.spec.ts (1 test) 19ms
+kernel:  ✓ src/lib/m4-decline-uniformity.spec.ts (1 test) 26ms
+kernel:  ✓ src/lib/noop-write-warning.spec.ts (3 tests) 8ms
+kernel:  ✓ src/lib/parent-freshness-entity.spec.ts (2 tests) 29ms
+kernel:  ✓ src/lib/m3-representation.spec.ts (1 test) 15ms
+kernel:  ✓ src/lib/native-authored-footprint.spec.ts (1 test) 21ms
+kernel:  ✓ src/lib/parent-proof-safety-falsifier.spec.ts (1 test) 31ms
+kernel:  ✓ src/lib/known-input-contract-review.spec.ts (2 tests) 40ms
+kernel:  ✓ src/lib/native-anchor-diagnostic.spec.ts (2 tests) 22ms
+kernel:  ✓ src/lib/legacy-payload.spec.ts (1 test) 26ms
+kernel:  ✓ src/lib/open-key-reachability.spec.ts (1 test) 11ms
+kernel:  ✓ src/lib/occupancy-successor-point-work.spec.ts (2 tests) 88ms
+kernel:  Test Files  100 passed (100)
+kernel:       Tests  920 passed | 1 expected fail (921)
+kernel:    Start at  12:31:09
+kernel:    Duration  60.51s (transform 4.44s, setup 0ms, import 26.19s, tests 6.85s, environment 67.24s)
+kernel: JSON report written to /private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-05.json
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      1m 2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1m 2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1m 2s

@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "vue",
+    "--skip-nx-cache",
+    "absent-collection.spec.ts",
+    "--testNamePattern=a rollback writing hidden rows runs no effect that could see them",
+    "--reporter=json",
+    "--outputFile=/private/tmp/st-native-broad-differential/predecessor/vue-hidden-focused/vitest.json",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-broad-differential/predecessor/candidate",
+  "fixtureSha256": "a24d7a6ebf44f00f50b1733ad03242313fb7529e9e65b35e4dbd92c8f9de24dc"
+}

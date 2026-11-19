@@ -1,0 +1,24 @@
+{
+  "argv": [
+    "npm",
+    "install",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund",
+    "/private/tmp/st-c28-r3-entity-registration-successor/tarballs/signal-tree-angular-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-entity-registration-successor/tarballs/signal-tree-kernel-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-entity-registration-successor/tarballs/signal-tree-react-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-entity-registration-successor/tarballs/signal-tree-solid-16.0.0-dev.tgz",
+    "/private/tmp/st-c28-r3-entity-registration-successor/tarballs/signal-tree-vue-16.0.0-dev.tgz",
+    "@angular/core@22.0.7",
+    "rxjs@7.8.2",
+    "react@19.2.8",
+    "@types/react@19.2.18",
+    "vue@3.5.42",
+    "solid-js@1.9.15",
+    "tslib@2.8.1",
+    "typescript@6.0.3"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-registration-successor/consumer",
+  "noProgressSeconds": 180
+}

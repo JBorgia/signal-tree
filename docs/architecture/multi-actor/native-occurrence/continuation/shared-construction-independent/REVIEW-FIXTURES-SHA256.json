@@ -1,0 +1,11 @@
+{
+  "packages/kernel/construction-review-gc.config.ts": "0f7ba487dc5884396d642fdb77ce3bc9060f40306700fc57d2cb14d5d05c6ac3",
+  "packages/kernel/src/lib/construction-review.gc.ts": "2b1ea139a0976e152b2320d70f9374190cbcf368d0423f1fde5043de76f1edbc",
+  "packages/kernel/src/lib/construction-routes-review.spec.ts": "418a1bdcf6919e53d67cdb4cb49b4b9b4fd62902072c650e67fcf8a38234d8a4",
+  "packages/kernel/src/lib/construction-marker-review.spec.ts": "7ad8729367bcf1c2d424ce4f7818f6b22150392171da68570f64603ea0422b80",
+  "packages/kernel/src/lib/construction-review-controls.spec.ts": "9de2da2f079116bbbd3ca0c09e178015f19de70d6091cc09f7c1d893b6b57ddb",
+  "packages/kernel/src/lib/construction-completion-snapshot-review.spec.ts": "6f530c62cde1f6365f658638686405b3d61f5fc42f84dee72373a65d5c9c2ff5",
+  "packages/angular/src/lib/construction-routes-review.spec.ts": "445fba4e9f60db42a5ff844960feaf801f43ecaa99e947960bcfc890e3d2f00f",
+  "packages/angular/src/lib/construction-factory-review.spec.ts": "c12e5167cf1df0044b3cc6300daa53442415e81b6b12b650842e9b30aead21af",
+  "packages/angular/src/lib/construction-retention-review.spec.ts": "67bb669c52b7201fa74a71a71ea57a6113ffc84296a9cb410f3525749e2ecf0e"
+}

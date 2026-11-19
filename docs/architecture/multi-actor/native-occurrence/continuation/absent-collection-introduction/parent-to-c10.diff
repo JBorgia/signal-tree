@@ -1,0 +1,139 @@
+--- /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/kernel/src/lib/entity-signal.ts
++++ /private/tmp/st-native-combined-c10-promoted/candidate/packages/kernel/src/lib/entity-signal.ts
+@@ -1064,13 +1064,44 @@
+     };
+   }
+ 
++  type OrdinaryPointPreparation = {
++    changes: CommittedEntityMutation[];
++    install: ReturnType<typeof ordinaryTopology.prepareInstall>;
++    interval: ReturnType<typeof ordinaryTopology.prepareInstall>['interval'];
++    ordinaryEndpoints: {
++      readonly before: readonly number[];
++      readonly after: readonly number[];
++      readonly domain?: readonly number[];
++    } | undefined;
++  };
++  type OrdinaryRichPreparation = OrdinaryPointPreparation & {
++    byPhysicalSubject: Map<number, readonly CommittedEntityMutation[]>;
++    byStep: Array<readonly CommittedEntityMutation[]>;
++  };
+   function prepareOrdinaryTopology(
++    demand: 'point',
++    changes: readonly CommittedEntityMutation[],
++    physical?: ReturnType<typeof structuralStore.preparePlacement>,
++    authoredOrder?: readonly number[],
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
++  ): OrdinaryPointPreparation;
++  function prepareOrdinaryTopology(
++    demand: 'rich',
++    changes: readonly CommittedEntityMutation[],
++    physical?: ReturnType<typeof structuralStore.preparePlacement>,
++    authoredOrder?: readonly number[],
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
++  ): OrdinaryRichPreparation;
++  function prepareOrdinaryTopology(
++    demand: 'point' | 'rich',
+     changes: readonly CommittedEntityMutation[],
+     physical = structuralStore.preparePlacement(),
+     authoredOrder?: readonly number[],
+     authoredDomain?: readonly number[],
+     physicalEntries?: PreparedPlacementEntries<K>
+-  ) {
++  ): OrdinaryPointPreparation | OrdinaryRichPreparation {
+     const placement = ordinaryTopology.preparePlacement(
+       structuralStore.preparePlacement()
+     );
+@@ -1089,11 +1120,13 @@
+     const staged = new Map<number, Presence>();
+     const keys = new Map<K, number | undefined>();
+     const selected: CommittedEntityMutation[] = [];
+-    const byStep: Array<readonly CommittedEntityMutation[]> = [];
+-    const byPhysicalSubject = new Map<
+-      number,
+-      readonly CommittedEntityMutation[]
+-    >();
++    // Only the rich frame consumer needs these per-step/per-subject indexes.
++    // Point writes still prepare the same completed ordinary changes and install.
++    const byStep: Array<readonly CommittedEntityMutation[]> | undefined =
++      demand === 'rich' ? [] : undefined;
++    const byPhysicalSubject = demand === 'rich'
++      ? new Map<number, readonly CommittedEntityMutation[]>()
++      : undefined;
+     const read = (subject: number): Presence => {
+       const row = placement.read(subject);
+       if (!row.present) return { present: false };
+@@ -1243,12 +1276,14 @@
+           write(change.subject, { ...ordinary, value: change.after as E });
+         }
+       }
+-      const previous = byPhysicalSubject.get(change.subject);
+-      byPhysicalSubject.set(
+-        change.subject,
+-        previous === undefined ? group : [...previous, ...group]
+-      );
+-      byStep.push(group);
++      if (byPhysicalSubject) {
++        const previous = byPhysicalSubject.get(change.subject);
++        byPhysicalSubject.set(
++          change.subject,
++          previous === undefined ? group : [...previous, ...group]
++        );
++      }
++      byStep?.push(group);
+       selected.push(...group);
+     }
+     let ordinaryEndpoints:
+@@ -1308,12 +1343,20 @@
+       completedChanges.set(change, completed);
+       return completed;
+     };
+-    for (const [subject, group] of byPhysicalSubject)
+-      byPhysicalSubject.set(subject, group.map(completeChange));
+-    return {
+-      changes: selected.map(completeChange),
++    if (byPhysicalSubject)
++      for (const [subject, group] of byPhysicalSubject)
++        byPhysicalSubject.set(subject, group.map(completeChange));
++    const completed = selected.map(completeChange);
++    if (byPhysicalSubject && byStep) return {
++      changes: completed,
+       byPhysicalSubject,
+       byStep: byStep.map((group) => group.map(completeChange)),
++      install: installPlacement,
++      interval: installPlacement.interval,
++      ordinaryEndpoints,
++    };
++    return {
++      changes: completed,
+       install: installPlacement,
+       interval: installPlacement.interval,
+       ordinaryEndpoints,
+@@ -1467,6 +1510,7 @@
+         };
+     }
+     const ordinaryPlan = prepareOrdinaryTopology(
++      'rich',
+       changes,
+       physicalPlacement,
+       frame.ordinaryOrder,
+@@ -1596,7 +1640,7 @@
+         // to detached completion, so sibling facts precede listener reentry.
+         if (membershipTap) {
+           releaseMembership = holdEntityMembershipDelivery(api);
+-          membershipTap(MEMBERSHIP_FACTS, frame.mutations);
++          membershipTap(MEMBERSHIP_FACTS, frame.mutations, frame.orderEndpoints);
+         }
+         return resultOf(result);
+       },
+@@ -2499,7 +2543,7 @@
+       nextValue,
+       fields
+     );
+-    const ordinaryPlan = prepareOrdinaryTopology([
++    const ordinaryPlan = prepareOrdinaryTopology('point', [
+       {
+         subject: subjectId,
+         before: transition.ordinaryBefore,

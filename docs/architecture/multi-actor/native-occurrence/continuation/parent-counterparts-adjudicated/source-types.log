@@ -1,0 +1,4 @@
+
+> @signaltree/workspace@16.0.0-dev typecheck:source /private/tmp/st-parent-freshness-other-frameworks/corrected-oracle/candidate
+> tsc --noEmit -p tsconfig.typecheck-all.json
+

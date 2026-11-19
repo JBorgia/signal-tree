@@ -1,0 +1,47 @@
+[
+  [
+    "141",
+    "99988",
+    "99988",
+    "02:36",
+    "0.0",
+    "43152",
+    "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+  ],
+  [
+    "143",
+    "141",
+    "99988",
+    "02:36",
+    "0.0",
+    "90288",
+    "node ./node_modules/.bin/../nx/dist/bin/nx.js run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+  ],
+  [
+    "393",
+    "143",
+    "393",
+    "02:02",
+    "0.0",
+    "217136",
+    "node /private/tmp/st-native-combined-c22/candidate/node_modules/.bin/../rollup/dist/bin/rollup -c rollup.config.cjs"
+  ],
+  [
+    "457",
+    "393",
+    "393",
+    "01:55",
+    "0.0",
+    "11184",
+    "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  ],
+  [
+    "99988",
+    "13484",
+    "99988",
+    "02:44",
+    "0.0",
+    "11632",
+    "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/st-native-combined-c22/run.py packages corepack pnpm nx run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+  ]
+]

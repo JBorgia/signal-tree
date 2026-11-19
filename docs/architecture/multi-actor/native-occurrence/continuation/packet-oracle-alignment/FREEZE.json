@@ -1,0 +1,20 @@
+{
+  "status": "test-only, Main review pending; three structural failures and point gate retained",
+  "files": {
+    "BASE-SOURCE-SHA256.json": "542125745ddaad67aead344961bdfb408e43c6447938f6834413038a90ad413d",
+    "COMMAND-RESULTS.json": "9ff4dd216e3ea52ebbea0dc7cce2a04d305dc33109b7efa6e48971e0bd2abf60",
+    "ORACLE-MAPPING.md": "e7dd5af71d570f82426342a172d384a0309b11226395abc2f8c9ea1f6db5e123",
+    "RESULTS.md": "c80c9c9c0c61a935b437e51701810163b0b7cc548b649a0c780b0f8c00096937",
+    "SOURCE-SHA256.json": "97aaedeef46bb224ce28e063798b2ea868d7a03ef519adf157293a577415754e",
+    "VERIFICATION.json": "c10700d1ceba97a97629e394137bf81a58a04be20f3cb2255d166c42dd5361fb",
+    "align-oracles.py": "031ddfd5e21abf6a619d577163f946998db56a3939b0f668982b46856ffbef9b",
+    "aligned-first.log": "9e64c9ac7b85a99b9700d52eab177a3b2cedbccbf37d0ecad9b7bab2fc44a4b1",
+    "baseline-first.log": "0dda60114e488fb39a5e33e124d27711a5cb1789a042cafd9e7acdc0a5e5f864",
+    "baseline-original.log": "7d9dc3a210f913fccb3b9738c12819305460c75742f3eb2ba96baaed9a085e9c",
+    "focused.log": "83f402f291a08987b76f3668a024772deb125682e7794c56dd7b5d6811bed341",
+    "point.log": "4a3ca63d48f7739af03b8b66b2fd00edc564308b3722ef3f49eebd1e4678e9fe",
+    "run-aligned.py": "8624fde1e975e9bbbb986003dcfc9fc9de39bd3ed820030e383a7fbef95ab131",
+    "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "tests.patch": "13d5d94a6744afbad54d77f3bede97668d97f6b068c3a0100ea2cd26c187f40e"
+  }
+}

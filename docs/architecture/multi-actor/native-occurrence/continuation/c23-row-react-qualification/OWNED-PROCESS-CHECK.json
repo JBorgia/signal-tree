@@ -1,0 +1,14 @@
+[
+  {
+    "target": "kernel",
+    "ownedPid": 34329,
+    "ownedPgid": 34329,
+    "groupPresentAtFreeze": false
+  },
+  {
+    "target": "react",
+    "ownedPid": 35053,
+    "ownedPgid": 35053,
+    "groupPresentAtFreeze": false
+  }
+]

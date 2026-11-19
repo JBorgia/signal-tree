@@ -1,0 +1,13 @@
+{
+  "manifest": "47e05e6216bab9fd186dfbb66b656f4e33dc1f9d98a81a1ad096ee61b12181f9",
+  "files": 3050,
+  "delta": [
+    "packages/angular/src/lib/effective-presence-install-reentry.spec.ts",
+    "packages/angular/src/lib/effective-presence-successor.spec.ts",
+    "packages/kernel/src/lib/effective-presence-install-reentry.spec.ts",
+    "packages/kernel/src/lib/effective-presence-reentry.spec.ts",
+    "packages/kernel/src/lib/effective-presence-successor.spec.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/member-membership.ts"
+  ]
+}

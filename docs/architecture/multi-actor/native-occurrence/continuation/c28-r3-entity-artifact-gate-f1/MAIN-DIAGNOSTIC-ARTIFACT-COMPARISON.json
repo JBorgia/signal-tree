@@ -1,0 +1,10 @@
+{
+  "base": "b4d66da3",
+  "scope": "regular files under canonical dist/packages; compared actual bytes, not a source freshness assertion",
+  "files": 192,
+  "different": [],
+  "candidateFiles": 192,
+  "extra": [],
+  "missing": [],
+  "sameFileSet": true
+}

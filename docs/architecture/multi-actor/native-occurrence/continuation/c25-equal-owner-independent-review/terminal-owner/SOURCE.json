@@ -1,0 +1,5 @@
+{
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "fd0fc33aeb3892fc551231c537db2e8764c558eb58eef0dcb21b23840cc87325",
+  "packages/kernel/src/lib/experimental-publication/private.ts": "7740647fba2eb590a71c64c3bf2a3cfc9d88c980a5eb45c4f1f90adc421bc9e2",
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23"
+}

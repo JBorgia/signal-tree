@@ -1,0 +1,93 @@
+[
+  {
+    "project": "angular",
+    "path": "packages/angular/src/lib/whole-value-new-keys.spec.ts",
+    "case": "publishes newly supplied ordinary keys through the angular facade",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at getter.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/angular/src/lib/whole-value-new-keys.spec.ts:35:14\n    at withWriteContext (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/write-context.ts:65:12)"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/angular/first.log"
+  },
+  {
+    "project": "react",
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "case": "React branch equal whole actual-owner / confirm",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:31:70\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log"
+  },
+  {
+    "project": "react",
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "case": "React branch equal whole actual-owner / rollback",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:31:70\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log"
+  },
+  {
+    "project": "react",
+    "path": "packages/react/src/branch-declaration-qualification.spec.tsx",
+    "case": "React branch disposed held receipt releases waiter without settling owner",
+    "errors": [
+      {
+        "name": "AssertionError",
+        "message": "expected [ 'held', 'conservative' ] to include 'no-write'",
+        "stack": "AssertionError: expected [ 'held', 'conservative' ] to include 'no-write'\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1319:15)\n    at Proxy.<anonymous> (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/react/src/branch-declaration-qualification.spec.tsx:61:103\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log"
+  },
+  {
+    "project": "react",
+    "path": "packages/react/src/whole-value-new-keys.spec.tsx",
+    "case": "publishes newly supplied ordinary keys through the React facade",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:483:18)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:490:13\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts:164:35\n    at Object.replace (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:488:26)\n    at node.n (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/location-runtime.ts:461:17)"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log"
+  },
+  {
+    "project": "vue",
+    "path": "packages/vue/src/lib/whole-value-new-keys.spec.ts",
+    "case": "publishes newly supplied ordinary keys through the vue facade",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at cell.set (/private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/vue-observation.ts:80:31)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/vue/src/lib/whole-value-new-keys.spec.ts:30:14"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/vue/first.log"
+  },
+  {
+    "project": "solid",
+    "path": "packages/solid/src/lib/whole-value-new-keys.spec.ts",
+    "case": "publishes newly supplied ordinary keys through the solid facade",
+    "errors": [
+      {
+        "name": "Error",
+        "message": "Scalar selection requires prepared admission",
+        "stack": "Error: Scalar selection requires prepared admission\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2891:25\n    at prepareScalarSelection (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-scalar-selection.ts:7:263)\n    at Object.prepare (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/experimental-publication/private.ts:180:55)\n    at publicationPreparer (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts:329:32)\n    at preparePublication (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:237:16)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:259:15\n    at Object.commitRecorded (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts:337:34)\n    at cell.replace [as set] (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts:248:37)\n    at /private/tmp/st-r3-compatibility-inventory/candidate/packages/solid/src/lib/whole-value-new-keys.spec.ts:42:14\n    at withWriteContext (/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/write-context.ts:65:12)"
+      }
+    ],
+    "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/first.log"
+  }
+]

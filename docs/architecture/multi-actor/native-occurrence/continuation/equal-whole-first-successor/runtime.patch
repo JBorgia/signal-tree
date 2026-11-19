@@ -1,0 +1,46 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1584,17 +1584,35 @@
+     });
+     if (structuralFrontier)
+       structuralFrontier.after = topologyUnit.physical.after;
++    // Whole replacement offers equal supplied fields to native endpoint selection.
++    // This publication domain does not change native value effects or physical diffs.
++    const ordinaryPublicationByChange = new Map<
++      import('./internals/mutation-capture-runtime').CommittedEntityMutation,
++      EntityPublicationEdit
++    >();
++    const publicationSteps = changes.map((change, ordinal) => {
++      const footprint = authoredByStep.get(ordinal);
++      return {
++        ordinal,
++        authoredFootprint: footprint,
++        authoredRemoval: options?.publication !== 'physical' && change.structuralRecord?.kind === 'remove'
++          ? {...change, fields:null, structural:change.structuralRecord} : undefined,
++        ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => {
++          const changedFields = effect.structural ? null : publicationFields(effect.before, effect.after);
++          const fields = !effect.structural && footprint?.kind === 'whole'
++            ? Object.freeze([...new Set([...(changedFields ?? []), ...Object.keys(effect.after ?? {})])])
++            : changedFields;
++          const edit = {...effect, restoredFields:restoredByStep.get(ordinal), fields, structural:effect.structuralRecord};
++          ordinaryPublicationByChange.set(effect, edit);
++          return edit;
++        }),
++      };
++    });
+     const publication=prepareEntityPublication(
+       changes.map((change,ordinal)=>{const physical=physicalValuesByStep.get(ordinal);return {...change,before:physical?physical.physicalBefore:change.before,after:physical?physical.physicalAfter:change.after,fields:change.structural?null:publicationFields(physical?physical.physicalBefore:change.before,physical?physical.physicalAfter:change.after),structural:change.structuralRecord};}),
+-      ordinaryPlan.changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
++      ordinaryPlan.changes.map(change=>ordinaryPublicationByChange.get(change)??({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
+       frame.orderEndpoints?.after,ordinaryPlan.ordinaryEndpoints?.after,false,
+-      changes.map((change, ordinal) => ({
+-        ordinal,
+-        authoredFootprint: authoredByStep.get(ordinal),
+-        authoredRemoval: options?.publication !== 'physical' && change.structuralRecord?.kind === 'remove'
+-          ? {...change, fields:null, structural:change.structuralRecord} : undefined,
+-        ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => ({...effect,restoredFields:restoredByStep.get(ordinal),fields:effect.structural?null:publicationFields(effect.before,effect.after),structural:effect.structuralRecord})),
+-      })),
++      publicationSteps,
+       entityPublication.requestsSeed()?(()=>{
+         const fresh=new Map(frame.mutations.flatMap(mutation=>mutation.kind==='create-fresh-subject'?[[mutation.subjectId,mutation.nextValue] as const]:[]));
+         return physicalPlacement.snapshot().map(subjectId=>{

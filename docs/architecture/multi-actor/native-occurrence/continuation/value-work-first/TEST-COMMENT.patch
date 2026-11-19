@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/lib/recipient-window-independent.spec.ts
++++ b/packages/kernel/src/lib/recipient-window-independent.spec.ts
+@@ -30,7 +30,7 @@
+ });
+ it('private unknown-native window includes owner opened by later callback-capable preparer',async()=>{
+  const o=owner(),tree=signalTree({pair:{x:0,y:0}});const one:unknown[]=[],two:unknown[]=[];const a=link(tree.$.pair,{set:v=>{one.push(v);}}) as Declared,b=link(tree.$.pair,{set:v=>{two.push(v);}});let pending:ReturnType<typeof o.transact>|undefined;let calls=0;
+- const spy=vi.spyOn(life,'prepareNativeRequirement');const release=preparePublicationMutations(tree.$.pair.x,()=>{calls++;pending=o.transact(()=>o.$.z(7));return undefined;},()=>{});
++ const spy=vi.spyOn(life,'prepareNativeRequirement');const release=preparePublicationMutations(tree.$.pair.x,()=>{calls++;pending=o.transact(()=>o.$.z(7));return undefined;},()=>{ /* Intentional completion sink: this probe only opens an owner during preparation. */ });
+  try{a.declare({kind:'unknown'},()=>tree.$.pair(v=>({...v,x:1})));expect(calls).toBe(1);if(!pending)throw Error('preparer did not open owner');expect(spy.mock.results.some(r=>r.type==='return'&&life.nativeProof(r.value.requirement).possible?.some(c=>c.outcome==='pending'))).toBe(true);await flush();expect(one).toEqual([]);expect(two).toEqual([]);pending.confirm();await flush();expect(one).toEqual([{x:1,y:0}]);expect(two).toEqual(one);await b.settled();}finally{release?.();spy.mockRestore();a.dispose();b.dispose();tree.destroy();o.destroy();}
+ });
+ 

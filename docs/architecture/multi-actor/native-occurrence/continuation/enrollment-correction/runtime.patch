@@ -1,0 +1,46 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -211,7 +211,7 @@
+  if(!requirement||!unactivatedRequirements.delete(requirement))return;
+  if(nativeRequirementReady(requirement))notifyRequirement(requirement);
+ }
+-type Operation={recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
++type Operation={declared:boolean;recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+ const stack:Frame[]=[];
+ const installedLast=new Map<Frame,object>();
+@@ -263,8 +263,10 @@
+  const nativeEvidence=native?nativeProof(native):undefined;
+  // Recipient enrollment must not turn destination D into a declaration input.
+  const required=uniqueOwners([...active.flatMap(frameOwners),...(nativeEvidence?.input??[]),...(nativeEvidence?.validation??[])]);
+- const op:Operation={recipientWindow:[],incomplete:matches.length===0||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+- if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:true,invalid:false};
++ // Native support is source evidence, not this recipient's declaration permission.
++ // Without a native requirement retain the conservative enrollment window.
++ const op:Operation={declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
++ if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:unknown||!native,invalid:false};
+  writes.push({map:c.ops,key:revision,value:op});
+  for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+  for(const frame of active){
+@@ -305,6 +307,10 @@
+  const op=connections.get(channel)?.ops.get(revision);
+  if(!op||op.frames.size)return undefined;
+  return op.proof;
++}
++/** Only a matching declaration may use declared early admission. */
++export function hasDeclaration(channel:object,revision:object):boolean {
++ return connections.get(channel)?.ops.get(revision)?.declared===true;
+ }
+ export function noWrite(channel:object,revision:object):void {
+  const c=connections.get(channel),op=c?.ops.get(revision);if(!op)return;
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -446,7 +446,7 @@
+ function decision(fact:Fact|undefined,channel:object):{early:boolean;pending:boolean}{
+  if(!fact)return {early:false,pending:false};
+  const p=proofs.get(fact);if(!p)return {early:false,pending:true};
+- return {early:!p.invalid&&!p.unknown&&!p.terminalRejectedRoles&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
++ return {early:lifecycle.hasDeclaration(channel,fact)&&!p.invalid&&!p.unknown&&!p.terminalRejectedRoles&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+ export function pendingDecision(fact:Fact|undefined,channel:object):boolean{return (bindings.get(channel)?.pending.size??0)>0||(bindings.get(channel)?.index.unresolved()??0)>0||decision(fact,channel).pending;}
+ export function allowed(fact:Fact|undefined,_owner:number,_position:number,channel:object):boolean{

@@ -1,0 +1,16 @@
+[
+  {
+    "pid": 58436,
+    "ppid": 58423,
+    "rssBytes": 180224,
+    "birth": "Tue Nov 3 11:22:34 2026",
+    "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx show project kernel --json"
+  },
+  {
+    "pid": 58439,
+    "ppid": 58436,
+    "rssBytes": 61767680,
+    "birth": "Tue Nov 3 11:22:34 2026",
+    "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js show project kernel --json"
+  }
+]

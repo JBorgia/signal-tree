@@ -1,0 +1,11 @@
+{
+  "base": "C4",
+  "patches": [
+    "/private/tmp/st-scalar-instrumentation-successor/runtime.patch",
+    "/private/tmp/st-scalar-instrumentation-successor/accounting-tests.patch",
+    "/private/tmp/st-scalar-instrumentation-successor/scalar-oracle.patch",
+    "/private/tmp/st-scalar-instrumentation-successor/omission-reason-companion.patch",
+    "/private/tmp/st-packet-oracle-alignment-successor/tests.patch"
+  ],
+  "reason": "Reviewed actual-event counter repair; test-only private-policy/oracle alignment retains old fixtures and original failures in component evidence."
+}

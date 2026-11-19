@@ -1,0 +1,62 @@
+
+> nx run kernel:test scalar-frame-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts --maxWorkers=1
+
+(node:44247) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:44254) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:44261) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (17 tests | 1 failed) 27ms
+   × sibling prepared records retain changed contribution when final sibling is equal 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > sibling prepared records retain changed contribution when final sibling is equal
+AssertionError: expected undefined to deeply equal { a: 1, b: +0 }
+
+- Expected:
+{
+  "a": 1,
+  "b": 0,
+}
+
++ Received:
+undefined
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:91:306
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 16 passed (17)
+   Start at  17:18:39
+   Duration  727ms (transform 395ms, setup 0ms, import 473ms, tests 27ms, environment 155ms)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

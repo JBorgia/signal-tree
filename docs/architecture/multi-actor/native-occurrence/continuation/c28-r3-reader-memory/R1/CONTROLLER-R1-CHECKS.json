@@ -1,0 +1,20 @@
+{
+  "controllerSha256": "1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344",
+  "method": "Evaluate actual AST validation/stop/result expressions; no controller import, subprocess, Nx, or memory workload",
+  "checks": {
+    "completeExpectedStreamAccepted": true,
+    "testDriftStops": true,
+    "runtimeDriftStops": true,
+    "cleanDoesNotStop": true,
+    "singleFinalWrongSizeSampleRejected": true,
+    "singleFinalCorrectSizeRejected": true,
+    "completeWrongSizeRejected": true,
+    "missingStageRejected": true,
+    "duplicateStageRejected": true,
+    "reorderedStagesRejected": true,
+    "nonfiniteRejected": true,
+    "reversedCasesRejected": true,
+    "equalLiveAndReceiptDriftRejected": true
+  },
+  "stageCount": 30
+}

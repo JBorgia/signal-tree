@@ -1,0 +1,1 @@
+Authorized native experiment. First slice: mandatory authored footprint classification at all frame replacement producers and propagation per publication step, without treating footprint as settled ownership. Pending: native normalized endpoint admission/inverse, source demand capture and recipient selection. Preserve first baseline failures. No activation/public policy/index.

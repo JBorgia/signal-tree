@@ -1,0 +1,20 @@
+# Frozen refusal-fixture overlay independent review
+
+Bounded accept for composition with Main's replay. No weakening, after-commit/refusal confusion, runtime mutation or discovery exclusion found. This verdict applies only to the four test files, not other state/admission/cost failures. No independent test execution performed.
+
+Identity: full manifest 9312b685e9f7a7752c44cf4424d5b8903eb4782cf787fcfe6cc3ae54d3c9a529; TESTS.patch da4def24afb96a4cd6947c4f3d8a608a41b50a372517471b24cdd5cd6976aede. Independently hashed every manifested candidate file; zero mismatches. Compared manifest against frozen R3: exactly the four named specs differ, with no added/removed manifest paths. All four archived originals independently match MAPPING.json original hashes. Runtime and configuration/ratchet files are unchanged. IDENTITY.json records the comparison.
+
+Actual patch and fixture inspection:
+
+- Restoration's two success spies now observe prepareSelectedUnit with default vi.spyOn forwarding, restored in finally. Exact thrown callback message, restored left/right values, no new restoration turn, and preserving unrelated confirmed b.y20 are retained. The public state assertions witness installation, so the new preparation count is not standing alone as proof that compensation ran. Other fallback spies are not rewritten.
+- Five observer-failure refusal sites throw once before invoking the real prepareSelectedUnit or obtaining a plan. They assert refusalCalls===1 and returnedPlans===0; hence a swallowed fault or alternate route cannot pass vacuously. Later wrapper calls preserve receiver/arguments/result, but the exact count forbids an unexpected retry in these cases. Existing distinct callback/group-close/capture-release recovery metadata, useful confirmation/Link settlement, report payload and throwing-console precedence assertions remain.
+- The shared opaque refusal fixture (three enhancer orders) uses mockImplementationOnce and checks exact thrown sentinel in spy results before restoration. Existing callback-threw-undefined distinction, SignalTreeRollbackError, callbackFailed/callbackError, whole-terminal inspection and recovery.rollback state assertions remain. It does not convert the opaque leaf into structural state.
+- Lifecycle refusal test explicitly labels the injected preparation failure. It adds reached/zero-plan and retained x1 assertions, keeps effect-validation-failed/pendingRetained/consequencesReleased, pending snapshot and confirmation behavior. The structural-drift text is an injected error marker, not evidence of naturally occurring drift.
+
+These refusals occur before any compensation plan exists. The original forward transaction writes have already installed, deliberately; the assertions require that authority remain pending after the refused compensation. This is distinct from a throw during publish/complete after compensation commits. No completion hooks are replaced and no lifecycle events are fabricated.
+
+Minor report precision: not every method is restored before confirmation. The lifecycle-view wrapper stays installed through pending.confirm and is restored in finally. Confirmation does not invoke preparation; the once/zero-plan assertions and runtime route make this harmless. Do not generalize the report's restoration wording into an additional executed premise. Real recovery.rollback in the opaque case does run after mock restoration.
+
+Raw author evidence inspected: affected-four-first has four files/236 actual passes, exit0/no timeout and unchanged-source checks; spec-types-first reports OK with existing baseline improvements, not a baseline edit. No retries or runtime repairs claimed. These tests reached their original useful assertions. I did not rerun or infer full-suite acceptance from them.
+
+Composition disposition: accept this exact test-only overlay, preserve originals/first failures, replay affected tests/spec types after composition. External ABA, nested realization ownership, dynamic admission and cost failures remain independent open results; this overlay neither fixes nor reclassifies them.

@@ -1,0 +1,65 @@
+{
+  "results": [
+    {
+      "name": "AG-UI draft needs review/apply; server receipt and native settlement remain separate",
+      "outcome": "PASS"
+    },
+    {
+      "name": "rejecting a reviewed proposal preserves an independent note without server execution",
+      "outcome": "PASS"
+    },
+    {
+      "name": "stale authoritative input version rejects ABA after review and preserves note",
+      "outcome": "PASS"
+    },
+    {
+      "name": "definitive persistence error rolls back locally without a server commit",
+      "outcome": "PASS"
+    },
+    {
+      "name": "lost acknowledgment retains authority; disposal refuses; retry commits once",
+      "outcome": "PASS"
+    },
+    {
+      "name": "disposing an unsent draft rejects it and destroys tree exactly once",
+      "outcome": "PASS"
+    },
+    {
+      "name": "settled session disposes without erasing accepted server state",
+      "outcome": "PASS"
+    },
+    {
+      "name": "terminal rejection retains local authority; overlap resolution enables local-only retry",
+      "outcome": "PASS"
+    },
+    {
+      "name": "post-terminal removal observer error is reported without retry or lost terminal outcome",
+      "outcome": "PASS"
+    },
+    {
+      "name": "protocol and forged transport context cannot mint consent; missing server grant blocks application",
+      "outcome": "PASS"
+    },
+    {
+      "name": "uncertain command retains its capped grant and owner until receipt retry then releases capacity",
+      "outcome": "PASS"
+    },
+    {
+      "name": "terminal receipt revokes grant while local recovery retains owner and never resends",
+      "outcome": "PASS"
+    },
+    {
+      "name": "human and declared embedded proposals share review, authority and local settlement",
+      "outcome": "PASS"
+    },
+    {
+      "name": "delayed embedded completion keeps its observed versions and rejects changed input without losing a note",
+      "outcome": "PASS"
+    },
+    {
+      "name": "in-session disposal cancels a producer before proposal without creating late authority",
+      "outcome": "PASS"
+    }
+  ],
+  "pageErrors": []
+}

@@ -1,0 +1,42 @@
+{
+  "manifest_sha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+  "original_and_copy_files_verified": 3053,
+  "results": {
+    "source-types": {
+      "exit": 0,
+      "elapsedSeconds": 10.396840624976903,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 19.28789212508127,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "angular": {
+      "exit": 0,
+      "elapsedSeconds": 93.60499408305623,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "react": {
+      "exit": 0,
+      "elapsedSeconds": 48.1074907919392,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "vue": {
+      "exit": 0,
+      "elapsedSeconds": 30.194389750016853,
+      "source_unchanged": true,
+      "changed": []
+    },
+    "solid": {
+      "exit": 0,
+      "elapsedSeconds": 23.828559792018496,
+      "source_unchanged": true,
+      "changed": []
+    }
+  }
+}

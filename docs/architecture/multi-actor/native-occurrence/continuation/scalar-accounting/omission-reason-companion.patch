@@ -1,0 +1,12 @@
+--- a/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts
+@@ -542,7 +542,8 @@
+         error = caught;
+       }
+       expect(error).toMatchObject({ code: 'SIGNALTREE_ROLLBACK_FAILED' });
+-      expect((error as Error).message).toMatch(/later-confirmed-dependency/);
++      expect(error).toMatchObject({ cause: { kind: 'effect-validation-failed' } });
++      expect((error as Error).message).toContain("the entity collection at 'g.rows' was omitted and changed");
+       expect(tree.$()).toEqual({ g: { k: 1 }, count: 0 });
+       // Refused, not settled: the transaction can still be confirmed.
+       pending.confirm();

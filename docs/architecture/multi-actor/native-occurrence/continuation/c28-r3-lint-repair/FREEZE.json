@@ -1,0 +1,30 @@
+{
+  "status": "frozen for independent review; not composed",
+  "base": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "files": 3104,
+  "changedOriginalPaths": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts",
+    "packages/react/src/branch-declaration-qualification.spec.tsx"
+  ],
+  "hashes": {
+    "MANIFEST.json": "39c757521770c5ae4f567310713f557b84bed08d0f7374f94eb31b9169283100",
+    "BASE-MANIFEST.json": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+    "runtime.patch": "c056b18cae0080246d58af6facce83fa71181539385d8fe140531b9bc2b63140",
+    "fixture-comments.patch": "14a63df4ebee97a58747e285edc79a21605b5f2c472bddf313a784a64896890c",
+    "precedence-tests.patch": "248ad97e30864fd2fbd99ca4871060ce702bb1ee24f15e5100d67d3d453945c9",
+    "reviewer-overlay.patch": "571675fa6faf71fd145c0c3cf5cb534c2a28a4913ac08248c6e22b605994b539",
+    "maintenance.patch": "3ed0b83b01b75f8c2731c8e6c32639b4f8eae7779e4a061ec87ae33c9b98c782",
+    "REPORT.md": "52e74e4f0e29eed53a36cffd5d0c4b5ceb6a21ccbd28c102275bccf0db04b935",
+    "REVIEW-REQUEST.md": "944dd8f42c7db1a7501f373cc7f852fac79834f056088982b3f404141434e35d",
+    "PREWRITTEN-MATRIX.md": "f5872372193abdf1a2f250c9a9d1c84451e67e7cd54ed2b34fe49f5c3063a2f2",
+    "RESULTS.json": "d89b8fb43c5e7ca76173f18df467c0209e456a104f8f07854f6d30451eb4298e",
+    "COMMENTS-EQUIVALENCE.json": "d507cf266cd26c8f4be7f553a392efd1850a2b909a1ae1421d45f700c30c898c",
+    "ALLOCATION-SHAPE.json": "33d0d4a05fec1f36728aa63428d128c1de530a202d02b3790090b8cf694c83f3",
+    "PRESERVED-LINT-FIRST.log": "c34aec0706f322d4417b78e9e2c93fd789e2d6e87ef1df8b9caddeae6da128de"
+  }
+}

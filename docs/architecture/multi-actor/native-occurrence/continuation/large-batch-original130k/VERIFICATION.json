@@ -1,0 +1,14 @@
+{
+  "inputManifestSha256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "snapshotSha256": "2372f88ceff1d5c21dabec41f9a62f5d268445de96b6e3cf7f041d772f6cbc0c",
+  "probeSha256": "3c6061908a0dc64c3c6bc0c7b3753c4022cd1e9d37d182f26557d787f956fe59",
+  "patchSha256": "4a353ff54c8b6a80abbede30f0dab3bad7a4731aa184851a8007c20676bd41c4",
+  "unchangedInputPaths": 3065,
+  "runtimeChanges": 0,
+  "testExecutions": 1,
+  "testsPassed": 1,
+  "orderedStageMarkers": 15,
+  "workerPid": 58691,
+  "watchdogTriggered": false,
+  "ownedGroupPresentAfterExit": false
+}

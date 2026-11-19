@@ -1,0 +1,30 @@
+{
+  "lib/experimental-publication/private.ts": {
+    "restoredSha256": "501bc25e28a2eae0c33adc608cd85c773b95e80a12a57c3ecc4c8d378327daa9",
+    "expectedRestoredSha256": "501bc25e28a2eae0c33adc608cd85c773b95e80a12a57c3ecc4c8d378327daa9",
+    "instrumentedSha256": "7447a9cc5fae7989427183265611da7885cba2fb66023b934d2102b1480ded47",
+    "largeRunMatches": true,
+    "derivedRunMatches": true
+  },
+  "lib/experimental-publication/lifecycle.ts": {
+    "restoredSha256": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6",
+    "expectedRestoredSha256": "8b248fb1ed4cd3c2d082dcb5dd7f91ba08255393d6c7b3e1324d6bd2914456c6",
+    "instrumentedSha256": "5be62d4da57d5ff72df81d9caf805c51d0b26a83d94bf2eeaf411f9cadfbaa23",
+    "largeRunMatches": true,
+    "derivedRunMatches": true
+  },
+  "lib/internals/native-scalar-selection.ts": {
+    "restoredSha256": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+    "expectedRestoredSha256": "b76da7518747449827a8bed7d140a4969f8805fd81f8c0ba6b899575f85447e8",
+    "instrumentedSha256": "5fc14ca9ff02b7f433d62fa4372384c708022289369e0371852b571e76ae50ab",
+    "largeRunMatches": true,
+    "derivedRunMatches": true
+  },
+  "enhancers/transactions/transactions.ts": {
+    "restoredSha256": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+    "expectedRestoredSha256": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+    "instrumentedSha256": "79e41d25b785b98daae85c58ef2f398cd0b7835230648b41fd2c9b7bf18cb32a",
+    "largeRunMatches": true,
+    "derivedRunMatches": true
+  }
+}

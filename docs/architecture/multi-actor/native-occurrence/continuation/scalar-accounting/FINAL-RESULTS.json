@@ -1,0 +1,22 @@
+{
+  "preregistered-red": {
+    "exit": 1,
+    "elapsedSeconds": 60.455338415980805
+  },
+  "focused": {
+    "exit": 0,
+    "elapsedSeconds": 69.96138270903612
+  },
+  "source-types": {
+    "exit": 0,
+    "elapsedSeconds": 16.0479961669771
+  },
+  "spec-types": {
+    "exit": 0,
+    "elapsedSeconds": 35.005953082989436
+  },
+  "final-focused": {
+    "exit": 0,
+    "elapsedSeconds": 90.26519000000553
+  }
+}

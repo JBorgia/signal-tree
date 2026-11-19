@@ -1,0 +1,125 @@
+[
+  {
+    "arm": "baseline",
+    "size": 128,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      40667
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 61532256,
+    "firstSampleHeapUsed": 44213336,
+    "sampledPositiveGrowth": 17318920,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "reader",
+    "size": 128,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      42727
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 62336416,
+    "firstSampleHeapUsed": 38942720,
+    "sampledPositiveGrowth": 23393696,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "reader",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      43928
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 65962688,
+    "firstSampleHeapUsed": 38985736,
+    "sampledPositiveGrowth": 26976952,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "baseline",
+    "size": 512,
+    "replicate": 1,
+    "exit": 0,
+    "watchdog": null,
+    "counts": {
+      "passed": 2,
+      "skipped": 9
+    },
+    "workerPids": [
+      44609
+    ],
+    "heapSizeLimits": [
+      4496293888
+    ],
+    "maxSampledHeapUsed": 76739632,
+    "firstSampleHeapUsed": 44301256,
+    "sampledPositiveGrowth": 32438376,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": true,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "arm": "baseline",
+    "size": 2048,
+    "replicate": 1,
+    "exit": -15,
+    "watchdog": "no-progress180s",
+    "counts": {},
+    "workerPids": [],
+    "heapSizeLimits": [],
+    "maxSampledHeapUsed": 0,
+    "firstSampleHeapUsed": 0,
+    "sampledPositiveGrowth": 0,
+    "steepGrowthStop": false,
+    "validTwoCasesAndFreshWorker": false,
+    "remainingOwned": [],
+    "runtimeMismatches": [],
+    "testUnchanged": true,
+    "attempts": 1
+  }
+]

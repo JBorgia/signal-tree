@@ -1,0 +1,13 @@
+{
+  "perFileTargetOccurrences": 1574,
+  "reviewMode": "read-only source, recorded graph and raw command evidence; no test or build reruns",
+  "inputs": {
+    "config.patch": "76ab5435fe551ec17a44911a6840d6c06c25a6b326cabe5308cfd0ad66e73a19",
+    "REPORT.md": "766ea7d425a2c6779044d1b1a83be57ea672e0eddbee8ae9946573a7a2194e8d",
+    "RESOLVER-SCOPE.md": "713dbdb338d22964f317fb1db54ba0468ed6f3772eac4518215675e84f159431",
+    "SNAPSHOT.json": "11c093b513c2b75d82f9c4ef3c2c71970ebb66aaba722419fe351a046c3c7b88",
+    "BEFORE-GRAPH.json": "46acd2eaef77a400cb2f1a90589d664e10241423ab230002477c4cdca4f17d44",
+    "GRAPH.json": "46acd2eaef77a400cb2f1a90589d664e10241423ab230002477c4cdca4f17d44",
+    "ALIAS-RESULTS.json": "ae61bcfb9ec3e83ffa9f727a8bc47ae80e73fdb753776b873623aff2e174ea53"
+  }
+}

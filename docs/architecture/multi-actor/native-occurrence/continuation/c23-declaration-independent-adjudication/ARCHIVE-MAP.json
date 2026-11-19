@@ -1,0 +1,284 @@
+[
+  {
+    "source": "ownership.py",
+    "archive": "ownership.py",
+    "sourceSha256": "1d73883dca029f279ed0456065f0fc26a265c42e4e5b0ce98c9a1edf9780ffe1",
+    "archiveSha256": "1d73883dca029f279ed0456065f0fc26a265c42e4e5b0ce98c9a1edf9780ffe1"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "e21c9ec0e7b8e361e264ef58f58c01bb219f3681341a5fb2d68ebee7ba27f02c",
+    "archiveSha256": "e21c9ec0e7b8e361e264ef58f58c01bb219f3681341a5fb2d68ebee7ba27f02c"
+  },
+  {
+    "source": "EXECUTION-LIMITS.md",
+    "archive": "EXECUTION-LIMITS.md",
+    "sourceSha256": "08a92a9edddabbbea30591729ae7461161810b2726ab14c372734660519a90db",
+    "archiveSha256": "08a92a9edddabbbea30591729ae7461161810b2726ab14c372734660519a90db"
+  },
+  {
+    "source": "VERIFIED-INPUT.json",
+    "archive": "VERIFIED-INPUT.json",
+    "sourceSha256": "7992dbdab86be6fb8efcb2eb4d37c601d9906c7be6188d8554e07ec71c7c5c35",
+    "archiveSha256": "7992dbdab86be6fb8efcb2eb4d37c601d9906c7be6188d8554e07ec71c7c5c35"
+  },
+  {
+    "source": "BASE-MANIFEST.json",
+    "archive": "BASE-MANIFEST.json.gz",
+    "sourceSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+    "archiveSha256": "69b7e1a3ed5d3717ab97cf1669c731fc8d8b609344354944fdbb6f2426bcac5a"
+  },
+  {
+    "source": "FULL-VERIFICATION-COMPLETED.json",
+    "archive": "FULL-VERIFICATION-COMPLETED.json",
+    "sourceSha256": "ce54d2f3fdb25125a49199e63232ee7d34310c16e96109ea635bc67b60b9124b",
+    "archiveSha256": "ce54d2f3fdb25125a49199e63232ee7d34310c16e96109ea635bc67b60b9124b"
+  },
+  {
+    "source": "COPY-INTERRUPTED.md",
+    "archive": "COPY-INTERRUPTED.md",
+    "sourceSha256": "aa66dfd2b840cd049ab0a5653dee934f4f3d3129167115fb2bb1941d7a1361c1",
+    "archiveSha256": "aa66dfd2b840cd049ab0a5653dee934f4f3d3129167115fb2bb1941d7a1361c1"
+  },
+  {
+    "source": "vitest.config.mjs",
+    "archive": "vitest.config.mjs",
+    "sourceSha256": "8cde7b0cec922f22639b0e4301ccc29221413309852bb7b99b5d74c5f73d7e8d",
+    "archiveSha256": "8cde7b0cec922f22639b0e4301ccc29221413309852bb7b99b5d74c5f73d7e8d"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "ea374bfd26f146773b0e664881b1dae376ca5e2db4f3ad95896f1e7e4070f123",
+    "archiveSha256": "ea374bfd26f146773b0e664881b1dae376ca5e2db4f3ad95896f1e7e4070f123"
+  },
+  {
+    "source": "EVIDENCE-HASHES.json",
+    "archive": "EVIDENCE-HASHES.json",
+    "sourceSha256": "877888b73751310609e2d18164a67b1a86d78a6145a4258992da6c640bdd2bae",
+    "archiveSha256": "877888b73751310609e2d18164a67b1a86d78a6145a4258992da6c640bdd2bae"
+  },
+  {
+    "source": "PREMISE.md",
+    "archive": "PREMISE.md",
+    "sourceSha256": "c889f7cdf6c0aa1ed888a54db7fb4a729d42ffd0f636e9c3d5fa3e40169ad32c",
+    "archiveSha256": "c889f7cdf6c0aa1ed888a54db7fb4a729d42ffd0f636e9c3d5fa3e40169ad32c"
+  },
+  {
+    "source": "original-raw/react/RESULT.json",
+    "archive": "original-raw/react/RESULT.json",
+    "sourceSha256": "bbc3151792e9679dbbd3b77f9361c6582f2bf5b0fa279f091e03619daac2da65",
+    "archiveSha256": "bbc3151792e9679dbbd3b77f9361c6582f2bf5b0fa279f091e03619daac2da65"
+  },
+  {
+    "source": "original-raw/react/first.log",
+    "archive": "original-raw/react/first.log",
+    "sourceSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996",
+    "archiveSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996"
+  },
+  {
+    "source": "original-raw/react/COMMAND.json",
+    "archive": "original-raw/react/COMMAND.json",
+    "sourceSha256": "087bb9e8c144a17a8664262deb8d9554761b887d30750ad4405d7aa6b18860b6",
+    "archiveSha256": "087bb9e8c144a17a8664262deb8d9554761b887d30750ad4405d7aa6b18860b6"
+  },
+  {
+    "source": "original-raw/kernel/RESULT.json",
+    "archive": "original-raw/kernel/RESULT.json",
+    "sourceSha256": "505801c6cb8ff7f3167c186ff1aac8c8c6eb4e2e540feab59a88463315f55431",
+    "archiveSha256": "505801c6cb8ff7f3167c186ff1aac8c8c6eb4e2e540feab59a88463315f55431"
+  },
+  {
+    "source": "original-raw/kernel/first.log",
+    "archive": "original-raw/kernel/first.log",
+    "sourceSha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0",
+    "archiveSha256": "f1b667f3b352932c8247369961824c79d3ad605cad81b1bfc630b65b668ea4c0"
+  },
+  {
+    "source": "original-raw/kernel/COMMAND.json",
+    "archive": "original-raw/kernel/COMMAND.json",
+    "sourceSha256": "f5533159c1711c3e666979f7328149d596ab0584e4f6a3b46131b8c429e220ef",
+    "archiveSha256": "f5533159c1711c3e666979f7328149d596ab0584e4f6a3b46131b8c429e220ef"
+  },
+  {
+    "source": "specs/neutral-branch.spec.ts",
+    "archive": "specs/neutral-branch.spec.ts",
+    "sourceSha256": "d56984d2ee43e62f0df684b5bbc547fbaf40f2be897a5daeb84b49d92f26deec",
+    "archiveSha256": "d56984d2ee43e62f0df684b5bbc547fbaf40f2be897a5daeb84b49d92f26deec"
+  },
+  {
+    "source": "specs/row-receipt-counterpart.spec.ts",
+    "archive": "specs/row-receipt-counterpart.spec.ts",
+    "sourceSha256": "9d470d18266a43bbc5bda5748646b8e9cc109395abdded0b886fdb4794bf5730",
+    "archiveSha256": "9d470d18266a43bbc5bda5748646b8e9cc109395abdded0b886fdb4794bf5730"
+  },
+  {
+    "source": "original-runs/react/RESULT.json",
+    "archive": "original-runs/react/RESULT.json",
+    "sourceSha256": "bbc3151792e9679dbbd3b77f9361c6582f2bf5b0fa279f091e03619daac2da65",
+    "archiveSha256": "bbc3151792e9679dbbd3b77f9361c6582f2bf5b0fa279f091e03619daac2da65"
+  },
+  {
+    "source": "original-runs/react/first.log",
+    "archive": "original-runs/react/first.log",
+    "sourceSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996",
+    "archiveSha256": "926a7f21bb4305d80d8399c7d63a051a1c324d8cee7f1ba333395a38e8953996"
+  },
+  {
+    "source": "original-runs/react/SOURCE-BEFORE.json",
+    "archive": "original-runs/react/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "2f2ed3778e0dd2b5a24c372d48349accaf3ab647e240c8d87ab432524ce699fe",
+    "archiveSha256": "96396902cfbeb462c037c43c7e3882d326bc572ae2551a02e3e84795d82aba84"
+  },
+  {
+    "source": "original-runs/react/COMMAND.json",
+    "archive": "original-runs/react/COMMAND.json",
+    "sourceSha256": "087bb9e8c144a17a8664262deb8d9554761b887d30750ad4405d7aa6b18860b6",
+    "archiveSha256": "087bb9e8c144a17a8664262deb8d9554761b887d30750ad4405d7aa6b18860b6"
+  },
+  {
+    "source": "original-runs/react/PROCESS.json",
+    "archive": "original-runs/react/PROCESS.json",
+    "sourceSha256": "693081284815dd34f9231e738b91037a8b5e620f3ce980694d2a98bfb35eb095",
+    "archiveSha256": "693081284815dd34f9231e738b91037a8b5e620f3ce980694d2a98bfb35eb095"
+  },
+  {
+    "source": "runs/react-preflight-failure/COMMAND.json",
+    "archive": "runs/react-preflight-failure/COMMAND.json",
+    "sourceSha256": "256c1b9a26ce067f95b74dbbb20622e05a8e70f14a4f0b68957d3dc10e87796c",
+    "archiveSha256": "256c1b9a26ce067f95b74dbbb20622e05a8e70f14a4f0b68957d3dc10e87796c"
+  },
+  {
+    "source": "runs/react/OWNERSHIP.json",
+    "archive": "runs/react/OWNERSHIP.json",
+    "sourceSha256": "3d3e78b07b85f7b0e17b75cdfcc14ced355cfacd2b87ae47ec558b14070aa8a2",
+    "archiveSha256": "3d3e78b07b85f7b0e17b75cdfcc14ced355cfacd2b87ae47ec558b14070aa8a2"
+  },
+  {
+    "source": "runs/react/RESULT.json",
+    "archive": "runs/react/RESULT.json",
+    "sourceSha256": "38e56cbdce2d902b88e36a058b399fe70a5cdceb5c0b607dc3472f194c998361",
+    "archiveSha256": "38e56cbdce2d902b88e36a058b399fe70a5cdceb5c0b607dc3472f194c998361"
+  },
+  {
+    "source": "runs/react/first.log",
+    "archive": "runs/react/first.log",
+    "sourceSha256": "c6234adceb9d254ffeb4357ea76892b2c30ea19cf957b684d2dd2ddf0ab03cc1",
+    "archiveSha256": "c6234adceb9d254ffeb4357ea76892b2c30ea19cf957b684d2dd2ddf0ab03cc1"
+  },
+  {
+    "source": "runs/react/COMMAND.json",
+    "archive": "runs/react/COMMAND.json",
+    "sourceSha256": "256c1b9a26ce067f95b74dbbb20622e05a8e70f14a4f0b68957d3dc10e87796c",
+    "archiveSha256": "256c1b9a26ce067f95b74dbbb20622e05a8e70f14a4f0b68957d3dc10e87796c"
+  },
+  {
+    "source": "runs/react/ownership.jsonl",
+    "archive": "runs/react/ownership.jsonl.gz",
+    "sourceSha256": "8fb06993c021bc015bf414638e03eb84d8924d2a309be9f95fe2daeea5e65b80",
+    "archiveSha256": "a410d462c5d79d76bf8f18afbaf3abb98ba3299f30a7c28ffcfab0141bfa3bb5"
+  },
+  {
+    "source": "runs/react/cache/run.json",
+    "archive": "runs/react/cache/run.json",
+    "sourceSha256": "75261f24330d5c06124195be49cfb3460d4df87d5e554927fc4bc226f2c66fbb",
+    "archiveSha256": "75261f24330d5c06124195be49cfb3460d4df87d5e554927fc4bc226f2c66fbb"
+  },
+  {
+    "source": "runs/react/data/eslint-2654242865465226088.hash",
+    "archive": "runs/react/data/eslint-2654242865465226088.hash",
+    "sourceSha256": "2f921fdb352d4f876bf0d8fe6c761d08d5c0151e34a03c405b77a8c2b9ad337c",
+    "archiveSha256": "2f921fdb352d4f876bf0d8fe6c761d08d5c0151e34a03c405b77a8c2b9ad337c"
+  },
+  {
+    "source": "runs/react/data/source-maps.json",
+    "archive": "runs/react/data/source-maps.json.gz",
+    "sourceSha256": "e356e7dd4c629798f06ba28c809dddb574b3cf8f6cc7731e4440a687699ea5c0",
+    "archiveSha256": "053f75b0299112b81710c48461c24b73ee052f62c4bb423503661d6a925216aa"
+  },
+  {
+    "source": "runs/react/data/playwright-5186013267177752385.hash",
+    "archive": "runs/react/data/playwright-5186013267177752385.hash",
+    "sourceSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2",
+    "archiveSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2"
+  },
+  {
+    "source": "runs/react/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "archive": "runs/react/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "sourceSha256": "7806eaf7f2d0c99daabb0965faed911463ae432663dbc463ace414ac624455dd",
+    "archiveSha256": "7806eaf7f2d0c99daabb0965faed911463ae432663dbc463ace414ac624455dd"
+  },
+  {
+    "source": "runs/react/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "archive": "runs/react/data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "runs/react/data/vite-7556005483977466535.hash",
+    "archive": "runs/react/data/vite-7556005483977466535.hash",
+    "sourceSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9",
+    "archiveSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9"
+  },
+  {
+    "source": "runs/react/data/file-map.json",
+    "archive": "runs/react/data/file-map.json.gz",
+    "sourceSha256": "4bd492d392d3080ad69eb7b565962ed58da54ba39b0ea00daa457fa1a3bad287",
+    "archiveSha256": "fe0b5465b141fc9f3442657cd4a8eed83d76a51a2dc0c4b00f02d11f1a2170ee"
+  },
+  {
+    "source": "runs/react/data/lockfile-nodes.hash",
+    "archive": "runs/react/data/lockfile-nodes.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "runs/react/data/parsed-lock-file.nodes.json",
+    "archive": "runs/react/data/parsed-lock-file.nodes.json.gz",
+    "sourceSha256": "62c90f7a638dc748d016fa76093e0ee64f80c39a537fa208f007549d361d9dc6",
+    "archiveSha256": "6017597251949c522723a73b5b5ece9379e4a1fc280ee27fc4d91b5ca71b7614"
+  },
+  {
+    "source": "runs/react/data/project-graph.lock",
+    "archive": "runs/react/data/project-graph.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "runs/react/data/project-graph.json",
+    "archive": "runs/react/data/project-graph.json.gz",
+    "sourceSha256": "3b3aef053e24949205de61d9981060f82f13d6d92e73cd163454f75568e30400",
+    "archiveSha256": "e5cebdf83fd7ecd8bdd5a493df7eaffb901ae6c0c791523012bab417edeb5bdc"
+  },
+  {
+    "source": "runs/react/data/parsed-lock-file.dependencies.json",
+    "archive": "runs/react/data/parsed-lock-file.dependencies.json.gz",
+    "sourceSha256": "c1be78a6f49124f0bb445f8b50c3a7ecb973b2635c443f6662e9e805bc28c00e",
+    "archiveSha256": "b601457c77417fc19193617f627f2a7985413123598d3996bd415a80ea11c3c9"
+  },
+  {
+    "source": "runs/react/data/rollup-14273536953574808233.hash",
+    "archive": "runs/react/data/rollup-14273536953574808233.hash",
+    "sourceSha256": "76205d1a46738873b80449d15c8b1155c967af2c258a326ef0342287d364bbbb",
+    "archiveSha256": "76205d1a46738873b80449d15c8b1155c967af2c258a326ef0342287d364bbbb"
+  },
+  {
+    "source": "runs/react/data/lockfile-dependencies.hash",
+    "archive": "runs/react/data/lockfile-dependencies.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "runs/react/data/nx_files.nxt",
+    "archive": "runs/react/data/nx_files.nxt.gz",
+    "sourceSha256": "8b43dbb2a97cb4371ecd294f64cc6d57d4e0bed1c1b50134014bb4ddfc6b58c6",
+    "archiveSha256": "76342a30627b409e7a90c79e776055ea01223e2ac30865450d6f4bee66a3f34a"
+  },
+  {
+    "source": "runs/react/data/vitest-7333614714660744029.hash",
+    "archive": "runs/react/data/vitest-7333614714660744029.hash.gz",
+    "sourceSha256": "ca70255b282e0e2aff25233ba9bb4cb10667604045b35f492a12be0cfc311442",
+    "archiveSha256": "7106b879bbab884ec6b53402a430f5cc7b76673296a908ec0d896d915dcba4e9"
+  }
+]

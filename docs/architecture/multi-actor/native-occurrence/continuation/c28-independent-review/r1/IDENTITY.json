@@ -1,0 +1,42 @@
+{
+  "manifestSha256": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b",
+  "runtimePatchSha256": "6509ca669862704b62bc0eafd9704231c7cdcfdbc78c201bf32a48890dee4da5",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "d64344f66b5df1463cc89e810bb370296902d450f527342f8cbbfd755f230815",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "d437aa15f4cf1f9aeac90bc94b676d4aa6fc5568bb488453750920180f072148",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/current-capture-r1.spec.ts": {
+      "sha256": "0d14fdb69b7938f8333051c401ea156b51cc72d35dd5396105183340419f26d6",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/current-validation.spec.ts": {
+      "sha256": "6eecbae00083bbb22a5e85463474bb37d11f3fa1464dc71afb5124ab73131071",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/opaque-current-input.spec.ts": {
+      "sha256": "7f9eef5938f835f0aba730089fef294983da775c645d2b7c156b1e373257f281",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "sha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/utils.ts": {
+      "sha256": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/internals/location-runtime.ts": {
+      "sha256": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+      "matchesManifest": true
+    },
+    "packages/kernel/src/lib/internals/node-shape.ts": {
+      "sha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+      "matchesManifest": true
+    }
+  }
+}

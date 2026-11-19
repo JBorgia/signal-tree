@@ -1,0 +1,833 @@
+[
+  {
+    "route": "setAll",
+    "pending": false,
+    "events": [
+      {
+        "event": "before-declare",
+        "phase": "before-call",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-writer",
+        "phase": "inside-declare",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 1,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:240\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at setAll (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5077:27)\n    at Proxy.api.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5333:16)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 2,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:82\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:28)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at setAll (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5077:27)\n    at Proxy.api.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5333:16)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 3,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:155\n    at Array.map (<anonymous>)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:56\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1591:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 4,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at computeField (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3607:13)\n    at readCurrent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:649:17)\n    at Object.settle (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:611:9)\n    at flushConsumers (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:252:16)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:393:52\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3483:41"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:125:31\n    at Array.filter (<anonymous>)\n    at changedSubjectFieldKeys (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:121:72)\n    at PathNotifier.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:358:23)\n    at Object.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)\n    at setAll (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5163:22)\n    at Proxy.api.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5333:16)\n    at Proxy.target.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.ts:245:22)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:14:143"
+      },
+      {
+        "event": "writer-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "declare-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-flush",
+        "phase": "before-flush",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at captureEffects (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)\n    at captureIntoBucket (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:480:15\n    at withoutWriteObservationScopes (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)\n    at PathNotifier._runNotify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:479:13)\n    at PathNotifier.flush (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:552:14)\n    at PathNotifier.flushSync (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:592:12)"
+      },
+      {
+        "event": "after-flush",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      }
+    ]
+  },
+  {
+    "route": "setAll",
+    "pending": true,
+    "events": [
+      {
+        "event": "before-declare",
+        "phase": "before-call",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-writer",
+        "phase": "inside-declare",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 1,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:240\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at setAll (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5077:27)\n    at Proxy.api.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5333:16)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 2,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:82\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:28)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at setAll (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5077:27)\n    at Proxy.api.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5333:16)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 3,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:155\n    at Array.map (<anonymous>)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:56\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1591:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 4,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at computeField (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3607:13)\n    at readCurrent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:649:17)\n    at Object.settle (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:611:9)\n    at flushConsumers (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:252:16)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:393:52\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3483:41"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:125:31\n    at Array.filter (<anonymous>)\n    at changedSubjectFieldKeys (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:121:72)\n    at PathNotifier.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:358:23)\n    at Object.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)\n    at setAll (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5163:22)\n    at Proxy.api.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:5333:16)\n    at Proxy.target.<computed> (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/intercept-leaf-signals.ts:245:22)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:14:143"
+      },
+      {
+        "event": "writer-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "declare-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-flush",
+        "phase": "before-flush",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at captureEffects (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)\n    at captureIntoBucket (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:480:15\n    at withoutWriteObservationScopes (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)\n    at PathNotifier._runNotify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:479:13)\n    at PathNotifier.flush (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:552:14)\n    at PathNotifier.flushSync (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:592:12)"
+      },
+      {
+        "event": "after-flush",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      },
+      {
+        "event": "after-confirm",
+        "phase": "confirm",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      }
+    ]
+  },
+  {
+    "route": "replaceOne",
+    "pending": false,
+    "events": [
+      {
+        "event": "before-declare",
+        "phase": "before-call",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-writer",
+        "phase": "inside-declare",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 1,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:240\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at Proxy.replaceOne (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:4223:42)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 2,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:82\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:28)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at Proxy.replaceOne (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:4223:42)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 3,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:155\n    at Array.map (<anonymous>)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:56\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1591:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 4,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at computeField (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3607:13)\n    at readCurrent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:649:17)\n    at Object.settle (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:611:9)\n    at flushConsumers (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:252:16)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:393:52\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3483:41"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:125:31\n    at Array.filter (<anonymous>)\n    at changedSubjectFieldKeys (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:121:72)\n    at PathNotifier.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:358:23)\n    at Object.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2474:20)\n    at Proxy.replaceOne (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:4223:42)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:14:196\n    at Module.runDeclaration (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts:396:14)"
+      },
+      {
+        "event": "writer-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "declare-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-flush",
+        "phase": "before-flush",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at captureEffects (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)\n    at captureIntoBucket (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:480:15\n    at withoutWriteObservationScopes (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)\n    at PathNotifier._runNotify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:479:13)\n    at PathNotifier.flush (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:552:14)\n    at PathNotifier.flushSync (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:592:12)"
+      },
+      {
+        "event": "after-flush",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      }
+    ]
+  },
+  {
+    "route": "replaceOne",
+    "pending": true,
+    "events": [
+      {
+        "event": "before-declare",
+        "phase": "before-call",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-writer",
+        "phase": "inside-declare",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 1,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:240\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at Proxy.replaceOne (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:4223:42)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 2,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:82\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:28)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at Proxy.replaceOne (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:4223:42)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 3,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:155\n    at Array.map (<anonymous>)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:56\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1591:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 4,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at computeField (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3607:13)\n    at readCurrent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:649:17)\n    at Object.settle (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:611:9)\n    at flushConsumers (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:252:16)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:393:52\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3483:41"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:125:31\n    at Array.filter (<anonymous>)\n    at changedSubjectFieldKeys (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:121:72)\n    at PathNotifier.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:358:23)\n    at Object.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2474:20)\n    at Proxy.replaceOne (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:4223:42)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:14:196\n    at Module.runDeclaration (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/experimental-publication/lifecycle.ts:396:14)"
+      },
+      {
+        "event": "writer-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "declare-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-flush",
+        "phase": "before-flush",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at captureEffects (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)\n    at captureIntoBucket (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:480:15\n    at withoutWriteObservationScopes (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)\n    at PathNotifier._runNotify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:479:13)\n    at PathNotifier.flush (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:552:14)\n    at PathNotifier.flushSync (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:592:12)"
+      },
+      {
+        "event": "after-flush",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      },
+      {
+        "event": "after-confirm",
+        "phase": "confirm",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      }
+    ]
+  },
+  {
+    "route": "row",
+    "pending": false,
+    "events": [
+      {
+        "event": "before-declare",
+        "phase": "before-call",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-writer",
+        "phase": "inside-declare",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 1,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:240\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:93"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 2,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:82\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:28)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:93"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 3,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:155\n    at Array.map (<anonymous>)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:56\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1591:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 4,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at computeField (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3607:13)\n    at readCurrent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:649:17)\n    at Object.settle (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:611:9)\n    at flushConsumers (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:252:16)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:393:52\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3483:41"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:125:31\n    at Array.filter (<anonymous>)\n    at changedSubjectFieldKeys (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:121:72)\n    at PathNotifier.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:358:23)\n    at Object.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2474:20)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:93\n    at withCallableWriteIntent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1875:7)\n    at write (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:9)"
+      },
+      {
+        "event": "writer-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "declare-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-flush",
+        "phase": "before-flush",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at captureEffects (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)\n    at captureIntoBucket (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:480:15\n    at withoutWriteObservationScopes (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)\n    at PathNotifier._runNotify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:479:13)\n    at PathNotifier.flush (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:552:14)\n    at PathNotifier.flushSync (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:592:12)"
+      },
+      {
+        "event": "after-flush",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      }
+    ]
+  },
+  {
+    "route": "row",
+    "pending": true,
+    "events": [
+      {
+        "event": "before-declare",
+        "phase": "before-call",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-writer",
+        "phase": "inside-declare",
+        "calls": 0,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 1,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:240\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1588:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:93"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 2,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:82\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1589:28)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2467:25)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:93"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 3,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:199\n    at Array.filter (<anonymous>)\n    at publicationFields (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2525:78)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:155\n    at Array.map (<anonymous>)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1596:56\n    at Array.map (<anonymous>)\n    at prepareEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1591:15)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1383:22)"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 4,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at computeField (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3607:13)\n    at readCurrent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:649:17)\n    at Object.settle (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:611:9)\n    at flushConsumers (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:252:16)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:393:52\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/observation-adapter.ts:82:34)\n    at deliver (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:383:17)\n    at Object.runInvalidationGroup (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/location-runtime.ts:425:11)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3483:41"
+      },
+      {
+        "event": "getter",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:125:31\n    at Array.filter (<anonymous>)\n    at changedSubjectFieldKeys (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:121:72)\n    at PathNotifier.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:358:23)\n    at Object.notify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/path-observation-port.ts:186:14)\n    at replaceOnePrivate (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:2474:20)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:93\n    at withCallableWriteIntent (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:1875:7)\n    at write (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/entity-signal.ts:3573:9)"
+      },
+      {
+        "event": "writer-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "declare-returned",
+        "phase": "inside-declare",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "before-flush",
+        "phase": "before-flush",
+        "calls": 5,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": []
+      },
+      {
+        "event": "getter",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "stack": "Error: \n    at Object.get x [as x] (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/whole-chronology.spec.ts:13:312)\n    at captureEffects (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2150:23)\n    at captureIntoBucket (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:2860:5)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4142:13)\n    at receiveOrdinaryNotification (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/enhancers/transactions/transactions.ts:4018:17)\n    at /private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:480:15\n    at withoutWriteObservationScopes (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/internals/write-observation-scope.ts:66:33)\n    at PathNotifier._runNotify (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:479:13)\n    at PathNotifier.flush (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:552:14)\n    at PathNotifier.flushSync (/private/tmp/st-whole-getter-causal-trace/c16/candidate/packages/kernel/src/lib/path-notifier.ts:592:12)"
+      },
+      {
+        "event": "after-flush",
+        "phase": "flush",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      },
+      {
+        "event": "after-confirm",
+        "phase": "confirm",
+        "calls": 6,
+        "endpointSame": true,
+        "ready": true,
+        "invalid": false,
+        "unknown": false,
+        "possible": [],
+        "sends": 0
+      }
+    ]
+  }
+]

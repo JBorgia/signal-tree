@@ -1,0 +1,51 @@
+{
+  "source": "/private/tmp/st-v16-integration-candidate",
+  "patch_sha256": "cc95bcf5d870d713d39ed4f027915460464be05a576c0c945f1af9cb1078e9e0",
+  "files": [
+    {
+      "file": "apps/demo/src/app/app.routes.ts",
+      "before_sha256": "eeff0324530af6a076301550984b45f7fb07a483dba2f2ca8f5a9749f6d5e539",
+      "overlay_sha256": "ca2ae45d2a354f5f80bbbeb5ed9adfebfbe68c67bfab57f2bb89e56bf5e9c976"
+    },
+    {
+      "file": "apps/demo/src/app/components/navigation/navigation.component.spec.ts",
+      "before_sha256": "c39c4973d80efb884c944960e95461132eb75a7c5b6941f2fe80f9115c4474a7",
+      "overlay_sha256": "9580eacb8befe177e7fa718c912860313713737c2b34e06e6f74a36ae0ca4c29"
+    },
+    {
+      "file": "apps/demo/src/app/components/navigation/navigation.component.ts",
+      "before_sha256": "49a3394bd8791c019026b1bd7263a3a54de16d6ae10ea970e46e2cbe6ca2f223",
+      "overlay_sha256": "5a03e81d7b11c9ea536140a908308a004faa6a9179d34cce5de91a8a1fb23d2d"
+    },
+    {
+      "file": "apps/demo/src/app/pages/independent-publication/independent-publication.component.html",
+      "before_sha256": null,
+      "overlay_sha256": "93683a81b9992ab32098d3d03dd8c7be884cbe949c5ab6e9691d5dbdd4570cab"
+    },
+    {
+      "file": "apps/demo/src/app/pages/independent-publication/independent-publication.component.scss",
+      "before_sha256": null,
+      "overlay_sha256": "80dc2f29749308f29a2fa1c89efc82696118b3eac07db99afb5b9acac9236662"
+    },
+    {
+      "file": "apps/demo/src/app/pages/independent-publication/independent-publication.component.spec.ts",
+      "before_sha256": null,
+      "overlay_sha256": "ea940b9cc907ecc64de1e9523d12e5fa3c34f569e4ca145b421f81cf3a48213f"
+    },
+    {
+      "file": "apps/demo/src/app/pages/independent-publication/independent-publication.component.ts",
+      "before_sha256": null,
+      "overlay_sha256": "401f224ff53650173ba5238edbfe5edc62dc8e233e4f84d9f4b73256b6481eac"
+    }
+  ],
+  "matching_composition_manifest_sha256": "cae244793913aa51ffe36848a8ba3f6e77af24185323a6141ba6c66a03a5876f",
+  "reference_evidence": {
+    "tools/experiments/multi-actor-operations/installed/reference.component.ts": "8b51cfe3aafa75a147729dd24eb2618db721f4864730570eefac36de5b1a8dba",
+    "tools/experiments/multi-actor-operations/installed/angular-runtime.mjs": "b186d7f31b32dccf33b8d8701e12bad01332a69fd90e8f15275eb0c0e7b9db36",
+    "apps/demo/project.json": "8fcbf34577a86209343b5221dc45e71f9733f6b0b671605681c0bd7ad97de9b5",
+    "apps/demo/jest.config.ts": "e39fbfb7a7400d0f237c5c98f8eb7fbc6135a9952bc0ebced1f9902d407568db",
+    "packages/kernel/src/lib/publication-declaration.ts": "46e468e60e102f16e54f8170b954cd0ec60207cd09806baea5d2bc270b757247"
+  },
+  "readme_sha256": "6a1d7fe70b4ec32f99220acc6150465d5b838011e92e81d20d4b151390d0315c",
+  "playwright_recipe_sha256": "b68ea2afec0c2c4494829ee6240ea79ff272474e231782d5c0a412452030f510"
+}

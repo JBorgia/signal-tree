@@ -1,0 +1,35 @@
+
+> nx run kernel:test footprint-discriminator-a.spec.ts
+
+> node tools/run-core-vitest.mjs footprint-discriminator-a.spec.ts
+
+(node:36125) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:36132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-footprint-discriminator-a/candidate/packages/kernel
+
+(node:36140) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  13:13:20
+   Duration  2.85s (transform 1.16s, setup 0ms, import 1.39s, tests 244ms, environment 810ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.8s

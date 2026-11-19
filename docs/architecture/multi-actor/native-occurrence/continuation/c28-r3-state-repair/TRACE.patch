@@ -1,0 +1,32 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,5 @@
++import {appendFileSync as stateTraceAppend} from 'node:fs';
++function stateTrace(event:unknown):void{const path=process.env.ST_STATE_TRACE;if(path)stateTraceAppend(path,JSON.stringify(event)+'\n');}
+ import {registerScalarSelection} from '../../lib/internals/native-scalar-selection';
+ import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+@@ -2852,6 +2854,7 @@
+       registry: getPositionRegistry(tree.$),
+     });
+     const recorded = resolveTransactionId(meta);
++    stateTrace({kind:'capture-probe',path,next,prev,id:recorded,participation:getWriteParticipation(meta),origin:meta?.origin,dedup:recorded!==undefined&&installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0])});
+     if (
+       recorded !== undefined &&
+       installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0])
+@@ -3125,6 +3128,7 @@
+       baselineValues.size > 0 ? baselineValues : undefined
+     );
+     const externalEffects = callbackExternalEffects.get(transactionId) ?? [];
++    stateTrace({kind:'materialize',transactionId,effects:effects.map(e=>({kind:e.kind,path:e.path,...(e.kind==='set'?{before:e.before,after:e.after}:{})})),externalEffects});
+     callbackExternalEffects.delete(transactionId);
+     if (pending && externalEffects.length) {
+       // The callback can author again after an ingress. Until that mixed
+@@ -4237,6 +4241,7 @@
+             subjectIds,
+             positionIds
+           ) => {
++            stateTrace({kind:'terminal-prepare',path,next,prev,id:resolveTransactionId(meta),participation:getWriteParticipation(meta),origin:meta?.origin,isRestoring});
+             if (
+               isRestoring ||
+               meta?.origin === 'restoration' ||

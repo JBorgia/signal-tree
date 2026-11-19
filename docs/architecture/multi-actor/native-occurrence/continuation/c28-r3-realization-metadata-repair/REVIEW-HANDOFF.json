@@ -1,0 +1,8 @@
+{
+  "reviewerThread": "01a19ce9-330c-7591-8740-eecca5ebb05f",
+  "tool": "mcp__codex_app__send_message_to_thread",
+  "delivery": "success",
+  "manifest": "0ececc2f73a615ecebe88b0d44113cae7555ba1d19beefc4cc53c4acfa1c1061",
+  "mainNotification": "Current parent-facing final response; no separate ancestor message sent",
+  "acceptance": "pending independent review"
+}

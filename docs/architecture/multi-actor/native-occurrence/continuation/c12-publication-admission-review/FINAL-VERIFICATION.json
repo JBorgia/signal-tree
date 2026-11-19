@@ -1,0 +1,18 @@
+{
+  "C12_manifest_sha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+  "original_and_copy_files_unchanged": 3053,
+  "runs": {
+    "progress-seven": {
+      "exit": 1,
+      "elapsedSeconds": 14.492837750003673,
+      "source_unchanged": true
+    },
+    "admission-controls": {
+      "exit": 0,
+      "elapsedSeconds": 5.450677582994103,
+      "source_unchanged": true
+    }
+  },
+  "runtime_edits": [],
+  "oracle_edits": []
+}

@@ -1,0 +1,19 @@
+{
+  "predecessorUnchanged": true,
+  "original23AndReviewKillersByteIdentical": true,
+  "normalizerSource": "/private/tmp/st-occurrence-successor/packages/kernel/src/lib/internals/plain-branch-membership.ts",
+  "normalizerSourceSha256": "6ce91d97dca19d448a7893856c7eca04e3eebafb6fc9e0cb76916ee1a32202cf",
+  "files": {
+    "test.log": "9fdc1e1fe89d26987ef24084e67fbb7bcc8264c8574757ea6ac8ef5960e5eddd",
+    "model.test.mjs": "36cb387ecf22ddcee62b10008348ea48e3fcae072bfacdfe601fb72ce77affc5",
+    "source-oracle.test.mjs": "365acc25395d4de0f4ffc9e7ea3a15aae1f7912fcc2e1d78817c57c9d6fae6b6",
+    "source-test.log": "cf07667e968e39cfbb903beb139454d2658656b93402944fb7a5b6c8d454391e",
+    "final-test.log": "08d210635fa84af6d45929e13d4fd8457f7ce928ef815eefb6a93359ac138ba2",
+    "RESULTS.md": "d95fa98efa55c7002253a7f95b29bc47dbb30186d52ea8f03615c8203e3d8a58",
+    "source-oracle-first.mjs": "cdd5265250e9ae97becf6dbe0932619b232aa896bf9d7b15b3ad8c1d9963d04a",
+    "normalizer.test.mjs": "4005f75df4f0a6bdedfb86d6c204ca57ea5f5788abd870eb1e1a87c1434b8611",
+    "first-test.log": "59c5baa3dc47000b811624b800b218e0a4e600671747e2d6a2acce2d2b06fefb",
+    "model.mjs": "1a86071996f7938b6909c90d31442c655e69b7d2b4833a741e5b5afe80b71e91",
+    "independent-review/adversarial.test.mjs": "67b252ec1da76f91356d9c92ab3c3878c8f1083feb32ebc5bef76a77ac2c6f09"
+  }
+}

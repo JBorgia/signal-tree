@@ -1,0 +1,777 @@
+{
+  "controller": "1d79497f61728e1f33ec300d05058cc2399f568eec71680226d0dd8034eb0344",
+  "completedRecords": 5,
+  "runDirectories": [
+    "baseline-512-r1",
+    "reader-128-r1",
+    "reader-512-r1",
+    "baseline-128-r1",
+    "baseline-2048-r1"
+  ],
+  "uniqueWorkerPids": [
+    40667,
+    42727,
+    43928,
+    44609
+  ],
+  "heapSizeLimits": [
+    4496293888
+  ],
+  "failuresOrStops": [
+    "baseline-2048-r1"
+  ],
+  "runs": [
+    {
+      "arm": "baseline",
+      "size": 128,
+      "replicate": 1,
+      "exit": 0,
+      "watchdog": null,
+      "workerPids": [
+        40667
+      ],
+      "initialHeap": 44213336,
+      "maxSampledHeap": 61532256,
+      "positiveBoundaryGrowth": 17318920,
+      "over512MiB": false,
+      "steepStop": false,
+      "checks": {
+        "commandMatches": true,
+        "testHashMatches": true,
+        "completeStages": true,
+        "matchingSizes": true,
+        "finiteNumbers": true,
+        "freshSingleWorker": true,
+        "sameHeapLimit": true,
+        "exactPassedNames": true,
+        "computedGrowthMatches": true,
+        "computedStopMatches": true,
+        "cleanRecordedSources": true,
+        "cleanOwned": true
+      },
+      "phases": [
+        {
+          "stage": "membership:before-create",
+          "heapUsed": 44213336,
+          "deltaFromMembershipStart": 0
+        },
+        {
+          "stage": "membership:after-create",
+          "heapUsed": 44360816,
+          "deltaFromMembershipStart": 147480
+        },
+        {
+          "stage": "membership:before-seed",
+          "heapUsed": 44492072,
+          "deltaFromMembershipStart": 278736
+        },
+        {
+          "stage": "membership:after-seed",
+          "heapUsed": 47037072,
+          "deltaFromMembershipStart": 2823736
+        },
+        {
+          "stage": "membership:before-replace",
+          "heapUsed": 46556808,
+          "deltaFromMembershipStart": 2343472
+        },
+        {
+          "stage": "membership:after-replace",
+          "heapUsed": 49388176,
+          "deltaFromMembershipStart": 5174840
+        },
+        {
+          "stage": "membership:before-clear",
+          "heapUsed": 49392200,
+          "deltaFromMembershipStart": 5178864
+        },
+        {
+          "stage": "membership:after-clear",
+          "heapUsed": 41898488,
+          "deltaFromMembershipStart": -2314848
+        },
+        {
+          "stage": "membership:after-original-assertions",
+          "heapUsed": 41235592,
+          "deltaFromMembershipStart": -2977744
+        },
+        {
+          "stage": "membership:before-stop",
+          "heapUsed": 41240496,
+          "deltaFromMembershipStart": -2972840
+        },
+        {
+          "stage": "membership:after-stop",
+          "heapUsed": 41251904,
+          "deltaFromMembershipStart": -2961432
+        },
+        {
+          "stage": "membership:before-destroy",
+          "heapUsed": 41256168,
+          "deltaFromMembershipStart": -2957168
+        },
+        {
+          "stage": "membership:after-destroy",
+          "heapUsed": 41287584,
+          "deltaFromMembershipStart": -2925752
+        },
+        {
+          "stage": "restoration:before-create",
+          "heapUsed": 41335520,
+          "deltaFromMembershipStart": -2877816
+        },
+        {
+          "stage": "restoration:after-create",
+          "heapUsed": 41579640,
+          "deltaFromMembershipStart": -2633696
+        },
+        {
+          "stage": "restoration:before-seed",
+          "heapUsed": 41583032,
+          "deltaFromMembershipStart": -2630304
+        },
+        {
+          "stage": "restoration:after-seed",
+          "heapUsed": 43354768,
+          "deltaFromMembershipStart": -858568
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 44045488,
+          "deltaFromMembershipStart": -167848
+        },
+        {
+          "stage": "restoration:before-replace",
+          "heapUsed": 44048896,
+          "deltaFromMembershipStart": -164440
+        },
+        {
+          "stage": "restoration:after-replace",
+          "heapUsed": 47407240,
+          "deltaFromMembershipStart": 3193904
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 49298960,
+          "deltaFromMembershipStart": 5085624
+        },
+        {
+          "stage": "restoration:before-undo",
+          "heapUsed": 48968480,
+          "deltaFromMembershipStart": 4755144
+        },
+        {
+          "stage": "restoration:after-undo",
+          "heapUsed": 48559712,
+          "deltaFromMembershipStart": 4346376
+        },
+        {
+          "stage": "restoration:after-undo-assertions",
+          "heapUsed": 48581152,
+          "deltaFromMembershipStart": 4367816
+        },
+        {
+          "stage": "restoration:before-redo",
+          "heapUsed": 48591928,
+          "deltaFromMembershipStart": 4378592
+        },
+        {
+          "stage": "restoration:after-redo",
+          "heapUsed": 58949408,
+          "deltaFromMembershipStart": 14736072
+        },
+        {
+          "stage": "restoration:after-redo-assertion",
+          "heapUsed": 58754832,
+          "deltaFromMembershipStart": 14541496
+        },
+        {
+          "stage": "restoration:before-destroy",
+          "heapUsed": 58765352,
+          "deltaFromMembershipStart": 14552016
+        },
+        {
+          "stage": "restoration:after-destroy",
+          "heapUsed": 61182392,
+          "deltaFromMembershipStart": 16969056
+        },
+        {
+          "stage": "restoration:after-final-drain",
+          "heapUsed": 61532256,
+          "deltaFromMembershipStart": 17318920
+        }
+      ]
+    },
+    {
+      "arm": "reader",
+      "size": 128,
+      "replicate": 1,
+      "exit": 0,
+      "watchdog": null,
+      "workerPids": [
+        42727
+      ],
+      "initialHeap": 38942720,
+      "maxSampledHeap": 62336416,
+      "positiveBoundaryGrowth": 23393696,
+      "over512MiB": false,
+      "steepStop": false,
+      "checks": {
+        "commandMatches": true,
+        "testHashMatches": true,
+        "completeStages": true,
+        "matchingSizes": true,
+        "finiteNumbers": true,
+        "freshSingleWorker": true,
+        "sameHeapLimit": true,
+        "exactPassedNames": true,
+        "computedGrowthMatches": true,
+        "computedStopMatches": true,
+        "cleanRecordedSources": true,
+        "cleanOwned": true
+      },
+      "phases": [
+        {
+          "stage": "membership:before-create",
+          "heapUsed": 38942720,
+          "deltaFromMembershipStart": 0
+        },
+        {
+          "stage": "membership:after-create",
+          "heapUsed": 39095016,
+          "deltaFromMembershipStart": 152296
+        },
+        {
+          "stage": "membership:before-seed",
+          "heapUsed": 39227408,
+          "deltaFromMembershipStart": 284688
+        },
+        {
+          "stage": "membership:after-seed",
+          "heapUsed": 41746136,
+          "deltaFromMembershipStart": 2803416
+        },
+        {
+          "stage": "membership:before-replace",
+          "heapUsed": 41289600,
+          "deltaFromMembershipStart": 2346880
+        },
+        {
+          "stage": "membership:after-replace",
+          "heapUsed": 44496120,
+          "deltaFromMembershipStart": 5553400
+        },
+        {
+          "stage": "membership:before-clear",
+          "heapUsed": 44500136,
+          "deltaFromMembershipStart": 5557416
+        },
+        {
+          "stage": "membership:after-clear",
+          "heapUsed": 46687192,
+          "deltaFromMembershipStart": 7744472
+        },
+        {
+          "stage": "membership:after-original-assertions",
+          "heapUsed": 46033144,
+          "deltaFromMembershipStart": 7090424
+        },
+        {
+          "stage": "membership:before-stop",
+          "heapUsed": 46038040,
+          "deltaFromMembershipStart": 7095320
+        },
+        {
+          "stage": "membership:after-stop",
+          "heapUsed": 46049440,
+          "deltaFromMembershipStart": 7106720
+        },
+        {
+          "stage": "membership:before-destroy",
+          "heapUsed": 46053696,
+          "deltaFromMembershipStart": 7110976
+        },
+        {
+          "stage": "membership:after-destroy",
+          "heapUsed": 46085104,
+          "deltaFromMembershipStart": 7142384
+        },
+        {
+          "stage": "restoration:before-create",
+          "heapUsed": 46133032,
+          "deltaFromMembershipStart": 7190312
+        },
+        {
+          "stage": "restoration:after-create",
+          "heapUsed": 46376720,
+          "deltaFromMembershipStart": 7434000
+        },
+        {
+          "stage": "restoration:before-seed",
+          "heapUsed": 46380104,
+          "deltaFromMembershipStart": 7437384
+        },
+        {
+          "stage": "restoration:after-seed",
+          "heapUsed": 48156096,
+          "deltaFromMembershipStart": 9213376
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 48842544,
+          "deltaFromMembershipStart": 9899824
+        },
+        {
+          "stage": "restoration:before-replace",
+          "heapUsed": 48845944,
+          "deltaFromMembershipStart": 9903224
+        },
+        {
+          "stage": "restoration:after-replace",
+          "heapUsed": 42280048,
+          "deltaFromMembershipStart": 3337328
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 44230328,
+          "deltaFromMembershipStart": 5287608
+        },
+        {
+          "stage": "restoration:before-undo",
+          "heapUsed": 43844632,
+          "deltaFromMembershipStart": 4901912
+        },
+        {
+          "stage": "restoration:after-undo",
+          "heapUsed": 51844536,
+          "deltaFromMembershipStart": 12901816
+        },
+        {
+          "stage": "restoration:after-undo-assertions",
+          "heapUsed": 51865136,
+          "deltaFromMembershipStart": 12922416
+        },
+        {
+          "stage": "restoration:before-redo",
+          "heapUsed": 51875904,
+          "deltaFromMembershipStart": 12933184
+        },
+        {
+          "stage": "restoration:after-redo",
+          "heapUsed": 60106768,
+          "deltaFromMembershipStart": 21164048
+        },
+        {
+          "stage": "restoration:after-redo-assertion",
+          "heapUsed": 59863520,
+          "deltaFromMembershipStart": 20920800
+        },
+        {
+          "stage": "restoration:before-destroy",
+          "heapUsed": 59874032,
+          "deltaFromMembershipStart": 20931312
+        },
+        {
+          "stage": "restoration:after-destroy",
+          "heapUsed": 61986568,
+          "deltaFromMembershipStart": 23043848
+        },
+        {
+          "stage": "restoration:after-final-drain",
+          "heapUsed": 62336416,
+          "deltaFromMembershipStart": 23393696
+        }
+      ]
+    },
+    {
+      "arm": "reader",
+      "size": 512,
+      "replicate": 1,
+      "exit": 0,
+      "watchdog": null,
+      "workerPids": [
+        43928
+      ],
+      "initialHeap": 38985736,
+      "maxSampledHeap": 65962688,
+      "positiveBoundaryGrowth": 26976952,
+      "over512MiB": false,
+      "steepStop": false,
+      "checks": {
+        "commandMatches": true,
+        "testHashMatches": true,
+        "completeStages": true,
+        "matchingSizes": true,
+        "finiteNumbers": true,
+        "freshSingleWorker": true,
+        "sameHeapLimit": true,
+        "exactPassedNames": true,
+        "computedGrowthMatches": true,
+        "computedStopMatches": true,
+        "cleanRecordedSources": true,
+        "cleanOwned": true
+      },
+      "phases": [
+        {
+          "stage": "membership:before-create",
+          "heapUsed": 38985736,
+          "deltaFromMembershipStart": 0
+        },
+        {
+          "stage": "membership:after-create",
+          "heapUsed": 39138032,
+          "deltaFromMembershipStart": 152296
+        },
+        {
+          "stage": "membership:before-seed",
+          "heapUsed": 39270424,
+          "deltaFromMembershipStart": 284688
+        },
+        {
+          "stage": "membership:after-seed",
+          "heapUsed": 46204328,
+          "deltaFromMembershipStart": 7218592
+        },
+        {
+          "stage": "membership:before-replace",
+          "heapUsed": 46215608,
+          "deltaFromMembershipStart": 7229872
+        },
+        {
+          "stage": "membership:after-replace",
+          "heapUsed": 50166112,
+          "deltaFromMembershipStart": 11180376
+        },
+        {
+          "stage": "membership:before-clear",
+          "heapUsed": 50169432,
+          "deltaFromMembershipStart": 11183696
+        },
+        {
+          "stage": "membership:after-clear",
+          "heapUsed": 55890392,
+          "deltaFromMembershipStart": 16904656
+        },
+        {
+          "stage": "membership:after-original-assertions",
+          "heapUsed": 55931080,
+          "deltaFromMembershipStart": 16945344
+        },
+        {
+          "stage": "membership:before-stop",
+          "heapUsed": 56224880,
+          "deltaFromMembershipStart": 17239144
+        },
+        {
+          "stage": "membership:after-stop",
+          "heapUsed": 55947384,
+          "deltaFromMembershipStart": 16961648
+        },
+        {
+          "stage": "membership:before-destroy",
+          "heapUsed": 55951648,
+          "deltaFromMembershipStart": 16965912
+        },
+        {
+          "stage": "membership:after-destroy",
+          "heapUsed": 56035360,
+          "deltaFromMembershipStart": 17049624
+        },
+        {
+          "stage": "restoration:before-create",
+          "heapUsed": 56083288,
+          "deltaFromMembershipStart": 17097552
+        },
+        {
+          "stage": "restoration:after-create",
+          "heapUsed": 56322672,
+          "deltaFromMembershipStart": 17336936
+        },
+        {
+          "stage": "restoration:before-seed",
+          "heapUsed": 56326056,
+          "deltaFromMembershipStart": 17340320
+        },
+        {
+          "stage": "restoration:after-seed",
+          "heapUsed": 63621448,
+          "deltaFromMembershipStart": 24635712
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 65962688,
+          "deltaFromMembershipStart": 26976952
+        },
+        {
+          "stage": "restoration:before-replace",
+          "heapUsed": 65497176,
+          "deltaFromMembershipStart": 26511440
+        },
+        {
+          "stage": "restoration:after-replace",
+          "heapUsed": 50260488,
+          "deltaFromMembershipStart": 11274752
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 56146312,
+          "deltaFromMembershipStart": 17160576
+        },
+        {
+          "stage": "restoration:before-undo",
+          "heapUsed": 56149744,
+          "deltaFromMembershipStart": 17164008
+        },
+        {
+          "stage": "restoration:after-undo",
+          "heapUsed": 51541088,
+          "deltaFromMembershipStart": 12555352
+        },
+        {
+          "stage": "restoration:after-undo-assertions",
+          "heapUsed": 51584232,
+          "deltaFromMembershipStart": 12598496
+        },
+        {
+          "stage": "restoration:before-redo",
+          "heapUsed": 51589544,
+          "deltaFromMembershipStart": 12603808
+        },
+        {
+          "stage": "restoration:after-redo",
+          "heapUsed": 54035112,
+          "deltaFromMembershipStart": 15049376
+        },
+        {
+          "stage": "restoration:after-redo-assertion",
+          "heapUsed": 54303152,
+          "deltaFromMembershipStart": 15317416
+        },
+        {
+          "stage": "restoration:before-destroy",
+          "heapUsed": 54078616,
+          "deltaFromMembershipStart": 15092880
+        },
+        {
+          "stage": "restoration:after-destroy",
+          "heapUsed": 63088704,
+          "deltaFromMembershipStart": 24102968
+        },
+        {
+          "stage": "restoration:after-final-drain",
+          "heapUsed": 63897176,
+          "deltaFromMembershipStart": 24911440
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "size": 512,
+      "replicate": 1,
+      "exit": 0,
+      "watchdog": null,
+      "workerPids": [
+        44609
+      ],
+      "initialHeap": 44301256,
+      "maxSampledHeap": 76739632,
+      "positiveBoundaryGrowth": 32438376,
+      "over512MiB": false,
+      "steepStop": false,
+      "checks": {
+        "commandMatches": true,
+        "testHashMatches": true,
+        "completeStages": true,
+        "matchingSizes": true,
+        "finiteNumbers": true,
+        "freshSingleWorker": true,
+        "sameHeapLimit": true,
+        "exactPassedNames": true,
+        "computedGrowthMatches": true,
+        "computedStopMatches": true,
+        "cleanRecordedSources": true,
+        "cleanOwned": true
+      },
+      "phases": [
+        {
+          "stage": "membership:before-create",
+          "heapUsed": 44301256,
+          "deltaFromMembershipStart": 0
+        },
+        {
+          "stage": "membership:after-create",
+          "heapUsed": 44448944,
+          "deltaFromMembershipStart": 147688
+        },
+        {
+          "stage": "membership:before-seed",
+          "heapUsed": 44579920,
+          "deltaFromMembershipStart": 278664
+        },
+        {
+          "stage": "membership:after-seed",
+          "heapUsed": 42935472,
+          "deltaFromMembershipStart": -1365784
+        },
+        {
+          "stage": "membership:before-replace",
+          "heapUsed": 42332512,
+          "deltaFromMembershipStart": -1968744
+        },
+        {
+          "stage": "membership:after-replace",
+          "heapUsed": 55426440,
+          "deltaFromMembershipStart": 11125184
+        },
+        {
+          "stage": "membership:before-clear",
+          "heapUsed": 54603088,
+          "deltaFromMembershipStart": 10301832
+        },
+        {
+          "stage": "membership:after-clear",
+          "heapUsed": 60328648,
+          "deltaFromMembershipStart": 16027392
+        },
+        {
+          "stage": "membership:after-original-assertions",
+          "heapUsed": 60369464,
+          "deltaFromMembershipStart": 16068208
+        },
+        {
+          "stage": "membership:before-stop",
+          "heapUsed": 60374376,
+          "deltaFromMembershipStart": 16073120
+        },
+        {
+          "stage": "membership:after-stop",
+          "heapUsed": 60385784,
+          "deltaFromMembershipStart": 16084528
+        },
+        {
+          "stage": "membership:before-destroy",
+          "heapUsed": 60390056,
+          "deltaFromMembershipStart": 16088800
+        },
+        {
+          "stage": "membership:after-destroy",
+          "heapUsed": 60473792,
+          "deltaFromMembershipStart": 16172536
+        },
+        {
+          "stage": "restoration:before-create",
+          "heapUsed": 60824160,
+          "deltaFromMembershipStart": 16522904
+        },
+        {
+          "stage": "restoration:after-create",
+          "heapUsed": 60764096,
+          "deltaFromMembershipStart": 16462840
+        },
+        {
+          "stage": "restoration:before-seed",
+          "heapUsed": 60767488,
+          "deltaFromMembershipStart": 16466232
+        },
+        {
+          "stage": "restoration:after-seed",
+          "heapUsed": 67515008,
+          "deltaFromMembershipStart": 23213752
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 45014960,
+          "deltaFromMembershipStart": 713704
+        },
+        {
+          "stage": "restoration:before-replace",
+          "heapUsed": 45018368,
+          "deltaFromMembershipStart": 717112
+        },
+        {
+          "stage": "restoration:after-replace",
+          "heapUsed": 58069632,
+          "deltaFromMembershipStart": 13768376
+        },
+        {
+          "stage": "restoration:after-original-drain",
+          "heapUsed": 63962872,
+          "deltaFromMembershipStart": 19661616
+        },
+        {
+          "stage": "restoration:before-undo",
+          "heapUsed": 63968488,
+          "deltaFromMembershipStart": 19667232
+        },
+        {
+          "stage": "restoration:after-undo",
+          "heapUsed": 52573672,
+          "deltaFromMembershipStart": 8272416
+        },
+        {
+          "stage": "restoration:after-undo-assertions",
+          "heapUsed": 52212048,
+          "deltaFromMembershipStart": 7910792
+        },
+        {
+          "stage": "restoration:before-redo",
+          "heapUsed": 52215472,
+          "deltaFromMembershipStart": 7914216
+        },
+        {
+          "stage": "restoration:after-redo",
+          "heapUsed": 65618128,
+          "deltaFromMembershipStart": 21316872
+        },
+        {
+          "stage": "restoration:after-redo-assertion",
+          "heapUsed": 65658752,
+          "deltaFromMembershipStart": 21357496
+        },
+        {
+          "stage": "restoration:before-destroy",
+          "heapUsed": 65660472,
+          "deltaFromMembershipStart": 21359216
+        },
+        {
+          "stage": "restoration:after-destroy",
+          "heapUsed": 75339528,
+          "deltaFromMembershipStart": 31038272
+        },
+        {
+          "stage": "restoration:after-final-drain",
+          "heapUsed": 76739632,
+          "deltaFromMembershipStart": 32438376
+        }
+      ]
+    },
+    {
+      "arm": "baseline",
+      "size": 2048,
+      "replicate": 1,
+      "exit": -15,
+      "watchdog": "no-progress180s",
+      "workerPids": [],
+      "initialHeap": 0,
+      "maxSampledHeap": 0,
+      "positiveBoundaryGrowth": 0,
+      "over512MiB": false,
+      "steepStop": false,
+      "checks": {
+        "commandMatches": true,
+        "testHashMatches": true,
+        "completeStages": false,
+        "matchingSizes": false,
+        "finiteNumbers": false,
+        "freshSingleWorker": false,
+        "sameHeapLimit": true,
+        "exactPassedNames": false,
+        "computedGrowthMatches": true,
+        "computedStopMatches": true,
+        "cleanRecordedSources": true,
+        "cleanOwned": true
+      },
+      "phases": []
+    }
+  ]
+}

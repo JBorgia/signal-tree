@@ -1,0 +1,44 @@
+--- a/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
++++ b/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
+@@ -76,9 +76,9 @@
+   }
+   prepareInterval(
+     stage: EntityPlacementStage<K>,
+-    entries: PreparedPlacementEntries<K> = [...stage.patch]
++    entries?: PreparedPlacementEntries<K>
+   ): TopologyViewInterval {
+-    const pairs = entries.flatMap(([subject, after]) => {
++    const pairs = (entries ?? [...stage.patch]).flatMap(([subject, after]) => {
+       const before = stage.base(subject);
+       const equal =
+         before.present === after.present &&
+@@ -93,7 +93,10 @@
+             Object.freeze({
+               subject,
+               before: Object.freeze({ ...before }),
+-              after: Object.freeze({ ...after }),
++              after:
++                entries && Object.isFrozen(after)
++                  ? after
++                  : Object.freeze({ ...after }),
+             }),
+           ];
+     });
+--- a/packages/kernel/src/lib/physical/entity-placement-stage.ts
++++ b/packages/kernel/src/lib/physical/entity-placement-stage.ts
+@@ -17,10 +17,11 @@
+   /** One immutable enumeration of a completed preparation, not a stored index. */
+   capturePatch(): PreparedPlacementEntries<K> {
+     const entries: Array<readonly [number, Readonly<EntityPlacement<K>>]> = [];
+-    for (const [subject, row] of this.patch)
+-      entries.push(
+-        Object.freeze([subject, Object.freeze({ ...row })] as const)
+-      );
++    // Map iteration creates this tuple; it is not the Map's stored row.
++    for (const entry of this.patch) {
++      entry[1] = Object.freeze({ ...entry[1] });
++      entries.push(Object.freeze(entry));
++    }
+     return Object.freeze(entries);
+   }
+   read(subject: number): EntityPlacement<K> {

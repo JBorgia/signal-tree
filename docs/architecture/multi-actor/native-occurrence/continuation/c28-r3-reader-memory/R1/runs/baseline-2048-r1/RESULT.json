@@ -1,0 +1,19 @@
+{
+  "arm": "baseline",
+  "size": 2048,
+  "replicate": 1,
+  "exit": -15,
+  "watchdog": "no-progress180s",
+  "counts": {},
+  "workerPids": [],
+  "heapSizeLimits": [],
+  "maxSampledHeapUsed": 0,
+  "firstSampleHeapUsed": 0,
+  "sampledPositiveGrowth": 0,
+  "steepGrowthStop": false,
+  "validTwoCasesAndFreshWorker": false,
+  "remainingOwned": [],
+  "runtimeMismatches": [],
+  "testUnchanged": true,
+  "attempts": 1
+}

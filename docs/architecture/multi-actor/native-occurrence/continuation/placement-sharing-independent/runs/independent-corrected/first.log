@@ -1,0 +1,57 @@
+
+> nx run kernel:test sharing-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs sharing-independent.spec.ts --maxWorkers=1
+
+(node:20473) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:20480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-placement-sharing-independent-review/candidate/packages/kernel
+
+(node:20487) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/physical/sharing-independent.spec.ts (2 tests | 1 failed) 20ms
+   × public final-front/order and rollback do not mutate captured physical stages 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/physical/sharing-independent.spec.ts > public final-front/order and rollback do not mutate captured physical stages
+AssertionError: expected 3 to be greater than or equal to 4
+ ❯ src/lib/physical/sharing-independent.spec.ts:39:22
+     37|     expect(tree.$.rows.ids()).toEqual([3,1,2]);
+     38|     expect(tree.$.rows.all()).toEqual([{id:3,n:3},{id:1,n:1},{id:2,n:2…
+     39|     expect(captures).toBeGreaterThanOrEqual(4);
+       |                      ^
+     40|   } finally {tree.destroy();spy.mockRestore();}
+     41| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:10:10
+   Duration  1.14s (transform 630ms, setup 0ms, import 754ms, tests 20ms, environment 272ms)
+
+Warning: command "node tools/run-core-vitest.mjs sharing-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

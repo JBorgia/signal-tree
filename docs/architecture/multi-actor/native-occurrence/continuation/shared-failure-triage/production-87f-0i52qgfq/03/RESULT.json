@@ -1,0 +1,15 @@
+{
+  "number": 3,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+    "fullName": "whole-value plain-object omission correctness an omission does not carry an unchanged inspection-only sibling to Link",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 34 skipped (35)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 2.8136448860168457
+}

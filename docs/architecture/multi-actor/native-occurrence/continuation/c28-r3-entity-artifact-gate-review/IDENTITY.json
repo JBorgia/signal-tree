@@ -1,0 +1,17 @@
+{
+  "reviewedAtUTC": "2026-11-03T15:07:16.882016+00:00",
+  "files": {
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/MANIFEST.json": "26193d775b3e3f9c0ecc859de029dc20a1a591638730846ac0413bc1e89b6c1e",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/IDENTITY.json": "c24d5d6930cfe77d8485fe30c39e756b06bfe7ca3496ff8b42486b05bd936e33",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/REPORT.md": "8175553600af427df52c6c3f162199afad3cf9c371cedf75f17a3ad41fbe107b",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/tooling.patch": "e3a2db6c7191887f01d237d2eadcfc9722ecfa59ecc05223ca84a8d634df6d2e",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/evidence/registration-mutation.json": "21ce63d314db0f650a05b86893548dbf92b687fb90e0254ad402179ade7dc943",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/evidence/classifier-blindness.json": "36f0de6af3d8e7fa68a4410f01cce98787965ef13aa553b70c4f9d40b2c66fc1",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/QUALIFICATION.json": "86a1a33f6218440115d734fe7ba1d0175fdcf27c7b7af88694d0c5325a907042",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/EXTRA-CHECKS.json": "c1a76b5e1c6bf823c8671eb51b056780eb177842a0df7d93acbaaf7f3048d680",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-entity-registration-artifacts.mjs": "9301086d59f762f055d6c8e6f26ffe35644e94c7a4c2f54416c02bcdab7c3d83",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/verify-gates.mjs": "c50ffdbe3e77171862902c9c6a89ec3cee43058b7e3e76d944efef8d39a1c0ea",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/fixtures/entity-registration-consumer/package-lock.json": "c5fdab1fe0a645eb4ea89cf9630d7827aee5489f9fe91faf963a02425364a55f",
+    "/private/tmp/st-c28-r3-entity-artifact-gate-work/successor/tools/fixtures/entity-registration-consumer/package.json": "9c855d591ba371aa59681dd6de40786621d4cfdc2c8f625044b5d3f3b522c9cc"
+  }
+}

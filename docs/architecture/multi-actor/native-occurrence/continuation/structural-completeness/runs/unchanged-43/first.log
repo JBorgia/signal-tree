@@ -1,0 +1,80 @@
+
+> nx run kernel:test transactions.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs transactions.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:7341) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:7354) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-structural-completeness-successor/candidate/packages/kernel
+
+(node:7362) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > seals explicitly captured live effects into one pending turn, then confirms without additional physical writes 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps explicit attribution local when two drafts interleave writes 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > nets repeated scalar writes within one draft from the first before value to the final after value 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a sealed transaction by delegating to pending rollback and marks the lifecycle aborted only on success 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > preserves later confirmed work when aborting a sealed transaction, then later undo uses the surviving context 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps a sealed transaction sealed when abort delegation refuses 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps a sealed transaction sealed when abort application throws 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps transaction lifecycle confirmed after capacity-zero confirmation, and abort cannot reinterpret eviction as speculation 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > seals rekey plus same-subject scalar capture into one pending structural turn and abort removes both same-turn changes 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts add plus same-turn fields as one realized structural remove 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > confirms a structural transaction with zero physical writes and preserves canonical metadata exactly 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > preserves authored structural ordering instead of collapsing repeated rekeys 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures a real SignalTree leaf write into an open draft, seals it as pending, then confirms without extra writes 6ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > nets repeated real scalar writes inside one draft from the first before value to the final after value 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps explicit attribution local when two real drafts interleave writes 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures heterogeneous real writes on one draft and aborts them through the frozen kernel 15ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures a real entity add transaction with canonical structural coverage already authored 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures a real entity remove transaction with canonical structural coverage already authored 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > proves collection-owner remove coverage is sufficient for real multi-field abort restoration 8ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a mixed live structural draft through the realization adapter by contextualizing the fresh subject removal 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a live fresh add by realizing a structural remove without reusing the fresh subject lifetime 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a live fresh add plus same-subject scalar through the same structural remove frontier 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > constructs fresh add plus rekey rollback as a stale pre-rekey remove and refuses it as structural drift 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > proves the adapter can remove the fresh subject once the stale rollback remove is contextualized to the current key 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > constructs fresh add plus rekey plus scalar rollback as the same stale pre-rekey remove frontier 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > restores multiple removed subjects in one live transaction abort even when they share one collection owner 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > undoes a confirmed structural remove after the live transaction harness is disposed 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > authors setAll as one canonical remove-set-add turn and replays the same fresh subject on redo 5ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > restores the authored structural snapshot rather than a later-mutated detached entity alias 1ms
+(node:7400) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > adds transaction semantics without exposing temporal history methods 8ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > keeps pending transactions out of confirmed causal turns until confirm 5ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > publishes a transaction callback as one coherent location state 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > rolls back a pending optimistic transaction without reverting later confirmed work 5ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > aborts a thrown transaction callback by undoing only transaction writes 3ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > aborts a mixed structural thrown rollback through the realization port, restores baseline state, and does not reuse the fresh subject id 26ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > throws rollback error with preserved callback failure when realization-port validation refuses and does not fallback to the scoped resolver 6ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > aborts a mixed structural explicit pending rollback through the realization port, restores baseline state, and closes the pending lifecycle 3ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > keeps the primary transaction error when capture release cleanup also fails 2ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > surfaces capture release cleanup failure when the transaction body succeeds 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > preserves a later same-subject field write when rolling back a pending rekey 3ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > rejects rollback of a pending add when later same-subject field work depends on that existence 2ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > supports an optimistic workflow where rollback reverts optimistic state but preserves later unrelated activity 2ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > supports application refetch fallback when rollback is conservatively rejected 2ms
+
+ Test Files  2 passed (2)
+      Tests  43 passed (43)
+   Start at  17:06:49
+   Duration  2.20s (transform 960ms, setup 0ms, import 1.26s, tests 132ms, environment 589ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.8s

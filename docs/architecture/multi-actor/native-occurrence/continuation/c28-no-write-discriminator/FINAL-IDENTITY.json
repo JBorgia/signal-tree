@@ -1,0 +1,17 @@
+{
+  "inputManifest": "0f4d2e5415a716bb5e9f63b11cef94c3238ed64adf89a470821d0cdd403daf2e",
+  "allInputFilesUnchanged": true,
+  "originalC27Unchanged": true,
+  "instrumentation": "none",
+  "artifacts": {
+    "two-history-public.spec.ts": "b11cd947609f6c4eb868449c22497d183f59edd37fda9519c822107c4f7224e5",
+    "OBSERVATIONS.jsonl": "e9a28696103f8affb2f11bb8c57e45b6ddabaa9e3bca15880ad54c0b44980dc1",
+    "SUMMARY.json": "620574687d146022e4f90a9c63c92cba5f78c6aa951ff12da8db67df631dc08f",
+    "REVIEW.md": "03ea72ac92bdc20956effa4dc32386b7099fae60e995a04bcd83152f43eb9c1d"
+  },
+  "result": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  }
+}

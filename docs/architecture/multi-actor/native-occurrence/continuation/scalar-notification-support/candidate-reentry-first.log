@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=scalar-native-support.spec.ts --testNamePattern=newer author completion reentry --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testNamePattern="newer author completion reentry" --maxWorkers=1
+
+(node:62376) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:62385) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-scalar-support-correction/candidate/packages/kernel
+
+(node:62392) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 8 skipped (9)
+   Start at  11:04:08
+   Duration  1.58s (transform 952ms, setup 0ms, import 1.14s, tests 38ms, environment 264ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.4s

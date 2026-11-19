@@ -1,0 +1,68 @@
+{
+  "fixture": "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-sealed-input-check-N6GVbV",
+  "results": [
+    {
+      "name": "historical no flags",
+      "pass": true
+    },
+    {
+      "name": "valid five-package seal",
+      "pass": true
+    },
+    {
+      "name": "missing seal flag",
+      "pass": true,
+      "error": "Error: Missing or invalid sealed input manifest/seal arguments"
+    },
+    {
+      "name": "missing manifest file",
+      "pass": true,
+      "error": "Error: ENOENT: no such file or directory, open '/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-sealed-input-check-N6GVbV/MANIFEST.json.missing'"
+    },
+    {
+      "name": "wrong manifest digest",
+      "pass": true,
+      "error": "Error: Source manifest digest differs"
+    },
+    {
+      "name": "duplicate flag",
+      "pass": true,
+      "error": "Error: Expected exactly --candidate PATH --manifest PATH --manifest-sha256 SHA256 --sealed-build PATH"
+    },
+    {
+      "name": "unknown flag",
+      "pass": true,
+      "error": "Error: Expected exactly --candidate PATH --manifest PATH --manifest-sha256 SHA256 --sealed-build PATH"
+    },
+    {
+      "name": "positional mixed opt in",
+      "pass": true,
+      "error": "Error: Expected exactly --candidate PATH --manifest PATH --manifest-sha256 SHA256 --sealed-build PATH"
+    },
+    {
+      "name": "source drift on recheck",
+      "pass": true,
+      "error": "Error: Source differs: package.json"
+    },
+    {
+      "name": "artifact drift",
+      "pass": true,
+      "error": "Error: Sealed artifacts differ"
+    },
+    {
+      "name": "wrong seal",
+      "pass": true,
+      "error": "Error: Sealed artifacts differ"
+    },
+    {
+      "name": "partial package receipt",
+      "pass": true,
+      "error": "Error: Invalid sealed build receipt/root/package set"
+    },
+    {
+      "name": "receipt changed on recheck",
+      "pass": true,
+      "error": "Error: Build receipt changed"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "frozenOriginalAndControlFilesVerified": 2918,
+  "changedOriginalPaths": [
+    "packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts",
+    "packages/kernel/src/lib/core-independent-review.spec.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts",
+    "packages/kernel/src/lib/physical/entity-mutation-frame.ts",
+    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts"
+  ],
+  "nativeDiagnosticStagePairsUnchanged": 28,
+  "sourceTypes": "pass",
+  "specTypes": "pass after emission-identical fixture-only typing corrections",
+  "focusedNx": {
+    "passed": 67,
+    "failed": 5,
+    "allFailuresReproducedInUnchangedControl": true
+  }
+}

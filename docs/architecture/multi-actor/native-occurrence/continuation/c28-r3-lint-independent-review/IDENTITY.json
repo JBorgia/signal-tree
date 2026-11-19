@@ -1,0 +1,64 @@
+{
+  "manifest": "39c757521770c5ae4f567310713f557b84bed08d0f7374f94eb31b9169283100",
+  "runtimePatch": "c056b18cae0080246d58af6facce83fa71181539385d8fe140531b9bc2b63140",
+  "files": 3104,
+  "matrixSha256": "652fa5e84cbfad0eace257dbd7b3add830d7cd6e2473195f697dc6d383ddaf6a",
+  "shape": {
+    "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": {
+      "base": {
+        "functions": 37,
+        "objects": 10,
+        "arrays": 3
+      },
+      "candidate": {
+        "functions": 37,
+        "objects": 10,
+        "arrays": 3
+      }
+    },
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": {
+      "base": {
+        "functions": 49,
+        "objects": 23,
+        "arrays": 1
+      },
+      "candidate": {
+        "functions": 49,
+        "objects": 23,
+        "arrays": 1
+      }
+    }
+  },
+  "comments": {
+    "packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts": true,
+    "packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts": true,
+    "packages/react/src/branch-declaration-qualification.spec.tsx": true,
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts": true
+  },
+  "raw": {
+    "precedence-corrected": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "summary": [
+        " Test Files  1 passed (1)",
+        "      Tests  40 passed (40)"
+      ],
+      "sha256": "6c4c108605246198e7e9bb7fdeed5a50e7bcd2c9086842ccc710207726fa9f11"
+    },
+    "candidate-precedence-first": {
+      "result": {
+        "exit": 0,
+        "timeout": false,
+        "sourceUnchanged": true
+      },
+      "summary": [
+        " Test Files  1 passed (1)",
+        "      Tests  40 passed (40)"
+      ],
+      "sha256": "2f93f45d597f9923ba69f695ed253a031f2de65a4fd5da87458d04778da892cc"
+    }
+  }
+}

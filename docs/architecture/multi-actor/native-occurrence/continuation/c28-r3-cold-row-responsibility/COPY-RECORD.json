@@ -1,0 +1,10 @@
+{
+  "base": "8f902607f4e4f9fa31bda66c0b1c87ce3fe38a6c2b7a145c366498a5fc9d5333",
+  "candidate": "/private/tmp/st-c28-r3-cold-row-responsibility/candidate",
+  "manifestFileCount": 3124,
+  "extraSpecs": {
+    "packages/kernel/src/lib/cold-row-responsibility.spec.ts": "9f979ca3a9c37853d2d67b6b7384698f4489fc0a7ceeca2c568ee8115b0e1205",
+    "packages/kernel/src/lib/preparation-reader-comparison.spec.ts": "1d8ad5f2cd107b3762ec41c1932ec07243cabbdcf8cca324cd97ecf70a2ae4bd"
+  },
+  "excluded": "git, node_modules contents, caches, generated archives; explicit dependency symlink only"
+}

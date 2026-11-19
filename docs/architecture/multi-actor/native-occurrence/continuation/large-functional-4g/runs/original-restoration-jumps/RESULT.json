@@ -1,0 +1,36 @@
+{
+  "id": "original-restoration-jumps",
+  "arm": "original",
+  "exit": 0,
+  "qualified": true,
+  "classification": "selected-case-pass",
+  "reason": null,
+  "cases": [
+    {
+      "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "name": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit",
+      "state": "passed",
+      "expectedFailure": false,
+      "mode": "run"
+    },
+    {
+      "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+      "name": "v16 restoration of turns larger than the argument limit > releases the claims of a truncated turn that cleared more rows than the argument limit",
+      "state": "skipped",
+      "expectedFailure": false,
+      "mode": "skip"
+    }
+  ],
+  "workerPids": [
+    59352
+  ],
+  "remainingOwned": [],
+  "sourceMismatches": [],
+  "dependencyDrift": false,
+  "telemetrySamples": 51,
+  "maxObservedOwnedRssBytes": 1711292416,
+  "minimumObservedHostFreePercentage": 32.0,
+  "elapsedSeconds": 34.44360179104842,
+  "attempts": 1,
+  "completedAt": "2026-11-03T18:25:23.594756+00:00"
+}

@@ -1,0 +1,29 @@
+{
+  "cwd": "/private/tmp/st-c21-fixture-corrections/public-control/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=/private/tmp/st-c21-fixture-corrections/public-control/progress-reporter.mjs",
+    "src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts",
+    "--testNamePattern=restores ordinary membership with a foreign live-row field before the next transaction captures"
+  ],
+  "settings": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c21-fixture-corrections/public-control/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c21-fixture-corrections/public-control/nx-data",
+    "TMPDIR": "/private/tmp/st-c21-fixture-corrections/public-control/tmp",
+    "ST_VERIFY_PROGRESS": "/private/tmp/st-c21-fixture-corrections/public-control/progress",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-c21-fixture-corrections/public-control/observations",
+    "NODE_OPTIONS": "--require=/private/tmp/st-c21-fixture-corrections/public-control/diagnostic-redirect.cjs"
+  },
+  "nodeBin": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin",
+  "noProgressSeconds": 180
+}

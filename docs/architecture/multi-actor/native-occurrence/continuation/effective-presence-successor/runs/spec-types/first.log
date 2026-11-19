@@ -1,0 +1,37 @@
+check-spec-types: 3 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/angular/src/lib/effective-presence-successor.spec.ts: 12 error(s), baseline allows 0
+  packages/kernel/src/lib/effective-presence-reentry.spec.ts: 2 error(s), baseline allows 0
+  packages/kernel/src/lib/effective-presence-successor.spec.ts: 12 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/angular/src/lib/effective-presence-successor.spec.ts(21,28): error TS2352: Conversion of type '{ n: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/angular/src/lib/effective-presence-successor.spec.ts(21,28): error TS2769: No overload matches this call.
+packages/angular/src/lib/effective-presence-successor.spec.ts(22,19): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/angular/src/lib/effective-presence-successor.spec.ts(22,19): error TS2769: No overload matches this call.
+packages/angular/src/lib/effective-presence-successor.spec.ts(58,14): error TS2352: Conversion of type '{ n: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/angular/src/lib/effective-presence-successor.spec.ts(58,14): error TS2769: No overload matches this call.
+packages/angular/src/lib/effective-presence-successor.spec.ts(59,12): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/angular/src/lib/effective-presence-successor.spec.ts(59,12): error TS2769: No overload matches this call.
+packages/angular/src/lib/effective-presence-successor.spec.ts(87,12): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/angular/src/lib/effective-presence-successor.spec.ts(87,12): error TS2769: No overload matches this call.
+packages/angular/src/lib/effective-presence-successor.spec.ts(105,12): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/angular/src/lib/effective-presence-successor.spec.ts(105,12): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-reentry.spec.ts(14,14): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-reentry.spec.ts(14,14): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(24,28): error TS2352: Conversion of type '{ n: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(24,28): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(25,19): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(25,19): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(61,14): error TS2352: Conversion of type '{ n: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(61,14): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(62,12): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(62,12): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(90,12): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(90,12): error TS2769: No overload matches this call.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(108,12): error TS2352: Conversion of type '{ other: number; }' to type 'void' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/effective-presence-successor.spec.ts(108,12): error TS2769: No overload matches this call.

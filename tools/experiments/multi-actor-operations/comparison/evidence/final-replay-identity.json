@@ -1,0 +1,17 @@
+{
+  "command": "node node_modules/typescript/bin/tsc -p tsconfig.c1.json && node node_modules/typescript/bin/tsc -p tsconfig.consumer.json && node --test comparison.test.mjs lifecycle.test.mjs",
+  "exitCode": 0,
+  "passed": 44,
+  "skipped": 0,
+  "hashes": {
+    "c0.mjs": "e56e2739b3b4933356a57d5cdc8abf7815b65ae9f6e338e8bfa0fbc8f6d616f6",
+    "c1.mts": "d88fbda79a4c04e4b48ab5cfb55d4bf9b290b9c6338aa93c80814ee055165c4a",
+    "c1.mjs": "fe6395b8144d2c560c42cf9af097b741c50f748f21aaf97bc2fe4f3db3e2c16f",
+    "c3.mjs": "f6065988335d64114b72577388dbd29ad1d5bfcc615ba00aa1dad9a43469eaad",
+    "comparison.test.mjs": "7aefea690001424cc6ffcd34991214328ee4bdd8486407d1f86a26cdb51580b3",
+    "lifecycle.test.mjs": "cf8e36ea3c26be588a5850b367c3426e6d433c0f0023fcf76e7ebe3d9999dafa",
+    "../coordinator.mjs": "096140d4460b8b8e51148444bc4e7c6f5bf3f80f4373f6b0586d46ecd1fa539c",
+    "../dispatch-fixture.mjs": "3ba8cd1b48cdfd8c0dbc4936ac4ed806421be2a123813363d9fae70ea008dcb6",
+    "reference-server.mjs": "3cda8fae17ea9344dce4b06d1b33d97af7388e7efc4baf4ba2777cae9fa85899"
+  }
+}

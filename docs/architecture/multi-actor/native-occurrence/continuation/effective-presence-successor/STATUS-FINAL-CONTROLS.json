@@ -1,0 +1,13 @@
+{
+  "running": null,
+  "completed": [
+    {
+      "name": "final-controls-kernel",
+      "exit": 0
+    },
+    {
+      "name": "final-controls-angular",
+      "exit": 0
+    }
+  ]
+}

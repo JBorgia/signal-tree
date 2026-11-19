@@ -1,0 +1,15 @@
+514:  ❯ src/lib/occurrence-successor.spec.ts (16 tests | 3 failed) 89ms
+515:    × exact replacement cancels only its old slot and disposal cancels remaining slots 4ms
+516:    × finalization work is independent of unrelated enrolled sibling count 1ms
+517:    × hidden unresolved support does not block selection reduction and reappearance restores it 1ms
+518: (node:4396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+530:  ❯ src/lib/tree-error-public-contract.spec.ts (8 tests | 1 failed) 33ms
+531:      × the Link handle is still exactly three members 2ms
+532: (node:4409) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+533: (Use `node --trace-warnings ...` to show where the warning was created)
+534: (node:4410) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+554:  ❯ src/lib/entity-tap-reads.spec.ts (13 tests | 1 failed) 59ms
+555:      × a cell held from before the tap keeps its cache until the group ends 4ms
+556: (node:4430) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+557: (Use `node --trace-warnings ...` to show where the warning was created)
+558:  ❯ src/lib/link-absent-locations.spec.ts (21 tests | 5 failed) 132ms

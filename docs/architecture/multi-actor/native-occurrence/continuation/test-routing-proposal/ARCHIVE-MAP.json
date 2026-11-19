@@ -1,0 +1,26 @@
+[
+  {
+    "source": "REPORTED-DISPOSITION.json",
+    "archive": "REPORTED-DISPOSITION.json",
+    "sourceSha256": "6d647ce9c3f33bbf633b7f6c4cab780d95463c4f3a3cfa880a3152f1e1b13197",
+    "archiveSha256": "6d647ce9c3f33bbf633b7f6c4cab780d95463c4f3a3cfa880a3152f1e1b13197"
+  },
+  {
+    "source": "INPUTS.json",
+    "archive": "INPUTS.json",
+    "sourceSha256": "815de75ac303b0abe20972fa9e4c7d264d1dbd6f63e11dd5834f264ae1e6f38d",
+    "archiveSha256": "815de75ac303b0abe20972fa9e4c7d264d1dbd6f63e11dd5834f264ae1e6f38d"
+  },
+  {
+    "source": "MANIFEST.json",
+    "archive": "MANIFEST.json",
+    "sourceSha256": "469fb79538af2af7fa0d5e4bf946dae7a402fc9a01be0d761332ed49c36c94c5",
+    "archiveSha256": "469fb79538af2af7fa0d5e4bf946dae7a402fc9a01be0d761332ed49c36c94c5"
+  },
+  {
+    "source": "PROPOSAL.md",
+    "archive": "PROPOSAL.md",
+    "sourceSha256": "fb17a94c53f8b6907134c4830b74005cd1022ef7ca5f4001355cfae4395bb784",
+    "archiveSha256": "fb17a94c53f8b6907134c4830b74005cd1022ef7ca5f4001355cfae4395bb784"
+  }
+]

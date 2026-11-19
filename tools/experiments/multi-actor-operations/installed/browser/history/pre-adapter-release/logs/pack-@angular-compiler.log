@@ -1,0 +1,46 @@
+[
+  {
+    "id": "@angular/compiler@22.0.7",
+    "name": "@angular/compiler",
+    "version": "22.0.7",
+    "size": 1016051,
+    "unpackedSize": 5010971,
+    "shasum": "8683fa3f248179b9dabebe6e05d761d180f4375a",
+    "integrity": "sha512-zhFPKYJzpml5bt58DkJq8S6S2bSJBomebgLYtUvZNLdQMicd5qmRGX6I3LO7Jd+HgjB2Flne/sloI+Jcyz1aOQ==",
+    "filename": "angular-compiler-22.0.7.tgz",
+    "files": [
+      {
+        "path": "LICENSE",
+        "size": 1105,
+        "mode": 493
+      },
+      {
+        "path": "README.md",
+        "size": 290,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/compiler.mjs",
+        "size": 1160193,
+        "mode": 493
+      },
+      {
+        "path": "fesm2022/compiler.mjs.map",
+        "size": 3557543,
+        "mode": 493
+      },
+      {
+        "path": "package.json",
+        "size": 1249,
+        "mode": 493
+      },
+      {
+        "path": "types/compiler.d.ts",
+        "size": 290591,
+        "mode": 493
+      }
+    ],
+    "entryCount": 6,
+    "bundled": []
+  }
+]

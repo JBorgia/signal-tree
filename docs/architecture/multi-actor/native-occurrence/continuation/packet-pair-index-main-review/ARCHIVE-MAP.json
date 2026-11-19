@@ -1,0 +1,50 @@
+[
+  {
+    "source": "run-gate.py",
+    "archive": "run-gate.py",
+    "sourceSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json.gz",
+    "sourceSha256": "e343560a23e2b5a7a445645d230e058ac62582ce7634fa99fd563e95666499eb",
+    "archiveSha256": "c139807121502f84ea991ee271a7a8e475504a4509e3a7ca30daa32a3fe9c16f"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "1948c0e1e085b9dc214765a69b85b4fa35e07bff274601af9a56f88266a4a2e0",
+    "archiveSha256": "1948c0e1e085b9dc214765a69b85b4fa35e07bff274601af9a56f88266a4a2e0"
+  },
+  {
+    "source": "runs/independent-pair-controls/RESULT.json",
+    "archive": "runs/independent-pair-controls/RESULT.json",
+    "sourceSha256": "6c21b685169e1e9dc9ce7f974b818ea962e5d357445161679c6f3b93f70dd7ac",
+    "archiveSha256": "6c21b685169e1e9dc9ce7f974b818ea962e5d357445161679c6f3b93f70dd7ac"
+  },
+  {
+    "source": "runs/independent-pair-controls/first.log",
+    "archive": "runs/independent-pair-controls/first.log",
+    "sourceSha256": "8b4fbf2df59bfa28be751e54036df23d49204b0028b2eba18c44ef29dd4fe806",
+    "archiveSha256": "8b4fbf2df59bfa28be751e54036df23d49204b0028b2eba18c44ef29dd4fe806"
+  },
+  {
+    "source": "runs/independent-pair-controls/SOURCE-BEFORE.json",
+    "archive": "runs/independent-pair-controls/SOURCE-BEFORE.json.gz",
+    "sourceSha256": "e343560a23e2b5a7a445645d230e058ac62582ce7634fa99fd563e95666499eb",
+    "archiveSha256": "c139807121502f84ea991ee271a7a8e475504a4509e3a7ca30daa32a3fe9c16f"
+  },
+  {
+    "source": "runs/independent-pair-controls/SOURCE-AFTER.json",
+    "archive": "runs/independent-pair-controls/SOURCE-AFTER.json",
+    "sourceSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  {
+    "source": "runs/independent-pair-controls/COMMAND.json",
+    "archive": "runs/independent-pair-controls/COMMAND.json",
+    "sourceSha256": "ded67a263a17302d175710958fdc8d42d00dd201b106dbcad2edc3d3bf039aee",
+    "archiveSha256": "ded67a263a17302d175710958fdc8d42d00dd201b106dbcad2edc3d3bf039aee"
+  }
+]

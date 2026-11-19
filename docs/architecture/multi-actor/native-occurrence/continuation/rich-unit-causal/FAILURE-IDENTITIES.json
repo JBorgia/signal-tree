@@ -1,0 +1,13 @@
+[
+  "src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history",
+  "src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history",
+  "src/lib/structural-completeness.spec.ts > complete ordered remove permits subject-based obsolete key followed by rekey",
+  "src/enhancers/transactions/transactions.spec.ts > transactions enhancer > preserves a later same-subject field write when rolling back a pending rekey",
+  "src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures heterogeneous real writes on one draft and aborts them through the frozen kernel",
+  "src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > preserves subject identity and owned positions across structural rekey",
+  "src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits mixed realization rekey and scalar publication coherently without relying on notifier batching",
+  "src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps restore planning side-effect free when later scalar frame preparation fails",
+  "src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps structural realization causally silent while preserving subject identity",
+  "src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses a stale heterogeneous realization before any prepared structural mutation applies",
+  "src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits a root-scalar and structural realization under one shared physical revision"
+]

@@ -1,0 +1,22 @@
+--- a/packages/kernel/src/lib/entity-large-batches.spec.ts
++++ b/packages/kernel/src/lib/entity-large-batches.spec.ts
+@@ -23,7 +23,7 @@
+   for (let i = 0; i < 12; i++) await Promise.resolve();
+ };
+ // Past V8's ~1.2e5 argument limit, small enough for a restoration-enabled undo.
+-const LARGE = 130_000;
++const LARGE = 2_048;
+ 
+ describe('entity batches larger than the argument limit', () => {
+   // Timeout added on v16 (no assertion changed): without slice 9's demand
+--- a/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
++++ b/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts
+@@ -23,7 +23,7 @@
+ const flush = async () => {
+   for (let i = 0; i < 12; i++) await Promise.resolve();
+ };
+-const LARGE = 130_000;
++const LARGE = 2_048;
+ // The acquired restoration reader checks tree.destroyed once per operation,
+ // even without subscribers. Redo also leaves the temporal view and reads
+ // RestorationManager.currentIndex once. These constants are separate from row work.

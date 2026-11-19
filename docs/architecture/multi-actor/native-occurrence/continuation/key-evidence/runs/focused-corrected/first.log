@@ -1,0 +1,58 @@
+
+> nx run kernel:test entity-missing-id-guard.spec.ts entity-key-evidence-public.spec.ts ordinary-key-evidence.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-missing-id-guard.spec.ts entity-key-evidence-public.spec.ts ordinary-key-evidence.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:92911) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:93124) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-key-evidence-successor/candidate/packages/kernel
+
+(node:93936) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > retains undefined separately from spelled and typed keys 24ms
+ ✓ src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > production mode retains undefined without warning 2ms
+ ✓ src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > retains null separately from spelled and typed keys 2ms
+ ✓ src/lib/entity-key-evidence-public.spec.ts > legacy key admission public controls > production mode retains null without warning 0ms
+(node:94081) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > warns when entities have no id and no selectId 10ms
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > does NOT warn when a selectId is provided 1ms
+ ✓ src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > does NOT warn when entities have an id field 1ms
+(node:94116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key undefined (undefined) 2ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key undefined (undefined) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key null (object) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key null (object) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key undefined (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key undefined (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key 1 (number) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key 1 (number) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit add key 1 (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > preserves explicit placement key 1 (string) 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > uses the rekey destination 0ms
+ ✓ src/lib/physical/ordinary-key-evidence.spec.ts > ordinary admission source key evidence > refuses missing source evidence 0ms
+
+ Test Files  3 passed (3)
+      Tests  19 passed (19)
+   Start at  17:02:43
+   Duration  8.58s (transform 2.50s, setup 0ms, import 3.30s, tests 49ms, environment 3.57s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      11.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     11.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    11.3s

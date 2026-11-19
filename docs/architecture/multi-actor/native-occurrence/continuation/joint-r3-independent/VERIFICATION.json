@@ -1,0 +1,12 @@
+{
+  "artifacts": {
+    "SOURCE-SHA256.json": true,
+    "source.patch": true,
+    "tests.patch": true,
+    "R2-to-R3.runtime.patch": true,
+    "R2-to-R3.tests.patch": true,
+    "approved-reader-tests.patch": true,
+    "private-hook-tests.patch": true
+  },
+  "mismatches": []
+}

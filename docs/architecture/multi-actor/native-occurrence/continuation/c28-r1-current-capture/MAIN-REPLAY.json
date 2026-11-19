@@ -1,0 +1,11 @@
+{
+  "manifestSha256": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b",
+  "verifiedEntries": 3090,
+  "result": {
+    "exit": 0,
+    "timeout": false,
+    "sourceUnchanged": true
+  },
+  "cases": 22,
+  "scope": "unchanged five-file replay; not unique additional tests"
+}

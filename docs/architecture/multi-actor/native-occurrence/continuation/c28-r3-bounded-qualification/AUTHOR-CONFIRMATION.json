@@ -1,0 +1,11 @@
+{
+  "thread": "01a19cef-d55c-7113-82aa-05f3c18257b9",
+  "explicitFreeze": true,
+  "noPlannedCandidateRuntimeTestMutations": true,
+  "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "runtimeManifest": "1edb39e668f2a370554f692d455b75fac08a9836003a150acd09e2326368a08c",
+  "runtimePatch": "e29e34f8b4a5043da4f984c104ad683ba65869c9b2da3a3d5c12bf22ce7db634",
+  "authorGate": "runs/final-gate/first.log",
+  "authorGateResult": "26/26 exit0 sourceUnchanged",
+  "scope": "147 plus three type gates only; author and public sibling cases excluded"
+}

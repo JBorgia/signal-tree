@@ -1,0 +1,50 @@
+[
+  {
+    "source": "TYPE-CHECK.json",
+    "archive": "TYPE-CHECK.json",
+    "sourceSha256": "4f8e7e58e02d8f469d4d56f0d1f35b9749453ca66bb791018ed5e895781c87d8",
+    "archiveSha256": "4f8e7e58e02d8f469d4d56f0d1f35b9749453ca66bb791018ed5e895781c87d8"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "fdae2bd3e77c52d4b7a39508763080dc37e491551d7522e64f80f574eff9889f",
+    "archiveSha256": "fdae2bd3e77c52d4b7a39508763080dc37e491551d7522e64f80f574eff9889f"
+  },
+  {
+    "source": "TYPE-EXAMPLES.ts",
+    "archive": "TYPE-EXAMPLES.ts",
+    "sourceSha256": "95957febdcdc96fc37823eb19fa94fda365be3d895be3c7884c12533d8444dc6",
+    "archiveSha256": "95957febdcdc96fc37823eb19fa94fda365be3d895be3c7884c12533d8444dc6"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "98e18512319b5e0f744190adfac526a7a1e2b105b591457ab5e7b09dab6b839a",
+    "archiveSha256": "98e18512319b5e0f744190adfac526a7a1e2b105b591457ab5e7b09dab6b839a"
+  },
+  {
+    "source": "API-SKETCH.ts",
+    "archive": "API-SKETCH.ts",
+    "sourceSha256": "ccb0f89963a8c8924e6266486560bad5ef2a766308a14ab07b738a926b2429ab",
+    "archiveSha256": "ccb0f89963a8c8924e6266486560bad5ef2a766308a14ab07b738a926b2429ab"
+  },
+  {
+    "source": "types-first.log",
+    "archive": "types-first.log",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "tsconfig.json",
+    "archive": "tsconfig.json",
+    "sourceSha256": "75467f218ecd665e25d2c87c93398b3fa2401e54395411aaab218701b54f4322",
+    "archiveSha256": "75467f218ecd665e25d2c87c93398b3fa2401e54395411aaab218701b54f4322"
+  },
+  {
+    "source": "PROPOSAL.md",
+    "archive": "PROPOSAL.md",
+    "sourceSha256": "d0c3ce2b2ca4fb59b1beb098636098b103683338d27981865fc0ecad14a4c59f",
+    "archiveSha256": "d0c3ce2b2ca4fb59b1beb098636098b103683338d27981865fc0ecad14a4c59f"
+  }
+]

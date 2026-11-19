@@ -1,0 +1,13 @@
+{
+  "IDENTITY.json": "0e400498783629dde78327655a76de33bdf34ca35673a2e30655dcf1a13c3229",
+  "PLAN.md": "b9756e2c3a1c0156fb5c61de5a8dfbc714532ad435a4b1e030bddca1a6019d43",
+  "inputs/ALTERNATIVES.md": "96c3d69c922ef535b65a26f41dbbb13984d62565f09f8950c7e3769846ab8b9a",
+  "inputs/R2-MANIFEST.json": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "inputs/N2-original-diagnostic.spec.ts": "9f50115495455f091230e6aa69537f514ad4a2ada5a1485ed4f77c20e957001b",
+  "inputs/packages/kernel/src/lib/approved-current-obligation.spec.ts": "b74ab938c968cd284a27b6c3ce54a16c27ecb6f897d2ec30a820fe619189e0e3",
+  "inputs/packages/kernel/src/lib/current-cutoff-r2.spec.ts": "f4677fb8ae50599745354f6a10e946bc662929a78362c8f6ed1fd67ff21d18e7",
+  "inputs/packages/kernel/src/lib/current-validation.spec.ts": "6eecbae00083bbb22a5e85463474bb37d11f3fa1464dc71afb5124ab73131071",
+  "inputs/packages/kernel/src/lib/experimental-publication/private.ts": "c7822db0f351bc488a78029b9df34382894fccef7355bca7b8b0866a608a8951",
+  "inputs/packages/kernel/src/lib/experimental-publication/lifecycle.ts": "69fd14f8883e2240997b25ee1edbb347585229bee27df118faa2c6a77c1531da",
+  "inputs/packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30"
+}

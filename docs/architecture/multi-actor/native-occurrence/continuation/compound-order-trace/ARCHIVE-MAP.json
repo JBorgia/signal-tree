@@ -1,0 +1,47 @@
+{
+  "README.md": {
+    "sha256": "6e2799e20ab91bafa793e3f2c2c6924f86b4787922ee2dcc9aa66e5ae4aa33be",
+    "archive": "README.md",
+    "archiveSha256": "6e2799e20ab91bafa793e3f2c2c6924f86b4787922ee2dcc9aa66e5ae4aa33be"
+  },
+  "SOURCE.json": {
+    "sha256": "6630a74c965b1f414eae5105c3eb3bb3ea09ba9b89f57f81149eee52086af1fd",
+    "archive": "SOURCE.json.gz",
+    "archiveSha256": "5829b6a62c5719298987d6e103ad247627fbcab9fb4b848bae473df730f00f22"
+  },
+  "logging-only.patch": {
+    "sha256": "d6a409a31733bc774e73d69be73a8d589ee3f109736e6a81ec36960cd2e6485b",
+    "archive": "logging-only.patch",
+    "archiveSha256": "d6a409a31733bc774e73d69be73a8d589ee3f109736e6a81ec36960cd2e6485b"
+  },
+  "run-gate.py": {
+    "sha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27",
+    "archive": "run-gate.py",
+    "archiveSha256": "e42b79e11addc004f7380358eed39393f9c63f1656714ede60c7be013cd3cc27"
+  },
+  "runs/trace/COMMAND.json": {
+    "sha256": "d1e5dc99bcf8c0598a40f958ef72059e241955f44b61ec41abb23720a75b1c42",
+    "archive": "runs/trace/COMMAND.json",
+    "archiveSha256": "d1e5dc99bcf8c0598a40f958ef72059e241955f44b61ec41abb23720a75b1c42"
+  },
+  "runs/trace/RESULT.json": {
+    "sha256": "1d7e6008d6aa45ffed23872f4e4e8dc2892d6bcdc99ab14a1949204a761d6c93",
+    "archive": "runs/trace/RESULT.json",
+    "archiveSha256": "1d7e6008d6aa45ffed23872f4e4e8dc2892d6bcdc99ab14a1949204a761d6c93"
+  },
+  "runs/trace/SOURCE-AFTER.json": {
+    "sha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c",
+    "archive": "runs/trace/SOURCE-AFTER.json",
+    "archiveSha256": "885758c54985f6408472006de9dd25fac0cee35f6fd58850e444e1fbb464f00c"
+  },
+  "runs/trace/SOURCE-BEFORE.json": {
+    "sha256": "72db16c080db4357130363debb8997567c2fe8ffe8037fe25509b344414d00fa",
+    "archive": "runs/trace/SOURCE-BEFORE.json.gz",
+    "archiveSha256": "216ada3e20d3b84917583482345f4ce9a0cbde108c0c34cd7c62fc4172078500"
+  },
+  "runs/trace/first.log": {
+    "sha256": "0fa9aed0136cf1984aad090d9991006a542da15ce4181476f7d488d0bf84278c",
+    "archive": "runs/trace/first.log",
+    "archiveSha256": "0fa9aed0136cf1984aad090d9991006a542da15ce4181476f7d488d0bf84278c"
+  }
+}

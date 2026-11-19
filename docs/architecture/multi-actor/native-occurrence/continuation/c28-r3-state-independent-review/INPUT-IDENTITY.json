@@ -1,0 +1,9 @@
+{
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "108517fe533b6e5f0c4abbbb700ed1d358ac3db170fbac6bf3ed270872018eb6",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c",
+  "packages/kernel/src/lib/write-context.ts": "8bb6f9dd964192f2ef92f399f2866e1577c2eb594bdff24fa060a357ab0129ad",
+  "packages/kernel/src/lib/external.ts": "dea4c23ea9ef115ea0200561068d6a1e64da0ba9e0ce53161f66a413cbf9d704",
+  "packages/kernel/src/lib/write-participation.ts": "874604cae15f14835731ed26a7f7b7bc65ec138ae966a2db2c9fb93032b7fb6e",
+  "packages/kernel/src/lib/experimental-publication/private.ts": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472"
+}

@@ -1,0 +1,59 @@
+{
+  "allC5ChangesFromC0Unchanged": [
+    "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+    "packages/kernel/src/lib/admission-refusal.spec.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/fixed-window-independent.spec.ts",
+    "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "packages/kernel/src/lib/independent-refusal-branches.spec.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "packages/kernel/src/lib/occurrence-successor.spec.ts",
+    "packages/kernel/src/lib/owner-transition-cancellation.spec.ts",
+    "packages/kernel/src/lib/packet-admission-r1.spec.ts",
+    "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+    "packages/kernel/src/lib/packet-index-review.spec.ts",
+    "packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+    "packages/kernel/src/lib/physical/entity-placement-stage.ts",
+    "packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts",
+    "packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts",
+    "packages/kernel/src/lib/physical/prepared-placement-visibility.ts",
+    "packages/kernel/src/lib/point-admission-followup.spec.ts",
+    "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts"
+  ],
+  "sixEnrollmentRuntimeFiles": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "c6": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b",
+      "shared": "4133f8ba5cea5a8af111b1b0060a7c9685b6f94d3700e58bd92807d11fb96b5b",
+      "equal": true
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "c6": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b",
+      "shared": "3caad96e40bdf8bfc1c1a81982a7878d7df6e279744307a2a96c5af33cce884b",
+      "equal": true
+    },
+    "packages/kernel/src/lib/internals/materialize-markers.ts": {
+      "c6": "ef06b600fb9a990b03df9965b2e412bcd780a99d0daf347f314bdd429981a5f6",
+      "shared": "ef06b600fb9a990b03df9965b2e412bcd780a99d0daf347f314bdd429981a5f6",
+      "equal": true
+    },
+    "packages/kernel/src/lib/internals/member-membership.ts": {
+      "c6": "dc7cb7c8e61f57ea05784ad751fa395d6c32ed5f23bf43734787e0894b57263e",
+      "shared": "dc7cb7c8e61f57ea05784ad751fa395d6c32ed5f23bf43734787e0894b57263e",
+      "equal": true
+    },
+    "packages/kernel/src/lib/internals/native-occurrence.ts": {
+      "c6": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+      "shared": "d2ec550141eaa50570b8c5751d6f32e9683274fe6974362323876d5fd892c0a8",
+      "equal": true
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "c6": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "shared": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "equal": true
+    }
+  }
+}

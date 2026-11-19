@@ -1,0 +1,64 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/consumer/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm install /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-kernel-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-angular-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-react-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-vue-16.0.0-dev.tgz /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-solid-16.0.0-dev.tgz @angular/core@^22.0.0 rxjs@^7.0.0 react@^19.0.0 react-dom@^19.0.0 @types/react@^19.0.0 @types/react-dom@^19.0.0 vue@^3.5.0 typescript@^5.6.0
+8 verbose argv "install" "--no-audit" "--no-fund" "--loglevel" "silent" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-kernel-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-angular-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-react-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-vue-16.0.0-dev.tgz" "/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-solid-16.0.0-dev.tgz" "@angular/core@^22.0.0" "rxjs@^7.0.0" "react@^19.0.0" "react-dom@^19.0.0" "@types/react@^19.0.0" "@types/react-dom@^19.0.0" "vue@^3.5.0" "typescript@^5.6.0"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_30_01_134Z-
+10 verbose logfile /private/tmp/st-c22-artifact-checks/npm-cache/_logs/2026-11-02T21_30_01_134Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly idealTree buildDeps
+14 silly fetch manifest @angular/core@^22.0.0
+15 silly packumentCache full:https://registry.npmjs.org/@angular%2fcore cache-miss
+16 http fetch GET https://registry.npmjs.org/@angular%2fcore attempt 1 failed with ENOTFOUND
+17 http fetch GET https://registry.npmjs.org/@angular%2fcore attempt 2 failed with ENOTFOUND
+18 http fetch GET https://registry.npmjs.org/@angular%2fcore attempt 3 failed with ENOTFOUND
+19 silly fetch manifest rxjs@^7.0.0
+20 silly packumentCache full:https://registry.npmjs.org/rxjs cache-miss
+21 http fetch GET https://registry.npmjs.org/rxjs attempt 1 failed with ENOTFOUND
+22 http fetch GET https://registry.npmjs.org/rxjs attempt 2 failed with ENOTFOUND
+23 http fetch GET https://registry.npmjs.org/rxjs attempt 3 failed with ENOTFOUND
+24 silly fetch manifest react@^19.0.0
+25 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+26 http fetch GET https://registry.npmjs.org/react attempt 1 failed with ENOTFOUND
+27 http fetch GET https://registry.npmjs.org/react attempt 2 failed with ENOTFOUND
+28 http fetch GET https://registry.npmjs.org/react attempt 3 failed with ENOTFOUND
+29 silly fetch manifest react-dom@^19.0.0
+30 silly packumentCache full:https://registry.npmjs.org/react-dom cache-miss
+31 http fetch GET https://registry.npmjs.org/react-dom attempt 1 failed with ENOTFOUND
+32 http fetch GET https://registry.npmjs.org/react-dom attempt 2 failed with ENOTFOUND
+33 http fetch GET https://registry.npmjs.org/react-dom attempt 3 failed with ENOTFOUND
+34 silly fetch manifest @types/react@^19.0.0
+35 silly packumentCache full:https://registry.npmjs.org/@types%2freact cache-miss
+36 http fetch GET https://registry.npmjs.org/@types%2freact attempt 1 failed with ENOTFOUND
+37 http fetch GET https://registry.npmjs.org/@types%2freact attempt 2 failed with ENOTFOUND
+38 http fetch GET https://registry.npmjs.org/@types%2freact attempt 3 failed with ENOTFOUND
+39 silly fetch manifest @types/react-dom@^19.0.0
+40 silly packumentCache full:https://registry.npmjs.org/@types%2freact-dom cache-miss
+41 http fetch GET https://registry.npmjs.org/@types%2freact-dom attempt 1 failed with ENOTFOUND
+42 http fetch GET https://registry.npmjs.org/@types%2freact-dom attempt 2 failed with ENOTFOUND
+43 http fetch GET https://registry.npmjs.org/@types%2freact-dom attempt 3 failed with ENOTFOUND
+44 silly fetch manifest vue@^3.5.0
+45 silly packumentCache full:https://registry.npmjs.org/vue cache-miss
+46 http fetch GET https://registry.npmjs.org/vue attempt 1 failed with ENOTFOUND
+47 http fetch GET https://registry.npmjs.org/vue attempt 2 failed with ENOTFOUND
+48 http fetch GET https://registry.npmjs.org/vue attempt 3 failed with ENOTFOUND
+49 silly fetch manifest typescript@^5.6.0
+50 silly packumentCache full:https://registry.npmjs.org/typescript cache-miss
+51 http fetch GET https://registry.npmjs.org/typescript attempt 1 failed with ENOTFOUND
+52 http fetch GET https://registry.npmjs.org/typescript attempt 2 failed with ENOTFOUND
+53 http fetch GET https://registry.npmjs.org/typescript attempt 3 failed with ENOTFOUND
+54 silly fetch manifest @signal-tree/react@file:../../../../../../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-QyKtYn/signal-tree-react-16.0.0-dev.tgz
+55 silly fetch manifest react@^19.0.0
+56 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+57 http fetch GET https://registry.npmjs.org/react attempt 1 failed with ENOTFOUND
+58 http fetch GET https://registry.npmjs.org/react attempt 2 failed with ENOTFOUND
+59 http fetch GET https://registry.npmjs.org/react attempt 3 failed with ENOTFOUND
+60 silly fetch manifest react@^18.0.0 || ^19.0.0
+61 silly packumentCache full:https://registry.npmjs.org/react cache-miss
+62 http fetch GET https://registry.npmjs.org/react attempt 1 failed with ENOTFOUND
+63 http fetch GET https://registry.npmjs.org/react attempt 2 failed with ENOTFOUND

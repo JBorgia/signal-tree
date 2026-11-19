@@ -1,0 +1,35 @@
+
+> nx run kernel:test equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern=net-zero destination
+
+> node tools/run-core-vitest.mjs equal-owner-admission.spec.ts --maxWorkers=1 --testNamePattern="net-zero destination"
+
+(node:58967) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:58974) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c24-equal-owner/candidate/packages/kernel
+
+(node:58981) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 11 skipped (12)
+   Start at  15:16:27
+   Duration  3.57s (transform 2.04s, setup 0ms, import 2.48s, tests 34ms, environment 853ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      4.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.8s

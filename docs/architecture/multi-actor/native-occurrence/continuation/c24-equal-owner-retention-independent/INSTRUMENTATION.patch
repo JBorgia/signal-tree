@@ -1,0 +1,41 @@
+--- /private/tmp/st-c24-equal-owner-retention-independent/private.uninstrumented.ts	2026-11-02 15:41:15
++++ /private/tmp/st-c24-equal-owner-retention-independent/source/packages/kernel/src/lib/experimental-publication/private.ts	2026-11-02 15:41:15
+@@ -572,3 +572,12 @@
+  ready(channel,b);
+  return selectedReceipt(channel);
+ }
++
++export function __reviewSelectedRequirement(node:object){
++ const requirement=nativeValues.get(node)?.requirement as lifecycle.NativeRequirement|undefined;
++ if(!requirement)throw Error('Missing selected ordinary source');
++ const seen=new Set<lifecycle.NativeRequirement>();const queue:Array<[lifecycle.NativeRequirement,number]>=[[requirement,0]];let depth=0,edges=0;
++ while(queue.length){const [part,d]=queue.pop()!;depth=Math.max(depth,d);if(seen.has(part))continue;seen.add(part);for(const child of part.components??[]){edges++;queue.push([child,d+1]);}}
++ lifecycle.__reviewResetVisits();const ready=lifecycle.nativeRequirementReady(requirement);const proof=lifecycle.nativeProof(requirement);const visits=lifecycle.__reviewVisits();
++ return {nodes:seen.size,depth,edges,ready,visits,owners:proof.owners.length,destination:proof.destination?.length??0,input:proof.input?.length??0,validation:proof.validation?.length??0,possible:proof.possible?.length??0};
++}
+--- /private/tmp/st-c24-equal-owner-retention-independent/lifecycle.uninstrumented.ts	2026-11-02 15:41:15
++++ /private/tmp/st-c24-equal-owner-retention-independent/source/packages/kernel/src/lib/experimental-publication/lifecycle.ts	2026-11-02 15:41:15
+@@ -119,6 +119,7 @@
+ const unactivatedRequirements=new WeakSet<NativeRequirement>();
+ const requirementListeners=new WeakMap<NativeRequirement,Set<()=>void>>();
+ export function nativeRequirementReady(requirement:NativeRequirement):boolean {
++ __reviewReadyVisits++;
+  return !unfinishedRequirements.has(requirement)&&!unactivatedRequirements.has(requirement)&&(requirement.components??[]).every(nativeRequirementReady);
+ }
+ export function combineNativeRequirements(components:readonly NativeRequirement[]):NativeRequirement {
+@@ -154,6 +155,7 @@
+  return Object.freeze({requirement,owners:Object.freeze(proof.owners.filter(owner=>owner.outcome!=='confirmed')),terminalRejectedRoles:proof.terminalRejectedRoles??0});
+ }
+ export function nativeProof(requirement: NativeRequirement): Proof {
++ __reviewProofVisits++;
+  const p=requirement.proof;if(p)return p;
+  const inputs=requirement.inputs.map(input=>nativeProof(input.requirement));
+  const validation=requirement.frames.map(effective);
+@@ -440,3 +442,7 @@
+  for(const cell of [...selected.owners,...(selected.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+  refresh(op);return selected;
+ }
++
++let __reviewReadyVisits=0,__reviewProofVisits=0;
++export function __reviewResetVisits():void{__reviewReadyVisits=0;__reviewProofVisits=0;}
++export function __reviewVisits(){return {ready:__reviewReadyVisits,proof:__reviewProofVisits};}

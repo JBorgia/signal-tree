@@ -1,0 +1,15 @@
+{
+  "number": 4,
+  "exit": 0,
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "fullName": "Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling",
+    "duplicateOrdinal": 1
+  },
+  "summary": [
+    "Test Files  1 passed (1)",
+    "Tests  1 passed | 20 skipped (21)"
+  ],
+  "elapsedSecondsForRunTrackingOnly": 2.4648358821868896
+}

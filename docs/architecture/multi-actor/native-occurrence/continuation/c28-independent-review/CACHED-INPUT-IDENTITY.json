@@ -1,0 +1,61 @@
+{
+  "c27": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "0c0605db8ad8c7dc537906a63d9588b64becf45b4ec02ffeff920d7668c36647",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "f21f99f975a5ad9577c618ddb2593edf200faa4b00de1c0a8c2e484479405873",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "sha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/utils.ts": {
+      "sha256": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/internals/node-shape.ts": {
+      "sha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/internals/location-runtime.ts": {
+      "sha256": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+      "manifestMatches": true
+    }
+  },
+  "c28": {
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "2e794449f43fe2799287e966bc41999e82735e5c0dbeac8aa260a7f0c1e5d9cf",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "90b2cf7ab466b08d519bce8598ea8913ad7e52044ae09ae2ede300cc8f3f7402",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "sha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/utils.ts": {
+      "sha256": "5ea0f1bc315cee445ab0700b33b1dbca2f06c11dee9c942b600bdce7a2ec1232",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/internals/node-shape.ts": {
+      "sha256": "435224e100d4a45f7a52691236b3a9289d05cfb11100eb26fd5fc7275921c5d1",
+      "manifestMatches": true
+    },
+    "packages/kernel/src/lib/internals/location-runtime.ts": {
+      "sha256": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+      "manifestMatches": true
+    }
+  },
+  "cached-current-input.spec.ts": "bc1504926067188a541e76e9b2e3539c3a8b1cf678ab7362949e55b8caa328d4",
+  "CAPTURED-DIFF.patch": "5db881b307f31ec411a95229fc3edd0feec010fc53f3e53a8e153a19e503cadb",
+  "CAPTURE.json": "6f2c4119886f5c0ee4e85d545f3764850a1d15eeca8797e77f901d0f4820fa4d",
+  "MAIN-REPLAY.json": "ae26a0954201beefb0c1d72ca487bd062f5535ba74c9dca1619f25e2a2e4a7c1",
+  "runs/c27/observations.jsonl": "cf9d5a3298182946a6dd1db05589be25151be28ef7713ac6ec9580ebefc90cb7",
+  "runs/c28/observations.jsonl": "d4a5db8e54f6ff429c79a299806c53e5c69713404d0822cc337bf63a0cb20073",
+  "runs/c28/command.json": "d36b4bab1a0604470502c2a4577b0081f2b46ac8c5d20a7336c6bce4ced18836"
+}

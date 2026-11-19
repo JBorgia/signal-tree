@@ -1,0 +1,125 @@
+
+> nx run kernel:test occurrence-successor.spec.ts dynamic-member-enrollment.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs occurrence-successor.spec.ts dynamic-member-enrollment.spec.ts --maxWorkers=1
+
+(node:70515) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:70522) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-member-enrollment-successor/candidate/packages/kernel
+
+(node:70532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occurrence-successor.spec.ts (12 tests | 4 failed) 73ms
+   × first omission enrolls clean scalar ancestry 35ms
+   × first omission enrolls clean empty ancestry 4ms
+   × first omission enrolls clean collection ancestry 4ms
+   × first omission enrolls clean mixed ancestry 8ms
+(node:70616) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/dynamic-member-enrollment.spec.ts (8 tests | 1 failed) 45ms
+     × failed preparation leaves no child and retry enrolls once 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/dynamic-member-enrollment.spec.ts > dynamic member enrollment > failed preparation leaves no child and retry enrolls once
+AssertionError: expected [ { a: { n: 2 } }, …(2) ] to deeply equal [ { a: { n: 2 } }, { a: { n: 3 } } ]
+
+- Expected
++ Received
+
+@@ -7,6 +7,11 @@
+    {
+      "a": {
+        "n": 3,
+      },
+    },
++   {
++     "a": {
++       "n": 999,
++     },
++   },
+  ]
+
+ ❯ src/lib/dynamic-member-enrollment.spec.ts:29:75
+     27|   try{expect(()=>t.$.rows({a:{n:1}})).toThrow(failure);expect(t.$.rows…
+     28|    t.$.rows({a:{n:2}});await tick();expect(sent).toEqual([{a:{n:2}}]);…
+     29|    (escaped as {n:(value:number)=>void}).n(999);await tick();expect(se…
+       |                                                                           ^
+     30|   }finally{off();l.dispose();t.destroy();}
+     31|  });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean scalar ancestry
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean mixed ancestry
+AssertionError: expected [] to deeply equal [ undefined ]
+
+- Expected
++ Received
+
+- [
+-   undefined,
+- ]
++ []
+
+ ❯ src/lib/occurrence-successor.spec.ts:23:22
+     21|   await flush();expect(sent).toEqual([]);
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:u…
+       |                      ^
+     24|  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy()…
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean empty ancestry
+ FAIL  src/lib/occurrence-successor.spec.ts > first omission enrolls clean collection ancestry
+AssertionError: expected [] to deeply equal [ [] ]
+
+- Expected
++ Received
+
+- [
+-   [],
+- ]
++ []
+
+ ❯ src/lib/occurrence-successor.spec.ts:23:22
+     21|   await flush();expect(sent).toEqual([]);
+     22|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     23|   expect(nestedSent).toEqual([kind==='empty'||kind==='collection'?[]:u…
+       |                      ^
+     24|  }finally{c.dispose();child.dispose();tree.destroy();foreign.destroy()…
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed | 15 passed (20)
+   Start at  19:55:16
+   Duration  2.42s (transform 868ms, setup 0ms, import 1.24s, tests 118ms, environment 791ms)
+
+Warning: command "node tools/run-core-vitest.mjs occurrence-successor.spec.ts dynamic-member-enrollment.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.0s

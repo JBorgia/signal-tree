@@ -1,0 +1,13 @@
+{
+  "manifestSha256": "9f3622a1231437c7f9cb732a1d2b3d0aa501ba45feee0c7a051f1e282b458f02",
+  "verifiedFiles": 3083,
+  "allMatch": true,
+  "source": "/private/tmp/st-c25-equal-owner/candidate",
+  "reviewInputs": {
+    "/private/tmp/st-finalized-role-write-audit/REVIEW.md": "64ed53d4f1508a5e3fe22262ab11fa51ec794b1e1c0dd66f49735bd076588acf",
+    "/private/tmp/st-finalized-role-premise-review/REVIEW.md": "f456ac9737f2286caa0ad26f43bc39c7f3fe45439f4536a578ba1dd32d7bc789",
+    "/private/tmp/st-finalized-role-premise-review/OWNER-HISTORY.md": "1324b944aca5cf3beb1f42d415faa1f1cb00343d3dc19a1576969b04bcf53aa3",
+    "/private/tmp/st-finalized-role-retirement-discriminator/REVIEW.md": "b3a0a1d26ca61f8b7059db8cc912e4ec355b6860509b79849ed54f6b2d92ed8c",
+    "/private/tmp/st-finalized-role-retirement-equivalence/REVIEW.md": "b2fff1984e74cb6456bf79b21a8ebff51a5aa2fefa70a9716b76ccf4eb20dbd0"
+  }
+}

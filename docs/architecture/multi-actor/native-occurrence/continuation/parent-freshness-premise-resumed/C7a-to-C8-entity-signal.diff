@@ -1,0 +1,755 @@
+--- C7a/packages/kernel/src/lib/entity-signal.ts
++++ C8/packages/kernel/src/lib/entity-signal.ts
+@@ -1,4 +1,7 @@
+ import type { PreparedPlacementEntries } from './physical/entity-placement-stage';
++import { PublicationPreparation } from './internals/publication-preparation';
++import { reportContainedObserverError } from './internals/error-reporter';
++import type { EntityStructureOperation, PreparedEntityStructure } from './internals/prepared-entity-structure';
+ import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
+ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+@@ -56,6 +59,7 @@
+ import { defineOwnedOwnerPath } from './internals/owned-mutation';
+ import {
+   defineEntityMembershipSource,
++  holdEntityMembershipDelivery,
+   MEMBERSHIP_CLOSE,
+   MEMBERSHIP_FACTS,
+   MEMBERSHIP_OPEN,
+@@ -429,17 +433,21 @@
+    */
+   const pendingSubjectEpochs = new Set<EpochHandle>();
+ 
++  // Source-owned install epoch makes library readers current before notifications.
++  let installedReadRevision=0;
+   const createVersionedProjection = <TValue>(
+     compute: () => TValue
+   ): ReadableCell<TValue> => {
+     let projectedVersion = -1;
++    let projectedInstall = -1;
+     let initialized = false;
+     let value: TValue;
+-    return locations.createDerived(() => {
++    return locations.createCurrentReadonly(() => {
+       const currentVersion = version();
+-      if (!initialized || projectedVersion !== currentVersion) {
++      if (!initialized || projectedVersion !== currentVersion || projectedInstall !== installedReadRevision) {
+         value = compute();
+         projectedVersion = currentVersion;
++        projectedInstall = installedReadRevision;
+         initialized = true;
+       }
+       return value;
+@@ -517,7 +525,74 @@
+     return new EntityMutationFrame(valueStore, structuralStore);
+   }
+ 
+-  function prepareSelectedRows(operations: readonly SelectedRowIntent[]) {
++  function prepareStructuralUnit(operations: readonly EntityStructureOperation[], publicationPhase?: PublicationPreparation): PreparedEntityStructure {
++    const frame = createEntityMutationFrame();
++    frame.useProposedPlacement();
++    const stage = structuralStore.preparePlacement();
++    const keys = new Map<K, number | undefined>();
++    const atKey = (key: K) => {
++      if (keys.has(key)) return keys.get(key);
++      const subject = structuralStore.subjectIdForKey(key);
++      if (subject === undefined) return undefined;
++      const row = stage.read(subject);
++      return row.present && row.key === key ? subject : undefined;
++    };
++    for (const op of operations) {
++      const key = op.key as K, prior = stage.read(op.subject);
++      if (op.kind === 'remove') {
++        if (!prior.present || prior.key !== key) throw new Error('Prepared removal source changed');
++        frame.stageSubjectTombstone({kind:'tombstone-subject',key,subjectId:op.subject,restoreAllowed:resolveSubjectState(op.subject)?.restoreAllowed ?? true});
++        keys.set(key,undefined);stage.remove(op.subject);
++      } else {
++        const occupied = atKey(key);
++        if (occupied !== undefined && occupied !== op.subject) throw new Error('Prepared destination is occupied');
++        if (op.kind === 'rekey') {
++          if (!prior.present || prior.key !== op.from) throw new Error('Prepared rekey source changed');
++          if (op.placement && !deepEqual(valueStore.backingForSubject(op.subject), op.value))
++            frame.stageValueReplacement({kind:'replace-value',key:op.from as K,subjectId:op.subject,nextValue:op.value as E,authoredFields:'realization'});
++          frame.stageKeyTransfer({kind:'transfer-key',subjectId:op.subject,fromKey:op.from as K,toKey:key,placement:op.placement});
++          keys.set(prior.key,undefined);stage.rekey(op.subject,key);
++          if(op.placement)stage.insert(op.subject,key,op.placement.beforeSubject,op.placement.afterSubject);
++        } else {
++          if (prior.present) throw new Error('Prepared addition lifetime is active');
++          const state=resolveSubjectState(op.subject);
++          if(op.kind==='fresh') {
++            if(state)throw new Error('Prepared fresh lifetime already exists');
++            frame.stageFreshSubject({kind:'create-fresh-subject',subjectId:op.subject,key,nextValue:op.value as E});
++          } else {
++            if(state && !state.restoreAllowed)throw new Error('Prepared restoration backing retired');
++            frame.stageSubjectRestore({kind:'restore-subject',subjectId:op.subject,key,realizedValue:op.value as E,restoreAllowed:state?.restoreAllowed??true,beforeSubject:op.beforeSubject,afterSubject:op.afterSubject});
++          }
++          stage.insert(op.subject,key,op.beforeSubject,op.afterSubject);
++        }
++        keys.set(key,op.subject);
++      }
++    }
++    const prepared = prepareEntityMutationFrame(frame,{advancePhysicalRevision:false,publication:'physical'});
++    const phase=publicationPhase ?? new PublicationPreparation();
++    phase.add(prepared.finalize,prepared.validate);if(!publicationPhase)phase.seal();
++    let result: ReturnType<typeof prepared.install> | undefined;
++    return {
++      install(){if(!publicationPhase)phase.validate();result=prepared.install();},
++      complete(){prepared.complete();},
++      invalidate(){
++        if(!result)throw new Error('Structural source unit not installed');
++        for(const subject of result.physicallyChangedSubjectIds)publishSubjectPhysicalChange(subject);
++        for(const op of operations){
++          lastSubjectIds=[op.subject];
++          if(op.kind==='remove')tombstoneSubjectSignal(op.subject);
++          else {
++            if(op.kind==='fresh')invalidateNodeCache(op.key as K);
++            if(op.kind==='rekey'){rekeyedSubjects.add(op.subject);if(activeIdValue===op.from)replaceLocation(activeIdSignal,op.key as K);}
++            syncEntitySignal(op.key as K);
++          }
++        }
++        updateSignals();
++      },
++    };
++  }
++
++  function prepareSelectedRows(operations: readonly SelectedRowIntent[],publicationPhase?:PublicationPreparation) {
+     const rows = new Map<number,{subjectId:number;key:string|number;value:unknown;edits:EntityRealizationEdit[];transition:EntityValueTransition<E>}>();
+     const steps: SelectedRowEdit[] = [];
+     for (const operation of operations) {
+@@ -538,7 +613,7 @@
+       rows.set(operation.subject,{subjectId:operation.subject,key:operation.key,value:after,edits:[],transition:previous?Object.freeze({...transition,physicalBefore:previous.transition.physicalBefore,ordinaryBefore:previous.transition.ordinaryBefore}):transition});
+       steps.push({...operation,physicalBefore:before,physicalAfter:after,ordinaryBefore:transition.ordinaryBefore,ordinaryAfter:transition.ordinaryAfter});
+     }
+-    return preparePointValues([...rows.values()],steps);
++    return preparePointValues([...rows.values()],steps,publicationPhase);
+   }
+   function stageSelected(id:K, before:E, after:E, fields:readonly string[] | null, selection:ClaimedFieldEndpoint):void {
+     const selections=selectedInverseField(selection,selection.subject,after,id)!;
+@@ -554,8 +629,9 @@
+       edits: readonly EntityRealizationEdit[];
+       transition?: EntityValueTransition<E>;
+     }[],
+-    selectedSteps?: readonly SelectedRowEdit[]
+-  ): { install(): void; invalidate(): void; publish(): void } {
++    selectedSteps?: readonly SelectedRowEdit[],
++    publicationPhase?: PublicationPreparation
++  ): { install(): void; invalidate(): void; publish(): void; complete():void } {
+     const prepared = values.map(({ subjectId, key, value, edits, transition }) => {
+       if (structuralStore.activeKeyForSubject(subjectId) !== key) {
+         throw new Error(
+@@ -585,13 +661,18 @@
+       ordinarySteps ?? prepared.map(row=>({subject:row.subjectId,before:row.transition.ordinaryBefore,after:row.transition.ordinaryAfter,fields:publicationFields(row.transition.ordinaryBefore,row.transition.ordinaryAfter),restoredFields:new Map(row.edits.flatMap(edit=>edit.kind==='field'&&edit.selection?[[edit.field,edit.selection] as const]:[]))})),undefined,undefined,true,
+       selectedSteps?.map((step,ordinal)=>({ordinal,authoredFootprint:authoredFootprint(step.fields),physical:[{subject:step.subject,before:step.physicalBefore,after:step.physicalAfter,fields:step.fields}],ordinary:[ordinarySteps![ordinal]!]}))
+     );
+-    if(selectedSteps)publication.unit?.finalize?.();
++    const phase=publicationPhase ?? new PublicationPreparation();
++    phase.add(()=>publication.unit?.finalize?.(),()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
++    let completed=false;
++    const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+     return {
++      complete,
+       install(): void {
+-        if(!selectedSteps)publication.unit?.finalize?.();
++        if(!publicationPhase)phase.validate();
+         for (const row of prepared)
+           valueStore.installValueTransition(row.transition);
+         if(publication.unit) installTerminalRecord(publication.unit.record);
++        installedReadRevision++;
+       },
+       invalidate(): void {
+         let failed = false;
+@@ -606,12 +687,12 @@
+             }
+           }
+         };
+-        if(publication.unit)stage(()=>entityPublication.complete(publication.unit!.completion));
+         for (const row of prepared) {
+           const epoch = row.epoch;
+           if (epoch) stage(() => advanceEpochHandle(epoch));
+         }
+         stage(() => updateSignals());
++        if(!publicationPhase)stage(complete);
+         if (failed) throw firstError;
+       },
+       publish(): void {
+@@ -717,7 +798,8 @@
+     physicalAfter?: ReadonlyMap<number, unknown>,
+     physicalEffects: readonly import('./internals/causal-runtime/causal-types').ReversalEffect[] = effects,
+     physicalPlacement?: EntityPlacementStage<K>,
+-    ordinaryOrder?: readonly number[]
++    ordinaryOrder?: readonly number[],
++    publicationPhase?: PublicationPreparation
+   ) {
+     type Presence = OrdinaryEntityPresence<K, E>;
+     const physical = physicalPlacement ?? structuralStore.preparePlacement();
+@@ -950,12 +1032,18 @@
+       undefined,ordinaryEndpoints?.after,false,undefined,undefined,undefined,ordinaryPlacements
+     );
+     if(publication.unit)markEntityPublicationFacts(changes,publication.id);
++    const finalize=()=>publication.unit?.finalize?.();
++    const phase=publicationPhase ?? new PublicationPreparation();
++    phase.add(finalize,()=>publication.unit?.validate?.());if(!publicationPhase)phase.seal();
++    let completed=false;
++    const complete=()=>{if(completed)return;completed=true;if(publication.unit)entityPublication.complete(publication.unit.completion);};
+     return {
++      complete,
+       changes,
+       ordinaryEndpoints,
+       interval: installPlacement.interval,
+       install: () => {
+-        publication.unit?.finalize?.();
++        if(!publicationPhase)phase.validate();
+         // Both realization callers install the complete physical unit first.
+         // Preserve its backing; this plan installs only ordinary authority.
+         for (const transition of valueTransitions)
+@@ -964,7 +1052,8 @@
+           if (!state.present) valueStore.dischargeOrdinaryValue(subject);
+         installPlacement();
+         if(publication.unit)installTerminalRecord(publication.unit.record);
+-        if(publication.unit)entityPublication.complete(publication.unit.completion);
++        installedReadRevision++;
++        if(!publicationPhase)complete();
+       },
+     };
+   }
+@@ -1227,6 +1316,19 @@
+ 
+   function commitAndProjectEntityMutationFrame(
+     frame: EntityMutationFrame<K, E>,
++    options?: { advancePhysicalRevision?: boolean; publication?: 'physical' },
++    deferCompletion=false
++  ) {
++    const prepared = prepareEntityMutationFrame(frame, options);
++    prepared.finalize();
++    prepared.validate();
++    const result = prepared.install();
++    if(!deferCompletion)prepared.complete();
++    return {...result,complete:prepared.complete};
++  }
++
++  function prepareEntityMutationFrame(
++    frame: EntityMutationFrame<K, E>,
+     options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }
+   ) {
+     const revision = physicalCommitClock?.revision();
+@@ -1459,54 +1561,62 @@
+       ordinaryPlan.changes,
+       topologyUnit
+     );
+-    publication.unit?.finalize?.();
++
+     let installed = false;
+-    let result: ReturnType<typeof frame.commit> | undefined;
+-    let failed = false;
+-    let firstError: unknown;
+-    const attempt = (body: () => void) => {
+-      try { body(); } catch (error) { if (!failed) { failed = true; firstError = error; } }
+-    };
+-    attempt(() => {
+-      result = frame.commit(
+-        observe ? () => observe(ordinaryPlan.changes) : undefined,
+-        responsibility, structuralFrontier, valueTransitions,
+-        () => {
+-          ordinaryPlan.install();
+-          if (publication.unit) installTerminalRecord(publication.unit.record);
+-          installed = true;
+-        }
+-      );
+-    });
+-    if (installed) {
+-      if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
+-      // All completions are attempted before retirement, even after one throws.
+-      attempt(() => { if (publication.unit) entityPublication.complete(publication.unit.completion); });
+-      attempt(() => { membershipTap?.(MEMBERSHIP_FACTS, frame.mutations); });
+-      // A missing lifetime is authority only because THIS frame installed its
+-      // authorized forget. No caller may infer eligibility from missing alone.
+-      for (const mutation of frame.mutations) {
+-        if (mutation.kind === 'retire-retained-value' && mutation.forgetLifetime) {
+-          const subject = mutation.subjectId;
+-          entityPublication.requestRetirement(subject, () =>
+-            resolveSubjectState(subject) === undefined && !ordinaryTopology.retains(subject));
+-        }
+-      }
+-      // The existing no-owner kernel gate still decides physical reclamation.
+-      // It must run for installed removals even if source completion threw.
+-      const removed = [...new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId))];
+-      attempt(() => reclaimRetiredSubjectsWithoutOwner(removed));
+-    }
+-    if (failed) throw firstError;
+-    if (!result) throw new Error('Entity frame did not install');
+-    return {
+-      ...result,
+-      valueResults,
+-      valueResultsByStep,
++    let consumed = false;
++    let completed = false;
++    let releaseMembership: (() => void) | undefined;
++    const observations: Array<() => void> = [];
++    const resultOf = (result: ReturnType<typeof frame.commit>) => ({
++      ...result, valueResults, valueResultsByStep,
+       ordinaryChanges: ordinaryPlan.byPhysicalSubject,
+       ordinaryEndpoints: ordinaryPlan.ordinaryEndpoints,
+-      topologyUnit,
+-      orderEndpoints: frame.orderEndpoints,
++      topologyUnit, orderEndpoints: frame.orderEndpoints,
++    });
++    return {
++      validate(){publication.unit?.validate?.();if(physicalCommitClock?.revision()!==revision)throw new Error('Entity prepared source revision changed');},
++      finalize(){publication.unit?.finalize?.();if(physicalCommitClock?.revision()!==revision)throw new Error('Entity finalization reentered installation');},
++      install() {
++        if (consumed || physicalCommitClock?.revision() !== revision)
++          throw new Error('Prepared entity source is stale or consumed');
++        consumed = true;
++        const result = frame.commit(
++          observe ? () => observe(ordinaryPlan.changes, delivery => observations.push(delivery)) : undefined,
++          responsibility, structuralFrontier, valueTransitions,
++          () => { ordinaryPlan.install(); if (publication.unit) installTerminalRecord(publication.unit.record); installedReadRevision++; installed = true; }
++        );
++        if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
++        // Capture installed facts inside their actual bulk unit. Delivery belongs
++        // to detached completion, so sibling facts precede listener reentry.
++        if (membershipTap) {
++          releaseMembership = holdEntityMembershipDelivery(api);
++          membershipTap(MEMBERSHIP_FACTS, frame.mutations);
++        }
++        return resultOf(result);
++      },
++      complete() {
++        if (!installed || completed) return;
++        completed = true;
++        let failed = false; let first: unknown;
++        const attempt = (body: () => void) => { try { body(); } catch (error) { if (!failed) { failed = true; first = error; } } };
++        try {
++          for (const delivery of observations) attempt(delivery);
++          attempt(() => { if (publication.unit) entityPublication.complete(publication.unit.completion); });
++          for (const mutation of frame.mutations) {
++            if (mutation.kind === 'retire-retained-value' && mutation.forgetLifetime) {
++              const subject = mutation.subjectId;
++              entityPublication.requestRetirement(subject, () => resolveSubjectState(subject) === undefined && !ordinaryTopology.retains(subject));
++            }
++          }
++          const removed = [...new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId))];
++          attempt(() => reclaimRetiredSubjectsWithoutOwner(removed));
++        } finally {
++          observations.length = 0;
++          attempt(() => releaseMembership?.());
++          releaseMembership = undefined;
++        }
++        if (failed) throw first;
++      },
+     };
+   }
+ 
+@@ -1838,8 +1948,10 @@
+ 
+   function planRekey(
+     from: K,
+-    to: K
++    to: K,
++    vacatingKeys?: ReadonlySet<K>
+   ): {
++    readonly recipe: EntityStructureOperation;
+     commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
+     publish(metaOverride?: WriteMetadata): void;
+   } {
+@@ -1857,6 +1969,7 @@
+       // write shares the tick. RESTORATION-REKEY-CLAIM-WIDTH-0.
+       const noOpSubjectId = allocateSubjectId(from);
+       return {
++        recipe:{kind:'rekey',subject:noOpSubjectId,from,key:to,value:entity},
+         commit(): void {
+           lastSubjectIds = [noOpSubjectId];
+         },
+@@ -1865,7 +1978,7 @@
+         },
+       };
+     }
+-    if (structuralStore.hasActiveKey(to)) {
++    if (structuralStore.hasActiveKey(to) && !vacatingKeys?.has(to)) {
+       throw new Error(`Cannot change id to ${String(to)}: already in use`);
+     }
+ 
+@@ -1879,6 +1992,7 @@
+     entity: E,
+     placement?: { beforeSubject?: number; afterSubject?: number }
+   ): {
++    readonly recipe: EntityStructureOperation;
+     commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void;
+     publish(metaOverride?: WriteMetadata): void;
+   } {
+@@ -1887,6 +2001,7 @@
+       // call, so the latch must name the addressed subject even when the
+       // rekey changes nothing. RESTORATION-REKEY-CLAIM-WIDTH-0.
+       return {
++        recipe:{kind:'rekey',subject:subjectId,from,key:to,value:entity,placement},
+         commit(): void {
+           lastSubjectIds = [subjectId];
+         },
+@@ -1905,6 +2020,7 @@
+     };
+ 
+     return {
++      recipe:{kind:'rekey',subject:subjectId,from,key:to,value:entity,placement},
+       commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
+         const transfer: PreparedKeyTransfer<K> = {
+           kind: 'transfer-key',
+@@ -1926,7 +2042,7 @@
+             authoredFields: 'realization',
+           });
+         frame.stageKeyTransfer(transfer);
+-        const result = commitAndProjectEntityMutationFrame(frame, options);
++        const result = commitAndProjectEntityMutationFrame(frame, options, true);
+         ordinaryChanges = result.ordinaryChanges.get(subjectId);
+         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+           publishSubjectPhysicalChange(changedSubjectId);
+@@ -1945,7 +2061,7 @@
+         }
+ 
+         syncEntitySignal(to);
+-        updateSignals();
++        updateSignals(result.complete);
+       },
+       publish(metaOverride?: WriteMetadata): void {
+         const meta = metaOverride ?? ambientMeta();
+@@ -2212,7 +2328,7 @@
+         selectedInverseField(inverseClaim,subjectIdForWrite,finalUpdated,id)
+       );
+       syncEntitySignal(id);
+-      updateSignals();
++      updateSignals(transition.complete);
+ 
+       // Notify PathNotifier
+       pathNotifier.notify(
+@@ -2286,13 +2402,13 @@
+       };
+       const frame = createEntityMutationFrame();
+       frame.stageValueReplacement(replacement);
+-      const committed = commitAndProjectEntityMutationFrame(frame);
++      const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+       const transition = committed.valueResults.get(subjectId);
+       // Derive preparation stages accessors once; every subsequent consumer
+       // observes that same physical value rather than reevaluating the input.
+       next = transition?.physicalAfter ?? next;
+       syncEntitySignal(id);
+-      updateSignals();
++      updateSignals(committed.complete);
+       pathNotifier.notify(
+         `${basePath}.${String(id)}`,
+         next,
+@@ -2370,7 +2486,7 @@
+     nextValue: E,
+     fields: readonly string[] | null,
+     restoredFields?:ReadonlyMap<string,NativeFieldEndpoint>
+-  ): EntityValueTransition<E> {
++  ): EntityValueTransition<E> & {complete():void} {
+     const revision = physicalCommitClock?.revision();
+     const transition = valueStore.prepareValueTransition(
+       subjectId,
+@@ -2414,14 +2530,22 @@
+         'Entity responsibility preparation reentered installation'
+       );
+     publication.unit?.finalize?.();
++    publication.unit?.validate?.();
+     valueStore.installValueTransition(transition);
+     ordinaryPlan.install();
+     if (plan) installTerminalRecord(plan);
+     if(publication.unit) installTerminalRecord(publication.unit.record);
+-    capture?.(ordinaryPlan.changes);
++    installedReadRevision++;
++    const observations:Array<()=>void>=[];
++    capture?.(ordinaryPlan.changes,delivery=>observations.push(delivery));
+     physicalCommitClock?.advance();
+-    if(publication.unit)entityPublication.complete(publication.unit.completion);
++    let completed=false;
++    const complete=()=>{if(completed)return;completed=true;let failed=false,first:unknown;
++      for(const deliver of [...observations,()=>{if(publication.unit)entityPublication.complete(publication.unit.completion);}])try{deliver();}catch(error){if(!failed){failed=true;first=error;}}
++      observations.length=0;if(failed)throw first;
++    };
+     return Object.freeze({
++      complete,
+       ...transition,
+       publicationUnit: publication.unit?publication.id:undefined,
+       ordinaryChanges: ordinaryPlan.changes,
+@@ -2446,7 +2570,7 @@
+     structuralFrontier?: import('./internals/mutation-capture-runtime').StructuralFrontierInterval,
+     preparedChanges?: readonly CommittedEntityMutation[],
+     topologyUnit?: import('./internals/mutation-capture-runtime').CompletedTopologyUnit
+-  ): ((changes: readonly CommittedEntityMutation[]) => void) | undefined {
++  ): ((changes: readonly CommittedEntityMutation[], deferObservation?: (delivery: () => void) => void) => void) | undefined {
+     if (
+       !mutationCaptureRuntime?.hasCommittedEntityObservers?.() &&
+       !(
+@@ -2474,7 +2598,7 @@
+           return [placement];
+         })
+       : undefined;
+-    return (changes) =>
++    return (changes, deferObservation) =>
+       mutationCaptureRuntime.publishCommittedEntity?.({
+         topologyUnit,
+         owner,
+@@ -2483,7 +2607,7 @@
+         structuralFrontier,
+         structuralRecords,
+         meta,
+-      });
++      }, deferObservation);
+   }
+ 
+   function rememberSubjectIds(ids: K[]): number[] {
+@@ -2571,13 +2695,13 @@
+       commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
+         const frame = createEntityMutationFrame();
+         frame.stageSubjectRestore(restoration);
+-        const result = commitAndProjectEntityMutationFrame(frame, options);
++        const result = commitAndProjectEntityMutationFrame(frame, options, true);
+         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+           publishSubjectPhysicalChange(changedSubjectId);
+         }
+         lastSubjectIds = [subjectId];
+         syncEntitySignal(key);
+-        updateSignals();
++        updateSignals(result.complete);
+       },
+       publish(metaOverride?: WriteMetadata): void {
+         // A restored lifetime re-enters collection membership. Value-only
+@@ -2633,11 +2757,11 @@
+           subjectId,
+           nextValue: entity,
+         });
+-        commitAndProjectEntityMutationFrame(frame, options);
++        const committed=commitAndProjectEntityMutationFrame(frame, options,true);
+         lastSubjectIds = [subjectId];
+         invalidateNodeCache(key);
+         syncEntitySignal(key);
+-        updateSignals();
++        updateSignals(committed.complete);
+       },
+       publish(metaOverride?: WriteMetadata): void {
+         pathNotifier.notify(
+@@ -2687,13 +2811,13 @@
+       commit(options?: { advancePhysicalRevision?: boolean; publication?: 'physical' }): void {
+         const frame = createEntityMutationFrame();
+         frame.stageSubjectTombstone(tombstone);
+-        const result = commitAndProjectEntityMutationFrame(frame, options);
++        const result = commitAndProjectEntityMutationFrame(frame, options, true);
+         for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+           publishSubjectPhysicalChange(changedSubjectId);
+         }
+         lastSubjectIds = [subjectId];
+         tombstoneSubjectSignal(subjectId);
+-        updateSignals();
++        updateSignals(result.complete);
+       },
+       publish(metaOverride?: WriteMetadata): void {
+         pathNotifier.notify(
+@@ -2942,7 +3066,7 @@
+     }
+ 
+     if (prepend) frame.stageFinalFront(preparedAdds.map((row) => row.id));
+-    const committed = commitAndProjectEntityMutationFrame(frame);
++    const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+     const subjectIdsByKey = new Map<K, number>();
+     for (const { id, subjectId } of preparedAdds) {
+       subjectIdsByKey.set(id, subjectId);
+@@ -2965,7 +3089,7 @@
+ 
+     // Finish the compound topology before path observers or taps can copy
+     // metadata or flush history. No shared collector or later backpatching.
+-    updateSignals();
++    updateSignals(committed.complete);
+     if (committed.orderEndpoints) {
+       if (mutationCaptureRuntime?.isCaptureActive()) getPositionIds();
+       publishOrderChange(
+@@ -3070,7 +3194,7 @@
+     };
+     frame.stageFreshSubject(freshSubject);
+     if (prepend) frame.stageFinalFront([id]);
+-    const committed = commitAndProjectEntityMutationFrame(frame);
++    const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+     const structuralEffect: PendingAddStructuralEffect = {
+       kind: 'add',
+       subject: subjectId,
+@@ -3095,7 +3219,7 @@
+     lastSubjectIds = [subjectId];
+     invalidateNodeCache(id);
+     syncEntitySignal(id);
+-    updateSignals();
++    updateSignals(committed.complete);
+ 
+     pathNotifier.notify(
+       `${basePath}.${String(id)}`,
+@@ -3285,21 +3409,22 @@
+   // ==================
+ 
+   /** Mark the collection dirty. O(1) — see the `version` docs above. */
+-  function updateSignals(): void {
++  function updateSignals(complete?:()=>void): void {
+     const pending = [...pendingSubjectEpochs];
+     pendingSubjectEpochs.clear();
+     // An absent collection reads empty before and after: nothing a consumer
+     // reads changed. Its membership hook wakes them when it comes back, so a
+     // reversal writing its hidden rows re-runs nobody while those rows are
+     // read physically (v16 8e).
+-    if (absent()) return;
+-    locations.runInvalidationGroup(() => {
+-      for (const epoch of pending) {
+-        advanceEpochHandle(epoch);
+-      }
+-      deriveLocation(version, (value) => value + 1);
+-      markOwnerInvalidated(ownerId);
+-    });
++    let failed=false,first:unknown;
++    const deliver=(run:()=>void)=>{try{run();}catch(error){if(!failed){failed=true;first=error;}}};
++    deliver(()=>{if(!absent())locations.runInvalidationGroup(() => {
++      for (const epoch of pending) deliver(()=>advanceEpochHandle(epoch));
++      deliver(()=>deriveLocation(version, (value) => value + 1));
++      deliver(()=>markOwnerInvalidated(ownerId));
++    });});
++    try{complete?.();}catch(error){if(!failed){failed=true;first=error;}else reportContainedObserverError({error,operation:'notify:subscriber'});}
++    if(failed)throw first;
+   }
+ 
+   function createEntityNode(
+@@ -4107,14 +4232,14 @@
+           authoredFields: Object.keys(transformedChanges),
+         });
+       }
+-      const committed = commitAndProjectEntityMutationFrame(frame);
++      const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
+ 
+       for (const { id } of updatedEntities) {
+         syncEntitySignal(id);
+       }
+ 
+       // Single signal update after all entities are updated
+-      updateSignals();
++      updateSignals(committed.complete);
+ 
+       const subjectIdsForWrite = rememberSubjectIds(ids);
+ 
+@@ -4214,13 +4339,13 @@
+       };
+       const frame = createEntityMutationFrame();
+       frame.stageSubjectTombstone(tombstone);
+-      const result = commitAndProjectEntityMutationFrame(frame);
++      const result = commitAndProjectEntityMutationFrame(frame, undefined, true);
+       for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+         publishSubjectPhysicalChange(changedSubjectId);
+       }
+       tombstoneSubjectSignal(subjectIdsForWrite[0]);
+       reclaimRetiredSubjectsWithoutOwner([subjectIdsForWrite[0]]);
+-      updateSignals();
++      updateSignals(result.complete);
+ 
+       // Notify PathNotifier
+       pathNotifier.notify(
+@@ -4308,7 +4433,7 @@
+         });
+       }
+ 
+-      const result = commitAndProjectEntityMutationFrame(frame);
++      const result = commitAndProjectEntityMutationFrame(frame, undefined, true);
+       for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+         publishSubjectPhysicalChange(changedSubjectId);
+       }
+@@ -4321,7 +4446,7 @@
+       );
+ 
+       // Single signal update after all entities are removed
+-      updateSignals();
++      updateSignals(result.complete);
+ 
+       // Notify PathNotifier for each removed entity
+       for (let i = 0; i < preparedRemovals.length; i++) {
+@@ -4452,6 +4577,7 @@
+         number,
+         EntityValueTransition<E>
+       > = new Map();
++      let completePublication: (()=>void)|undefined;
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       const addedEntities: Array<{ id: K; entity: E; subjectId: number }> = [];
+@@ -4475,7 +4601,8 @@
+             nextValue: row.finalUpdated,
+             authoredFields: Object.keys(row.transformedChanges),
+           });
+-        const committed = commitAndProjectEntityMutationFrame(frame);
++        const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
++        completePublication = committed.complete;
+         valueResults = committed.valueResults;
+         ordinaryChanges = committed.ordinaryChanges;
+         const addedSubjectIdsByKey = new Map<K, number>();
+@@ -4523,7 +4650,7 @@
+       }
+ 
+       // Single signal update after all entities are processed
+-      updateSignals();
++      updateSignals(completePublication);
+ 
+       const addedSubjectIdsForWrite = addedEntities.map(
+         ({ subjectId }) => subjectId
+@@ -4633,6 +4760,7 @@
+         number,
+         readonly CommittedEntityMutation[]
+       > = new Map();
++      let completePublication: (()=>void)|undefined;
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       try {
+@@ -4645,8 +4773,9 @@
+             restoreAllowed:
+               resolveSubjectState(subjectId)?.restoreAllowed ?? true,
+           });
+-        ordinaryChanges =
+-          commitAndProjectEntityMutationFrame(frame).ordinaryChanges;
++        const committed=commitAndProjectEntityMutationFrame(frame,undefined,true);
++        ordinaryChanges=committed.ordinaryChanges;
++        completePublication=committed.complete;
+       } finally {
+         // Observed once every row is tombstoned, before reactive publication.
+         membershipUnit?.(MEMBERSHIP_CLOSE);
+@@ -4667,7 +4796,7 @@
+       );
+       replaceLocation(activeIdSignal, undefined);
+       lastSubjectIds = activeSubjects.map(({ subjectId }) => subjectId);
+-      updateSignals();
++      updateSignals(completePublication);
+ 
+       for (const {
+         id,
+@@ -4823,6 +4952,7 @@
+         number,
+         EntityValueTransition<E>
+       > = new Map();
++      let completePublication: (()=>void)|undefined;
+       const membershipUnit = membershipTap;
+       membershipUnit?.(MEMBERSHIP_OPEN_ORDER);
+       let addedSubjectIds: readonly number[];
+@@ -4882,7 +5012,8 @@
+         frame.stageFinalOrder(incomingIds);
+         if (survivingOrderChanged(currentSubjects, afterSubjects))
+           frame.ordinaryOrder = afterSubjects;
+-        const committed = commitAndProjectEntityMutationFrame(frame);
++        const committed = commitAndProjectEntityMutationFrame(frame, undefined, true);
++        completePublication = committed.complete;
+         valueResults = committed.valueResults;
+         ordinaryChanges = committed.ordinaryChanges;
+         for (const { subjectId } of stagedRemovals)
+@@ -4947,7 +5078,7 @@
+         });
+       }
+ 
+-      updateSignals();
++      updateSignals(completePublication);
+ 
+       for (let index = 0; index < stagedRemovals.length; index += 1) {
+         const { id, entity, subjectId } = stagedRemovals[index];
+@@ -5269,6 +5400,7 @@
+     enumerable: false,
+     configurable: true,
+   });
++  Object.defineProperty(api, '__prepareStructuralUnit', { value: prepareStructuralUnit });
+   Object.defineProperty(api, '__preparePointValues', {
+     value: preparePointValues,
+     enumerable: false,

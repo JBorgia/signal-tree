@@ -1,0 +1,15 @@
+{
+  "designManifestMatches": {
+    "DESIGN.md": true,
+    "DISCRIMINATORS.md": true,
+    "HEISENBERG-HANDOFF.md": true,
+    "SOURCE-READS.json": true
+  },
+  "C6SourceReads": {
+    "packages/kernel/src/adapter.ts": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+    "packages/kernel/src/lib/internals/native-location-realization.ts": "6a85bce4173de5889f649cbde90a0ca0d8351debf2dcf87bc99512e157573dd0",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "76e8d645a8652ab9528cde87547c45623ca73ff146451cc39f2773c14a01bf5e",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "c97c14f089a7df085ac41325d445f0c545df502ff21d6f2983d658bcced6b392",
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": "d082605b6c48613dc08db6a066d4657c5f43622712bab23bff095fd162b32954"
+  }
+}

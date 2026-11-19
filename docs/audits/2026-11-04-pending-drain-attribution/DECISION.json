@@ -1,0 +1,14 @@
+{
+  "phase": "V16-PENDING-DRAIN-ATTRIBUTION-0",
+  "status": "complete",
+  "registeredChildren": 82,
+  "validChildren": 82,
+  "runtimeBase": "9aa20563b72ad73bc4a1ae736181ffebd73dc418",
+  "runtimeChanged": false,
+  "repairDemonstrated": false,
+  "disposition": "No owner-journal/completion-retention repair selected. Preserve C and prior cost evidence; continue separately authorized qualification. No adoption or production acceptance.",
+  "snapshotIncrementDifferenceBytes": 59816,
+  "snapshotCodeIncrementDifferenceBytes": 56120,
+  "snapshotPendingContextIncrementDifferenceBytes": 0,
+  "limits": "Single fresh snapshot per checkpoint/arm, qualified engine retained sizes not additive; no byte-exact partition of process heap or historical drain CPU attribution."
+}

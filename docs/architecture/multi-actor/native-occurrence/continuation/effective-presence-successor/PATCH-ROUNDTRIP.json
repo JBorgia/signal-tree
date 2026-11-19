@@ -1,0 +1,36 @@
+{
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "apply",
+        "--check",
+        "/private/tmp/st-effective-presence-successor/FROM-C11.patch"
+      ],
+      "cwd": "/private/tmp/st-effective-presence-successor/patch-check",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "apply",
+        "/private/tmp/st-effective-presence-successor/FROM-C11.patch"
+      ],
+      "cwd": "/private/tmp/st-effective-presence-successor/patch-check",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "candidateFilesMatch": {
+    "packages/kernel/src/lib/entity-signal.ts": true,
+    "packages/kernel/src/lib/internals/member-membership.ts": true,
+    "packages/angular/src/lib/effective-presence-install-reentry.spec.ts": true,
+    "packages/angular/src/lib/effective-presence-successor.spec.ts": true,
+    "packages/kernel/src/lib/effective-presence-install-reentry.spec.ts": true,
+    "packages/kernel/src/lib/effective-presence-reentry.spec.ts": true,
+    "packages/kernel/src/lib/effective-presence-successor.spec.ts": true
+  }
+}

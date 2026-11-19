@@ -1,0 +1,22 @@
+{
+  "exit": -15,
+  "watchdog": {
+    "reason": "active-case-deadline",
+    "cases": [
+      [
+        "synthetic-deadline-control",
+        "append-only start survives overwritten current"
+      ]
+    ],
+    "ownedPgid": 88888,
+    "at": 1793652583.373388
+  },
+  "caseStartsObserved": 1,
+  "unclosedCases": [
+    [
+      "synthetic-deadline-control",
+      "append-only start survives overwritten current"
+    ]
+  ],
+  "ownedGroupStillPresent": false
+}

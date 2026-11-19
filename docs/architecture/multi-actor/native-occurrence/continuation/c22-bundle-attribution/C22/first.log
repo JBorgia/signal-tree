@@ -1,0 +1,23 @@
+target                   prod (ships)      dev (diagnostics)
+──────────────────────────────────────────────────────────────────
+/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467
+  let error = new Error(text);
+              ^
+
+Error: Build failed with 1 error:
+../../../var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-budget-S8nbXl/signaltree-bare.js:2:33: ERROR: Could not resolve "/private/tmp/st-parent-freshness-implementation-independent/c22-bundle-cost-attribution/dist/packages/kernel/dist/index.js"
+    at failureErrorWithLog (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:926:25
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:878:52
+    at buildResponseToResult (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:924:7)
+    at /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:951:16
+    at responseCallbacks.<computed> (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/esbuild@0.25.12/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:509:28)
+    at addChunk (node:internal/streams/readable:563:12) {
+  errors: [Getter/Setter],
+  warnings: [Getter/Setter]
+}
+
+Node.js v24.15.0

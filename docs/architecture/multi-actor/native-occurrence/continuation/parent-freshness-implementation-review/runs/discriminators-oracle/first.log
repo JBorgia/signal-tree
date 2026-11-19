@@ -1,0 +1,62 @@
+
+> nx run angular:test independent-parent-discriminators.spec.ts --testNamePattern=cold sort --maxWorkers=1
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular independent-parent-discriminators.spec.ts --testNamePattern="cold sort" --maxWorkers=1
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:85133) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:85169) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/oracle/packages/angular
+
+(node:85176) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/independent-parent-discriminators.spec.ts (2 tests | 1 failed | 1 skipped) 10ms
+   × cold sort write error leaves backing installed and native mirror unchanged 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/independent-parent-discriminators.spec.ts > cold sort write error leaves backing installed and native mirror unchanged
+TypeError: Cannot read properties of undefined (reading '0')
+ ❯ src/lib/independent-parent-discriminators.spec.ts:18:106
+     16|   t.$.rows.addMany([{id:2},{id:1}]);let error:unknown;try{t.$();}catch…
+     17|   expect(error).toBeInstanceOf(Error);expect((error as Error).message)…
+     18|   const rt=getTreeScalarSlotRuntime(t.$)!;const slot=rt.resolveScalarS…
+       |                                                                                                          ^
+     19|   const backing=rt.readSlot(slot);const native=t.$.child.n();const par…
+     20|   expect(backing).toBe(1);expect(native).toBe(0);expect(calls).toBe(1);
+ ❯ new ZoneAwarePromise ../../node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+ ❯ new ZoneAwarePromise ../../node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 skipped (2)
+   Start at  09:34:52
+   Duration  950ms (transform 507ms, setup 127ms, import 587ms, tests 10ms, environment 149ms)
+
+Warning: command "NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular independent-parent-discriminators.spec.ts --testNamePattern="cold sort" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project angular failed
+
+Failed tasks:
+
+- angular:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        angular:test    1.5s

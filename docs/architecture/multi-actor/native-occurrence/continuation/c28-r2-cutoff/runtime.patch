@@ -1,0 +1,137 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -157,13 +157,16 @@
+ }
+ /** Admission-local confirmed history, never a settlement-time filter. */
+ export type CurrentRelevance=ReadonlySet<OwnerCell>;
+-export function currentRelevance(retained:NativeRequirement,invocation:NativeRequirement):CurrentRelevance {
+- // An unfinished predecessor can still acquire validation/activation evidence.
+- // Historical cleanup is restricted to closed predecessors at admission.
+- if(!nativeRequirementReady(retained))return new Set();
++export function currentRelevance(prior:NativeRequirement,selected:NativeRequirement|undefined,invocation:NativeRequirement):CurrentRelevance {
++ // P is the installed predecessor; S is a selected OLD contributor, never C.
++ // Consumed historical requirements must also be closed at this admission.
++ const historical=[...new Set([prior,...(selected?[selected]:[]),...invocation.inputs.map(input=>input.requirement)])];
++ if(historical.some(requirement=>!nativeRequirementReady(requirement)))return new Set();
+  const protectedOwners=new Set(invocation.inputs.flatMap(input=>input.owners));
+  for(const frame of invocation.frames)for(const cell of frame.protectedOwners)protectedOwners.add(cell);
+- const parts=[nativeProof(retained),nativeProof(invocation)];
++ // H (closed historical I/V) and V (current confirmed validation) share
++ // relevance only after this closure test and the captured-pending lower bound.
++ const parts=[...historical.map(nativeProof),nativeProof(invocation)];
+  return new Set(parts.flatMap(part=>[...(part.input??[]),...(part.validation??[])])
+   .filter(cell=>cell.outcome==='confirmed'&&!protectedOwners.has(cell)));
+ }
+@@ -185,7 +188,10 @@
+ /** Scalar-only construction; never installs listeners during preparation. */
+ export function combineScalarNativeRequirements(parts:readonly NativeRequirement[],relevance?:CurrentRelevance):NativeRequirement {
+  const requirement=combineNativeRequirements(parts);
+- if(relevance?.size)Object.defineProperty(requirement,'proof',{get:()=>currentObligations(combineProofs(parts.map(nativeProof)),relevance),configurable:true,enumerable:true});
++ if(relevance?.size){
++  const sources=requirement.components!; // Frozen construction snapshot, released on normalization.
++  Object.defineProperty(requirement,'proof',{get:()=>currentObligations(combineProofs(sources.map(nativeProof)),sources.every(nativeRequirementReady)?relevance:undefined),configurable:true,enumerable:true});
++ }
+  scalarComposites.add(requirement);
+  normalizeScalar(requirement);return requirement;
+ }
+@@ -293,7 +299,7 @@
+  if(!requirement||!unactivatedRequirements.delete(requirement))return;
+  if(nativeRequirementReady(requirement))notifyRequirement(requirement);
+ }
+-type Operation={relevance?:CurrentRelevance;declared:boolean;recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
++type Operation={relevance?:CurrentRelevance;invocation?:NativeRequirement;declared:boolean;recipientWindow:readonly OwnerCell[];incomplete:boolean;projectionPending:boolean;native?:NativeRequirement;coverageUnknown:boolean;channel:object;dependencies:Set<OwnerCell>;revision:object;frames:Set<Frame>;proof?:Proof;views:Set<View>;started:boolean;surviving:boolean;noopFallbacks:Map<View,Operation>};
+ const connections=new Map<object,Connection>();
+ const stack:Frame[]=[];
+ const installedLast=new Map<Frame,object>();
+@@ -316,9 +322,14 @@
+ function state(view:View,value:State):void {if(['started','superseded','disposed','no-write'].includes(view.value.state))return;view.value=Object.freeze(value);}
+ function effective(frame:Frame):Proof{const all=[...frame.parents,frame];const validation=uniqueOwners(all.flatMap(frameOwners));return {owners:validation,validation,unknown:all.some(frameUnknown),invalid:all.some(frameInvalid)};}
+ function setOperationState(op:Operation,value:State):void{for(const view of op.views)state(view,value);}
++// Prospective relevance cannot weaken an operation before raw validation and
++// native activation finish. No listener or deferred reclassification is created.
++function projectionReady(op:Operation):boolean {
++ return !op.relevance?.size||(!op.frames.size&&(!op.invocation||nativeRequirementReady(op.invocation))&&(!op.native||nativeRequirementReady(op.native)));
++}
+ function refresh(op:Operation):void{
+  if(op.started)return;
+- if(op.frames.size||op.projectionPending){for(const view of op.views)state(view,{state:'validating'});return;}
++ if(op.frames.size||op.projectionPending||!projectionReady(op)){for(const view of op.views)state(view,{state:'validating'});return;}
+  const p=op.proof;if(!p)return;
+  if(p.invalid||p.unknown){setOperationState(op,{state:'conservative',reason:p.invalid?'invalid-declaration':'unknown'});return;}
+  if((p.terminalRejectedRoles??0)!==0||p.owners.some(x=>x.outcome==='rolled-back'||x.outcome==='abandoned')){setOperationState(op,{state:'conservative',reason:'rejected-dependency'});return;}
+@@ -349,7 +360,7 @@
+  const required=uniqueOwners([...active.flatMap(frameOwners),...(invocationEvidence?.input??[]),...(invocationEvidence?.validation??[])]);
+  // Native support is source evidence, not this recipient's declaration permission.
+  // Without a native requirement retain the conservative enrollment window.
+- const op:Operation={relevance,declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
++ const op:Operation={relevance,invocation:relevance?.size?invocation:undefined,declared:matches.length!==0,recipientWindow:[],incomplete:(!native&&matches.length===0)||unobservedAuthorship||active.some(frame=>frame.declaredOwners===undefined),projectionPending,native,coverageUnknown:unknown,channel,dependencies:new Set([...known,...required,...(nativeEvidence?.owners??[]),...(nativeEvidence?.possible??[]),...blockers]),revision,frames:new Set(),views:new Set(),started:false,surviving:false,noopFallbacks:new Map()};
+  if(matches.length===0)op.proof={owners:Object.freeze([...known]),destination:Object.freeze([...known]),unknown:unknown||!native,invalid:false};
+  writes.push({map:c.ops,key:revision,value:op});
+  for(const cell of op.dependencies)adds.push({set:cell.dependents,value:op});
+@@ -409,7 +420,7 @@
+ export function keepRevision(channel:object,revision:object):void{connections.get(channel)?.ops.get(revision)?.noopFallbacks.clear();}
+ export function decision(channel:object,revision:object):{early:boolean;pending:boolean}{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return {early:false,pending:false};
+- if(op.frames.size||op.projectionPending)return {early:false,pending:true};
++ if(op.frames.size||op.projectionPending||!projectionReady(op))return {early:false,pending:true};
+  const p=op.proof!;return {early:!p.invalid&&!p.unknown&&!(p.terminalRejectedRoles??0)&&p.owners.every(x=>x.outcome==='confirmed'),pending:[...p.owners,...(p.possible??[])].some(x=>x.outcome==='pending'||x.outcome==='abandoned')};
+ }
+ function retire(op:Operation):void{for(const cell of op.dependencies)cell.dependents.delete(op);}
+@@ -443,10 +454,13 @@
+  }
+  for(const op of operations){
+   const proofs=[...op.frames].map(effective);if(op.native)proofs.push(nativeProof(op.native));
+-  op.proof=currentObligations(recipientProof(op,{...combineProofs(proofs),unknown:op.coverageUnknown||proofs.some(p=>p.unknown)}),op.relevance);
+-  reconcileCurrentDependencies(op,op.proof,op.relevance);
++  const raw=recipientProof(op,{...combineProofs(proofs),unknown:op.coverageUnknown||proofs.some(p=>p.unknown)});
++  op.frames.clear();
++  const relevance=projectionReady(op)?op.relevance:undefined;
++  op.proof=currentObligations(raw,relevance);
++  reconcileCurrentDependencies(op,op.proof,relevance);
+   for(const cell of [...op.proof.owners,...(op.proof.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+-  op.frames.clear();refresh(op);wake(op.channel);
++  refresh(op);wake(op.channel);
+  }
+  for(const f of h.frames){f.ops.clear();f.installedOwners.clear();installedLast.delete(f);unknownFrames.delete(f);invalidFrames.delete(f);}
+  h.frames.clear();
+@@ -519,8 +533,10 @@
+ }
+ export function projectRevision(channel:object,revision:object,proof:Readonly<Proof>,projectionPending=false):Readonly<Proof>{
+  const op=connections.get(channel)?.ops.get(revision);if(!op)return proof;
+- const selected=currentObligations(recipientProof(op,proof),op.relevance);
+- reconcileCurrentDependencies(op,selected,op.relevance);op.relevance=undefined;
++ const ready=projectionReady(op),relevance=ready?op.relevance:undefined;
++ const selected=currentObligations(recipientProof(op,proof),relevance);
++ reconcileCurrentDependencies(op,selected,relevance);
++ if(ready){op.relevance=undefined;op.invocation=undefined;}
+  op.projectionPending=projectionPending;op.proof=selected;
+  for(const cell of [...selected.owners,...(selected.possible??[])]){op.dependencies.add(cell);cell.dependents.add(op);}
+  refresh(op);return selected;
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -181,7 +181,7 @@
+    // Only an independently supplied retaining literal has no newly consumed input.
+    // Keep derived/branch/entity input evidence on the established admission path.
+    const exact=!!restoration||!admitted&&literal&&retained.owner!==undefined;
+-   const relevance=exact?undefined:lifecycle.currentRelevance(retained.requirement as lifecycle.NativeRequirement,prepared.requirement);
++   const relevance=exact?undefined:lifecycle.currentRelevance(predecessor.requirement as lifecycle.NativeRequirement,admitted?undefined:retained.requirement as lifecycle.NativeRequirement,prepared.requirement);
+    const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted&&!relevance?.size?prepared.requirement:lifecycle.combineScalarNativeRequirements(admitted?[prepared.requirement]:[retained.requirement as lifecycle.NativeRequirement,prepared.requirement],relevance);
+    const endpoint=requirement===retained.requirement?retained:Object.freeze({...retained,requirement});
+    const view=mutation.changed||mutation.physicalChanged||!existingView||existingView.requirement!==requirement?{requirement}:existingView;
+@@ -301,6 +301,7 @@
+  for(const unit of b.pending){
+   if(!unit.complete)break;
+   if(unit.invocation&&!lifecycle.nativeRequirementReady(unit.invocation))break;
++  if(unit.relevance?.size&&unit.native&&!lifecycle.nativeRequirementReady(unit.native))break;
+   unit.releaseInvocation?.();unit.releaseInvocation=undefined;
+   const proof=proofs.get(unit.fact)??lifecycle.proof(channel,unit.fact);
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+@@ -359,7 +360,7 @@
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+    selectProjection(b,unit.fact,support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined),unit.changed);
+   }
+-  unit.payload=undefined;b.pending.delete(unit);unit.resolve();
++  unit.relevance=undefined;unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+  if(!b.pending.size)drainLegacyScalars(channel,b);
+  }finally{b.delivery.reducing=false;}

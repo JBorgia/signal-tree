@@ -1,0 +1,41 @@
+--- R3/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts
++++ composed/packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts
+@@ -327,17 +327,26 @@
+   }
+ });
+ 
+-it('reports realization refusal with retained authority and permits confirmation', () => {
++it('reports injected pre-install realization refusal with retained authority and permits confirmation', () => {
+   const tree = make();
+   const events: TransactionLifecycleObservation[] = [];
+   const port = getTreeRealizationPort(tree.$)!;
+-  const validate = port.validateEffects;
++  if (!port.prepareSelectedUnit) throw new Error('Expected selected preparation port');
++  const prepare = port.prepareSelectedUnit;
++  let refusalCalls = 0, returnedPlans = 0;
+   try {
+     const reader = transactionLifecycleReader(tree)!;
+     reader.subscribe((event) => events.push(event));
+     const pending = tree.transact(() => tree.$.x(1));
+-    port.validateEffects = () => ({ kind: 'structural-drift' });
++    // Generic injected preparation failure, not a public structural-drift witness.
++    port.prepareSelectedUnit = function (...args) {
++      refusalCalls++;
++      if (refusalCalls === 1) throw new Error('injected pre-install failure: structural-drift');
++      const plan = prepare.apply(this, args); returnedPlans++; return plan;
++    };
+     expect(() => pending.rollback()).toThrow(/structural-drift/);
++    expect(refusalCalls).toBe(1); expect(returnedPlans).toBe(0);
++    expect(tree.$.x()).toBe(1);
+     // v16 (slice 6, class b): the scope stays open until real settlement, and
+     // a validation refusal is the owner's `effect-validation-failed`.
+     expect(events.at(-1)).toMatchObject({
+@@ -351,7 +360,7 @@
+     expect(events.at(-1)!.kind).toBe('confirmed');
+     expect(reader.snapshot().pending).toEqual([]);
+   } finally {
+-    port.validateEffects = validate;
++    port.prepareSelectedUnit = prepare;
+     tree.destroy();
+   }
+ });

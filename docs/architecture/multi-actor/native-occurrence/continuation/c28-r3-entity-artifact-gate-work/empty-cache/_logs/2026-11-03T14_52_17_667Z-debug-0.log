@@ -1,0 +1,126 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-c28-r3-entity-artifact-gate-work/unavailable/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm ci
+8 verbose argv "ci" "--ignore-scripts" "--no-audit" "--no-fund" "--offline"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c28-r3-entity-artifact-gate-work/empty-cache/_logs/2026-11-03T14_52_17_667Z-
+10 verbose logfile /private/tmp/st-c28-r3-entity-artifact-gate-work/empty-cache/_logs/2026-11-03T14_52_17_667Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+13 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+14 silly idealTree buildDeps
+15 silly reify moves {}
+16 http cache vue@https://registry.npmjs.org/vue/-/vue-3.5.42.tgz 0ms (cache hit)
+17 http cache tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz 0ms (cache hit)
+18 http cache source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz 0ms (cache hit)
+19 http cache typescript@https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz 0ms (cache hit)
+20 http cache solid-js@https://registry.npmjs.org/solid-js/-/solid-js-1.9.15.tgz 0ms (cache hit)
+21 http cache seroval-plugins@https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.5.6.tgz 0ms (cache hit)
+22 http cache rxjs@https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz 0ms (cache hit)
+23 http cache seroval@https://registry.npmjs.org/seroval/-/seroval-1.5.6.tgz 0ms (cache hit)
+24 http cache react@https://registry.npmjs.org/react/-/react-19.2.8.tgz 0ms (cache hit)
+25 http cache postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz 0ms (cache hit)
+26 http cache magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz 0ms (cache hit)
+27 http cache nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz 0ms (cache hit)
+28 http cache picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz 0ms (cache hit)
+29 http cache estree-walker@https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz 0ms (cache hit)
+30 http cache csstype@https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz 0ms (cache hit)
+31 http cache @vue/runtime-dom@https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.5.42.tgz 0ms (cache hit)
+32 http cache @vue/server-renderer@https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.5.42.tgz 0ms (cache hit)
+33 http cache entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz 0ms (cache hit)
+34 http cache @vue/runtime-core@https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.42.tgz 0ms (cache hit)
+35 http cache @vue/compiler-ssr@https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.5.42.tgz 0ms (cache hit)
+36 http cache @vue/compiler-sfc@https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.5.42.tgz 0ms (cache hit)
+37 http cache @vue/compiler-dom@https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.5.42.tgz 0ms (cache hit)
+38 http cache @vue/reactivity@https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.5.42.tgz 0ms (cache hit)
+39 http cache @vue/compiler-core@https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.5.42.tgz 0ms (cache hit)
+40 http cache @jridgewell/sourcemap-codec@https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz 0ms (cache hit)
+41 http cache @vue/shared@https://registry.npmjs.org/@vue/shared/-/shared-3.5.42.tgz 0ms (cache hit)
+42 http cache @types/react@https://registry.npmjs.org/@types/react/-/react-19.2.18.tgz 0ms (cache hit)
+43 http cache @babel/parser@https://registry.npmjs.org/@babel/parser/-/parser-7.29.12.tgz 0ms (cache hit)
+44 http cache @babel/types@https://registry.npmjs.org/@babel/types/-/types-7.29.11.tgz 0ms (cache hit)
+45 silly tarball no local data for vue@https://registry.npmjs.org/vue/-/vue-3.5.42.tgz. Extracting by manifest.
+46 silly tarball no local data for tslib@https://registry.npmjs.org/tslib/-/tslib-2.8.1.tgz. Extracting by manifest.
+47 silly tarball no local data for source-map-js@https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.2.tgz. Extracting by manifest.
+48 silly tarball no local data for typescript@https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz. Extracting by manifest.
+49 silly tarball no local data for solid-js@https://registry.npmjs.org/solid-js/-/solid-js-1.9.15.tgz. Extracting by manifest.
+50 silly tarball no local data for seroval-plugins@https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.5.6.tgz. Extracting by manifest.
+51 silly tarball no local data for rxjs@https://registry.npmjs.org/rxjs/-/rxjs-7.8.2.tgz. Extracting by manifest.
+52 silly tarball no local data for seroval@https://registry.npmjs.org/seroval/-/seroval-1.5.6.tgz. Extracting by manifest.
+53 http cache @babel/helper-validator-identifier@https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz 0ms (cache hit)
+54 silly tarball no local data for react@https://registry.npmjs.org/react/-/react-19.2.8.tgz. Extracting by manifest.
+55 silly tarball no local data for postcss@https://registry.npmjs.org/postcss/-/postcss-8.5.32.tgz. Extracting by manifest.
+56 silly tarball no local data for magic-string@https://registry.npmjs.org/magic-string/-/magic-string-0.30.21.tgz. Extracting by manifest.
+57 silly tarball no local data for nanoid@https://registry.npmjs.org/nanoid/-/nanoid-3.3.20.tgz. Extracting by manifest.
+58 silly tarball no local data for picocolors@https://registry.npmjs.org/picocolors/-/picocolors-1.1.1.tgz. Extracting by manifest.
+59 silly tarball no local data for estree-walker@https://registry.npmjs.org/estree-walker/-/estree-walker-2.0.2.tgz. Extracting by manifest.
+60 silly tarball no local data for csstype@https://registry.npmjs.org/csstype/-/csstype-3.2.3.tgz. Extracting by manifest.
+61 silly tarball no local data for @vue/runtime-dom@https://registry.npmjs.org/@vue/runtime-dom/-/runtime-dom-3.5.42.tgz. Extracting by manifest.
+62 silly tarball no local data for @vue/server-renderer@https://registry.npmjs.org/@vue/server-renderer/-/server-renderer-3.5.42.tgz. Extracting by manifest.
+63 silly tarball no local data for entities@https://registry.npmjs.org/entities/-/entities-7.0.1.tgz. Extracting by manifest.
+64 silly tarball no local data for @vue/runtime-core@https://registry.npmjs.org/@vue/runtime-core/-/runtime-core-3.5.42.tgz. Extracting by manifest.
+65 silly tarball no local data for @vue/compiler-ssr@https://registry.npmjs.org/@vue/compiler-ssr/-/compiler-ssr-3.5.42.tgz. Extracting by manifest.
+66 silly tarball no local data for @vue/compiler-sfc@https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-3.5.42.tgz. Extracting by manifest.
+67 silly tarball no local data for @vue/compiler-dom@https://registry.npmjs.org/@vue/compiler-dom/-/compiler-dom-3.5.42.tgz. Extracting by manifest.
+68 silly tarball no local data for @vue/reactivity@https://registry.npmjs.org/@vue/reactivity/-/reactivity-3.5.42.tgz. Extracting by manifest.
+69 silly tarball no local data for @vue/compiler-core@https://registry.npmjs.org/@vue/compiler-core/-/compiler-core-3.5.42.tgz. Extracting by manifest.
+70 silly tarball no local data for @jridgewell/sourcemap-codec@https://registry.npmjs.org/@jridgewell/sourcemap-codec/-/sourcemap-codec-1.6.0.tgz. Extracting by manifest.
+71 silly tarball no local data for @vue/shared@https://registry.npmjs.org/@vue/shared/-/shared-3.5.42.tgz. Extracting by manifest.
+72 silly tarball no local data for @types/react@https://registry.npmjs.org/@types/react/-/react-19.2.18.tgz. Extracting by manifest.
+73 silly tarball no local data for @babel/parser@https://registry.npmjs.org/@babel/parser/-/parser-7.29.12.tgz. Extracting by manifest.
+74 silly tarball no local data for @babel/types@https://registry.npmjs.org/@babel/types/-/types-7.29.11.tgz. Extracting by manifest.
+75 silly tarball no local data for @babel/helper-validator-identifier@https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz. Extracting by manifest.
+76 http cache @babel/helper-string-parser@https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.11.tgz 0ms (cache hit)
+77 http cache @angular/core@https://registry.npmjs.org/@angular/core/-/core-22.0.7.tgz 0ms (cache hit)
+78 silly tarball no local data for @babel/helper-string-parser@https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.11.tgz. Extracting by manifest.
+79 silly tarball no local data for @angular/core@https://registry.npmjs.org/@angular/core/-/core-22.0.7.tgz. Extracting by manifest.
+80 verbose stack Error: request to https://registry.npmjs.org/vue/-/vue-3.5.42.tgz failed: cache mode is 'only-if-cached' but no cached response is available.
+80 verbose stack     at cacheFetch (/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/node_modules/make-fetch-happen/lib/cache/index.js:12:13)
+80 verbose stack     at async fetch (/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/node_modules/make-fetch-happen/lib/fetch.js:98:7)
+81 error code ENOTCACHED
+82 error request to https://registry.npmjs.org/vue/-/vue-3.5.42.tgz failed: cache mode is 'only-if-cached' but no cached response is available.
+83 silly unfinished npm timer reify 1793717537950
+84 silly unfinished npm timer reify:unpack 1793717537956
+85 silly unfinished npm timer reifyNode:node_modules/vue 1793717537956
+86 silly unfinished npm timer reifyNode:node_modules/typescript 1793717537956
+87 silly unfinished npm timer reifyNode:node_modules/tslib 1793717537956
+88 silly unfinished npm timer reifyNode:node_modules/source-map-js 1793717537956
+89 silly unfinished npm timer reifyNode:node_modules/solid-js 1793717537956
+90 silly unfinished npm timer reifyNode:node_modules/seroval-plugins 1793717537956
+91 silly unfinished npm timer reifyNode:node_modules/seroval 1793717537956
+92 silly unfinished npm timer reifyNode:node_modules/rxjs 1793717537956
+93 silly unfinished npm timer reifyNode:node_modules/react 1793717537956
+94 silly unfinished npm timer reifyNode:node_modules/postcss 1793717537956
+95 silly unfinished npm timer reifyNode:node_modules/picocolors 1793717537956
+96 silly unfinished npm timer reifyNode:node_modules/nanoid 1793717537956
+97 silly unfinished npm timer reifyNode:node_modules/magic-string 1793717537956
+98 silly unfinished npm timer reifyNode:node_modules/estree-walker 1793717537956
+99 silly unfinished npm timer reifyNode:node_modules/entities 1793717537956
+100 silly unfinished npm timer reifyNode:node_modules/csstype 1793717537956
+101 silly unfinished npm timer reifyNode:node_modules/@vue/shared 1793717537956
+102 silly unfinished npm timer reifyNode:node_modules/@vue/server-renderer 1793717537956
+103 silly unfinished npm timer reifyNode:node_modules/@vue/runtime-dom 1793717537956
+104 silly unfinished npm timer reifyNode:node_modules/@vue/runtime-core 1793717537956
+105 silly unfinished npm timer reifyNode:node_modules/@vue/reactivity 1793717537956
+106 silly unfinished npm timer reifyNode:node_modules/@vue/compiler-ssr 1793717537956
+107 silly unfinished npm timer reifyNode:node_modules/@vue/compiler-sfc 1793717537956
+108 silly unfinished npm timer reifyNode:node_modules/@vue/compiler-dom 1793717537956
+109 silly unfinished npm timer reifyNode:node_modules/@vue/compiler-core 1793717537956
+110 silly unfinished npm timer reifyNode:node_modules/@types/react 1793717537956
+111 silly unfinished npm timer reifyNode:node_modules/@jridgewell/sourcemap-codec 1793717537956
+112 silly unfinished npm timer reifyNode:node_modules/@babel/types 1793717537956
+113 silly unfinished npm timer reifyNode:node_modules/@babel/parser 1793717537956
+114 silly unfinished npm timer reifyNode:node_modules/@babel/helper-validator-identifier 1793717537956
+115 silly unfinished npm timer reifyNode:node_modules/@babel/helper-string-parser 1793717537956
+116 silly unfinished npm timer reifyNode:node_modules/@angular/core 1793717537956
+117 verbose cwd /private/tmp/st-c28-r3-entity-artifact-gate-work/unavailable
+118 verbose os Darwin 25.2.0
+119 verbose node v24.15.0
+120 verbose npm  v11.12.1
+121 verbose exit 1
+122 verbose code 1
+123 error A complete log of this run can be found in: /private/tmp/st-c28-r3-entity-artifact-gate-work/empty-cache/_logs/2026-11-03T14_52_17_667Z-debug-0.log

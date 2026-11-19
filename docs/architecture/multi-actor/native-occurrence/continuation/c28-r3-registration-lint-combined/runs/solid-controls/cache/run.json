@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test solid scalar-frame-publication whole-value-new-keys entity-native-obligation-composition native-publication-error-boundary --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T05:45:20.230Z",
+    "endTime": "2026-11-03T05:45:28.990Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "solid:test",
+      "target": "test",
+      "projectName": "solid",
+      "hash": "12321342057362040455",
+      "startTime": "2026-11-03T05:45:20.277Z",
+      "endTime": "2026-11-03T05:45:28.989Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 0
+    }
+  ]
+}

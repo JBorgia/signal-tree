@@ -1,0 +1,35 @@
+
+> nx run kernel:test point-result-allocation.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs point-result-allocation.spec.ts --maxWorkers=1
+
+(node:69831) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69838) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-point-demand-c8a/candidate/packages/kernel
+
+(node:69846) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  09:11:00
+   Duration  8.70s (transform 1.56s, setup 0ms, import 1.91s, tests 2.32s, environment 3.67s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      10.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     10.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    10.9s

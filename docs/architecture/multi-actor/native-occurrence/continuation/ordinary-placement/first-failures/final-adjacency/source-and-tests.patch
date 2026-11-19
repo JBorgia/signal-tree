@@ -1,0 +1,491 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
+ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+ import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+@@ -756,6 +757,7 @@
+       structuralStore.preparePlacement()
+     );
+     const orderBefore = ordinaryOrder ? placement.snapshot() : undefined;
++    const episodes = new Map<number, OrdinaryRestorationPlacement>();
+     const staged = new Map<number, Presence>();
+     const physicalValues = new Map<number, E>();
+     const changes: CommittedEntityMutation[] = [];
+@@ -795,6 +797,7 @@
+             }
+           : undefined;
+       if (context?.kind === 'remove') {
++        episodes.delete(subject);
+         placement.remove(subject);
+         staged.set(subject, { present: false });
+         changes.push({
+@@ -806,6 +809,9 @@
+           structuralRecord: context,
+         });
+       } else if (context?.kind === 'add') {
++        // Replace the last surviving episode without moving any value operation.
++        episodes.delete(subject);
++        episodes.set(subject, { subject, beforeSubject: context.beforeSubject, afterSubject: context.afterSubject });
+         const value = deepClone(context.value) as E;
+         placement.insert(
+           subject,
+@@ -921,6 +927,7 @@
+         })
+       );
+     }
++    const ordinaryPlacements = resolveOrdinaryRestorationPlacement(placement, episodes);
+     if (ordinaryOrder) placement.orderDomain(ordinaryOrder);
+     const installPlacement = ordinaryTopology.prepareInstall(
+       placement,
+@@ -939,7 +946,7 @@
+     const publication=prepareEntityPublication(
+       physicalEffects.flatMap(effect=>typeof effect.subjectId==='number'?[{subject:effect.subjectId,before:effect.before,after:effect.after,fields:effect.subjectFieldSegments?.length===0?null:effect.subjectFieldSegments??[],structural:effect.structuralContext}]:[]),
+       changes.map(change=>({...change,fields:change.structural?null:publicationFields(change.before,change.after),structural:change.structuralRecord})),
+-      undefined,ordinaryEndpoints?.after
++      undefined,ordinaryEndpoints?.after,false,undefined,undefined,undefined,ordinaryPlacements
+     );
+     if(publication.unit)markEntityPublicationFacts(changes,publication.id);
+     return {
+@@ -2333,9 +2340,9 @@
+     const b=after && typeof after==='object'?after as Record<string,unknown>:{};
+     return Object.freeze([...new Set([...Object.keys(a),...Object.keys(b)])].filter(key=>Object.prototype.hasOwnProperty.call(a,key)!==Object.prototype.hasOwnProperty.call(b,key)||!Object.is(a[key],b[key])));
+   }
+-  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture) {
++  function prepareEntityPublication(physical: readonly EntityPublicationEdit[], ordinary: readonly EntityPublicationEdit[], physicalOrder?: readonly number[], ordinaryOrder?: readonly number[], point=false, steps?: readonly EntityPublicationStep[],seed?:readonly EntityProjectionSeedEntry<K,E|undefined>[],capture?:import('./internals/mutation-capture-runtime').CommittedEntityCapture,ordinaryPlacements?:readonly OrdinaryRestorationPlacement[]) {
+     const id=Object.freeze({});
+-    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
++    const unit=(point?entityPublication.preparePoint.bind(entityPublication):entityPublication.prepare.bind(entityPublication))({id,owner:ownerId??-1,ordinaryPlacements,meta:ambientMeta(),prepareResponsibility:capture?fieldSelections=>mutationCaptureRuntime?.prepareEntityResponsibility?.({...capture,fieldSelections}):undefined,seed,physical,steps:ambientMeta()?.participation==='inspection'?undefined:steps?.map(step=>({...step,physical:step.physical??physical.slice(step.ordinal,step.ordinal+1)})),ordinary:ambientMeta()?.participation==='inspection'?[]:ordinary,physicalOrder,ordinaryOrder:ambientMeta()?.participation==='inspection'?undefined:ordinaryOrder,inputs:currentEntityPublicationInputs()});
+     return {id,unit};
+   }
+   function commitExistingSubjectValue(
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import { orderRestoresForPlacement } from '../../physical/order-restores-for-placement';
+ import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent,type SelectedOutcome} from '../selected-write-operation';
+ import { replaceSelectedLocation } from '../location-runtime';
+ import {fieldEndpoints} from '../native-field-selection';
+@@ -2953,100 +2954,6 @@
+   );
+ }
+ 
+-/**
+- * Orders a frame's restores so each one, when it commits, finds its recorded
+- * neighbours live. Restores commit in sequence and each resolves its anchors
+- * against the rows live at that moment, so the order decides the placement.
+- * Capture order cannot be used: the notifier delivers a row's removal in the
+- * slot of that row's EARLIER write, so `updateOne('a'); clear()` reversed
+- * restored [a, c, z].
+- *
+- * Next is, in order of preference: a restore whose restored anchors are all
+- * placed and that has a live anchor (or no live-able anchor at all); one with
+- * at least one live anchor while another is still waiting; else the head of a
+- * chain with nothing live (one whose predecessor is not waiting). An anchor
+- * that is a surviving row, or a restore already placed, is live. The tiers
+- * matter both ways: `updateOne c; removeOne a; removeOne c` anchors a to c (c
+- * was there when a went), so c goes first; `removeMany([z, a])` beside a
+- * surviving c anchors z and a to each other, so a goes first, against c.
+- */
+-function orderRestoresForPlacement<
+-  T extends ReversalEffect & { subjectId: number }
+->(
+-  restores: readonly T[],
+-  anchorsOf: (
+-    effect: T
+-  ) => { beforeSubject?: number; afterSubject?: number } | undefined,
+-  isLive: (effect: T, subject: number) => boolean
+-): T[] {
+-  if (restores.length < 2) return [...restores];
+-  const pending = new Map<string, T>();
+-  for (const effect of restores) {
+-    pending.set(rowScope(effect.owner, effect.subjectId), effect);
+-  }
+-  const waiting = new Map<T, number>();
+-  const hasLiveAnchor = new Set<T>();
+-  const dependents = new Map<string, T[]>();
+-  const full: T[] = [];
+-  const partial: T[] = [];
+-  for (const effect of restores) {
+-    const anchors = anchorsOf(effect);
+-    let count = 0;
+-    for (const subject of [anchors?.beforeSubject, anchors?.afterSubject]) {
+-      if (subject === undefined) continue;
+-      const key = rowScope(effect.owner, subject);
+-      if (pending.has(key)) {
+-        count += 1;
+-        const list = dependents.get(key);
+-        if (list) list.push(effect);
+-        else dependents.set(key, [effect]);
+-      } else if (isLive(effect, subject)) {
+-        hasLiveAnchor.add(effect);
+-      }
+-    }
+-    waiting.set(effect, count);
+-    if (count === 0) full.push(effect);
+-    else if (hasLiveAnchor.has(effect)) partial.push(effect);
+-  }
+-  const placed = new Set<T>();
+-  const ordered: T[] = [];
+-  let fullHead = 0;
+-  let partialHead = 0;
+-  const isWaitingOn = (effect: T, subject: number | undefined): boolean => {
+-    if (subject === undefined) return false;
+-    const anchor = pending.get(rowScope(effect.owner, subject));
+-    return anchor !== undefined && !placed.has(anchor);
+-  };
+-  while (ordered.length < restores.length) {
+-    while (fullHead < full.length && placed.has(full[fullHead])) fullHead += 1;
+-    while (partialHead < partial.length && placed.has(partial[partialHead])) {
+-      partialHead += 1;
+-    }
+-    const next =
+-      fullHead < full.length
+-        ? full[fullHead++]
+-        : partialHead < partial.length
+-        ? partial[partialHead++]
+-        : restores.find(
+-            (effect) =>
+-              !placed.has(effect) &&
+-              !isWaitingOn(effect, anchorsOf(effect)?.beforeSubject)
+-          ) ?? (restores.find((effect) => !placed.has(effect)) as T);
+-    placed.add(next);
+-    ordered.push(next);
+-    for (const dependent of dependents.get(
+-      rowScope(next.owner, next.subjectId)
+-    ) ?? []) {
+-      if (placed.has(dependent)) continue;
+-      const left = (waiting.get(dependent) ?? 1) - 1;
+-      waiting.set(dependent, left);
+-      hasLiveAnchor.add(dependent);
+-      if (left === 0) full.push(dependent);
+-      else partial.push(dependent);
+-    }
+-  }
+-  return ordered;
+-}
+ 
+ function getStructuralAddEffect(
+   descriptor: TreeRealizationDescriptor | undefined,
+--- a/packages/kernel/src/lib/internals/entity-egress-projection.ts
++++ b/packages/kernel/src/lib/internals/entity-egress-projection.ts
+@@ -74,6 +74,8 @@
+     ordinary?: boolean,
+     evidence?:EntityPublicationEvidence
+   ): boolean;
++  /** Reposition already eligible lifetimes using final source ordinary facts. */
++  relocate(placements: NonNullable<EntityPublicationPacket['ordinaryPlacements']>, evidence?: EntityPublicationEvidence): boolean;
+   /** Apply one notification. Returns true if eligible authority advanced. */
+   apply(
+     subjectId: number | undefined,
+@@ -196,7 +198,7 @@
+     prepare(packet,evidence) {
+       const structural = packet.physical.some(edit => edit.structural !== undefined) ||
+         entityPublicationOrdinary(packet).some(edit => edit.structural !== undefined || !rows.has(edit.subject)) ||
+-        packet.physicalOrder !== undefined || packet.ordinaryOrder !== undefined;
++        packet.physicalOrder !== undefined || packet.ordinaryOrder !== undefined || !!packet.ordinaryPlacements?.length;
+       if (!structural) {
+         // Existing-row point writes prepare only touched rows. Rendering a
+         // subscribed collection's complete output is separate, requested work.
+@@ -229,6 +231,7 @@
+       let changed = false;
+       for (const edit of entityPublicationOrdinary(packet))
+         changed = draft.apply(edit.subject,edit.after,edit.structural,false,edit.fields,true,evidence?.forEdit?.(edit)??evidence) || changed;
++      if (packet.ordinaryPlacements?.length) changed = draft.relocate(packet.ordinaryPlacements, evidence) || changed;
+       if (packet.ordinaryOrder) changed = draft.reorder(packet.ordinaryOrder,false,true,evidence) || changed;
+       const prepared = draft.state();
+       const install = {set(_key:unknown,_value:unknown) {
+@@ -262,6 +265,22 @@
+       return changed;
+     },
+ 
++    relocate(placements, evidence) {
++      const moving = new Set(placements.filter(value => isEligible(value.subject)).map(value => value.subject));
++      if (!moving.size) return false;
++      const before = order;
++      order = order.filter(subject => !moving.has(subject));
++      for (const value of placements) {
++        if (!moving.has(value.subject)) continue;
++        const after = value.afterSubject === undefined ? -1 : order.indexOf(value.afterSubject);
++        const previous = value.beforeSubject === undefined ? -1 : order.indexOf(value.beforeSubject);
++        const at = after >= 0 ? after : previous >= 0 ? previous + 1 : order.length;
++        order.splice(at, 0, value.subject);
++        if (evidence) contributors.set(slot(value.subject, 'p'), evidence.placement(value.subject, 'ordinary'));
++      }
++      return before.some((subject, index) => subject !== order[index]);
++    },
++
+     reseed(entries) {
+       topology = createEntityTopology(entries);
+       load(entries);
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -33,6 +33,8 @@
+   });
+ }
+ export interface EntityPublicationPacket {
++  /** Final source-owned ordinary adjacency; does not edit values or membership. */
++  readonly ordinaryPlacements?: readonly import('../physical/ordinary-restoration-placement').OrdinaryRestorationPlacement[];
+   readonly prepareResponsibility?: (fields?:import('./native-field-selection').NativeFieldSelections)=>import('./intrinsic-mutation').TerminalRecordPlan|undefined;
+   readonly owner: number;
+   readonly id: object;
+--- a/packages/kernel/src/lib/ordinary-restoration-placement.spec.ts
++++ b/packages/kernel/src/lib/ordinary-restoration-placement.spec.ts
+@@ -0,0 +1,118 @@
++import { writeFileSync } from 'node:fs';
++import { join } from 'node:path';
++import { describe, expect, it } from 'vitest';
++import { EntityPlacementStage } from './physical/entity-placement-stage';
++import { resolveOrdinaryRestorationPlacement, type OrdinaryRestorationPlacement } from './physical/ordinary-restoration-placement';
++import { createEntityEgressProjection } from './internals/entity-egress-projection';
++import { entityMap, signalTree, transactions } from '../index';
++import { getEntityPublicationBinding } from './internals/entity-publication';
++import type { ReversalEffect } from './internals/causal-runtime/causal-types';
++
++function stage(ids: number[]) {
++  const base = new Map(ids.map((id, i) => [id, { present: true as const, key: id, beforeSubject: ids[i-1], afterSubject: ids[i+1] }]));
++  return new EntityPlacementStage<number>(id => base.get(id) ?? { present: false }, ids[0], ids.at(-1));
++}
++function resolve(initial: number[], requests: OrdinaryRestorationPlacement[]) {
++  const placement = stage(initial);
++  for (const value of requests) placement.insert(value.subject, value.subject, value.beforeSubject, value.afterSubject);
++  const final = resolveOrdinaryRestorationPlacement(placement, new Map(requests.map(value => [value.subject, value])));
++  return { placement, final };
++}
++function assertLinks(p: EntityPlacementStage<number>, ids: number[]) {
++  expect(p.snapshot()).toEqual(ids);expect(p.head).toBe(ids[0]);expect(p.tail).toBe(ids.at(-1));
++  ids.forEach((id,i)=>expect(p.read(id)).toEqual({present:true,key:id,beforeSubject:ids[i-1],afterSubject:ids[i+1]}));
++}
++describe('final ordinary placement', () => {
++  for (const reverse of [false,true]) it(`resolves restored successor with surviving C reverse=${reverse}`,()=>{
++    const requests=[{subject:1,afterSubject:2},{subject:2,beforeSubject:1,afterSubject:3}];
++    const {placement}=resolve([3],reverse?requests.reverse():requests);assertLinks(placement,[1,2,3]);
++  });
++  it('prefers successor over nonadjacent predecessor',()=>{
++    const {placement}=resolve([3,4,5],[{subject:1,beforeSubject:5,afterSubject:4}]);assertLinks(placement,[3,1,4,5]);
++  });
++  it('uses predecessor when successor is finally absent',()=>{
++    const {placement}=resolve([3,4],[{subject:1,beforeSubject:3,afterSubject:99}]);assertLinks(placement,[3,1,4]);
++  });
++  it('appends when both anchors are absent and keeps disconnected stable fallback',()=>{
++    const {placement}=resolve([3],[{subject:1,beforeSubject:91,afterSubject:92},{subject:2}]);assertLinks(placement,[3,1,2]);
++  });
++  it('resolves a cycle without a surviving anchor using existing stable fallback',()=>{
++    const {placement}=resolve([],[{subject:1,beforeSubject:2,afterSubject:2},{subject:2,beforeSubject:1,afterSubject:1}]);
++    assertLinks(placement,[2,1]);
++  });
++  it('does not restore finally absent episode or use same-key replacement as anchor',()=>{
++    const p=stage([3,4]);p.remove(4);p.insert(8,4);
++    const final=resolveOrdinaryRestorationPlacement(p,new Map([[1,{subject:1,afterSubject:4}]]));
++    expect(final).toEqual([]);expect(p.snapshot()).toEqual([3,8]);
++    p.insert(1,1,undefined,4);resolveOrdinaryRestorationPlacement(p,new Map([[1,{subject:1,afterSubject:4}]]));
++    expect(p.snapshot()).toEqual([3,8,1]);
++  });
++  it('matches egress final placement without changing membership or values',()=>{
++    const {placement,final}=resolve([3],[{subject:1,afterSubject:2},{subject:2,beforeSubject:1,afterSubject:3}]);
++    const rows=[{subjectId:2,key:2,row:{id:2,n:20}},{subjectId:3,key:3,row:{id:3,n:30}},{subjectId:1,key:1,row:{id:1,n:10}}];
++    const projection=createEntityEgressProjection(rows);projection.relocate(final);
++    expect(projection.value()).toEqual(placement.snapshot().map(id=>rows.find(row=>row.subjectId===id)!.row));
++    projection.relocate([{subject:99,afterSubject:1}]);expect(projection.value()).toHaveLength(3);
++  });
++  it('explicit order remains last and retains invalid-domain refusal',()=>{
++    const {placement}=resolve([3,4],[{subject:1,afterSubject:2},{subject:2,afterSubject:3}]);
++    placement.orderDomain([2,1]);expect(placement.snapshot()).toEqual([2,1,3,4]);
++    expect(()=>placement.orderDomain([1,1])).toThrow('repeats');expect(()=>placement.orderDomain([9])).toThrow('absent');
++  });
++  it('only visits affected placement state, independent of collection size',()=>{
++    const counts:number[]=[];
++    for(const n of [32,1024]) {
++      const p=stage(Array.from({length:n},(_,i)=>i+3));let reads=0;const read=p.read.bind(p);p.read=id=>{reads++;return read(id);};
++      p.insert(1,1,undefined,2);p.insert(2,2,1,3);reads=0;
++      resolveOrdinaryRestorationPlacement(p,new Map([[1,{subject:1,afterSubject:2}],[2,{subject:2,beforeSubject:1,afterSubject:3}]]));
++      counts.push(reads);expect(p.read(1)).toMatchObject({afterSubject:2});
++    }
++    expect(counts[0]).toBe(counts[1]);expect(counts[0]).toBeGreaterThan(0);
++    if(process.env['ST_PREPARED_REVIEW_OUTPUT']) writeFileSync(join(process.env['ST_PREPARED_REVIEW_OUTPUT'],'placement-work.json'),JSON.stringify({sizes:[32,1024],stageReads:counts})+'\n');
++  });
++});
++
++it('source retains sequential values and last surviving add episode across repeated lifetime and rekey',()=>{
++  const tree=signalTree({rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});
++  try {
++    tree.$.rows.setAll([{id:1,n:10},{id:2,n:20},{id:3,n:30}]);
++    const rows=tree.$.rows;
++    const ids=[1,2,3].map(id=>getEntityPublicationBinding(rows.byIdOrFail(id))!.subject!);
++    const [a,b,c]=ids;
++    const effects:ReversalEffect[]=[
++      {owner:0,subjectId:a,structural:'remove',before:1,after:undefined,structuralContext:{kind:'remove',subject:a,key:1,value:{id:1,n:10}}},
++      {owner:0,subjectId:a,structural:'add',before:undefined,after:1,structuralContext:{kind:'add',subject:a,key:1,value:{id:1,n:11},afterSubject:b}},
++      {owner:0,subjectId:a,before:11,after:12,subjectFieldSegments:['n']},
++      {owner:0,subjectId:a,structural:'remove',before:1,after:undefined,structuralContext:{kind:'remove',subject:a,key:1,value:{id:1,n:12}}},
++      {owner:0,subjectId:a,structural:'add',before:undefined,after:1,structuralContext:{kind:'add',subject:a,key:1,value:{id:1,n:13},beforeSubject:c}},
++      {owner:0,subjectId:a,before:13,after:14,subjectFieldSegments:['n']},
++      {owner:0,subjectId:a,structural:'rekey',before:1,after:4},
++    ];
++    const source=rows as unknown as {__prepareOrdinaryRealization(e:readonly ReversalEffect[],after:undefined,physical:readonly ReversalEffect[]):{changes:Array<{after:unknown}>;interval:{pairs:Array<{subject:number;after:unknown}>};install():void}};
++    const plan=source.__prepareOrdinaryRealization(effects,undefined,[]);
++    expect(plan.changes.map(change=>change.after)).toEqual([undefined,{id:1,n:11},{id:1,n:12},undefined,{id:1,n:13},{id:1,n:14},{id:1,n:14}]);
++    expect(plan.interval.pairs.find(pair=>pair.subject===a)?.after).toEqual({present:true,key:4,beforeSubject:c,afterSubject:undefined});
++    // Planning alone cannot mutate the public physical image.
++    expect(rows.ids()).toEqual([1,2,3]);expect(rows.byIdOrFail(1).n()).toBe(10);
++    plan.install();
++    const next=source.__prepareOrdinaryRealization([{owner:0,subjectId:a,before:14,after:15,subjectFieldSegments:['n']}],undefined,[]);
++    expect(next.changes[0].after).toEqual({id:1,n:15});
++    expect(rows.ids()).toEqual([1,2,3]);expect(rows.byIdOrFail(1).n()).toBe(10);
++  } finally {tree.destroy();}
++});
++
++it('final adjacency replay agrees for finite anchor combinations without changing values',()=>{
++  let cases=0;
++  // Two restores, two surviving rows; include absent anchors and mutual dependency.
++  for(const aBefore of [undefined,2,3,4,99]) for(const aAfter of [undefined,2,3,4,99])
++    for(const bBefore of [undefined,1,3,4,99]) for(const bAfter of [undefined,1,3,4,99]) {
++      const {placement,final}=resolve([3,4],[{subject:1,beforeSubject:aBefore,afterSubject:aAfter},{subject:2,beforeSubject:bBefore,afterSubject:bAfter}]);
++      const projection=createEntityEgressProjection([4,2,3,1].map(id=>({subjectId:id,key:id,row:{id}})));
++      // Preserve the survivor order; only restored subjects are deliberately displaced.
++      projection.reorder([3,4],false,true);
++      projection.relocate(final);
++      expect(projection.value().map(row=>(row as {id:number}).id)).toEqual(placement.snapshot());
++      cases++;
++    }
++  expect(cases).toBe(625);
++});
+--- a/packages/kernel/src/lib/physical/order-restores-for-placement.ts
++++ b/packages/kernel/src/lib/physical/order-restores-for-placement.ts
+@@ -0,0 +1,98 @@
++const rowScope = (owner: unknown, subject: unknown): string =>
++  `${String(owner)}\u0000${String(subject)}`;
++
++/**
++ * Orders a frame's restores so each one, when it commits, finds its recorded
++ * neighbours live. Restores commit in sequence and each resolves its anchors
++ * against the rows live at that moment, so the order decides the placement.
++ * Capture order cannot be used: the notifier delivers a row's removal in the
++ * slot of that row's EARLIER write, so `updateOne('a'); clear()` reversed
++ * restored [a, c, z].
++ *
++ * Next is, in order of preference: a restore whose restored anchors are all
++ * placed and that has a live anchor (or no live-able anchor at all); one with
++ * at least one live anchor while another is still waiting; else the head of a
++ * chain with nothing live (one whose predecessor is not waiting). An anchor
++ * that is a surviving row, or a restore already placed, is live. The tiers
++ * matter both ways: `updateOne c; removeOne a; removeOne c` anchors a to c (c
++ * was there when a went), so c goes first; `removeMany([z, a])` beside a
++ * surviving c anchors z and a to each other, so a goes first, against c.
++ */
++export function orderRestoresForPlacement<
++  T extends { owner: unknown; subjectId: number }
++>(
++  restores: readonly T[],
++  anchorsOf: (
++    effect: T
++  ) => { beforeSubject?: number; afterSubject?: number } | undefined,
++  isLive: (effect: T, subject: number) => boolean
++): T[] {
++  if (restores.length < 2) return [...restores];
++  const pending = new Map<string, T>();
++  for (const effect of restores) {
++    pending.set(rowScope(effect.owner, effect.subjectId), effect);
++  }
++  const waiting = new Map<T, number>();
++  const hasLiveAnchor = new Set<T>();
++  const dependents = new Map<string, T[]>();
++  const full: T[] = [];
++  const partial: T[] = [];
++  for (const effect of restores) {
++    const anchors = anchorsOf(effect);
++    let count = 0;
++    for (const subject of [anchors?.beforeSubject, anchors?.afterSubject]) {
++      if (subject === undefined) continue;
++      const key = rowScope(effect.owner, subject);
++      if (pending.has(key)) {
++        count += 1;
++        const list = dependents.get(key);
++        if (list) list.push(effect);
++        else dependents.set(key, [effect]);
++      } else if (isLive(effect, subject)) {
++        hasLiveAnchor.add(effect);
++      }
++    }
++    waiting.set(effect, count);
++    if (count === 0) full.push(effect);
++    else if (hasLiveAnchor.has(effect)) partial.push(effect);
++  }
++  const placed = new Set<T>();
++  const ordered: T[] = [];
++  let fullHead = 0;
++  let partialHead = 0;
++  const isWaitingOn = (effect: T, subject: number | undefined): boolean => {
++    if (subject === undefined) return false;
++    const anchor = pending.get(rowScope(effect.owner, subject));
++    return anchor !== undefined && !placed.has(anchor);
++  };
++  while (ordered.length < restores.length) {
++    while (fullHead < full.length && placed.has(full[fullHead])) fullHead += 1;
++    while (partialHead < partial.length && placed.has(partial[partialHead])) {
++      partialHead += 1;
++    }
++    const next =
++      fullHead < full.length
++        ? full[fullHead++]
++        : partialHead < partial.length
++        ? partial[partialHead++]
++        : restores.find(
++            (effect) =>
++              !placed.has(effect) &&
++              !isWaitingOn(effect, anchorsOf(effect)?.beforeSubject)
++          ) ?? (restores.find((effect) => !placed.has(effect)) as T);
++    placed.add(next);
++    ordered.push(next);
++    for (const dependent of dependents.get(
++      rowScope(next.owner, next.subjectId)
++    ) ?? []) {
++      if (placed.has(dependent)) continue;
++      const left = (waiting.get(dependent) ?? 1) - 1;
++      waiting.set(dependent, left);
++      hasLiveAnchor.add(dependent);
++      if (left === 0) full.push(dependent);
++      else partial.push(dependent);
++    }
++  }
++  return ordered;
++}
++
+--- a/packages/kernel/src/lib/physical/ordinary-restoration-placement.ts
++++ b/packages/kernel/src/lib/physical/ordinary-restoration-placement.ts
+@@ -0,0 +1,34 @@
++import { EntityPlacementStage } from './entity-placement-stage';
++import { orderRestoresForPlacement } from './order-restores-for-placement';
++
++/** One final surviving add episode; payload execution stays in its original order. */
++export interface OrdinaryRestorationPlacement {
++  readonly subject: number;
++  readonly beforeSubject?: number;
++  readonly afterSubject?: number;
++}
++
++/** Resolve only affected restores against final ordinary membership, never display. */
++export function resolveOrdinaryRestorationPlacement<K>(
++  placement: EntityPlacementStage<K>,
++  episodes: ReadonlyMap<number, OrdinaryRestorationPlacement>
++): readonly OrdinaryRestorationPlacement[] {
++  const restores = [...episodes.values()].flatMap(episode => {
++    const final = placement.read(episode.subject);
++    return final.present ? [{ ...episode, key: final.key, owner: 0, subjectId: episode.subject }] : [];
++  });
++  if (!restores.length) return [];
++  // Provisional inserts must not count as surviving anchors. Keep final keys.
++  for (const restore of restores) placement.remove(restore.subject);
++  const ordered = orderRestoresForPlacement(restores, value => value,
++    (_restore, subject) => placement.read(subject).present);
++  for (const restore of ordered)
++    placement.insert(restore.subject, restore.key, restore.beforeSubject, restore.afterSubject);
++  // Consumers receive final adjacency, in the same dependency resolution order.
++  return Object.freeze(ordered.map(restore => {
++    const final = placement.read(restore.subject);
++    if (!final.present) throw new Error('Resolved ordinary restore is absent');
++    return Object.freeze({ subject: restore.subject,
++      beforeSubject: final.beforeSubject, afterSubject: final.afterSubject });
++  }));
++}

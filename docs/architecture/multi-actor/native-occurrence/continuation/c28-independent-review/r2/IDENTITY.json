@@ -1,0 +1,35 @@
+{
+  "manifest": "597eaf690450a74cc128b8e90b7032aa7d5ef842deae48a4358ade9ed4b9952c",
+  "patch": "0d01c32f3faccb74f464d1e6de9e49606dbae0a1c70184ae682d6f79c6e08834",
+  "files": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "sha256": "69fd14f8883e2240997b25ee1edbb347585229bee27df118faa2c6a77c1531da",
+      "matches": true
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "c7822db0f351bc488a78029b9df34382894fccef7355bca7b8b0866a608a8951",
+      "matches": true
+    },
+    "packages/kernel/src/lib/approved-current-obligation.spec.ts": {
+      "sha256": "b74ab938c968cd284a27b6c3ce54a16c27ecb6f897d2ec30a820fe619189e0e3",
+      "matches": true
+    },
+    "packages/kernel/src/lib/current-cutoff-r2.spec.ts": {
+      "sha256": "f4677fb8ae50599745354f6a10e946bc662929a78362c8f6ed1fd67ff21d18e7",
+      "matches": true
+    },
+    "packages/kernel/src/lib/scalar-horizon-lifecycle-controls.spec.ts": {
+      "sha256": "fc0f5d3503b3dbc97825b3372eb9d52c42f41b6032dc3a330803aaff03c16b51",
+      "matches": true
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "sha256": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+      "matches": true
+    }
+  },
+  "runtime.patch": "0d01c32f3faccb74f464d1e6de9e49606dbae0a1c70184ae682d6f79c6e08834",
+  "SNAPSHOT.json": "85ec8149da94005f8371a2fd0b7d0c4fdc98cbea901065d81efc539e9924ca0b",
+  "runs/before-first/first.log": "ab40020a63ee94e7cf7eeb2472e7f4b92f646d1593a9c400500163b4dfb58150",
+  "runs/after-first/first.log": "e8a973172f101676ced9fad389991e2608b5176b298dbdb489e4b729ab557c36",
+  "runs/after-first/command.json": "e628e45073969966065f0746aa1c2ac2e91874bbadc3034c7698d463a088af2f"
+}

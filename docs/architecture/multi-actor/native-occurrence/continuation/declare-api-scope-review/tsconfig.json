@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": [],
+    "paths": {
+      "@signal-tree/kernel": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/kernel/src/index.ts"
+      ],
+      "@signal-tree/angular": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/angular/src/index.ts"
+      ],
+      "@signal-tree/react": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/react/src/index.ts"
+      ],
+      "@signal-tree/vue": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/vue/src/index.ts"
+      ],
+      "@signal-tree/solid": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/solid/src/index.ts"
+      ],
+      "@signal-tree/kernel/adapter": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/kernel/src/adapter.ts"
+      ],
+      "@signal-tree/kernel/internals": [
+        "/private/tmp/st-native-combined-c22/candidate/packages/kernel/src/internals.ts"
+      ]
+    }
+  },
+  "files": [
+    "API-SKETCH.ts",
+    "TYPE-EXAMPLES.ts",
+    "/private/tmp/st-native-combined-c22/candidate/types.d.ts"
+  ]
+}

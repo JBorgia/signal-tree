@@ -1,0 +1,9 @@
+🧼 Package-hygiene verification (real packed contents)
+
+✅ angular (16 files) — clean
+✅ kernel (137 files) — clean
+✅ react (9 files) — clean
+✅ solid (12 files) — clean
+✅ vue (12 files) — clean
+
+✅ All 5 packages ship clean tarballs with their declared entries

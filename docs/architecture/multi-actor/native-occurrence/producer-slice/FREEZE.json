@@ -1,0 +1,26 @@
+{
+  "status": "partial native producer slice; five reproduced predecessor failures; remaining mechanism unimplemented",
+  "sourceManifestSha256": "33b7668b428297ec1ca81404efe3dca22fa4d8133db3afee0de4888e4245038e",
+  "runtimePatchSha256": "41410c87e937f5bd3b6f7d8a93df9a7f6e5ddef1fcdbc7d910ab63b9a90dc7f8",
+  "files": {
+    "control-nx.log": "4c37eeb3b90b7851f4325cd9cbf6630c49c0e6e29a5c7176c7beb9082dd53510",
+    "baseline-nx.log": "b245c03d40b3a5adea7aa8b924beca9d8425f4b134010018ebb90a66b08c92b3",
+    "tracked-source.patch": "228795052bd382dacf8278b070080ca32a0bbe826700d2cada23687ea8e1e3f6",
+    "SCOPE.md": "584425d1e039b312b70efd5df3c8ffe0dbae12a1270c3035f810554908895265",
+    "control-structural.log": "47f9d325bf3cc932319a3b347cc5f3bf5e9ebd5e4ad89b57787f89e824bc807b",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "SOURCE-SHA256.json": "33b7668b428297ec1ca81404efe3dca22fa4d8133db3afee0de4888e4245038e",
+    "runtime.patch": "41410c87e937f5bd3b6f7d8a93df9a7f6e5ddef1fcdbc7d910ab63b9a90dc7f8",
+    "baseline-observations.jsonl": "7a882fd159541e29630a6f1272a5c63c66cb36e90effe11adbadb93b9e03f716",
+    "final-nx.log": "8551ab6a8b0e314b07b6673562d9c232029c52e59de40527ad81d10caa74c104",
+    "verify-fixture-emission.cjs": "9b37e10455e89363a239249907a6bd237106b33e12fb1294b2b2918c1e36b9fb",
+    "RESULTS.md": "379bf96a0ebde5d5b6d906412bc1a6aa222df07f5df00c35143fa679aaa66ade",
+    "spec-types-first.log": "bb1b7389be5dc27619156158f98d101019b7e4fa60927cb8ee6bfd5cf69f66e9",
+    "VERIFICATION.json": "2498204cdfab18783ceb0e7091e4b77cc1ff0c12e6d771bf402bb562e69dfee4",
+    "fixture-emission.json": "f951c12428d75553609a9891b82f691e235e6426ab7c1dec7c8da5fbebfda22f",
+    "source-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "slice-nx-first.log": "27e34528ee049dc9819198e22adbdfdd24a577644b60dcef6ebbd64706cd0936",
+    "slice-observations.jsonl": "391edf15d7b02084be98a87a47c3018f4c15bcecb2efe9e69ee27b4cb1d505e8",
+    "final-observations.jsonl": "19261690cb5c9f5ae0cdb34e75af4b6defc271b21f3dd0b50684c354d7fdfce4"
+  }
+}

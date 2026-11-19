@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "originalCase": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit",
+    "originalTestPath": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "originalSha256": "223de1a18e26295983f10f860cee2a40f7e719cafecbacf644c3a03e7bf4315d",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED COUNT CALIBRATION; LARGE EXECUTION UNRESOLVED",
+    "disposition": "Original 390001 > 390000 is a real reader-lifecycle singleton, not demonstrated redundant row work. Calibrated undo 3N+1/redo 12N+2. Latest C23 stage run ended at before-undo; no undo completion, redo, cleanup assertions or measured final counts.",
+    "latestTestPath": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
+    "latestTestSha256": "46d69ecf44f8d07171a4a0e6d80d646962adb810da2e14cfd4c2b6f6226f0d2c",
+    "latestCase": "v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit (stage-marker-only diagnostic; original assertions unchanged)",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-c23-restoration-stage-independent/run-once/first.log",
+      "/private/tmp/st-c23-restoration-stage-independent/run-once/stages.jsonl",
+      "/private/tmp/st-c23-restoration-stage-independent/run-once/WATCHDOG.json",
+      "/private/tmp/st-c23-restoration-stage-independent/run-once/RESULT.json"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 2,
+    "originalCase": "connection-local branch updater retains useful progress with second enrollment before-pending",
+    "originalTestPath": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED ORACLE REPLACEMENT; COUNTERPARTS PASS",
+    "disposition": "Unrelated pending owner/recipient-only mismatch cannot manufacture native obligation. Exact both-endpoint payload, no borrowed declaration permission, unchanged ownership, settlement and no duplicates asserted. Actual-native-window counterweights and all 13 retained permission/unknown guards pass in same C23 union.",
+    "latestTestPath": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "latestTestSha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "latestCase": "aggregate exact progress branch/before-pending/confirm AND /rollback",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 3,
+    "originalCase": "connection-local branch updater retains useful progress with second enrollment during-pending",
+    "originalTestPath": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED ORACLE REPLACEMENT; COUNTERPARTS PASS",
+    "disposition": "Unrelated pending owner/recipient-only mismatch cannot manufacture native obligation. Exact both-endpoint payload, no borrowed declaration permission, unchanged ownership, settlement and no duplicates asserted. Actual-native-window counterweights and all 13 retained permission/unknown guards pass in same C23 union.",
+    "latestTestPath": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "latestTestSha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "latestCase": "aggregate exact progress branch/during-pending/confirm AND /rollback",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 4,
+    "originalCase": "connection-local root updater retains useful progress with second enrollment before-pending",
+    "originalTestPath": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED ORACLE REPLACEMENT; COUNTERPARTS PASS",
+    "disposition": "Unrelated pending owner/recipient-only mismatch cannot manufacture native obligation. Exact both-endpoint payload, no borrowed declaration permission, unchanged ownership, settlement and no duplicates asserted. Actual-native-window counterweights and all 13 retained permission/unknown guards pass in same C23 union.",
+    "latestTestPath": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "latestTestSha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "latestCase": "aggregate exact progress root/before-pending/confirm AND /rollback",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 5,
+    "originalCase": "connection-local root updater retains useful progress with second enrollment during-pending",
+    "originalTestPath": "packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalSha256": "ac4407a0f0db940377f2334edcade0f1e3ee8e59386c6b8e7453786f72a33f00",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/aggregate-independent-input.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED ORACLE REPLACEMENT; COUNTERPARTS PASS",
+    "disposition": "Unrelated pending owner/recipient-only mismatch cannot manufacture native obligation. Exact both-endpoint payload, no borrowed declaration permission, unchanged ownership, settlement and no duplicates asserted. Actual-native-window counterweights and all 13 retained permission/unknown guards pass in same C23 union.",
+    "latestTestPath": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "latestTestSha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "latestCase": "aggregate exact progress root/during-pending/confirm AND /rollback",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 6,
+    "originalCase": "sample held selected continuation after completed rollback and destroy",
+    "originalTestPath": "packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "originalSha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED GC ROUTING; UNCHANGED BODY PASSES",
+    "disposition": "Original fails typeof globalThis.gc before capture. Same selected-write continuation/non-replay assertions pass in explicit hold-proceed/drop-proceed/hold-row arms, alongside original nine GC modes. Not a reader-freshness oracle change.",
+    "latestTestPath": "packages/kernel/src/lib/held-continuation-probe.spec.ts",
+    "latestTestSha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+    "latestCase": "sample held selected continuation after completed rollback and destroy [three explicit GC arms]",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-c23-gc-composition-verification/candidate/artifacts/forwarding-retention/run-08foao/held-hold-proceed.log",
+      "/private/tmp/st-c23-gc-composition-verification/candidate/artifacts/forwarding-retention/run-08foao/held-drop-proceed.log",
+      "/private/tmp/st-c23-gc-composition-verification/candidate/artifacts/forwarding-retention/run-08foao/held-hold-row.log",
+      "/private/tmp/st-c23-gc-composition-verification/candidate/artifacts/forwarding-retention/run-08foao/RESULT.json"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 7,
+    "originalCase": "public onUpdate refuses x inverse after y; retry, writes=xy",
+    "originalTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED OUTPUT HARNESS; UNCHANGED CASE PASSES",
+    "disposition": "Required ST_PUBLIC_DIAGNOSTIC_OUTPUT omitted originally. C23 runner supplies own public-observations directory; exact retry/confirm artifact exists and original atomic-refusal assertions run unchanged.",
+    "latestTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "latestTestSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "latestCase": "public onUpdate refuses x inverse after y; retry, writes=xy",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log",
+      "/private/tmp/st-native-combined-c23/runs/composition/public-observations/xy-retry.json"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 8,
+    "originalCase": "public onUpdate refuses x inverse after y; confirm, writes=xy",
+    "originalTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED OUTPUT HARNESS; UNCHANGED CASE PASSES",
+    "disposition": "Required ST_PUBLIC_DIAGNOSTIC_OUTPUT omitted originally. C23 runner supplies own public-observations directory; exact retry/confirm artifact exists and original atomic-refusal assertions run unchanged.",
+    "latestTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "latestTestSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "latestCase": "public onUpdate refuses x inverse after y; confirm, writes=xy",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log",
+      "/private/tmp/st-native-combined-c23/runs/composition/public-observations/xy-confirm.json"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 9,
+    "originalCase": "public onUpdate refuses x inverse after y; retry, writes=yx",
+    "originalTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED OUTPUT HARNESS; UNCHANGED CASE PASSES",
+    "disposition": "Required ST_PUBLIC_DIAGNOSTIC_OUTPUT omitted originally. C23 runner supplies own public-observations directory; exact retry/confirm artifact exists and original atomic-refusal assertions run unchanged.",
+    "latestTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "latestTestSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "latestCase": "public onUpdate refuses x inverse after y; retry, writes=yx",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log",
+      "/private/tmp/st-native-combined-c23/runs/composition/public-observations/yx-retry.json"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 10,
+    "originalCase": "public onUpdate refuses x inverse after y; confirm, writes=yx",
+    "originalTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED OUTPUT HARNESS; UNCHANGED CASE PASSES",
+    "disposition": "Required ST_PUBLIC_DIAGNOSTIC_OUTPUT omitted originally. C23 runner supplies own public-observations directory; exact retry/confirm artifact exists and original atomic-refusal assertions run unchanged.",
+    "latestTestPath": "packages/kernel/src/lib/public-selected-unit.spec.ts",
+    "latestTestSha256": "9444bc2f0966edec6cb224d54391ed2daca5eaadc714fb1457ad32fab1fb8dcd",
+    "latestCase": "public onUpdate refuses x inverse after y; confirm, writes=yx",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log",
+      "/private/tmp/st-native-combined-c23/runs/composition/public-observations/yx-confirm.json"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 11,
+    "originalCase": "domain-only: distinct fixed-window treatment and useful confirm",
+    "originalTestPath": "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "originalSha256": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED ORACLE REPLACEMENT; COUNTERPARTS PASS",
+    "disposition": "Unrelated pending owner/recipient-only mismatch cannot manufacture native obligation. Exact both-endpoint payload, no borrowed declaration permission, unchanged ownership, settlement and no duplicates asserted. Actual-native-window counterweights and all 13 retained permission/unknown guards pass in same C23 union.",
+    "latestTestPath": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "latestTestSha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "latestCase": "domain-only root input / branch output confirm",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 12,
+    "originalCase": "domain-only: distinct fixed-window treatment and useful rollback",
+    "originalTestPath": "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "originalSha256": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED ORACLE REPLACEMENT; COUNTERPARTS PASS",
+    "disposition": "Unrelated pending owner/recipient-only mismatch cannot manufacture native obligation. Exact both-endpoint payload, no borrowed declaration permission, unchanged ownership, settlement and no duplicates asserted. Actual-native-window counterweights and all 13 retained permission/unknown guards pass in same C23 union.",
+    "latestTestPath": "packages/kernel/src/lib/recipient-progress-positive-counterparts.spec.ts",
+    "latestTestSha256": "76defc6debd096ec0d520e663e71b47d2146329076748583b58c030689da568e",
+    "latestCase": "domain-only root input / branch output rollback",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 13,
+    "originalCase": "paired restoration installs 3 physical rows once",
+    "originalTestPath": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "originalSha256": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED COUNT CALIBRATION; SCALED ORIGINAL PASSES",
+    "disposition": "Original redo 37 > 36 includes one currentIndex manager read. Undo 3N unchanged; redo 12N+1, every row/write/order/tombstone assertion retained. Real repeated-validation and row-snapshot mutants reach and fail numeric ceilings.",
+    "latestTestPath": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "latestTestSha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac",
+    "latestCase": "paired restoration installs 3 physical rows once",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 14,
+    "originalCase": "paired restoration installs 32 physical rows once",
+    "originalTestPath": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "originalSha256": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED COUNT CALIBRATION; SCALED ORIGINAL PASSES",
+    "disposition": "Original redo 385 > 384 includes one currentIndex manager read. Undo 3N unchanged; redo 12N+1, every row/write/order/tombstone assertion retained. Real repeated-validation and row-snapshot mutants reach and fail numeric ceilings.",
+    "latestTestPath": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "latestTestSha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac",
+    "latestCase": "paired restoration installs 32 physical rows once",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 15,
+    "originalCase": "paired restoration installs 256 physical rows once",
+    "originalTestPath": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "originalSha256": "d0dd363f4b4399842fbf6f516a549fe96f4a0cf764337c29b7cb49fe6b5f323c",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "AUTHORIZED COUNT CALIBRATION; SCALED ORIGINAL PASSES",
+    "disposition": "Original redo 3073 > 3072 includes one currentIndex manager read. Undo 3N unchanged; redo 12N+1, every row/write/order/tombstone assertion retained. Real repeated-validation and row-snapshot mutants reach and fail numeric ceilings.",
+    "latestTestPath": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
+    "latestTestSha256": "e0fe1017a817c65d3884124f12c0d1e7cc42682c8024201a41cf79f1bea33eac",
+    "latestCase": "paired restoration installs 256 physical rows once",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 16,
+    "originalCase": "attempts later live lifetime invalidation after first installed row invalidation fails",
+    "originalTestPath": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "originalSha256": "a22e7978157eb600c6d87ee7567f64a2b36fb069d7152c6bacacaf2377f85544",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED PRIVATE-SPY FORWARDING; ORIGINAL ASSERTIONS PASS",
+    "disposition": "Spy dropped shared publicationPhase, causing sibling standalone revalidation before injected invalidation. Typed rest tuple/original.apply(this,args) preserves phase and receiver; sentinel identity, later invalidation attempts and state/delivery assertions unchanged.",
+    "latestTestPath": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
+    "latestTestSha256": "06cf63fe0338d8e3e94e0d10ff3f04d59468cd8b029798c4d430d013fc6d8d34",
+    "latestCase": "attempts later live lifetime invalidation after first installed row invalidation fails",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  },
+  {
+    "id": 17,
+    "originalCase": "attempts mixed installed invalidation and delivery while preserving the first failure",
+    "originalTestPath": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "originalSha256": "6275794c45a003ec6330cfd31822e7dcc35134751fc8f3868a42e7871ce2ab02",
+    "preservedOriginal": "/private/tmp/st-c27-remaining-failure-ledger/originals/packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "originalFailureLog": "/private/tmp/st-c21-undispatched-kernel/first.log",
+    "originalSourceManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+    "classification": "FIXED PRIVATE-SPY FORWARDING; ORIGINAL ASSERTIONS PASS",
+    "disposition": "Spy dropped shared publicationPhase, causing sibling standalone revalidation before injected invalidation. Typed rest tuple/original.apply(this,args) preserves phase and receiver; sentinel identity, later invalidation attempts and state/delivery assertions unchanged.",
+    "latestTestPath": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
+    "latestTestSha256": "cb2219188fb4587d2777c05ae7a9bb0a74538bb4ef68149db3f126e5282d219f",
+    "latestCase": "attempts mixed installed invalidation and delivery while preserving the first failure",
+    "latestSourceManifest": "/private/tmp/st-native-combined-c23/SNAPSHOT-C23.json",
+    "latestExecutedEvidence": [
+      "/private/tmp/st-native-combined-c23/runs/composition/first.log"
+    ],
+    "C26TestBytesUnchangedFromC23": true,
+    "C26ReplayClaim": false
+  }
+]

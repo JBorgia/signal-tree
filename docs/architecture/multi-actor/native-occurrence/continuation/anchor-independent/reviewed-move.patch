@@ -1,0 +1,20 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -5127,7 +5127,6 @@
+   // `key` is carried explicitly alongside `subjectId` because it is genuinely
+   // separate information: after `changeId(1, 77)` the row payload still reads
+   // `{ id: 1 }` while the address is 77, so `selectId(row)` cannot recover it.
+-  defineEntityPublicationBinding(api as object,{source:entityPublication});
+   defineEntityProjectionSeed(api as object, () => {
+     const seed: Array<{ subjectId: number; key: K; row: E }> = [];
+     // An absent collection seeds an empty projection, as `all()` reads.
+@@ -5338,6 +5337,9 @@
+       return (target as unknown as Record<string | symbol, unknown>)[prop];
+     },
+   });
++  // The materializer stamps the returned collection identity, not its raw
++  // proxy target. Source enrollment must retain that same identity.
++  defineEntityPublicationBinding(proxy as object, { source: entityPublication });
+   return proxy;
+ }
+ 

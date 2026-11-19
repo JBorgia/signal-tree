@@ -1,0 +1,18 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -2049,6 +2049,7 @@
+     const nested = reAdding;
+     interceptsSuppressed = 0;
+     reAdding = false;
++    const priorSelection = activeIdValue;
+     taps.depth++;
+     try {
+       for (const handler of tapHandlers)
+@@ -2056,6 +2057,7 @@
+           ...args
+         );
+     } finally {
++      replaceLocation(activeIdSignal, priorSelection);
+       taps.depth--;
+       interceptsSuppressed = suppressed;
+       reAdding = nested;

@@ -1,0 +1,11 @@
+{
+  "manifestSha256": "4b48ad0640fa4b480c072f0f8c05a72898422a5c3067d90e7a9bc40ccb701e30",
+  "patchSha256": "b3c188fd18a5451a68345cf3bae558994ebf2aafb2ffb9ff0563f05787734169",
+  "changed": [
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts",
+    "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts",
+    "packages/kernel/src/lib/scalar-native-support.spec.ts"
+  ],
+  "originalC12AndC14Unchanged": true
+}

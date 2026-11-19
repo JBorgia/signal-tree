@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "Node16",
+    "moduleResolution": "node16",
+    "strict": true,
+    "skipLibCheck": false,
+    "noEmit": true,
+    "types": [],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "files": [
+    "consumer.ts",
+    "operation-consumer.ts"
+  ]
+}

@@ -1,0 +1,22 @@
+{"framework":"angular","control":"fresh-error-identity-and-recovery","result":"PASS","sourceCalls":3}
+{"framework":"vue","control":"fresh-error-identity-and-recovery","result":"PASS","sourceCalls":3}
+{"framework":"vue","variant":"native","control":"dependency-poll-error","sameError":true,"sourceRuns":1,"innerRuns":2}
+{"framework":"vue","variant":"candidate","control":"dependency-poll-error","returned":"X","sameError":false,"sourceRuns":2,"innerRuns":2}
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Fresh dependency error was suppressed by the invocation-marker fallback
+
+1 !== 0
+
+    at file:///private/tmp/st-current-read-capability-proof/proof-evidence/marker-error-controls.mjs:49:8 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 1,
+  expected: 0,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.15.0

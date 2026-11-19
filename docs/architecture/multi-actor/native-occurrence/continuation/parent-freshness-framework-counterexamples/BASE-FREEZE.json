@@ -1,0 +1,37 @@
+{
+  "baseManifestSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+  "manifestSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+  "manifestFiles": 3047,
+  "changedBaselineFiles": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/materialize-markers.ts",
+    "packages/kernel/src/lib/internals/member-membership.ts",
+    "packages/kernel/src/lib/internals/native-location-realization.ts",
+    "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+    "packages/kernel/src/lib/internals/snapshot-authority.ts",
+    "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+    "packages/kernel/src/lib/utils.ts"
+  ],
+  "newFiles": [
+    "packages/angular/src/lib/bounded-reentry-baseline.spec.ts",
+    "packages/angular/src/lib/bounded-reentry-targeted.spec.ts",
+    "packages/angular/src/lib/parent-freshness-callbacks.spec.ts",
+    "packages/angular/src/lib/parent-freshness-entity.spec.ts",
+    "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+    "packages/angular/src/lib/parent-freshness-grouped.spec.ts",
+    "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
+    "packages/kernel/src/lib/bounded-reentry-baseline.spec.ts",
+    "packages/kernel/src/lib/bounded-reentry-targeted.spec.ts",
+    "packages/kernel/src/lib/construction-completion-snapshot-review.spec.ts",
+    "packages/kernel/src/lib/internals/snapshot-installation.ts",
+    "packages/kernel/src/lib/parent-freshness-callbacks.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-entity.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-grouped.spec.ts",
+    "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts"
+  ],
+  "runtimePatchSha256": "19e8c5dbd6208da35754e97244c389ade7f199548d6c81610ce309669cc78c6d",
+  "combinedPatchSha256": "07d0cee0b6f8059d154f96875b53755cc66ad801ab6be499c4fe9e521b9d8020",
+  "status": "bounded proof frozen for independent review; no activation or release claim"
+}

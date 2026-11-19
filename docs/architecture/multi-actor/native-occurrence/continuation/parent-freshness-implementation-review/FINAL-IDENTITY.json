@@ -1,0 +1,38 @@
+{
+  "frozenCandidate": {
+    "manifestSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+    "verifiedFiles": 3047,
+    "mismatches": []
+  },
+  "frozenBase": {
+    "manifestSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+    "verifiedFiles": 3031,
+    "mismatches": []
+  },
+  "reviewCandidate": {
+    "manifestSha256": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+    "verifiedFiles": 3047,
+    "mismatches": []
+  },
+  "reviewOracle": {
+    "manifestSha256": "3ad1adb2de2936e52baf2ca06d630babc858d4186c2c4fed48818639056b388a",
+    "verifiedFiles": 3031,
+    "mismatches": []
+  },
+  "coldErrorCrossArmAssertions": "passed",
+  "contracts": {
+    "docs/review-contract.md": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+    "docs/contributor-contracts.md": "0211a2851f9f5724182555a3ff2c2ebdf89c43f88a6123d5e09fc505b8bd51d2",
+    "docs/support-policy.md": "b65aac2d81986a940c6259404eae344fbe77d3ca5466fc326b203d31499c04bd",
+    ".github/skills/adversarial-confirmation/references/protocol.md": "d6331155e2d0e8fa421244f0845c1efcd96d7970afa96a8bacf32805ff029d84",
+    "docs/architecture/multi-actor/framework-current-read/DECISION.md": "1199591b850afc9f1788f66b8f25073f85e311022b3d8ca62da83e0de812b498",
+    "docs/architecture/multi-actor/native-occurrence/continuation/parent-freshness-design-resumed/REENTRY-CACHE-RULES.md": "5274297976e4ebbfaa2889dceb3ffd968b0063fdfa4e81ced24f85e16fbfaead",
+    "docs/architecture/multi-actor/native-occurrence/continuation/parent-freshness-design-resumed/HOOKS.md": "fbc3bcfad250fc6778d17dfca3b95fe48334c5cb09640b1054f8e92748356da5"
+  },
+  "reviewArtifacts": {
+    "REVIEW.md": "6725641d131b025d7b0891777c26ae4eaf02ef6c53b60ebe23d29d2039d5e82b",
+    "compare.py": "669a028c91510c3ad33c5e1c8ad5d528287176b67bda6d3be9b54e5e1c54804e",
+    "PAIRED-COMPARISONS.json": "d52c1428c90093283c950c42451146523eea6de696ff3ab60fd61df82caeec30",
+    "candidate/packages/angular/src/lib/independent-parent-discriminators.spec.ts": "00a6cb20786b9b7d4ae359eabdf503ae9a1fe7e96f65055325627657c56e9369"
+  }
+}

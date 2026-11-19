@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "/private/tmp/st-native-combined-c11/run-gate.py",
+    "retention-hold-proceed-success",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "forwarding-retention-probe",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "NODE_OPTIONS": "--expose-gc",
+    "ST_GC_ARM": "hold-proceed",
+    "ST_GC_SCENARIO": "success",
+    "ST_GC_OUTPUT": "/private/tmp/st-c11-forwarding-retention/hold-proceed-success.json"
+  }
+}

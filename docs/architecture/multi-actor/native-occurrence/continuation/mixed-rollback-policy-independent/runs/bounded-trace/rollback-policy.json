@@ -1,0 +1,1828 @@
+[
+  {
+    "variant": "undeclared",
+    "events": [
+      {
+        "stage": "whole",
+        "event": "native-prepare",
+        "unknownArgument": false,
+        "inputs": []
+      },
+      {
+        "stage": "whole",
+        "event": "prepareRevision",
+        "fact": 5,
+        "uncertainty": {
+          "invalidAttribution": false,
+          "unobservedOrigin": false,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "finalized",
+        "fact": 5,
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "project",
+        "fact": 5,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 5,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 5,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 5,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 5,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [
+                {
+                  "owner": 1,
+                  "id": 1,
+                  "outcome": "pending"
+                }
+              ],
+              "destination": [
+                {
+                  "owner": 1,
+                  "id": 1,
+                  "outcome": "pending"
+                }
+              ],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "rollback",
+        "event": "native-prepare",
+        "unknownArgument": true,
+        "inputs": []
+      },
+      {
+        "stage": "rollback",
+        "event": "prepareRevision",
+        "fact": 6,
+        "uncertainty": {
+          "invalidAttribution": true,
+          "unobservedOrigin": true,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "finalized",
+        "fact": 6,
+        "native": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 1,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "project",
+        "fact": 6,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": [
+            {
+              "owner": 2,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 6,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 6,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 6,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 6,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "rollback",
+        "event": "receipts",
+        "before": {
+          "state": "superseded"
+        },
+        "error": "undefined"
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "selected",
+        "fact": 6,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "started",
+        "fact": 6,
+        "basis": "surviving"
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 0,
+              "y": 9
+            }
+          ]
+        ],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "variant": "declared-settlement",
+    "events": [
+      {
+        "stage": "whole",
+        "event": "native-prepare",
+        "unknownArgument": false,
+        "inputs": []
+      },
+      {
+        "stage": "whole",
+        "event": "prepareRevision",
+        "fact": 11,
+        "uncertainty": {
+          "invalidAttribution": false,
+          "unobservedOrigin": false,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "finalized",
+        "fact": 11,
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "project",
+        "fact": 11,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 11,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 11,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 11,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 11,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [
+                {
+                  "owner": 3,
+                  "id": 1,
+                  "outcome": "pending"
+                }
+              ],
+              "destination": [
+                {
+                  "owner": 3,
+                  "id": 1,
+                  "outcome": "pending"
+                }
+              ],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "rollback",
+        "event": "native-prepare",
+        "unknownArgument": true,
+        "inputs": []
+      },
+      {
+        "stage": "rollback",
+        "event": "prepareRevision",
+        "fact": 12,
+        "uncertainty": {
+          "invalidAttribution": true,
+          "unobservedOrigin": true,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "finalized",
+        "fact": 12,
+        "native": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 3,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "project",
+        "fact": 12,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": [
+            {
+              "owner": 4,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 12,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 12,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 12,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 12,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "rollback",
+        "event": "receipts",
+        "before": {
+          "state": "superseded"
+        },
+        "settlement": {
+          "state": "conservative",
+          "reason": "unknown"
+        },
+        "error": "undefined"
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "selected",
+        "fact": 12,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "started",
+        "fact": 12,
+        "basis": "surviving"
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 0,
+              "y": 9
+            }
+          ]
+        ],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "variant": "fresh-after",
+    "events": [
+      {
+        "stage": "whole",
+        "event": "native-prepare",
+        "unknownArgument": false,
+        "inputs": []
+      },
+      {
+        "stage": "whole",
+        "event": "prepareRevision",
+        "fact": 17,
+        "uncertainty": {
+          "invalidAttribution": false,
+          "unobservedOrigin": false,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "finalized",
+        "fact": 17,
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "project",
+        "fact": 17,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 17,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 17,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 17,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "selected",
+        "fact": 17,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 7,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "whole",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [
+                {
+                  "owner": 5,
+                  "id": 1,
+                  "outcome": "pending"
+                }
+              ],
+              "destination": [
+                {
+                  "owner": 5,
+                  "id": 1,
+                  "outcome": "pending"
+                }
+              ],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "rollback",
+        "event": "native-prepare",
+        "unknownArgument": true,
+        "inputs": []
+      },
+      {
+        "stage": "rollback",
+        "event": "prepareRevision",
+        "fact": 18,
+        "uncertainty": {
+          "invalidAttribution": true,
+          "unobservedOrigin": true,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "finalized",
+        "fact": 18,
+        "native": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "destination": [
+            {
+              "owner": 5,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ],
+          "input": [],
+          "validation": [],
+          "possible": [
+            {
+              "owner": 6,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "project",
+        "fact": 18,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": true,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": true,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": [
+            {
+              "owner": 6,
+              "id": 1,
+              "outcome": "pending"
+            }
+          ]
+        }
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 18,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 18,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 18,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "selected",
+        "fact": 18,
+        "declared": false,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "rollback",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": true,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "rollback",
+        "event": "receipts",
+        "before": {
+          "state": "superseded"
+        },
+        "error": "undefined"
+      },
+      {
+        "stage": "fresh",
+        "event": "native-prepare",
+        "unknownArgument": false,
+        "inputs": []
+      },
+      {
+        "stage": "fresh",
+        "event": "prepareRevision",
+        "fact": 19,
+        "uncertainty": {
+          "invalidAttribution": false,
+          "unobservedOrigin": false,
+          "uncapturedUpdaterInput": false,
+          "recipientDomain": false
+        },
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "fresh",
+        "event": "finalized",
+        "fact": 19,
+        "native": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "fresh",
+        "event": "project",
+        "fact": 19,
+        "incoming": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        },
+        "outgoing": {
+          "unknown": false,
+          "invalid": false,
+          "unavailableInput": false,
+          "historicalWindow": false,
+          "terminalRejectedRoles": 0,
+          "owners": [],
+          "destination": [],
+          "input": [],
+          "validation": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "fresh",
+        "event": "selected",
+        "fact": 19,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "fresh",
+        "event": "selected",
+        "fact": 19,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "fresh",
+        "event": "selected",
+        "fact": 19,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "fresh",
+        "event": "selected",
+        "fact": 19,
+        "declared": true,
+        "payload": [
+          {
+            "id": "a",
+            "x": 0,
+            "y": 9
+          }
+        ],
+        "changed": true
+      },
+      {
+        "stage": "fresh",
+        "event": "started",
+        "fact": 19,
+        "basis": "declared"
+      },
+      {
+        "stage": "fresh",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 0,
+              "y": 9
+            }
+          ]
+        ],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      },
+      {
+        "stage": "fresh",
+        "event": "receipt",
+        "value": {
+          "state": "started",
+          "basis": "declared"
+        }
+      },
+      {
+        "stage": "foreign-confirm",
+        "event": "sample",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 0,
+              "y": 9
+            }
+          ]
+        ],
+        "fields": [
+          {
+            "key": "id",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "x",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          },
+          {
+            "key": "y",
+            "proof": {
+              "unknown": false,
+              "invalid": false,
+              "unavailableInput": false,
+              "historicalWindow": false,
+              "terminalRejectedRoles": 0,
+              "owners": [],
+              "destination": [],
+              "input": [],
+              "validation": [],
+              "possible": []
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

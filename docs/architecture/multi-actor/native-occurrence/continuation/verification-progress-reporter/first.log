@@ -1,0 +1,36 @@
+
+> nx run kernel:test whole-value-new-keys --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-verification-progress-reporter/reporter.mjs
+
+> node tools/run-core-vitest.mjs whole-value-new-keys --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-verification-progress-reporter/reporter.mjs
+
+(node:28365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:28372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c11/candidate/packages/kernel
+
+(node:28379) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/whole-value-new-keys.spec.ts (26 tests) 64ms
+
+ Test Files  1 passed (1)
+      Tests  26 passed (26)
+   Start at  10:25:38
+   Duration  1.68s (transform 902ms, setup 0ms, import 1.07s, tests 64ms, environment 396ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.5s

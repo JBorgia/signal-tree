@@ -1,0 +1,12 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "-p",
+    "packages/kernel/tsconfig.typecheck.json"
+  ],
+  "cwd": "/private/tmp/st-c23-declare-public-successor/candidate",
+  "node": "24.15.0",
+  "noOutputDeadlineSeconds": 180
+}

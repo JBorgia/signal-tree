@@ -1,0 +1,7 @@
+✓ consumer gate self-test rejects warning retention, missing dev/error controls, and process dependence
+Self-test — the checker must FAIL against deliberately broken fixtures
+
+  ✓ detects an advisory literal surviving ngDevMode=false
+  ✓ detects a bundle that does not shrink at all
+
+✓ Self-test passed: both failure modes are detectable.

@@ -1,0 +1,8 @@
+
+Running 2 gates
+
+  · source-controls      pass ✓  (no raw NUL or unexpected C0 control character in any tracked source)
+  · doc-links            pass ✓  (every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time))
+
+──────────────────────────────────────────────────────────────────────────────
+2/2 passed, 0 failed, 0 known-red.

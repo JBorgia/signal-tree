@@ -1,0 +1,17 @@
+{
+  "BASE-MANIFEST.json": "986f7a94c80734070fc51395ca8eee63d808a4fbf949dadc48f5de1e4c48b3b2",
+  "FIXTURE-CORRECTION.md": "d650f00c454229ec1591b02cd4d6de2db5447e024f86af543b19edd57a7220d2",
+  "MANIFEST.json": "9805ab2fae49202a334ef506c71a3583ff0f8dfebec51e8b27d992b23971653b",
+  "PREREGISTERED-CORRECTED.json": "bd454ecb4b95d09b809e0b941496d24f645185b4065df2b8c31bb9fb5acd6046",
+  "PREREGISTERED.json": "5ed05ae92bce04eff8b748fd6bfc20cec8252d5544c676876b310fb9f4ba4b5a",
+  "REVIEW.md": "7094abd3e8d6df65ace278f74474d1bda32427f481a22095e25c599d11a2f0e3",
+  "SNAPSHOT.json": "29db99ea462ef832d68828f929bce2e76339565005d21decbdaa882af8d3e6cb",
+  "after-observations.jsonl": "252049eaf9ee933d3ace57c485c7314d0aa2df8f91113e19cb0d85d4b70c6ce7",
+  "before-corrected-observations.jsonl": "d4a5db8e54f6ff429c79a299806c53e5c69713404d0822cc337bf63a0cb20073",
+  "before-observations.jsonl": "d4a5db8e54f6ff429c79a299806c53e5c69713404d0822cc337bf63a0cb20073",
+  "first-current-capture-r1.spec.ts": "0fb66e4bf646474fe496d3bff88f1fbb2a12ec176d93d43da98fa33931815197",
+  "opaque-after-observations.jsonl": "129231c93ff4afe17150f86aef3ff0912f56188ecc8d92176ba3336d178d7764",
+  "run-focused.py": "87069a840f724328727a103c056fe6c527dd891befd56e8eee4b34df9743513f",
+  "runtime.patch": "6509ca669862704b62bc0eafd9704231c7cdcfdbc78c201bf32a48890dee4da5",
+  "tests.patch": "922c4405cc132473a1d8f622e9c81d18ada4d2e4e2e8ef77df802149f3cc58bc"
+}

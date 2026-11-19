@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "facade-imports.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a",
+  "env": {}
+}

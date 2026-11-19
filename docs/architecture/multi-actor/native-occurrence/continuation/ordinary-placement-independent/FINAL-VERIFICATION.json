@@ -1,0 +1,11 @@
+{
+  "frozen-author": {
+    "matchedManifestEntries": 2970,
+    "mismatches": []
+  },
+  "review-copy": {
+    "matchedManifestEntries": 2970,
+    "mismatches": []
+  },
+  "reviewerFixtureSha256": "6e0573e4b08fd76eb18e7f55e41811eb30ea28d5ef43f41c7c636c3db0436d51"
+}

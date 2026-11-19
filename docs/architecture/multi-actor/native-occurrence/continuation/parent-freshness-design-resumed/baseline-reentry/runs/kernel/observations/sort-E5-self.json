@@ -1,0 +1,196 @@
+{
+  "facade": "kernel",
+  "seam": "sort",
+  "scenario": "E5-self",
+  "callsBeforeDemand": 0,
+  "calls": 3,
+  "afterWrite": true,
+  "sentinelReached": false,
+  "nested": {
+    "name": "nested-root",
+    "kind": "return",
+    "value": {
+      "child": {
+        "n": 1
+      },
+      "rows": {
+        "all": [
+          {
+            "id": 3,
+            "n": 0
+          },
+          {
+            "id": 2,
+            "n": 1
+          },
+          {
+            "id": 1,
+            "n": 2
+          }
+        ]
+      }
+    },
+    "callsBefore": 1,
+    "callsAfter": 3
+  },
+  "events": [
+    {
+      "name": "action-enter",
+      "calls": 1
+    },
+    {
+      "name": "write-returned",
+      "calls": 1,
+      "child": 1
+    },
+    {
+      "name": "nested-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 1
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 3,
+              "n": 0
+            },
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 1,
+      "callsAfter": 3
+    },
+    {
+      "name": "first-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 0,
+      "callsAfter": 3
+    },
+    {
+      "name": "immediate-root-1",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "immediate-root-2",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "rows": {
+          "all": [
+            {
+              "id": 2,
+              "n": 1
+            },
+            {
+              "id": 1,
+              "n": 2
+            }
+          ]
+        }
+      },
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "installed-child",
+      "kind": "return",
+      "value": 1,
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "recovery-write",
+      "kind": "return",
+      "value": null,
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "post-write-root-1",
+      "kind": "throw",
+      "sameSentinel": false,
+      "sameTripwire": false,
+      "error": {
+        "name": "RangeError",
+        "message": "Maximum call stack size exceeded",
+        "stack": "RangeError: Maximum call stack size exceeded\n    at Object.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:447:16)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)"
+      },
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "post-write-root-2",
+      "kind": "throw",
+      "sameSentinel": false,
+      "sameTripwire": false,
+      "error": {
+        "name": "RangeError",
+        "message": "Maximum call stack size exceeded",
+        "stack": "RangeError: Maximum call stack size exceeded\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:621:25)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)"
+      },
+      "callsBefore": 3,
+      "callsAfter": 3
+    },
+    {
+      "name": "post-write-all",
+      "kind": "throw",
+      "sameSentinel": false,
+      "sameTripwire": false,
+      "error": {
+        "name": "RangeError",
+        "message": "Maximum call stack size exceeded",
+        "stack": "RangeError: Maximum call stack size exceeded\n    at Object.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:447:16)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)\n    at Object.node.refresh (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:664:18)\n    at readCurrent (/private/tmp/st-parent-freshness-resumed/baseline-reentry/candidate/packages/kernel/src/lib/internals/location-runtime.ts:627:22)"
+      },
+      "callsBefore": 3,
+      "callsAfter": 3
+    }
+  ]
+}

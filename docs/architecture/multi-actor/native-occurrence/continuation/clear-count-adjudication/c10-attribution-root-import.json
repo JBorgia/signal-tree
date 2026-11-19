@@ -1,0 +1,16 @@
+[
+  [
+    "    at orderRestoresForPlacement (/private/tmp/st-parent-freshness-other-frameworks/clear-adjudication/c10/packages/kernel/src/lib/physical/order-restores-for-placement.ts:78:20)",
+    {
+      "calls": 3,
+      "visits": 513
+    }
+  ],
+  [
+    "    at Object.prepare (/private/tmp/st-parent-freshness-other-frameworks/clear-adjudication/c10/packages/kernel/src/lib/experimental-publication/entity.ts:102:90)",
+    {
+      "calls": 256,
+      "visits": 32896
+    }
+  ]
+]

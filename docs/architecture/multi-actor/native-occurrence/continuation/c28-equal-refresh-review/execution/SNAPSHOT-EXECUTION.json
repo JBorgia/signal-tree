@@ -1,0 +1,17 @@
+{
+  "files": {
+    "REPORT.md": "22b9d4da8b634161a3783b71645775849bbffbf0be8cf9c2ebd18f6d156f231b",
+    "run.py": "0ef33a0a1241563f2388c6c69fe0fe5aeabacc86a7db9dcfc5325a50af1d911b",
+    "IDENTITY.json": "3f29e80f2eefadbfc8152ade1bedb507c2a60df2dc4a93905bad5cecdd8d55fc",
+    "C27-MANIFEST.json": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+    "runs/spec-types-first/RESULT.json": "066b2338c47b9507945208a04517e0de4d914fbd8e5655faf285f86f3d18a236",
+    "runs/spec-types-first/COMMAND.json": "aae1377050f3a9832548f7b15857587f5eb6df571d00b2399f13e73921370aa5",
+    "runs/spec-types-first/PROCESS.json": "1350fdf7759bcc3299b0c4043aae3ea818f0783cecd34c1a058662dd08832465",
+    "runs/probes-first/RESULT.json": "066b2338c47b9507945208a04517e0de4d914fbd8e5655faf285f86f3d18a236",
+    "runs/probes-first/COMMAND.json": "34930e3d51deb6dbf6f1f49223332a38d16185e4a36fffee51b09cc105aa6b79",
+    "runs/probes-first/PROCESS.json": "c6762731f48d2b43dff6f3c91ccfca447b61d3865145aa643eb1a57671c4a13f",
+    "runs/spec-types-first/first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "runs/probes-first/first.log": "3cd8389eb5e20d0c07a203f070207bc045396955b137f70312409d56f95fdf0f"
+  },
+  "results": "4 pass; spec types pass; no changes"
+}

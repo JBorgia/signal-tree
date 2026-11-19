@@ -1,0 +1,94 @@
+
+ NX   Running target test for 3 projects:
+
+- kernel
+- angular
+- vue
+
+With additional flags:
+  current-read-capability
+  --maxWorkers=2
+
+
+
+> nx run kernel:test current-read-capability --maxWorkers=2
+
+> node tools/run-core-vitest.mjs current-read-capability --maxWorkers=2
+
+(node:40547) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40554) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/kernel
+
+(node:40575) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  13:14:32
+   Duration  1.49s (transform 457ms, setup 0ms, import 539ms, tests 11ms, environment 786ms)
+
+
+> nx run angular:test current-read-capability --maxWorkers=2
+
+> NODE_OPTIONS=--expose-gc npx vitest run --root packages/angular current-read-capability --maxWorkers=2
+
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:40576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40598) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/angular
+
+(node:40605) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  13:14:35
+   Duration  745ms (transform 62ms, setup 254ms, import 35ms, tests 4ms, environment 307ms)
+
+
+> nx run vue:test current-read-capability --maxWorkers=2
+
+> pnpm exec tsc --noEmit -p packages/vue/tsconfig.spec.json && npx vitest run --config packages/vue/vitest.config.ts current-read-capability --maxWorkers=2
+
+(node:40623) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+npm warn Unknown env config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "auto-install-peers". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+npm warn Unknown project config "shamefully-hoist". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+(node:40742) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:40764) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-current-read-capability-proof/packages/vue
+
+(node:40771) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  13:14:41
+   Duration  324ms (transform 64ms, setup 0ms, import 175ms, tests 6ms, environment 0ms)
+
+
+
+
+ NX   Successfully ran target test for 3 projects
+
+
+  Run duration:      9.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.9s (1 task)
+  Recoverable time:  3.8s (39% of the run)
+
+  Recommendations:
+    - Increase parallelism to recover up to 3.8s → https://nx.dev/docs/concepts/ci-concepts/parallelization-distribution?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=parallelization.
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.

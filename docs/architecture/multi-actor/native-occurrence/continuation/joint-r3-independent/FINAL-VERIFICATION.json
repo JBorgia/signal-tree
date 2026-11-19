@@ -1,0 +1,10 @@
+{
+  "sourceManifestSha256": "59cdc07d250e7262f09789c3332bd80363f152011d777cc15ca5226ffe69c6c8",
+  "authorChanged": [],
+  "copyChanged": [],
+  "runtimeDelta": [
+    "packages/kernel/src/lib/internals/plain-branch-membership.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts"
+  ],
+  "originalFalsifierIdentical": true
+}

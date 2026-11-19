@@ -1,0 +1,27 @@
+{
+  "author": {
+    "checked": 2971,
+    "mismatches": []
+  },
+  "independent": {
+    "checked": 2971,
+    "mismatches": []
+  },
+  "frozenArtifacts": {
+    "checked": 15,
+    "mismatches": []
+  },
+  "changedVsBase": [
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "addedVsBase": [
+    "packages/kernel/src/lib/known-input-contract-review.spec.ts",
+    "packages/kernel/src/lib/recipient-cause-classification.spec.ts",
+    "packages/kernel/src/lib/recipient-window-review.spec.ts"
+  ],
+  "authorTraceRestored": true,
+  "adversarySha256": "cf2afd13592ca316e8a337fd1172386d685577fe9647ae2d544db0971a9e24fc"
+}

@@ -1,0 +1,33 @@
+{
+  "exactC16Manifest": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+  "allBaselinePathsUnchanged": true,
+  "explicitFieldMatchesPriorSuccessorWhole": true,
+  "observations": [
+    {
+      "case": "terminal",
+      "otherPending": false,
+      "sameEndpoint": false,
+      "beforeDestination": [
+        "confirmed"
+      ],
+      "afterDestination": []
+    },
+    {
+      "case": "terminal",
+      "otherPending": true,
+      "sameEndpoint": true,
+      "beforeDestination": [
+        "confirmed"
+      ],
+      "afterDestination": [
+        "confirmed"
+      ]
+    }
+  ],
+  "result": {
+    "exit": 0,
+    "elapsedSeconds": 9.98749820899684,
+    "source_unchanged": true
+  },
+  "scope": "Two confirmed-owner cases only; no runtime/old assertion/policy edits"
+}

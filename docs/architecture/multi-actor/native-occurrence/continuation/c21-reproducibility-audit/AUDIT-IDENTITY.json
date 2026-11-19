@@ -1,0 +1,7 @@
+{
+  "targetManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "scopedCandidateFilesVerified": 1738,
+  "baselineCommit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "baselineTree": "10e6be502fda139bb16ab7a72c426efc86ce8888",
+  "missingNamedBaseline": "87ddcfdedcb5d91e700d812bd6cbee2f77038510"
+}

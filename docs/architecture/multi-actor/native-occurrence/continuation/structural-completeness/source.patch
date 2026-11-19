@@ -1,0 +1,50 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -504,22 +504,42 @@
+         group.push(effect);
+       }
+       let valid = true;
++      // Retain the authentic recipe resolved at admission. Physical lowering
++      // must not erase an ordinary contribution or defer descriptor lookup.
++      const resolved = new Map<ReversalEffect, ReversalEffect>();
+       for (const [owner, group] of groups) {
+         const node = resolveCollectionNode(options.tree, options.descriptors.get(owner), structuralOwnerPaths, group[0]);
+-        // Original add backing/restore evidence is checked before a physical
+-        // transfer can replace that add. No absent binding grants permission.
+         if (!node?.__validateOrdinaryStructure ||
+-          group.some(effect => effect.structural === 'add' &&
+-            (!node.__restoreOne || !getStructuralAddEffect(options.descriptors.get(owner), effect))) ||
++          !node.__prepareOrdinaryRealization ||
+           !node.__validateOrdinaryStructure(group)) {
+           valid = false;
+           break;
+         }
++        for (const effect of group) {
++          if (effect.structural === 'rekey') continue;
++          const context = effect.structural === 'add'
++            ? getStructuralAddEffect(options.descriptors.get(owner), effect)
++            : effect.structuralContext;
++          // The existing ordinary installer requires an existence recipe.
++          // Without it, refuse the entire paired operation before lowering.
++          // Legacy unlowered physical routes retain subject-based removal.
++          if (!context || context.kind === 'rekey' ||
++            context.subject !== effect.subjectId ||
++            !Object.prototype.hasOwnProperty.call(context, 'value') ||
++            (effect.structural === 'add' && !node.__restoreOne)) {
++            valid = false;
++            break;
++          }
++          resolved.set(effect, context === effect.structuralContext ? effect :
++            Object.freeze({ ...effect, structuralContext: context }));
++        }
++        if (!valid) break;
+       }
+       const byOwner = new Map(effects.map(effect => [effect.owner, effect]));
+       // Failed semantic admission is returned for the existing typed refusal
+       // path; it must not be lowered or partially installed.
+-      const physical = valid ? prepareOrdinaryRealization(effects, (owner, subject) => {
++      const ordinary = effects.map(effect => resolved.get(effect) ?? effect);
++      const physical = valid ? prepareOrdinaryRealization(ordinary, (owner, subject) => {
+         const effect = byOwner.get(owner);
+         return effect ? resolveCollectionNode(options.tree, options.descriptors.get(owner), structuralOwnerPaths, effect)?.__findKeyBySubjectId?.(subject) : undefined;
+       }).physical : Object.freeze([...effects]);

@@ -1,0 +1,72 @@
+--- a/packages/react/src/parent-freshness-counterparts.spec.tsx
++++ b/packages/react/src/parent-freshness-counterparts.spec.tsx
+@@ -107,7 +107,10 @@
+       expect.soft(afterNested).toEqual(expected);
+       expect.soft(cached).toBe(nativeBefore);
+       expect.soft(countDuring).toBe(countBefore);
+-      expect(heldBranch()).toEqual(expected);
++      // The enclosing whole value applies its omissions after nested writes.
++      // A thrown completion skips that remaining outer work.
++      const finalExpected = fail ? expected : { old: { n: 10 }, a: { n: 1 } };
++      expect(heldBranch()).toEqual(finalExpected);
+       expect(heldBranch()).not.toBe(branchBefore);
+       expect(installedRow(heldBranch['a'])).toBe(retainedA);
+       expect(readNative()).toEqual(heldRoot());
+@@ -117,7 +120,8 @@
+         [old, 'old', 11],
+         [a, 'a', 3],
+       ];
+-      if (reenter) updates.push([installedRow(heldBranch['b']), 'b', 4]);
++      if (fail && reenter)
++        updates.push([installedRow(heldBranch['b']), 'b', 4]);
+       for (const [row, key, value] of updates) {
+         const count = observed.length;
+         await step(() => write(row, value));
+--- a/packages/solid/src/lib/parent-freshness-counterparts.spec.ts
++++ b/packages/solid/src/lib/parent-freshness-counterparts.spec.ts
+@@ -108,7 +108,10 @@
+       expect.soft(afterNested).toEqual(expected);
+       expect.soft(cached).toBe(nativeBefore);
+       expect.soft(countDuring).toBe(countBefore);
+-      expect(heldBranch()).toEqual(expected);
++      // The enclosing whole value applies its omissions after nested writes.
++      // A thrown completion skips that remaining outer work.
++      const finalExpected = fail ? expected : { old: { n: 10 }, a: { n: 1 } };
++      expect(heldBranch()).toEqual(finalExpected);
+       expect(heldBranch()).not.toBe(branchBefore);
+       expect(installedRow(heldBranch['a'])).toBe(retainedA);
+       expect(readNative()).toEqual(heldRoot());
+@@ -118,7 +121,8 @@
+         [old, 'old', 11],
+         [a, 'a', 3],
+       ];
+-      if (reenter) updates.push([installedRow(heldBranch['b']), 'b', 4]);
++      if (fail && reenter)
++        updates.push([installedRow(heldBranch['b']), 'b', 4]);
+       for (const [row, key, value] of updates) {
+         const count = observed.length;
+         await step(() => write(row, value));
+--- a/packages/vue/src/lib/parent-freshness-counterparts.spec.ts
++++ b/packages/vue/src/lib/parent-freshness-counterparts.spec.ts
+@@ -99,7 +99,10 @@
+       expect.soft(afterNested).toEqual(expected);
+       expect.soft(cached).toBe(nativeBefore);
+       expect.soft(countDuring).toBe(countBefore);
+-      expect(heldBranch()).toEqual(expected);
++      // The enclosing whole value applies its omissions after nested writes.
++      // A thrown completion skips that remaining outer work.
++      const finalExpected = fail ? expected : { old: { n: 10 }, a: { n: 1 } };
++      expect(heldBranch()).toEqual(finalExpected);
+       expect(heldBranch()).not.toBe(branchBefore);
+       expect(installedRow(heldBranch['a'])).toBe(retainedA);
+       expect(readNative()).toEqual(heldRoot());
+@@ -109,7 +112,8 @@
+         [old, 'old', 11],
+         [a, 'a', 3],
+       ];
+-      if (reenter) updates.push([installedRow(heldBranch['b']), 'b', 4]);
++      if (fail && reenter)
++        updates.push([installedRow(heldBranch['b']), 'b', 4]);
+       for (const [row, key, value] of updates) {
+         const count = observed.length;
+         await step(() => write(row, value));

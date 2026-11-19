@@ -1,0 +1,9 @@
+{
+  "argv": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--only=entity-registration-artifacts,entity-registration-artifacts:self"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-entity-artifact-gate-f1/candidate",
+  "env": {}
+}

@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "link-absent-locations.spec.ts",
+    "--testNamePattern=Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling",
+    "--reporter=verbose",
+    "--maxWorkers=1"
+  ],
+  "cwd": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/candidate",
+  "identity": {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+    "fullName": "Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling",
+    "duplicateOrdinal": 1
+  },
+  "fixtureSha256": "5ced65b25e334b5142f6d1fe6f7bd6533b698032acac29fd9cf2a70af7a088d9",
+  "environment": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "ST_OBSERVATIONS": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/04/observations/native.jsonl",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/04/observations/prepared",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-native-shared-failure-triage/production-87f-0i52qgfq/04/observations/public"
+  },
+  "filterNote": "Equivalent full-name regex; literal whitespace and hyphens need no escape. No fixture or timeout changes."
+}

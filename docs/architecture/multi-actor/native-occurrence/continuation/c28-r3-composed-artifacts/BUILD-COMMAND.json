@@ -1,0 +1,20 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-composed-artifacts/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "run-many",
+    "-t",
+    "build",
+    "--projects=kernel,angular,react,vue,solid",
+    "--parallel=1",
+    "--skip-nx-cache",
+    "--output-style=stream",
+    "--nxBail"
+  ],
+  "node": "24.15.0",
+  "pnpm": "10.17.0",
+  "noOutputWatchdogSeconds": 180,
+  "manifestSha256": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd"
+}

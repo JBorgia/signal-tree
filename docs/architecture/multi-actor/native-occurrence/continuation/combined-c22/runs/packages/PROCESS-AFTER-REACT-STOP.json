@@ -1,0 +1,58 @@
+[
+  {
+    "process": [
+      "141",
+      "99988",
+      "99988",
+      "04:59",
+      "0.0",
+      "42096",
+      "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+    ]
+  },
+  {
+    "process": [
+      "143",
+      "141",
+      "99988",
+      "04:59",
+      "0.0",
+      "56240",
+      "node ./node_modules/.bin/../nx/dist/bin/nx.js run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+    ]
+  },
+  {
+    "process": [
+      "2756",
+      "143",
+      "2756",
+      "01:08",
+      "0.0",
+      "57968",
+      "node /private/tmp/st-native-combined-c22/candidate/node_modules/.bin/../rollup/dist/bin/rollup -c rollup.config.cjs"
+    ],
+    "cwd": "p2756\nfcwd\nn/private/tmp/st-native-combined-c22/candidate/packages/angular\n"
+  },
+  {
+    "process": [
+      "2768",
+      "2756",
+      "2756",
+      "01:04",
+      "0.0",
+      "11776",
+      "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+    ]
+  },
+  {
+    "process": [
+      "99988",
+      "13484",
+      "99988",
+      "05:07",
+      "0.0",
+      "11632",
+      "/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python /private/tmp/st-native-combined-c22/run.py packages corepack pnpm nx run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+    ]
+  }
+]

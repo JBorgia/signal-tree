@@ -1,0 +1,51 @@
+[
+  {
+    "pid": 48311,
+    "ppid": 48293,
+    "rssBytes": 999424,
+    "birth": "Tue Nov 3 11:09:06 2026",
+    "command": "node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48314,
+    "ppid": 48311,
+    "rssBytes": 56754176,
+    "birth": "Tue Nov 3 11:09:06 2026",
+    "command": "node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48447,
+    "ppid": 48430,
+    "rssBytes": 35569664,
+    "birth": "Tue Nov 3 11:09:11 2026",
+    "command": "node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config vitest.config.ts src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48430,
+    "ppid": 48314,
+    "rssBytes": 48168960,
+    "birth": "Tue Nov 3 11:09:11 2026",
+    "command": "node tools/run-core-vitest.mjs src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48456,
+    "ppid": 48447,
+    "rssBytes": 88752128,
+    "birth": "Tue Nov 3 11:09:11 2026",
+    "command": "node /private/tmp/st-large-qualification/screen-candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-large-qualification/reporter.mjs"
+  },
+  {
+    "pid": 48466,
+    "ppid": 48456,
+    "rssBytes": 19333120,
+    "birth": "Tue Nov 3 11:09:12 2026",
+    "command": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+  },
+  {
+    "pid": 48467,
+    "ppid": 48456,
+    "rssBytes": 72122368,
+    "birth": "Tue Nov 3 11:09:12 2026",
+    "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+  }
+]

@@ -1,0 +1,141 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
+@@ -0,0 +1,52 @@
++import { appendFileSync } from 'node:fs';
++import { getEntityPublicationBinding } from '../entity-publication';
++import { expect, it } from 'vitest';
++import { entityMap, restoration, signalTree, undoable } from '../../../index';
++import { getMutationCaptureRuntime } from '../mutation-capture-runtime';
++
++const drain = async () => { for (let i = 0; i < 32; i++) await Promise.resolve(); };
++it('private source completion sees the complete selected mixed inverse before authoring newer truth', async () => {
++  const tree = signalTree({
++    left: entityMap<{ id: string; n: number }, string>(),
++    right: entityMap<{ id: string; n: number }, string>(),
++  }, { enhancers: [restoration()] });
++  let releaseCapture: (() => void) | undefined;
++  let releaseListener: (() => void) | undefined;
++  try {
++    tree.$.left.addOne({ id: 'a', n: 1 });
++    tree.$.right.setAll([{ id: 'a', n: 11 }, { id: 'b', n: 12 }]);
++    await drain();
++    undoable(() => {
++      tree.$.left.removeOne('a');
++      tree.$.right.byIdOrFail('a').n(50);
++      tree.$.right.byIdOrFail('b').n(60);
++    });
++    await drain();
++    expect(tree.$.left.ids()).toEqual([]);
++    expect(tree.$.right.all()).toEqual([{ id: 'a', n: 50 }, { id: 'b', n: 60 }]);
++    const runtime = getMutationCaptureRuntime(tree.$.left);
++    if (!runtime?.subscribeCommittedEntity) throw new Error('Existing capture seam unavailable');
++    releaseCapture = runtime.activateCapture();
++    let armed = true;
++    const observed: unknown[] = [];
++    releaseListener = getEntityPublicationBinding(tree.$.left)!.source.subscribe({ prepare(){return {record:{writes:[],adds:[]},completion:{}};}, complete(){
++      if (!armed) return;
++      armed = false;
++      observed.push({ left: tree.$.left.all(), right: tree.$.right.all() });
++      appendFileSync('/private/tmp/st-rich-unit-successor/observations/completion.jsonl',JSON.stringify({observed,stack:new Error().stack})+'\n');
++      tree.$.right.byIdOrFail('a').n(777);
++    }});
++    tree.undo();
++    await drain();
++    expect(armed).toBe(false);
++    expect(observed).toEqual([{
++      left: [{ id: 'a', n: 1 }],
++      right: [{ id: 'a', n: 11 }, { id: 'b', n: 12 }],
++    }]);
++    expect(tree.$.right.all()).toEqual([{ id: 'a', n: 777 }, { id: 'b', n: 12 }]);
++  } finally {
++    releaseListener?.();
++    releaseCapture?.();
++    tree.destroy();
++  }
++});
+--- a/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
+@@ -0,0 +1,18 @@
++import { it, expect } from 'vitest';
++import { appendFileSync } from 'node:fs';
++import { entityMap, signalTree, restoration, undoable } from '../index';
++const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
++it('public retained getter does not observe a partial two-collection inverse',async()=>{
++ type Row={id:string;value:number;opaque:()=>void};
++ const t=signalTree({left:entityMap<Row,string>(),right:entityMap<Row,string>()},{enhancers:[restoration()]});
++ let armed=false;const reads:unknown[]=[];let partial=false;
++ const row=(id:string):Row=>({id,get value(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){partial=true;reads.push({id,left,right,stack:new Error().stack});}}return 1;},opaque:()=>{}});
++ try{
++ t.$.left.addOne(row('a'));t.$.right.addOne(row('b'));await drain();
++ undoable(()=>{t.$.left.removeOne('a');t.$.right.removeOne('b');});await drain();
++ expect(t.$.left.ids()).toEqual([]);expect(t.$.right.ids()).toEqual([]);
++ armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;await drain();
++ appendFileSync('/private/tmp/st-rich-unit-successor/observations/getter.jsonl',JSON.stringify({partial,reads,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
++ expect(error).toBeUndefined();expect(partial).toBe(false);
++ }finally{armed=false;t.destroy();}
++});
+--- a/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
+@@ -0,0 +1,17 @@
++import { it, expect } from 'vitest';
++import { appendFileSync } from 'node:fs';
++import { entityMap, signalTree, restoration, undoable } from '../index';
++import { getEntityPublicationBinding } from './internals/entity-publication';
++const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
++it('private source preparation cannot expose a partially installed mixed inverse',async()=>{
++ const t=signalTree({left:entityMap<{id:string},string>(),right:entityMap<{id:string},string>()},{enhancers:[restoration()]});
++ let armed=false;const seen:unknown[]=[];const release:Array<()=>void>=[];
++ try{
++ t.$.left.addOne({id:'a'});t.$.right.addOne({id:'b'});await drain();
++ undoable(()=>{t.$.left.removeOne('a');t.$.right.removeOne('b');});await drain();
++ for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if((left.length===0)!==(right.length===0)){seen.push({left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){}}));
++ armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;
++ appendFileSync('/private/tmp/st-rich-unit-successor/observations/participant.jsonl',JSON.stringify({seen,error,left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
++ expect(seen).toEqual([]);
++ }finally{armed=false;for(const off of release)off();t.destroy();}
++});
+--- a/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
++++ b/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
+@@ -0,0 +1,17 @@
++import { it, expect } from 'vitest';
++import { appendFileSync } from 'node:fs';
++import { entityMap, signalTree, restoration, undoable } from '../index';
++import { getEntityPublicationBinding } from './internals/entity-publication';
++const drain=async()=>{for(let i=0;i<32;i++)await Promise.resolve();};
++it('private source preparation after scalar installation cannot refuse a partial inverse',async()=>{
++ const t=signalTree({n:0,left:entityMap<{id:string},string>(),right:entityMap<{id:string},string>()},{enhancers:[restoration()]});
++ let armed=false;const seen:unknown[]=[];const release:Array<()=>void>=[];
++ try{
++ t.$.left.addOne({id:'a'});t.$.right.addOne({id:'b'});await drain();
++ undoable(()=>{t.$.n(9);t.$.left.removeOne('a');});await drain();
++ for(const node of [t.$.left,t.$.right])release.push(getEntityPublicationBinding(node)!.source.subscribe({prepare(){if(armed){const left=[...t.$.left.ids()],right=[...t.$.right.ids()];if(t.$.n()===0&&left.length===0){seen.push({n:t.$.n(),left,right,stack:new Error().stack});throw new Error('participant preparation refused');}}return undefined;},complete(){}}));
++ armed=true;let error:unknown;try{t.undo();}catch(e){error=String(e);}armed=false;
++ appendFileSync('/private/tmp/st-rich-unit-successor/observations/preparation-scalar.jsonl',JSON.stringify({seen,error,n:t.$.n(),left:t.$.left.ids(),right:t.$.right.ids()})+'\n');
++ expect(seen).toEqual([]);
++ }finally{armed=false;for(const off of release)off();t.destroy();}
++});
+--- a/packages/kernel/src/lib/rich-unit-source-group.spec.ts
++++ b/packages/kernel/src/lib/rich-unit-source-group.spec.ts
+@@ -0,0 +1,22 @@
++import {it,expect} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {getTreeRealizationPort} from './internals/causal-runtime/tree-realization-adapter';
++import type {ReversalEffect} from './internals/causal-runtime/causal-types';
++import {getOwnedPositionIds} from './internals/owned-mutation';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getMutationCaptureRuntime} from './internals/mutation-capture-runtime';
++it('same-source restores retain proposed anchors, all rows and ordinary membership before observation',()=>{
++ const t=signalTree({rows:entityMap<{id:number;n:number},number>()},{enhancers:[transactions()]});let off=()=>{};let release=()=>{};
++ try{
++ t.$.rows.addOne({id:1,n:11});t.$.rows.addOne({id:2,n:12});
++ const a=getEntityPublicationBinding(t.$.rows.byIdOrFail(1))!.subject!,b=getEntityPublicationBinding(t.$.rows.byIdOrFail(2))!.subject!;
++ const owner=getOwnedPositionIds(t.$.rows)![0],p=getTreeRealizationPort(t.$)!;
++ t.transact(()=>{t.$.rows.removeOne(1);t.$.rows.removeOne(2);});
++ const effects:ReversalEffect[]=[{owner,subjectId:a,structural:'add',before:undefined,after:1,structuralContext:{kind:'remove',subject:a,key:1,value:{id:1,n:11},afterSubject:b}},{owner,subjectId:b,structural:'add',before:undefined,after:2,structuralContext:{kind:'remove',subject:b,key:2,value:{id:2,n:12},beforeSubject:a}}];
++ const rt=getMutationCaptureRuntime(t.$.rows)!;release=rt.activateCapture();const seen:unknown[]=[];off=rt.subscribeCommittedEntity!(()=>seen.push(t.$.rows.all()));
++ const prepared=p.prepareOrdinaryEffects!(effects);expect(p.validateEffects(prepared)).toBeUndefined();p.applyAtomically(prepared);
++ expect(t.$.rows.all()).toEqual([{id:1,n:11},{id:2,n:12}]);expect(seen.length).toBeGreaterThan(0);for(const value of seen)expect(value).toEqual([{id:1,n:11},{id:2,n:12}]);
++ const validate=(t.$.rows as unknown as {__validateOrdinaryStructure(e:readonly ReversalEffect[]):boolean}).__validateOrdinaryStructure;
++ expect(validate([{owner,subjectId:a,structural:'remove',before:1,after:undefined},{owner,subjectId:b,structural:'remove',before:2,after:undefined}])).toBe(true);
++ }finally{off();release();t.destroy();}
++});

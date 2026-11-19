@@ -1,0 +1,20 @@
+{
+  "argv": [
+    "python3",
+    "/private/tmp/st-native-combined-c11/run-gate.py",
+    "retention-hold-value-caught",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "forwarding-retention-probe",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "NODE_OPTIONS": "--expose-gc",
+    "ST_GC_ARM": "hold-value",
+    "ST_GC_SCENARIO": "caught",
+    "ST_GC_OUTPUT": "/private/tmp/st-c11-forwarding-retention/hold-value-caught.json"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "manifest": "9f14f5a476482cca596528aaed18cbf6be17122f73261e0fa047be40b641e94c",
+  "entries": 3066,
+  "changes": {
+    "packages/kernel/src/lib/recipient-window-review.spec.ts": {
+      "C19": "a6196ef6b47bf7a167e17e60e2d1ad19feb132afafd6575999e85f4356ed7361",
+      "C20": "f933ed3a4e9b401b08925966648c9a6316444b402d4b78ff5f45c8ae52e3b86d"
+    },
+    "packages/kernel/src/lib/occurrence-successor.spec.ts": {
+      "C19": "dcda43411b62f894d7b0402801a2ecedaafeeb23d431af46538d98e8663e4462",
+      "C20": "4938fe5f5c3e6f987cafb2f67982ae3f0745038678557f6b81765000a185548a"
+    },
+    "packages/kernel/src/lib/recipient-positive-counterparts.spec.ts": {
+      "C19": null,
+      "C20": "af371d339dd11a4a60a53a1ad1eff583f899cece5d9465d4c6f9f46def3c7e29"
+    }
+  },
+  "archivalLoops": 3,
+  "archivalExpandedCases": 12,
+  "retainedOriginalCases": 13
+}

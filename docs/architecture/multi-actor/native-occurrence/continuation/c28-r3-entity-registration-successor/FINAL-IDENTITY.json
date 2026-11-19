@@ -1,0 +1,14 @@
+{
+  "manifestSha256": "b0e09d16858ce67143ed08b3b2d159831ab96ddcb1d989a1d50d5ce880d04b2d",
+  "runtimePatchSha256": "2daa5b09c2b98e817b270522ec798705fdba91b3e7289a02cd7fc43ce128f6b1",
+  "sourceUnchanged": true,
+  "artifactsUnchanged": true,
+  "original8CasesSha256": "6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71",
+  "original8CasesUnchanged": true,
+  "controls": {
+    "lifecycle.mjs": "e9528a1b3d53c4d14cba76a468227eafe77ad04a31c379e466e0ba3a41f3ee8b",
+    "cases.mjs": "6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71",
+    "no-link.mjs": "45164b36d733020355e3e568fe24ca1790a50a12dd55607e3ada817f42ade0a7",
+    "consumer.mjs": "a004e0d462a1ad66a101ce8831a91c94310e62d898a0e2729449a3c644bbd686"
+  }
+}

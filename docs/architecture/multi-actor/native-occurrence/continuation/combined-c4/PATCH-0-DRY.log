@@ -1,0 +1,3 @@
+patching file 'packages/kernel/src/lib/experimental-publication/entity.ts'
+patching file 'packages/kernel/src/lib/experimental-publication/lifecycle.ts'
+patching file 'packages/kernel/src/lib/internals/entity-publication.ts'

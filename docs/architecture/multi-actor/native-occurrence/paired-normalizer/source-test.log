@@ -1,0 +1,77 @@
+✔ rebind inverse retains a certified absent endpoint, distinct from present undefined (0.669709ms)
+✔ join preserves certified absence support while emitting own present undefined (0.154417ms)
+✔ same segment keeps first baseline and latest after selection; inverse restores q as D (1.506375ms)
+✔ distinct segments cannot capture-compose; compensation keeps both field effects (0.151375ms)
+✔ equal no-effect retains selection; declaration cannot discard destination obligation (0.058ms)
+✔ omitted superseded effect produces no inverse selection (0.055333ms)
+✔ continuous selected occupancy transfers first endpoint across segments (0.096291ms)
+✔ discontinuous structural endpoints remain separate; no omitted bridge invented (0.050375ms)
+✔ remove/add cancellation retains synthetic field baseline and latest authored selection (0.215542ms)
+✔ ordinary add lowers to physical rekey without substituting ordinary support (0.106208ms)
+✔ history references survive supersession/held output and release exactly (0.096083ms)
+✔ join staged order, mixed fields, and exclusion support; never adopt extra source row (0.388333ms)
+✔ same-value changed support is selected only with staged permission; peer stays peer (0.198208ms)
+✔ hidden/restored old lifetime may retain peer; same key new lifetime cannot alias it (0.249708ms)
+✔ held exact completion rejects changed source frontier; immutable captured map still renders (0.098042ms)
+✔ rebind equal native field values do not invent synthetic ownership from different support (0.050709ms)
+✔ q7 -> r11 -> r7 normalizes away: retain native q selection, rejectr has no inverse (0.171333ms)
+✔ q7 -> r11 -> r13 retains admitted endpoint then selected inverse restores q (0.051625ms)
+✔ selective omitted field keeps later confirmed selection; another selected slot may restore (0.044375ms)
+✔ observed later-confirmed refusal preserves all field support without an inverse (0.04625ms)
+✔ delimiter collision in occurrence/dimension retains distinct values and support (0.805375ms)
+✔ opaque same-string occurrence tokens and numeric/string identities cannot alias (0.070708ms)
+✔ rebind field tokens preserve tuple boundaries and canonicalize only exact identity (0.1875ms)
+✔ render __proto__ as own enumerable data without changing prototype (0.111625ms)
+✔ absent own rebind field does not read inherited getter (0.069792ms)
+✔ normalizer produces q retained selection from captured baseline, not supplied retained q (0.51575ms)
+✔ x5 omit/readd g y13 transforms before and final after payload/support together (1.062417ms)
+✔ before rewrite excludes entity subjects and does not create absent intermediate branch (0.098292ms)
+✔ final frontier includes coalesced descendant absent from effects; stale capture refuses (0.843083ms)
+✔ paired deletion keeps certified absence while own undefined remains present (0.074167ms)
+✔ rebind absence is derived from exact row-domain requirement and renders no property (0.248625ms)
+✔ absent-both member stays only while a descendant effect survives initial filter (0.074958ms)
+✖ paired normalizer matches actual frozen source for member rewrite and scalar netzero (1.884584ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 32
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 153.378917
+
+✖ failing tests:
+
+test at ../../../../private/tmp/st-native-paired-normalizer/source-oracle.test.mjs:11:1
+✖ paired normalizer matches actual frozen source for member rewrite and scalar netzero (1.884584ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      {
+        after: 5,
+        before: 0,
+        position: 1
+  ...
+        before: {
+  +       x: 5,
+  -       x: 0,
+          y: 0
+        },
+        position: 2
+      },
+      {
+  
+      at TestContext.<anonymous> (file:///private/tmp/st-native-paired-normalizer/source-oracle.test.mjs:22:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.start (node:internal/test_runner/test:1096:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ { position: 1, before: 0, after: 5 }, { position: 2, before: [Object] }, { position: 3, before: 0, after: 13 } ],
+    expected: [ { position: 1, before: 0, after: 5 }, { position: 2, before: [Object] }, { position: 3, before: 0, after: 13 } ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

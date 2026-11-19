@@ -1,0 +1,23 @@
+{
+  "cwd": "/private/tmp/st-c28-r3-disposition-index-review/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "src/lib/disposition-index-independent.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-disposition-index-review/controls-first/tmp",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-disposition-index-review/controls-first/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-disposition-index-review/controls-first/data",
+    "ST_RESTORATION_WORK": "/private/tmp/st-c28-r3-disposition-index-review/controls-first/counts.jsonl"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "commit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "tree": "10e6be502fda139bb16ab7a72c426efc86ce8888",
+  "archiveSha256": "f68758a1fda1ccb3198098f97d1f0c4b254ce2def039c602d291b2deb72595ad",
+  "archiveFileCount": 2517,
+  "changedArchiveFiles": [
+    "packages/kernel/src/lib/entity-signal.ts"
+  ]
+}

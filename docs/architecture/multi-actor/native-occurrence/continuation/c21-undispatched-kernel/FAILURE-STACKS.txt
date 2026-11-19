@@ -1,0 +1,197 @@
+
+ FAIL  src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts > v16 restoration of turns larger than the argument limit > jumps across a turn that cleared more rows than the argument limit
+AssertionError: expected 390001 to be less than or equal to 390000
+ ❯ src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts:63:50
+     61|         tree.jumpTo(0);
+     62|         expect(stats.valueStoreWrites).toBe(LARGE);
+     63|         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(3…
+       |                                                  ^
+     64|         const ids = tree.$.rows.ids();
+     65|         expect(ids.length).toBe(LARGE);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/17]⎯
+
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment before-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment during-pending
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/aggregate-independent-input.spec.ts:32:21
+     30|   expect(sent[0]).toMatchObject({x:1,y:0});
+     31|   expect(receipt?.read()).toMatchObject({state:'started'});
+     32|   expect(otherSent).toEqual([]);
+       |                     ^
+     33|   expect(p.inspect()).toEqual(before);
+     34|   expect(owner.$.z()).toBe(7);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/17]⎯
+
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment before-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment during-pending
+AssertionError: expected [ { pair: { x: +0, y: +0 }, …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "pair": {
++       "x": 0,
++       "y": 0,
++     },
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/aggregate-independent-input.spec.ts:32:21
+     30|   expect(sent[0]).toMatchObject({x:1,y:0});
+     31|   expect(receipt?.read()).toMatchObject({state:'started'});
+     32|   expect(otherSent).toEqual([]);
+       |                     ^
+     33|   expect(p.inspect()).toEqual(before);
+     34|   expect(owner.$.z()).toBe(7);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/17]⎯
+
+ FAIL  src/lib/held-continuation-probe.spec.ts > sample held selected continuation after completed rollback and destroy
+AssertionError: expected 'undefined' to be 'function' // Object.is equality
+
+Expected: "function"
+Received: "undefined"
+
+ ❯ src/lib/held-continuation-probe.spec.ts:27:31
+     25| async function sample(refs:Record<string,WeakRef<object>>){const round…
+     26| it('sample held selected continuation after completed rollback and des…
+     27|  expect(typeof globalThis.gc).toBe('function');const mode=process.env[…
+       |                               ^
+     28|  const {box,refs}=await setup(mode);
+     29|  const held=await sample(refs);let staleError:string|undefined;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/17]⎯
+
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; retry, writes=xy
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; confirm, writes=xy
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; retry, writes=yx
+ FAIL  src/lib/public-selected-unit.spec.ts > public onUpdate refuses x inverse after y; confirm, writes=yx
+Error: unique evidence output directory required
+ ❯ src/lib/public-selected-unit.spec.ts:21:82
+     19|   const describe=(e:unknown)=>e instanceof Error?{name:e.name,message:…
+     20|   const result={order,followup,before,calls,afterFailure,afterFollowup…
+     21|   const directory=process.env['ST_PUBLIC_DIAGNOSTIC_OUTPUT'];if(!direc…
+       |                                                                                  ^
+     22|   writeFileSync(`${directory}/${order}-${followup}.json`,JSON.stringif…
+     23|   expect(firstError).toBeDefined();expect(calls.some(c=>c.changes.x===…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/17]⎯
+
+ FAIL  src/lib/recipient-cause-classification.spec.ts > domain-only: distinct fixed-window treatment and useful confirm
+ FAIL  src/lib/recipient-cause-classification.spec.ts > domain-only: distinct fixed-window treatment and useful rollback
+AssertionError: expected [ { x: 1, y: +0 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 1,
++     "y": 0,
++   },
++ ]
+
+ ❯ src/lib/recipient-cause-classification.spec.ts:18:111
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/17]⎯
+
+ FAIL  src/lib/restoration-paired-work.spec.ts > paired restoration installs 3 physical rows once
+AssertionError: expected 37 to be less than or equal to 36
+ ❯ src/lib/restoration-paired-work.spec.ts:36:50
+     34|         tree.jumpTo(1);
+     35|         expect(stats.structuralSubjectTombstones).toBe(count);
+     36|         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(1…
+       |                                                  ^
+     37|         expect(tree.$.rows.all()).toEqual([]);
+     38|       } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/17]⎯
+
+ FAIL  src/lib/restoration-paired-work.spec.ts > paired restoration installs 32 physical rows once
+AssertionError: expected 385 to be less than or equal to 384
+ ❯ src/lib/restoration-paired-work.spec.ts:36:50
+     34|         tree.jumpTo(1);
+     35|         expect(stats.structuralSubjectTombstones).toBe(count);
+     36|         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(1…
+       |                                                  ^
+     37|         expect(tree.$.rows.all()).toEqual([]);
+     38|       } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/17]⎯
+
+ FAIL  src/lib/restoration-paired-work.spec.ts > paired restoration installs 256 physical rows once
+AssertionError: expected 3073 to be less than or equal to 3072
+ ❯ src/lib/restoration-paired-work.spec.ts:36:50
+     34|         tree.jumpTo(1);
+     35|         expect(stats.structuralSubjectTombstones).toBe(count);
+     36|         expect(stats.publicationDependencyReads).toBeLessThanOrEqual(1…
+       |                                                  ^
+     37|         expect(tree.$.rows.all()).toEqual([]);
+     38|       } finally {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/17]⎯
+
+ FAIL  src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts > attempts later live lifetime invalidation after first installed row invalidation fails
+AssertionError: expected a thrown error to be Error: controlled installed lifetime inva…
+
+- Expected
++ Received
+
+  Error {
+-   "message": "controlled installed lifetime invalidation",
++   "message": "Entity publication source changed before installation",
+  }
+
+ ❯ src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts:17:29
+     15|    return {...plan,invalidate(){attempts.push(values[0]!.subjectId);pl…
+     16|   });
+     17|   try {expect(()=>t.undo()).toThrow(sentinel);}finally{spy.mockRestore…
+       |                             ^
+     18|   expect(t.$.left.ids()).toEqual(['a']);
+     19|   expect(t.$.right.all()).toEqual([{id:'a',n:11},{id:'b',n:12}]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/17]⎯
+
+ FAIL  src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts > attempts mixed installed invalidation and delivery while preserving the first failure
+AssertionError: expected Error: Entity publication source changed … to be Error: first installed invalidation // Object.is equality
+
+- Expected
++ Received
+
+  Error {
+-   "message": "first installed invalidation",
++   "message": "Entity publication source changed before installation",
+  }
+
+ ❯ src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts:50:22
+     48|       let thrown: unknown;
+     49|       try { tree.undo(); } catch (error) { thrown = error; }
+     50|       expect(thrown).toBe(first);
+       |                      ^
+     51|       expect(new Set(attempts).size).toBe(2);
+     52|       expect(scalar).toHaveBeenCalledTimes(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/17]⎯
+
+

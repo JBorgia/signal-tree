@@ -1,0 +1,9 @@
+{
+  "exit": 1,
+  "timeout": false,
+  "changedManifestFiles": [],
+  "overlayUnchanged": {
+    "packages/kernel/src/lib/direct-row-declaration-qualification.spec.ts": true,
+    "packages/kernel/src/lib/entity-declaration-useful-lifecycle.spec.ts": true
+  }
+}

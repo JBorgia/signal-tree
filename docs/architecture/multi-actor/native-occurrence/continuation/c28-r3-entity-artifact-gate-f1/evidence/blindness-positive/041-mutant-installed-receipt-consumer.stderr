@@ -1,0 +1,10 @@
+file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-2oKvj7/mutant/receipt-cases.ts:6
+const check = (value         , message        ) => { if (!value) throw new Error(message); };
+                                                                       ^
+
+Error: changed write must not return no-write
+    at check (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-2oKvj7/mutant/receipt-cases.ts:6:72)
+    at runReceiptCase (file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-2oKvj7/mutant/receipt-cases.ts:32:5)
+    at async file:///private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-2oKvj7/mutant/receipt-consumer.mjs:3:33
+
+Node.js v24.15.0

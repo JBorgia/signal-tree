@@ -1,0 +1,111 @@
+{
+  "completed": [
+    {
+      "id": "kernel-batch-01",
+      "exit": 0,
+      "files": 100,
+      "tests": 2115,
+      "passed": 2115,
+      "failed": 0,
+      "pending": 0,
+      "failures": [],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-01/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-01.json"
+    },
+    {
+      "id": "kernel-batch-02",
+      "exit": 0,
+      "files": 100,
+      "tests": 1156,
+      "passed": 1147,
+      "failed": 0,
+      "pending": 9,
+      "failures": [],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-02/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-02.json"
+    },
+    {
+      "id": "kernel-batch-03",
+      "exit": 1,
+      "files": 100,
+      "tests": 922,
+      "passed": 921,
+      "failed": 1,
+      "pending": 0,
+      "failures": [
+        {
+          "file": "/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+          "status": "failed",
+          "message": "",
+          "assertions": [
+            {
+              "ancestorTitles": [
+                "entityMap \u2014 collection queries are lazily derived (13.5.0)"
+              ],
+              "fullName": "entityMap \u2014 collection queries are lazily derived (13.5.0) a single-entity update does not rebuild the collection",
+              "status": "failed",
+              "title": "a single-entity update does not rebuild the collection",
+              "duration": 702.760125,
+              "failureMessages": [
+                "AssertionError: expected 13000 to be less than 2000\n    at /private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts:215:19\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+              ],
+              "meta": {},
+              "tags": []
+            }
+          ]
+        }
+      ],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-03/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-03.json"
+    },
+    {
+      "id": "kernel-batch-04",
+      "exit": 0,
+      "files": 100,
+      "tests": 828,
+      "passed": 826,
+      "failed": 0,
+      "pending": 2,
+      "failures": [],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-04/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-04.json"
+    },
+    {
+      "id": "kernel-batch-05",
+      "exit": 0,
+      "files": 100,
+      "tests": 921,
+      "passed": 921,
+      "failed": 0,
+      "pending": 0,
+      "failures": [],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-05/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-05.json"
+    },
+    {
+      "id": "kernel-batch-06",
+      "exit": 0,
+      "files": 100,
+      "tests": 873,
+      "passed": 872,
+      "failed": 0,
+      "pending": 1,
+      "failures": [],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-06/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-06.json"
+    },
+    {
+      "id": "kernel-batch-07",
+      "exit": 0,
+      "files": 36,
+      "tests": 288,
+      "passed": 288,
+      "failed": 0,
+      "pending": 0,
+      "failures": [],
+      "receipt": "/private/tmp/st-v16-lint-corrected-qualification/runs/kernel-batch-07/RESULT.json",
+      "report": "/private/tmp/st-v16-lint-corrected-qualification/batch-results/kernel-batch-07.json"
+    }
+  ],
+  "stop": null
+}

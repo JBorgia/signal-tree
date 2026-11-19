@@ -1,0 +1,8 @@
+{
+  "approved-current-obligation.spec.ts": "b74ab938c968cd284a27b6c3ce54a16c27ecb6f897d2ec30a820fe619189e0e3",
+  "current-cutoff-r2.spec.ts": "f4677fb8ae50599745354f6a10e946bc662929a78362c8f6ed1fd67ff21d18e7",
+  "current-validation.spec.ts": "6eecbae00083bbb22a5e85463474bb37d11f3fa1464dc71afb5124ab73131071",
+  "cached-current-input.spec.ts": "bc58ba744daf67402549b409861d698974445c5afa2a0a2f0c7869e22d27c03e",
+  "opaque-current-input.spec.ts": "ca7c1a869cd6a6b21336299101d1a619cfa879997d690bc514f110aebe585846",
+  "scalar-horizon-lifecycle-controls.spec.ts": "fc0f5d3503b3dbc97825b3372eb9d52c42f41b6032dc3a330803aaff03c16b51"
+}

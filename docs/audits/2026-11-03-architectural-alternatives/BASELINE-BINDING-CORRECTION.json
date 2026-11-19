@@ -1,0 +1,37 @@
+{
+  "originalBindingsSha256": "fdf60d0e2ae6e22b3882e34fb01d1d6befedcaa45103c61560cee76dd7f57977",
+  "originalPreregistrationSha256": "d867dcba7f97c18703261858ced2faef642c6f2dc3fc22c12ff95c4fbaae304b",
+  "reason": "Independent review found buildReceipts copied from previous prototype comparison; retained describes v16 rather than publishedv15 and selected describes singletonprototype rather than frozenselected. Those stale links do not describe these arms.",
+  "originalRecordsPreservedUnmodified": true,
+  "executedArmMappings": "Root/source/artifact manifests,scheduleargv andrawoutputs are correct andguard-verified;defect inmetadatareceiptfield only;no datapointsor registrationsrewritten",
+  "correctedProvenance": {
+    "retained": {
+      "kind": "published npm artifact;no local build claimed",
+      "version": "15.4.4",
+      "tarballURL": "https://registry.npmjs.org/@signal-tree/kernel/-/kernel-15.4.4.tgz",
+      "tarballSha256": "3178f30b75d45b820161db400b567740a4a2dd066c85b790e4383dcfc7d14197",
+      "registryIntegrity": "sha512-IfD1tc3KsbnWTIB6eUGt/KYlTJSRUUtWKqnqrzeaQuMisxJ/D4EXkSUz25Ll8XHdA+5Mp9P2JOWoiOgL9cge3A==",
+      "registrySha512AndSha1Verified": true,
+      "registryMetadataSha256": "78addf87f0324ff540e8cdce990fa9534daeeed27010c57c39abded447877739",
+      "artifactManifestSha256": "d64aba164767dd6d687ef0a40e46135c67d0c6d02d6d606d5a2381453f754140",
+      "files": 109
+    },
+    "selected": {
+      "kind": "frozen v16 build,not singletonprototype",
+      "sourceCommit": "3eabc01ddab71f16b8def0172c43c344bfd08731",
+      "runtimeCommit": "fe18a8e1c1f3da42727341d6c6fa30a407c1461e",
+      "correctBuildReceipt": {
+        "command": "/private/tmp/st-v16-improvement/runs/corrected-five-build/COMMAND.json",
+        "result": "/private/tmp/st-v16-improvement/runs/corrected-five-build/RESULT.json",
+        "commandSha256": "39ab7296f0367c11d36689020a608b404a50b61c74411ae6025dc4b2eaafd48a",
+        "resultSha256": "803fee71682352cbe2e837d3106f47972a53a955bc129f80aaca4a0a1ff27fd0"
+      },
+      "priorFrozenArtifactMap": "/private/tmp/st-v16-runtime-attribution/cost/RETAINED-ARTIFACTS.json",
+      "priorFrozenArtifactMapSha256": "2e51f09fcc2d96f8a0a8221f11b85ace04927daaa85b3978df4385f2151f9a24",
+      "artifactManifestSha256": "2e51f09fcc2d96f8a0a8221f11b85ace04927daaa85b3978df4385f2151f9a24",
+      "all193ArtifactsMatchPriorFrozenMap": true
+    }
+  },
+  "bothArtifactMapsReverifiedAfterCampaign": true,
+  "noCostRetry": true
+}

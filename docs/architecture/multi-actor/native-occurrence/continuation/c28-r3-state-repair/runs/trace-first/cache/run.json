@@ -1,0 +1,21 @@
+{
+  "run": {
+    "command": "nx test kernel src/enhancers/transactions/transaction-safety.spec.ts src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts --testNamePattern=retains external ABA written inside a failed callback|keeps outer transaction authorship active across an inner realization write --skip-nx-cache --maxWorkers=1",
+    "startTime": "2026-11-03T04:30:40.578Z",
+    "endTime": "2026-11-03T04:30:43.172Z",
+    "inner": false
+  },
+  "tasks": [
+    {
+      "taskId": "kernel:test",
+      "target": "test",
+      "projectName": "kernel",
+      "hash": "3040532741088254167",
+      "startTime": "2026-11-03T04:30:40.621Z",
+      "endTime": "2026-11-03T04:30:43.172Z",
+      "params": "",
+      "cacheStatus": "cache-miss",
+      "status": 1
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "checks": {
+    "proof-copy": {
+      "verified": 3047,
+      "mismatches": []
+    },
+    "proof-frozen": {
+      "verified": 3047,
+      "mismatches": []
+    },
+    "c8-copy": {
+      "verified": 3031,
+      "mismatches": []
+    }
+  },
+  "originalPrivateFixturesUnchanged": {
+    "packages/react/src/parent-freshness-counterparts.spec.tsx": "93cf0c47e6fd501b59b05b46271d16543e138d90568a503c9020ebfa78b46a01",
+    "packages/solid/src/lib/parent-freshness-counterparts.spec.ts": "e9e10d77db5f943da1016c2620742d7900d10205d73f86328a4ed9025a9641e9",
+    "packages/vue/src/lib/parent-freshness-counterparts.spec.ts": "2cfd4233f1e221c72ba9ce9647c75e222ded58d277c3fdf7de241665c0697e8a"
+  },
+  "newTestFiles": {
+    "packages/react/src/parent-freshness-counterparts.spec.tsx": "2431b05bc5dfb20caf5dc9fc070e372961fc52d3bb6231172fd1aa26c8e87596",
+    "packages/solid/src/lib/parent-freshness-counterparts.spec.ts": "9be14e49e2849f084e61384034d5919695b2c8c5478204bcc4dd44cee454f126",
+    "packages/vue/src/lib/parent-freshness-counterparts.spec.ts": "8cdac84212260f1dea2964c75b96927b70476248dd62a858a5ab7e762767f073"
+  },
+  "baseManifest": "5cb0b3d5616b3f9d002625270ee4b6793f8ba0388f5d6327ba52fa213d789b7b",
+  "snapshot": "63d2575dab20752831cfc7cae6323ea9853fa1cd78ce159e298dbeeb62dcf7ab",
+  "testPatch": "98bffa22332ec788189d0b76287a772bfe759c1d887942dc155afdbd542100f5",
+  "oracleCorrection": "ab33a2247f71e93d49c2f1931e46a78569fef71feb308aaf2d9faee2d12faf27"
+}

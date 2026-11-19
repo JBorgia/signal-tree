@@ -1,0 +1,98 @@
+{
+  "method": "actual validator extracted by TypeScript AST and evaluated in isolated VM; no gate campaign",
+  "outcomes": [
+    {
+      "name": "current exact witness + exit42",
+      "accepted": true
+    },
+    {
+      "name": "stale token under a new invocation",
+      "accepted": false
+    },
+    {
+      "name": "missing expected token",
+      "accepted": false
+    },
+    {
+      "name": "witness with exit1",
+      "accepted": false
+    },
+    {
+      "name": "witness with exit0",
+      "accepted": false
+    },
+    {
+      "name": "no witness with exit42",
+      "accepted": false
+    },
+    {
+      "name": "setup error exit1",
+      "accepted": false
+    },
+    {
+      "name": "duplicate witness",
+      "accepted": false
+    },
+    {
+      "name": "truncated JSON",
+      "accepted": false
+    },
+    {
+      "name": "missing kind",
+      "accepted": false
+    },
+    {
+      "name": "missing token",
+      "accepted": false
+    },
+    {
+      "name": "missing baseline",
+      "accepted": false
+    },
+    {
+      "name": "missing mutant",
+      "accepted": false
+    },
+    {
+      "name": "missing controls",
+      "accepted": false
+    },
+    {
+      "name": "missing recovery",
+      "accepted": false
+    },
+    {
+      "name": "missing inputs",
+      "accepted": false
+    },
+    {
+      "name": "wrong kind",
+      "accepted": false
+    },
+    {
+      "name": "wrong baseline",
+      "accepted": false
+    },
+    {
+      "name": "wrong mutant",
+      "accepted": false
+    },
+    {
+      "name": "wrong controls",
+      "accepted": false
+    },
+    {
+      "name": "wrong recovery",
+      "accepted": false
+    },
+    {
+      "name": "wrong inputs",
+      "accepted": false
+    },
+    {
+      "name": "extra field",
+      "accepted": false
+    }
+  ],
+  "mutantToolHashMatches": true
+}

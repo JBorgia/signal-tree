@@ -1,0 +1,41 @@
+# Frozen native partial-install discriminator
+
+No runtime changes. Diagnostic candidate: /private/tmp/st-native-partial-install-diagnostic/candidate, copied from /private/tmp/st-native-explicit-handoff-successor/candidate. Frozen source manifest SHA256 057c6b8f4933eca5dbb3c0c31c069612264998b66e71c9e49ddd1a933edddad3. All 2926 predecessor files verified before copy and again after execution. Only the diagnostic spec was added.
+
+## Decisive observations
+
+Transaction writes x7 then y11, starting from x0/y0. Two ordinary selected inverse effects run through the actual perEffect projection setter route, in order y then x. Registered location interceptors prove that route; no port replacement, planner alteration, forged effect or runtime instrumentation was used. Source excludes both frames for these effects: no structural effect makes planHeterogeneousFrame return undefined (adapter:941), and subjectFieldSegments makes planScalarFrame return undefined (1585). applyAtomically:620 then calls applyEffect.
+
+1. **First installed, second refuses before install.** The y interceptor proceeds and returns. At the x interceptor: x7 retains exact authored requirement, y0 has exact baseline requirement, pending count1. x throws before proceed. After rollback throws the identical sentinel: x7/authored remains, y0/baseline remains, pending count0. x's retained destination now has outcome rolled-back. Removing interceptors and retrying rollback does nothing: x7/y0, pending0, same requirements. This is partial installation followed by terminal rejection on the frozen predecessor, NOT 'nothing installed' and NOT an accepted policy for the successor.
+
+2. **All installed, intrinsic observer throws.** y proceeds, x proceeds; x intrinsic observer throws after both values/support are baseline. This observer boundary contains the error: rollback returns without throwing, pending0, retry no-op. This is an exercised final observer failure, not proof of the transaction catch branch.
+
+3. **All installed, final registered interceptor throws.** y and x both install baseline value/support; x interceptor throws after proceed returns. Identical sentinel propagates, pending0, retry no-op. This is the propagating installed-then-error control.
+
+4. **Mixed normal live scalar + selected entity field.** Plain scalar3 and entity x7 both restore0, entity requirement is baseline, pending0; registered entity projection interceptor is never called. This concrete mixed workload uses preparePointRealization, not perEffect. It does NOT establish impossibility for all mixed inputs. Source reason: transactions:3810–3856 selects the point attempt for mixed subject/no-subject effects; adapter:795–882 can resolve this live top-level field and scalar slot and returns a prepared point. Missing handles/deeper paths can decline, so no universal mixed-route exclusion is claimed.
+
+Machine evidence: observations-v2-second-refuses.json, observations-v2-final-observer-throws.json, observations-v2-final-interceptor-throws.json, observations-v2-mixed.json. Each proof is serialized at capture time to avoid mutable owner-cell outcomes changing the earlier observation. Identity booleans use direct requirement identity comparison.
+
+## First evidence preservation and commands
+
+Initial fixture (first-fixture.spec.ts), first-runtime.log:3pass. Successful-test console output is suppressed by this harness. Added file output only in observation-first-fixture.spec.ts / observation-runtime.log:3pass. Those observations files are preserved, but their atSecond proof owner objects were serialized later and reflect later settlement; use only their immediate scalar/identity/pending fields. v2 serializes proof immediately and adds the propagating post-install error control; observation-v2-runtime.log:4pass. No assertion was weakened or flipped; original route/value/support assertions stayed intact. These are diagnostic pass counts, not successor acceptance. The thrown partial-install error and its unchanged terminal behavior are the first behavioral evidence, not a failed expectation chosen from a desired policy.
+
+Command from candidate, Node24.15.0, pinned pnpm via corepack:
+PATH=/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:$PATH NX_DAEMON=false NX_ISOLATE_PLUGINS=false corepack pnpm nx test kernel --skip-nx-cache native-partial-install-diagnostic.spec.ts
+
+node tools/check-spec-types.mjs: exit0, spec-types.log. No baseline update. Historical archived-tsconfig missing-path warnings are preserved; no historical config changed. Every output generation used a distinct filename; frozen observations were not appended/overwritten.
+
+## Source audit: required installation units and callback ordering
+
+- Built-in general adapter: member preparation at 537; value-frame selection at 556; members.install at 608; heterogeneousFrame.commit OR scalarFrame.commit then each perEffect at 615–630; members.publish after. The unit set can contain membership plus a scalar frame plus perEffects, not just selected entity invocations.
+- Member installation is itself multiple stages: plain-branch-membership.ts:1211 installs the scalar frame then loops setMemberPresence before captureChanges. setMemberPresence prepares/installs its publication record and completes its publication in finally. A top-level members.install return is not a universal callback-free mark for all membership work. Partial member installation cannot be described as a single pre-install refusal without more evidence.
+- Scalar frame commit: adapter:1624 frame.commit precedes explicit path notifications; default frame.commit can perform its own publication. A mark after commit is not automatically before all callbacks. This slice has not added hooks or altered scalar-frame policy.
+- Heterogeneous unit: adapter:1440–1470 installs scalar storage, removals, placements/rekeys, live point plans and ordinary plans, then advances clock; invalidate/publish follow separately. These are multiple source-owned installation boundaries. No perEffect receipt alone proves this unit's completion.
+- Prepared point: adapter:884 installs members or scalar frame, then each collection, advances clock and sets installed. transactions:3368 sets completion.selected before point.install and completion.committed only after installation/frontier steps before point.publish. Exact point completion must remain separate from an unrelated perEffect receipt.
+- Direct selected entity value: entity-signal.ts:2258–2266 installs value, ordinary topology and publication terminal record, then capture callback, clock advance and complete publication. A receipt mark after the terminal record and before capture is sound for this exact path.
+- Row replacement frame: entity-signal.ts:1374 installOrdinary closure installs ordinary topology and publication terminal record. physical/entity-mutation-frame.ts:394 invokes that closure, THEN installs its separate responsibility argument at :396, THEN calls observeCommitted. Current caller sets responsibility=undefined. Therefore a mark at the end of this closure is sound only for this current caller; a reusable general frame completion hook must be after the separate responsibility installation and before observeCommitted. Do not generalize the closure mark across a nonundefined responsibility.
+- Transaction catch: transactions.ts:4931 uses completion.committed when selected, otherwise any physical clock change. Ordinary perEffect delegation did not set completion.selected. That explains the measured terminal rejection after y installed/x refused. Normal return also sets installed=true unconditionally; a selected guard with no exact terminal bridge cannot fix skipped/swallowed execution reliably.
+
+## Disposition
+
+No lifecycle runtime patch. An isolated one-use guard would leave this transaction completion ambiguity reachable; the evidence does not justify replacing it with either any-installed or all-installed as a new policy. Main/Hume must adjudicate how to preserve the actual partial-install contract with invocation-specific facts, including mixed/frame units. The old getter counterexample and all first recurrence archives remain intact. Structural work remains gated. No outgoing Link leak, full atomicity or universal mixed-route/heap claim.

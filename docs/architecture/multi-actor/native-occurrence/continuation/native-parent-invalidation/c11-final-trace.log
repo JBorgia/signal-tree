@@ -1,0 +1,35 @@
+
+> nx run kernel:test --testFile=parent-proof-diagnostic.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=parent-proof-diagnostic.spec.ts --maxWorkers=1
+
+(node:52593) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:52602) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-parent-invalidation-review/c11/packages/kernel
+
+(node:52615) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed (2)
+   Start at  10:51:35
+   Duration  2.04s (transform 951ms, setup 0ms, import 1.14s, tests 44ms, environment 690ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      3.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.5s

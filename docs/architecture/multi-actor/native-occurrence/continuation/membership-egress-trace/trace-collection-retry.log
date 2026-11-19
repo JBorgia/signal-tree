@@ -1,0 +1,104 @@
+
+> nx run kernel:test link-absent-locations.spec.ts --testNamePattern=a collection.*no enhancers.*an omission --maxWorkers=1
+
+> node tools/run-core-vitest.mjs link-absent-locations.spec.ts --testNamePattern="a collection.*no enhancers.*an omission" --maxWorkers=1
+
+(node:74742) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:74749) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-membership-egress-trace/instrumented/packages/kernel
+
+(node:74756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+TRACE membership {"address":["a"],"present":false,"ordinary":{"before":{"present":true,"value":{"value":1,"keep":2}},"after":{"present":false}}}
+
+stdout | src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+TRACE ready-before {"address":["a","rows"],"payload":[{"id":"r","n":1}],"presence":{"address":["a"],"state":false,"ordinary":{"before":{"present":true,"value":{"value":1,"keep":2}},"after":{"present":false}}},"collection":false}
+TRACE ready-after {"address":["a","rows"],"payload":[{"id":"r","n":1}],"projected":[],"present":false,"aggregate":true}
+
+stdout | src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+TRACE membership {"address":["a","value"],"present":false,"ordinary":{"before":{"present":true,"value":1},"after":{"present":false}}}
+TRACE membership {"address":["a","rows"],"present":false,"ordinary":{"before":{"present":true,"value":{"all":[]}},"after":{"present":false}}}
+TRACE membership {"address":["a"],"present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":{"keep":9}}}}
+TRACE membership {"address":["a","keep"],"present":true}
+TRACE ready-before {"address":["a","rows"],"payload":[{"id":"r","n":1}],"presence":{"address":["a","rows"],"state":false,"ordinary":{"before":{"present":true,"value":{"all":[]}},"after":{"present":false}}},"collection":false}
+TRACE ready-after {"address":["a","rows"],"payload":[{"id":"r","n":1}],"projected":[],"present":false,"aggregate":true}
+TRACE ready-before {"address":["a","rows"],"payload":[{"id":"r","n":1}],"presence":{"address":["a"],"state":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":{"keep":9}}}},"collection":false}
+TRACE ready-after {"address":["a","rows"],"payload":[{"id":"r","n":1}],"projected":[],"present":false,"aggregate":true}
+
+stdout | src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+TRACE membership {"address":["a","value"],"present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":7}}}
+
+stdout | src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+TRACE scalar {"address":["a","rows"],"intent":"replace","before":[],"after":[],"branchInputs":0}
+TRACE scalar {"address":["a","rows"],"intent":"replace","before":[],"after":[{"id":"s","n":2}],"branchInputs":0}
+TRACE membership {"address":["a","rows"],"present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":{"all":[]}}}}
+TRACE ready-before {"address":["a","rows"],"payload":[{"id":"r","n":1}],"unitPayload":[],"collection":true}
+TRACE ready-after {"address":["a","rows"],"payload":[{"id":"r","n":1}],"projected":[],"present":false,"aggregate":true}
+TRACE ready-before {"address":["a","rows"],"payload":[{"id":"r","n":1}],"unitPayload":[{"id":"s","n":2}],"collection":true}
+TRACE ready-after {"address":["a","rows"],"payload":[{"id":"r","n":1}],"projected":[],"present":false,"aggregate":true}
+TRACE ready-before {"address":["a","rows"],"payload":[{"id":"r","n":1}],"presence":{"address":["a","rows"],"state":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":{"all":[]}}}},"collection":false}
+TRACE ready-after {"address":["a","rows"],"payload":{"all":[]},"projected":{"all":[]},"present":true,"aggregate":true}
+
+ ❯ src/lib/link-absent-locations.spec.ts (21 tests | 1 failed | 20 skipped) 43ms
+       × an omission, and re-adds of the location and of a sibling 42ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling
+AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]
+
+- Expected:
+[
+  {
+    "id": "s",
+    "n": 2,
+  },
+]
+
++ Received:
+{
+  "all": [],
+}
+
+ ❯ expectExposed src/lib/link-absent-locations.spec.ts:144:66
+    142|     if (!held) {
+    143|       await connection.settled();
+    144|       expect(endpoint, `${source.name} endpoint after ${label}`).toEqu…
+       |                                                                  ^
+    145|         location.present ? source.exposed(tree) : source.absent
+    146|       );
+ ❯ step src/lib/link-absent-locations.spec.ts:174:7
+ ❯ src/lib/link-absent-locations.spec.ts:192:9
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 20 skipped (21)
+   Start at  16:55:11
+   Duration  5.22s (transform 2.13s, setup 0ms, import 2.52s, tests 43ms, environment 2.35s)
+
+Warning: command "node tools/run-core-vitest.mjs link-absent-locations.spec.ts --testNamePattern="a collection.*no enhancers.*an omission" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.5s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    6.5s

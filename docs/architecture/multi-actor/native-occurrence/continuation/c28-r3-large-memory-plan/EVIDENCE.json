@@ -1,0 +1,18 @@
+{
+  "baseEntryMapEqual": true,
+  "entries": 3095,
+  "files": {
+    "/private/tmp/st-c28-r3-disposition-index/REPORT.md": "3a67fc62e5c1e73cabf27391090d0fecea516baad3a12dd0a557958124ffe7f2",
+    "/private/tmp/st-c28-r3-disposition-index/IDENTITY.json": "3811ea0ffb59206e48d8648bc5c94cf3466b31b0ab41a68ec7a8b593259dab9e",
+    "/private/tmp/st-c28-r3-disposition-index/runtime.patch": "1381415b67f26ec53f28b07b51c7d219d39efd706a9ea304822dbc88015e27a9",
+    "/private/tmp/st-c28-r3-disposition-index/BASE-MANIFEST.json": "fa371d221f9904c4feec2d8f684360c73ccb7e30b98bf03a18d0dea5768bf791",
+    "/private/tmp/st-c28-r3-comparator/MANIFEST.json": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+    "/private/tmp/st-c28-r3-disposition-index/large-entity-corrected/first.log": "dca7b89e09fc05af565e945f9feb309dbb6edfaa643c8ffa1f17613e797d584e",
+    "/private/tmp/st-c28-r3-disposition-index/large-entity-corrected/COMMAND.json": "5a955c5573ea4c6a1fc4092647e22ff2206ff39c87441eb0481c044a7a59bc75",
+    "/private/tmp/st-c28-r3-disposition-index/large-entity-corrected/RESULT.json": "0c71095f705a27d6e7ca556a1e43bcc857100932d8b37f30e97c8c9120dc512f",
+    "/private/tmp/st-c28-r3-disposition-index/large-restoration-first/first.log": "37e4d2925352c1f656050035401c6bb8644862539f1f1ce33475b4c1d02e1783",
+    "/private/tmp/st-c28-r3-disposition-index/large-restoration-first/RESULT.json": "9c1affae9919487fe1d9e1162aef920d31e227581212fdb279756e3e1ad965a4",
+    "/private/tmp/st-r3-compatibility-inventory/full-runs/kernel/WATCHDOG.json": "cfd29e91200f134aa187353a224c710cf6a8ba2b5af00e8fd537295dd90e76a9",
+    "/Users/jonathanborgia/code/signaltree/docs/performance/measurement-contract.md": "f92c245ffd2c46f5258d0d9899e6c163e9dcfa1072ae9d071d6fc7e087b2db6b"
+  }
+}

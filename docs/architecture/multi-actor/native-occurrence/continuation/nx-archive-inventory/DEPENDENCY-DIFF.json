@@ -1,0 +1,22 @@
+{
+  "@signaltree/source": {
+    "removed": [
+      {
+        "source": "@signaltree/source",
+        "target": "vue",
+        "type": "static"
+      },
+      {
+        "source": "@signaltree/source",
+        "target": "react",
+        "type": "static"
+      },
+      {
+        "source": "@signaltree/source",
+        "target": "solid",
+        "type": "static"
+      }
+    ],
+    "added": []
+  }
+}

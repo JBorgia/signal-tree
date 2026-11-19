@@ -1,0 +1,52 @@
+{
+  "INPUT-SHA256.json": {
+    "sha256": "da54a2e0906d133dd049b90fa6f95d7c89f1dad8d90ea2b50c3a89d6ae304b14",
+    "archive": "INPUT-SHA256.json",
+    "archiveSha256": "da54a2e0906d133dd049b90fa6f95d7c89f1dad8d90ea2b50c3a89d6ae304b14"
+  },
+  "PRODUCTION-COMPARISON.md": {
+    "sha256": "89e23bd274dcd86c2b138606ac782b28b9b89bc6b1449b9050fc29c05675293b",
+    "archive": "PRODUCTION-COMPARISON.md",
+    "archiveSha256": "89e23bd274dcd86c2b138606ac782b28b9b89bc6b1449b9050fc29c05675293b"
+  },
+  "PRODUCTION-FIXTURE-INVENTORY.json": {
+    "sha256": "731ccb17338062b280e60f85b618fc3c7085c9339d3f3c8478d22f5386647246",
+    "archive": "PRODUCTION-FIXTURE-INVENTORY.json",
+    "archiveSha256": "731ccb17338062b280e60f85b618fc3c7085c9339d3f3c8478d22f5386647246"
+  },
+  "PRODUCTION-RUN-PATH.txt": {
+    "sha256": "0a8ff7c2787023d4ae08e49cadf9986a8e9c77238bf57597d485121efe530f7f",
+    "archive": "PRODUCTION-RUN-PATH.txt",
+    "archiveSha256": "0a8ff7c2787023d4ae08e49cadf9986a8e9c77238bf57597d485121efe530f7f"
+  },
+  "PROPOSED-87F-COMMANDS.json": {
+    "sha256": "b3fb6f84ee65f17b8ea28b358ca48ff0934165aad3f9f22502cf85d658f0fdeb",
+    "archive": "PROPOSED-87F-COMMANDS.json",
+    "archiveSha256": "b3fb6f84ee65f17b8ea28b358ca48ff0934165aad3f9f22502cf85d658f0fdeb"
+  },
+  "REPORT.md": {
+    "sha256": "c717e3ae99d2d6537693ec3640e833f898fc94054496335c5786f2ddea296993",
+    "archive": "REPORT.md",
+    "archiveSha256": "c717e3ae99d2d6537693ec3640e833f898fc94054496335c5786f2ddea296993"
+  },
+  "TRIAGE-107.json": {
+    "sha256": "b2eab1d7da583b92ca1ed20e18540bc81b249118e91d8678746416a8482b300e",
+    "archive": "TRIAGE-107.json.gz",
+    "archiveSha256": "8a1b5a8aecd39954c243e4217de2fc887d793fef686336a685698c8e3fb4d703"
+  },
+  "build-report.py": {
+    "sha256": "88efe2133e111f82725ec21d47b2271072c0a40fda2ed3d6389e89d0e519e9aa",
+    "archive": "build-report.py",
+    "archiveSha256": "88efe2133e111f82725ec21d47b2271072c0a40fda2ed3d6389e89d0e519e9aa"
+  },
+  "production-driver.log": {
+    "sha256": "595dd0cd0461e555963bee1b11aa13651f2aaef1d84c16a28a8e246a8f7a8db5",
+    "archive": "production-driver.log",
+    "archiveSha256": "595dd0cd0461e555963bee1b11aa13651f2aaef1d84c16a28a8e246a8f7a8db5"
+  },
+  "run-production.py": {
+    "sha256": "7c8a1a91e3505a73c4ef1ef74a9f234aac75e955144c92a422200b8533919209",
+    "archive": "run-production.py",
+    "archiveSha256": "7c8a1a91e3505a73c4ef1ef74a9f234aac75e955144c92a422200b8533919209"
+  }
+}

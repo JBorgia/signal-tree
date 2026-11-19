@@ -1,0 +1,97 @@
+{
+  "base": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "C26andC27ObservationsEqual": true,
+  "rows": [
+    {
+      "terminal": "confirm",
+      "n": 0,
+      "phase": "closed",
+      "actual": 1,
+      "confirmed": 0,
+      "requirements": 7,
+      "components": 0
+    },
+    {
+      "terminal": "confirm",
+      "n": 1,
+      "phase": "closed",
+      "actual": 2,
+      "confirmed": 1,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "confirm",
+      "n": 2,
+      "phase": "closed",
+      "actual": 3,
+      "confirmed": 2,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "confirm",
+      "n": 4,
+      "phase": "closed",
+      "actual": 5,
+      "confirmed": 4,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "confirm",
+      "n": 4,
+      "phase": "p-terminal",
+      "actual": 5,
+      "confirmed": 5,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "rollback",
+      "n": 0,
+      "phase": "closed",
+      "actual": 1,
+      "confirmed": 0,
+      "requirements": 7,
+      "components": 0
+    },
+    {
+      "terminal": "rollback",
+      "n": 1,
+      "phase": "closed",
+      "actual": 2,
+      "confirmed": 1,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "rollback",
+      "n": 2,
+      "phase": "closed",
+      "actual": 3,
+      "confirmed": 2,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "rollback",
+      "n": 4,
+      "phase": "closed",
+      "actual": 5,
+      "confirmed": 4,
+      "requirements": 9,
+      "components": 0
+    },
+    {
+      "terminal": "rollback",
+      "n": 4,
+      "phase": "p-terminal",
+      "actual": 0,
+      "confirmed": 0,
+      "requirements": 9,
+      "components": 0
+    }
+  ],
+  "countsSha256": "4c37704678b11e3770fe18a0b0efb3590f1b3b51470a1d4d40b4b2eb2a37caba"
+}

@@ -1,0 +1,57 @@
+{
+  "ANALYSIS.md": {
+    "sha256": "f2769d5c8452096d87602dc8cb4c84ed32f622b43cf0209499f5cfcaf048d9e3",
+    "archive": "ANALYSIS.md",
+    "archiveSha256": "f2769d5c8452096d87602dc8cb4c84ed32f622b43cf0209499f5cfcaf048d9e3"
+  },
+  "BASELINE.json": {
+    "sha256": "a2a48510fc6204f618b81afb0b0caab3c97c8142c550b19a47fc72fac64cf390",
+    "archive": "BASELINE.json",
+    "archiveSha256": "a2a48510fc6204f618b81afb0b0caab3c97c8142c550b19a47fc72fac64cf390"
+  },
+  "INDEPENDENT-ATTRIBUTION.json": {
+    "sha256": "22ec60630f85750207b0fa9cc090fd40e8cc75d18cd47cbb182c16e82b56bbfe",
+    "archive": "INDEPENDENT-ATTRIBUTION.json",
+    "archiveSha256": "22ec60630f85750207b0fa9cc090fd40e8cc75d18cd47cbb182c16e82b56bbfe"
+  },
+  "original-replay.log": {
+    "sha256": "7cf62877000f928cb1be85aa2169a7eea26ec3aa38daa9af309fba762ea5af2b",
+    "archive": "original-replay.log",
+    "archiveSha256": "7cf62877000f928cb1be85aa2169a7eea26ec3aa38daa9af309fba762ea5af2b"
+  },
+  "original.spec.ts": {
+    "sha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "archive": "original.spec.ts",
+    "archiveSha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872"
+  },
+  "placement-replay.log": {
+    "sha256": "7f83539fbe34f2d285eca79db8b590451993bf172f006692de9cd54d0faed915",
+    "archive": "placement-replay.log",
+    "archiveSha256": "7f83539fbe34f2d285eca79db8b590451993bf172f006692de9cd54d0faed915"
+  },
+  "run-gate.py": {
+    "sha256": "c233569f9b68eef4ea1a5c964d3efdf51c7d77725ee9b3603f2b0ece56a1f9e4",
+    "archive": "run-gate.py",
+    "archiveSha256": "c233569f9b68eef4ea1a5c964d3efdf51c7d77725ee9b3603f2b0ece56a1f9e4"
+  },
+  "runs/traced/COMMAND.json": {
+    "sha256": "5edf30da20c1db3f9244e0b009e96ca77027104aa438b38070fc0100084adc8e",
+    "archive": "runs/traced/COMMAND.json",
+    "archiveSha256": "5edf30da20c1db3f9244e0b009e96ca77027104aa438b38070fc0100084adc8e"
+  },
+  "runs/traced/RESULT.json": {
+    "sha256": "22a0d85161ca284a361ca6dcc68156d55403872df894d160635a4927a1120f62",
+    "archive": "runs/traced/RESULT.json",
+    "archiveSha256": "22a0d85161ca284a361ca6dcc68156d55403872df894d160635a4927a1120f62"
+  },
+  "runs/traced/first.log": {
+    "sha256": "0d3c377c17073fdc7ac516527f50ba107757347c61c382b6ba2b44b41284de51",
+    "archive": "runs/traced/first.log",
+    "archiveSha256": "0d3c377c17073fdc7ac516527f50ba107757347c61c382b6ba2b44b41284de51"
+  },
+  "visits.jsonl": {
+    "sha256": "ba09316f07fea7e8afe522535a67b0a5e4195fc954fc54cbff1f960a72c71180",
+    "archive": "visits.jsonl",
+    "archiveSha256": "ba09316f07fea7e8afe522535a67b0a5e4195fc954fc54cbff1f960a72c71180"
+  }
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "cb15dbcd8e4e20bd3d8b2d76cfe59bc60d0a53a4aaf4c3c4120089e74a4ee39d",
+    "archiveSha256": "cb15dbcd8e4e20bd3d8b2d76cfe59bc60d0a53a4aaf4c3c4120089e74a4ee39d"
+  },
+  {
+    "source": "FAILURES-AS-READ.json",
+    "archive": "FAILURES-AS-READ.json",
+    "sourceSha256": "28daef1e83708009a6b7eaa6d863c0bd6ea88296664eb41d2e35eb25fa29638e",
+    "archiveSha256": "28daef1e83708009a6b7eaa6d863c0bd6ea88296664eb41d2e35eb25fa29638e"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "d0d4126cc592ece78941d9191d1dfda1ae0279744082918d64af41a03332fdf5",
+    "archiveSha256": "d0d4126cc592ece78941d9191d1dfda1ae0279744082918d64af41a03332fdf5"
+  }
+]

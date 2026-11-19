@@ -1,0 +1,28 @@
+{
+  "inputs": {
+    "/private/tmp/st-c28-r3-work-attribution/REPORT.md": "8d2d7c166ac2746a424c2b1b9e3e41d7a84230ffcf7b2488aa8921913bb0f617",
+    "/private/tmp/st-c28-r3-work-attribution/original.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "/private/tmp/st-c28-r3-work-attribution/instrumentation.patch": "af55a8604b416ff450c22732cc5446237a564aa91149b7076be59ddf54f6faa9",
+    "/private/tmp/st-c28-r3-work-attribution/observations.jsonl": "9e88668fde01b64e136f715b2803eb478dc212b13994da889cf4d56dcf9bd044",
+    "/private/tmp/st-c28-r3-work-attribution/COMMAND.json": "d51e7dd5d4d8c547e73eb6b9287ba3dc50a304c6857bd2284623ed87620caedb",
+    "/private/tmp/st-c28-r3-work-attribution/RESULT.json": "c0be478fc9cee6e590bd26ac2680c3c2ea831cb460ef7a963fa39d005b4f397f",
+    "/private/tmp/st-c28-r3-work-attribution/IDENTITY.json": "3451e2c979ddd8eaf6c61458babeecd7471615866ff74af0898829bb34f1f5d7",
+    "/private/tmp/st-c28-r3-work-attribution/BASE-MANIFEST.json": "fa371d221f9904c4feec2d8f684360c73ccb7e30b98bf03a18d0dea5768bf791",
+    "/private/tmp/st-c28-r3-work-attribution/first.log": "a2b9ec63229ea2bfddccfc1e10eb299c06c0d05e4ec34044e1e67b08b8341752"
+  },
+  "reviewedRuntime": {
+    "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "64901f0404ab81652855f8ee31ee30283443f30da74016257ebcc399c08aa0db",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "e1b062e95a54a7729c06733d4f8198eb5c398cf1658141bf215a69fe7d9ab472",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+    "packages/kernel/src/lib/internals/utilities/deep-equal.ts": "d3281de95e87aab27bc493810e4b3e1b13c9ce874d9e68c8435140c94f48271c",
+    "packages/kernel/src/lib/physical/entity-value-store.ts": "059aae610ad58eb804aa99f4d0df656467bc8b155608ba8fd229ce85717b69c0"
+  },
+  "totals": [
+    13000,
+    13000
+  ],
+  "histogramsIdentical": true
+}

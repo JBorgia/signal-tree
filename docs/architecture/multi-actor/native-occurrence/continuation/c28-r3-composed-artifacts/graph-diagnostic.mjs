@@ -1,0 +1,463 @@
+#!/usr/bin/env node
+/**
+ * Bundle-budget gate. Re-measures SignalTree's own gzip cost and fails on a
+ * regression.
+ *
+ * TWO BUDGETS PER TARGET, and the split is the point.
+ *
+ *   - `prodKB`  — built with `ngDevMode: false`, which is what a production
+ *     Angular app actually ships. THIS is the number that guards users.
+ *   - `devKB`   — the default build, dev diagnostics and all. A loose ceiling
+ *     that catches a genuinely leaked module, not a tightrope.
+ *
+ * Before 14.0.0 there was one budget, measured on the DEV build. It moved five
+ * times in two releases — 5.8 → 6.9 → 7.1 → 7.2 → 7.3 for the bare tree — and
+ * every single bump comment says some version of "entirely dev-only text,
+ * production is unchanged". The gate was fighting the project's own policy of
+ * making silent failures loud: every new ST-code diagnostic is a string, every
+ * string costs gzip, and the ritual response was to raise the number and write
+ * a paragraph explaining why it did not matter.
+ *
+ * A number that gets raised whenever it fires is not a budget. Splitting it
+ * puts the tight constraint where the cost is real (production) and lets dev
+ * text grow, which is the trade this codebase deliberately makes.
+ *
+ * Budgets are gzip KB, own-code only (@angular/rxjs/tslib external). Bump them
+ * deliberately in a commit if a real feature justifies it — never silently. A
+ * PROD bump needs a genuine justification; a DEV bump usually means a new
+ * diagnostic and can just say so.
+ */
+import { build } from "/private/tmp/st-c28-r3-composed-artifacts/candidate/node_modules/esbuild/lib/main.js";
+import { gzipSync } from 'node:zlib';
+import { mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+
+const CORE = new URL('../dist/packages/kernel/dist/index.js', "file:///private/tmp/st-c28-r3-composed-artifacts/candidate/tools/check-bundle-budget.mjs")
+  .pathname;
+const REPO_NODE_MODULES = new URL('../node_modules', "file:///private/tmp/st-c28-r3-composed-artifacts/candidate/tools/check-bundle-budget.mjs").pathname;
+
+/**
+ * This gate measures BUILT OUTPUT (`dist/`), not source — and for a long time
+ * it never checked whether that output matched the source it was run against.
+ * It could not fail on a stale `dist`; it measured whatever was lying there.
+ *
+ * Not hypothetical. `npm run build` was itself broken (it resolved to a project
+ * with no build target and exited 1), so nothing rebuilt `dist`, so this gate
+ * reported a green number from an artifact several commits old through an
+ * entire release-hardening session. Two bugs, each survivable alone: the dead
+ * script let the artifact go stale, and the missing freshness check made the
+ * staleness invisible. Every budget "verification" in between was measuring
+ * code nobody had written yet.
+ *
+ * `verify-gates.mjs` now owns one production build for the whole verification
+ * run and seals `dist/` while checks consume it. Rebuilding here would violate
+ * that artifact boundary and make concurrent checks observe different output.
+ *
+ * Timestamps were tried first and rejected: an Nx cache RESTORE writes correct
+ * output without bumping mtimes, so "source newer than dist" reports a stale
+ * build that is not stale. A check with false alarms gets disabled, which
+ * leaves you back here.
+ */
+// id -> { code, budgetKB }
+const TARGETS = {
+  'signaltree-bare': {
+    // Bumped 5.8 → 6.9 for 13.5.0. Measured 6.81KB. Attributed, minified bytes in
+    // the bare bundle: signal-tree.js +2137 (the ST2018 entity-array
+    // diagnostic, the compared() marker interception, and the materializeNode
+    // wiring), shared/deep-equal.js +538 (the Error / primitive-wrapper /
+    // prototype-gate correctness fixes — a leaf holding an Error used to
+    // compare equal to any other Error), utils.js +241 (the per-node
+    // materialisation memo), markers/compared.js +113.
+    //
+    // NOT a tree-shaking regression: compared.js contributes 113 bytes because
+    // only its type guard survives, and the rest tree-shakes. Roughly 0.7KB of
+    // the gzip growth is dev-only text that folds — the same bundles built with
+    // `define: { ngDevMode: false }` grow only +0.37KB, which is the real cost a
+    // production app pays for materialisation memoisation.
+    //
+    // What it bought (measured, docs/architecture/optimisation-options.md):
+    // reading the whole state with nothing changed 1400us → 0.044us, time
+    // travel flat in state size (340.60ms → 0.04ms at 10k rows), and a
+    // diagnostic for an idiom mistake worth ~30x.    //
+    // Bumped 6.9 → 7.1 for 14.0.0: the ST2020 (duplicate stored() key) and
+    // ST2021 (marker inside an array) diagnostic messages. Measured 6.99KB.
+    // Entirely dev-only text — production is 5.46 / 8.04 / 7.42KB, unchanged
+    // by these two beyond the O(1) non-enumerable defineProperty that closes
+    // the stored() storage leak. check-devmode-foldable confirms it folds.    //
+    // Bumped 7.1 → 7.2 for the marker snapshot/hydrate registry. Measured 7.04KB;
+    // production 5.53KB (dev code still folds fully — check-devmode-foldable
+    // confirms ~1.5-1.9KB reclaimed per tree).
+    //
+    // What it bought: `form()` and `entityMap()` values reach snapshots at
+    // all — before this, `persistence()` wrote `{}` for a form and reported
+    // success. The cost is the snapshot/hydrate hooks on status, form and
+    // entityMap plus the O(1) processor stamp; it REPLACED two hardcoded
+    // duck-type tests, so part of the growth is offset.    //
+    // Bumped 7.2 → 7.3 for the async-marker snapshot hooks and ST2022.
+    // Measured 7.12KB; production 5.59KB.
+    //
+    // What it bought: `asyncSource`/`asyncStream` values reach
+    // snapshots at all — before this `tree.$()` dropped them entirely, the same
+    // defect `form()` had — plus ST2022, which fires when a marker registers
+    // without declaring what of it is state. That diagnostic is the guard
+    // against a SEVENTH instance of this defect class, so its bytes are the
+    // cheapest on this list.
+    // 14.0.0: split into dev/prod. Measured dev 7.35KB, prod 5.59KB. The dev
+    // figure grew ~50 bytes for ST2023's message; prod is unchanged, because
+    // the guard is inline at the call site and folds.
+    //
+    // Bumped 5.7 → 5.8 at the 14.0.0 RC. Measured prod 5.70KB — EXACTLY the
+    // budget, which passes and is the least useful state a budget can be in:
+    // the next byte fails it, and the failure would be attributed to whatever
+    // change happened to be next rather than to the 0.05KB the marker snapshot
+    // memo added here. Raised deliberately so the number reflects a measurement
+    // with headroom, not a coincidence.
+    //
+    // Bumped again for ST2027 (the deep-equal-copy no-op write). The diagnostic
+    // hooks the LEAF COMPARATOR rather than `recursiveUpdate`, because a direct
+    // `tree.$.x.set(v)` never reaches the latter — and that is the write form
+    // the corrupted benchmarks used, so hooking the cheaper site would have
+    // missed the case that motivated it. That needs a `path` threaded through
+    // `createSignalStore` and a ternary at five leaf-creation sites. Both are
+    // ngDevMode-guarded INLINE and fold; what cannot fold is the ternary's
+    // existence and the extra parameter in the signature. Measured: prod
+    // +0.07KB, dev +0.30KB.
+    // 15.0.0 release hardening: the causal runtime and entity identity kernel are
+    // now reachable from the default signalTree() construction path. Measured
+    // after rebuilding from source: prod 9.45KB, dev 11.45KB.
+    //
+    // ⚠️ 15.0.0 DECLARATIVE CONSTRUCTION — +0.47KB prod, +0.49KB dev, and this
+    // one is a DESIGN COST, not a diagnostic. Read it before bumping again.
+    //
+    // Enhancers used to arrive through `.with()`, so a tree that never called it
+    // never linked the enhancer machinery and esbuild dropped the whole resolver.
+    // They arrive in `signalTree`'s config now, which puts two modules on the
+    // MANDATORY construction path of every tree, including one with no
+    // enhancers at all. Measured attribution, minified prod bytes:
+    //
+    //     enhancers/index.js                    +851  (resolveEnhancerOrder)
+    //     lib/internals/enhancer-requirements.js +817  (config validation)
+    //     lib/internals/tree-capabilities.js     +99   (the plan sees enhancers)
+    //     lib/signal-tree.js                     -432  (canonicalWith deleted)
+    //     ─────────────────────────────────────────────
+    //     net                                   +1335  ≈ +0.47KB gzip
+    //
+    // A runtime `if (enhancers.length === 0)` short-circuit does NOT recover it:
+    // tree-shaking is static, and the call site keeps both modules alive however
+    // the guard resolves. The only real reductions are a leaner resolver (Kahn's
+    // algorithm with adjacency maps and cycle detection, for a set already
+    // validated by the pass beside it) or folding validation INTO ordering so the
+    // provided-capability set is computed once. Both are their own change; do not
+    // attempt either as a side effect of a budget bump.
+    //
+    // Measured after the migration: prod 9.91KB, dev 11.94KB.
+    //
+    // Then 15.0 REMOVED lazy signal creation, and the bare bundle came back
+    // down to prod 9.51KB / dev 11.50KB — 0.41KB, which is most of the 0.47KB
+    // declarative construction cost above. Not a coincidence worth reading into:
+    // one is the enhancer resolver arriving, the other is a proxy and a memory
+    // manager leaving. They are unrelated and happen to be similar in size.
+    //
+    // Re-tightened rather than left at 10.0: a budget kept loose after a shrink
+    // stops measuring, which is the defect just fixed in dead-exports and the
+    // lint ledger.
+    // Bumped 11.7 → 11.9 for MARKER-GRAMMAR-DIAGNOSTICS-0: ST2021 grew arms for
+    // Map values and Set members, so it carries two more diagnostic sentences.
+    // Raised only because PROD IS FLAT — 9.66 KB before and after — and
+    // `check-devmode-foldable` is green, so the strings provably do not ship.
+    // That is the condition this file's own guidance states for a dev bump; a
+    // prod change would have been a regression to fix instead.
+    // Universal locations add vanilla subscriptions, coherent grouped
+    // publication, exception-safe settlement, and weak reverse dependency
+    // edges so abandoned derived recipes collect. After removing duplicate
+    // dispatch and notification code, the generator measures 9.76KB prod and
+    // 11.91KB dev. Raised by 0.1KB rather than weakening those invariants.
+    //
+    // Callable terminal locations replace `.set`/`.update` with one read /
+    // replace / derive grammar and add `leaf(value)` as explicit topology.
+    // After moving entity projections off the mandatory runtime object,
+    // restoring scalar-owned mutation emission, deleting the legacy setter
+    // fallback, and consolidating terminal construction, the final floor is
+    // 9.93KB prod / 12.09KB dev. Against archived 84837fb3, equivalent runnable
+    // bundles differ by 430 minified bytes: location-runtime +503, signal-tree
+    // +158, leaf +133, intrinsic observers +35, offset by owned-mutation -268
+    // and scalar-runtime -126. This is the callable contract, not an optional
+    // module leak.
+    // Framework-native leaf realization now lives behind the adapter entry.
+    // The first implementation left its native branches in the mandatory
+    // location/scalar modules and measured 10.80KB prod / 12.95KB dev here.
+    // Splitting complete kernel-owned native runtimes behind `kernel/adapter`
+    // restores the neutral floor to 9.95KB prod / 12.10KB dev without changing
+    // Angular or Vue semantics.
+    // 15.2.0: the framework-specialized epoch architecture. Measured 10.19KB
+    // prod / 12.31KB dev, up from the 9.95/12.10 floor the adapter split
+    // established. This is NOT an optional module leaking back onto the
+    // mandatory path -- verified: native-location-realization.ts is still
+    // imported only by kernel/adapter.ts, and the one import added to a
+    // mandatory module (registerIntrinsicMutationSource) points at
+    // intrinsic-mutation, which the bare path already reached. The cost is
+    // distributed inline across location-runtime, intrinsic-mutation,
+    // tree-scalar-slot-runtime, signal-tree and write-participation
+    // (+308/-76 lines), which is the paired createEpoch/advanceEpoch contract
+    // itself. Raised to the measurement plus the usual narrow headroom rather
+    // than clawed back, because reclaiming it is a performance change and
+    // belongs in its own release.
+    // Owner-approved v16 cost after reduction audit; rationale and exact
+    // measurements: docs/research/v16-candidate-acceptance-0/README.md.
+    // Owner approved October 18: whole-value new-key correctness cost.
+    // Exact attribution, reductions, uncertainty and preserved headroom:
+    // docs/audits/2026-10-17-incumbent-readiness/ARTIFACT-ACCEPTANCE.md.
+    devKB: 14.79,
+    prodKB: 12.41,
+    code: `
+      import { signalTree } from ${JSON.stringify(CORE)};
+      const t = signalTree({ count: 0, user: { name: 'a' } });
+      t.$.count(1); t.$.user.name('b');
+      globalThis.__sink = [t.$.count(), t.$.user.name()];
+    `,
+  },
+  'signaltree-entities': {
+    // Bumped 8.6 → 9.9 for 11.4.1: the 11.4.0 entityMap cache-aware fold
+    // (load/staleTime/persist/tags, RFC 0003) raised the measured floor to
+    // 9.67KB and shipped that way — the gate was not updated with the
+    // feature. Measured breakdown (11.5.0): entity-loader.js is ~3.5KB
+    // minified (~1.1KB gzip) of that.
+    //
+    // Lowered 9.9 → 8.6 for 12.0.0 (RFC 0005 §6): the reclaim landed. v12
+    // removed the raw `load: fn` path and entity-map.ts's static `attachLoader`
+    // import, so the loader/cache/SWR/persist machinery is reached ONLY through
+    // the `loader()` helper. A plain `entityMap()` (measured here) now
+    // tree-shakes it out entirely — measured 8.36KB gzip, down from 9.89KB in
+    // the 11.6 dual-path interim (~1.53KB reclaimed). Cache-aware collections
+    // pay for the machinery via `loader()`; plain collections do not. This
+    // budget locks the win in — a regression back toward 9.9 means something
+    // re-introduced a static reference to the loader machinery on the plain path.
+    //
+    // Bumped 8.6 → 8.7 for 13.4.0: the traversal diagnostics (ST2008-ST2011)
+    // added in that release live in recursiveUpdate/unwrap/applyState — paths
+    // EVERY tree reaches, so they cannot tree-shake for a consumer who never
+    // triggers them. Measured 8.66KB; +0.06KB of guarded message strings, not
+    // a leaked optional module. Defining `ngDevMode: false` removes them
+    // entirely (see docs/performance/dropping-dev-code.md, which measures
+    // ~1.15KB reclaimed for this scenario). Deliberate, not a regression.
+    //
+    // Bumped 8.7 → 9.8 for 13.5.0. Measured 9.71KB. Attributed, minified bytes in
+    // the bare bundle: signal-tree.js +2137 (the ST2018 entity-array
+    // diagnostic, the compared() marker interception, and the materializeNode
+    // wiring), shared/deep-equal.js +538 (the Error / primitive-wrapper /
+    // prototype-gate correctness fixes — a leaf holding an Error used to
+    // compare equal to any other Error), utils.js +241 (the per-node
+    // materialisation memo), markers/compared.js +113.
+    //
+    // NOT a tree-shaking regression: compared.js contributes 113 bytes because
+    // only its type guard survives, and the rest tree-shakes. Roughly 0.7KB of
+    // the gzip growth is dev-only text that folds — the same bundles built with
+    // `define: { ngDevMode: false }` grow only +0.37KB, which is the real cost a
+    // production app pays for materialisation memoisation.
+    //
+    // What it bought (measured, docs/architecture/optimisation-options.md):
+    // reading the whole state with nothing changed 1400us → 0.044us, time
+    // travel flat in state size (340.60ms → 0.04ms at 10k rows), and a
+    // diagnostic for an idiom mistake worth ~30x.    //
+    // Bumped 9.8 → 10.0 for 14.0.0: the ST2020 (duplicate stored() key) and
+    // ST2021 (marker inside an array) diagnostic messages. Measured 9.89KB.
+    // Entirely dev-only text — production is 5.46 / 8.04 / 7.42KB, unchanged
+    // by these two beyond the O(1) non-enumerable defineProperty that closes
+    // the stored() storage leak. check-devmode-foldable confirms it folds.    //
+    // Bumped 10.0 → 10.2 for the marker snapshot/hydrate registry. Measured 10.05KB;
+    // production 8.16KB (dev code still folds fully — check-devmode-foldable
+    // confirms ~1.5-1.9KB reclaimed per tree).
+    //
+    // What it bought: `form()` and `entityMap()` values reach snapshots at
+    // all — before this, `persistence()` wrote `{}` for a form and reported
+    // success. The cost is the snapshot/hydrate hooks on status, form and
+    // entityMap plus the O(1) processor stamp; it REPLACED two hardcoded
+    // duck-type tests, so part of the growth is offset.    //
+    // Bumped 10.2 → 10.4 for the async-marker snapshot hooks and ST2022.
+    // Measured 10.30KB; production 8.24KB.
+    //
+    // What it bought: `asyncSource`/`asyncStream` values reach
+    // snapshots at all — before this `tree.$()` dropped them entirely, the same
+    // defect `form()` had — plus ST2022, which fires when a marker registers
+    // without declaring what of it is state. That diagnostic is the guard
+    // against a SEVENTH instance of this defect class, so its bytes are the
+    // cheapest on this list.
+    // 14.0.0: split into dev/prod. Measured dev 10.50KB, prod 8.25KB.
+    //
+    // Bumped 8.4 → 8.7 at the 14.0.0 RC. Measured prod 8.57KB, and the overage
+    // was ATTRIBUTED before raising rather than after: rebuilding at 1b79fd26
+    // (before the two 14.0.0 perf fixes) gives 8.48KB, so 0.08KB of it predates
+    // them and the budget had been quietly red for earlier RC work. The
+    // remaining 0.09KB is the weak `byId()` node cache (WeakRef +
+    // FinalizationRegistry) and the marker snapshot memo.
+    //
+    // What those 90 bytes bought, both measured: reading `byId()` across a 10k
+    // collection went from 4,149 to 844 B/entity, 39.6MB to 8.05MB
+    // (docs/architecture/memory-profile.md), and a marker's snapshot wrapper
+    // stopped being re-allocated on every UNRELATED write, which is what makes
+    // `computed(() => tree.$().rows)` stable for an OnPush consumer. On the axis
+    // that matters for a phone this is 90 bytes of download against 31MB of
+    // heap — see docs/architecture/size-structure-review.md for why retained
+    // heap is weighted above gzip here.
+    //
+    // Bumped 8.7 → 9.3 prod / 11.2 → 11.8 dev for the 14.0.0 RC. Measured 9.13
+    // and 11.56. Attributed: prepend (which re-orders the storage map rather
+    // than rebuilding every per-entity signal), active-entity tracking
+    // (activeId/activeEntity/setActiveId/clearActiveId), changeId, and the
+    // ST2026 predicate-churn diagnostic. Prod and dev grew by almost the same
+    // amount — 0.56 against 0.53 — which confirms the diagnostic is folding:
+    // its ~500 characters of message text are absent from the prod figure, and
+    // `check-devmode-foldable` passes.
+    //
+    // What it bought: three capabilities the audit found in peer stores and
+    // not here, and a diagnostic for a 75x cost (0.27ms hoisted against 20.54ms
+    // inline over 1,000 entities) that is otherwise symptomless — the cache is
+    // weak, so nothing leaks and nothing breaks; the app is just slow forever.
+    // Bumped for ST2027 — see the attribution on `signaltree-bare`. Measured
+    // prod +0.07KB, dev +0.30KB from threading the leaf path for the
+    // diagnostic's message.
+    //
+    // ⚠️ RE-BASELINED for 14.0.0, and read the reason before trusting anything
+    // above. Until `ensureBuilt()` was added, this gate measured whatever was
+    // in `dist/` without checking it matched the source — and `npm run build`
+    // was broken, so `dist/` was stale for an entire hardening session. Every
+    // number attributed above was computed that way. They are recorded as
+    // written, not silently corrected, because a fabricated correction would be
+    // no better; treat the pre-14.0.0 attributions as indicative, not measured.
+    //
+    // First honest baseline, both ends rebuilt from source:
+    //
+    //     b254edc1 (14.0.0 hardening start)   9.13 prod   11.56 dev
+    //     after the hardening work            9.40 prod   12.07 dev
+    //
+    // +0.27 prod, +0.51 dev. `signaltree-bare` moved +0.09/+0.35 over the same
+    // span, so ~0.18KB of the prod growth is entity-specific: the `where`/`find`
+    // storage-scan fast path and `entityMap`'s `history` flag (RFC 0012). The
+    // shared remainder is ST2027's leaf-path threading and ST2028's structural
+    // clone. Dev outgrows prod roughly 2:1, which is the expected shape when
+    // most of what landed is diagnostic text that folds — `ngDevMode: false`
+    // reclaims it (see check-devmode-foldable).
+    // Bumped for ST2031 — the changeId held-node diagnostic. Measured cost:
+    // 9.40 -> 9.69 prod, 12.07 -> 12.36 dev, all of it in entity-signal.ts, so
+    // `signaltree-bare` and `signaltree-form` are unmoved.
+    //
+    // The cost is a `Map<K,K>` of retired ids plus a `Set` of already-reported
+    // ones. Those are DATA, not strings, so they do not fold away under
+    // `ngDevMode: false` the way the message does — which is why the dev and prod
+    // deltas are the same 0.29KB rather than dev-only.
+    //
+    // Paid deliberately: `changeId` drops the old per-entity signal on purpose,
+    // so a node held across a rekey reads `undefined` forever with nothing said.
+    // 0.29KB to convert a permanent silent failure into a named one is the trade
+    // this library's diagnostics exist to make. If it needs reclaiming, the Map
+    // is the thing to make dev-only, not the message.
+    // 15.0.0 release hardening: plain entityMap() now pays for the same causal
+    // runtime plus structural identity machinery. Measured after rebuilding
+    // from source: prod 20.77KB, dev 23.45KB.
+    //
+    // Post-RC declarative restoration closure moved the final measured floor to
+    // 21.49KB prod / 24.18KB dev. Before rebaselining, the closed active-index
+    // experiment's two shadow resolvers and public parity hooks were deleted;
+    // that recovered 0.17KB but left 21.49/24.18 stable across repeat builds.
+    // The remaining code is on the plain EntityMap path: owner-scoped target
+    // preparation, compact historical projection, and physical identity/order
+    // machinery. Dev foldability remains green (24.18 -> 21.48KB), so no
+    // diagnostic text leaked into production. Budgets retain about 0.2KB of
+    // headroom rather than rounding the measured values down.
+    // Callable EntityMap fields add writable projections over stable entity
+    // identity. With the shared callable kernel included, the measured floor is
+    // 21.96KB prod / 24.60KB dev. The ceilings retain narrow headroom without
+    // weakening field identity, raw ingress, or terminal topology.
+    // Carrier-specific query and field realizations move that floor to 22.01KB
+    // prod / 24.66KB dev after adapter-only runtime splitting; the native
+    // implementation remains absent from neutral bundles.
+    // Native-name collision rejection adds declaration-time validation to the
+    // existing computed-slice builder. Measured 22.20KB prod / 24.84KB dev.
+    // The compact exact-name list prevents slices from corrupting collection
+    // accessors or writers before materialization; it must also run in prod.
+    // Deliberate correctness cost (~0.19KB), not a diagnostic folding regression.
+    // 15.2.0: same epoch architecture, measured here at 22.47KB prod /
+    // 25.10KB dev. entity-signal.ts carries the per-subject epoch registry
+    // (subjectEpochs / pendingSubjectEpochs) on top of the shared kernel
+    // growth above. Same disposition and same reason.
+    // Same v16 approval; keeps diagnostics and correctness intact.
+    // Same October 18 artifact-only approval; no performance-neutrality claim.
+    devKB: 28.98,
+    prodKB: 26.16,
+    code: `
+      import { signalTree, entityMap } from ${JSON.stringify(CORE)};
+      const t = signalTree({ count: 0, users: entityMap() });
+      t.$.users.addOne({ id: 1, name: 'a' }); t.$.users.updateOne(1, { name: 'b' });
+      globalThis.__sink = t.$.users.all();
+    `,
+  },
+};
+
+const EXTERNAL = ['@angular/*', 'rxjs', 'rxjs/*', 'tslib'];
+const dir = mkdtempSync(join(tmpdir(), 'st-budget-'));
+let failed = false;
+
+async function measure(entry, define) {
+  const out = await build({
+    entryPoints: [entry],
+    bundle: true,
+    minify: true,
+    format: 'esm',
+    platform: 'browser',
+    treeShaking: true,
+    external: EXTERNAL,
+    nodePaths: [REPO_NODE_MODULES],
+    write: false,
+    metafile: true,
+    legalComments: 'none',
+    logLevel: 'silent',
+    define,
+  });
+  const label = entry.split('/').at(-1).replace('.js','') + (define.ngDevMode ? '-prod' : '-dev');
+  const bytes = Buffer.from(out.outputFiles[0].contents);
+  writeFileSync("/private/tmp/st-c28-r3-composed-artifacts/graph" + '/' + label + '.js', bytes);
+  writeFileSync("/private/tmp/st-c28-r3-composed-artifacts/graph" + '/' + label + '.json', JSON.stringify({gzipBytes:gzipSync(bytes,{level:9}).length,minifiedBytes:bytes.length,metafile:out.metafile},null,2));
+  return (
+    gzipSync(Buffer.from(out.outputFiles[0].contents), { level: 9 }).length /
+    1024
+  );
+}
+
+console.log('target                   prod (ships)      dev (diagnostics)');
+console.log('─'.repeat(66));
+
+for (const [id, { code, devKB, prodKB }] of Object.entries(TARGETS)) {
+  const entry = join(dir, `${id}.js`);
+  writeFileSync(entry, code, 'utf8');
+
+  const prod = await measure(entry, { ngDevMode: 'false' });
+  const dev = await measure(entry, {});
+
+  const prodOk = prod <= prodKB;
+  const devOk = dev <= devKB;
+  if (!prodOk || !devOk) failed = true;
+
+  console.log(
+    `${id.padEnd(22)} ` +
+      `${prodOk ? '✅' : '❌'} ${prod.toFixed(2)}/${prodKB}KB   ` +
+      `${devOk ? '✅' : '❌'} ${dev.toFixed(2)}/${devKB}KB`
+  );
+}
+
+if (failed) {
+  console.error(
+    '\n❌ Bundle budget exceeded.\n\n' +
+      '  PROD over  — the shipped artifact exceeds its current limit. Compare a\n' +
+      '               fresh baseline with the same toolchain, then inspect the\n' +
+      '               emitted graph. Distinguish optional reachability from\n' +
+      '               required behavior; do not assume an optional-module leak.\n\n' +
+      '  DEV over   — measure the production/development difference and check\n' +
+      '               diagnostic folding (`node tools/check-devmode-foldable.mjs`).\n' +
+      '               A flat production result alone does not justify a higher\n' +
+      '               development limit. Budget changes need measured rationale\n' +
+      '               and owner approval; this result remains failed.\n'
+  );
+  process.exit(1);
+}
+console.log('\n✅ Bundle within budget (prod and dev).');

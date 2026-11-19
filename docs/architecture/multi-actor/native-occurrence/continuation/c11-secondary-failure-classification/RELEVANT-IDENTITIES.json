@@ -1,0 +1,92 @@
+{
+  "packages/kernel/src/index.ts": {
+    "C8a": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388",
+    "C11": "180b166b80796e9519188f694e29a4fff2a66a92256e2858557e1d7a7b7d2388",
+    "same": true
+  },
+  "packages/kernel/src/lib/entity-signal.ts": {
+    "C8a": "d6b3ec2c4ef3a8ecb1e8e46dc98082c3924837ce183d078eb832976ce0b79bd4",
+    "C11": "8a301cc1ee1e87fdf37c33508197d3019f3c6e38b6fed88c209285de05006d70",
+    "same": false
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": {
+    "C8a": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "C11": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+    "same": true
+  },
+  "packages/kernel/src/lib/internals/scalar-publication-coverage.ts": {
+    "C8a": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83",
+    "C11": "16eca660de3cf72612ffdf4f377b235fadadc3f1387944621135c1e96aeddc83",
+    "same": true
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": {
+    "C8a": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+    "C11": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+    "same": true
+  },
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts": {
+    "C8a": "b6c13c3e26f6ef27834f6e7e9c97ac395a7a5980a4de4259e8c70b2d1ab7fbce",
+    "C11": "b6c13c3e26f6ef27834f6e7e9c97ac395a7a5980a4de4259e8c70b2d1ab7fbce",
+    "same": true
+  },
+  "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts": {
+    "C8a": "cad4feca7d082b6d7f10dd6e6ab5a1172b19274d7602b21bbd0a0da6bf23ccaa",
+    "C11": "cad4feca7d082b6d7f10dd6e6ab5a1172b19274d7602b21bbd0a0da6bf23ccaa",
+    "same": true
+  },
+  "packages/kernel/src/lib/structural-admission-sequence.spec.ts": {
+    "C8a": "e6154fc6e1159571839a93edc4dac3ed8f29cb81ad04fbecf312e220ec568a72",
+    "C11": "e6154fc6e1159571839a93edc4dac3ed8f29cb81ad04fbecf312e220ec568a72",
+    "same": true
+  },
+  "packages/kernel/src/lib/occupancy-successor-realization.spec.ts": {
+    "C8a": "dbec4105d11acee4f5ac999cc0d077341cf14d71cdbfbeca294107e91319eae7",
+    "C11": "dbec4105d11acee4f5ac999cc0d077341cf14d71cdbfbeca294107e91319eae7",
+    "same": true
+  },
+  "packages/kernel/src/lib/complete-structural-sequence.spec.ts": {
+    "C8a": "45b9b8114a5f19a322ce0b03d595c4d62cf0cd7a53dcd9f74069129d0b93be1f",
+    "C11": "45b9b8114a5f19a322ce0b03d595c4d62cf0cd7a53dcd9f74069129d0b93be1f",
+    "same": true
+  },
+  "packages/kernel/src/lib/structural-completeness.spec.ts": {
+    "C8a": "287421da208040f0e140069b8d2a5ab7db77b1d397638dcd6070781ae01dc89a",
+    "C11": "287421da208040f0e140069b8d2a5ab7db77b1d397638dcd6070781ae01dc89a",
+    "same": true
+  },
+  "docs/review-contract.md": {
+    "C8a": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+    "C11": "b9b2f633a6d8dda9b1955cd01f92e3b1e8aabe8f3e110e806bbaa57c0a43e4e9",
+    "same": true
+  },
+  "docs/contributor-contracts.md": {
+    "C8a": "0211a2851f9f5724182555a3ff2c2ebdf89c43f88a6123d5e09fc505b8bd51d2",
+    "C11": "0211a2851f9f5724182555a3ff2c2ebdf89c43f88a6123d5e09fc505b8bd51d2",
+    "same": true
+  },
+  "RELEASE-CURRENT.md": {
+    "C8a": "22619dc9ef9f7b069579d493075f1cfee225a2025daf80e52c5d5d7350fd1e44",
+    "C11": "22619dc9ef9f7b069579d493075f1cfee225a2025daf80e52c5d5d7350fd1e44",
+    "same": true
+  },
+  "package.json": {
+    "C8a": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    "C11": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    "same": true
+  },
+  ".nvmrc": {
+    "C8a": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "C11": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "same": true
+  },
+  "packages/kernel/vitest.config.ts": {
+    "C8a": "76f5676437b9d8e8236e7b3a48e47c42b326458dcf1f712407a97ceac447b566",
+    "C11": "76f5676437b9d8e8236e7b3a48e47c42b326458dcf1f712407a97ceac447b566",
+    "same": true
+  },
+  "tools/run-core-vitest.mjs": {
+    "C8a": "7f10fcc5361b9f5112bcca63e9b1459b220a806928574dd7d2c9eac6441f5a00",
+    "C11": "7f10fcc5361b9f5112bcca63e9b1459b220a806928574dd7d2c9eac6441f5a00",
+    "same": true
+  }
+}

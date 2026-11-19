@@ -1,0 +1,914 @@
+[
+  {
+    "source": "SECOND-FIXTURE-candidate.ts",
+    "archive": "SECOND-FIXTURE-candidate.ts",
+    "sourceSha256": "76c7cdd68cd2b0e2dfb783e0b9ec0e5f853e501eed2d920e4438d4dcc38de816",
+    "archiveSha256": "76c7cdd68cd2b0e2dfb783e0b9ec0e5f853e501eed2d920e4438d4dcc38de816"
+  },
+  {
+    "source": "run.py",
+    "archive": "run.py",
+    "sourceSha256": "95dcf8b226e3ea37a3bf209b5a820f006eb5ea405e38b96593282ab4d1926aca",
+    "archiveSha256": "95dcf8b226e3ea37a3bf209b5a820f006eb5ea405e38b96593282ab4d1926aca"
+  },
+  {
+    "source": "FINAL-IDENTITY.json",
+    "archive": "FINAL-IDENTITY.json",
+    "sourceSha256": "8e3e46ba1f9d81f1c139bb4d2c8e58d1b24631d7e2dd68c62f0af6f174660dd3",
+    "archiveSha256": "8e3e46ba1f9d81f1c139bb4d2c8e58d1b24631d7e2dd68c62f0af6f174660dd3"
+  },
+  {
+    "source": "FIRST-FIXTURE-candidate.ts",
+    "archive": "FIRST-FIXTURE-candidate.ts",
+    "sourceSha256": "63368487dd5f72fa07525062516aef93a017637dce3a526cedd4e3cbe38b3a7b",
+    "archiveSha256": "63368487dd5f72fa07525062516aef93a017637dce3a526cedd4e3cbe38b3a7b"
+  },
+  {
+    "source": "PAIRED-COMPARISONS.json",
+    "archive": "PAIRED-COMPARISONS.json",
+    "sourceSha256": "d52c1428c90093283c950c42451146523eea6de696ff3ab60fd61df82caeec30",
+    "archiveSha256": "d52c1428c90093283c950c42451146523eea6de696ff3ab60fd61df82caeec30"
+  },
+  {
+    "source": "SECOND-FIXTURE-oracle.ts",
+    "archive": "SECOND-FIXTURE-oracle.ts",
+    "sourceSha256": "76c7cdd68cd2b0e2dfb783e0b9ec0e5f853e501eed2d920e4438d4dcc38de816",
+    "archiveSha256": "76c7cdd68cd2b0e2dfb783e0b9ec0e5f853e501eed2d920e4438d4dcc38de816"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "7103dd0137c87671a9065bf7f665fb463244c22b951569868e3267fe9493aa85",
+    "archiveSha256": "7103dd0137c87671a9065bf7f665fb463244c22b951569868e3267fe9493aa85"
+  },
+  {
+    "source": "final-verify.py",
+    "archive": "final-verify.py",
+    "sourceSha256": "ca609f7155dba2b2251557a9bdf8824f21cb2f1f1b1c8bd459c5b86124cdcd3c",
+    "archiveSha256": "ca609f7155dba2b2251557a9bdf8824f21cb2f1f1b1c8bd459c5b86124cdcd3c"
+  },
+  {
+    "source": "FIRST-FIXTURE-oracle.ts",
+    "archive": "FIRST-FIXTURE-oracle.ts",
+    "sourceSha256": "63368487dd5f72fa07525062516aef93a017637dce3a526cedd4e3cbe38b3a7b",
+    "archiveSha256": "63368487dd5f72fa07525062516aef93a017637dce3a526cedd4e3cbe38b3a7b"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "6725641d131b025d7b0891777c26ae4eaf02ef6c53b60ebe23d29d2039d5e82b",
+    "archiveSha256": "6725641d131b025d7b0891777c26ae4eaf02ef6c53b60ebe23d29d2039d5e82b"
+  },
+  {
+    "source": "compare.py",
+    "archive": "compare.py",
+    "sourceSha256": "669a028c91510c3ad33c5e1c8ad5d528287176b67bda6d3be9b54e5e1c54804e",
+    "archiveSha256": "669a028c91510c3ad33c5e1c8ad5d528287176b67bda6d3be9b54e5e1c54804e"
+  },
+  {
+    "source": "candidate-data/eslint-2654242865465226088.hash",
+    "archive": "candidate-data/eslint-2654242865465226088.hash",
+    "sourceSha256": "d20432996186770d483ea4deb0e1adb37153f9ff4faab3342da17f412e5c0c5a",
+    "archiveSha256": "d20432996186770d483ea4deb0e1adb37153f9ff4faab3342da17f412e5c0c5a"
+  },
+  {
+    "source": "candidate-data/source-maps.json",
+    "archive": "candidate-data/source-maps.json.gz",
+    "sourceSha256": "d1747baa02a3a15dd34407a1ba9d838584d4b6d936722e5c3aaab0e560f54272",
+    "archiveSha256": "5b9fc0c8ebd8062fc5e099ca8d95e99ffb18ed4f3530b2c3b3f3dd2f17e946ae"
+  },
+  {
+    "source": "candidate-data/playwright-5186013267177752385.hash",
+    "archive": "candidate-data/playwright-5186013267177752385.hash",
+    "sourceSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2",
+    "archiveSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2"
+  },
+  {
+    "source": "candidate-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "archive": "candidate-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "sourceSha256": "60472cca333dd6f4cef3b87344cc83a0407abd802cb6858215b831a44055c430",
+    "archiveSha256": "60472cca333dd6f4cef3b87344cc83a0407abd802cb6858215b831a44055c430"
+  },
+  {
+    "source": "candidate-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "archive": "candidate-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "candidate-data/vite-7556005483977466535.hash",
+    "archive": "candidate-data/vite-7556005483977466535.hash",
+    "sourceSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9",
+    "archiveSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9"
+  },
+  {
+    "source": "candidate-data/file-map.json",
+    "archive": "candidate-data/file-map.json.gz",
+    "sourceSha256": "e4a2fb9d2d33d7a8e70f52e56104cf76c940ca8909aa9fbb0b1ed65546f7b073",
+    "archiveSha256": "44c33e0c68da09dd734603f3ad97dd16b3d80ce8ebbeb992b3d834829b86a95a"
+  },
+  {
+    "source": "candidate-data/lockfile-nodes.hash",
+    "archive": "candidate-data/lockfile-nodes.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "candidate-data/parsed-lock-file.nodes.json",
+    "archive": "candidate-data/parsed-lock-file.nodes.json.gz",
+    "sourceSha256": "62c90f7a638dc748d016fa76093e0ee64f80c39a537fa208f007549d361d9dc6",
+    "archiveSha256": "6017597251949c522723a73b5b5ece9379e4a1fc280ee27fc4d91b5ca71b7614"
+  },
+  {
+    "source": "candidate-data/project-graph.lock",
+    "archive": "candidate-data/project-graph.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "candidate-data/project-graph.json",
+    "archive": "candidate-data/project-graph.json.gz",
+    "sourceSha256": "66427f9abe660fb9a7ee24fbebb600b2fe55ae3c69ea050a9a5ed3685a11b7ba",
+    "archiveSha256": "1a8a316cc944c0df475df81fa23300ca05e16f43b07e805bc8402a20ee2366f7"
+  },
+  {
+    "source": "candidate-data/parsed-lock-file.dependencies.json",
+    "archive": "candidate-data/parsed-lock-file.dependencies.json.gz",
+    "sourceSha256": "c1be78a6f49124f0bb445f8b50c3a7ecb973b2635c443f6662e9e805bc28c00e",
+    "archiveSha256": "b601457c77417fc19193617f627f2a7985413123598d3996bd415a80ea11c3c9"
+  },
+  {
+    "source": "candidate-data/rollup-14273536953574808233.hash",
+    "archive": "candidate-data/rollup-14273536953574808233.hash",
+    "sourceSha256": "20a3c348f6b03f51d837ad307f45390ba5a140f691be79f91cb7cd71562698a9",
+    "archiveSha256": "20a3c348f6b03f51d837ad307f45390ba5a140f691be79f91cb7cd71562698a9"
+  },
+  {
+    "source": "candidate-data/lockfile-dependencies.hash",
+    "archive": "candidate-data/lockfile-dependencies.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "candidate-data/nx_files.nxt",
+    "archive": "candidate-data/nx_files.nxt.gz",
+    "sourceSha256": "de22e461c07c2febab8d76f04c4836b24a7cfe2ec7296591d869f1a88609f5e2",
+    "archiveSha256": "c628255dfb2fb3c924897cd6b345de6f9b1bab37231c350764501d58cab97b35"
+  },
+  {
+    "source": "candidate-data/vitest-7333614714660744029.hash",
+    "archive": "candidate-data/vitest-7333614714660744029.hash.gz",
+    "sourceSha256": "2618b7802fcb240d6df91753769bf4445447d0e35adb593a35212a79698ff405",
+    "archiveSha256": "43d5b60e1fcaf70a64976145106506833e9105fe4892f309165727374bc33649"
+  },
+  {
+    "source": "oracle-data/eslint-2654242865465226088.hash",
+    "archive": "oracle-data/eslint-2654242865465226088.hash",
+    "sourceSha256": "5a538891f02518bb7b714faaee4b7d3a421808237b84c811c19dd250af7ce387",
+    "archiveSha256": "5a538891f02518bb7b714faaee4b7d3a421808237b84c811c19dd250af7ce387"
+  },
+  {
+    "source": "oracle-data/source-maps.json",
+    "archive": "oracle-data/source-maps.json.gz",
+    "sourceSha256": "d1747baa02a3a15dd34407a1ba9d838584d4b6d936722e5c3aaab0e560f54272",
+    "archiveSha256": "5b9fc0c8ebd8062fc5e099ca8d95e99ffb18ed4f3530b2c3b3f3dd2f17e946ae"
+  },
+  {
+    "source": "oracle-data/playwright-5186013267177752385.hash",
+    "archive": "oracle-data/playwright-5186013267177752385.hash",
+    "sourceSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2",
+    "archiveSha256": "6297f85b0c5b3ecbe34008fa98074c85a22f4c028d3b7661739fa8ab377c8da2"
+  },
+  {
+    "source": "oracle-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "archive": "oracle-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.db",
+    "sourceSha256": "9e6d6ca50502cd856020b1a596f8d43214d75f6f61dcbe1b07849fce4e310166",
+    "archiveSha256": "9e6d6ca50502cd856020b1a596f8d43214d75f6f61dcbe1b07849fce4e310166"
+  },
+  {
+    "source": "oracle-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "archive": "oracle-data/DD047AA8-7766-5CAE-9F41-ADDD05FB53F0-v3.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "oracle-data/vite-7556005483977466535.hash",
+    "archive": "oracle-data/vite-7556005483977466535.hash",
+    "sourceSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9",
+    "archiveSha256": "142d885ed09eaaa73443daeab31c5f46050f9bc0b0b08b5b74f6cc4a8ea8c8a9"
+  },
+  {
+    "source": "oracle-data/file-map.json",
+    "archive": "oracle-data/file-map.json.gz",
+    "sourceSha256": "f05854a5df9747314f62f182b5f3458def3e1e4bdc33642bb2363dc36ebcfe55",
+    "archiveSha256": "3e489a2d914e7f33190c9f19322b33e5f8d021961ef70edc53a8fde3083663f5"
+  },
+  {
+    "source": "oracle-data/lockfile-nodes.hash",
+    "archive": "oracle-data/lockfile-nodes.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "oracle-data/parsed-lock-file.nodes.json",
+    "archive": "oracle-data/parsed-lock-file.nodes.json.gz",
+    "sourceSha256": "62c90f7a638dc748d016fa76093e0ee64f80c39a537fa208f007549d361d9dc6",
+    "archiveSha256": "6017597251949c522723a73b5b5ece9379e4a1fc280ee27fc4d91b5ca71b7614"
+  },
+  {
+    "source": "oracle-data/project-graph.lock",
+    "archive": "oracle-data/project-graph.lock",
+    "sourceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "archiveSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "oracle-data/project-graph.json",
+    "archive": "oracle-data/project-graph.json.gz",
+    "sourceSha256": "ec2bf62f0e9c6012cfd45937f629fc6a3bc54076497b29e336d84abde4850a35",
+    "archiveSha256": "b2ee520fef96e958a537a355fa3c2df4c76645c0e03911079cea06f6abce1ade"
+  },
+  {
+    "source": "oracle-data/parsed-lock-file.dependencies.json",
+    "archive": "oracle-data/parsed-lock-file.dependencies.json.gz",
+    "sourceSha256": "c1be78a6f49124f0bb445f8b50c3a7ecb973b2635c443f6662e9e805bc28c00e",
+    "archiveSha256": "b601457c77417fc19193617f627f2a7985413123598d3996bd415a80ea11c3c9"
+  },
+  {
+    "source": "oracle-data/rollup-14273536953574808233.hash",
+    "archive": "oracle-data/rollup-14273536953574808233.hash",
+    "sourceSha256": "a95d0e48577aa22a4e1c419d7a7a9e0160df8abe121189f8100d3a87386d42e3",
+    "archiveSha256": "a95d0e48577aa22a4e1c419d7a7a9e0160df8abe121189f8100d3a87386d42e3"
+  },
+  {
+    "source": "oracle-data/lockfile-dependencies.hash",
+    "archive": "oracle-data/lockfile-dependencies.hash",
+    "sourceSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2",
+    "archiveSha256": "9fc5d635c40d8f8a030a34a65db2f2eb1d4c0f5119edb3f7d1025e0446f1fcc2"
+  },
+  {
+    "source": "oracle-data/nx_files.nxt",
+    "archive": "oracle-data/nx_files.nxt.gz",
+    "sourceSha256": "ecbdff7c087e9037a6df7aa6f81a187b9a0e92cc2b84bf3653a581d06a726c8a",
+    "archiveSha256": "e59d00a68ef9caa2a5dcfc8f51ce001957844468b9e9110ab9434aa48f77a6c3"
+  },
+  {
+    "source": "oracle-data/vitest-7333614714660744029.hash",
+    "archive": "oracle-data/vitest-7333614714660744029.hash.gz",
+    "sourceSha256": "22f6bddee3f2e10e986fdf1e3f9fceaf205f0775e6614b297fe0cf05836b7257",
+    "archiveSha256": "97da2dd15754d0a5da8dccc7d9d10e1779d1b2bbd998e2f29353805ee9606700"
+  },
+  {
+    "source": "candidate-cache/run.json",
+    "archive": "candidate-cache/run.json",
+    "sourceSha256": "7b74d6d41efede2642dd0fe7c321ee8d5bc671d5a2cb25adb3e4e23583255b75",
+    "archiveSha256": "7b74d6d41efede2642dd0fe7c321ee8d5bc671d5a2cb25adb3e4e23583255b75"
+  },
+  {
+    "source": "oracle-cache/run.json",
+    "archive": "oracle-cache/run.json",
+    "sourceSha256": "48b81fdc3d26fdccbbdb4192dd6c3b1ede25bff506c019ba73a67643e54d74c7",
+    "archiveSha256": "48b81fdc3d26fdccbbdb4192dd6c3b1ede25bff506c019ba73a67643e54d74c7"
+  },
+  {
+    "source": "runs/oracle-angular/RESULT.json",
+    "archive": "runs/oracle-angular/RESULT.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "runs/oracle-angular/first.log",
+    "archive": "runs/oracle-angular/first.log",
+    "sourceSha256": "b9acb9f9f306ee36221d7775b5113abdf661a4bb5f085657ea19d20aebd165b4",
+    "archiveSha256": "b9acb9f9f306ee36221d7775b5113abdf661a4bb5f085657ea19d20aebd165b4"
+  },
+  {
+    "source": "runs/oracle-angular/COMMAND.json",
+    "archive": "runs/oracle-angular/COMMAND.json",
+    "sourceSha256": "be68fe9ac4cf7cbb21f1b95c15aaae9657d58e929dc25a7db173f800a888f7bc",
+    "archiveSha256": "be68fe9ac4cf7cbb21f1b95c15aaae9657d58e929dc25a7db173f800a888f7bc"
+  },
+  {
+    "source": "runs/oracle-angular/observations/marker-E5-child.json",
+    "archive": "runs/oracle-angular/observations/marker-E5-child.json",
+    "sourceSha256": "1650f1d2a2657ada663658f709bced9e9baf341f5c6f91adb0b50cde2d84263b",
+    "archiveSha256": "1650f1d2a2657ada663658f709bced9e9baf341f5c6f91adb0b50cde2d84263b"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-E4.json",
+    "archive": "runs/oracle-angular/observations/sort-E4.json",
+    "sourceSha256": "f4174e85e35494fcd023c5535e7a6ee47f15f9b714b076a8357e4cc992cdce13",
+    "archiveSha256": "f4174e85e35494fcd023c5535e7a6ee47f15f9b714b076a8357e4cc992cdce13"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-readonly-child.json",
+    "archive": "runs/oracle-angular/observations/sort-readonly-child.json",
+    "sourceSha256": "8e228a50c9e3a7156c8002f8eabd7f3465c92b6be7a978dd50c26bbd04535d77",
+    "archiveSha256": "8e228a50c9e3a7156c8002f8eabd7f3465c92b6be7a978dd50c26bbd04535d77"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sorted-false.json",
+    "archive": "runs/oracle-angular/observations/sorted-false.json",
+    "sourceSha256": "fa9db5956f45863cf3ef3d4efe7879630a2c76192612fd94bd7ccfbb5745495d",
+    "archiveSha256": "fa9db5956f45863cf3ef3d4efe7879630a2c76192612fd94bd7ccfbb5745495d"
+  },
+  {
+    "source": "runs/oracle-angular/observations/marker-E5-self.json",
+    "archive": "runs/oracle-angular/observations/marker-E5-self.json",
+    "sourceSha256": "02249a5a893a59c92dd8496067faa11830827f67da0c85c7f0a2809c4136657d",
+    "archiveSha256": "02249a5a893a59c92dd8496067faa11830827f67da0c85c7f0a2809c4136657d"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-E1-isolated.json",
+    "archive": "runs/oracle-angular/observations/sort-E1-isolated.json",
+    "sourceSha256": "9cc8185e836febb2608462f1f8906b09a25e3131450d0696e7aabe1f5d5ecb15",
+    "archiveSha256": "9cc8185e836febb2608462f1f8906b09a25e3131450d0696e7aabe1f5d5ecb15"
+  },
+  {
+    "source": "runs/oracle-angular/observations/warm-marker-E5-self.json",
+    "archive": "runs/oracle-angular/observations/warm-marker-E5-self.json",
+    "sourceSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f",
+    "archiveSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-E5-self.json",
+    "archive": "runs/oracle-angular/observations/sort-E5-self.json",
+    "sourceSha256": "5b2b6ad925c72b5c26db3d83e9320ce69c5a746717b59bffa5b58b222dbf79d8",
+    "archiveSha256": "5b2b6ad925c72b5c26db3d83e9320ce69c5a746717b59bffa5b58b222dbf79d8"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-E3.json",
+    "archive": "runs/oracle-angular/observations/sort-E3.json",
+    "sourceSha256": "2d4d0f964d1839cd20a56105bcc47bc8e33790d99200c4e729674f5a6e1c7045",
+    "archiveSha256": "2d4d0f964d1839cd20a56105bcc47bc8e33790d99200c4e729674f5a6e1c7045"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sorted-true.json",
+    "archive": "runs/oracle-angular/observations/sorted-true.json",
+    "sourceSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63",
+    "archiveSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63"
+  },
+  {
+    "source": "runs/oracle-angular/observations/marker-E1.json",
+    "archive": "runs/oracle-angular/observations/marker-E1.json",
+    "sourceSha256": "bcc5246dce38bdb901e2872fc541906287722d6087ebd6f959849bed6f089a50",
+    "archiveSha256": "bcc5246dce38bdb901e2872fc541906287722d6087ebd6f959849bed6f089a50"
+  },
+  {
+    "source": "runs/oracle-angular/observations/warm-marker-E4.json",
+    "archive": "runs/oracle-angular/observations/warm-marker-E4.json",
+    "sourceSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960",
+    "archiveSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-readonly-self.json",
+    "archive": "runs/oracle-angular/observations/sort-readonly-self.json",
+    "sourceSha256": "1ce4556a4976af3f3e5df938a1763dc3cd6dc92a9e56faf20212eafba3e0c064",
+    "archiveSha256": "1ce4556a4976af3f3e5df938a1763dc3cd6dc92a9e56faf20212eafba3e0c064"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-E1.json",
+    "archive": "runs/oracle-angular/observations/sort-E1.json",
+    "sourceSha256": "76aba3fcdc06c33c1e46df973c9f0fb75dbc7afaff6318959327ea843f9d5276",
+    "archiveSha256": "76aba3fcdc06c33c1e46df973c9f0fb75dbc7afaff6318959327ea843f9d5276"
+  },
+  {
+    "source": "runs/oracle-angular/observations/warm-marker-E5-child.json",
+    "archive": "runs/oracle-angular/observations/warm-marker-E5-child.json",
+    "sourceSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e",
+    "archiveSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e"
+  },
+  {
+    "source": "runs/oracle-angular/observations/marker-E3.json",
+    "archive": "runs/oracle-angular/observations/marker-E3.json",
+    "sourceSha256": "5a2bffb3acc21033f0c594689af56f339a22d8f5164229325289333ee381c9f9",
+    "archiveSha256": "5a2bffb3acc21033f0c594689af56f339a22d8f5164229325289333ee381c9f9"
+  },
+  {
+    "source": "runs/oracle-angular/observations/warm-marker-E3.json",
+    "archive": "runs/oracle-angular/observations/warm-marker-E3.json",
+    "sourceSha256": "e54df6e7c97966aa23e7323b0473cf3895a0563f3f54a5f102f4db5bc075c6a3",
+    "archiveSha256": "e54df6e7c97966aa23e7323b0473cf3895a0563f3f54a5f102f4db5bc075c6a3"
+  },
+  {
+    "source": "runs/oracle-angular/observations/sort-E5-child.json",
+    "archive": "runs/oracle-angular/observations/sort-E5-child.json",
+    "sourceSha256": "9a5ec8b5164c44486aca6dc2a3c70801ecb4a28e91ee107bd50586543f92b300",
+    "archiveSha256": "9a5ec8b5164c44486aca6dc2a3c70801ecb4a28e91ee107bd50586543f92b300"
+  },
+  {
+    "source": "runs/oracle-angular/observations/marker-E4.json",
+    "archive": "runs/oracle-angular/observations/marker-E4.json",
+    "sourceSha256": "6d88d3cc1c554cc0875f78f55184b7b40677900431ae8c6b39b4b3f8c30c41b1",
+    "archiveSha256": "6d88d3cc1c554cc0875f78f55184b7b40677900431ae8c6b39b4b3f8c30c41b1"
+  },
+  {
+    "source": "runs/oracle-kernel/RESULT.json",
+    "archive": "runs/oracle-kernel/RESULT.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "runs/oracle-kernel/first.log",
+    "archive": "runs/oracle-kernel/first.log",
+    "sourceSha256": "5643a493534b7c6e4274203527b564519a06bf4105fefdc9219385315685b641",
+    "archiveSha256": "5643a493534b7c6e4274203527b564519a06bf4105fefdc9219385315685b641"
+  },
+  {
+    "source": "runs/oracle-kernel/COMMAND.json",
+    "archive": "runs/oracle-kernel/COMMAND.json",
+    "sourceSha256": "641a8f60ae7eef15a86e2ba69d2ce5a50a8924873e8392b5668355881d28e277",
+    "archiveSha256": "641a8f60ae7eef15a86e2ba69d2ce5a50a8924873e8392b5668355881d28e277"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/marker-E5-child.json",
+    "archive": "runs/oracle-kernel/observations/marker-E5-child.json",
+    "sourceSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742",
+    "archiveSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sort-E4.json",
+    "archive": "runs/oracle-kernel/observations/sort-E4.json",
+    "sourceSha256": "7109f53b9592dc2235b8bfca4c3aa92a619698d950eecfc7e6af1ebf8588a698",
+    "archiveSha256": "7109f53b9592dc2235b8bfca4c3aa92a619698d950eecfc7e6af1ebf8588a698"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sorted-false.json",
+    "archive": "runs/oracle-kernel/observations/sorted-false.json",
+    "sourceSha256": "9e300b13dc3f621baabca52cca87352a879246a0ff86636b2b8d19081ca8dc13",
+    "archiveSha256": "9e300b13dc3f621baabca52cca87352a879246a0ff86636b2b8d19081ca8dc13"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/marker-E5-self.json",
+    "archive": "runs/oracle-kernel/observations/marker-E5-self.json",
+    "sourceSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f",
+    "archiveSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sort-E1-isolated.json",
+    "archive": "runs/oracle-kernel/observations/sort-E1-isolated.json",
+    "sourceSha256": "b59786666308ff088cb34b7e10f9022174588ecd37862c32e1a2079c76970cd8",
+    "archiveSha256": "b59786666308ff088cb34b7e10f9022174588ecd37862c32e1a2079c76970cd8"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sort-E5-self.json",
+    "archive": "runs/oracle-kernel/observations/sort-E5-self.json",
+    "sourceSha256": "df44c1b92e5b46966463143b587eb222235a2345ec8f6d7b07751fa209169ee0",
+    "archiveSha256": "df44c1b92e5b46966463143b587eb222235a2345ec8f6d7b07751fa209169ee0"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sort-E3.json",
+    "archive": "runs/oracle-kernel/observations/sort-E3.json",
+    "sourceSha256": "8e350261dbc204302c254c79f8466bcdc3c87998665e1fe5122fe5259d66606f",
+    "archiveSha256": "8e350261dbc204302c254c79f8466bcdc3c87998665e1fe5122fe5259d66606f"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sorted-true.json",
+    "archive": "runs/oracle-kernel/observations/sorted-true.json",
+    "sourceSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63",
+    "archiveSha256": "9b267638f23e5b50fec6c5c5194f9c403f27e8214eb8c067e36b588fe9021c63"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/marker-E1.json",
+    "archive": "runs/oracle-kernel/observations/marker-E1.json",
+    "sourceSha256": "a0b9cfafa4f9a9b6e115ec2fb09251d94c8cf029dc1b4d06f114dbcab62bd04c",
+    "archiveSha256": "a0b9cfafa4f9a9b6e115ec2fb09251d94c8cf029dc1b4d06f114dbcab62bd04c"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sort-E1.json",
+    "archive": "runs/oracle-kernel/observations/sort-E1.json",
+    "sourceSha256": "23e04cfe869e1ca31e299eb163e84ad25b28cc60b6736b0fed4f0830d36def7c",
+    "archiveSha256": "23e04cfe869e1ca31e299eb163e84ad25b28cc60b6736b0fed4f0830d36def7c"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/marker-E3.json",
+    "archive": "runs/oracle-kernel/observations/marker-E3.json",
+    "sourceSha256": "759933df24ee6e1e9dbb228abf4d8fceaa07e37fe9bbb6821583080fdd009bab",
+    "archiveSha256": "759933df24ee6e1e9dbb228abf4d8fceaa07e37fe9bbb6821583080fdd009bab"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/sort-E5-child.json",
+    "archive": "runs/oracle-kernel/observations/sort-E5-child.json",
+    "sourceSha256": "f43fee96b816a72c59f8be9650da72a0155605f176dfe353db6b1c74cf67ba07",
+    "archiveSha256": "f43fee96b816a72c59f8be9650da72a0155605f176dfe353db6b1c74cf67ba07"
+  },
+  {
+    "source": "runs/oracle-kernel/observations/marker-E4.json",
+    "archive": "runs/oracle-kernel/observations/marker-E4.json",
+    "sourceSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a",
+    "archiveSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a"
+  },
+  {
+    "source": "runs/discriminators-angular-final/RESULT.json",
+    "archive": "runs/discriminators-angular-final/RESULT.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "runs/discriminators-angular-final/first.log",
+    "archive": "runs/discriminators-angular-final/first.log",
+    "sourceSha256": "b17d969d49c296a7027c1a1dcd5471a347141cecc2647db9c0f947e60738220f",
+    "archiveSha256": "b17d969d49c296a7027c1a1dcd5471a347141cecc2647db9c0f947e60738220f"
+  },
+  {
+    "source": "runs/discriminators-angular-final/COMMAND.json",
+    "archive": "runs/discriminators-angular-final/COMMAND.json",
+    "sourceSha256": "a8f9ebb542dae363b5140eda1b15e0a8f7cd4d93c24c1e3459b5e2b8ae1e2001",
+    "archiveSha256": "a8f9ebb542dae363b5140eda1b15e0a8f7cd4d93c24c1e3459b5e2b8ae1e2001"
+  },
+  {
+    "source": "runs/discriminators-angular-final/observations/cold-error.json",
+    "archive": "runs/discriminators-angular-final/observations/cold-error.json",
+    "sourceSha256": "06a4bf0b832288a67511f88fee5e8359e9c72934abcee9be2b26afa584fb2a0d",
+    "archiveSha256": "06a4bf0b832288a67511f88fee5e8359e9c72934abcee9be2b26afa584fb2a0d"
+  },
+  {
+    "source": "runs/discriminators-oracle/RESULT.json",
+    "archive": "runs/discriminators-oracle/RESULT.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "runs/discriminators-oracle/first.log",
+    "archive": "runs/discriminators-oracle/first.log",
+    "sourceSha256": "abac1611d947d60fba5ba195948765e3fd8b789c2a24e61e15126bb9cc26f10f",
+    "archiveSha256": "abac1611d947d60fba5ba195948765e3fd8b789c2a24e61e15126bb9cc26f10f"
+  },
+  {
+    "source": "runs/discriminators-oracle/COMMAND.json",
+    "archive": "runs/discriminators-oracle/COMMAND.json",
+    "sourceSha256": "ddd7eab211ade43e3f93da77f82215b62fbafd626424a82b973bf29182b95912",
+    "archiveSha256": "ddd7eab211ade43e3f93da77f82215b62fbafd626424a82b973bf29182b95912"
+  },
+  {
+    "source": "runs/discriminators-angular/RESULT.json",
+    "archive": "runs/discriminators-angular/RESULT.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "runs/discriminators-angular/first.log",
+    "archive": "runs/discriminators-angular/first.log",
+    "sourceSha256": "9910501c9cad081ce9fbce624eb34645437af3702d2ec918d755acffb497ef64",
+    "archiveSha256": "9910501c9cad081ce9fbce624eb34645437af3702d2ec918d755acffb497ef64"
+  },
+  {
+    "source": "runs/discriminators-angular/COMMAND.json",
+    "archive": "runs/discriminators-angular/COMMAND.json",
+    "sourceSha256": "1860560369f86939683a2f152efd8da951bb4d8b8e9785c06b5eb25b4f446317",
+    "archiveSha256": "1860560369f86939683a2f152efd8da951bb4d8b8e9785c06b5eb25b4f446317"
+  },
+  {
+    "source": "runs/discriminators-angular-corrected/RESULT.json",
+    "archive": "runs/discriminators-angular-corrected/RESULT.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "runs/discriminators-angular-corrected/first.log",
+    "archive": "runs/discriminators-angular-corrected/first.log",
+    "sourceSha256": "2e1195f06fa232339d9538802f971d487e353117ea1813a44d630371b160bf89",
+    "archiveSha256": "2e1195f06fa232339d9538802f971d487e353117ea1813a44d630371b160bf89"
+  },
+  {
+    "source": "runs/discriminators-angular-corrected/COMMAND.json",
+    "archive": "runs/discriminators-angular-corrected/COMMAND.json",
+    "sourceSha256": "2879207da8b3df6b1966b76c267e43066b9505e28be6683e86e03b557629b933",
+    "archiveSha256": "2879207da8b3df6b1966b76c267e43066b9505e28be6683e86e03b557629b933"
+  },
+  {
+    "source": "runs/focused-kernel/RESULT.json",
+    "archive": "runs/focused-kernel/RESULT.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "runs/focused-kernel/first.log",
+    "archive": "runs/focused-kernel/first.log",
+    "sourceSha256": "6dc08d49bb89349d644c0e00814cd7ab9b26cceb5cc6b971ed0fc37a8dbd398e",
+    "archiveSha256": "6dc08d49bb89349d644c0e00814cd7ab9b26cceb5cc6b971ed0fc37a8dbd398e"
+  },
+  {
+    "source": "runs/focused-kernel/COMMAND.json",
+    "archive": "runs/focused-kernel/COMMAND.json",
+    "sourceSha256": "f84454fa2863e0ee4963baf87b04a41b21b45ac8b338629fd37bf924ca41205f",
+    "archiveSha256": "f84454fa2863e0ee4963baf87b04a41b21b45ac8b338629fd37bf924ca41205f"
+  },
+  {
+    "source": "runs/focused-kernel/observations/marker-E5-child.json",
+    "archive": "runs/focused-kernel/observations/marker-E5-child.json",
+    "sourceSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742",
+    "archiveSha256": "370d330fd924e9ec3766f93847ec9181472d80c4da31acf9c7164cb5e15b2742"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sort-E4.json",
+    "archive": "runs/focused-kernel/observations/sort-E4.json",
+    "sourceSha256": "da1d12256fe3ba6a8990322fd39d7abec03510bec28841e54f4325827f6c792d",
+    "archiveSha256": "da1d12256fe3ba6a8990322fd39d7abec03510bec28841e54f4325827f6c792d"
+  },
+  {
+    "source": "runs/focused-kernel/observations/kernel-ordinary.json",
+    "archive": "runs/focused-kernel/observations/kernel-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sorted-false.json",
+    "archive": "runs/focused-kernel/observations/sorted-false.json",
+    "sourceSha256": "d7e61f0b5619ab3a04ff1313b14098df7c77663db55ec364ae2d724932663f55",
+    "archiveSha256": "d7e61f0b5619ab3a04ff1313b14098df7c77663db55ec364ae2d724932663f55"
+  },
+  {
+    "source": "runs/focused-kernel/observations/terminal-window.json",
+    "archive": "runs/focused-kernel/observations/terminal-window.json",
+    "sourceSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5",
+    "archiveSha256": "7ff95ebbdade2358f45d840d61423d61a36fd7323d9a4ad70ddb47b3bbccb7d5"
+  },
+  {
+    "source": "runs/focused-kernel/observations/marker-E5-self.json",
+    "archive": "runs/focused-kernel/observations/marker-E5-self.json",
+    "sourceSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f",
+    "archiveSha256": "0a061b6f63baafff332a009aa4b209708185d02db2a078571f33b9fc7474767f"
+  },
+  {
+    "source": "runs/focused-kernel/observations/direct-capture.json",
+    "archive": "runs/focused-kernel/observations/direct-capture.json",
+    "sourceSha256": "3760490e25d7a149b1e25cb28bc8dd27fd2d5e2d2aea075c42f7ca0dceedd01e",
+    "archiveSha256": "3760490e25d7a149b1e25cb28bc8dd27fd2d5e2d2aea075c42f7ca0dceedd01e"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sort-E1-isolated.json",
+    "archive": "runs/focused-kernel/observations/sort-E1-isolated.json",
+    "sourceSha256": "616f0eb883473e31401446ba72718d12fdc126f93267059ddc995358b44d00e1",
+    "archiveSha256": "616f0eb883473e31401446ba72718d12fdc126f93267059ddc995358b44d00e1"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sort-E5-self.json",
+    "archive": "runs/focused-kernel/observations/sort-E5-self.json",
+    "sourceSha256": "d8e3e9f45852ebd591de48e7712fef2c84dc4ebe8ab597bb335c9edaa37255d2",
+    "archiveSha256": "d8e3e9f45852ebd591de48e7712fef2c84dc4ebe8ab597bb335c9edaa37255d2"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sort-E3.json",
+    "archive": "runs/focused-kernel/observations/sort-E3.json",
+    "sourceSha256": "4a7b77faf7551727f2e4bd10357cd2057c47a6a9dab0c909867509c7e917af40",
+    "archiveSha256": "4a7b77faf7551727f2e4bd10357cd2057c47a6a9dab0c909867509c7e917af40"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sorted-true.json",
+    "archive": "runs/focused-kernel/observations/sorted-true.json",
+    "sourceSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446",
+    "archiveSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446"
+  },
+  {
+    "source": "runs/focused-kernel/observations/marker-E1.json",
+    "archive": "runs/focused-kernel/observations/marker-E1.json",
+    "sourceSha256": "886b48d9c90f21b1397b854b2fddedf5ebdde9ee726c936bd27d002a52a9da2f",
+    "archiveSha256": "886b48d9c90f21b1397b854b2fddedf5ebdde9ee726c936bd27d002a52a9da2f"
+  },
+  {
+    "source": "runs/focused-kernel/observations/builder-work.json",
+    "archive": "runs/focused-kernel/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sort-E1.json",
+    "archive": "runs/focused-kernel/observations/sort-E1.json",
+    "sourceSha256": "2a79fbb22436ca21f5148113530cad91b72e2c41dda971b89cf0173dc3220dbf",
+    "archiveSha256": "2a79fbb22436ca21f5148113530cad91b72e2c41dda971b89cf0173dc3220dbf"
+  },
+  {
+    "source": "runs/focused-kernel/observations/marker-E3.json",
+    "archive": "runs/focused-kernel/observations/marker-E3.json",
+    "sourceSha256": "981025f4caa460b4e0e9a2e2903631037944fc735e9a1bcd0844e261782e44d1",
+    "archiveSha256": "981025f4caa460b4e0e9a2e2903631037944fc735e9a1bcd0844e261782e44d1"
+  },
+  {
+    "source": "runs/focused-kernel/observations/sort-E5-child.json",
+    "archive": "runs/focused-kernel/observations/sort-E5-child.json",
+    "sourceSha256": "012359935fd70cd34c71d3df47713984d211b127befd290e92e22be7ec721602",
+    "archiveSha256": "012359935fd70cd34c71d3df47713984d211b127befd290e92e22be7ec721602"
+  },
+  {
+    "source": "runs/focused-kernel/observations/marker-E4.json",
+    "archive": "runs/focused-kernel/observations/marker-E4.json",
+    "sourceSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a",
+    "archiveSha256": "9e9325f86f1b89a74b7842995dfc4123723cd08cfdcf38a10e2f850d7bbcf89a"
+  },
+  {
+    "source": "runs/focused-kernel/observations/kernel-keyed.json",
+    "archive": "runs/focused-kernel/observations/kernel-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/focused-angular/RESULT.json",
+    "archive": "runs/focused-angular/RESULT.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "runs/focused-angular/first.log",
+    "archive": "runs/focused-angular/first.log",
+    "sourceSha256": "59c1c876dd36527925e9542f227a915d446a64e19f1ab8729bda54d20ab2ea7e",
+    "archiveSha256": "59c1c876dd36527925e9542f227a915d446a64e19f1ab8729bda54d20ab2ea7e"
+  },
+  {
+    "source": "runs/focused-angular/COMMAND.json",
+    "archive": "runs/focused-angular/COMMAND.json",
+    "sourceSha256": "592ce710e28904493dcdbc71ae62a20b767db4e49d63c05b3a4913c0e9d27275",
+    "archiveSha256": "592ce710e28904493dcdbc71ae62a20b767db4e49d63c05b3a4913c0e9d27275"
+  },
+  {
+    "source": "runs/focused-angular/observations/marker-E5-child.json",
+    "archive": "runs/focused-angular/observations/marker-E5-child.json",
+    "sourceSha256": "2090ef531fd301748a86d009f4ac6757dcf0062a64acf5aea04495f4bc692a8f",
+    "archiveSha256": "2090ef531fd301748a86d009f4ac6757dcf0062a64acf5aea04495f4bc692a8f"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-E4.json",
+    "archive": "runs/focused-angular/observations/sort-E4.json",
+    "sourceSha256": "3e61269bdcc5dcb7954933ae21335697a8f68628e42ca73c43a7ce6cde2ef6a4",
+    "archiveSha256": "3e61269bdcc5dcb7954933ae21335697a8f68628e42ca73c43a7ce6cde2ef6a4"
+  },
+  {
+    "source": "runs/focused-angular/observations/angular-ordinary.json",
+    "archive": "runs/focused-angular/observations/angular-ordinary.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-readonly-child.json",
+    "archive": "runs/focused-angular/observations/sort-readonly-child.json",
+    "sourceSha256": "8e228a50c9e3a7156c8002f8eabd7f3465c92b6be7a978dd50c26bbd04535d77",
+    "archiveSha256": "8e228a50c9e3a7156c8002f8eabd7f3465c92b6be7a978dd50c26bbd04535d77"
+  },
+  {
+    "source": "runs/focused-angular/observations/angular-native-timing.json",
+    "archive": "runs/focused-angular/observations/angular-native-timing.json",
+    "sourceSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158",
+    "archiveSha256": "62712ae2c748ad9babb4bb7c70131164654b6e54bed9bf6e1b4ddc15d253d158"
+  },
+  {
+    "source": "runs/focused-angular/observations/sorted-false.json",
+    "archive": "runs/focused-angular/observations/sorted-false.json",
+    "sourceSha256": "4f032dffa3c396378661726281964bfae0f3494f168a0a246979b2ae9efec074",
+    "archiveSha256": "4f032dffa3c396378661726281964bfae0f3494f168a0a246979b2ae9efec074"
+  },
+  {
+    "source": "runs/focused-angular/observations/terminal-window.json",
+    "archive": "runs/focused-angular/observations/terminal-window.json",
+    "sourceSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183",
+    "archiveSha256": "4753596974f6e18cd3676419ea0bc466e585b42e9d35c4e0de073bf674490183"
+  },
+  {
+    "source": "runs/focused-angular/observations/marker-E5-self.json",
+    "archive": "runs/focused-angular/observations/marker-E5-self.json",
+    "sourceSha256": "d001ff1b09ff500ed0c996c2c19e16f997db614b09158970ac3845974c86b279",
+    "archiveSha256": "d001ff1b09ff500ed0c996c2c19e16f997db614b09158970ac3845974c86b279"
+  },
+  {
+    "source": "runs/focused-angular/observations/direct-capture.json",
+    "archive": "runs/focused-angular/observations/direct-capture.json",
+    "sourceSha256": "e8e3d60bf38454952d9c5808dae4c87ea8ed3924fe98252d7fd4bf415aed06f1",
+    "archiveSha256": "e8e3d60bf38454952d9c5808dae4c87ea8ed3924fe98252d7fd4bf415aed06f1"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-E1-isolated.json",
+    "archive": "runs/focused-angular/observations/sort-E1-isolated.json",
+    "sourceSha256": "4e7f2b4abcbb38fd773aaa07c42757eb5d1ca38a4fefba3e5d4c270132011260",
+    "archiveSha256": "4e7f2b4abcbb38fd773aaa07c42757eb5d1ca38a4fefba3e5d4c270132011260"
+  },
+  {
+    "source": "runs/focused-angular/observations/warm-marker-E5-self.json",
+    "archive": "runs/focused-angular/observations/warm-marker-E5-self.json",
+    "sourceSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f",
+    "archiveSha256": "fdf9010a0fbbc9d050ea0065fa314ef4f75d821e8d53bf36cd04ebdbe5433e6f"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-E5-self.json",
+    "archive": "runs/focused-angular/observations/sort-E5-self.json",
+    "sourceSha256": "35d203b8cd7509ecefe110939cd493ece427b81b045f55ea57c54892e6e6c198",
+    "archiveSha256": "35d203b8cd7509ecefe110939cd493ece427b81b045f55ea57c54892e6e6c198"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-E3.json",
+    "archive": "runs/focused-angular/observations/sort-E3.json",
+    "sourceSha256": "de28e6176b4858f00ace09223e9ad7fb8e4a35ac3e4eefd4ee279b3aba49226f",
+    "archiveSha256": "de28e6176b4858f00ace09223e9ad7fb8e4a35ac3e4eefd4ee279b3aba49226f"
+  },
+  {
+    "source": "runs/focused-angular/observations/sorted-true.json",
+    "archive": "runs/focused-angular/observations/sorted-true.json",
+    "sourceSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446",
+    "archiveSha256": "f87f90e6b70dd1c39c8d9fc047ae500842e153e9cf48307008ed586466205446"
+  },
+  {
+    "source": "runs/focused-angular/observations/marker-E1.json",
+    "archive": "runs/focused-angular/observations/marker-E1.json",
+    "sourceSha256": "56b1ce3ae3460a49c1b2b03579fda3f821039cf0b7b9c9750e0355cf567078ad",
+    "archiveSha256": "56b1ce3ae3460a49c1b2b03579fda3f821039cf0b7b9c9750e0355cf567078ad"
+  },
+  {
+    "source": "runs/focused-angular/observations/builder-work.json",
+    "archive": "runs/focused-angular/observations/builder-work.json",
+    "sourceSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e",
+    "archiveSha256": "e49879a471bd55c9ba5dfd3c22d8d460f245145c1c345b9d33c7269f509fdf2e"
+  },
+  {
+    "source": "runs/focused-angular/observations/angular-keyed.json",
+    "archive": "runs/focused-angular/observations/angular-keyed.json",
+    "sourceSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da",
+    "archiveSha256": "723fc6fcfa881262f388cd47c607a5b3f79a1ba51f75b846cf910e6d53eb68da"
+  },
+  {
+    "source": "runs/focused-angular/observations/warm-marker-E4.json",
+    "archive": "runs/focused-angular/observations/warm-marker-E4.json",
+    "sourceSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960",
+    "archiveSha256": "cd2ebab0dc0c712a58f252e1148720f6a3bef22ab69dcccfc86a82d1b2a44960"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-readonly-self.json",
+    "archive": "runs/focused-angular/observations/sort-readonly-self.json",
+    "sourceSha256": "d71c8950ff2871b37771489fb22c56c6917cde56962d3c9b61f5c49fe5f8ebf0",
+    "archiveSha256": "d71c8950ff2871b37771489fb22c56c6917cde56962d3c9b61f5c49fe5f8ebf0"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-E1.json",
+    "archive": "runs/focused-angular/observations/sort-E1.json",
+    "sourceSha256": "205d3565e5eedb9f2a55b0a093e4d908f2ac1de27b3ac4bdd3698d5740e56a40",
+    "archiveSha256": "205d3565e5eedb9f2a55b0a093e4d908f2ac1de27b3ac4bdd3698d5740e56a40"
+  },
+  {
+    "source": "runs/focused-angular/observations/warm-marker-E5-child.json",
+    "archive": "runs/focused-angular/observations/warm-marker-E5-child.json",
+    "sourceSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e",
+    "archiveSha256": "53e5291a63cbeb85b90d6b7d3445123f9052edb059dbf83ef04b0fb32cf45f5e"
+  },
+  {
+    "source": "runs/focused-angular/observations/marker-E3.json",
+    "archive": "runs/focused-angular/observations/marker-E3.json",
+    "sourceSha256": "704755117479eb29efdcf0394fb1eab67373dc74bf1271be0f1c5bee2f1f34e4",
+    "archiveSha256": "704755117479eb29efdcf0394fb1eab67373dc74bf1271be0f1c5bee2f1f34e4"
+  },
+  {
+    "source": "runs/focused-angular/observations/warm-marker-E3.json",
+    "archive": "runs/focused-angular/observations/warm-marker-E3.json",
+    "sourceSha256": "0b40983663b67db93f90255a8345180fcb52dcbbe1847341cc09191a3cd1b531",
+    "archiveSha256": "0b40983663b67db93f90255a8345180fcb52dcbbe1847341cc09191a3cd1b531"
+  },
+  {
+    "source": "runs/focused-angular/observations/sort-E5-child.json",
+    "archive": "runs/focused-angular/observations/sort-E5-child.json",
+    "sourceSha256": "642371fd4424193a9cbfff16596071d5d7c39f1507dd38ba7e111c277106de7c",
+    "archiveSha256": "642371fd4424193a9cbfff16596071d5d7c39f1507dd38ba7e111c277106de7c"
+  },
+  {
+    "source": "runs/focused-angular/observations/marker-E4.json",
+    "archive": "runs/focused-angular/observations/marker-E4.json",
+    "sourceSha256": "7a9bbc48db606dc9ce4b7b8218054385142e02f54b32332304245a03baf4f4b7",
+    "archiveSha256": "7a9bbc48db606dc9ce4b7b8218054385142e02f54b32332304245a03baf4f4b7"
+  },
+  {
+    "source": "runs/discriminators-oracle-corrected/RESULT.json",
+    "archive": "runs/discriminators-oracle-corrected/RESULT.json",
+    "sourceSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176",
+    "archiveSha256": "3fcf365c70bf262b9592ec1998f4c4609c36c75d846b67c5e86d7c9f03f07176"
+  },
+  {
+    "source": "runs/discriminators-oracle-corrected/first.log",
+    "archive": "runs/discriminators-oracle-corrected/first.log",
+    "sourceSha256": "5014ee9f788d3eb531ad317380ad8238013a76d8a9b35a0fb728daa785fbda39",
+    "archiveSha256": "5014ee9f788d3eb531ad317380ad8238013a76d8a9b35a0fb728daa785fbda39"
+  },
+  {
+    "source": "runs/discriminators-oracle-corrected/COMMAND.json",
+    "archive": "runs/discriminators-oracle-corrected/COMMAND.json",
+    "sourceSha256": "4f1710bc384e72e9b6beada7806529a2b1df837f496791b212ace75ec48f6043",
+    "archiveSha256": "4f1710bc384e72e9b6beada7806529a2b1df837f496791b212ace75ec48f6043"
+  },
+  {
+    "source": "runs/discriminators-oracle-final/RESULT.json",
+    "archive": "runs/discriminators-oracle-final/RESULT.json",
+    "sourceSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5",
+    "archiveSha256": "bfdedf06596faa2042b0fedd9653ec1023d2e96ed56dc40b607985bc8438c1d5"
+  },
+  {
+    "source": "runs/discriminators-oracle-final/first.log",
+    "archive": "runs/discriminators-oracle-final/first.log",
+    "sourceSha256": "17bb6ed925a5525d9689ee06c6df358a6d81370bcfed3eb45fca214c023ba801",
+    "archiveSha256": "17bb6ed925a5525d9689ee06c6df358a6d81370bcfed3eb45fca214c023ba801"
+  },
+  {
+    "source": "runs/discriminators-oracle-final/COMMAND.json",
+    "archive": "runs/discriminators-oracle-final/COMMAND.json",
+    "sourceSha256": "c70d842989f57df233e12e6a2345c4026471a81c9a30cd8795c75f21fd4ce593",
+    "archiveSha256": "c70d842989f57df233e12e6a2345c4026471a81c9a30cd8795c75f21fd4ce593"
+  },
+  {
+    "source": "runs/discriminators-oracle-final/observations/cold-error.json",
+    "archive": "runs/discriminators-oracle-final/observations/cold-error.json",
+    "sourceSha256": "309ea94ea56494f40aea6f0888822c7ce9e58c9fa11aa73c32396ef2d742a844",
+    "archiveSha256": "309ea94ea56494f40aea6f0888822c7ce9e58c9fa11aa73c32396ef2d742a844"
+  }
+]

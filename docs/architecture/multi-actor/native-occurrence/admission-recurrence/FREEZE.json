@@ -1,0 +1,31 @@
+{
+  "status": "frozen on covered inverse handoff failure; not accepted",
+  "predecessorManifestVerified": 2921,
+  "changedPaths": [
+    "packages/kernel/src/enhancers/transactions/transactions.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/experimental-publication/entity.ts",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts",
+    "packages/kernel/src/lib/internals/entity-publication.ts",
+    "packages/kernel/src/lib/internals/entity-value-transition.ts",
+    "packages/kernel/src/lib/internals/mutation-capture-runtime.ts",
+    "packages/kernel/src/lib/internals/native-field-selection.ts",
+    "packages/kernel/src/lib/native-admission-handoff.spec.ts"
+  ],
+  "sourceManifestSha256": "b9edaeb2a0051f0401c9dbccc0864b8647093a7496569b2227204f8302efd602",
+  "files": {
+    "source-types-first.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "first-falsifiers.log": "fe3eb1adc72d7622f9f30376089b1bba5329c876e0bdef511b13c41aae8c6f6f",
+    "source.patch": "ac4eeb560ac293a5b60986a0a63dab85daa5756f0092e43d4adc7f2db4464cc3",
+    "trace.log": "8c0fb2f5124f999b20494039114e4c4d333e588bf07e32acd6d80b3f878db20a",
+    "first-runtime.log": "cdd6fac9955d053ac275e283b47f8200eace1470cd3a8d59e67042f5d73bc673",
+    "spec-types.log": "2749a94e5c57b3be72519a48fca2d89b6c46bf74b18e45ff637da8961051871b",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "SOURCE-SHA256.json": "b9edaeb2a0051f0401c9dbccc0864b8647093a7496569b2227204f8302efd602",
+    "runtime.patch": "e543bd5032711a3e7e1f4af52ad576af2ca3e441b90e7148e04dfeba281777de",
+    "trace-only.patch": "3998b0ac1f1af08608f6422213491ec57d9ee0bd34ab7b0a77568b22dbef1d02",
+    "first-fixture.spec.ts": "2abdb59ed9d92fb7e52e4c790feb148788de30f5a042986d7281a15f7aea9040",
+    "RESULTS.md": "effb803efc10b88ccfd82ccd8b48bcc8896c1aa26c4c2e6a7989eb1221a1d4f2",
+    "final-runtime.log": "a41e0366f820647e926241bd56c15dc1dcfd756a236fcf2cbe0a370f59734d16"
+  }
+}

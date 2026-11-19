@@ -1,0 +1,22 @@
+{
+  "controllerSha256": "092d450bc1e0a380b05dd60f0344700949fc21ad88559ac739ce89754e4504d7",
+  "method": "Evaluate actual extracted numeric/valid/stop AST expressions only; no import, measurement or source edit",
+  "syntheticMemory": [
+    {
+      "at": 1,
+      "pid": 1,
+      "rss": 1,
+      "heapTotal": 1,
+      "heapUsed": 1,
+      "external": 1,
+      "arrayBuffers": 1,
+      "heapSizeLimit": 1,
+      "stage": "restoration:after-final-drain",
+      "size": 999
+    }
+  ],
+  "requestedSize": 128,
+  "numericAccepted": true,
+  "testDriftStops": false,
+  "singleFinalWrongSizeSampleAccepted": true
+}

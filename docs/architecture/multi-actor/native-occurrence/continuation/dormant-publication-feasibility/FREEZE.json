@@ -1,0 +1,39 @@
+{
+  "baseline_manifest_sha256": "ffba656df9413c59d334884064b0690281cc9a29c3170a8775a1cc32c845dc0d",
+  "source_manifest_sha256": "baeaf6be485837d199e646ec8f77a9a0d8a234bdf5c3631816d567d6f129abca",
+  "baseline_files_verified": 3033,
+  "runtime_changes": [],
+  "added_specs": [
+    "packages/kernel/src/lib/dormant-feasibility-discriminator.spec.ts",
+    "packages/kernel/src/lib/dormant-input-discriminator.spec.ts"
+  ],
+  "tests_patch_sha256": "7391c10cc2438dbab3c82e05e93d48f114e2c9417da9a786f7494298fca006a8",
+  "results": {
+    "final-spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 7.648490749998018,
+      "source_unchanged": true
+    },
+    "native-input-discriminator": {
+      "exit": 0,
+      "elapsedSeconds": 4.4300284589407966,
+      "source_unchanged": true
+    },
+    "activation-boundaries": {
+      "exit": 1,
+      "elapsedSeconds": 4.541112042032182,
+      "source_unchanged": true
+    },
+    "discriminator": {
+      "exit": 0,
+      "elapsedSeconds": 6.820679416996427,
+      "source_unchanged": true
+    },
+    "spec-types": {
+      "exit": 0,
+      "elapsedSeconds": 8.70527024997864,
+      "source_unchanged": true
+    }
+  },
+  "disposition": "Conditional feasibility only; no implementation acceptance; original baseline unchanged."
+}

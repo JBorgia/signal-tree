@@ -1,0 +1,24 @@
+{
+  "project": "vue",
+  "run": "vue",
+  "counts": {
+    "passed": 223
+  },
+  "discoveredFiles": 34,
+  "selectedFiles": 34,
+  "startedFiles": 34,
+  "completedFiles": 34,
+  "missingCompletion": [],
+  "unexpectedModules": [],
+  "runEndSeen": true,
+  "result": {
+    "project": "vue",
+    "exit": 0,
+    "watchdog": null,
+    "elapsedSeconds": 21.372347333002836,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  "failures": []
+}

@@ -1,0 +1,91 @@
+{
+  "baseline": {
+    "result": {
+      "exit": 0,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "assertionErrors": [],
+    "testCounts": [
+      " Test Files  1 passed (1)",
+      "      Tests  3 passed (3)"
+    ]
+  },
+  "source-types": {
+    "result": {
+      "exit": 0,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "assertionErrors": [],
+    "testCounts": []
+  },
+  "spec-types": {
+    "result": {
+      "exit": 0,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "assertionErrors": [],
+    "testCounts": []
+  },
+  "mutant-validation": {
+    "result": {
+      "exit": 1,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "f88835726039771224104e0a83faeb35bcbc8e91ea9e19ac3bd72cd311a2da54"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "assertionErrors": [
+      "AssertionError: expected 18 to be less than or equal to 9",
+      "AssertionError: expected 192 to be less than or equal to 96",
+      "AssertionError: expected 1536 to be less than or equal to 768"
+    ],
+    "testCounts": [
+      "\u23af\u23af\u23af\u23af\u23af\u23af\u23af Failed Tests 3 \u23af\u23af\u23af\u23af\u23af\u23af\u23af",
+      " Test Files  1 failed (1)",
+      "      Tests  3 failed (3)"
+    ]
+  },
+  "mutant-snapshot": {
+    "result": {
+      "exit": 1,
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "during": "2b6fd7a978bfbfe3410793998a759afbd6072cc7ed9b1ac8e70a51188ad03209"
+    },
+    "restore": {
+      "before": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "after": "fd5795420a9ecb633b2269e3000aba192bf6c9ef90452bf4a63c0f5fbb862b50",
+      "equal": true
+    },
+    "assertionErrors": [
+      "AssertionError: expected 61 to be less than or equal to 37",
+      "AssertionError: expected 641 to be less than or equal to 385",
+      "AssertionError: expected 5121 to be less than or equal to 3073"
+    ],
+    "testCounts": [
+      "\u23af\u23af\u23af\u23af\u23af\u23af\u23af Failed Tests 3 \u23af\u23af\u23af\u23af\u23af\u23af\u23af",
+      " Test Files  1 failed (1)",
+      "      Tests  3 failed (3)"
+    ]
+  }
+}

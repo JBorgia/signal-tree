@@ -1,0 +1,86 @@
+
+> nx run kernel:test scalar-native-support parent-proof-safety-falsifier native-certificate-successor scalar-frame-publication publication-evidence-scope-controls publication-retirement-boundaries --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-native-support parent-proof-safety-falsifier native-certificate-successor scalar-frame-publication publication-evidence-scope-controls publication-retirement-boundaries --maxWorkers=1
+
+(node:71847) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71854) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c14-finally-successor/candidate/packages/kernel
+
+(node:71861) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71862) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71897) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 57ms
+   × omission then restored retained collection selects matching payload and support 27ms
+(node:71898) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71902) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:63:23
+     61|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     62|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     63|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     64|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     65| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 55 passed (56)
+   Start at  11:22:12
+   Duration  4.51s (transform 864ms, setup 0ms, import 1.66s, tests 321ms, environment 1.70s)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-native-support parent-proof-safety-falsifier native-certificate-successor scalar-frame-publication publication-evidence-scope-controls publication-retirement-boundaries --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.4s

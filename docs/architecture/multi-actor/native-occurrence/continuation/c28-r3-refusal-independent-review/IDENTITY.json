@@ -1,0 +1,13 @@
+{
+  "manifestSha": "9312b685e9f7a7752c44cf4424d5b8903eb4782cf787fcfe6cc3ae54d3c9a529",
+  "patchSha": "da4def24afb96a4cd6947c4f3d8a608a41b50a372517471b24cdd5cd6976aede",
+  "changed": [
+    "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
+    "packages/kernel/src/enhancers/transactions/transaction-lifecycle-view.spec.ts",
+    "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
+    "packages/kernel/src/lib/transaction-observer-failure.spec.ts"
+  ],
+  "manifestMismatchFiles": [],
+  "extraManifestPaths": [],
+  "removedManifestPaths": []
+}

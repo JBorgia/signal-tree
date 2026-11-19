@@ -1,0 +1,27 @@
+{
+  "candidate": "/private/tmp/st-packet-index-admission-r1/candidate",
+  "status": "bounded experiment frozen; independent review pending; point gate failing",
+  "files": {
+    "BASE-SOURCE-SHA256.json": "5688501724309578e31b18cad1e67d37d775e3f679611ef631339ac88e5354e0",
+    "SOURCE-SHA256.json": "9863ad3f6955407e79e2663c4060f505b5f71c6f49cd96bc6e492335b09cd464",
+    "runtime.patch": "dc5b423bf82f7495047ee6ef227b0f81011ca8e83419b17b2f9af79672f59bda",
+    "tests.patch": "13650423c2194571ccd7cc2a435c0ac2e3c211fa5c4a1a781b224d201982249b",
+    "VERIFICATION.json": "e71b124c383522ac23411fc13585f692a98a7edf83d265e793ce443ba896e21d",
+    "COUNTS.json": "d76d7d08edc39e08e7fded6641693257c1bb722ee6c69fe36ee475833fb79382",
+    "RESULTS.md": "7edfb3e6d2fa927add338e8c8a6a571bd63a377bcb74bc35eebf58c7c860fcc2",
+    "COMMANDS.md": "9a5edaf70fccf9ae2780cc9c4ddace64f1f5f2de102d3d63871622981e60c045",
+    "REVIEW-REQUEST.md": "18a566c4e1ddd72182e80e9373f1948f8223ab64b373e922ec7bb1a92468d0e9",
+    "focused-final.log": "db8a97f84386e8f7c6360ccbec726f7515e954bf3b5578b89a66e9318a36558f",
+    "new-controls-final.log": "f824c3b515d0abbcfe2309c7fc107ff53727cb1101e5a6f18f555239e1548a9c",
+    "point-owned.log": "6cbfa06b6ddc5eedde162e1a662125413edeb07f63481739fdccf5cdf3d91d91",
+    "source-types-final.log": "2777e45a8f2426aafce0f570c13e8fcdde9f41b77773118f51a1d28edcd3f061",
+    "spec-types-final.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "allocation-final/FINAL-IDENTITY.json": "ab74657789c54ee2997a668b59c09edb631f5a2ffe2b00212ce7e4263331879c",
+    "allocation-final/optimized.log": "47b1def62b150f1ec1998d563ae578c6595efd34e2623c6b9a3288651ad46e50",
+    "allocation-final/baseline-b.log": "b57a6528549208604eb8b279eece52f6c87952137985cc3a9763c9fa1b28f423",
+    "allocation-final/point.log": "e577b50290c5c405df225daee6106d5a581a4822b588f0f3b492a356f7023efa",
+    "allocation-final/optimized.jsonl": "047227f5ea0e90d2bdf62309177101d3d7b32c3e812282fb6758ab238f44c17b",
+    "allocation-final/baseline-b.jsonl": "263da088c7c1fd0e7089b11e0bbd2f040a65440131f5d829947baffaa7bbdd92",
+    "allocation-final/point.jsonl": "ed24d74b4140b43ea0c470a7885c4e617336a59a6612fb99a0bfe23349e6177f"
+  }
+}

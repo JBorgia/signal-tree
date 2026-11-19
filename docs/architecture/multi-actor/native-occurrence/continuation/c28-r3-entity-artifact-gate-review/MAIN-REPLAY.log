@@ -1,0 +1,84 @@
+{
+  "parserSelfChecks": "pass",
+  "reclassifiedSavedRuns": [
+    {
+      "label": "baseline-installed-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "baseline-installed-lifecycle-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "baseline-installed-receipt-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "baseline-production-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "baseline-production-lifecycle-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "baseline-production-receipt-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "mutant-installed-consumer",
+      "kind": "behavior"
+    },
+    {
+      "label": "mutant-installed-lifecycle-consumer",
+      "kind": "behavior"
+    },
+    {
+      "label": "mutant-installed-receipt-consumer",
+      "kind": "behavior"
+    },
+    {
+      "label": "mutant-production-consumer",
+      "kind": "behavior"
+    },
+    {
+      "label": "mutant-production-lifecycle-consumer",
+      "kind": "behavior"
+    },
+    {
+      "label": "mutant-production-receipt-consumer",
+      "kind": "behavior"
+    },
+    {
+      "label": "recovery-installed-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "recovery-installed-lifecycle-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "recovery-installed-receipt-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "recovery-production-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "recovery-production-lifecycle-consumer",
+      "kind": "pass"
+    },
+    {
+      "label": "recovery-production-receipt-consumer",
+      "kind": "pass"
+    }
+  ],
+  "outerRegistryCounterexample": {
+    "input": "saved empty-cache setup failure; tool catch maps failure to process.exitCode=1",
+    "toolPassed": false,
+    "runtimeArms": 0,
+    "registryState": "proven",
+    "method": "executed exact registry IfStatement in isolated VM, no registry/build/install campaign"
+  }
+}

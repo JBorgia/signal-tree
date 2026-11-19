@@ -1,0 +1,3 @@
+packages/kernel/src/lib/packet-physical-pair-work.spec.ts 178ms
+packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts 35ms
+packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts 12ms

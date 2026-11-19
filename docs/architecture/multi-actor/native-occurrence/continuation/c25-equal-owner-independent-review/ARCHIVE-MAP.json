@@ -1,0 +1,74 @@
+[
+  {
+    "source": "SOURCE.json",
+    "archive": "SOURCE.json",
+    "sourceSha256": "3cb1d19b5adeedfec981bcaf0a55286ab839a13def4bab57c900240c632089e3",
+    "archiveSha256": "3cb1d19b5adeedfec981bcaf0a55286ab839a13def4bab57c900240c632089e3"
+  },
+  {
+    "source": "private-provisional.patch",
+    "archive": "private-provisional.patch",
+    "sourceSha256": "ec70b22e641cf3d8dc3cd7d7423a8974ea423742f6035964f586d8b332a6d50f",
+    "archiveSha256": "ec70b22e641cf3d8dc3cd7d7423a8974ea423742f6035964f586d8b332a6d50f"
+  },
+  {
+    "source": "PROVISIONAL.md",
+    "archive": "PROVISIONAL.md",
+    "sourceSha256": "272bfa29f93589773b25d8571945884fece8384db6dcf81efcdc74d6795fb648",
+    "archiveSha256": "272bfa29f93589773b25d8571945884fece8384db6dcf81efcdc74d6795fb648"
+  },
+  {
+    "source": "terminal-owner/terminal-owner-possible-refresh.spec.ts",
+    "archive": "terminal-owner/terminal-owner-possible-refresh.spec.ts",
+    "sourceSha256": "ac0a34afd897db63761ea699cc9386d72a22e9837d3c55bb1cbb3443cc151171",
+    "archiveSha256": "ac0a34afd897db63761ea699cc9386d72a22e9837d3c55bb1cbb3443cc151171"
+  },
+  {
+    "source": "terminal-owner/SOURCE.json",
+    "archive": "terminal-owner/SOURCE.json",
+    "sourceSha256": "d4283319407cfeb2c7003cbfc4545d0f5f41bbbe2859fa26bfaa711499f9d003",
+    "archiveSha256": "d4283319407cfeb2c7003cbfc4545d0f5f41bbbe2859fa26bfaa711499f9d003"
+  },
+  {
+    "source": "terminal-owner/REVIEW.md",
+    "archive": "terminal-owner/REVIEW.md",
+    "sourceSha256": "4a1fd4757f126602b5714c637e11fb70e561844bda3f10fab69c820afa34f628",
+    "archiveSha256": "4a1fd4757f126602b5714c637e11fb70e561844bda3f10fab69c820afa34f628"
+  },
+  {
+    "source": "captured/packages/kernel/src/enhancers/transactions/transactions.ts",
+    "archive": "captured/packages/kernel/src/enhancers/transactions/transactions.ts.gz",
+    "sourceSha256": "030f259dd5cfe14b6c8456c19e33ebd1c7015b4bd0b65613bb01d4a326ac53b6",
+    "archiveSha256": "41c97f7082aad742f24ac6634bde9a23220efc511c295a6654233f7462dcf75d"
+  },
+  {
+    "source": "captured/packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "archive": "captured/packages/kernel/src/lib/equal-owner-current-input.spec.ts",
+    "sourceSha256": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3",
+    "archiveSha256": "6c9a827823e85c25fee1bfab655e45afad654a949aa87afd6dc4866c7cc4c7f3"
+  },
+  {
+    "source": "captured/packages/kernel/src/lib/experimental-publication/private.ts",
+    "archive": "captured/packages/kernel/src/lib/experimental-publication/private.ts",
+    "sourceSha256": "1b89f829ae3d3672fd9f8f7c04b16b9cd8db027403fb9056a0da7d6251037f16",
+    "archiveSha256": "1b89f829ae3d3672fd9f8f7c04b16b9cd8db027403fb9056a0da7d6251037f16"
+  },
+  {
+    "source": "captured/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "archive": "captured/packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "sourceSha256": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8",
+    "archiveSha256": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8"
+  },
+  {
+    "source": "frozen/IDENTITY.json",
+    "archive": "frozen/IDENTITY.json",
+    "sourceSha256": "ee39aa8b2d49650300bbf11aa799c174f4ab71e7690bf563d17617603188cd77",
+    "archiveSha256": "ee39aa8b2d49650300bbf11aa799c174f4ab71e7690bf563d17617603188cd77"
+  },
+  {
+    "source": "frozen/REVIEW.md",
+    "archive": "frozen/REVIEW.md",
+    "sourceSha256": "3799751135554736200162b05ed386844fbf2caad9d3db3753998bb7f9cf7f6a",
+    "archiveSha256": "3799751135554736200162b05ed386844fbf2caad9d3db3753998bb7f9cf7f6a"
+  }
+]

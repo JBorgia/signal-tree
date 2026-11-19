@@ -1,0 +1,4 @@
+{"framework":"angular","legacyRejectedBeforeGetter":true,"migratedNativeTap":true}
+{"framework":"vue","legacyRejectedBeforeGetter":true,"migratedNativeTap":true}
+{"framework":"solid","legacyRejectedBeforeGetter":true,"migratedNativeTap":true}
+{"portableMasks":"0-6","nativeFactoriesUsed":false}

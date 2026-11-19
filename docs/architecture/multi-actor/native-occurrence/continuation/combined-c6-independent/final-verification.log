@@ -1,0 +1,78 @@
+{
+  "c0": {
+    "manifestSha256": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+    "files": 2974,
+    "mismatches": []
+  },
+  "c5": {
+    "manifestSha256": "b38d1ddc2a326b0589abe910447af92362a80e5e438b20cec657573d2603d620",
+    "files": 2986,
+    "mismatches": []
+  },
+  "shared": {
+    "manifestSha256": "f63ade892aa381b827f1db54986fbb2ca787cb1bde497847104bd0a40bd9dffe",
+    "files": 2982,
+    "mismatches": []
+  },
+  "c6": {
+    "manifestSha256": "925bd916560115e5fffd9c761e2eeca6a170f43dab0c8214aa5c7177315b69b4",
+    "files": 2994,
+    "mismatches": []
+  },
+  "composition": {
+    "sharedDelta": [
+      "packages/angular/src/lib/construction-resource-cleanup.spec.ts",
+      "packages/angular/src/lib/keyed-construction-cleanup.spec.ts",
+      "packages/kernel/src/lib/construction-resource-cleanup.spec.ts",
+      "packages/kernel/src/lib/dynamic-member-enrollment.spec.ts",
+      "packages/kernel/src/lib/experimental-publication/private.ts",
+      "packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts",
+      "packages/kernel/src/lib/independent-occurrence-terminal.spec.ts",
+      "packages/kernel/src/lib/internals/construction-allocation.ts",
+      "packages/kernel/src/lib/internals/intrinsic-mutation.ts",
+      "packages/kernel/src/lib/internals/materialize-markers.ts",
+      "packages/kernel/src/lib/internals/member-membership.ts",
+      "packages/kernel/src/lib/internals/native-occurrence.ts",
+      "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts",
+      "packages/kernel/src/lib/internals/owned-mutation.ts",
+      "packages/kernel/src/lib/internals/position-registry.ts",
+      "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts",
+      "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts",
+      "packages/kernel/src/lib/signal-tree.ts"
+    ],
+    "conflicts": [],
+    "expectedVsActual": [],
+    "c5Changes": [
+      "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
+      "packages/kernel/src/lib/admission-refusal.spec.ts",
+      "packages/kernel/src/lib/entity-signal.ts",
+      "packages/kernel/src/lib/experimental-publication/entity.ts",
+      "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+      "packages/kernel/src/lib/fixed-window-independent.spec.ts",
+      "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+      "packages/kernel/src/lib/independent-refusal-branches.spec.ts",
+      "packages/kernel/src/lib/internals/entity-publication.ts",
+      "packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts",
+      "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts",
+      "packages/kernel/src/lib/occurrence-successor.spec.ts",
+      "packages/kernel/src/lib/owner-transition-cancellation.spec.ts",
+      "packages/kernel/src/lib/packet-admission-r1.spec.ts",
+      "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+      "packages/kernel/src/lib/packet-index-review.spec.ts",
+      "packages/kernel/src/lib/physical/entity-ordinary-topology.ts",
+      "packages/kernel/src/lib/physical/entity-placement-stage.ts",
+      "packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts",
+      "packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts",
+      "packages/kernel/src/lib/physical/prepared-placement-visibility.ts",
+      "packages/kernel/src/lib/point-admission-followup.spec.ts",
+      "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts"
+    ],
+    "c5Lost": []
+  },
+  "freezeChecks": {
+    "manifestSha256": true,
+    "patchSha256": true,
+    "reviewSha256": true
+  }
+}

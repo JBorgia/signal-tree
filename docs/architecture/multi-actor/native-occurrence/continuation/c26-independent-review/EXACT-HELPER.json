@@ -1,0 +1,6 @@
+{
+  "sourceFile": "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+  "verbatimChunkSha256": "5c1878da897db79c3366f1a0185443023ebf5e1b5f30ecba3e5c00bad23391e5",
+  "modelSha256": "451c881d04ddfb5751f84311c3844322cfd0d5a980354157c09eaa6e990b1d38",
+  "scope": "Verbatim C26 pure helpers in isolated existing predicate model; no native imports or completion simulation"
+}

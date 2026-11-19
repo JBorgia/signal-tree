@@ -1,0 +1,60 @@
+
+> nx run kernel:test joint-membership-seal-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs joint-membership-seal-independent.spec.ts --maxWorkers=1
+
+(node:42480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:42487) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-r2-independent/candidate/packages/kernel
+
+(node:42494) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/joint-membership-seal-independent.spec.ts > scalar and collection seal after all sibling preparation; membership=true
+{"membership":true,"owner":4,"scalarOwners":[],"rowOwners":[4],"a":0,"row":0}
+
+ ❯ src/lib/joint-membership-seal-independent.spec.ts (2 tests | 1 failed) 20ms
+   × scalar and collection seal after all sibling preparation; membership=true 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/joint-membership-seal-independent.spec.ts > scalar and collection seal after all sibling preparation; membership=true
+AssertionError: expected [] to include 4
+ ❯ src/lib/joint-membership-seal-independent.spec.ts:23:127
+     21|   const scalarOwners=life.nativeProof(a!).possible?.map(c=>c.owner)??[…
+     22|   console.log(JSON.stringify({membership,owner,scalarOwners,rowOwners,…
+     23|   expect(scalar()).toBe(0);expect(t.$.rows.byIdOrFail(1).n()).toBe(0);…
+       |                                                                                                                               ^
+     24|   plan!.install();plan!.publish();expect(scalar()).toBe(1);expect(t.$.…
+     25|  }finally{offA();offRow();pending?.rollback();t.destroy();foreign.dest…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:59:08
+   Duration  781ms (transform 431ms, setup 0ms, import 513ms, tests 20ms, environment 172ms)
+
+Warning: command "node tools/run-core-vitest.mjs joint-membership-seal-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

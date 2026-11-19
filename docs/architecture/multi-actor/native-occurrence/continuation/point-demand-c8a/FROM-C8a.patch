@@ -1,0 +1,181 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1058,13 +1058,44 @@
+     };
+   }
+ 
++  type OrdinaryPointPreparation = {
++    changes: CommittedEntityMutation[];
++    install: ReturnType<typeof ordinaryTopology.prepareInstall>;
++    interval: ReturnType<typeof ordinaryTopology.prepareInstall>['interval'];
++    ordinaryEndpoints: {
++      readonly before: readonly number[];
++      readonly after: readonly number[];
++      readonly domain?: readonly number[];
++    } | undefined;
++  };
++  type OrdinaryRichPreparation = OrdinaryPointPreparation & {
++    byPhysicalSubject: Map<number, readonly CommittedEntityMutation[]>;
++    byStep: Array<readonly CommittedEntityMutation[]>;
++  };
+   function prepareOrdinaryTopology(
++    demand: 'point',
++    changes: readonly CommittedEntityMutation[],
++    physical?: ReturnType<typeof structuralStore.preparePlacement>,
++    authoredOrder?: readonly number[],
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
++  ): OrdinaryPointPreparation;
++  function prepareOrdinaryTopology(
++    demand: 'rich',
++    changes: readonly CommittedEntityMutation[],
++    physical?: ReturnType<typeof structuralStore.preparePlacement>,
++    authoredOrder?: readonly number[],
++    authoredDomain?: readonly number[],
++    physicalEntries?: PreparedPlacementEntries<K>
++  ): OrdinaryRichPreparation;
++  function prepareOrdinaryTopology(
++    demand: 'point' | 'rich',
+     changes: readonly CommittedEntityMutation[],
+     physical = structuralStore.preparePlacement(),
+     authoredOrder?: readonly number[],
+     authoredDomain?: readonly number[],
+     physicalEntries?: PreparedPlacementEntries<K>
+-  ) {
++  ): OrdinaryPointPreparation | OrdinaryRichPreparation {
+     const placement = ordinaryTopology.preparePlacement(
+       structuralStore.preparePlacement()
+     );
+@@ -1083,11 +1114,13 @@
+     const staged = new Map<number, Presence>();
+     const keys = new Map<K, number | undefined>();
+     const selected: CommittedEntityMutation[] = [];
+-    const byStep: Array<readonly CommittedEntityMutation[]> = [];
+-    const byPhysicalSubject = new Map<
+-      number,
+-      readonly CommittedEntityMutation[]
+-    >();
++    // Only the rich frame consumer needs these per-step/per-subject indexes.
++    // Point writes still prepare the same completed ordinary changes and install.
++    const byStep: Array<readonly CommittedEntityMutation[]> | undefined =
++      demand === 'rich' ? [] : undefined;
++    const byPhysicalSubject = demand === 'rich'
++      ? new Map<number, readonly CommittedEntityMutation[]>()
++      : undefined;
+     const read = (subject: number): Presence => {
+       const row = placement.read(subject);
+       if (!row.present) return { present: false };
+@@ -1237,12 +1270,14 @@
+           write(change.subject, { ...ordinary, value: change.after as E });
+         }
+       }
+-      const previous = byPhysicalSubject.get(change.subject);
+-      byPhysicalSubject.set(
+-        change.subject,
+-        previous === undefined ? group : [...previous, ...group]
+-      );
+-      byStep.push(group);
++      if (byPhysicalSubject) {
++        const previous = byPhysicalSubject.get(change.subject);
++        byPhysicalSubject.set(
++          change.subject,
++          previous === undefined ? group : [...previous, ...group]
++        );
++      }
++      byStep?.push(group);
+       selected.push(...group);
+     }
+     let ordinaryEndpoints:
+@@ -1302,12 +1337,20 @@
+       completedChanges.set(change, completed);
+       return completed;
+     };
+-    for (const [subject, group] of byPhysicalSubject)
+-      byPhysicalSubject.set(subject, group.map(completeChange));
+-    return {
+-      changes: selected.map(completeChange),
++    if (byPhysicalSubject)
++      for (const [subject, group] of byPhysicalSubject)
++        byPhysicalSubject.set(subject, group.map(completeChange));
++    const completed = selected.map(completeChange);
++    if (byPhysicalSubject && byStep) return {
++      changes: completed,
+       byPhysicalSubject,
+       byStep: byStep.map((group) => group.map(completeChange)),
++      install: installPlacement,
++      interval: installPlacement.interval,
++      ordinaryEndpoints,
++    };
++    return {
++      changes: completed,
+       install: installPlacement,
+       interval: installPlacement.interval,
+       ordinaryEndpoints,
+@@ -1461,6 +1504,7 @@
+         };
+     }
+     const ordinaryPlan = prepareOrdinaryTopology(
++      'rich',
+       changes,
+       physicalPlacement,
+       frame.ordinaryOrder,
+@@ -2493,7 +2537,7 @@
+       nextValue,
+       fields
+     );
+-    const ordinaryPlan = prepareOrdinaryTopology([
++    const ordinaryPlan = prepareOrdinaryTopology('point', [
+       {
+         subject: subjectId,
+         before: transition.ordinaryBefore,
+--- /dev/null
++++ b/packages/kernel/src/lib/point-result-demand.spec.ts
+@@ -0,0 +1,18 @@
++import {expect,it} from 'vitest';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding,entityPublicationOrdinary,type EntityPublicationPacket} from './internals/entity-publication';
++import {withWriteContext} from './write-context';
++it('point adoption still completes synthetic ordinary add and source support',()=>{
++ const t=signalTree({rows:entityMap<{id:string;n:number},string>()});const r=t.$.rows;r.addOne({id:'a',n:1});withWriteContext({participation:'inspection'},()=>r.addOne({id:'hidden',n:99}));const b=getEntityPublicationBinding(r.byIdOrFail('hidden'))!;let seen:EntityPublicationPacket|undefined;
++ const off=b.source.subscribe({prepare(p){seen=p;return undefined;},complete(){}});
++ try{r.updateOne('hidden',{n:7});expect(r.byIdOrFail('hidden').n()).toBe(7);expect(seen).toBeDefined();const edits=entityPublicationOrdinary(seen!);expect(edits.some(e=>e.subject===b.subject&&e.structural?.kind==='add')).toBe(true);expect(b.source.evidence()!.field(b.subject!,'n','ordinary')).toBeDefined();expect(r.byIdOrFail('a').n()).toBe(1);}finally{off();t.destroy();}
++});
++it('rich inverse frame retains repeated-subject facts and original handle through rollback',()=>{
++ const t=signalTree({rows:entityMap<{id:string;n:number},string>()},{enhancers:[transactions()]});const r=t.$.rows;r.setAll([{id:'a',n:1},{id:'b',n:2}]);const a=r.byIdOrFail('a'),b=r.byIdOrFail('b');const source=getEntityPublicationBinding(a)!.source;const packets:EntityPublicationPacket[]=[];const off=source.subscribe({prepare(p){packets.push(p);return undefined;},complete(){}});
++ try{const q=t.transact(()=>{r.updateOne('a',{n:7});r.updateOne('a',{n:11});r.updateOne('b',{n:8});});expect([a.n(),b.n()]).toEqual([11,8]);packets.length=0;q.rollback();expect([a.n(),b.n()]).toEqual([1,2]);expect(r.byIdOrFail('a')).toBe(a);expect(packets.length).toBeGreaterThan(0);expect(packets.flatMap(p=>entityPublicationOrdinary(p))).not.toHaveLength(0);r.updateOne('a',{n:12});expect(a.n()).toBe(12);}finally{off();t.destroy();}
++});
++it('recipient preparation reentry refuses stale point installation and keeps nested source facts',()=>{
++ const t=signalTree({rows:entityMap<{id:string;n:number},string>()});const r=t.$.rows;r.addOne({id:'a',n:1});const row=r.byIdOrFail('a'),s=getEntityPublicationBinding(row)!.source;let entered=false;
++ const off=s.subscribe({prepare(){if(!entered){entered=true;r.updateOne('a',{n:99});}return undefined;},complete(){}});
++ try{expect(()=>r.updateOne('a',{n:7})).toThrow('Entity publication source changed during preparation');expect(entered).toBe(true);expect(row.n()).toBe(99);off();r.updateOne('a',{n:11});expect(row.n()).toBe(11);}finally{off();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/point-result-allocation.spec.ts
+@@ -0,0 +1,27 @@
++import {appendFileSync} from 'node:fs';
++import {expect,it} from 'vitest';
++import {entityMap,signalTree} from '../index';
++// Diagnostic constructor interception only; never a CPU/heap timing harness.
++function countContainers(run:()=>void){
++ const Original=globalThis.Map;let containers=0,entries=0,mapArrays=0,mapEntries=0;
++ const originalMap=Array.prototype.map;
++ Array.prototype.map=function<U>(this:unknown[],callback:(value:unknown,index:number,array:unknown[])=>U,thisArg?:unknown):U[]{const result:U[]=Reflect.apply(originalMap,this,[callback,thisArg]);mapArrays++;mapEntries+=result.length;return result;};
++ const Counted=new Proxy(Original,{construct(target,args,newTarget){containers++;const input=args[0] as Iterable<unknown>|undefined;
++  const wrapped=input==null?input:{*[Symbol.iterator](){for(const pair of input){entries++;yield pair;}}};
++  return Reflect.construct(target,[wrapped],newTarget);
++ }});
++ globalThis.Map=Counted;
++ try{run();return {containers,entries,mapArrays,mapEntries};}finally{globalThis.Map=Original;Array.prototype.map=originalMap;}
++}
++it('constructor counter independently calibrates empty and copied containers',()=>{
++ const source=new Map([[1,2],[3,4]]);let copied=0,empty=-1;expect(countContainers(()=>{copied=new Map(source).size;empty=new Map().size;[1,2,3].map(x=>x+1);})).toEqual({containers:2,entries:2,mapArrays:1,mapEntries:3});expect([copied,empty]).toEqual([2,0]);
++});
++for(const width of [2,32])for(const size of [2000,20000])it(`populated point Map allocations width=${width} rows=${size}`,()=>{
++ const t=signalTree({rows:entityMap<{id:number;v:number;[key:string]:number},number>({selectId:r=>r.id})});
++ try{t.$.rows.setAll(Array.from({length:size},(_,id)=>{const r:{id:number;v:number;[key:string]:number}={id,v:0};for(let k=2;k<width;k++)r['f'+k]=k;return r;}));
++ const measured=countContainers(()=>{for(let i=0;i<200;i++)t.$.rows.updateOne(i,{v:1});});
++ for(let i=0;i<200;i++)expect(t.$.rows.byId(i)?.().v).toBe(1);expect(t.$.rows.byId(201)?.().v).toBe(0);expect(measured.containers).toBeGreaterThan(0);expect(measured.entries).toBeGreaterThan(0);
++ const output=process.env.ST_POINT_ALLOCATION_OUTPUT;
++ if(output)appendFileSync(output,JSON.stringify({width,size,writes:200,...measured})+'\n');
++ }finally{t.destroy();}
++});

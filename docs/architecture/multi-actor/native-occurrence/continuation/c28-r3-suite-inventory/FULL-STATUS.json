@@ -1,0 +1,47 @@
+[
+  {
+    "project": "kernel",
+    "exit": -15,
+    "watchdog": "no-progress-180s",
+    "elapsedSeconds": 553.3701257080538,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "angular",
+    "exit": 1,
+    "watchdog": null,
+    "elapsedSeconds": 94.7305739580188,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "react",
+    "exit": 1,
+    "watchdog": null,
+    "elapsedSeconds": 27.571701957960613,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "vue",
+    "exit": 1,
+    "watchdog": null,
+    "elapsedSeconds": 27.810879749944434,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  },
+  {
+    "project": "solid",
+    "exit": 1,
+    "watchdog": null,
+    "elapsedSeconds": 41.306355375098065,
+    "remainingOwned": [],
+    "sourceUnchanged": true,
+    "attempts": 1
+  }
+]

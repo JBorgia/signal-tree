@@ -1,0 +1,70 @@
+
+> nx run kernel:test dynamic-member-enrollment.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs dynamic-member-enrollment.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1
+
+(node:78719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:78726) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dynamic-member-enrollment-successor/candidate/packages/kernel
+
+(node:78733) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/dynamic-member-enrollment.spec.ts (9 tests | 1 failed) 28ms
+     × an authored descendant adopts only its needed inspection-created ancestor path 6ms
+(node:78734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/dynamic-member-enrollment.spec.ts > dynamic member enrollment > an authored descendant adopts only its needed inspection-created ancestor path
+AssertionError: expected {} to deeply equal { a: { n: 2 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 2,
+-   },
+- }
++ {}
+
+ ❯ src/lib/dynamic-member-enrollment.spec.ts:66:71
+     64|   const t=make();const sent:unknown[]=[];const l=link(t.$.rows,{set:v=…
+     65|   try{withWriteContext({participation:'inspection'},()=>t.$.rows({a:{n…
+     66|    (t.$.rows.a as InstalledRow).n(2);await tick();expect(sent.at(-1)).…
+       |                                                                       ^
+     67|   }finally{l.dispose();t.destroy();}
+     68|  });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 34 passed (35)
+   Start at  19:58:59
+   Duration  1.20s (transform 472ms, setup 0ms, import 636ms, tests 68ms, environment 341ms)
+
+Warning: command "node tools/run-core-vitest.mjs dynamic-member-enrollment.spec.ts whole-value-new-keys.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.6s

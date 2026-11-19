@@ -1,0 +1,26 @@
+import {afterAll,expect,it} from 'vitest';
+import {writeFileSync} from 'node:fs';
+import {signalTree} from './signal-tree';
+import {entityMap} from './markers/entity-map';
+import {restoration} from '../enhancers/restoration/restoration';
+import {transactions} from '../enhancers/transactions/transactions';
+const results:unknown[]=[];
+afterAll(()=>writeFileSync('/private/tmp/st-c19-clear-find-attribution/observations.json',JSON.stringify(results,null,2)));
+for(const n of [3,8,256,1024])for(const [name,enhancers] of [['transactions',()=>[transactions()]],['transactions-restoration',()=>[transactions(),restoration()]],['restoration-transactions',()=>[restoration(),transactions()]]] as const){
+ it(`clear attribution N=${n} ${name}`,()=>{
+  const rows=Array.from({length:n},(_,id)=>({id,n:id}));const t=signalTree({rows:entityMap<{id:number;n:number},number>()},{enhancers:enhancers()});
+  try{t.$.rows.setAll(rows);const p=t.transact(()=>t.$.rows.setAll([]));expect(t.$.rows.count()).toBe(0);
+   const original=Array.prototype.find;const sites=new Map<string,{calls:number;visits:number;lengths:number[];stack:string}>();let tracing=false;
+   Array.prototype.find=function<T>(this:T[],predicate:(v:T,i:number,a:T[])=>unknown,thisArg?:unknown):T|undefined{
+    if(tracing)return Reflect.apply(original,this,[predicate,thisArg]);
+    tracing=true;let stack='';try{stack=new Error('find site').stack??'';}finally{tracing=false;}
+    let key=stack;for(const line of stack.split('\n')){if(line.includes('/packages/kernel/src/')&&!line.includes('clear-find-attribution.spec.ts')){key=line;break;}}
+    let site=sites.get(key);if(!site){site={calls:0,visits:0,lengths:[],stack};sites.set(key,site);}site.calls++;site.lengths.push(this.length);
+    return Reflect.apply(original,this,[function(v:T,i:number,a:T[]){site.visits++;return Reflect.apply(predicate,thisArg,[v,i,a]);}]);
+   };
+   try{p.rollback();}finally{Array.prototype.find=original;}
+   expect(t.$.rows.ids()).toEqual(rows.map(r=>r.id));expect(t.$.rows.all()).toEqual(rows);expect(Array.prototype.find).toBe(original);
+   const entries=[...sites].map(([key,s])=>({key,...s}));results.push({n,name,total:entries.reduce((v,s)=>v+s.visits,0),sites:entries});
+  }finally{t.destroy();}
+ });
+}

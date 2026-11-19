@@ -1,0 +1,12 @@
+{
+  "FAILURE-IDENTITIES.json": "ce3e3de64c201f0145508f0dd31d877456fbfd25c906eb0c9fa9d5b3b4ca4be4",
+  "HEISENBERG-HANDOFF.md": "9e30f56c5036956a2b9e70e8c349a6b230b7f99a177f3377bbe87a03bb890eb3",
+  "INPUTS.json": "cf03fdd99297dbc7ecc75e82cc26221ca388368347145e1588d3426d334f1ed2",
+  "VERIFICATION.json": "6f225a697893ef208944823a0ca9d364f988184db25574b843971ba3a0f2ca24",
+  "raw/1-first.log": "4abcc46a8e0b742f8d6d03747f656b988b332b523b223a3f2f2c45dc97d637fa",
+  "raw/2-first.log": "4fbf2196fc6ac567579eeb9407cf6a1ff5c018ccbdd00257879d6b6c3b16fb4e",
+  "raw/3-read-boundary.jsonl": "bf4d4bbc2492ec0d8c69bd3ef425289935bc162020ee4c040fa12b3b5b3a5b6c",
+  "raw/4-completion.jsonl": "cf4a2e42fff5d906e3d0f08837cd8d74cd85eab919073a2d745a5fa10da8cc07",
+  "raw/5-REVIEW.md": "503965f44f4ff19d4d8ee949524dd9914ec356ca5be4aa9128419c7b5b60e25c",
+  "raw/6-sibling-window-false.json": "04c92358d993df50f3618b67800531ad6a99b9c86e40b5dd7fd2d36c2de14ad4"
+}

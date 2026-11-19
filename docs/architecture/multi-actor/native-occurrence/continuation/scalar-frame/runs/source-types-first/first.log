@@ -1,0 +1,3 @@
+packages/kernel/src/lib/internals/scalar-publication-coverage.ts(8,20): error TS2353: Object literal may only specify known properties, and '[COVERAGE]' does not exist in type 'WriteMetadata'.
+packages/kernel/src/lib/path-notifier.ts(869,56): error TS2345: Argument of type 'WriteMetadata | undefined' is not assignable to parameter of type 'WriteMetadata'.
+  Type 'undefined' is not assignable to type 'WriteMetadata'.

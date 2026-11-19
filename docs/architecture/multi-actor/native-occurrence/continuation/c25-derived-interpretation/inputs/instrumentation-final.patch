@@ -1,0 +1,44 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -593,3 +593,6 @@
+  return selectedReceipt(channel);
+ }
+ 
++// C25 research-only structural roots; removed before runtime freeze.
++export function __c25SourceRoots(node:object,snapshots:readonly object[]){return {endpoint:nativeValues.get(node),view:nativeViews.get(node),snapshots:snapshots.map(value=>snapshotViews.get(value)),bindings:[...bindings.values()]};}
++export function __c25FactRoot(value:object){return factRequirements.get(value as Fact);}
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -441,3 +441,6 @@
+  refresh(op);return selected;
+ }
+ 
++// C25 research-only structural roots; removed before runtime freeze.
++export function __c25LifecycleRoots(){return {sources,pending,connections,stack,installedLast,unknownFrames,invalidFrames,queuedConnections};}
++export function __c25LifecycleWeakRoots(value:object){return [requirementListeners.get(value as NativeRequirement),ownerTransitionObservers.get(value as OwnerCell)];}
+--- a/packages/kernel/src/lib/internals/native-scalar-selection.ts
++++ b/packages/kernel/src/lib/internals/native-scalar-selection.ts
+@@ -10,3 +10,6 @@
+ export function withScalarSelections<T>(selections:ReadonlyMap<object,NativeFieldEndpoint>,work:()=>T):T{const previous=restored;restored=selections;try{return work();}finally{restored=previous;}}
+ export function restoredScalarSelection(node:object):NativeFieldEndpoint|undefined{return restored?.get(node);}
+ 
++const __c25RegistryRoots=new WeakMap<object,()=>object>();
++export function __c25RegisterRoots(registry:object,roots:()=>object):void{__c25RegistryRoots.set(registry,roots);}
++export function __c25ReadRoots(registry:object):object|undefined{return __c25RegistryRoots.get(registry)?.();}
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,4 +1,4 @@
+-import {registerScalarSelection} from '../../lib/internals/native-scalar-selection';
++import {registerScalarSelection,__c25RegisterRoots} from '../../lib/internals/native-scalar-selection';
+ import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+ import {
+@@ -2894,6 +2894,8 @@
+     bindFieldEndpoints(admission.operationEffect,{before,after});
+     return {endpoint};
+   }):undefined;
++
++  if(lifecycleRegistry)__c25RegisterRoots(lifecycleRegistry,()=>({installedOperations,pendingTransactions,expectedDispositions}));
+ 
+   const recordConfirmedBucket = (
+     bucket: CaptureBucket

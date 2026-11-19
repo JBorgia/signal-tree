@@ -1,0 +1,107 @@
+{
+  "angular20": {
+    "types-bundler": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.bundler.json"
+      ],
+      "exit": 0
+    },
+    "types-node16": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.node16.json"
+      ],
+      "exit": 0
+    },
+    "runtime": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "--test",
+        "public-controls.mjs",
+        "independent-controls.mjs"
+      ],
+      "exit": 0
+    },
+    "aot": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+        "-p",
+        "tsconfig.aot.json"
+      ],
+      "exit": 0
+    }
+  },
+  "angular21": {
+    "types-bundler": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.bundler.json"
+      ],
+      "exit": 0
+    },
+    "types-node16": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.node16.json"
+      ],
+      "exit": 0
+    },
+    "runtime": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "--test",
+        "public-controls.mjs",
+        "independent-controls.mjs"
+      ],
+      "exit": 0
+    },
+    "aot": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+        "-p",
+        "tsconfig.aot.json"
+      ],
+      "exit": 0
+    }
+  },
+  "vue350": {
+    "types-bundler": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.bundler.json"
+      ],
+      "exit": 0
+    },
+    "types-node16": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.node16.json"
+      ],
+      "exit": 0
+    },
+    "runtime": {
+      "command": [
+        "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+        "--test",
+        "public-controls.mjs",
+        "independent-controls.mjs"
+      ],
+      "exit": 0
+    }
+  }
+}

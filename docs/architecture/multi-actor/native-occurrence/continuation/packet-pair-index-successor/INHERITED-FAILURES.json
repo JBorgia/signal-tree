@@ -1,0 +1,25 @@
+{
+  "candidateFailures": [
+    "FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation",
+    "FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for scalar support",
+    "FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: before-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: during-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: enroll-in-updater",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: before-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: during-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: enroll-in-updater"
+  ],
+  "predecessorFailures": [
+    "FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation",
+    "FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for scalar support",
+    "FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: before-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: during-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: enroll-in-updater",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: before-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: during-pending",
+    "FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: enroll-in-updater"
+  ],
+  "sameNamedFailures": true
+}

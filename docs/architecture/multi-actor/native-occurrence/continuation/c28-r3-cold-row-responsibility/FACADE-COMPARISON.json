@@ -1,0 +1,406 @@
+{
+  "comparison-capture": {
+    "cold-restoration": {
+      "before": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterUndo": [
+        {
+          "node": true,
+          "fields": [
+            "id",
+            "n"
+          ],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": true,
+          "fields": [
+            "id",
+            "n"
+          ],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterRedo": [
+        {
+          "node": true,
+          "fields": [
+            "id",
+            "n"
+          ],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": true,
+          "fields": [
+            "id",
+            "n"
+          ],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "snapshotFacadeCalls": 16,
+      "sent": [
+        [
+          {
+            "id": "c",
+            "n": 3
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "n": 1
+          },
+          {
+            "id": "b",
+            "n": 2
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 3
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 8
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 10
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 8
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ]
+      ],
+      "fieldSent": [
+        10,
+        8
+      ]
+    },
+    "cold-transaction": {
+      "before": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterInspection": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterRollback": [
+        {
+          "node": true,
+          "fields": [
+            "id",
+            "n"
+          ],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": true,
+          "fields": [
+            "id",
+            "n"
+          ],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "snapshotFacadeCalls": 6,
+      "sent": [
+        [
+          {
+            "id": "a",
+            "n": 1
+          },
+          {
+            "id": "b",
+            "n": 2
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "n": 9
+          },
+          {
+            "id": "b",
+            "n": 2
+          }
+        ]
+      ],
+      "fieldSent": null
+    }
+  },
+  "candidate-first": {
+    "cold-restoration": {
+      "before": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterUndo": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterRedo": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "snapshotFacadeCalls": 0,
+      "sent": [
+        [
+          {
+            "id": "c",
+            "n": 3
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "n": 1
+          },
+          {
+            "id": "b",
+            "n": 2
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 3
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 8
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 10
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ],
+        [
+          {
+            "id": "c",
+            "n": 8
+          },
+          {
+            "id": "d",
+            "n": 4
+          }
+        ]
+      ],
+      "fieldSent": [
+        10,
+        8
+      ]
+    },
+    "cold-transaction": {
+      "before": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterInspection": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "afterRollback": [
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        },
+        {
+          "node": false,
+          "fields": [],
+          "positions": [
+            2
+          ]
+        }
+      ],
+      "snapshotFacadeCalls": 0,
+      "sent": [
+        [
+          {
+            "id": "a",
+            "n": 1
+          },
+          {
+            "id": "b",
+            "n": 2
+          }
+        ],
+        [
+          {
+            "id": "a",
+            "n": 9
+          },
+          {
+            "id": "b",
+            "n": 2
+          }
+        ]
+      ],
+      "fieldSent": null
+    }
+  }
+}

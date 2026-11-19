@@ -1,0 +1,12 @@
+{
+  "base": "C3",
+  "patches": [
+    "RETIREMENT-0.patch",
+    "RETIREMENT-1.patch"
+  ],
+  "addedTests": [
+    "packages/kernel/src/lib/fixed-window-independent.spec.ts",
+    "packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "packages/kernel/src/lib/owner-transition-cancellation.spec.ts"
+  ]
+}

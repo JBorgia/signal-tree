@@ -1,0 +1,59 @@
+[
+  {
+    "name": "valid",
+    "actualExit": 0,
+    "pass": true,
+    "errors": []
+  },
+  {
+    "name": "missing-arm",
+    "actualExit": 1,
+    "pass": true,
+    "errors": [
+      "Incomplete execution matrix",
+      "Missing mode: held-hold-row"
+    ]
+  },
+  {
+    "name": "duplicate-arm",
+    "actualExit": 1,
+    "pass": true,
+    "errors": [
+      "Unexpected or duplicate mode: held-drop-proceed",
+      "Missing mode: held-hold-row"
+    ]
+  },
+  {
+    "name": "swapped-artifacts",
+    "actualExit": 1,
+    "pass": true,
+    "errors": [
+      "held-hold-proceed: Missing, mismatched or incomplete sampling artifact: held-hold-proceed",
+      "held-drop-proceed: Missing, mismatched or incomplete sampling artifact: held-drop-proceed"
+    ]
+  },
+  {
+    "name": "missing-artifact",
+    "actualExit": 1,
+    "pass": true,
+    "errors": [
+      "held-hold-row: ENOENT: no such file or directory, open '/private/tmp/st-c21-gc-routing-successor/matrix-falsifiers/absent.json'"
+    ]
+  },
+  {
+    "name": "failed-child-with-valid-artifact",
+    "actualExit": 1,
+    "pass": true,
+    "errors": [
+      "Failed or mismatched execution: hold-proceed-success"
+    ]
+  },
+  {
+    "name": "malformed-round",
+    "actualExit": 1,
+    "pass": true,
+    "errors": [
+      "held-hold-row: Malformed sampling round: held-hold-row"
+    ]
+  }
+]

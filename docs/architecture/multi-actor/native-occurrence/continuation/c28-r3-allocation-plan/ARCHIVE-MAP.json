@@ -1,0 +1,14 @@
+[
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "03425c931eac4a8762a75fa55dcda94b523df74b15503d66fa4fe3addbabee68",
+    "archiveSha256": "03425c931eac4a8762a75fa55dcda94b523df74b15503d66fa4fe3addbabee68"
+  },
+  {
+    "source": "PLAN.md",
+    "archive": "PLAN.md",
+    "sourceSha256": "a4ad4c0512dac2772497b0bac37f1e7191e562081d93cb8175a3528a6538be86",
+    "archiveSha256": "a4ad4c0512dac2772497b0bac37f1e7191e562081d93cb8175a3528a6538be86"
+  }
+]

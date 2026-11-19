@@ -1,0 +1,32 @@
+[
+  {
+    "source": "/private/tmp/st-rich-unit-successor/runs/first-runtime/first.log",
+    "copy": "/private/tmp/st-rich-unit-causal-trace/raw/1-first.log",
+    "sha256": "4abcc46a8e0b742f8d6d03747f656b988b332b523b223a3f2f2c45dc97d637fa"
+  },
+  {
+    "source": "/private/tmp/st-rich-unit-successor/runs/unchanged-required/first.log",
+    "copy": "/private/tmp/st-rich-unit-causal-trace/raw/2-first.log",
+    "sha256": "4fbf2196fc6ac567579eeb9407cf6a1ff5c018ccbdd00257879d6b6c3b16fb4e"
+  },
+  {
+    "source": "/private/tmp/st-rich-unit-successor/diagnostic/read-boundary.jsonl",
+    "copy": "/private/tmp/st-rich-unit-causal-trace/raw/3-read-boundary.jsonl",
+    "sha256": "bf4d4bbc2492ec0d8c69bd3ef425289935bc162020ee4c040fa12b3b5b3a5b6c"
+  },
+  {
+    "source": "/private/tmp/st-rich-unit-successor/observations/completion.jsonl",
+    "copy": "/private/tmp/st-rich-unit-causal-trace/raw/4-completion.jsonl",
+    "sha256": "cf4a2e42fff5d906e3d0f08837cd8d74cd85eab919073a2d745a5fa10da8cc07"
+  },
+  {
+    "source": "/private/tmp/st-scalar-frame-publication-independent/REVIEW.md",
+    "copy": "/private/tmp/st-rich-unit-causal-trace/raw/5-REVIEW.md",
+    "sha256": "503965f44f4ff19d4d8ee949524dd9914ec356ca5be4aa9128419c7b5b60e25c"
+  },
+  {
+    "source": "/private/tmp/st-scalar-frame-publication-independent/runs/independent-controls-final/observations/sibling-window-false.json",
+    "copy": "/private/tmp/st-rich-unit-causal-trace/raw/6-sibling-window-false.json",
+    "sha256": "04c92358d993df50f3618b67800531ad6a99b9c86e40b5dd7fd2d36c2de14ad4"
+  }
+]

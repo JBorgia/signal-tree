@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.node16.json"
+  ],
+  "cwd": "/private/tmp/st-c23-public-packed-proof/consumer",
+  "noProgressSeconds": 180
+}

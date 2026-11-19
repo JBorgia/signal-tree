@@ -1,0 +1,43 @@
+{
+  "ledgerSha256": "cdd6e5287072cd252b444cdb67441e8a76206ad56d2fc7ff7009f2e1b256f248",
+  "sourceMatchesFrozenR3": true,
+  "newExecutionsHere": 0,
+  "required": [
+    {
+      "project": "angular",
+      "path": "packages/angular/src/lib/whole-value-new-keys.spec.ts",
+      "case": "publishes newly supplied ordinary keys through the angular facade",
+      "sha256": "4b253ccd9d584b4bd768b20fc4e7e115051e8f3d11a51e4380141256967e11b4",
+      "failure": "Scalar selection requires prepared admission",
+      "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/angular/first.log",
+      "status": "external unchanged failure; future repair acceptance requires entire file unchanged"
+    },
+    {
+      "project": "react",
+      "path": "packages/react/src/whole-value-new-keys.spec.tsx",
+      "case": "publishes newly supplied ordinary keys through the React facade",
+      "sha256": "ebe6def4d9922612ce386949ca67b3f476b9bae46e3dd4f9660b2d9a4b234667",
+      "failure": "Scalar selection requires prepared admission",
+      "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/react/first.log",
+      "status": "external unchanged failure; future repair acceptance requires entire file unchanged"
+    },
+    {
+      "project": "vue",
+      "path": "packages/vue/src/lib/whole-value-new-keys.spec.ts",
+      "case": "publishes newly supplied ordinary keys through the vue facade",
+      "sha256": "53d4c578d5de844431dbe2cb81d9e89ea2e8338defc544cc4fdaba230055d97d",
+      "failure": "Scalar selection requires prepared admission",
+      "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/vue/first.log",
+      "status": "external unchanged failure; future repair acceptance requires entire file unchanged"
+    },
+    {
+      "project": "solid",
+      "path": "packages/solid/src/lib/whole-value-new-keys.spec.ts",
+      "case": "publishes newly supplied ordinary keys through the solid facade",
+      "sha256": "b857f1b9b00b4b91429bb2382df0e5fb5557564e062feb4f837d4736a7786416",
+      "failure": "Scalar selection requires prepared admission",
+      "log": "/private/tmp/st-r3-compatibility-inventory/full-runs/solid/first.log",
+      "status": "external unchanged failure; future repair acceptance requires entire file unchanged"
+    }
+  ]
+}

@@ -1,0 +1,96 @@
+
+> nx run kernel:test retained-source-public-controls.spec.ts
+
+> node tools/run-core-vitest.mjs retained-source-public-controls.spec.ts
+
+(node:43281) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:43288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-retained-source-controls/candidate/packages/kernel
+
+(node:43295) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/retained-source-public-controls.spec.ts (6 tests | 3 failed) 46ms
+   × retained-source: hidden ancestor compensation restores physical rows without changing untouched siblings 26ms
+   × retained-source: hidden collection compensation restores physical rows without changing untouched siblings 4ms
+   × retained-source: hidden two-row refusal preserves both rows, then retry compensates while still absent 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/retained-source-public-controls.spec.ts > retained-source: hidden ancestor compensation restores physical rows without changing untouched siblings
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Missing live leaf for owner 5 [effect-validation-failed]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:410:3
+    408|   cause: RollbackFailureCause
+    409| ): SignalTreeRollbackError =>
+    410|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    411|
+    412| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4945:23
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4565:19
+ ❯ src/lib/retained-source-public-controls.spec.ts:35:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/retained-source-public-controls.spec.ts > retained-source: hidden collection compensation restores physical rows without changing untouched siblings
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: turn 3 depends on state this rollback would invalidate, so reversing turn 2 is no longer safe [later-confirmed-dependency]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:410:3
+    408|   cause: RollbackFailureCause
+    409| ): SignalTreeRollbackError =>
+    410|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    411|
+    412| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4899:29
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4565:19
+ ❯ src/lib/retained-source-public-controls.spec.ts:35:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/retained-source-public-controls.spec.ts > retained-source: hidden two-row refusal preserves both rows, then retry compensates while still absent
+AssertionError: expected [] to have a length of 2 but got +0
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ src/lib/retained-source-public-controls.spec.ts:55:19
+     53|   let failure:unknown;try{pending.rollback();}catch(error){failure=err…
+     54|   expect(failure).toMatchObject({code:'SIGNALTREE_ROLLBACK_FAILED',cau…
+     55|   expect(visited).toHaveLength(2);expect(new Set(visited)).toEqual(new…
+       |                   ^
+     56|   absent(tree,rows,'ancestor');off();
+     57|   expect(stored(rows)).toEqual([{id:'a',n:7,tag:'A'},{id:'b',n:9,tag:'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 3 passed (6)
+   Start at  16:42:46
+   Duration  1.34s (transform 657ms, setup 0ms, import 789ms, tests 46ms, environment 367ms)
+
+Warning: command "node tools/run-core-vitest.mjs retained-source-public-controls.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.9s

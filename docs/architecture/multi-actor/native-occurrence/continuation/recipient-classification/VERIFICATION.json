@@ -1,0 +1,25 @@
+{
+  "predecessorFilesVerifiedUnchanged": 2968,
+  "changedInherited": {
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts": "11ed1ee5de87db332a9e12501ee4bd2427546863ca4f262ee3bd4549e25db179",
+    "packages/kernel/src/lib/aggregate-native-input-independent.spec.ts": "dd3a96166f3f0987ec191b26201c7b98ae93e7d44025c4ef50935c5b2d0a6341",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "e1908fff513014d1edbfa804c9e0bc778a6d57850e18789365be3f8994490e14",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "eddf7a756dfa0b38a87a40f756341fdb63da4909f59af4aa2775425fe7623644"
+  },
+  "added": {
+    "packages/kernel/src/lib/recipient-cause-classification.spec.ts": "a81d0d139a8f2b2f5f67fdbe6b79791c020faed921f0abceb658df4804924aa3",
+    "packages/kernel/src/lib/recipient-window-review.spec.ts": "e4c5e4b25030b37c4365169441202d7ffb5c5d662af1daddc3ecc53dc71d0136",
+    "packages/kernel/src/lib/known-input-contract-review.spec.ts": "6e8f443a169b10e992a008bab11c899ce1bb588b2c2b22654ad9327544f0bcd8"
+  },
+  "mainTerminalControlsExact": true,
+  "enrollmentSpecUnchanged": true,
+  "windowControlsUnchanged": true,
+  "sourceFiles": 2971,
+  "sha256": {
+    "SOURCE-SHA256.json": "c374723071aa1aea781d1b2caf3c13c92d522a4c226831e2fb923a20e5c72147",
+    "runtime.patch": "bc5ca4ccda1beb57bdf59b6a49c4c589f40b49893c82ff469bfde57217d5cce8",
+    "tests.patch": "ccb4d2a3c58c5bf47ef80ffbeb7c4dba6aa867d164996d4f6121560d4ca7bd81",
+    "source.patch": "e3deb5c6299a1f5720a4588d6279612657840a6bed223ea642c826ead19cd03f",
+    "combined-B-runtime.patch": "676e376b395b5dfd815534824ca0a474d333aa5b66faf7a5a90df45880a314b7"
+  }
+}

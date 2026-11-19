@@ -1,0 +1,10 @@
+{
+  "baseManifestSha256": "fa371d221f9904c4feec2d8f684360c73ccb7e30b98bf03a18d0dea5768bf791",
+  "changedRuntime": {
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "0e9e8347f26bec9a360b0db5080fb52b0949b3f30da011db93efe018a8d57fce"
+  },
+  "additionalDiagnostics": [
+    "restoration-scaling-diagnostic.spec.ts",
+    "restoration-scaling-slice-corrected.spec.ts"
+  ]
+}

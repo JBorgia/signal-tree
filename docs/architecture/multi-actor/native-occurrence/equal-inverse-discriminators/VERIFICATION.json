@@ -1,0 +1,12 @@
+{
+  "originalAndCopiedManifestFilesVerified": 2918,
+  "cases": 16,
+  "observerPairsMatch": true,
+  "ordinaryPhysicalFieldProofsMatch": true,
+  "independentEqualPrematureSevenDelivery": true,
+  "nativeQRejectRestoresZero": true,
+  "equalRHasNoNativeFieldChanges": true,
+  "restoredSevenStillNamesRejectedR": true,
+  "sourceManifestSha256": "80a0116269b26af939f775b9a10ff8a79d99b6e9b556a17b05137ab5e3f67502",
+  "fixtureSha256": "80fe4212b8eb9295cbcb2a971f15598f2c75d1605e3bf711597ed0e8d2bac813"
+}

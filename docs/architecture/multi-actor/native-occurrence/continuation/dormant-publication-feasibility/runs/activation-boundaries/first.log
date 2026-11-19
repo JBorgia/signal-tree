@@ -1,0 +1,70 @@
+
+> nx run kernel:test publication-enrollment-adjudicated.spec.ts point-result-demand.spec.ts inspection-egress-conformance.spec.ts --testNamePattern=enroll-in-updater|recipient preparation reentry|BASE-[12] --maxWorkers=1
+
+> node tools/run-core-vitest.mjs publication-enrollment-adjudicated.spec.ts point-result-demand.spec.ts inspection-egress-conformance.spec.ts --testNamePattern="enroll-in-updater|recipient preparation reentry|BASE-[12]" --maxWorkers=1
+
+(node:87911) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87920) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-dormant-publication-feasibility/candidate/packages/kernel
+
+(node:87928) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:87960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-enrollment-adjudicated.spec.ts (16 tests | 2 failed | 14 skipped) 25ms
+   × adjudicated enrollment invariance branch: enroll-in-updater 21ms
+   × adjudicated enrollment invariance root: enroll-in-updater 3ms
+(node:87961) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance branch: enroll-in-updater
+ FAIL  src/lib/publication-enrollment-adjudicated.spec.ts > adjudicated enrollment invariance root: enroll-in-updater
+AssertionError: expected [] to have a length of 1 but got +0
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ src/lib/publication-enrollment-adjudicated.spec.ts:42:22
+     40|   expect(otherStarts.every(call=>call[2]==='surviving')).toBe(true);
+     41|   if(['before-pending','during-pending','enroll-in-updater'].includes(…
+     42|    expect(otherSent).toHaveLength(1);expect(otherSent[0]).toMatchObjec…
+       |                      ^
+     43|   }else if(variant==='dispose-after-declaration'){
+     44|    expect(otherSent.length).toBeLessThanOrEqual(1);if(otherSent.length…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  2 failed | 3 passed | 34 skipped (39)
+   Start at  09:43:08
+   Duration  2.24s (transform 753ms, setup 0ms, import 1.12s, tests 50ms, environment 767ms)
+
+Warning: command "node tools/run-core-vitest.mjs publication-enrollment-adjudicated.spec.ts point-result-demand.spec.ts inspection-egress-conformance.spec.ts --testNamePattern="enroll-in-updater|recipient preparation reentry|BASE-[12]" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.8s

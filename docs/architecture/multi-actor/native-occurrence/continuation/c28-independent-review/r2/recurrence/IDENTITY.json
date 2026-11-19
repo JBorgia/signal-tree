@@ -1,0 +1,16 @@
+{
+  "diagnostic/NO-WRITE-FIRST.jsonl": "8c9b9816f2115898b5c2b359dbbf2d2e9dc7382181b132937649f18ceab5d175",
+  "diagnostic/instrumentation.patch": "a83cf5e3850631e15482efbc7c60db95b086488f4d6f0e9a0173df671e5c0da8",
+  "diagnostic/PREREGISTERED.json": "49f410481b635a2f3956959fe4ae35b1d932128debf8cd8a7c79c37fe6128a5a",
+  "diagnostic/candidate/packages/kernel/src/lib/repeated-no-write-roots.spec.ts": "f5e8d8474b5cb13dc6c785ac7808b5e74e8ec1533a8380b0b96447f175bf56ff",
+  "diagnostic/runs/roots-cleanup-first/first.log": "11979d58305bdb0a63068baba95ec86757d98f203208c5151bf7c1a05251656d",
+  "SNAPSHOT.json": "37c8e0011c5b7c35e32c3e6a9fd55204b482640dab88d737ee55a8d6d82ce012",
+  "packages/kernel/src/lib/experimental-publication/private.ts": {
+    "candidate": "c7822db0f351bc488a78029b9df34382894fccef7355bca7b8b0866a608a8951",
+    "frozen": "c7822db0f351bc488a78029b9df34382894fccef7355bca7b8b0866a608a8951"
+  },
+  "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+    "candidate": "69fd14f8883e2240997b25ee1edbb347585229bee27df118faa2c6a77c1531da",
+    "frozen": "69fd14f8883e2240997b25ee1edbb347585229bee27df118faa2c6a77c1531da"
+  }
+}

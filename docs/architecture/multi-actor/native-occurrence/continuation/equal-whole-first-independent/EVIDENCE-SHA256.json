@@ -1,0 +1,18 @@
+{
+  "REVIEW.md": "e7ad8269453baa45198d235f366fd01ab1944d863f022ec9e392d412a011d6cc",
+  "VERIFIED.json": "22bd83c2296c508f44eab887a3b59cc949b3f94260c05a665f0adbeb1addd7ee",
+  "evidence/FIRST-LATE-GETTER.spec.ts": "787f11f96f4c3fbc809e5b7989c4d81b9b403b47585c67b60aaa9499a507dba3",
+  "evidence/FREEZE.json": "e5dd215479225ac82818da992965e55837427e5673c741c5f2d9b29799c16cf5",
+  "evidence/GETTER-CONTROLS.spec.ts": "c13477f73723c6c34aae2f0efa1000a143155ef9f39c3fbe6cc1f2a627705932",
+  "evidence/LATE-GETTER.spec.ts": "c167e0dc7bbdf11dcacc3e8706839bca8f67c58bacf57258ba254c605ccd7f9d",
+  "evidence/REPORT.md": "3dc52020b61e798b58841fdb02a72341f4ba6596de98268e8f280dd863ef9482",
+  "evidence/baseline/runs/late-getter-matched-observer/first.log": "0a4007a128edfec7848d149961508516b81c59d7baae55422e5bdaaa24a49c8f",
+  "evidence/baseline/whole-getters.json": "fbad3a37842d6e69bd33eaae9ddba0df14f655953572809639ff8d6d0435be47",
+  "evidence/baseline/whole-late-getter.json": "f6926af279f000f6a43ce052795bac489dfba7eff883ffad26700a7505cad3a0",
+  "evidence/runs/first-proof/first.log": "f80f4fd48f72ccc15ea6c2bb19c156b4fe95e47a9de3ecb8b408f20ef559f09a",
+  "evidence/runs/late-getter-matched-observer/first.log": "7686d8d74db479d80a58ee37f3d49103f590bde8ab856054c55903a6f5e40b01",
+  "evidence/runtime.patch": "f7203ac99e828c33020772683a34f5d1c859b55c1b121e3924307e95052005e8",
+  "evidence/tests.patch": "d65afedf69d84c69a47068ece81eabb8bc98ecd2489f314fc6dd1216ea33247c",
+  "evidence/whole-getters.json": "5b249780dd268f6bb57db43e9f439791b93e21620fa6c64fb7852a45bc4a2ce0",
+  "evidence/whole-late-getter.json": "be46bf33fa6bae9551ed8d7c261b8653f7db2573e79edeb9ed558a5bb171900b"
+}

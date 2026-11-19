@@ -1,0 +1,961 @@
+--- a/packages/kernel/src/enhancers/restoration/restoration.ts
++++ b/packages/kernel/src/enhancers/restoration/restoration.ts
+@@ -3137,13 +3137,12 @@
+                     }
+                     frame.set(slot, value);
+                   }
++                  const install = frame.prepareCommit?.({advanceRevision:false,publish:false});
++                  if (!install) throw new Error('Declarative scalar preparation unavailable');
+                   let result: ReturnType<typeof frame.commit> | undefined;
+                   return {
+                     install(): void {
+-                      result = frame.commit({
+-                        advanceRevision: false,
+-                        publish: false,
+-                      });
++                      result = install();
+                     },
+                     publish(): void {
+                       if (!result) {
+@@ -3157,15 +3156,19 @@
+                 },
+               }
+             : undefined;
+-        const prepared = prepareDeclarativeTransitionInstallation(
++        const prepared = withWriteContext(
++          {origin:'restoration', ownerId:getPositionRegistry(tree.$)?.id},
++          () => prepareDeclarativeTransitionInstallation(
+           target,
+           bindings,
+           scalarBinding,
+           {
+-            prepareTarget: (members) =>
+-              preparePlainBranchMembers(tree.$ as object, members),
++            prepareTarget: (members, scalars, turns) => ({
++              ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)}))),
++              includesScalars: true,
++            }),
+           }
+-        );
++        ));
+         isRestoring = true;
+         try {
+           const apply = () =>
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,4 @@
++import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+ import {
+   completeOrderCapture,
+@@ -3522,8 +3523,8 @@
+                     advanceRevision: false,
+                     publish: false,
+                   })
+-                : () =>
+-                    frame.commit({ advanceRevision: false, publish: false });
++                : undefined;
++              if (!install) throw new Error('Transaction scalar preparation unavailable');
+               let result: ReturnType<typeof frame.commit> | undefined;
+               return {
+                 install(): void {
+@@ -3563,11 +3564,11 @@
+                         effect.ownerPath ?? descriptor?.ownerPath ?? path,
+                         undefined,
+                         [effect.owner],
+-                        {
++                        scalarFrameMetadata(result, scalarSlotRuntime.resolveScalarSlot(effect.owner), {
+                           ...getActiveWriteContext(),
+                           intent: 'system',
+                           participation: 'realized',
+-                        },
++                        }),
+                         treeOwnerId
+                       );
+                     } catch (error) {
+@@ -3588,8 +3589,10 @@
+       bindings,
+       scalarBinding,
+       {
+-        prepareTarget: (members) =>
+-          preparePlainBranchMembers(tree.$ as object, members),
++        prepareTarget: (members, scalars, turns) => ({
++          ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)}))),
++          includesScalars: true,
++        }),
+       },
+       {
+         onCommitted() {
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -1,3 +1,4 @@
++import { stampScalarNotification } from '../internals/scalar-publication-coverage';
+ import { RecipientOccurrences, type OccurrenceHandle } from './recipient-occurrence';
+ import type { EntityContributorEdit } from '../internals/entity-egress-projection';
+ import { currentEntityPublicationInputs, getEntityPublicationBinding, type EntityPublicationEvidence } from '../internals/entity-publication';
+@@ -23,7 +24,8 @@
+ type FieldInfo={relative:readonly string[];address:readonly string[]};
+ type FieldTrie={children:Map<string,FieldTrie>;field?:object};
+ type CollectionSupport={occurrence:OccurrenceHandle;payload:unknown;relative:readonly string[]|undefined;entries:Map<string,{requirement:lifecycle.NativeRequirement;proof:Proof}>};
+-type Binding={index:RecipientOccurrences;occurrences:Map<object,OccurrenceHandle>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
++type LegacyScalar={value:unknown;relative:readonly string[];revision:number};
++type Binding={legacyScalars:LegacyScalar[];index:RecipientOccurrences;occurrences:Map<object,OccurrenceHandle>;collections:Map<object,CollectionSupport>;aggregate:boolean;initialized:Set<object>;valueInitialized:boolean;slotTrie:SlotTrie;fields:Map<object,FieldInfo>;fieldTrie:FieldTrie;fieldFacts:Map<object,Fact>;completedFields:Map<object,Fact>;releases:(()=>void)[];owner:number;position:number;current?:Fact;valueFact:Fact;completedValueFact:Fact;valuePayload:unknown;baselineStructure:Fact;presence:Map<Slot,Presence>;completedPresence:Map<Slot,Presence>;source?:object;registry?:object;address?:readonly string[];pending:Set<Unit>;projected?:Readonly<{fact:Fact;payload:unknown;changed:boolean}>;release?:()=>void};
+ const bindings=new Map<object,Binding>();
+ const proofs=new WeakMap<Fact,Proof>();
+ const ownProofs=new WeakMap<Fact,Proof>();
+@@ -32,6 +34,7 @@
+ const noopPredecessors=new WeakMap<Fact,Fact|undefined>();
+ function effectivePredecessor(fact:Fact|undefined):Fact|undefined{while(fact&&noopPredecessors.has(fact))fact=noopPredecessors.get(fact);return fact;}
+ const facts=new WeakSet<object>();
++const scalarFacts=new WeakSet<object>();
+ const grants=new WeakMap<Fact,Set<object>>();
+ const callbacks=new Map<object,()=>void>();
+ const consumedIngress=new Set<object>();
+@@ -251,6 +254,7 @@
+   }
+   unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
++ if(!b.pending.size)drainLegacyScalars(channel,b);
+ }
+ function wakeChannel(channel:object):void{queueMicrotask(()=>{const b=bindings.get(channel);if(b)ready(channel,b);callbacks.get(channel)?.();});}
+ function captureValueInput(channel:object,field?:object):object|undefined{const b=bindings.get(channel);if(!b)return;const info=field&&b.fields.get(field);const states=info?presenceForField(b,info.address):[...b.presence.values()];const absent=states.filter(state=>!state.present);return {facts:Object.freeze(absent.length?absent.map(state=>state.fact):[b.baselineStructure,field?b.fieldFacts.get(field)!:b.valueFact,...states.map(state=>state.fact)])};}
+@@ -261,19 +265,21 @@
+  const attributed=meta?.transactionId;
+  const known=typeof attributed==='number'?lifecycle.ownerCell(b.owner,attributed):undefined;
+  const valid=attributed===undefined||!!known&&meta?.transactionOwner===lifecycle.ownerToken(b.owner);
+- const previous=b.current;
++ const previous=(mutation.publicationPredecessors?.has(channel)?mutation.publicationPredecessors.get(channel):b.current) as Fact|undefined;
+  const ownInput=mutation.intent==='derive'?(input as {facts?:readonly Fact[]}|undefined)?.facts:undefined;
+  const scopes=branchInputs.map(scope=>scope.recipients.get(channel)??{facts:[],unknown:false});const captured=ownInput||scopes.length?Object.freeze([...new Set([...(ownInput??[]),...scopes.flatMap(scope=>scope.facts)])]):undefined;
+  const native=(nativeUnit as {requirement?:lifecycle.NativeRequirement}|undefined)?.requirement;
+  const nativeKnown=native?lifecycle.nativeProof(native).destination??[]:known?[known]:[];
+  const unknown=!clean&&(!valid||meta?.origin!==undefined||(mutation.intent==='derive'&&!ownInput)||scopes.some(scope=>scope.unknown));
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);
++ scalarFacts.add(fact);
++ mutation.publicationPredecessors?.set(channel,fact);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+  const unit:Unit={native,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
+  const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,unknown,fact.blockers,native,b.aggregate);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+- return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined}};
++ return {record:combineTerminalRecords(plan,terminalEdits)!,completion:{channel,unit,cleanIngress:clean?ingress:undefined},coveredRecipients:[channel]};
+ }
+ export function acquiringCollection(channel:object,source:object):boolean {
+  const binding=bindings.get(channel);return !!ingress&&!!binding&&ingress.channel===channel&&!ingress.collections.has(source);
+@@ -349,7 +355,7 @@
+   binding.presence.set(slot,state);binding.completedPresence.set(slot,state);indexSlot(binding,slot);
+   return proof=>{ownProofs.set(fact,proof);proofs.set(fact,proof);};
+  });
+- binding={index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
++ binding={legacyScalars:[],index,occurrences:new Map(),collections:new Map(),aggregate:context?.aggregate===true,initialized:new Set(),valueInitialized:true,slotTrie:{children:new Map(),slots:new Map()},fields:new Map(),fieldTrie:{children:new Map()},fieldFacts:new Map(),completedFields:new Map(),releases:[],owner,position,current:baseline,valueFact:baseline,completedValueFact:baseline,valuePayload:context?.value,baselineStructure:baseline,presence:new Map(),completedPresence:new Map(),source,registry:context?.registry,address:context?.address,pending:new Set()};bindings.set(channel,binding);
+  if(identity.supported&&source){
+   const enroll=(node:object)=>{const occurrence=index.enroll(node);binding.occurrences.set(node,occurrence);return occurrence;};
+   enroll(source);
+@@ -382,7 +388,7 @@
+ export function onEligibility(_owner:number,cb:()=>void,channel:object):()=>void{callbacks.set(channel,cb);return()=>{callbacks.delete(channel);};}
+ export function acquire(channel:object,work:()=>void):void{const prev=ingress;ingress={channel,consumed:false,collections:new Set()};try{work();}finally{if(ingress)consumedIngress.delete(ingress);ingress=prev;}}
+ /** Notification metadata no longer admits publication responsibility. */
+-export function annotate(meta:WriteMetadata|undefined,_owner:number|undefined,_positions:number[]|undefined,_authored:boolean,_payload:unknown):WriteMetadata{return {...meta};}
++export function annotate(meta:WriteMetadata|undefined,_owner:number|undefined,_positions:number[]|undefined,_authored:boolean,_payload:unknown):WriteMetadata{return stampScalarNotification(meta,_payload,serial);}
+ export function evidence(_meta:unknown):Fact|undefined{return undefined;}
+ export function complete(_meta:unknown):void{}
+ export function refresh():undefined{return undefined;}
+@@ -407,7 +413,7 @@
+  original({...r,run:()=>{if(fact){let set=grants.get(fact);if(!set)grants.set(fact,set=new Set());set.add(channel);}r.run();}});return true;
+ }
+ export function started(fact:Fact|undefined,channel:object):void{if(fact)lifecycle.started(channel,fact,grants.get(fact)?.has(channel)?'surviving':'declared');}
+-export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
++export function dispose(channel:object,_other:object):void{const b=bindings.get(channel);b?.release?.();for(const release of b?.releases??[])release();b?.index.dispose();if(b?.registry&&b.address&&projection.supported(channel)){removeIndex(b.registry,b.address,channel);--indexedBindings;}if(b)b.legacyScalars.length=0;for(const unit of b?.pending??[]){unit.payload=undefined;unit.resolve();}bindings.delete(channel);lifecycle.disposeConnection(channel);callbacks.delete(channel);projection.releaseSource(channel);}
+ export function heldCount():number{return lifecycle.diagnostics().operations;}
+ export function diagnostics(){return {...lifecycle.diagnostics(),...projection.projectionCounts(),listeners:callbacks.size,latest:bindings.size};}
+ export function declare(channel:object,_owner:number,_position:number,input:unknown,work:()=>unknown,_disposed:()=>boolean){return lifecycle.runDeclaration(channel,input,work);}
+@@ -427,7 +433,7 @@
+  }else if(b.source)installFact(b,b.source,'value',fact,requirement);
+  b.valuePayload=payload;b.valueFact=fact;b.completedValueFact=fact;
+  if(b.current)lifecycle.supersede(channel,b.current);
+- b.current=fact;b.projected=Object.freeze({fact,payload,changed:true});
++ b.current=fact;b.projected=Object.freeze({fact,payload:b.aggregate?maskPayload(b):payload,changed:true});
+  return fact;
+ }
+ export function refreshSource(channel:object):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined{const b=bindings.get(channel);if(b)ready(channel,b);return b?.projected&&b.projected.fact===b.current?b.projected:undefined;}
+@@ -436,3 +442,27 @@
+ // Native scope admission is independent of recipient registration and disposal.
+ registerMembershipPublication(prepareMembership,completeMembership);
+ registerBranchPublicationInputs(beginBranchInput,endBranchInput);
++
++/** A later installed fact for this exact source contribution supersedes an
++ * older legacy ping. Aggregate/current revisions and sibling writes do not. */
++export function scalarContributionIsCurrent(channel:object,relative:readonly string[],observedRevision:number):boolean {
++ const b=bindings.get(channel);if(!b)return false;
++ const field=b.aggregate?fieldAt(b.fieldTrie,relative)?.field:undefined;
++ const fact=b.aggregate?(field?b.fieldFacts.get(field):undefined):b.valueFact;
++ return !fact || !scalarFacts.has(fact) || fact.revision<=observedRevision;
++}
++
++/** Uncovered scalar observations retain their own payload and source position.
++ * Completion, not a fresh physical read, supplies the recipient base. */
++function drainLegacyScalars(channel:object,b:Binding):void {
++ for(const contribution of b.legacyScalars.splice(0)){
++  if(!scalarContributionIsCurrent(channel,contribution.relative,contribution.revision))continue;
++  project(channel,undefined,applyAtRelativePath(b.valuePayload,contribution.relative,contribution.value),contribution.relative);
++ }
++}
++export function projectScalarContribution(channel:object,value:unknown,relative:readonly string[],revision:number):Readonly<{fact:Fact;payload:unknown;changed:boolean}>|undefined {
++ const b=bindings.get(channel);if(!b)return;
++ b.legacyScalars.push({value,relative,revision});
++ ready(channel,b);
++ return b.projected&&b.projected.fact===b.current?b.projected:undefined;
++}
+--- a/packages/kernel/src/lib/experimental-publication/projection.ts
++++ b/packages/kernel/src/lib/experimental-publication/projection.ts
+@@ -7,7 +7,7 @@
+ export function bindSource(channel:object,owner:number,position:number,identity:Identity):void{bindings.set(channel,{owner,position,identity:Object.freeze({...identity})});}
+ export function supported(channel:object):boolean{return bindings.get(channel)?.identity.supported===true;}
+ export function stampSource(meta:WriteMetadata|undefined,_subjects:readonly number[]|undefined,_fields:readonly string[]|null|undefined,_value:unknown,_prev:unknown):WriteMetadata{return {...meta};}
+-export function subscribeProjection(notifier:{subscribe(pattern:string,handler:(...args:any[])=>void):()=>void},_channel:object,handler:(...args:any[])=>void):()=>void{return notifier.subscribe('**',handler);}
++export function subscribeProjection(notifier:{subscribe(pattern:string,handler:(...args:any[])=>void):()=>void;subscribeProjection?(handler:(...args:any[])=>void):()=>void},_channel:object,handler:(...args:any[])=>void):()=>void{return notifier.subscribeProjection?notifier.subscribeProjection(handler):notifier.subscribe('**',handler);}
+ // Equal setters complete their private installed work without a synthetic event.
+ export function deliverEqual(_entry:unknown):void{}
+ export function releaseSource(channel:object):void{bindings.delete(channel);}
+--- a/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/target-transition.ts
+@@ -71,10 +71,13 @@
+ 
+ export type PlainBranchMemberTransitionTargetBinding = {
+   prepareTarget(
+-    target: ReadonlyMap<PositionId, PlainBranchMemberTransitionTarget>
++    target: ReadonlyMap<PositionId, PlainBranchMemberTransitionTarget>,
++    scalars?: ReadonlyMap<PositionId, unknown>,
++    turns?: ReadonlyMap<PositionId, number>
+   ): PreparedCollectionTransitionTarget & {
+     /** Per state location a member value set, the turn that set it. */
+     readonly staged?: ReadonlyMap<PositionId, number>;
++    readonly includesScalars?: boolean;
+   };
+ };
+ 
+@@ -99,9 +102,9 @@
+       throw new Error(
+         'Declarative transition has member targets but no member binding'
+       );
+-    const members = memberBinding.prepareTarget(target.plainBranchMembers);
++    const members = memberBinding.prepareTarget(target.plainBranchMembers, target.scalars, target.scalarTurns);
+     prepared.push(members);
+-    scalars = withoutSupersededScalars(
++    scalars = members.includesScalars ? new Map() : withoutSupersededScalars(
+       target.scalars,
+       target.scalarTurns,
+       members.staged
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,3 +1,4 @@
++import { scalarFrameMetadata } from '../scalar-publication-coverage';
+ import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent,type SelectedOutcome} from '../selected-write-operation';
+ import { replaceSelectedLocation } from '../location-runtime';
+ import {fieldEndpoints} from '../native-field-selection';
+@@ -545,20 +546,27 @@
+         }
+       }
+       const members = memberTargets.size
+-        ? preparePlainBranchMembers(options.tree.$, memberTargets)
++        ? preparePlainBranchMembers(options.tree.$, memberTargets, authoredValueEffects.filter(effect=>
++            !effect.structural && effect.subjectId===undefined && effect.subjectFieldSegments===undefined &&
++            !hasInlineScopedAddress(effect) && !hasInlineSubjectAddress(effect) &&
++            scalarSlotRuntime?.resolveScalarSlot(effect.owner)!==undefined).map(effect=>({owner:effect.owner,after:effect.after,turn:effect.turn})))
+         : undefined;
+       // A scalar value an earlier turn left is superseded where a later
+       // turn's member write staged its location (`withoutSupersededScalars`).
+       const staged = members?.staged;
++      const remainingValueEffects = members ? authoredValueEffects.filter(effect=>
++        effect.structural || effect.subjectId!==undefined || effect.subjectFieldSegments!==undefined ||
++        hasInlineScopedAddress(effect) || hasInlineSubjectAddress(effect) ||
++        scalarSlotRuntime?.resolveScalarSlot(effect.owner)===undefined) : authoredValueEffects;
+       const valueEffects = staged?.size
+-        ? authoredValueEffects.filter(
++        ? remainingValueEffects.filter(
+             (effect) =>
+               effect.turn === undefined ||
+               effect.structural !== undefined ||
+               typeof effect.subjectId === 'number' ||
+               (staged.get(effect.owner) ?? effect.turn) <= effect.turn
+           )
+-        : authoredValueEffects;
++        : remainingValueEffects;
+       const apply = () => {
+         // Prepare the remaining frame before any member is installed. All member
+         // values and presence are installed before any effect is published.
+@@ -752,7 +760,7 @@
+      install(){if(installed||clock.revision()!==revision)throw new Error('Selected operation revision changed');scalarResult=installScalars();for(const plan of plans)plan.install();clock.advance();installed=true;},
+      publish(){if(!installed||!scalarResult)throw new Error('Selected operation not installed');let failed=false;let first:unknown;const run=(body:()=>void)=>{try{body();}catch(error){if(!failed){failed=true;first=error;}}};
+        try{for(const plan of plans)run(()=>plan.invalidate());run(()=>slots.publishPrepared(scalarResult!));for(const plan of plans)run(()=>plan.publish());for(const delivery of deliveries)run(delivery);
+-         for(const effect of scalarEffects)run(()=>{const descriptor=descriptors.get(effect.owner);const path=resolveNotifyPath(tree,descriptor,owners,effect);if(path)getPathNotifier().notify(path,effect.after,effect.before,descriptor?.ownerPath??path,undefined,[effect.owner],{...getActiveWriteContext(),intent:'system',participation:'realized'});});
++         for(const effect of scalarEffects)run(()=>{const descriptor=descriptors.get(effect.owner);const path=resolveNotifyPath(tree,descriptor,owners,effect);if(path)getPathNotifier().notify(path,effect.after,effect.before,descriptor?.ownerPath??path,undefined,[effect.owner],scalarFrameMetadata(scalarResult,slots.resolveScalarSlot(effect.owner),{...getActiveWriteContext(),intent:'system',participation:'realized'}));});
+        }finally{deliveries.length=0;plans.length=0;scalarEffects.length=0;}
+        if(failed)throw first;
+      }
+@@ -990,11 +998,11 @@
+               descriptor?.ownerPath ?? path,
+               undefined,
+               [effect.owner],
+-              {
++              scalarFrameMetadata(installedScalars, slots.resolveScalarSlot(effect.owner), {
+                 ...(getActiveWriteContext() ?? {}),
+                 intent: 'system',
+                 participation: 'realized',
+-              }
++              })
+             );
+         });
+       run(() => markOwnerInvalidatedFrom(tree as object));
+@@ -1497,6 +1505,8 @@
+       : meta;
+   };
+ 
++  const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false});
++  if (scalarFrame && !installScalarFrame) throw new Error('Scalar realization preparation unavailable');
+   let scalarCommitResult:
+     | ReturnType<NonNullable<typeof scalarFrame>['commit']>
+     | undefined;
+@@ -1508,10 +1518,7 @@
+       throw new Error('Heterogeneous realization base revision is stale.');
+     }
+ 
+-    scalarCommitResult = scalarFrame?.commit({
+-      advanceRevision: false,
+-      publish: false,
+-    });
++    scalarCommitResult = installScalarFrame?.();
+ 
+     for (const { plan } of plannedRemoves) {
+       plan.commit({ advancePhysicalRevision: false, publication: 'physical' });
+@@ -1605,7 +1612,7 @@
+           descriptor?.ownerPath ?? notifyPath,
+           typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
+           [effect.owner],
+-          publicationMeta(effect)
++          scalarFrameMetadata(scalarCommitResult, scalarSlotRuntime?.resolveScalarSlot(effect.owner), publicationMeta(effect))
+         )
+       );
+     }
+@@ -1684,9 +1691,11 @@
+     frame.set(slotIndex, effect.after);
+   }
+ 
++  const install = frame.prepareCommit?.();
++  if (!install) throw new Error('Scalar realization preparation unavailable');
+   return {
+     commit(): void {
+-      frame.commit();
++      const installedScalars = install();
+ 
+       for (const effect of effects) {
+         const descriptor = descriptors.get(effect.owner);
+@@ -1707,11 +1716,11 @@
+           descriptor?.ownerPath ?? notifyPath,
+           typeof effect.subjectId === 'number' ? [effect.subjectId] : undefined,
+           [effect.owner],
+-          {
++          scalarFrameMetadata(installedScalars, scalarSlotRuntime.resolveScalarSlot(effect.owner), {
+             ...(getActiveWriteContext() ?? {}),
+             intent: 'system',
+             participation: 'realized',
+-          }
++          })
+         );
+       }
+     },
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+@@ -1,3 +1,4 @@
++import { withScalarPublicationCoverage } from './scalar-publication-coverage';
+ import type { WriteMetadata } from '../mutation-types';
+ import { isTraversableNode } from './node-shape';
+ import { getNodeProcessor, snapshotMarkerNode } from './materialize-markers';
+@@ -148,7 +149,7 @@
+         path,
+         mutation.after,
+         mutation.before,
+-        withMutationIntent(getActiveWriteContext(), mutation.intent),
++        withScalarPublicationCoverage(withMutationIntent(getActiveWriteContext(), mutation.intent), mutation.coveredRecipients),
+         ownerPathOverride ?? getOwnerPath(node, path),
+         getSubjectIds(node),
+         getPositionIds(node)
+@@ -170,7 +171,7 @@
+         path,
+         mutation.after,
+         mutation.before,
+-        withMutationIntent(getActiveWriteContext(), mutation.intent),
++        withScalarPublicationCoverage(withMutationIntent(getActiveWriteContext(), mutation.intent), mutation.coveredRecipients),
+         ownerPathOverride ?? getOwnerPath(node, path),
+         getSubjectIds(node),
+         getPositionIds(node)
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -29,6 +29,8 @@
+ export interface PreparedPublicationUnit {
+   readonly record: TerminalRecordPlan;
+   readonly completion: object;
++  /** Recipients whose prepared unit contains this exact contribution. */
++  readonly coveredRecipients?: readonly object[];
+   /** Pure private metadata finalization after all callback-capable preparation. */
+   readonly finalize?: () => void;
+ }
+@@ -64,9 +66,12 @@
+ type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+ export interface IntrinsicMutation<T> {
+   readonly intent: 'replace' | 'derive';
++  /** Operation-local predecessor chain for sibling plans prepared before installation. */
++  readonly publicationPredecessors?: Map<object, object | undefined>;
+   readonly before: T;
+   readonly after: T;
+   readonly changed: boolean;
++  readonly coveredRecipients?: readonly object[];
+ }
+ 
+ type IntrinsicMutationObserver<T> = (mutation: IntrinsicMutation<T>) => void;
+@@ -307,17 +312,18 @@
+     const captured = input as PublicationInput | undefined;
+     const nativeUnit = native?.prepare(mutation, captured?.native);
+     const plans: TerminalRecordPlan[] = nativeUnit ? [nativeUnit.record] : [];
++    const coveredRecipients: object[] = [];
+     const parts: Array<{ complete: PublicationCompleter; value: object }> = nativeUnit && native
+       ? [{ complete: native.complete, value: nativeUnit.completion }] : [];
+     for (const [prepare, entry] of snapshot) {
+       const unit = prepare(mutation, captured?.inputs.get(prepare), nativeUnit?.completion);
+-      if (unit) { plans.push(unit.record); parts.push({ complete: entry.complete, value: unit.completion }); }
++      if (unit) { plans.push(unit.record); parts.push({ complete: entry.complete, value: unit.completion }); coveredRecipients.push(...(unit.coveredRecipients ?? [])); }
+     }
+     nativeUnit?.finalize?.();
+     const record = combineTerminalRecords(...plans);
+     if (!record) return undefined;
+     const completion = { parts };
+-    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion };
++    return { record: combineTerminalRecords(record, { writes: [], adds: [{ set: installedPublications, value: completion }] })!, completion, coveredRecipients };
+   };
+ }
+ 
+@@ -399,3 +405,11 @@
+   if (recordPublicationSnapshot) throw new Error('Publication snapshot recorder already registered');
+   recordPublicationSnapshot = record;
+ }
++
++/** Frame ownership uses the same source participant as the direct setter. */
++export function prepareScalarSourcePublication(node: object, mutation: IntrinsicMutation<unknown>): PreparedPublicationUnit | undefined {
++  return SOURCES.get(node)?.publicationPreparer?.(mutation);
++}
++export function completeScalarSourcePublication(unit: PreparedPublicationUnit): void {
++  completePublication(unit.completion);
++}
+--- a/packages/kernel/src/lib/internals/location-runtime.ts
++++ b/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -489,7 +489,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
+-          if (observer) observer({intent:'replace',before:before as T,after:changed ? next : before as T,changed});
++          if (observer) observer({intent:'replace',before:before as T,after:changed ? next : before as T,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+         finally {
+@@ -523,7 +523,7 @@
+           ), publicationPrepare ? current => preparePublication(false,current) : undefined);
+           const changed=typeof result==='boolean'?result:result.changed;
+           const physicalChanged=typeof result==='boolean'?result:result.physicalChanged;
+-          mutationSource2.observer?.({intent:'derive',before,after:changed ? next : before,changed});
++          mutationSource2.observer?.({intent:'derive',before,after:changed ? next : before,changed,coveredRecipients:unit?.coveredRecipients});
+           if (physicalChanged) publish([binding]);
+         } catch (error) { failed = true; throw error; }
+         finally {
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,5 @@
++import { completeScalarFrame } from './tree-scalar-slot-runtime';
++import { reportContainedObserverError as reportFrameError } from './error-reporter';
+ import type { PositionId } from '../types';
+ import { markTreeCell } from './cell-identity';
+ import {
+@@ -43,6 +45,16 @@
+   }
+ 
+   publish(result: ScalarSlotCommitResult): void {
++    let failed = false;
++    try { this.invalidate(result); }
++    catch (error) { failed = true; throw error; }
++    finally {
++      try { completeScalarFrame(result); }
++      catch (error) { if (!failed) throw error; reportFrameError({error,operation:'notify:subscriber'}); }
++    }
++  }
++
++  private invalidate(result: ScalarSlotCommitResult): void {
+     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+       recordProductionSubstrateStat('publications', result.changedSlots.length);
+     }
+@@ -249,6 +261,7 @@
+               before: before as T,
+               after: changed || dormant ? value : (before as T),
+               changed: changed || dormant,
++              coveredRecipients: unit?.coveredRecipients,
+             }
+           : undefined;
+         if (mutation) capture?.(mutation);
+@@ -322,6 +335,7 @@
+           before,
+           after: changed || dormant ? next : before,
+           changed: changed || dormant,
++              coveredRecipients: unit?.coveredRecipients,
+         };
+         capture?.(mutation);
+         publishResult(
+@@ -383,6 +397,7 @@
+         slotIndex,
+         liveness
+       );
++      kernel.bindPublicationSource(slotIndex, leaf);
+       if (positionId !== undefined) {
+         leafByPositionId.set(positionId, leaf as Location<unknown>);
+       }
+--- a/packages/kernel/src/lib/internals/observation-substrate.ts
++++ b/packages/kernel/src/lib/internals/observation-substrate.ts
+@@ -119,7 +119,8 @@
+           { path: ownerPath, positionIds, ownerId: registry.id },
+           mutation.before,
+           mutation.after,
+-          mutation.intent
++          mutation.intent,
++          mutation.coveredRecipients
+         );
+       }) ?? (() => undefined);
+   }
+--- a/packages/kernel/src/lib/internals/owned-mutation.ts
++++ b/packages/kernel/src/lib/internals/owned-mutation.ts
+@@ -1,3 +1,4 @@
++import { withScalarPublicationCoverage } from './scalar-publication-coverage';
+ import type { Location } from './cell-runtime';
+ 
+ import type { MutationCaptureRuntime } from './mutation-capture-runtime';
+@@ -172,7 +173,8 @@
+   options: OwnedMutationOptions,
+   before: unknown,
+   after: unknown,
+-  mutationIntent: OwnedMutationIntent
++  mutationIntent: OwnedMutationIntent,
++  coveredRecipients?: readonly object[]
+ ): void {
+   markOwnerInvalidated(options.ownerId);
+ 
+@@ -212,10 +214,10 @@
+     // and must not acquire one. Entity/structural notification owns that fact.
+     undefined,
+     [positionId],
+-    {
++    withScalarPublicationCoverage({
+       ...(getActiveWriteContext() ?? {}),
+       mutationIntent,
+-    },
++    }, coveredRecipients),
+     options.ownerId
+   );
+ }
+@@ -247,7 +249,8 @@
+           options,
+           mutation.before,
+           mutation.after,
+-          mutation.intent
++          mutation.intent,
++          mutation.coveredRecipients
+         );
+       }
+       if (mutation.intent === 'replace') {
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -1,3 +1,4 @@
++import { scalarFrameMetadata } from './scalar-publication-coverage';
+ import {
+   PRODUCTION_SUBSTRATE_STATS_ENABLED,
+   recordProductionSubstrateStat,
+@@ -1103,9 +1104,7 @@
+   const frame = runtime.beginFrame();
+   for (const [slot, value] of values) frame.set(slot, value.after);
+   const installFrame =
+-    scalarTargets === undefined
+-      ? () => frame.commit({ advanceRevision: false, publish: false })
+-      : frame.prepareCommit?.({ advanceRevision: false, publish: false });
++    frame.prepareCommit?.({ advanceRevision: false, publish: false });
+   if (!installFrame)
+     throw new Error('Plain branch scalar frame cannot be prepared');
+   let result: ScalarSlotCommitResult | undefined;
+@@ -1181,7 +1180,7 @@
+           }
+           run(() =>
+             runtime.publishPrepared({
+-              revision: installed.revision,
++              ...installed,
+               changedSlots: [...changedSlots],
+             })
+           );
+@@ -1251,7 +1250,7 @@
+             path,
+             undefined,
+             [value.position],
+-            meta,
++            scalarFrameMetadata(installed, slot, meta),
+             registry.id
+           );
+         }
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/scalar-publication-coverage.ts
+@@ -0,0 +1,95 @@
++import type { WriteMetadata } from '../mutation-types';
++import type { ScalarSlotCommitResult } from './tree-scalar-slot-runtime';
++
++// A receipt of recipient participation, never publication permission.
++const COVERAGE = Symbol('ScalarPublicationCoverage');
++const CONTRIBUTIONS = Symbol('ScalarNotificationContributions');
++export type ScalarNotificationContribution = Readonly<{
++  meta: WriteMetadata;
++  value: unknown;
++  revision: number;
++}>;
++type ContributionChain =
++  | { readonly entry: ScalarNotificationContribution }
++  | { readonly left: ContributionChain; readonly right: ContributionChain };
++type Covered = WriteMetadata & {
++  readonly [COVERAGE]?: readonly object[];
++  readonly [CONTRIBUTIONS]?: ContributionChain;
++};
++export function withScalarPublicationCoverage(
++  meta: WriteMetadata | undefined,
++  recipients: readonly object[] | undefined
++): WriteMetadata {
++  const result: Covered = { ...meta, [COVERAGE]: recipients };
++  return result;
++}
++export function scalarPublicationCovers(
++  meta: WriteMetadata | undefined,
++  channel: object
++): boolean {
++  return (meta as Covered | undefined)?.[COVERAGE]?.includes(channel) === true;
++}
++export function mergeScalarPublicationCoverage(
++  left: WriteMetadata,
++  right: WriteMetadata,
++  merged: WriteMetadata | undefined
++): WriteMetadata | undefined {
++  // This view is private to projection subscribers. Generic delivery keeps
++  // its existing undefined metadata when attribution cannot be merged.
++  const base =
++    merged ?? (left.ownerId === right.ownerId ? { ownerId: left.ownerId } : {});
++  const a = (left as Covered)[COVERAGE],
++    b = (right as Covered)[COVERAGE];
++  // Every coalesced contribution must be covered for a recipient. Undefined
++  // is an uncovered contribution, not an empty list that can be discarded.
++  const result: Covered = withScalarPublicationCoverage(
++    base,
++    a && b ? a.filter((channel) => b.includes(channel)) : undefined
++  );
++  const l = (left as Covered)[CONTRIBUTIONS],
++    r = (right as Covered)[CONTRIBUTIONS];
++  const combined: Covered =
++    l && r ? { ...result, [CONTRIBUTIONS]: { left: l, right: r } } : result;
++  return combined;
++}
++export function scalarFrameMetadata(
++  result: ScalarSlotCommitResult | undefined,
++  slot: number | undefined,
++  meta: WriteMetadata
++): WriteMetadata {
++  return withScalarPublicationCoverage(
++    meta,
++    slot === undefined ? undefined : result?.publication?.coverage.get(slot)
++  );
++}
++
++/** Capture before batching; values are notification payloads, never late reads. */
++export function stampScalarNotification(
++  meta: WriteMetadata | undefined,
++  value: unknown,
++  revision: number
++): WriteMetadata {
++  const original: Covered = { ...meta };
++  delete (original as { [CONTRIBUTIONS]?: unknown })[CONTRIBUTIONS];
++  const result: Covered = {
++    ...original,
++    [CONTRIBUTIONS]: { entry: { meta: original, value, revision } },
++  };
++  return result;
++}
++export function scalarNotificationContributions(
++  meta: WriteMetadata | undefined
++): Iterable<ScalarNotificationContribution> | undefined {
++  const root = (meta as Covered | undefined)?.[CONTRIBUTIONS];
++  if (!root) return undefined;
++  // Persistent concatenation is O(1) per enqueue; iterative traversal avoids
++  // recursion on a long coalesced turn. No history survives the queued entry.
++  return (function* () {
++    const pending = [root];
++    while (pending.length) {
++      const next = pending.pop()!;
++      if ('entry' in next) yield next.entry;
++      else pending.push(next.right, next.left);
++    }
++  })();
++}
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -1,3 +1,5 @@
++import { completeScalarFrame } from './tree-scalar-slot-runtime';
++import { reportContainedObserverError as reportFrameError } from './error-reporter';
+ import type { PositionId } from '../types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+ import {
+@@ -51,6 +53,16 @@
+   }
+ 
+   publish(result: ScalarSlotCommitResult): void {
++    let failed = false;
++    try { this.invalidate(result); }
++    catch (error) { failed = true; throw error; }
++    finally {
++      try { completeScalarFrame(result); }
++      catch (error) { if (!failed) throw error; reportFrameError({error,operation:'notify:subscriber'}); }
++    }
++  }
++
++  private invalidate(result: ScalarSlotCommitResult): void {
+     if (PRODUCTION_SUBSTRATE_STATS_ENABLED) {
+       recordProductionSubstrateStat('publications', result.changedSlots.length);
+     }
+@@ -205,6 +217,7 @@
+         liveness
+       );
+       publication.bind(slotIndex, binding as WritableLocationBinding<unknown>);
++      kernel.bindPublicationSource(slotIndex, leaf);
+       if (positionId !== undefined) {
+         leafByPositionId.set(positionId, leaf as Location<unknown>);
+       }
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -1,6 +1,6 @@
+ import {getActiveWriteContext} from '../write-context';
+-import { installTerminalRecord } from './intrinsic-mutation';
+-import type { TerminalRecordPlan } from './intrinsic-mutation';
++import { prepareScalarSourcePublication, completeScalarSourcePublication, installTerminalRecord } from './intrinsic-mutation';
++import type { PreparedPublicationUnit, TerminalRecordPlan } from './intrinsic-mutation';
+ import type { PositionId } from '../mutation-types';
+ import type { PhysicalCommitClock } from './physical-commit-clock';
+ 
+@@ -15,6 +15,17 @@
+ export interface ScalarSlotCommitResult {
+   readonly revision: number;
+   readonly changedSlots: readonly SlotIndex[];
++  readonly publication?: ScalarFramePublication;
++}
++
++export interface ScalarFramePublication {
++  readonly coverage: ReadonlyMap<number, readonly object[]>;
++  complete(): void;
++}
++
++/** Completion belongs to the installed frame, independently of invalidation slots. */
++export function completeScalarFrame(result: ScalarSlotCommitResult): void {
++  result.publication?.complete();
+ }
+ 
+ export type SingleSlotCommitResult =
+@@ -37,6 +48,7 @@
+ }
+ 
+ export interface TreeScalarSlotRuntime {
++  bindPublicationSource(slotIndex: SlotIndex, node: object): void;
+   commitRecorded<T>(slotIndex: SlotIndex, value: T, prepare?: () => TerminalRecordPlan | undefined, prepareUnchanged?: (current: T) => TerminalRecordPlan | undefined): {changed:boolean;physicalChanged:boolean};
+   needsAuthorityAdmission(slotIndex:SlotIndex):boolean;
+   readRecordSlot<T>(slotIndex: SlotIndex): T;
+@@ -142,6 +154,7 @@
+   physicalCommitClock?: PhysicalCommitClock
+ ): TreeScalarSlotRuntime {
+   const values: unknown[] = [];
++  const publicationSources: Array<object | undefined> = [];
+   const inspectionBaseline = new Map<number,unknown>();
+   const equalities: SlotEqualityFn[] = [];
+   const slotByPositionId = new Map<PositionId, SlotIndex>();
+@@ -194,23 +207,44 @@
+     const physical=new Set(changed.map(x=>x.slotIndex));
+     const inspection=getActiveWriteContext()?.participation==='inspection';
+     const shadowPlans:Array<{slotIndex:number;keep:boolean;value:unknown}>=[];
++    const units: PreparedPublicationUnit[] = [];
++    const publicationPredecessors = new Map<object, object | undefined>();
++    const coverage = new Map<number, readonly object[]>();
+     for(const [slotIndex,nextValue] of staged){
+       const has=inspectionBaseline.has(slotIndex);
+       const before=has?inspectionBaseline.get(slotIndex):values[slotIndex];
+       const equal=has?equalities[slotIndex](before,nextValue):!physical.has(slotIndex);
+       const keep=inspection&&!equal;
+       if(keep!==has || keep&&!Object.is(inspectionBaseline.get(slotIndex),before))shadowPlans.push({slotIndex,keep,value:before});
++      const source = publicationSources[slotIndex];
++      if (source) {
++        const unit = prepareScalarSourcePublication(source, {intent:'replace', before, after:equal ? before : nextValue, changed:!equal, publicationPredecessors});
++        if (unit) { units.push(unit); coverage.set(slotIndex, unit.coveredRecipients ?? []); }
++      }
+     }
+     if(getCommittedRevision()!==base)throw new Error('Reentrant scalar preparation');
+     let used=false;
++    const publication: ScalarFramePublication | undefined = units.length ? {
++      coverage,
++      complete() {
++        const pending = units.splice(0);
++        let failed = false, first: unknown;
++        for (const unit of pending) {
++          try { completeScalarSourcePublication(unit); }
++          catch (error) { if (!failed) { failed = true; first = error; } }
++        }
++        if (failed) throw first;
++      },
++    } : undefined;
+     return()=>{
+       if(used)throw new Error('Prepared scalar commit already used');
+       if(getCommittedRevision()!==base)throw new Error('Stale prepared scalar commit');
+       used=true;
+       for(const {slotIndex,nextValue}of changed)values[slotIndex]=nextValue;
+       for(const p of shadowPlans){if(p.keep)inspectionBaseline.set(p.slotIndex,p.value);else inspectionBaseline.delete(p.slotIndex);}
++      for (const unit of units) installTerminalRecord(unit.record);
+       const revision=(changed.length||shadowPlans.length)&&options?.advanceRevision!==false?advanceRevision():getCommittedRevision();
+-      return {revision,changedSlots:changed.map(x=>x.slotIndex)};
++      return {revision,changedSlots:changed.map(x=>x.slotIndex),...(publication ? {publication} : {})};
+     };
+   };
+   const commitSlots = (staged:ReadonlyMap<SlotIndex,unknown>,options?:{advanceRevision?:boolean}):ScalarSlotCommitResult => prepareSlots(staged,options)();
+@@ -227,6 +261,7 @@
+   };
+ 
+   return {
++    bindPublicationSource(slotIndex, node) { assertSlotIndex(slotIndex); publicationSources[slotIndex] = node; },
+     createSlot<T>(
+       initialValue: T,
+       equal: (current: T, next: T) => boolean,
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -1,3 +1,4 @@
++import { scalarPublicationCovers, scalarNotificationContributions } from './internals/scalar-publication-coverage';
+ import './experimental-publication/entity';
+ import { entityPublicationOrdinary, entityPublicationUnit, getEntityPublicationBinding, type EntityPublicationEvidence } from './internals/entity-publication';
+ import { entityValueTransition } from './internals/entity-value-transition';
+@@ -630,6 +631,7 @@
+       fields
+     ) => {
+       if (disposed || !endpoint.set) return;
++      if (scalarPublicationCovers(meta, consequenceKey)) { dirty = true; observeLink(); return; }
+       if(entityValueTransition(meta)?.publicationUnit || entityPublicationUnit(meta)) return;
+       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
+       // local position id, so identity is (registry, position) — never the
+@@ -817,10 +819,19 @@
+         return;
+       }
+       if (inspection) return;
+-      researchFact =
+-        relative.length === 0 ? research.evidence(meta) : undefined;
+-      eligible = applyAtRelativePath(eligible, relative, v);
+-      researchFact = research.project(consequenceKey, meta, eligible, relative);
++      const contributions=scalarNotificationContributions(meta);
++      if(contributions){
++        for(const contribution of contributions){
++          if(scalarPublicationCovers(contribution.meta,consequenceKey) ||
++             !research.scalarContributionIsCurrent(consequenceKey,relative,contribution.revision))continue;
++          const receipt=research.projectScalarContribution(consequenceKey,contribution.value,relative,contribution.revision);
++          if(receipt){eligible=receipt.payload as T;researchFact=receipt.fact;}
++        }
++      }else{
++        researchFact = relative.length === 0 ? research.evidence(meta) : undefined;
++        eligible = applyAtRelativePath(eligible, relative, v);
++        researchFact = research.project(consequenceKey, meta, eligible, relative);
++      }
+       dirty = true;
+       observeLink();
+     }
+--- a/packages/kernel/src/lib/path-notifier.ts
++++ b/packages/kernel/src/lib/path-notifier.ts
+@@ -1,3 +1,4 @@
++import { mergeScalarPublicationCoverage } from './internals/scalar-publication-coverage';
+ import {
+   entityValueTransition,
+   mergeEntityValueTransition,
+@@ -75,6 +76,7 @@
+   ownerPath?: string;
+   origin?: string;
+   meta?: WriteMetadata;
++  projectionMeta?: WriteMetadata;
+   declaredScopes?: DeclaredWriteScopes;
+   subjectId?: number;
+   positionId?: number;
+@@ -147,6 +149,7 @@
+ 
+   // Map of pattern -> Set of handlers
+   private subscribers = new Map<string, Set<PathNotifierHandler>>();
++  private projectionHandlers = new WeakSet<PathNotifierHandler>();
+ 
+   // Batching state
+   private resetCallbacks = new Set<() => void>();
+@@ -243,6 +246,14 @@
+    * Subscribe to mutations matching a path pattern
+    * Returns unsubscribe function
+    */
++  /** Internal projection view retains constituent receipts without changing
++   * ordinary subscribers' coalesced metadata or callback count. */
++  subscribeProjection(handler: PathNotifierHandler): () => void {
++    this.projectionHandlers.add(handler);
++    const release=this.subscribe('**',handler);
++    return ()=>{this.projectionHandlers.delete(handler);release();};
++  }
++
+   subscribe(pattern: string, handler: PathNotifierHandler): () => void {
+     if (!this.subscribers.has(pattern)) {
+       this.subscribers.set(pattern, new Set());
+@@ -388,6 +399,7 @@
+       ownerPath,
+       origin,
+       meta,
++      projectionMeta:meta,
+       declaredScopes,
+       subjectId: subjectIds?.[0],
+       positionId: positionIds?.[0],
+@@ -424,7 +436,8 @@
+     declaredScopes?: DeclaredWriteScopes,
+     ownerId?: number,
+     subjectFieldFootprint?: readonly string[] | null,
+-    isolateSubscribers = false
++    isolateSubscribers = false,
++    projectionMeta?: WriteMetadata
+   ): void {
+     // ⚠️ THE INTERCEPTOR LOOP WAS DELETED IN 15.0 — PATH-NOTIFIER-INTERCEPT-
+     // SURVIVAL-0. It ran here, before subscribers, and could suppress delivery
+@@ -472,7 +485,7 @@
+                 origin,
+                 subjectIds,
+                 positionIds,
+-                meta,
++                this.projectionHandlers.has(handler) ? projectionMeta ?? meta : meta,
+                 declaredScopes,
+                 ownerId,
+                 subjectFieldFootprint
+@@ -548,7 +561,8 @@
+           entry.declaredScopes,
+           entry.ownerId,
+           entry.subjectFieldFootprint,
+-          true
++          true,
++          entry.projectionMeta
+         );
+       }
+     }
+@@ -825,7 +839,9 @@
+     target.newValue = next.newValue;
+     target.ownerPath = next.ownerPath;
+     target.origin = this.mergeOrigin(target.origin, next.origin);
+-    target.meta = this.mergeMeta(target.meta, next.meta);
++    const merged=this.mergeMeta(target.meta, next.meta);
++    target.projectionMeta=mergeScalarPublicationCoverage(target.projectionMeta ?? {},next.projectionMeta ?? {},merged);
++    target.meta = merged;
+     target.subjectId = next.subjectId;
+     target.positionId = next.positionId;
+     target.subjectIds = next.subjectIds;

@@ -1,0 +1,1 @@
+Interrupted before Nx test output appeared; no test verdict claimed. Source hashing completed. Retry uses explicit per-experiment Nx workspace-data/cache and TMPDIR; causal attribution of startup delay remains unproved.

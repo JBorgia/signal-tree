@@ -1,0 +1,95 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -629,11 +629,19 @@
+    * an adapter's computed) depends on the collection as the cached projection
+    * would. Outside taps this is one comparison per access.
+    */
+-  const fresh = <T>(read: () => T): ReadableCell<T> =>
+-    (() => {
++  const fresh = <T>(read: () => T): ReadableCell<T> => {
++    const current = (): T => {
+       version();
+       return read();
+-    }) as ReadableCell<T>;
++    };
++    // Callable reads must remain uncached across reentrant writes. Other read
++    // forms belong to the realization (for example a ref's value getter), not
++    // to the kernel. Resolve those against a fresh realization on each access:
++    // retaining a native computed here would recreate the held-publication bug.
++    return new Proxy(current, {
++      get: (_target, key) => Reflect.get(locations.createDerived(current), key),
++    });
++  };
+   const inTap = <T>(cell: ReadableCell<T>, read: () => T): ReadableCell<T> =>
+     taps.depth ? fresh(read) : cell;
+   // Identity-stable across value-only writes: the key snapshot is shared until
+@@ -1008,7 +1016,7 @@
+         // RESTORATION-REKEY-CLAIM-WIDTH-0.
+         lastSubjectIds = [subjectId];
+ 
+-        if (activeIdSignal() === from) {
++        if (activeIdValue === from) {
+           replaceLocation(activeIdSignal, to);
+         }
+ 
+@@ -1034,7 +1042,21 @@
+   }
+ 
+   /** Active-entity selection. See the `activeId`/`activeEntity` accessors. */
+-  const activeIdSignal = locations.createCell<K | undefined>(undefined);
++  // Keep the source-owned selection readable while grouped publication is held.
++  // The realization still controls dependency tracking and observer delivery.
++  let activeIdValue: K | undefined;
++  const activeIdSignal = locations.createWritable<K | undefined>(
++    () => activeIdValue,
++    (next) => {
++      if (Object.is(activeIdValue, next)) return false;
++      activeIdValue = next;
++      return true;
++    }
++  ).location;
++  const readActiveId = (): K | undefined => {
++    activeIdSignal();
++    return activeIdValue;
++  };
+   let cachedActiveEntity: ReadableCell<E | undefined> | undefined;
+ 
+   function publishOrderChange(
+@@ -2604,7 +2626,7 @@
+ 
+     // ── Active entity ───────────────────────────────────────────────────────
+     get activeId(): ReadableCell<K | undefined> {
+-      return activeIdSignal.asReadonly();
++      return inTap(activeIdSignal.asReadonly(), readActiveId);
+     },
+ 
+     /**
+@@ -2618,7 +2640,7 @@
+      */
+     get activeEntity(): ReadableCell<E | undefined> {
+       const read = () => {
+-        const id = activeIdSignal();
++        const id = taps.depth ? readActiveId() : activeIdSignal();
+         if (id === undefined) return undefined;
+         // A selection names a key even while no subject occupies it. Keep the
+         // membership edge only while absent; a present selection stays scoped
+@@ -2634,15 +2656,15 @@
+       // Not an error when the id is absent: selection frequently outlives the
+       // row (a delete arriving from a socket while a detail pane is open), and
+       // `activeEntity` already resolves to undefined in that case.
+-      const previous = activeIdSignal();
++      const previous = activeIdValue;
+       replaceLocation(activeIdSignal, id);
+-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
++      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
+     },
+ 
+     clearActiveId(): void {
+-      const previous = activeIdSignal();
++      const previous = activeIdValue;
+       replaceLocation(activeIdSignal, undefined);
+-      if (!Object.is(previous, activeIdSignal())) markOwnerInvalidated(ownerId);
++      if (!Object.is(previous, activeIdValue)) markOwnerInvalidated(ownerId);
+     },
+ 
+     has(id: K): ReadableCell<boolean> {

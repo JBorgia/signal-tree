@@ -1,0 +1,670 @@
+[
+  {
+    "write": "whole",
+    "settle": "confirm",
+    "stages": [
+      {
+        "stage": "initial",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              1,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": true,
+          "invalid": false,
+          "owners": [],
+          "possible": [
+            [
+              1,
+              "pending"
+            ],
+            [
+              2,
+              "pending"
+            ]
+          ]
+        }
+      },
+      {
+        "stage": "reauthor",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              1,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "confirm",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 7,
+              "y": 9
+            }
+          ]
+        ],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              1,
+              "confirmed"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "foreign-confirm",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 7,
+              "y": 9
+            }
+          ]
+        ],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              1,
+              "confirmed"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      }
+    ],
+    "projections": [
+      {
+        "stage": "initial",
+        "unknown": true,
+        "invalid": false,
+        "owners": [
+          [
+            1,
+            "pending"
+          ]
+        ],
+        "possible": [
+          [
+            1,
+            "pending"
+          ],
+          [
+            2,
+            "pending"
+          ]
+        ]
+      },
+      {
+        "stage": "reauthor",
+        "unknown": false,
+        "invalid": false,
+        "owners": [
+          [
+            1,
+            "pending"
+          ]
+        ],
+        "possible": []
+      }
+    ]
+  },
+  {
+    "write": "whole",
+    "settle": "rollback",
+    "stages": [
+      {
+        "stage": "initial",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              3,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": true,
+          "invalid": false,
+          "owners": [],
+          "possible": [
+            [
+              3,
+              "pending"
+            ],
+            [
+              4,
+              "pending"
+            ]
+          ]
+        }
+      },
+      {
+        "stage": "reauthor",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              3,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "rollback",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "foreign-confirm",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 0,
+              "y": 9
+            }
+          ]
+        ],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      }
+    ],
+    "projections": [
+      {
+        "stage": "initial",
+        "unknown": true,
+        "invalid": false,
+        "owners": [
+          [
+            3,
+            "pending"
+          ]
+        ],
+        "possible": [
+          [
+            3,
+            "pending"
+          ],
+          [
+            4,
+            "pending"
+          ]
+        ]
+      },
+      {
+        "stage": "reauthor",
+        "unknown": false,
+        "invalid": false,
+        "owners": [
+          [
+            3,
+            "pending"
+          ]
+        ],
+        "possible": []
+      },
+      {
+        "stage": "rollback",
+        "unknown": true,
+        "invalid": false,
+        "owners": [],
+        "possible": [
+          [
+            4,
+            "pending"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "write": "field",
+    "settle": "confirm",
+    "stages": [
+      {
+        "stage": "initial",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              5,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": true,
+          "invalid": false,
+          "owners": [],
+          "possible": [
+            [
+              5,
+              "pending"
+            ],
+            [
+              6,
+              "pending"
+            ]
+          ]
+        }
+      },
+      {
+        "stage": "reauthor",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              5,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "confirm",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 7,
+              "y": 9
+            }
+          ]
+        ],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              5,
+              "confirmed"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "foreign-confirm",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 7,
+              "y": 9
+            }
+          ]
+        ],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              5,
+              "confirmed"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      }
+    ],
+    "projections": [
+      {
+        "stage": "initial",
+        "unknown": true,
+        "invalid": false,
+        "owners": [
+          [
+            5,
+            "pending"
+          ]
+        ],
+        "possible": [
+          [
+            5,
+            "pending"
+          ],
+          [
+            6,
+            "pending"
+          ]
+        ]
+      },
+      {
+        "stage": "reauthor",
+        "unknown": false,
+        "invalid": false,
+        "owners": [
+          [
+            5,
+            "pending"
+          ]
+        ],
+        "possible": []
+      }
+    ]
+  },
+  {
+    "write": "field",
+    "settle": "rollback",
+    "stages": [
+      {
+        "stage": "initial",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              7,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": true,
+          "invalid": false,
+          "owners": [],
+          "possible": [
+            [
+              7,
+              "pending"
+            ],
+            [
+              8,
+              "pending"
+            ]
+          ]
+        }
+      },
+      {
+        "stage": "reauthor",
+        "value": {
+          "id": "a",
+          "x": 7,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [
+            [
+              7,
+              "pending"
+            ]
+          ],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "rollback",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      },
+      {
+        "stage": "foreign-confirm",
+        "value": {
+          "id": "a",
+          "x": 0,
+          "y": 9
+        },
+        "sent": [
+          [
+            {
+              "id": "a",
+              "x": 0,
+              "y": 9
+            }
+          ]
+        ],
+        "x": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        },
+        "y": {
+          "unknown": false,
+          "invalid": false,
+          "owners": [],
+          "possible": []
+        }
+      }
+    ],
+    "projections": [
+      {
+        "stage": "initial",
+        "unknown": true,
+        "invalid": false,
+        "owners": [
+          [
+            7,
+            "pending"
+          ]
+        ],
+        "possible": [
+          [
+            7,
+            "pending"
+          ],
+          [
+            8,
+            "pending"
+          ]
+        ]
+      },
+      {
+        "stage": "reauthor",
+        "unknown": false,
+        "invalid": false,
+        "owners": [
+          [
+            7,
+            "pending"
+          ]
+        ],
+        "possible": []
+      },
+      {
+        "stage": "rollback",
+        "unknown": true,
+        "invalid": false,
+        "owners": [],
+        "possible": [
+          [
+            8,
+            "pending"
+          ]
+        ]
+      }
+    ]
+  }
+]

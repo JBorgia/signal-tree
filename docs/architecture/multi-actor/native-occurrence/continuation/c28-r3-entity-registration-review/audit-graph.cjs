@@ -1,0 +1,7 @@
+const ts=require('/Users/jonathanborgia/code/signaltree/node_modules/typescript');const fs=require('fs'),path=require('path');
+const root='/private/tmp/st-c28-r3-composition/candidate/packages/kernel/src/lib';const start=path.join(root,'experimental-publication/entity.ts'),target=path.join(root,'link.ts');const edges=new Map(),calls=[];
+function resolve(f,s){const p=path.resolve(path.dirname(f),s);return [p+'.ts',path.join(p,'index.ts'),p].find(p=>fs.existsSync(p)&&fs.statSync(p).isFile());}
+function scan(f){if(edges.has(f))return;const ast=ts.createSourceFile(f,fs.readFileSync(f,'utf8'),ts.ScriptTarget.Latest,true);const deps=[];edges.set(f,deps);for(const st of ast.statements){if((ts.isImportDeclaration(st)&&!st.importClause?.isTypeOnly||ts.isExportDeclaration(st)&&!st.isTypeOnly)&&st.moduleSpecifier&&ts.isStringLiteral(st.moduleSpecifier)){const x=st.moduleSpecifier.text;if(x.startsWith('.')){const d=resolve(f,x);if(d)deps.push(d);}}}
+ function top(n){if(ts.isFunctionLike(n)||ts.isClassDeclaration(n)||ts.isClassExpression(n))return;if(ts.isCallExpression(n))calls.push({file:path.relative(root,f),call:n.expression.getText(ast)});ts.forEachChild(n,top);}top(ast);deps.forEach(scan);}
+scan(start);function route(f,seen=new Set()){if(f===target)return[f];if(seen.has(f))return;seen.add(f);for(const d of edges.get(f)||[]){const r=route(d,seen);if(r)return[f,...r];}}
+console.log(JSON.stringify({modules:edges.size,pathEntityBackToLink:route(start)||null,topLevelCalls:calls},null,2));

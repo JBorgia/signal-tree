@@ -1,0 +1,21 @@
+{
+  "argv": [
+    "corepack",
+    "pnpm",
+    "run",
+    "typecheck"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-cold-row-responsibility/candidate",
+  "env": {
+    "TMPDIR": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-source-types/tmp",
+    "ST_READER_CANDIDATE": "1",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-source-types/cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-source-types/data",
+    "ST_COLD_OUTPUT": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-source-types/observations.jsonl",
+    "ST_SNAPSHOT_OUTPUT": "/private/tmp/st-c28-r3-cold-row-responsibility/runs/main-source-types/observations.jsonl"
+  }
+}

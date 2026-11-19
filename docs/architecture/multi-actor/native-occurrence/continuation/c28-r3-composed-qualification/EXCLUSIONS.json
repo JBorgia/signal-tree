@@ -1,0 +1,4 @@
+[
+  "packages/kernel/src/lib/entity-large-batches.spec.ts",
+  "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts"
+]

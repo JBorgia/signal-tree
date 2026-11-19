@@ -1,0 +1,1 @@
+First postprocessor exited1 at ledger-name comparison: original ledger joins suite/title with " > "; Vitest JSON fullName joins with a space. All102 arm-to-arm statuses/error first lines matched. Corrected comparison normalizes only this reporter delimiter; raw inputs/results unchanged. No test rerun.

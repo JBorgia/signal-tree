@@ -1,0 +1,1 @@
+The verbatim contract-reading transcript is stored as contracts-read.txt.gz. Its relative links belong to the original files, not this evidence directory. ARCHIVE-MAP.json retains its original content hash and compressed artifact hash; decompress to replay the exact reviewed text.

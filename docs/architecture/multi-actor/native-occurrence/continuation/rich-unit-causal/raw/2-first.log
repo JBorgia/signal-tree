@@ -1,0 +1,476 @@
+
+> nx run kernel:test structural-admission-controls.spec.ts structural-completeness.spec.ts tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts transactions.spec.ts --reporter=verbose --maxWorkers=1
+
+> node tools/run-core-vitest.mjs structural-admission-controls.spec.ts structural-completeness.spec.ts tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts transactions.spec.ts --reporter=verbose --maxWorkers=1
+
+(node:98116) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:98126) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-rich-unit-successor/candidate/packages/kernel
+
+(node:98137) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > applies scalar leaf effects without transaction recapture 4ms
+ × src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > preserves subject identity and owned positions across structural rekey 10ms
+   → Prepared structural subject missing
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > characterizes entity field PositionIds as shared collection coverage, not exact field identity 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > validates a subject descriptor added after adapter creation with zero tree visits 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > resolves the same semantic subject target after a rekey performed after adapter creation with zero tree visits 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > resolves a restored semantic subject target after adapter creation with zero tree visits 8ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses same-key structural work when that key is now occupied by a different subject 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > resolves scalar realization by stable PositionId after a physical rekey 5ms
+ × src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits mixed realization rekey and scalar publication coherently without relying on notifier batching 1ms
+   → Prepared structural subject missing
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes structural remove and add from owner-level producer metadata 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > prepares and realizes a retained-subject structural restore from removal metadata alone 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes a same-turn restore plus separate subject scalar under one shared physical revision 4ms
+ × src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps restore planning side-effect free when later scalar frame preparation fails 3ms
+   → expected [Function] to throw an error
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes same-turn restore then rekey against prepared subject state 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps restore-rekey planning side-effect free when a later stale subject scalar fails 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses prepared restore-rekey when the destination key remains occupied 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes remove-restore-rekey when prepared vacancy overrides live occupancy 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps prepared vacancy side-effect free when a later scalar effect refuses 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps competing prepared restores side-effect free when earlier prepared occupancy blocks a later rekey 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes remove-restore-rekey-scalar as one coherent prepared topology turn 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses rekey when a later prepared restore re-occupies the vacated destination 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes same-subject remove then restore at a new key 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes fresh add plus later scalar without physically creating the subject during preparation 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > does not consume a planned fresh subject id when later realization validation refuses 0ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > consumes a committed fresh subject id exactly once and advances the next ordinary allocation 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > treats fresh add at a historical key as a new subject lifetime 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes fresh add followed by rekey and scalar against prepared future topology 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > realizes same-key replacement as remove old subject then fresh add new subject 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > retains held subject facades across same-key fresh replacement until the old subject is restored elsewhere 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > validates known scalar positions with zero tree visits across 10 to 100k positions 915ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses unknown positions without a traversal fallback 0ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > restores each removed subject from its own structural payload on one collection owner 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > reactivates the exact held row and field when restoring the same tombstoned subject 1ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > still emits canonical notifier traffic during realization, proving non-authoring is a broader seam than the adapter 0ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps scalar realization causally silent between authored writes 1ms
+ × src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps structural realization causally silent while preserving subject identity 2ms
+   → Prepared structural subject missing
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > restores authored capture after a realization write throws 2ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps outer transaction authorship active across an inner realization write 5ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > atomicity spike: pre-commit scalar staging failure leaves state and notifications unchanged 0ms
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > stales an open scalar frame after a structural rekey before commit 1ms
+ × src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses a stale heterogeneous realization before any prepared structural mutation applies 2ms
+   → expected [Function] to throw error including 'ScalarSlotMutationFrame base revision…' but got 'Prepared structural subject missing'
+ × src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits a root-scalar and structural realization under one shared physical revision 1ms
+   → Prepared structural subject missing
+ ✓ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > validates the full effect set before any mutation and refuses structural drift without partial application 0ms
+(node:98159) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > seals explicitly captured live effects into one pending turn, then confirms without additional physical writes 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps explicit attribution local when two drafts interleave writes 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > nets repeated scalar writes within one draft from the first before value to the final after value 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a sealed transaction by delegating to pending rollback and marks the lifecycle aborted only on success 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > preserves later confirmed work when aborting a sealed transaction, then later undo uses the surviving context 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps a sealed transaction sealed when abort delegation refuses 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps a sealed transaction sealed when abort application throws 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps transaction lifecycle confirmed after capacity-zero confirmation, and abort cannot reinterpret eviction as speculation 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > seals rekey plus same-subject scalar capture into one pending structural turn and abort removes both same-turn changes 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts add plus same-turn fields as one realized structural remove 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > confirms a structural transaction with zero physical writes and preserves canonical metadata exactly 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > preserves authored structural ordering instead of collapsing repeated rekeys 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures a real SignalTree leaf write into an open draft, seals it as pending, then confirms without extra writes 3ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > nets repeated real scalar writes inside one draft from the first before value to the final after value 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > keeps explicit attribution local when two real drafts interleave writes 0ms
+ × src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures heterogeneous real writes on one draft and aborts them through the frozen kernel 11ms
+   → Prepared structural subject missing
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures a real entity add transaction with canonical structural coverage already authored 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures a real entity remove transaction with canonical structural coverage already authored 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > proves collection-owner remove coverage is sufficient for real multi-field abort restoration 7ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a mixed live structural draft through the realization adapter by contextualizing the fresh subject removal 2ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a live fresh add by realizing a structural remove without reusing the fresh subject lifetime 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > aborts a live fresh add plus same-subject scalar through the same structural remove frontier 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > constructs fresh add plus rekey rollback as a stale pre-rekey remove and refuses it as structural drift 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > proves the adapter can remove the fresh subject once the stale rollback remove is contextualized to the current key 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > constructs fresh add plus rekey plus scalar rollback as the same stale pre-rekey remove frontier 0ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > restores multiple removed subjects in one live transaction abort even when they share one collection owner 3ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > undoes a confirmed structural remove after the live transaction harness is disposed 1ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > authors setAll as one canonical remove-set-add turn and replays the same fresh subject on redo 3ms
+ ✓ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > restores the authored structural snapshot rather than a later-mutated detached entity alias 1ms
+(node:98160) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > adds transaction semantics without exposing temporal history methods 4ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > keeps pending transactions out of confirmed causal turns until confirm 3ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > publishes a transaction callback as one coherent location state 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > rolls back a pending optimistic transaction without reverting later confirmed work 3ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > aborts a thrown transaction callback by undoing only transaction writes 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > aborts a mixed structural thrown rollback through the realization port, restores baseline state, and does not reuse the fresh subject id 15ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > throws rollback error with preserved callback failure when realization-port validation refuses and does not fallback to the scoped resolver 3ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > aborts a mixed structural explicit pending rollback through the realization port, restores baseline state, and closes the pending lifecycle 2ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > keeps the primary transaction error when capture release cleanup also fails 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > surfaces capture release cleanup failure when the transaction body succeeds 1ms
+ × src/enhancers/transactions/transactions.spec.ts > transactions enhancer > preserves a later same-subject field write when rolling back a pending rekey 10ms
+   → SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Prepared structural subject missing [effect-validation-failed]
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > rejects rollback of a pending add when later same-subject field work depends on that existence 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > supports an optimistic workflow where rollback reverts optimistic state but preserves later unrelated activity 1ms
+ ✓ src/enhancers/transactions/transactions.spec.ts > transactions enhancer > supports application refetch fallback when rollback is conservatively rejected 1ms
+(node:98162) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=false 12ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=false, preceding entity transaction=true 5ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=false 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=false 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undo/redo whole object, restoration first=true, preceding entity transaction=true 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes a confirmed object-leaf transaction, restoration first=true 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > undoes an atomic replacement with restoration alone 0ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > keeps ordinary branch children independently restorable 0ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > restores the entire terminal value across shape changes from null 0ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > restores the entire terminal value across shape changes from { min: +0, max: 10 } 0ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rolls back an atomic object leaf without a restoration enhancer 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses to overwrite external truth, including a safe sibling 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > keeps pending overlap refusal atomic and retries after settlement 3ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses structural drift before reversing an atomic leaf sibling 2ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > retains external undefined as terminal truth and refuses the whole undo 0ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > refuses redo after external undefined without changing the history position 0ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: transactions 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: transactions-first 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > rollback preserves external undefined with complete reversal or atomic refusal: restoration-first 1ms
+ ✓ src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > does not treat a retained slot as permission to restore an externally omitted terminal 2ms
+(node:98166) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C1 — scalar collision > REPAIRED: undo is REFUSED, and the server value survives 8ms
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C2 — structural collision > a user rekey and a realization rekey of the same subject 5ms
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C3 — THE ATOMICITY CASE: mixed safe and unsafe in one turn > REPAIRED: one conflicting location refuses the WHOLE turn 1ms
+ ✓ src/enhancers/restoration/p0c-divergence.spec.ts > P0-C C4 — the state machine after a refusal > records where the undo cursor sits after a conflicting undo 1ms
+(node:98167) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ × src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history 18ms
+   → expected Error: Prepared structural subject missing to be undefined
+   → expected { min: 1, max: 9 } to deeply equal { min: +0, max: 10 }
+   → expected [ 3 ] to deeply equal [ 1 ]
+   → expected true to be false // Object.is equality
+   → expected false to be true // Object.is equality
+   → expected 0 to be greater than 0
+   → expected [ 3 ] to deeply equal [ 2 ]
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey external, scalarFirst=true: whole unit, delivery and history 2ms
+ ✓ src/lib/structural-admission-controls.spec.ts > external rekey refusal preserves exact source support and revision, scalarFirst=true 1ms
+ × src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history 2ms
+   → expected Error: Prepared structural subject missing to be undefined
+   → expected { min: 1, max: 9 } to deeply equal { min: +0, max: 10 }
+   → expected [ 3 ] to deeply equal [ 1 ]
+   → expected true to be false // Object.is equality
+   → expected false to be true // Object.is equality
+   → expected 0 to be greater than 0
+   → expected [ 3 ] to deeply equal [ 2 ]
+ ✓ src/lib/structural-admission-controls.spec.ts > paired rekey external, scalarFirst=false: whole unit, delivery and history 1ms
+ ✓ src/lib/structural-admission-controls.spec.ts > external rekey refusal preserves exact source support and revision, scalarFirst=false 1ms
+(node:98168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ✓ src/lib/structural-completeness.spec.ts > incomplete ordinary removal refuses whole unit scalarFirst=false 10ms
+ ✓ src/lib/structural-completeness.spec.ts > incomplete ordinary removal refuses whole unit scalarFirst=true 1ms
+ ✓ src/lib/structural-completeness.spec.ts > complete removal context installs ordinary absence and cannot replay 2ms
+ ✓ src/lib/structural-completeness.spec.ts > descriptor-resolved add carries captured recipe into ordinary installation 9ms
+ ✓ src/lib/structural-completeness.spec.ts > legacy unlowered subject removal remains supported 1ms
+ × src/lib/structural-completeness.spec.ts > complete ordered remove permits subject-based obsolete key followed by rekey 4ms
+   → Prepared structural subject missing
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected Error: Prepared structural subject missing to be undefined
+
+- Expected:
+undefined
+
++ Received:
+Error {
+  "message": "Prepared structural subject missing",
+}
+
+ ❯ src/lib/structural-admission-controls.spec.ts:54:30
+     52|           expect.soft(delivered).toEqual([]);
+     53|         } else {
+     54|           expect.soft(error).toBeUndefined();
+       |                              ^
+     55|           expect.soft(tree.$.bounds()).toEqual({min:0,max:10});
+     56|           expect.soft(tree.$.rows.ids()).toEqual([1]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/23]⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected { min: 1, max: 9 } to deeply equal { min: +0, max: 10 }
+
+- Expected
++ Received
+
+  {
+-   "max": 10,
+-   "min": 0,
++   "max": 9,
++   "min": 1,
+  }
+
+ ❯ src/lib/structural-admission-controls.spec.ts:55:40
+     53|         } else {
+     54|           expect.soft(error).toBeUndefined();
+     55|           expect.soft(tree.$.bounds()).toEqual({min:0,max:10});
+       |                                        ^
+     56|           expect.soft(tree.$.rows.ids()).toEqual([1]);
+     57|           // Selective undo moves applied frontiers, not the temporal-…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/23]⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected [ 3 ] to deeply equal [ 1 ]
+
+- Expected
++ Received
+
+  [
+-   1,
++   3,
+  ]
+
+ ❯ src/lib/structural-admission-controls.spec.ts:56:42
+     54|           expect.soft(error).toBeUndefined();
+     55|           expect.soft(tree.$.bounds()).toEqual({min:0,max:10});
+     56|           expect.soft(tree.$.rows.ids()).toEqual([1]);
+       |                                          ^
+     57|           // Selective undo moves applied frontiers, not the temporal-…
+     58|           expect.soft(tree.canUndo()).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/23]⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/structural-admission-controls.spec.ts:58:39
+     56|           expect.soft(tree.$.rows.ids()).toEqual([1]);
+     57|           // Selective undo moves applied frontiers, not the temporal-…
+     58|           expect.soft(tree.canUndo()).toBe(false);
+       |                                       ^
+     59|           expect.soft(tree.canRedo()).toBe(true);
+     60|           expect.soft(delivered.length).toBeGreaterThan(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/23]⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/structural-admission-controls.spec.ts:59:39
+     57|           // Selective undo moves applied frontiers, not the temporal-…
+     58|           expect.soft(tree.canUndo()).toBe(false);
+     59|           expect.soft(tree.canRedo()).toBe(true);
+       |                                       ^
+     60|           expect.soft(delivered.length).toBeGreaterThan(0);
+     61|           for (const value of delivered) expect.soft(value).toEqual({b…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/23]⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected 0 to be greater than 0
+ ❯ src/lib/structural-admission-controls.spec.ts:60:41
+     58|           expect.soft(tree.canUndo()).toBe(false);
+     59|           expect.soft(tree.canRedo()).toBe(true);
+     60|           expect.soft(delivered.length).toBeGreaterThan(0);
+       |                                         ^
+     61|           for (const value of delivered) expect.soft(value).toEqual({b…
+     62|           tree.redo(); await drain();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/23]⎯
+
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=true: whole unit, delivery and history
+ FAIL  src/lib/structural-admission-controls.spec.ts > paired rekey inspection, scalarFirst=false: whole unit, delivery and history
+AssertionError: expected [ 3 ] to deeply equal [ 2 ]
+
+- Expected
++ Received
+
+  [
+-   2,
++   3,
+  ]
+
+ ❯ src/lib/structural-admission-controls.spec.ts:64:42
+     62|           tree.redo(); await drain();
+     63|           expect.soft(tree.$.bounds()).toEqual({min:1,max:9});
+     64|           expect.soft(tree.$.rows.ids()).toEqual([2]);
+       |                                          ^
+     65|           expect.soft(tree.getCurrentIndex()).toBe(before.index);
+     66|         }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/23]⎯
+
+ FAIL  src/lib/structural-completeness.spec.ts > complete ordered remove permits subject-based obsolete key followed by rekey
+Error: Prepared structural subject missing
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1570:25
+
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:625:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:707:9
+ ❯ src/lib/structural-completeness.spec.ts:64:105
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/23]⎯
+
+ FAIL  src/enhancers/transactions/transactions.spec.ts > transactions enhancer > preserves a later same-subject field write when rolling back a pending rekey
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Prepared structural subject missing [effect-validation-failed]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:410:3
+    408|   cause: RollbackFailureCause
+    409| ): SignalTreeRollbackError =>
+    410|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    411|
+    412| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4945:23
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4565:19
+ ❯ src/enhancers/transactions/transactions.spec.ts:513:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'SIGNALTREE_ROLLBACK_FAILED', recovery: undefined }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/greenfield-transactions.spec.ts > greenfield transactions > captures heterogeneous real writes on one draft and aborts them through the frozen kernel
+Error: Prepared structural subject missing
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1570:25
+
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:625:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:707:9
+ ❯ rollbackPendingTurnAt src/lib/internals/causal-runtime/pending-rollback.ts:91:16
+ ❯ src/lib/internals/causal-runtime/greenfield-transactions.spec.ts:156:5
+ ❯ Object.abortPendingTurn src/lib/internals/causal-runtime/greenfield-transactions.spec.ts:1294:10
+ ❯ DefaultGreenfieldTransactionDraft.abort src/lib/internals/causal-runtime/greenfield-transactions.ts:112:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > preserves subject identity and owned positions across structural rekey
+Error: Prepared structural subject missing
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1570:25
+
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:625:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:707:9
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:208:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits mixed realization rekey and scalar publication coherently without relying on notifier batching
+Error: Prepared structural subject missing
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1570:25
+
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:625:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:707:9
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:689:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps restore planning side-effect free when later scalar frame preparation fails
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:1175:70
+    1173|       });
+    1174|
+    1175|     expect(() => adapter.applyAtomically([addEffect, scalarEffect])).t…
+       |                                                                      ^
+    1176|       'Prepared scalar frame failure'
+    1177|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > keeps structural realization causally silent while preserving subject identity
+Error: Prepared structural subject missing
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1570:25
+
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:625:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:707:9
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:3811:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > refuses a stale heterogeneous realization before any prepared structural mutation applies
+AssertionError: expected [Function] to throw error including 'ScalarSlotMutationFrame base revision…' but got 'Prepared structural subject missing'
+
+Expected: "ScalarSlotMutationFrame base revision is stale."
+Received: "Prepared structural subject missing"
+
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:4226:7
+    4224|         { owner: statusOwner, before: 'pending', after: 'shipped' },
+    4225|       ])
+    4226|     ).toThrow('ScalarSlotMutationFrame base revision is stale.');
+       |       ^
+    4227|
+    4228|     getPathNotifier().flushSync();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/23]⎯
+
+ FAIL  src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts > tree realization adapter > commits a root-scalar and structural realization under one shared physical revision
+Error: Prepared structural subject missing
+ ❯ planHeterogeneousFrame src/lib/internals/causal-runtime/tree-realization-adapter.ts:1570:25
+
+ ❯ apply src/lib/internals/causal-runtime/tree-realization-adapter.ts:625:13
+ ❯ run src/lib/internals/causal-runtime/post-application-failure.ts:31:7
+ ❯ Object.runInvalidationGroup src/lib/internals/location-runtime.ts:414:7
+ ❯ applyInInvalidationGroup src/lib/internals/causal-runtime/post-application-failure.ts:34:30
+ ❯ Object.applyAtomically src/lib/internals/causal-runtime/tree-realization-adapter.ts:707:9
+ ❯ src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts:4315:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/23]⎯
+
+
+ Test Files  5 failed | 2 passed (7)
+      Tests  11 failed | 111 passed (122)
+   Start at  17:37:52
+   Duration  4.06s (transform 695ms, setup 0ms, import 1.20s, tests 1.18s, environment 1.13s)
+
+Warning: command "node tools/run-core-vitest.mjs structural-admission-controls.spec.ts structural-completeness.spec.ts tree-realization-adapter.spec.ts opaque-leaf-restoration.spec.ts p0c-divergence.spec.ts transactions.spec.ts --reporter=verbose --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.5s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.4s

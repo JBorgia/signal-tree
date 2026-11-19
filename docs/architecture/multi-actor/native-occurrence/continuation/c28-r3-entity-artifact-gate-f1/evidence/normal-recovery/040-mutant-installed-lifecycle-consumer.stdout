@@ -1,0 +1,7 @@
+{"name":"pre-Link pending field confirm","sent":[9],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending field rollback","sent":[0],"second":[],"third":[],"phase":"complete","pass":true}
+{"name":"pre-Link pending collection confirm","sent":[],"second":[],"third":[],"phase":"confirm","pass":false,"error":{"name":"Error","message":"useful terminal output exactly once"}}
+{"name":"pre-Link pending collection rollback","sent":[],"second":[],"third":[],"phase":"rollback","pass":false,"error":{"name":"Error","message":"useful terminal output exactly once"}}
+{"name":"late collection multiple Links confirm","sent":[],"second":[],"third":[],"phase":"confirm","pass":false,"error":{"name":"Error","message":"useful terminal output exactly once"}}
+{"name":"late collection multiple Links rollback","sent":[],"second":[],"third":[],"phase":"rollback","pass":false,"error":{"name":"Error","message":"useful terminal output exactly once"}}
+{"passed":2,"total":6}

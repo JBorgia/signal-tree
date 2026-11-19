@@ -1,0 +1,13 @@
+{
+  "exit": 0,
+  "watchdog": null,
+  "sourceUnchanged": true,
+  "changed": [],
+  "requested": 1,
+  "started": 1,
+  "ended": 1,
+  "toolingSetMismatch": false,
+  "residualGroupCleanup": false,
+  "remainingOwnedProcesses": [],
+  "psExit": 0
+}

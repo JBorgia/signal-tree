@@ -1,0 +1,27 @@
+{
+  "baseManifestSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "candidateManifestSha256": "081e2114166b06506da5ea4e9b25544de8f4b2214b9fd16e93a0ad2423d35aaa",
+  "changed": [
+    "packages/kernel/src/index.ts",
+    "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts",
+    "packages/kernel/src/lib/link.ts",
+    "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
+    "packages/kernel/src/lib/publication-declaration.ts",
+    "packages/kernel/src/lib/link-declaration-public.spec.ts",
+    "packages/kernel/src/lib/link-declaration.typing.spec.ts"
+  ],
+  "patches": {
+    "public-surface.patch": "818d99835b6bc58e80728655cb97098dbc76634a43e3ae3992fc26a51c89df2e",
+    "internal-type-tightening.patch": "d66239834bd87fee0688031d0b8cbfb33cd11ea4aaaf134201d63c531eaf2e84",
+    "public-tests.patch": "45d3a7d990047050b19e51635713646593ba482acf9eb8066edb05bd59fd4b61",
+    "combined.patch": "963f0f24bd25f77c228529bb2268871f8cb8c56190d1d2818e5fd435e6e621d3"
+  },
+  "runtimeBehaviorChanged": false,
+  "newPublicValueExport": "existing SignalTreePublicationError identity",
+  "sourceAdmissionUnchanged": true,
+  "finalSpecTypes": "pending rerun after type-only fixture corrections",
+  "runtimeQualification": "blocked/pending independent source adjudication",
+  "independentReviewPending": true,
+  "frozen": true
+}

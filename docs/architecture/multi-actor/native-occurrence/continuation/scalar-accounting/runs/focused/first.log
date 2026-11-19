@@ -1,0 +1,39 @@
+
+> nx run kernel:test scalar-install-accounting.spec.ts tree-scalar-slot-runtime.spec.ts production-scalar-substrate.benchmark.spec.ts --testNamePattern=scalar slot runtime|counts|stale install|reentry counts|ordinary authority-only|recorded shadow|proves compiled scalar reads --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-install-accounting.spec.ts tree-scalar-slot-runtime.spec.ts production-scalar-substrate.benchmark.spec.ts --testNamePattern="scalar slot runtime|counts|stale install|reentry counts|ordinary authority-only|recorded shadow|proves compiled scalar reads" --maxWorkers=1
+
+(node:81089) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81101) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-instrumentation-successor/candidate/packages/kernel
+
+(node:81157) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81781) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81813) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  3 passed (3)
+      Tests  24 passed | 7 skipped (31)
+   Start at  20:33:00
+   Duration  22.32s (transform 1.38s, setup 0ms, import 2.43s, tests 11.34s, environment 7.04s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      24.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     24.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    24.1s

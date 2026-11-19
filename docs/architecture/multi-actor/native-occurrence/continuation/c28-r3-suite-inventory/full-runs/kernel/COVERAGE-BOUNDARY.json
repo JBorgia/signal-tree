@@ -1,0 +1,25 @@
+{
+  "discoveredFiles": 638,
+  "completedFiles": 279,
+  "unstartedFiles": 358,
+  "startedIncompleteFiles": [
+    "packages/kernel/src/lib/entity-large-batches.spec.ts"
+  ],
+  "lastCaseStart": {
+    "at": 1793679647056,
+    "kind": "case-start",
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "name": "entity batches larger than the argument limit > setAll, replace and clear with membership observed"
+  },
+  "lastCaseResult": {
+    "at": 1793679647056,
+    "kind": "case-result",
+    "file": "/private/tmp/st-r3-compatibility-inventory/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts",
+    "name": "entity batches larger than the argument limit > setAll, replace and clear with membership observed",
+    "state": "passed",
+    "expectedFailure": false,
+    "mode": "run"
+  },
+  "activeCaseProven": null,
+  "limit": "Last case result is passed. No subsequent case-start was emitted; current case/operation after that result is not established. Source order is not execution evidence. No further kernel run authorized here."
+}

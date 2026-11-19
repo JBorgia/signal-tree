@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -2292,6 +2292,8 @@
+   key: string | number
+ ): unknown {
+   const rowNode = collectionNode.byIdOrFail(key);
++  // TEST MUTANT: repeat real row snapshot materialization, discarding the first result.
++  if (typeof rowNode === 'function') rowNode();
+   return typeof rowNode === 'function' ? rowNode() : rowNode;
+ }
+ 

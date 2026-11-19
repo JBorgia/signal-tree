@@ -1,0 +1,20 @@
+0 verbose cli /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/npm
+1 info using npm@11.12.1
+2 info using node@v24.15.0
+3 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/private/tmp/st-c28-r3-entity-artifact-gate-work/successor/dist/packages/vue/.npmrc
+5 silly config load:file:/Users/jonathanborgia/.npmrc
+6 silly config load:file:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/etc/npmrc
+7 verbose title npm pack
+8 verbose argv "pack" "--ignore-scripts" "--json" "--pack-destination" "/private/var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-entity-artifact-0lAsRY/clean-tarballs"
+9 verbose logfile logs-max:10 dir:/private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a-cache/_logs/2026-11-03T14_58_52_864Z-
+10 verbose logfile /private/tmp/st-c28-r3-entity-artifact-gate-work/cold-a-cache/_logs/2026-11-03T14_58_52_864Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+14 verbose cwd /private/tmp/st-c28-r3-entity-artifact-gate-work/successor/dist/packages/vue
+15 verbose os Darwin 25.2.0
+16 verbose node v24.15.0
+17 verbose npm  v11.12.1
+18 verbose exit 0
+19 info ok

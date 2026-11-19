@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+    "tools/check-spec-types.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-late-confirm-review/r3-copy",
+  "node": "v24.15.0",
+  "pnpm": "10.17.0",
+  "manifestSHA256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "verifiedBefore": 3095,
+  "env": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c28-r3-late-confirm-review/runs/spec-types-first/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c28-r3-late-confirm-review/runs/spec-types-first/nx-data",
+    "TMPDIR": "/private/tmp/st-c28-r3-late-confirm-review/runs/spec-types-first/tmp",
+    "ST_COMPARATOR_BOUNDARY_OUTPUT": "/private/tmp/st-c28-r3-late-confirm-review/runs/spec-types-first/observations.jsonl"
+  },
+  "timeoutSeconds": 180
+}

@@ -1,0 +1,43 @@
+
+> nx run kernel:test recipient-progress-positive-counterparts.spec.ts publication-enrollment-adjudicated.spec.ts recipient-source-permission.spec.ts recipient-window-independent.spec.ts recipient-cause-classification.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-progress-positive-counterparts.spec.ts publication-enrollment-adjudicated.spec.ts recipient-source-permission.spec.ts recipient-window-independent.spec.ts recipient-cause-classification.spec.ts --maxWorkers=1
+
+(node:97815) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97824) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c21-recipient-positive-counterparts/candidate/packages/kernel
+
+(node:97838) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97850) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97854) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97858) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97860) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  5 passed (5)
+      Tests  50 passed (50)
+   Start at  13:59:24
+   Duration  12.09s (transform 3.10s, setup 0ms, import 5.69s, tests 464ms, environment 4.39s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      13.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     13.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    13.6s

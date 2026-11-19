@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": false,
+    "preserveSymlinks": false,
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": [],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ]
+  },
+  "files": [
+    "src/migration.ts"
+  ]
+}

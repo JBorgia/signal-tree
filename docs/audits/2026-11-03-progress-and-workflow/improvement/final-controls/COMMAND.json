@@ -1,0 +1,27 @@
+{
+  "cwd": "/Users/jonathanborgia/code/signaltree/.worktrees/v16-integration-candidate",
+  "argv": [
+    "node",
+    "tools/verify-gates.mjs",
+    "--release",
+    "--only=source-controls,doc-links,documented-imports,documented-symbols,readme-apis,semantic-discoverability,version-claims,release-claims,numeric-claims",
+    "--artifact-integrity=sha256-7892fe8daaff3c11fce09d3d5f2a4614ad5cadb45bdb0b8369ab94450a7940d9"
+  ],
+  "env": {
+    "PATH": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/pmk/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/Applications/ChatGPT.app/Contents/Resources/codex-cli/codex-path:/Users/jonathanborgia/.codex/tmp/arg0-macos/codex-arg0iM3W5v:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/override:/Users/jonathanborgia/.local/bin:/Users/jonathanborgia/.agentic/server:/Users/jonathanborgia/.opencode/bin:/Users/jonathanborgia/bin:/Users/jonathanborgia/.rd/bin:/Users/jonathanborgia/.codeium/windsurf/bin:/Users/jonathanborgia/Library/pnpm:/Users/jonathanborgia/Library/Android/sdk/platform-tools:/opt/homebrew/opt/openjdk@17/bin:/Users/jonathanborgia/.pyenv/shims:/Library/Frameworks/Python.framework/Versions/3.14/bin:/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin:/opt/homebrew/sbin:/Users/jonathanborgia/.foundry/bin:/Users/jonathanborgia/.cache/codex-runtimes/codex-primary-runtime/dependencies/bin/fallback:/Applications/ChatGPT.app/Contents/Resources:/Applications/ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS",
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_NO_CLOUD": "true",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-v16-improvement-final-docs/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-v16-improvement-final-docs/nx-data",
+    "TMPDIR": "/private/tmp/st-v16-improvement-final-docs/runs/final-document-controls/tmp",
+    "npm_config_cache": "/private/tmp/st-v16-improvement-final-docs/npm-cache"
+  },
+  "sourceManifestSha256": "f210e4320982ab58ed33ae8bf5400117f4fc5d8014e2c6b4f21c1a21b684b72c",
+  "sourceManifestFile": "/private/tmp/st-v16-improvement-final-docs/manifests/f210e4320982ab58ed33ae8bf5400117f4fc5d8014e2c6b4f21c1a21b684b72c.json",
+  "absoluteTimeoutSeconds": 900,
+  "noLogProgressTimeoutSeconds": 900,
+  "processCensusTimeoutSeconds": 30,
+  "startedAt": "2026-11-04T00:45:08.788530+00:00"
+}

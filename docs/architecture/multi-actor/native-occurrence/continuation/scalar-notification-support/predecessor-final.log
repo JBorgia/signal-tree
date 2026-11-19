@@ -1,0 +1,283 @@
+
+> nx run kernel:test --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --testFile=native-certificate-successor.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --testFile=native-certificate-successor.spec.ts --maxWorkers=1
+
+(node:63287) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:63294) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-scalar-support-correction/predecessor/packages/kernel
+
+(node:63301) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-native-support.spec.ts (10 tests | 7 failed) 54ms
+   × late enrollment preserves throw and useful settlement 27ms
+   × late enrollment preserves contradiction and useful settlement 4ms
+   × fresh literal replaces failed scalar support equal=false 3ms
+   × fresh literal replaces failed scalar support equal=true 3ms
+   × late native-only possible window survives uncovered notification 2ms
+   × private repeated uncovered observations retain one wrapper and release subscriptions 3ms
+   × private repeated fallback retains unfinished native validation until close 2ms
+(node:63302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 3 failed) 55ms
+   × composite readiness follows parent finalization without a recipient operation 8ms
+   × enrollment retains parent invalidation for scalar support 20ms
+   × omission then restored retained collection selects matching payload and support 17ms
+(node:63303) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/parent-proof-safety-falsifier.spec.ts (1 test | 1 failed) 30ms
+   × actual parent declaration contradiction must not publish inherited scalar through late enrollment 29ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/native-certificate-successor.spec.ts:23:55
+     21|    throw sentinel;
+     22|   })).toThrow(sentinel);
+     23|   expect(lifecycle.nativeRequirementReady(composite)).toBe(true);expec…
+       |                                                       ^
+     24|  }finally{lifecycle.disposeConnection(channel);}
+     25| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for scalar support
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/native-certificate-successor.spec.ts:45:88
+     43|    throw new Error('parent invalid');
+     44|   })).toThrow('parent invalid');
+     45|   child!.declare({kind:'independent'},()=>tree.$.pair.y(8));await flus…
+       |                                                                                        ^
+     46|   q.confirm();await flush();expect(sent).toEqual([membership?{y:8}:{x:…
+     47|  }finally{child?.dispose();parent.dispose();tree.destroy();foreign.des…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  src/lib/parent-proof-safety-falsifier.spec.ts > actual parent declaration contradiction must not publish inherited scalar through late enrollment
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/parent-proof-safety-falsifier.spec.ts:10:86
+      8|  expect(failure).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATI…
+      9|  child!.declare({kind:'independent'},()=>tree.$.pair.y(8));getPathNoti…
+     10|  expect(tree.$.pair()).toEqual({x:7,y:8});expect(foreign.$.z()).toBe(7…
+       |                                                                                      ^
+     11|  }finally{child?.dispose();parent.dispose();q.confirm();tree.destroy()…
+     12| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  src/lib/scalar-native-support.spec.ts > late enrollment preserves throw and useful settlement
+ FAIL  src/lib/scalar-native-support.spec.ts > late enrollment preserves contradiction and useful settlement
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/scalar-native-support.spec.ts:68:22
+     66|       await flush();
+     67|       expect(s.tree.$.pair()).toEqual({ x: 7, y: 8 });
+     68|       expect(s.sent).toEqual([]);
+       |                      ^
+     69|       s.q.confirm();
+     70|       await flush();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  src/lib/scalar-native-support.spec.ts > fresh literal replaces failed scalar support equal=false
+ FAIL  src/lib/scalar-native-support.spec.ts > fresh literal replaces failed scalar support equal=true
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/scalar-native-support.spec.ts:84:22
+     82|       s.child.declare({ kind: 'independent' }, () => s.tree.$.pair.y(8…
+     83|       await flush();
+     84|       expect(s.sent).toEqual([]);
+       |                      ^
+     85|       s.child.declare({ kind: 'independent' }, () =>
+     86|         s.tree.$.pair.x(equal ? 7 : 9)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  src/lib/scalar-native-support.spec.ts > late native-only possible window survives uncovered notification
+AssertionError: expected [ { x: 7 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++   },
++ ]
+
+ ❯ src/lib/scalar-native-support.spec.ts:129:18
+    127|   try {
+    128|     await flush();
+    129|     expect(sent).toEqual([]);
+       |                  ^
+    130|     q.confirm();
+    131|     await flush();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  src/lib/scalar-native-support.spec.ts > private repeated uncovered observations retain one wrapper and release subscriptions
+AssertionError: expected [ { x: 7, y: 8 }, { x: 8, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++   {
++     "x": 8,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/scalar-native-support.spec.ts:190:22
+    188|       );
+    189|       await flush();
+    190|       expect(s.sent).toEqual([]);
+       |                      ^
+    191|     }
+    192|     const wrappers = selected.filter((r) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ FAIL  src/lib/scalar-native-support.spec.ts > private repeated fallback retains unfinished native validation until close
+AssertionError: expected [] to deeply equal [ { x: 10 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "x": 10,
+-   },
+- ]
++ []
+
+ ❯ src/lib/scalar-native-support.spec.ts:285:18
+    283|     q.confirm();
+    284|     await flush();
+    285|     expect(sent).toEqual([{ x: 10 }]);
+       |                  ^
+    286|   } finally {
+    287|     child?.dispose();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  11 failed | 5 passed (16)
+   Start at  11:06:20
+   Duration  3.53s (transform 1.01s, setup 0ms, import 1.58s, tests 138ms, environment 1.34s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=scalar-native-support.spec.ts --testFile=parent-proof-safety-falsifier.spec.ts --testFile=native-certificate-successor.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.3s

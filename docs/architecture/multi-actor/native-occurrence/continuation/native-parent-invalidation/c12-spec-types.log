@@ -1,0 +1,13 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/parent-proof-diagnostic.spec.ts: 4 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/parent-proof-diagnostic.spec.ts(14,142): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+packages/kernel/src/lib/parent-proof-diagnostic.spec.ts(14,290): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+packages/kernel/src/lib/parent-proof-diagnostic.spec.ts(16,124): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.
+packages/kernel/src/lib/parent-proof-diagnostic.spec.ts(16,171): error TS2683: 'this' implicitly has type 'any' because it does not have a type annotation.

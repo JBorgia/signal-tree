@@ -1,0 +1,113 @@
+{
+  "createdUtc": "2026-11-03T14:44:11.190574+00:00",
+  "scope": "read-only inspection; plan-only packet; no builds or test executions",
+  "frozenRoot": "/private/tmp/st-c28-r3-registration-lint-combined/candidate",
+  "manifestSha256": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84",
+  "sourceVerification": {
+    "listedFiles": 3119,
+    "mismatches": [],
+    "extraFileScan": false
+  },
+  "existingArtifactVerification": {
+    "ARTIFACT-HASHES.json": {
+      "sha256": "7ef529e11b6b1b752086cf27bc2f141c14c62ac6ad77d15f29d21601aeb6a2a7",
+      "listedFiles": 191,
+      "mismatches": []
+    },
+    "TARBALL-HASHES.json": {
+      "sha256": "b8bd60cc639d5389510b6d5bd8136cb8927b9058006285a6aaf9d121b1c7035d",
+      "listedFiles": 5,
+      "mismatches": []
+    }
+  },
+  "frozenPeerVersions": {
+    "@angular/core": "22.0.7",
+    "rxjs": "7.8.2",
+    "react": "19.2.8",
+    "@types/react": "19.2.18",
+    "vue": "3.5.42",
+    "solid-js": "1.9.15",
+    "tslib": "2.8.1",
+    "typescript": "6.0.3"
+  },
+  "workingRoot": {
+    "path": "/Users/jonathanborgia/code/signaltree",
+    "branch": "fix/d1-d2-forward-port",
+    "head": "628d302dadb082a48c58528651c9088234d0a777",
+    "statusAtStart": [
+      " M .gitignore",
+      " M RELEASE-CURRENT.md",
+      " M TODO.md",
+      "?? docs/architecture/multi-actor/",
+      "?? docs/audits/2026-10-29-multi-actor-product/",
+      "?? frontier",
+      "?? tools/experiments/multi-actor-operations/"
+    ]
+  },
+  "relevantSourceHashes": {
+    "AGENTS.md": "e24bfff2e9bff7c569dd827207c57f6ed04d038c8878da4cc6e662dbc79d2155",
+    ".nvmrc": "b911698dc3cf3227d34d0ad6727f1c4408791203c9665de99ab959331a1fb07d",
+    "package.json": "7d43fe562e3532b093ffe03a0844b83e071314b949294ce6aa3c2a2e81f48c2b",
+    "pnpm-lock.yaml": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+    ".github/instructions/build-pipeline.instructions.md": "5aa2d25f7e8226168b60948bd9ae8c050bc1e7c4329c331f350814f72a337df7",
+    ".github/instructions/type-declarations-fix.md": "2fe02af2698f53e51d31926b6c21846d710d923461e1c4eb5464dccaa311d276",
+    ".github/VALIDATION_GUIDE.md": "1fb6eba4bccad5f4f5517ea13a4bcf9b7649b1d62114ba903f8cb85f99660ef7",
+    "tools/verify-gates.mjs": "9677ff90a0df9887280384e91d7c02c4df903944bbe4b3b20768ecc761604c71",
+    "tools/verify-consumer-typecheck.mjs": "b6e5ba1bc2916439e5507052cd08f961a752bc072103c6a1c8a61ba13cccc9bf",
+    "tools/verify-tarball-consumer.mjs": "d7b92ff3b1d34765d86f9e79dd58f679568dd98db8db0b2e5ea370530abf499a",
+    "scripts/release-plan.mjs": "752d60968fe43ebb7b605f903a1effdc63f2c0c714c7b537f0bc8c8e486e9dfb",
+    "scripts/publish-artifact-integrity.mjs": "54bf8e8a9d886f681546c7c7c175eddcc8fdaf135d4fccf8ddd168b01d00dc11",
+    "scripts/prepare-publish-artifacts.mjs": "53be4c90d009c317677c11eb0408707108708fc3f904518527ce9fad0e361f2a",
+    "scripts/publish-candidate.mjs": "62ece3ed2e51558a2efd6bfb665d3d1e73ad067a374c246afa3626085b036dec",
+    "scripts/test-tree-shaking.js": "5fde3f3ffdbfc716b56178f9c0cda4de0a878123876cb93d1f8e05cba81c80eb",
+    "tools/run-core-vitest.mjs": "7f10fcc5361b9f5112bcca63e9b1459b220a806928574dd7d2c9eac6441f5a00",
+    "packages/kernel/project.json": "6a72ec115860f8f2dea793e2fb36a350fcbec6a2b98c9f56e289bcce11037687",
+    "packages/kernel/src/lib/link.ts": "a413b304b5f989af64620795ccefcbf3061285f9def16086f93cfccbb90cbba5",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "packages/kernel/tests/entity-registration/cases.d.mts": "aaf843f639eebec86c98a860638d44cd600670a260fb7213da739adae3bb7624",
+    "packages/kernel/tests/entity-registration/cases.mjs": "6f483b54d2310c0b89526489f64e7503360e9ea326707be3ae8b0f1df5050b71",
+    "packages/kernel/tests/entity-registration/lifecycle.d.mts": "b5ad39b1b4658fb6ae94687faeb59e5ee1c5e79a78107b6fecfc0e37c219ca59",
+    "packages/kernel/tests/entity-registration/lifecycle.mjs": "e9528a1b3d53c4d14cba76a468227eafe77ad04a31c379e466e0ba3a41f3ee8b",
+    "packages/kernel/tests/entity-registration/receipt-cases.ts": "b8ff2181f2a9c13d510eccd9fdb949f3875924425179c1b4ff1db3547ae3f99a",
+    "tools/experiments/entity-registration/README.md": "24e940474a5f2dea7559ae1a465f8084db7c4742cb7bb2eec2700de68226dae5",
+    "tools/experiments/entity-registration/build-consumers.mjs": "55fd3e67212a214cbb57ac358f7957dec85b178ff05bc7285cfcc6c1b769b6b8",
+    "tools/experiments/entity-registration/consumer.mjs": "a004e0d462a1ad66a101ce8831a91c94310e62d898a0e2729449a3c644bbd686",
+    "tools/experiments/entity-registration/facade-imports.mjs": "801490e414f258dbb5d8a8dce42cc78640551d266395638f991deb518a332937",
+    "tools/experiments/entity-registration/lifecycle-consumer.mjs": "ef7fb6c77428c46b7b0db6273c5f1cf545e96a67fa22a41df487e146bc432820",
+    "tools/experiments/entity-registration/no-link.mjs": "45164b36d733020355e3e568fe24ca1790a50a12dd55607e3ada817f42ade0a7",
+    "tools/experiments/entity-registration/receipt-consumer.mjs": "9ad61a067e03a47c7b682bcce781409c4c9ea84ff84fedd6ed693c45336d9ae2",
+    "packages/kernel/src/lib/entity-registration-lifecycle.spec.ts": "75ee66bdf1cdecb4705a566def0bf9554da216aaa37969711e4d5dab3cb88567",
+    "packages/kernel/src/lib/entity-registration-original.spec.ts": "a47b42ae34485522e5d8fd53ed09fb9275c2d4b14a96552659f8360e82e3eb19",
+    "packages/kernel/src/lib/entity-registration-receipts.spec.ts": "81b3345afccc4aca760b2663b93cc7062e8314efc7f338a22e989298cf51c09f"
+  },
+  "evidenceRecordHashes": {
+    "FREEZE.json": "63256d45966867e18876187647ac55cdbfe3f7092e8e27de3b430f482d7ded90",
+    "BUILD-COMMAND.json": "82d8cebbfa67c39c96a429f2986ef821ef5053cd9e8c961a0184eae9693d5680",
+    "BUILD-RESULT.json": "4dd4f11b14adfb495eb2297409c72b76439b14d978cf6a6f858442c5b7a2e581",
+    "PACKED-RESULT.json": "b93e41e97187d8da002d0de026529251a9591fcd74ef443d822a03875b68890f",
+    "FINAL-IDENTITY.json": "58e7874a1e3c7251450643204916fda258819add311f6d4c7dcbd84ada85e7e3",
+    "INSTALLED-AGREEMENT.json": "0c8993d18849a05aad4a62e077a41379f88ce74c063b6a9ade6f5a1d3fa6e97a",
+    "PRODUCTION-GRAPHS.json": "478d4968eab9fd93aea3a2eae13e3dbda4d8be9f49bc1da3a870f821c603a731"
+  },
+  "revision2": {
+    "dateUtc": "2026-11-03T14:48:30.768246+00:00",
+    "method": "read-only inspection; no commands that install/build/test",
+    "additionalFrozenInputHashes": {
+      ".github/workflows/validate.yml": "5702741f2e095aec26d8570df21a537d854174ea68b4ca8929b80bcb4bf3a5e2",
+      ".github/workflows/release.yml": "133c33178455a06bfdf2d0f72c0cc6131023beee993a5c30862ab8cf45381d14",
+      ".github/workflows/publish.yml": "0b1bb8b436ed108d646a2ee3a62bfabad5d165f43b98c6cbd250db55cc176f9f",
+      "tools/verify-angular-aot-consumer.mjs": "02a1a9c6b5e43ed66f4a71fb0a31144e5bbbe6bb277a54cb50f9e63dddea9585",
+      "packages/kernel/vitest.config.ts": "6d4d513f837212af3960c49dfb46f7fef0e47e28e4f762dd4ffc9a93160da880"
+    },
+    "workingWorkflowHashes": {
+      ".github/workflows/validate.yml": "5702741f2e095aec26d8570df21a537d854174ea68b4ca8929b80bcb4bf3a5e2",
+      ".github/workflows/release.yml": "133c33178455a06bfdf2d0f72c0cc6131023beee993a5c30862ab8cf45381d14",
+      ".github/workflows/publish.yml": "0b1bb8b436ed108d646a2ee3a62bfabad5d165f43b98c6cbd250db55cc176f9f"
+    },
+    "historicalConsumerLock": {
+      "path": "/private/tmp/st-c28-r3-registration-lint-combined/consumer/package-lock.json",
+      "sha256": "1fe387741cc9f4077a9c3ec8f68154e4e133ab0e26e8b3db0652d360b17cd514",
+      "use": "read-only footprint evidence, not proposed fixture"
+    }
+  }
+}

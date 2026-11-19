@@ -1,0 +1,18 @@
+{
+  "author": {
+    "checked": 2971,
+    "mismatches": []
+  },
+  "copy": {
+    "checked": 2971,
+    "mismatches": []
+  },
+  "frozenArtifacts": {
+    "checked": 14,
+    "mismatches": []
+  },
+  "newTestHashes": {
+    "independent-refusal-branches.spec.ts": "dcd47b88da49a78738f70f55dcf1b76b3c7d9ed61a9100292149cc1e7186dc58",
+    "independent-packet-producers.spec.ts": "9f9f6e20cea1f7e7487b8cba53bef4fd3a683a89a9d53e6ad23d325d9178ab26"
+  }
+}

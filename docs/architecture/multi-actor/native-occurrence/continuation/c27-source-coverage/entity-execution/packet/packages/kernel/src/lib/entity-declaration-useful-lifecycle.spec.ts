@@ -1,0 +1,116 @@
+import { appendFileSync } from 'node:fs';
+import { expect, it } from 'vitest';
+import { entityMap, link, signalTree, transactions, type PublicationReceipt } from '../index';
+
+const record = (name: string, value: unknown): void => {
+  const output = process.env['ST_ENTITY_DECLARATION_OUTPUT'];
+  if (output) appendFileSync(output, JSON.stringify({ name, value }) + '\n');
+};
+
+const drain = async () => { for (let i = 0; i < 120; i++) await Promise.resolve(); };
+type Row = { id: string; n: number };
+
+it('direct-row rollback publishes restored truth and preserves detached receipt status through lifetime replacement', async () => {
+  const tree = signalTree({ rows: entityMap<Row, string>() }, { enhancers: [transactions()] });
+  tree.$.rows.addOne({ id: 'a', n: 0 }); await drain();
+  const row = tree.$.rows.byIdOrFail('a');
+  const sent: unknown[] = [];
+  const connection = link(row, { set: value => { sent.push(value); } });
+  let receipt: PublicationReceipt | undefined;
+  let release = () => { /* No subscription until the pending write is installed. */ };
+  try {
+    const p = tree.transact(() => row.n(7)); await drain();
+    expect(row()).toEqual({ id: 'a', n: 7 }); expect(sent).toEqual([]);
+    const ownership = p.inspect(); let notices = 0;
+    release = row.n.subscribe(() => { notices++; });
+    receipt = connection.declare({ kind: 'independent' }, () => row({ id: 'a', n: 7 }));
+    const initial = receipt.read();
+    expect(Object.isFrozen(receipt)).toBe(true); expect(Object.isFrozen(initial)).toBe(true);
+    expect(notices).toBe(0); expect(p.inspect()).toEqual(ownership);
+    await drain(); expect(sent).toEqual([]);
+    let settled = false;
+    const waiter = connection.settled().then(() => { settled = true; });
+    await drain(); expect(settled).toBe(false);
+    p.rollback(); await drain(); await waiter;
+    expect(settled).toBe(true);
+    expect(row()).toEqual({ id: 'a', n: 0 });
+    expect(sent).toEqual([{ id: 'a', n: 0 }]);
+    const terminal = receipt.read();
+    expect(terminal.state).not.toBe('disposed');
+    record('ROW-RECEIPT-OBSERVATION', { initial, afterRollback: terminal, sent });
+    expect(Object.isFrozen(terminal)).toBe(true);
+    // Only the existing terminal/sticky state-machine category is checked here.
+    // Exact rollback receipt disposition remains separately adjudicable; payload
+    // and settlement assertions above do not depend on selecting a status oracle.
+    switch (terminal.state) {
+      case 'started':
+      case 'superseded':
+      case 'no-write':
+      case 'disposed': break;
+      default: throw new Error(`Receipt remained nonterminal after settlement: ${terminal.state}`);
+    }
+    expect(Reflect.set(terminal, 'state', 'forged')).toBe(false);
+    connection.dispose();
+    tree.$.rows.removeOne('a'); tree.$.rows.addOne({ id: 'a', n: 99 }); await drain();
+    const replacement = tree.$.rows.byIdOrFail('a');
+    expect(replacement).not.toBe(row); expect(row()).toBeUndefined();
+    expect(replacement()).toEqual({ id: 'a', n: 99 });
+    expect(receipt.read()).toEqual(terminal);
+    expect(sent).toEqual([{ id: 'a', n: 0 }]);
+    replacement.n(100); await drain();
+    expect(replacement.n()).toBe(100); expect(receipt.read()).toEqual(terminal);
+    expect(sent).toEqual([{ id: 'a', n: 0 }]);
+  } finally {
+    record('ROW-RECEIPT-FINAL', { status: receipt?.read(), sent });
+    release(); connection.dispose(); tree.destroy();
+  }
+});
+
+it('collection unknown declaration releases useful surviving value after foreign rollback then respects disposal', async () => {
+  const tree = signalTree({ rows: entityMap<Row, string>() });
+  const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
+  tree.$.rows.addOne({ id: 'a', n: 0 }); await drain();
+  const row = tree.$.rows.byIdOrFail('a'); const sent: unknown[] = [];
+  const connection = link(tree.$.rows, { set: value => { sent.push(value); } });
+  try {
+    const q = foreign.transact(() => foreign.$.q(7)); const ownership = q.inspect();
+    const receipt = connection.declare({ kind: 'unknown' }, () => row.n(1));
+    expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 1 }]); expect(q.inspect()).toEqual(ownership);
+    await drain(); expect(sent).toEqual([]);
+    q.rollback(); await drain(); await connection.settled();
+    expect(foreign.$.q()).toBe(0);
+    expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 1 }]);
+    expect(sent).toEqual([[{ id: 'a', n: 1 }]]);
+    record('COLLECTION-UNKNOWN-RECEIPT', receipt.read());
+    await drain(); expect(sent).toEqual([[{ id: 'a', n: 1 }]]);
+    connection.dispose();
+    tree.$.rows.removeOne('a'); tree.$.rows.addOne({ id: 'a', n: 9 }); await drain();
+    expect(tree.$.rows.byIdOrFail('a')).not.toBe(row); expect(row()).toBeUndefined();
+    expect(tree.$.rows.all()).toEqual([{ id: 'a', n: 9 }]);
+    expect(sent).toEqual([[{ id: 'a', n: 1 }]]);
+  } finally { connection.dispose(); tree.destroy(); foreign.destroy(); }
+});
+
+it('entity-field endpoint reentry delivers both actual writes without stale duplicates or permission transfer', async () => {
+  const tree = signalTree({ rows: entityMap<Row, string>() });
+  const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
+  tree.$.rows.addOne({ id: 'a', n: 0 }); await drain();
+  const row = tree.$.rows.byIdOrFail('a'); const sent: unknown[] = []; let reentries = 0;
+  const connection = link(row.n, { set: value => {
+    sent.push(value);
+    if (value === 1) {
+      reentries++;
+      connection.declare({ kind: 'independent' }, () => row.n(2));
+    }
+  } });
+  try {
+    const q = foreign.transact(() => foreign.$.q(7)); const ownership = q.inspect();
+    connection.declare({ kind: 'independent' }, () => row.n(1));
+    await drain(); await connection.settled();
+    expect(sent).toEqual([1, 2]); expect(reentries).toBe(1); expect(row.n()).toBe(2);
+    expect(q.inspect()).toEqual(ownership); expect(foreign.$.q()).toBe(7);
+    q.rollback(); await drain(); expect(sent).toEqual([1, 2]);
+    connection.dispose(); row.n(3); await drain();
+    expect(row.n()).toBe(3); expect(sent).toEqual([1, 2]); expect(reentries).toBe(1);
+  } finally { connection.dispose(); tree.destroy(); foreign.destroy(); }
+});

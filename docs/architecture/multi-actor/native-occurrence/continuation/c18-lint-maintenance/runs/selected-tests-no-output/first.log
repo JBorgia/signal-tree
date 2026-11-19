@@ -1,0 +1,71 @@
+
+> nx run kernel:test value-work-handoff.spec.ts whole-bounded-qualification.spec.ts whole-unowned-publication-authorized.spec.ts native-authored-footprint.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs value-work-handoff.spec.ts whole-bounded-qualification.spec.ts whole-unowned-publication-authorized.spec.ts native-authored-footprint.spec.ts --maxWorkers=1
+
+(node:5346) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5353) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c18-lint-maintenance/candidate/packages/kernel
+
+(node:5360) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/whole-bounded-qualification.spec.ts (13 tests | 1 failed) 68ms
+   × mixed whole refreshes only unowned support while actual owned field holds then rolls back 14ms
+(node:5363) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5364) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:5365) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/whole-bounded-qualification.spec.ts > mixed whole refreshes only unowned support while actual owned field holds then rolls back
+AssertionError: expected undefined to deeply equal [ { id: 'a', x: +0, y: 9 } ]
+
+- Expected:
+[
+  {
+    "id": "a",
+    "x": 0,
+    "y": 9,
+  },
+]
+
++ Received:
+undefined
+
+ ❯ src/lib/whole-bounded-qualification.spec.ts:21:541
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 31 passed (32)
+   Start at  12:14:28
+   Duration  3.85s (transform 878ms, setup 0ms, import 1.52s, tests 202ms, environment 1.53s)
+
+Warning: command "node tools/run-core-vitest.mjs value-work-handoff.spec.ts whole-bounded-qualification.spec.ts whole-unowned-publication-authorized.spec.ts native-authored-footprint.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.6s

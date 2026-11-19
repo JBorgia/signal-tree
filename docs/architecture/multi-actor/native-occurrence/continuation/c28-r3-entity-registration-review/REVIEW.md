@@ -1,0 +1,29 @@
+# Entity registration reachability — bounded premise review
+
+**Missing emitted initialization is established; a specific public behavioral failure is not established by this review. Gate any runtime repair on Anscombe's packaged public counterexample.** No source edits, new builds, consumer runs or broad search. Reviewed exact composition sources and existing emitted artifacts/graphs; their five relevant source files hash-identically (EVIDENCE.json).
+
+## Dependency and emitted evidence
+
+link.ts:3 has only a bare import of experimental-publication/entity. That module has no consumed runtime export; its top-level registerEntityPublicationFactory call (line60) is its registration job. internals/entity-publication.ts:130–134 owns the single factory, rejects repeat registration, and stores it process/module-locally. Package sideEffects:false contradicts reliance on keeping an otherwise-unused module for this job.
+
+Existing demo-unsandboxed-first.log:47–53 explicitly reports ignored-bare-import. More decisive artifact inspection: dist/kernel/dist/lib/link.js has no entity registration import; experimental-publication/entity.js is not emitted; internals/entity-publication.js retains `let factory;` and nativeParticipant's optional call, but no registration export/setter or assignment. Thus even unbundled use of THIS emitted package cannot run this lost registration. This is source/artifact initialization divergence, not merely speculation from a warning.
+
+The recorded budget metafiles are wrapped under `metafile` (not top-level inputs). All four inspected bare/entity graphs have no registration-module input. Entity graphs retain5950 attributed bytes from the internal entity-publication module, bare graphs227; these describe this graph only, not useful factory execution or missing bytes' performance value. Those budget workloads are not public Link behavior tests. They cannot prove speculative sends, lost delivery, or semantic safety.
+
+## Initial and late lifecycle
+
+EntityPublicationSource is instantiated per materialized collection at entity-signal.ts1866. Native participant is lazy: nativeParticipant uses `this.native ??= factory?.(this)` and is requested by prepare, subscribe, evidence and captureInput/views. Factory absence is NOT cached as a permanent result; if registration later occurs, the next call can create a participant. Successful participant creation stays per source, shared by all recipients.
+
+But late creation does not replay history. entity.ts's factory starts empty fields/members/placement/view maps. Earlier prepare calls without native use packet.prepareResponsibility fallback and supply no native completion to recipients. Link's collection seed reads current source evidence; recipient preparation conditionally creates source-projection receipts only when prepared.requirement exists. Therefore registration at first Link call may restore FUTURE preparation yet cannot be assumed equivalent for writes/transactions that occurred before Link creation. Current relation-creation adoption may permit some cases; it does not establish every pending field/collection case. Source import/module evaluation before first write, late collection creation after import, and truly late Link import are separate conditions.
+
+Absent factory alone does not prove leakage: fallback responsibility, projection and other Link decision paths still exist. The exact field/collection public sequences must decide which obligation is violated. Initial seeding and successful confirm/rollback delivery are necessary counterweights, not merely absence of premature sends.
+
+## Explicit reachability direction if the artifact counterexample confirms
+
+Use a real consumed private value dependency/call for factory provisioning, not an unused import or blanket sideEffects:true. Preserve one registry/participant authority and per-source lazy allocation. Registration must be available before the first source event whose obligations must survive until a later recipient; merely calling an exported initializer inside link is insufficient unless the pre-Link pending/adoption case is proved safe. Repeated Links/facades must not re-register and trip the current single-authority guard, reset existing maps, or create one native participant per recipient.
+
+Two implementation directions need bounded evidence, not an automatic selection here: (a) exported private initializer invoked at an existing guaranteed initialization boundary, with an idempotence rule that still rejects competing authority; or (b) source/materialization receives the actual private factory as a consumed dependency and retains one lazy participant. Both must explain the pre-Link capture boundary. A direct dependency from all entity sources can retain additional lifecycle modules for no-Link consumers; do not call that pay-for-use without checking the bare/entity/no-Link graphs. A Link-only dependency can preserve code splitting but cannot retroactively reconstruct lost source evidence. This is the concrete timing/cost tradeoff, not justification for a new public switch or global leaf registry.
+
+If preserving intentional module-initialization semantics is chosen, a narrowly truthful side-effect declaration is technically different from blanket sideEffects:true; it still requires emitted-artifact and cost checks and is not selected by this review. No artifact counterexample permits widening API/source admission, erasing existing obligations, or relaxing budgets.
+
+Minimal follow-up after Anscombe's result: compare source versus exact installed package for field and collection writes with Link before transaction, Link after pending work, and collection created after import; require useful confirmed/rolled-back delivery, no duplicate authority, and graph inclusion at the chosen boundary. Preserve first failures. No repair authorization or production activation inferred from this premise review.

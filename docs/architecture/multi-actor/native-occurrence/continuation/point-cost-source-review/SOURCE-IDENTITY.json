@@ -1,0 +1,13 @@
+{
+  "manifestSha256": "b8eace4025ff735988dee88db512a2e9ceb5ac9e1302683d68d6900acea17576",
+  "verifiedRelevantFiles": {
+    "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+    "packages/kernel/src/lib/entity-signal.ts": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+    "packages/kernel/src/lib/internals/entity-publication.ts": "98c5b53dcafe88403cdb9b808e0ec105a6b5051b84ce87580145fdabc6a7aa79",
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+    "packages/kernel/src/lib/experimental-publication/entity.ts": "6abf93aabcd79c091cf78db5328f3068f9f65420e62f389854b6ca3eb372fab8",
+    "packages/kernel/src/lib/experimental-publication/private.ts": "e022f8ce37bb23c659c27b342023b361ba11e4a8dcb16a783ab44f51ad3e9c28",
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": "a621673bb7a4df5aca0113e59b1ec40c8b5a1d5cd2dfef7299e59642a7f57ad2",
+    "packages/kernel/src/enhancers/restoration/order-boundary-evidence.ts": "100d9028bb73442b9d6280dfda9d6c2cb4d07f3ba6d3151b3b2098b72697f004"
+  }
+}

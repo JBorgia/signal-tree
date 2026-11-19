@@ -1,0 +1,85 @@
+typecheck            provable  core sources AND typing specs compile (both projects, not just one)
+test:all             provable  ordinary behaviour suites across published packages and the demo; retention-gc and forwarding-retention-gc run separately; diagnostic recording uses explicit replay
+lint:budget          provable  eslint errors across all 10 projects, AND warnings never grow
+built-barrels        provable  every source export survives into the built barrel
+devmode-foldable     UNPROVEN  diagnostics fold away when a consumer defines ngDevMode=false
+devmode-foldable:self provable  the foldability checker detects a surviving literal AND a non-shrinking bundle
+version-claims       provable  every documented Angular-version claim matches peerDependencies
+exports-importable   provable  every package export can actually be imported
+tree-shaking         UNPROVEN  an unused enhancer does not survive into a consumer bundle
+tree-shaking:self    provable  the tree-shaking checker detects code pulling in a forbidden module
+sanity               provable  workspace smoke/parity checks
+package-hygiene      UNPROVEN  no junk in any tarball, and every declared entry is present
+package-hygiene:self provable  the hygiene checker flags junk and a missing required entry
+react-reference-typecheck provable  every committed source file in apps/react-reference compiles against the actual workspace packages — reference code is documentation with executable authority
+api-callable-baseline UNPROVEN  the committed INVOCATION-SURFACE baseline matches the built surface — no public function, method, callable property, callable type or constructable class added, removed, changed KIND or changed SIGNATURE
+api-callable-baseline:self provable  the callable checker detects an added/removed member, a rename as removal+addition, a method<->callable-property kind flip, a new exported function, a changed parameter or return type, an added or removed overload on a callable type, optional->required, and a changed class CONSTRUCTOR — while ignoring a non-exported interface
+api-baseline         provable  the committed public API baseline matches the built surface — no undeclared export added or removed
+source-controls      provable  no raw NUL or unexpected C0 control character in any tracked source
+spec-types:hygiene   provable  every spec-type baseline entry addresses a SURVIVING spec — a bound attached to no surviving subject is not protection
+kernel-neutrality    provable  every declared-neutral kernel root has an Angular-free TRANSITIVE TYPE closure — type-only edges included
+kernel-neutrality:self provable  the closure walker itself — pointed at the known-tainted Angular runtime, it must report taint
+source-controls:self provable  the NUL detector itself — a checker whose only evidence is 'found nothing' is indistinguishable from one that cannot find anything
+readme-apis:teaching provable  the retired-API half of the doc gate — proven separately because one mutation cannot exercise two independent checks
+readme-apis          provable  every @signaltree symbol named in a shipped README or live doc exists, and no live doc EXAMPLE teaches a retired API
+dead-exports         provable  no NEW export is unreachable from every entry point and every import
+angular-store-runtime provable  defineStore resolves without the JIT compiler with local/root/platform identity and injector-owned teardown
+angular-aot-consumer provable  installed tarballs bootstrap in production AOT without a runtime compiler, render repeated writes and release component/root stores with their injectors
+angular-coupling-budget provable  kernel production modules remain free of Angular runtime coupling
+c6-neutrality-invariants provable  kernel-owned locations keep stable identity while direct reads participate in Angular dependency tracking and zoneless rendering
+numeric-claims       UNPROVEN  every measured figure on a live surface names a tool that produces it — ratcheted, so new ungenerated numbers cannot land
+numeric-claims:self  provable  the numeric-claims scanner detects a figure in a section that names no generator, and clears it once one is named
+release-claims       provable  every symbol/code ADDED since the last release tag reaches every surface that claims to describe the library
+rc-public-dispositions UNPROVEN  every RC public symbol has release authority; settled negative dispositions are absent from tarballs
+rc-public-dispositions:self provable  the RC public-disposition checker catches blocked symbols and permits allowed symbols
+demo-coverage        provable  every ROOT-barrel export is demonstrated in the demo app — not node methods or type-only declarations
+dead-exports:self    provable  the reachability scan itself is neither too narrow nor too broad
+bench-harness        provable  all 3 benchmark arms construct, run, and satisfy their postconditions
+restoration-hot-path provable  root, scoped-manager, and direct retained-effect restoration arms run and satisfy exact value, identity, frontier, history, and redo postconditions
+history-ownership-bench provable  the 6 Phase 0A ownership arms construct, run, keep owner-path postconditions honest, and preserve the current decision-20 verdict contract
+memory-harness       provable  every memory scenario runs under forced GC and reports collectability
+memory-compare       provable  all 3 cross-library memory arms construct and measure a marginal slope
+update-matrix        provable  every arm of the cross-library update matrix constructs, runs and satisfies its postconditions
+bounded-history-retention UNPROVEN  a tree with a BOUNDED restoration() does not retain retired subjects without bound
+bounded-history-retention:self provable  the retention verdict rejects the pre-fix table AND the 8.1x table its first threshold accepted
+retired-lifetime-gross-retention UNPROVEN  a non-retaining arm stays under an absolute retained-heap ceiling — the slope between two 4 MB-quantized, overlapping medians could not express it
+retired-lifetime-gross-retention:self provable  the retention checker rejects the retention REGIME and accepts flat totals, bounded fixed runtime cost, and the worst control sample measured across 24 processes
+restoration-turn-capacity provable  maxHistorySize retains completed designated turns exactly: omitted defaults, zero retains none, and positive N retains N
+restoration-required-set provable  the restoration claim-set oracle exercises designated retained work and distinguishes ordinary, bounded, and external classifications
+signal-identity-durability UNPROVEN  a live consumer keeps receiving updates across garbage collection — the property the test suite structurally cannot check
+signal-identity-durability:self provable  the durability checker detects a non-durable identity map and accepts a durable one
+memory-consistency   UNPROVEN  the retained-heap table is internally possible — no scenario measures less than a scenario it strictly contains
+memory-consistency:self provable  the containment checker rejects the exact 59.95/18.03 table that shipped, and accepts a consistent one
+historical-ab-isolation:self provable  the historical-A/B isolation checker rejects a comparison whose two arms are the same build (NOT full proof of a historical comparison — see the file header)
+state-scale          provable  the O(1)-write thesis, measured against @ngrx/signals on state-size and consumer axes
+raw-signals          provable  the "why not raw signals" arms construct, interleave, and their postconditions fire
+size-compare         provable  cross-library gzip cost is measurable for both libraries
+size-report          provable  every published package builds and its tree-shaken size is measurable
+spec-types           provable  spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test
+retention-gc         provable  the GC-requiring retention proofs: diagnostic and Link owners release values at their boundaries, and source locations do not retain abandoned derived recipes
+forwarding-retention-gc provable  nine forwarding plus three held-continuation GC fixtures: closed callbacks refuse replay, sampled receivers/errors release, explicit held values/rows survive, with positive/negative controls
+documented-imports   provable  every import specifier a LIVE document teaches resolves against the published export map — the documented -> publishable edge no other gate checks
+semantic-discoverability provable  the canonical manifest states the v15 model, facade rule, link/persistence, external-authority, and causal-projection boundaries, and each primary package README reaches its co-packed manifest
+semantic-discoverability:self provable  the semantic-discoverability checker accepts complete guidance and rejects a missing causal-projection rule
+documented-symbols   UNPROVEN  a package barrel's own API-SUMMARY list does not advertise a symbol the barrel fails to export — the symbol-level complement to documented-imports' specifier-level check
+documented-symbols:self provable  the barrel-summary checker rejects an advertised-but-unexported symbol, accepts an exported one, and skips `.method` entries
+documented-imports:self provable  the documented-import checker accepts a real entry point and rejects both a bogus subpath and a bogus package
+documented-examples  provable  every example a LIVE document teaches still typechecks against the API it imports — the block-level complement to documented-symbols and documented-imports, which check names and specifiers but never the call
+documented-examples:self provable  the documented-example checker rejects a deleted method, an unexported symbol and a wrong-carrier spelling, while tolerating the elided context and repeated declarations that made the previous whole-file attempt permanently red
+error-codes          provable  every diagnostic code the packages can emit is in docs/errors/README.md, and the catalogue invents none
+error-codes:self     provable  the catalogue checker detects a removed code AND reports the catalogue in sync without the probe
+declaration-docs     provable  a package whose source carries JSDoc ships JSDoc in its shipped .d.ts
+declaration-docs:self provable  the declaration-docs checker flags a stripped declaration set AND reports clean at the real ratio
+doc-links            provable  every relative link resolves AND every install instruction selects a publishable current package (archive/CHANGELOG excluded as point-in-time)
+doc-links:self       provable  the documentation checker flags a missing target and stale dist-tag, then reports the repo clean without them
+publish-manifests    UNPROVEN  the BUILT manifests are installable off this machine — no workspace/file/link protocols, internal ranges admit the versions shipping beside them
+publish-manifests:self provable  the manifest checker rejects `workspace:*` and a range that admits nothing, and its comparator handles prereleases
+publish-artifacts    provable  every declared `files` entry of every package resolves in dist
+framework-facade-closure provable  packed framework facades forward every intended neutral runtime symbol by identity, while consumer declarations compile with skipLibCheck=false under bundler and node16 resolution
+react-ssr-facade     provable  the packed React facade supplies a canonical server snapshot to useSyncExternalStore
+bundle-budget        provable  built package sizes stay inside their budgets
+publish-architecture provable  every shell and CI registry path delegates to the canonical candidate publisher
+publish-authorization provable  the canonical publisher retains its managed npm credential fallback
+release-prerelease-metadata provable  prerelease tags create GitHub releases marked as prereleases
+release-plan:self    provable  the public release boundary rejects private Studio source, unexpected packages and reversed dependencies
+release-plan         provable  the canonical release set matches publishable manifests and orders kernel before adapters

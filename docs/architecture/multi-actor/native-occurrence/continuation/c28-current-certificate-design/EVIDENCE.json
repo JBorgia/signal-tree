@@ -1,0 +1,13 @@
+{
+  "C27Manifest": "bc4c2447f4deeec12bc4ef05ed61392da3ceabb087e55e01d543adae82376ebd",
+  "allSourceFilesVerified": 3086,
+  "sourceUnchanged": true,
+  "executionsThisTask": "none; file/hash/source inspection only",
+  "inputs": {
+    "/private/tmp/st-c27-owner-history/REVIEW.md": "b2d889ead9b166ce2bb65268ce276c0a49ca9369260072547642ac68831a67a7",
+    "/private/tmp/st-c27-owner-history/TERMINAL-CONSUMERS.md": "860d7281c043d5a10fcc1535ad6beffdebd3a42df7a7ca8dfe87064971469df7",
+    "/private/tmp/st-c27-owner-history-main/COUNTS.jsonl": "4c37704678b11e3770fe18a0b0efb3590f1b3b51470a1d4d40b4b2eb2a37caba",
+    "/private/tmp/st-c27-owner-history-main/owner-history-independent.spec.ts": "5cf7c1b4f81b2a683980f122e1492102b95c25676630b682bafdde8950dc5bb9"
+  },
+  "designSha256": "a0c9230784dcf1ab887f6732c485a69f2267adab193219b2e2bddbf195c2cac4"
+}

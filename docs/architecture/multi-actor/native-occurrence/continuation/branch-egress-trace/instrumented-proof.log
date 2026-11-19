@@ -1,0 +1,147 @@
+
+> nx run kernel:test --testFile=oracle-alignment-independent.spec.ts branch-omission-correctness.spec.ts --testNamePattern=branch supplied-name adoption|same-turn removal and reintroduction ends absent --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=oracle-alignment-independent.spec.ts branch-omission-correctness.spec.ts --testNamePattern="branch supplied-name adoption|same-turn removal and reintroduction ends absent" --maxWorkers=1
+
+(node:2900) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:2907) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-branch-egress-trace/instrumented/packages/kernel
+
+(node:2914) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/oracle-alignment-independent.spec.ts > branch supplied-name adoption with omission rolls back both to ordinary baseline
+BRANCHTRACE {"event":"link.notification","v":"Inspected","prev":"Ada","path":"profile.name","positions":[3],"meta":{"participation":"inspection","mutationIntent":"replace","ownerId":1},"eligible":{"name":"Ada","age":42}}
+BRANCHTRACE {"event":"scalar.prepare","revision":7,"previous":1,"relative":["name"],"mutation":{"intent":"replace","before":"Ada","after":"Inspected","changed":true},"context":{"transactionId":1,"transactionOwner":{}}}
+BRANCHTRACE {"event":"source.membership","address":["profile"],"key":"age","physicalBefore":true,"present":false,"ordinaryBefore":true,"ordinaryAfter":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}},"context":{"transactionId":1,"transactionOwner":{}}}
+BRANCHTRACE {"event":"membership.prepare","address":["profile"],"key":"age","present":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}},"context":{"transactionId":1,"transactionOwner":{}}}
+BRANCHTRACE {"event":"membership.unit","revision":8,"previous":7,"address":["profile","age"],"changed":true,"state":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}}}
+BRANCHTRACE {"event":"link.notification","v":"Inspected","prev":"Ada","path":"profile.name","positions":[3],"meta":{"transactionId":1,"transactionOwner":{},"mutationIntent":"replace","ownerId":1},"eligible":{"name":"Ada","age":42}}
+BRANCHTRACE {"event":"legacy.project","payload":{"name":"Inspected","age":42},"relative":["name"],"pending":2,"current":8,"context":{"transactionId":1,"transactionOwner":{},"mutationIntent":"replace","ownerId":1}}
+BRANCHTRACE {"event":"link.notification","path":"profile","positions":[2],"meta":{"transactionId":1,"transactionOwner":{},"ownerId":1},"eligible":{"name":"Inspected","age":42}}
+BRANCHTRACE {"event":"ready.before","revision":7,"previous":1,"field":["name"],"payload":"Inspected","valuePayload":{"name":"Ada","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[{"owner":1,"outcome":"pending"}]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":5}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[{"owner":1,"outcome":"pending"}]},"revision":7,"current":8,"noop":false,"changed":true,"valuePayload":{"name":"Inspected","age":42},"projected":{"name":"Inspected","age":42},"projectedRevision":7,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":5}]}
+BRANCHTRACE {"event":"ready.before","revision":8,"previous":7,"membership":["profile","age"],"memberPresent":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}},"valuePayload":{"name":"Inspected","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[{"owner":1,"outcome":"pending"}]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":5}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[{"owner":1,"outcome":"pending"}]},"revision":8,"current":8,"noop":false,"changed":true,"valuePayload":{"name":"Inspected","age":42},"projected":{"name":"Inspected"},"projectedRevision":8,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"link.refresh","eligible":{"name":"Inspected","age":42},"receipt":{"name":"Inspected"}}
+
+stdout | src/lib/oracle-alignment-independent.spec.ts > branch supplied-name adoption with omission rolls back both to ordinary baseline
+BRANCHTRACE {"event":"slot.frame.prepare","staged":[[1,42]],"changed":[],"shadowPlans":[],"context":{"origin":"transaction-rollback","transactionId":1,"ownerId":1}}
+BRANCHTRACE {"event":"source.membership","address":["profile"],"key":"age","physicalBefore":false,"present":true,"ordinaryBefore":false,"ordinaryAfter":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":42}},"context":{"origin":"transaction-rollback","transactionId":1,"ownerId":1}}
+BRANCHTRACE {"event":"membership.prepare","address":["profile"],"key":"age","present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":42}},"context":{"origin":"transaction-rollback","transactionId":1,"ownerId":1}}
+BRANCHTRACE {"event":"membership.unit","revision":9,"previous":8,"address":["profile","age"],"changed":true,"state":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":42}}}
+BRANCHTRACE {"event":"slot.frame.prepare","staged":[[0,"Ada"]],"changed":[{"slotIndex":0,"nextValue":"Ada"}],"shadowPlans":[],"context":{"origin":"transaction-rollback","transactionId":1,"ownerId":1}}
+BRANCHTRACE {"event":"link.notification","v":"Ada","prev":"Inspected","path":"profile.name","positions":[3],"meta":{"origin":"transaction-rollback","transactionId":1,"ownerId":1,"intent":"system","participation":"realized"},"eligible":{"name":"Inspected"}}
+BRANCHTRACE {"event":"legacy.project","payload":{"name":"Ada"},"relative":["name"],"pending":1,"current":9,"priorProjected":{"name":"Inspected"},"context":{"origin":"transaction-rollback","transactionId":1,"ownerId":1,"intent":"system","participation":"realized"}}
+BRANCHTRACE {"event":"link.notification","path":"profile","positions":[2],"meta":{"origin":"transaction-rollback","transactionId":1,"ownerId":1,"intent":"system","participation":"realized"},"eligible":{"name":"Ada"}}
+BRANCHTRACE {"event":"ready.before","revision":9,"previous":8,"membership":["profile","age"],"memberPresent":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":42}},"valuePayload":{"name":"Inspected","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[{"owner":1,"outcome":"rolled-back"}]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[{"owner":1,"outcome":"rolled-back"}]},"revision":9,"current":9,"noop":false,"changed":true,"valuePayload":{"name":"Inspected","age":42},"projected":{"name":"Inspected","age":42},"projectedRevision":9,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":9}]}
+BRANCHTRACE {"event":"link.refresh","eligible":{"name":"Ada"},"receipt":{"name":"Inspected","age":42}}
+
+ ❯ src/lib/oracle-alignment-independent.spec.ts (9 tests | 1 failed | 8 skipped) 30ms
+   × branch supplied-name adoption with omission rolls back both to ordinary baseline 29ms
+(node:2917) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+BRANCHTRACE {"event":"scalar.prepare","revision":7,"previous":1,"relative":["name"],"mutation":{"intent":"replace","before":"Ada","after":"Ada","changed":false}}
+BRANCHTRACE {"event":"source.membership","address":["profile"],"key":"age","physicalBefore":true,"present":false,"ordinaryBefore":true,"ordinaryAfter":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}}}
+BRANCHTRACE {"event":"membership.prepare","address":["profile"],"key":"age","present":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}}}
+BRANCHTRACE {"event":"membership.unit","revision":8,"previous":7,"address":["profile","age"],"changed":true,"state":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}}}
+BRANCHTRACE {"event":"scalar.prepare","revision":9,"previous":8,"relative":["name"],"mutation":{"intent":"replace","before":"Ada","after":"Ada","changed":false}}
+BRANCHTRACE {"event":"scalar.prepare","revision":10,"previous":9,"relative":["age"],"mutation":{"intent":"replace","before":42,"after":8,"changed":true}}
+BRANCHTRACE {"event":"source.membership","address":["profile"],"key":"age","physicalBefore":false,"present":true,"ordinaryBefore":false,"ordinaryAfter":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":8}}}
+BRANCHTRACE {"event":"membership.prepare","address":["profile"],"key":"age","present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":8}}}
+BRANCHTRACE {"event":"membership.unit","revision":11,"previous":10,"address":["profile","age"],"changed":true,"state":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":8}}}
+BRANCHTRACE {"event":"scalar.prepare","revision":12,"previous":11,"relative":["name"],"mutation":{"intent":"replace","before":"Ada","after":"Ada","changed":false}}
+BRANCHTRACE {"event":"source.membership","address":["profile"],"key":"age","physicalBefore":true,"present":false,"ordinaryBefore":true,"ordinaryAfter":false,"ordinary":{"before":{"present":true,"value":8},"after":{"present":false}}}
+BRANCHTRACE {"event":"membership.prepare","address":["profile"],"key":"age","present":false,"ordinary":{"before":{"present":true,"value":8},"after":{"present":false}}}
+BRANCHTRACE {"event":"membership.unit","revision":13,"previous":12,"address":["profile","age"],"changed":true,"state":false,"ordinary":{"before":{"present":true,"value":8},"after":{"present":false}}}
+BRANCHTRACE {"event":"ready.before","revision":7,"previous":1,"field":["name"],"payload":"Ada","valuePayload":{"name":"Ada","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":5}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":7,"current":13,"noop":false,"changed":false,"valuePayload":{"name":"Ada","age":42},"projected":{"name":"Ada","age":42},"projectedRevision":7,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":5}]}
+BRANCHTRACE {"event":"ready.before","revision":8,"previous":7,"membership":["profile","age"],"memberPresent":false,"ordinary":{"before":{"present":true,"value":42},"after":{"present":false}},"valuePayload":{"name":"Ada","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":5}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":8,"current":13,"noop":false,"changed":true,"valuePayload":{"name":"Ada","age":42},"projected":{"name":"Ada"},"projectedRevision":8,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.before","revision":9,"previous":8,"field":["name"],"payload":"Ada","valuePayload":{"name":"Ada","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":9,"current":13,"noop":true,"changed":false,"valuePayload":{"name":"Ada","age":42},"projected":{"name":"Ada"},"projectedRevision":8,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.before","revision":10,"previous":9,"field":["age"],"payload":8,"valuePayload":{"name":"Ada","age":42},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":10,"current":13,"noop":false,"changed":true,"valuePayload":{"name":"Ada","age":8},"projected":{"name":"Ada"},"projectedRevision":10,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.before","revision":11,"previous":10,"membership":["profile","age"],"memberPresent":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":8}},"valuePayload":{"name":"Ada","age":8},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":8}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":11,"current":13,"noop":false,"changed":true,"valuePayload":{"name":"Ada","age":8},"projected":{"name":"Ada","age":8},"projectedRevision":11,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":11}]}
+BRANCHTRACE {"event":"ready.before","revision":12,"previous":11,"field":["name"],"payload":"Ada","valuePayload":{"name":"Ada","age":8},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":11}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":12,"current":13,"noop":true,"changed":false,"valuePayload":{"name":"Ada","age":8},"projected":{"name":"Ada","age":8},"projectedRevision":11,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":11}]}
+BRANCHTRACE {"event":"ready.before","revision":13,"previous":12,"membership":["profile","age"],"memberPresent":false,"ordinary":{"before":{"present":true,"value":8},"after":{"present":false}},"valuePayload":{"name":"Ada","age":8},"proof":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":true,"revision":11}]}
+BRANCHTRACE {"event":"ready.after","effective":{"unknown":true,"invalid":false,"rejected":0,"owners":[]},"revision":13,"current":13,"noop":false,"changed":true,"valuePayload":{"name":"Ada","age":8},"projected":{"name":"Ada"},"projectedRevision":13,"completedPresence":[{"address":["profile"],"present":true,"revision":2},{"address":["profile","name"],"present":true,"revision":3},{"address":["profile","age"],"present":false,"revision":13}]}
+BRANCHTRACE {"event":"link.refresh","eligible":{"name":"Ada","age":42},"receipt":{"name":"Ada"}}
+BRANCHTRACE {"event":"link.notification","path":"profile","meta":{"ownerId":1},"eligible":{"name":"Ada"}}
+BRANCHTRACE {"event":"link.notification","v":8,"prev":42,"path":"profile.age","positions":[2],"meta":{"mutationIntent":"replace","ownerId":1},"eligible":{"name":"Ada"}}
+BRANCHTRACE {"event":"legacy.project","payload":{"name":"Ada","age":8},"relative":["age"],"pending":0,"current":13,"priorProjected":{"name":"Ada"},"context":{"mutationIntent":"replace","ownerId":1}}
+BRANCHTRACE {"event":"link.notification","path":"profile","meta":{"ownerId":1},"eligible":{"name":"Ada","age":8}}
+BRANCHTRACE {"event":"link.notification","path":"profile","meta":{"ownerId":1},"eligible":{"name":"Ada","age":8}}
+
+ ❯ src/lib/branch-omission-correctness.spec.ts (35 tests | 1 failed | 34 skipped) 37ms
+     × same-turn removal and reintroduction ends absent at Link 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > same-turn removal and reintroduction ends absent at Link
+AssertionError: expected { name: 'Ada', age: 8 } to strictly equal { name: 'Ada' }
+
+- Expected
++ Received
+
+  {
++   "age": 8,
+    "name": "Ada",
+  }
+
+ ❯ src/lib/branch-omission-correctness.spec.ts:255:33
+    253|         await nextTask();
+    254|         await relation.settled();
+    255|         expect(received.at(-1)).toStrictEqual(
+       |                                 ^
+    256|           end === 'present' ? { name: 'Ada', age: undefined } : { name…
+    257|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/oracle-alignment-independent.spec.ts > branch supplied-name adoption with omission rolls back both to ordinary baseline
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/lib/oracle-alignment-independent.spec.ts:30:257
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 42 skipped (44)
+   Start at  17:05:00
+   Duration  2.70s (transform 1.06s, setup 0ms, import 1.47s, tests 67ms, environment 851ms)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=oracle-alignment-independent.spec.ts branch-omission-correctness.spec.ts --testNamePattern="branch supplied-name adoption|same-turn removal and reintroduction ends absent" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.4s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.4s

@@ -1,0 +1,14 @@
+{
+  "sourceManifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db",
+  "sourceFiles": 2934,
+  "sourceUnchanged": true,
+  "disposableManifestFilesUnchanged": true,
+  "probeSha256": "2efac45b046474e3c5ba1a79274965aa21b44e0e1c95fedcf60ac7a7ccf48362",
+  "collectorSha256": "b9df8334d2ece2ba6f3e2eb4fb7aef7d45ff00fd8eb62c94ccbabc0937551186",
+  "node": "24.15.0",
+  "versions": {
+    "vitest": "4.1.9",
+    "nx": "23.1.0",
+    "typescript": "6.0.3"
+  }
+}

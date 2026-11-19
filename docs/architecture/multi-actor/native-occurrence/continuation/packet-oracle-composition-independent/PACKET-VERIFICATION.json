@@ -1,0 +1,9 @@
+{
+  "changed": [
+    "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+    "packages/kernel/src/lib/packet-index-review.spec.ts"
+  ],
+  "manifestFiles": 2973,
+  "mismatches": [],
+  "manifestSha256": "97aaedeef46bb224ce28e063798b2ea868d7a03ef519adf157293a577415754e"
+}

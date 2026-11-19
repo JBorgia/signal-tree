@@ -1,0 +1,9 @@
+{
+  "candidateFilesVerified": 2923,
+  "traceOnlyChangedFiles": [
+    "packages/kernel/src/lib/internals/native-field-selection.ts"
+  ],
+  "inverse11to7EndpointBindings": 1,
+  "adapterEndpointReads": 0,
+  "runtimeRepaired": false
+}

@@ -1,0 +1,186 @@
+[
+  {
+    "number": 1,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+      "fullName": "entity link ownership controls bare field ignores another row, collection, and tree",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/audit-entity-boundaries.spec.ts > entity link ownership controls > bare field ignores another row, collection, and tree 8ms",
+    "firstLogSha256": "98ce609bdfd1d46338b289743e184f759206ae1fc5841234ef79e202d0cecc16",
+    "experimentalMessages": {
+      "057c": [
+        "Error: Native occurrence has no verified root/address\n    at captureNativeOccurrence (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/internals/native-occurrence.ts:31:32)\n    at RecipientOccurrences.enroll (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts:33:69)\n    at enroll (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/experimental-publication/private.ts:351:55)\n    at Module.bindSource (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/experimental-publication/private.ts:352:3)\n    at link (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/link.ts:555:12)\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/audit-entity-boundaries.spec.ts:173:28\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "c47b": [
+        "Error: Native occurrence has no verified root/address\n    at captureNativeOccurrence (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/internals/native-occurrence.ts:31:32)\n    at RecipientOccurrences.enroll (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/experimental-publication/recipient-occurrence.ts:33:69)\n    at enroll (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/experimental-publication/private.ts:351:55)\n    at Module.bindSource (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/experimental-publication/private.ts:352:3)\n    at link (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/link.ts:555:12)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/audit-entity-boundaries.spec.ts:173:28\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  },
+  {
+    "number": 2,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+      "fullName": "opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/opaque-leaf-restoration.spec.ts > opaque leaves retain terminal topology through restoration > still refuses structural drift before reversing an atomic leaf sibling 12ms",
+    "firstLogSha256": "04d302b5b46da9305e4b228856f6709cd63c28bf6c6aeadf19339d5e34eddb00",
+    "experimentalMessages": {
+      "057c": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/opaque-leaf-restoration.spec.ts:253:33\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "c47b": [
+        "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/opaque-leaf-restoration.spec.ts:253:33\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  },
+  {
+    "number": 3,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/branch-omission-correctness.spec.ts",
+      "fullName": "whole-value plain-object omission correctness an omission does not carry an unchanged inspection-only sibling to Link",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/branch-omission-correctness.spec.ts > whole-value plain-object omission correctness > an omission does not carry an unchanged inspection-only sibling to Link 10ms",
+    "firstLogSha256": "4ddb4165d19bb04163195b199e4a3ef83faba9949b3141e3adb6b61b09f94419",
+    "experimentalMessages": {
+      "057c": [
+        "AssertionError: expected { name: 'Inspected' } to strictly equal { name: 'Ada' }\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/branch-omission-correctness.spec.ts:309:31\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "c47b": [
+        "AssertionError: expected { name: 'Inspected' } to strictly equal { name: 'Ada' }\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/branch-omission-correctness.spec.ts:309:31\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  },
+  {
+    "number": 4,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/link-absent-locations.spec.ts",
+      "fullName": "Link and path observers on 'a collection' no enhancers an omission, and re-adds of the location and of a sibling",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/link-absent-locations.spec.ts > Link and path observers on 'a collection' > no enhancers > an omission, and re-adds of the location and of a sibling 9ms",
+    "firstLogSha256": "a9ab08b52818761f785c00d42f2732f9fd4a4e58c0e611e7a3695c83a000acff",
+    "experimentalMessages": {
+      "057c": [
+        "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]\n    at expectExposed (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts:144:66)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at step (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts:174:7)\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts:192:9\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "c47b": [
+        "AssertionError: a collection endpoint after a re-add of a.rows: expected { all: [] } to deeply equal [ { id: 's', n: 2 } ]\n    at expectExposed (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts:144:66)\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at step (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts:174:7)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/link-absent-locations.spec.ts:192:9\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  },
+  {
+    "number": 5,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
+      "fullName": "the durable commit boundary, carried by public Link a FOREIGN tree's open transaction neither absorbs nor delays this tree's write",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/link-commit-boundary-carrier.spec.ts > the durable commit boundary, carried by public Link > a FOREIGN tree's open transaction neither absorbs nor delays this tree's write 12ms",
+    "firstLogSha256": "63f5dfada8601af0513a62291503799bd968858c04eafaa83a66aff396b709e4",
+    "experimentalMessages": {
+      "057c": [
+        "AssertionError: expected undefined to be 'MINE' // Object.is equality\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts:164:44\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "c47b": [
+        "AssertionError: expected undefined to be 'MINE' // Object.is equality\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts:164:44\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  },
+  {
+    "number": 6,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-missing-id-guard.spec.ts",
+      "fullName": "entityMap missing-id guard (dev mode) warns when entities have no id and no selectId",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/entity-missing-id-guard.spec.ts > entityMap missing-id guard (dev mode) > warns when entities have no id and no selectId 6ms",
+    "firstLogSha256": "702a42f7d3bde4689935d4188ca1003c3f5f4313e35069b37900b17e463ab8cd",
+    "experimentalMessages": {
+      "057c": [
+        "Error: Ordinary entity admission lacks a key\n    at prepareOrdinaryTopology (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-signal.ts:983:19)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-signal.ts:1268:26)\n    at addOneWithStructuralEffect (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-signal.ts:2914:23)\n    at addOne (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-signal.ts:3817:14)\n    at Proxy.api.<computed> (/private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-signal.ts:4980:16)\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-missing-id-guard.spec.ts:21:75\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+      ],
+      "c47b": [
+        "Error: Ordinary entity admission lacks a key\n    at prepareOrdinaryTopology (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-signal.ts:1021:19)\n    at commitAndProjectEntityMutationFrame (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-signal.ts:1306:26)\n    at addOneWithStructuralEffect (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-signal.ts:2962:23)\n    at addOne (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-signal.ts:3865:14)\n    at Proxy.api.<computed> (/private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-signal.ts:5029:16)\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-missing-id-guard.spec.ts:21:75\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)"
+      ]
+    }
+  },
+  {
+    "number": 7,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/audit-entity-boundaries.spec.ts",
+      "fullName": "audit entity boundaries row and field links retain ownership, enhanced=false",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/audit-entity-boundaries.spec.ts > audit entity boundaries > row and field links retain ownership, enhanced=false 10ms",
+    "firstLogSha256": "c46f17d8c71f5bcbfaba3cf36f881b1fe1ae442dd0c0408ed9d438d72cab5cba",
+    "experimentalMessages": {
+      "057c": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at Object.chain (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:7\n    at Array.forEach (<anonymous>)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2021:10\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/audit-entity-boundaries.spec.ts:79:24\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)"
+      ],
+      "c47b": [
+        "Error: STACK_TRACE_ERROR\n    at task (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at Object.chain (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:7\n    at Array.forEach (<anonymous>)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2021:10\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/audit-entity-boundaries.spec.ts:79:24\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)"
+      ]
+    }
+  },
+  {
+    "number": 8,
+    "identity": {
+      "project": "kernel",
+      "file": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
+      "fullName": "entityMap \u2014 collection queries are lazily derived (13.5.0) a single-entity update does not rebuild the collection",
+      "duplicateOrdinal": 1
+    },
+    "production": "passed",
+    "predecessor": "failed",
+    "successor": "failed",
+    "classification": "introduced relative to exact production 87f for this selected assertion",
+    "productionPassLine": "\u2713 src/lib/entity-granular-reactivity.spec.ts > entityMap \u2014 collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection 82ms",
+    "firstLogSha256": "aba714bda5b1845693b89223f8728dbb2dd1b9bd30053753ade15933393dfdb9",
+    "experimentalMessages": {
+      "057c": [
+        "AssertionError: expected 14400 to be less than 2000\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts:215:19\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      ],
+      "c47b": [
+        "AssertionError: expected 14400 to be less than 2000\n    at /private/tmp/st-native-broad-differential/successor/candidate/packages/kernel/src/lib/entity-granular-reactivity.spec.ts:215:19\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      ]
+    }
+  }
+]

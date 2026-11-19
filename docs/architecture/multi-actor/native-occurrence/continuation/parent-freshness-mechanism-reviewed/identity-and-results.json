@@ -1,0 +1,47 @@
+{
+  "C7a": {
+    "manifest_entries": 2996,
+    "missing": [],
+    "changed": []
+  },
+  "controls": {
+    "manifest_entries": 2996,
+    "missing": [],
+    "changed": []
+  },
+  "manifest_sha256": "d911ae7768e8e1a43eceb99ef5277988a6ff9e59c910337bb1e6b79db4d1b71d",
+  "runs": {
+    "angular-typed-contract": {
+      "exit": 1,
+      "elapsedSeconds": 2.2951020420296118
+    },
+    "kernel-typed-contract": {
+      "exit": 1,
+      "elapsedSeconds": 2.6096416669897735
+    },
+    "kernel-contract-red": {
+      "exit": 1,
+      "elapsedSeconds": 1.8525846659904346
+    },
+    "spec-types-corrected": {
+      "exit": 0,
+      "elapsedSeconds": 7.400374707998708
+    },
+    "source-types": {
+      "exit": 0,
+      "elapsedSeconds": 2.753318792034406
+    },
+    "original-diagnostic": {
+      "exit": 0,
+      "elapsedSeconds": 4.230579666967969
+    },
+    "angular-contract-red": {
+      "exit": 1,
+      "elapsedSeconds": 2.333299874968361
+    },
+    "spec-types": {
+      "exit": 1,
+      "elapsedSeconds": 6.681032042019069
+    }
+  }
+}

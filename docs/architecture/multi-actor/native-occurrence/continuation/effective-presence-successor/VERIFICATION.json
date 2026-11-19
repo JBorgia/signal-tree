@@ -1,0 +1,19 @@
+{
+  "manifestSha256": "47e05e6216bab9fd186dfbb66b656f4e33dc1f9d98a81a1ad096ee61b12181f9",
+  "candidateFilesVerified": 3050,
+  "frozenC11FilesVerified": 3045,
+  "mismatches": [],
+  "runtimeChangesOnly": [
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/member-membership.ts"
+  ],
+  "rootLockMatches": true,
+  "lockSha256": "5e1ccb86b533ff4241d8a6ae5ac32ee9a56c6e10a416a8d1be3322d0ba531239",
+  "dependencyRealPath": "/Users/jonathanborgia/code/signaltree/node_modules",
+  "versions": {
+    "node": "v24.15.0",
+    "pnpm": "10.17.0"
+  },
+  "ST_PREPARED_REVIEW_OUTPUT": "unset; recorded per command",
+  "limits": "No broad suites, build, performance/allocation measurement or release acceptance"
+}

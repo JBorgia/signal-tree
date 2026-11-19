@@ -1,0 +1,97 @@
+commit c76814e0b5053602ef7e900d01dfa58aa07929e4
+Author: Borgia <jonathanborgia@gmail.com>
+Date:   Sun Sep 20 13:04:31 2026 -0600
+
+    perf(kernel): skip mutation-source registration for unreachable cells
+    
+    An internal cell -- an entity's value cell, its activation counter, the
+    collection's active-id cell -- is created by `createCell` and stored only in a
+    private Map inside `createEntitySignal`. Nothing hands one out, so no caller can
+    pass one to `observeIntrinsicMutations`. Registering a per-cell SourceRecord and
+    WeakMap entry for it buys an observability that cannot be exercised.
+    
+    `createCell` now passes `observable: false` and shares one frozen
+    UNOBSERVABLE_SOURCE. Measured 121 B/entity at full realization (residue
+    2,831 -> 2,709), deterministic: five interleaved repetitions per arm with a
+    spread of at most 2 B, and stable at 120/121/121 across N = 5k/10k/20k, which
+    rules out a WeakMap table-doubling artifact.
+    
+    This reverses the verdict recorded in 71182dd5, which priced specializing the
+    internal cell into a distinct minimal type and called it not worth ~180 B. The
+    implementation that was actually needed is one boolean parameter and one frozen
+    object, so the cost side collapsed. The benefit also came in below that
+    estimate -- 121 B, not 180 B -- and is recorded as measured, not as predicted.
+    
+    It does not reach the <2,000 B milestone and does not revive wrapper-slimming:
+    the residue is still two permanent Locations per realized subject, and the
+    deferred architecture is still the only route below 2,000 B.
+    
+    Instrumenting the base build shows `byId` alone registers four mutation sources
+    per entity, only one a `createCell`, and invoking the node adds a fifth. At
+    ~60 B per retained registration that accounts for the 120 B at full realization
+    exactly. It does NOT account for the 8 B measured at `byId` only, where the same
+    arithmetic predicts ~60 B. Cell count, a transient uncached cell from the
+    `subjectId === undefined` branch, and table doubling were each tested and
+    killed. That 8 B is reproducible and unattributed; it is documented as such.
+    
+    The shared source is frozen because it is shared: installing an observer on it
+    would otherwise wire every internal cell in the process to one callback. That
+    throws instead, and is pinned by test. No test observes a cell directly because
+    no caller can reach one -- that unreachability is what licenses the change.
+    
+    CPU unchanged: entity-updateOne-10k 2.02x both sides; scalar-set 1.40x -> 1.36x
+    against an A/A band of +-2.1%, not claimed as an improvement.
+    
+    Kernel suite: 278 files, 2,346 passing.
+
+diff --git a/packages/kernel/src/lib/internals/native-location-realization.ts b/packages/kernel/src/lib/internals/native-location-realization.ts
+index 270f4e09..272f9479 100644
+--- a/packages/kernel/src/lib/internals/native-location-realization.ts
++++ b/packages/kernel/src/lib/internals/native-location-realization.ts
+@@ -1,6 +1,9 @@
+ import { markTreeCell } from './cell-identity';
+ import type { Location, ReadonlyLocation } from './cell-runtime';
+-import { registerIntrinsicMutationSource } from './intrinsic-mutation';
++import {
++  registerIntrinsicMutationSource,
++  unobservableMutationSource,
++} from './intrinsic-mutation';
+ import {
+   registerWritableLocationBinding,
+   type LocationPublisher,
+@@ -68,16 +71,21 @@ export function createNativeLocationRuntime(
+ 
+   const createWritable = <T>(
+     read: () => T,
+-    write: (value: T, intent: 'replace' | 'derive') => boolean
++    write: (value: T, intent: 'replace' | 'derive') => boolean,
++    /**
++     * `SUBJECT-STATE-MINIMAL-0`. Pass false for a cell no caller can reach and
++     * therefore no caller can observe — see `unobservableMutationSource`.
++     */
++    observable = true
+   ): WritableLocationBinding<T> => {
+     const realized = observation.createWritableCell?.(read);
+     if (!realized)
+       throw new Error('Expected a native writable cell realization');
+ 
+     const location = markTreeCell(realized.cell as unknown as Location<T>);
+-    const mutationSource1 = registerIntrinsicMutationSource<T>(
+-      location as object
+-    );
++    const mutationSource1 = observable
++      ? registerIntrinsicMutationSource<T>(location as object)
++      : unobservableMutationSource<T>();
+     const binding: WritableLocationBinding<T> = {
+       location,
+       notify: () => realized.token.invalidate(),
+@@ -128,7 +136,8 @@ export function createNativeLocationRuntime(
+         if (equal(value, next)) return false;
+         value = next;
+         return true;
+-      }
++      },
++      false
+     ).location;
+   };
+ 

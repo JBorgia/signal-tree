@@ -1,0 +1,68 @@
+
+> nx run kernel:test c8-review-composition.spec.ts --testNamePattern=membership readiness error --maxWorkers=1
+
+> node tools/run-core-vitest.mjs c8-review-composition.spec.ts --testNamePattern="membership readiness error" --maxWorkers=1
+
+(node:49447) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:49454) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-r4-review-resumed/c8-candidate/packages/kernel
+
+(node:49461) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/c8-review-composition.spec.ts (5 tests | 1 failed | 4 skipped) 15ms
+   × membership readiness error retains installed enrollment and drains recipient completion 15ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/c8-review-composition.spec.ts > membership readiness error retains installed enrollment and drains recipient completion
+AssertionError: expected {} to deeply equal { a: { n: 1 } }
+
+- Expected
++ Received
+
+- {
+-   "a": {
+-     "n": 1,
+-   },
+- }
++ {}
+
+ ❯ src/lib/c8-review-composition.spec.ts:50:110
+     48|  try{
+     49|   let caught:unknown;try{t.$.rows({a:{n:1}});}catch(error){caught=erro…
+     50|   expect(caught).toBe(sentinel);expect(reads.length).toBeGreaterThan(0…
+       |                                                                                                              ^
+     51|   expect(t.$.rows()).toEqual({a:{n:1}});await tick();expect(sent).toEq…
+     52|   t.$.rows.a.n(2);await tick();expect(sent).toEqual([{a:{n:1}},{a:{n:2…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  08:54:44
+   Duration  868ms (transform 492ms, setup 0ms, import 580ms, tests 15ms, environment 187ms)
+
+Warning: command "node tools/run-core-vitest.mjs c8-review-composition.spec.ts --testNamePattern="membership readiness error" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.3s

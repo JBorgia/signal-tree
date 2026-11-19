@@ -1,0 +1,8 @@
+{
+  "argv": [
+    "node",
+    "tools/verify-consumer-typecheck.mjs"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-composed-artifacts/candidate",
+  "noProgressSeconds": 180
+}

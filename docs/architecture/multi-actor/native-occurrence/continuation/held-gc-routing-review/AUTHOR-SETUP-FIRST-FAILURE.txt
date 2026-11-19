@@ -1,0 +1,1 @@
+Setup stopped before any test launch: FileExistsError tools/held-continuation-probe. Exact C21 already contains historical retention target and matching config. All manifest entries verified unchanged; use existing target without edits.

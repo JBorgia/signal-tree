@@ -1,0 +1,19 @@
+{
+  "candidate": "/private/tmp/st-packet-point-admission-successor/candidate",
+  "status": "frozen bounded pre-admission correction; independent review pending; inherited reds and point failure retained",
+  "files": {
+    "BASE-SOURCE-SHA256.json": "872d18d5b66200e6f8254c0c0ee318eb2f2bfd30b7eefff6a0f6efcdb5f4496c",
+    "SOURCE-SHA256.json": "542125745ddaad67aead344961bdfb408e43c6447938f6834413038a90ad413d",
+    "VERIFICATION.json": "ae411a79f657d6c40903d180e5d6bdbb53f2043f82cd8ca9985139f24960af46",
+    "runtime.patch": "af3692c9d1678661223f49d4f8d109dd5b07c45a9db9bdeded1c319ce18b368e",
+    "tests.patch": "3847f07f3c4e692e1f0d40875d2c6fd89be76ec231ae96e5b0be9a45ddcee6d4",
+    "RESULTS.md": "ef2e5118f366f42a9ac026583652a03facaab98371b502a1728a7614db3781a0",
+    "COMMANDS.md": "6e33eaf1efca539019d85d6bd958779decd0cb4fc64bb238f438bf70a1752c76",
+    "REVIEW-REQUEST.md": "084032210ae2723e92996f5e95790544017849f101ae367124e44610cc0a060e",
+    "focused-first.log": "413ce72108f32ea215a5c383387705621c3fd52b3a267c8379e1163d79bd5eb1",
+    "targeted.log": "6a74d3cb8cdd8d09f6e956c145410e5f8064844a1007cc364718d598719c0700",
+    "point.log": "e45af35aa28dd29d7ce978a7144a54ab14f0cf7c9831ec49ac61b12286ff640f",
+    "source-types.log": "2e09b52d14311ade1cd63b9d20f4ef0db333c67c2aa3ef3e1e0b8597fd30f896",
+    "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  }
+}

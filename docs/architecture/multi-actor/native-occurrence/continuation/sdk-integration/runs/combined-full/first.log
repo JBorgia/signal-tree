@@ -1,0 +1,13 @@
+
+ NX   Running target test for 5 projects:
+
+- kernel
+- angular
+- react
+- vue
+- solid
+
+With additional flags:
+  --maxWorkers=2
+
+

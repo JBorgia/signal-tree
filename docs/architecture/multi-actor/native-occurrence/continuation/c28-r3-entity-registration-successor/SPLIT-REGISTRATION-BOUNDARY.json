@@ -1,0 +1,20 @@
+{
+  "../consumer/split/early.mjs": {
+    "staticOutputs": [
+      "../consumer/split/chunk-43EKSJS2.mjs",
+      "../consumer/split/early.mjs"
+    ],
+    "producerInputs": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js"
+    ]
+  },
+  "../consumer/split/late.mjs": {
+    "staticOutputs": [
+      "../consumer/split/chunk-43EKSJS2.mjs",
+      "../consumer/split/late.mjs"
+    ],
+    "producerInputs": [
+      "../consumer/node_modules/@signal-tree/kernel/dist/lib/experimental-publication/entity.js"
+    ]
+  }
+}

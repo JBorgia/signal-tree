@@ -1,0 +1,8 @@
+{
+  "baseManifest": "/private/tmp/st-native-combined-c21/SNAPSHOT-C21.json",
+  "incomingManifest": "/private/tmp/st-c21-point-bounded-alternatives/SNAPSHOT-A.json",
+  "selectedRuntimeOnly": "packages/kernel/src/lib/experimental-publication/private.ts",
+  "before": "e022f8ce37bb23c659c27b342023b361ba11e4a8dcb16a783ab44f51ad3e9c28",
+  "after": "e7e036c669e7a4b4014db1d3af3fa11ead56fe0976363dcd1a63a0fe66cf4b25",
+  "excludedResearchTests": true
+}

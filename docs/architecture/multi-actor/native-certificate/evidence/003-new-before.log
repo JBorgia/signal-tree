@@ -1,0 +1,155 @@
+
+> nx run kernel:test native-certificate-successor.spec.ts
+
+> node tools/run-core-vitest.mjs native-certificate-successor.spec.ts
+
+(node:584) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:592) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-projection-certificate-successor/packages/kernel
+
+(node:600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 5 failed) 27ms
+   × composite readiness follows parent finalization without a recipient operation 4ms
+   × released readiness listener does not run at close 1ms
+   × enrollment retains parent invalidation for scalar support 10ms
+   × enrollment retains parent invalidation for membership support 3ms
+   × omission then restored retained collection selects matching payload and support 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > composite readiness follows parent finalization without a recipient operation
+AssertionError: expected a thrown error to be Error: parent
+
+- Expected
++ Received
+
+- Error {
+-   "message": "parent",
++ TypeError {
++   "message": "__vite_ssr_import_3__.combineNativeRequirements is not a function",
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:22:7
+     20|    lifecycle.onNativeRequirementReady(composite,()=>seen.push(lifecycl…
+     21|    throw sentinel;
+     22|   })).toThrow(sentinel);
+       |       ^
+     23|   expect(lifecycle.nativeRequirementReady(composite)).toBe(true);expec…
+     24|  }finally{lifecycle.disposeConnection(channel);}
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > released readiness listener does not run at close
+TypeError: onNativeRequirementReady is not a function
+ ❯ src/lib/native-certificate-successor.spec.ts:31:13
+     29|  try{lifecycle.runDeclaration(channel,{kind:'independent'},()=>{
+     30|   const p=lifecycle.prepareNativeRequirement([],false,[]);installTermi…
+     31|   lifecycle.onNativeRequirementReady(p.requirement,()=>calls++)();
+       |             ^
+     32|  });expect(calls).toBe(0);}finally{lifecycle.disposeConnection(channel…
+     33| });
+ ❯ Module.runDeclaration src/lib/experimental-publication/lifecycle.ts:280:14
+ ❯ src/lib/native-certificate-successor.spec.ts:29:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for scalar support
+AssertionError: expected [ { x: 7, y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "x": 7,
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/native-certificate-successor.spec.ts:45:88
+     43|    throw new Error('parent invalid');
+     44|   })).toThrow('parent invalid');
+     45|   child!.declare({kind:'independent'},()=>tree.$.pair.y(8));await flus…
+       |                                                                                        ^
+     46|   q.confirm();await flush();expect(sent).toEqual([membership?{y:8}:{x:…
+     47|  }finally{child?.dispose();parent.dispose();tree.destroy();foreign.des…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > enrollment retains parent invalidation for membership support
+AssertionError: expected [ { y: 8 } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "y": 8,
++   },
++ ]
+
+ ❯ src/lib/native-certificate-successor.spec.ts:45:88
+     43|    throw new Error('parent invalid');
+     44|   })).toThrow('parent invalid');
+     45|   child!.declare({kind:'independent'},()=>tree.$.pair.y(8));await flus…
+       |                                                                                        ^
+     46|   q.confirm();await flush();expect(sent).toEqual([membership?{y:8}:{x:…
+     47|  }finally{child?.dispose();parent.dispose();tree.destroy();foreign.des…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected [] to deeply equal [ { other: 1 } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "other": 1,
+-   },
+- ]
++ []
+
+ ❯ src/lib/native-certificate-successor.spec.ts:58:84
+     56|  try{
+     57|   rows.updateOne('a',{x:7});await flush();expect(sent).toEqual([]);
+     58|   c.declare({kind:'independent'},()=>tree.$({other:1}));await flush();…
+       |                                                                                    ^
+     59|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     60|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  12:30:02
+   Duration  1.31s (transform 655ms, setup 0ms, import 781ms, tests 27ms, environment 382ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-certificate-successor.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.8s

@@ -1,0 +1,87 @@
+
+> nx run kernel:test --testFile=packet-physical-pair --maxWorkers=1
+
+> node tools/run-core-vitest.mjs --testFile=packet-physical-pair --maxWorkers=1
+
+(node:30948) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30958) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c11-packet-pair-index-review/predecessor/packages/kernel
+
+(node:30965) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-physical-pair-work.spec.ts (3 tests | 3 failed) 461ms
+   × root-import clear rollback pairs physical edits without repeated scans (32 rows) 62ms
+   × root-import clear rollback pairs physical edits without repeated scans (256 rows) 93ms
+   × root-import clear rollback pairs physical edits without repeated scans (1024 rows) 306ms
+(node:30970) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30971) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/packet-physical-pair-work.spec.ts > root-import clear rollback pairs physical edits without repeated scans (32 rows)
+AssertionError: physical pairing predicate visits: expected 528 to be less than or equal to 32
+ ❯ src/lib/packet-physical-pair-work.spec.ts:71:60
+     69|       // Local algorithm discriminator, not a changed release/work bud…
+     70|       // Preserve the separate direct-import clear 2N count oracle unc…
+     71|       expect(pairing, 'physical pairing predicate visits').toBeLessTha…
+       |                                                            ^
+     72|         count
+     73|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/lib/packet-physical-pair-work.spec.ts > root-import clear rollback pairs physical edits without repeated scans (256 rows)
+AssertionError: physical pairing predicate visits: expected 32896 to be less than or equal to 256
+ ❯ src/lib/packet-physical-pair-work.spec.ts:71:60
+     69|       // Local algorithm discriminator, not a changed release/work bud…
+     70|       // Preserve the separate direct-import clear 2N count oracle unc…
+     71|       expect(pairing, 'physical pairing predicate visits').toBeLessTha…
+       |                                                            ^
+     72|         count
+     73|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/lib/packet-physical-pair-work.spec.ts > root-import clear rollback pairs physical edits without repeated scans (1024 rows)
+AssertionError: physical pairing predicate visits: expected 524800 to be less than or equal to 1024
+ ❯ src/lib/packet-physical-pair-work.spec.ts:71:60
+     69|       // Local algorithm discriminator, not a changed release/work bud…
+     70|       // Preserve the separate direct-import clear 2N count oracle unc…
+     71|       expect(pairing, 'physical pairing predicate visits').toBeLessTha…
+       |                                                            ^
+     72|         count
+     73|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 8 passed (11)
+   Start at  10:30:50
+   Duration  4.02s (transform 1.11s, setup 0ms, import 1.69s, tests 484ms, environment 1.37s)
+
+Warning: command "node tools/run-core-vitest.mjs --testFile=packet-physical-pair --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      4.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     4.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    4.7s

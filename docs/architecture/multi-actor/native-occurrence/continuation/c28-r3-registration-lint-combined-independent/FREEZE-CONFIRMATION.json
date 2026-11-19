@@ -1,0 +1,14 @@
+{
+  "manifest": "89058c7adf0bf680c3d8ef4778ff31d295ccc40d1911a31ac254484fa24a5c84",
+  "freezeSha256": "63256d45966867e18876187647ac55cdbfe3f7092e8e27de3b430f482d7ded90",
+  "recordedHashesMatch": {
+    "MANIFEST.json": true,
+    "REPORT.md": true,
+    "runtime.patch": true,
+    "existing-fixture-comments.patch": true,
+    "permanent-tests.patch": true,
+    "EVIDENCE-SNAPSHOT.json": true,
+    "FINAL-IDENTITY.json": true
+  },
+  "runtimeRerun": false
+}

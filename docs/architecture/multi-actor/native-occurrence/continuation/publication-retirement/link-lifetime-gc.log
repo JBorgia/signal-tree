@@ -1,0 +1,9 @@
+
+ RUN  v4.1.9 /private/tmp/st-publication-retirement-successor/candidate/packages/kernel
+
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  17:04:19
+   Duration  3.38s (transform 1.11s, setup 0ms, import 1.37s, tests 1.25s, environment 532ms)
+

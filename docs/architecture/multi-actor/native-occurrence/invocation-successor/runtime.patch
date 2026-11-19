@@ -1,0 +1,220 @@
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,4 +1,4 @@
+-import {fieldEndpoints,bindFieldEndpoints} from '../../lib/internals/native-field-selection';
++import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+ import {
+   completeOrderCapture,
+   type OrderBoundaryEvidence,
+@@ -1989,7 +1989,6 @@
+     }
+     if (existing) {
+       if (existing.kind === 'set' && effect.kind === 'set') {
+-        const oldEndpoints=fieldEndpoints(existing),newEndpoints=fieldEndpoints(effect);
+         const replaceBaseline=!existing.plainBranchMembership&&effect.plainBranchMembership?.before===false;
+         if (identity) identify(existing, identity);
+         if (!composePlainBranchMemberEffect(existing, effect)) {
+@@ -2004,7 +2003,7 @@
+               after: afterPresent,
+             };
+         }
+-        if(newEndpoints)bindFieldEndpoints(existing,{before:replaceBaseline?newEndpoints.before:oldEndpoints?.before??newEndpoints.before,after:newEndpoints.after});
++        composeFieldEndpoints(existing,effect,replaceBaseline);
+         existing.mutationIntent = combineScalarMutationIntent(
+           existing.mutationIntent,
+           effect.mutationIntent
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import {claimFieldEndpointInvocation,type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+ import type { EntityProjectionSeedEntry } from './internals/entity-projection-seed';
+ import { EntityPublicationSource, markEntityPublicationFacts, entityPublicationFactsUnit, defineEntityPublicationBinding, currentEntityPublicationInputs, withEntityPublicationInput, withEntityPublicationUnit, type EntityPublicationEdit, type EntityPublicationStep } from './internals/entity-publication';
+ import { createPreparedPlacementVisibility } from './physical/prepared-placement-visibility';
+@@ -1181,6 +1182,7 @@
+         : structuralStore.subjectIdForKey(tailKey);
+     const changeIndexByMutation = new Map<unknown, number>();
+     const physicalValuesByStep=new Map<number,EntityValueTransition<E>>();
++    const restoredByStep = new Map<number,ReadonlyMap<string,NativeFieldEndpoint>>();
+     const authoredByStep = new Map<number, import('./internals/entity-publication').EntityAuthoredFootprint>();
+     for (const m of frame.mutations) {
+       changeIndexByMutation.set(m, changes.length);
+@@ -1190,6 +1192,7 @@
+       const path = `${basePath}.${String(key)}`;
+       if (m.kind === 'replace-value') {
+         authoredByStep.set(changes.length, authoredFootprint(m.authoredFields));
++        if(m.restoredFields)restoredByStep.set(changes.length,m.restoredFields);
+         const transition = valueTransitions.get(m)!;
+         physicalValuesByStep.set(changes.length,transition);
+         changes.push({
+@@ -1332,7 +1335,7 @@
+         authoredFootprint: authoredByStep.get(ordinal),
+         authoredRemoval: options?.publication !== 'physical' && change.structuralRecord?.kind === 'remove'
+           ? {...change, fields:null, structural:change.structuralRecord} : undefined,
+-        ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => ({...effect,fields:effect.structural?null:publicationFields(effect.before,effect.after),structural:effect.structuralRecord})),
++        ordinary: (ordinaryPlan.byStep[ordinal] ?? []).map(effect => ({...effect,restoredFields:restoredByStep.get(ordinal),fields:effect.structural?null:publicationFields(effect.before,effect.after),structural:effect.structuralRecord})),
+       })),
+       entityPublication.requestsSeed()?(()=>{
+         const fresh=new Map(frame.mutations.flatMap(mutation=>mutation.kind==='create-fresh-subject'?[[mutation.subjectId,mutation.nextValue] as const]:[]));
+@@ -2031,6 +2034,12 @@
+    * instruction array, a `Set` and an id array per mutation regardless of size.
+    * For a one-field update that machinery is the mutation.
+    */
++  function selectedInverseField(claim:ClaimedFieldEndpoint|undefined,subject:number,value:E):ReadonlyMap<string,NativeFieldEndpoint>|undefined {
++    if(!claim)return undefined;
++    if(claim.source!==entityPublication||claim.subject!==subject||Object.prototype.hasOwnProperty.call(value,claim.field)!==claim.endpoint.present||claim.endpoint.present&&!deepEqual(value[claim.field],claim.endpoint.value))
++      throw new Error('Inverse endpoint changed during setter preparation');
++    return new Map([[claim.field,claim.endpoint]]);
++  }
+   function authoredFootprint(scope: readonly string[] | null | 'derive' | 'realization'): import('./internals/entity-publication').EntityAuthoredFootprint {
+     if (scope === null) return Object.freeze({kind:'whole'});
+     if (scope === 'derive') return Object.freeze({kind:'derive'});
+@@ -2051,7 +2060,8 @@
+   function commitExistingSubjectValue(
+     subjectId: number,
+     nextValue: E,
+-    fields: readonly string[] | null
++    fields: readonly string[] | null,
++    restoredFields?:ReadonlyMap<string,NativeFieldEndpoint>
+   ): EntityValueTransition<E> {
+     const revision = physicalCommitClock?.revision();
+     const transition = valueStore.prepareValueTransition(
+@@ -2082,8 +2092,8 @@
+     });
+     const publication = prepareEntityPublication(
+       [{subject:subjectId,before:transition.physicalBefore,after:transition.physicalAfter,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields)}],
+-      ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord})),
+-      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}],undefined,{owner:getPositionIds()?.[0] as number,ownerPath:basePath,changes:ordinaryPlan.changes,topologyUnit,meta:ambientMeta()}
++      ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord})),
++      undefined,undefined,false,[{ordinal:0,authoredFootprint:authoredFootprint(fields),ordinary:ordinaryPlan.changes.map(change=>({...change,restoredFields,fields:publicationFields(transition.physicalBefore,transition.physicalAfter,fields),structural:change.structuralRecord}))}],undefined,{owner:getPositionIds()?.[0] as number,ownerPath:basePath,changes:ordinaryPlan.changes,topologyUnit,meta:ambientMeta()}
+     );
+     const capture = committedEntityObserver(
+       undefined,
+@@ -3695,6 +3705,7 @@
+     // ==================
+ 
+     updateOne(id: K, changes: Partial<E>): void {
++      const inverseClaim=claimFieldEndpointInvocation(entityPublication,structuralStore.subjectIdForKey(id),Object.keys(changes));
+       const callableIntent = consumeCallableWriteIntent();
+       const entity = presentEntity(id);
+       if (!entity) {
+@@ -3731,7 +3742,8 @@
+       const transition = commitExistingSubjectValue(
+         subjectIdForWrite,
+         finalUpdated,
+-        Object.keys(transformedChanges)
++        Object.keys(transformedChanges),
++        selectedInverseField(inverseClaim,subjectIdForWrite,finalUpdated)
+       );
+       syncEntitySignal(id);
+       updateSignals();
+@@ -3769,6 +3781,7 @@
+      * wrong-slot write built into it. This one cannot drift.
+      */
+     replaceOne(id: K, entity: E): void {
++      const inverseClaim=claimFieldEndpointInvocation(entityPublication,structuralStore.subjectIdForKey(id));
+       const callableIntent = consumeCallableWriteIntent();
+       const prev = presentEntity(id);
+       if (!prev) {
+@@ -3808,6 +3821,7 @@
+         subjectId,
+         nextValue: next,
+         authoredFields: mutationIntent === 'derive' ? 'derive' : null,
++        restoredFields:selectedInverseField(inverseClaim,subjectId,next),
+       };
+       const frame = createEntityMutationFrame();
+       frame.stageValueReplacement(replacement);
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,4 +1,5 @@
+-import {fieldEndpoints} from '../native-field-selection';
++import {fieldEndpoints,withFieldEndpointInvocation} from '../native-field-selection';
++import {getEntityPublicationBinding} from '../entity-publication';
+ import { withEntityPointPublicationPreparation } from '../entity-publication';
+ import { withSelectedEntityDisposition } from '../selected-entity-disposition';
+ import {
+@@ -1791,6 +1792,15 @@
+     );
+   }
+ 
++  const invoke = (target:object,body:()=>void):void => {
++    const endpoint=fieldEndpoints(effect)?.after;
++    if(!endpoint){body();return;}
++    const binding=getEntityPublicationBinding(target),path=effect.subjectFieldSegments;
++    if(!binding||binding.subject!==effect.subjectId||path?.length!==1||binding.field!==undefined&&binding.field!==path[0])
++      throw new Error('Inverse endpoint does not match resolved source field');
++    withFieldEndpointInvocation(binding,path[0],endpoint,body);
++  };
++
+   withWriteContext(
+     {
+       ...(getActiveWriteContext() ?? {}),
+@@ -1815,7 +1825,8 @@
+         );
+         if (isWritableEntityNode(row)) {
+           const read = row as unknown as () => unknown;
+-          row(withoutFieldAtSegments(read(), effect.subjectFieldSegments));
++          const value=withoutFieldAtSegments(read(), effect.subjectFieldSegments);
++          invoke(row,()=>row(value));
+           return;
+         }
+       }
+@@ -1828,12 +1839,12 @@
+           structuralOwnerPaths
+         );
+         if (isWritableLeaf(target)) {
+-          target.set(effect.after);
++          invoke(target,()=>target.set(effect.after));
+           return;
+         }
+ 
+         if (isWritableEntityNode(target)) {
+-          target(effect.after);
++          invoke(target,()=>target(effect.after));
+           return;
+         }
+ 
+--- a/packages/kernel/src/lib/internals/native-field-selection.ts
++++ b/packages/kernel/src/lib/internals/native-field-selection.ts
+@@ -1,3 +1,5 @@
++import {getActiveWriteContext,withWriteContext} from '../write-context';
++import type {WriteMetadata} from '../mutation-types';
+ /** Private, source-issued ordinary field endpoint; ownership is bound by native admission. */
+ export interface NativeFieldEndpoint {
+   readonly present:boolean;
+@@ -19,3 +21,26 @@
+   else delete (effect as Paired)[ENDPOINTS];
+   return effect;
+ }
++
++/** Match native baseline choice; missing either side clears the complete pair. */
++export function composeFieldEndpoints(existing:object,incoming:object,replaceBaseline:boolean):void {
++  const first=fieldEndpoints(existing),last=fieldEndpoints(incoming);
++  const before=replaceBaseline?last?.before:first?.before;
++  bindFieldEndpoints(existing,before&&last?{before,after:last.after}:undefined);
++}
++
++export interface ClaimedFieldEndpoint {readonly source:object;readonly subject:number;readonly field:string;readonly endpoint:NativeFieldEndpoint}
++const INVOCATION=Symbol('native-inverse-invocation');
++type Invocation={claim?:ClaimedFieldEndpoint;claimed:boolean;closed:boolean};
++type InvocationMetadata=WriteMetadata&{[INVOCATION]?:Invocation};
++export function withFieldEndpointInvocation<T>(binding:{source:object;subject?:number},field:string,endpoint:NativeFieldEndpoint,body:()=>T):T {
++  if(binding.subject===undefined)throw new Error('Inverse endpoint has no subject lifetime');
++  const token:Invocation={claim:Object.freeze({source:binding.source,subject:binding.subject,field,endpoint}),claimed:false,closed:false};
++  const meta:InvocationMetadata={...getActiveWriteContext(),[INVOCATION]:token};
++  try{return withWriteContext(meta,body);}finally{token.closed=true;token.claim=undefined;}
++}
++export function claimFieldEndpointInvocation(source:object,subject:number|undefined,fields:readonly string[]|null=null):ClaimedFieldEndpoint|undefined {
++  const token=(getActiveWriteContext() as InvocationMetadata|undefined)?.[INVOCATION];
++  if(!token||token.closed||token.claimed||token.claim?.source!==source||token.claim.subject!==subject||fields!==null&&!fields.includes(token.claim.field))return undefined;
++  token.claimed=true;return token.claim;
++}
+--- a/packages/kernel/src/lib/physical/entity-mutation-frame.ts
++++ b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+@@ -14,6 +14,7 @@
+   E extends Record<string, unknown>
+ > = {
+   kind: 'replace-value';
++  readonly restoredFields?:ReadonlyMap<string,import('../internals/native-field-selection').NativeFieldEndpoint>;
+   key: K;
+   subjectId: number;
+   nextValue: E;

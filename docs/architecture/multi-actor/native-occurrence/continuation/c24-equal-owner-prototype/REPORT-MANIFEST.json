@@ -1,0 +1,9 @@
+{
+  "REPORT.md": "6a15c4bde1b51ba22b2716d20d93df4d02cfdf873e1bd97cae2874cab39b6368",
+  "FREEZE.json": "e300477a22517723faeb0ebd3f2c16ebee8d41a73f5c6c3c24f78287f5e883f7",
+  "SNAPSHOT-FROZEN.json": "cb54add521dafd9ec875b87d6c19f85de38e4b56d0c79c147a7c3c3e41306bcd",
+  "runtime-frozen.patch": "3cd1e93852c8550bc6a5cbdba45e28e5aa4aaee6a75233cfd3b01fa244ec03ef",
+  "controls-frozen.patch": "8ec5106b9b5b0e7f8d859746453353814bd5886d41c67264f5fa434564aa70b8",
+  "research-frozen.patch": "fd094780fb6319ed6370efd9c03f02891135fd22f14166891302bb5907d7beb1",
+  "RETENTION-OBSERVATIONS.jsonl": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d"
+}

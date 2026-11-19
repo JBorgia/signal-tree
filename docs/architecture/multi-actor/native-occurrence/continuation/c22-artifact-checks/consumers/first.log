@@ -1,0 +1,62 @@
+📦 Packing SignalTree packages and type-checking a real consumer
+
+node:internal/errors:985
+  const err = new Error(message);
+              ^
+
+Error: Command failed: npm pack --pack-destination /var/folders/rq/j_cb8q_538sbvjlg2bzwyts40000gn/T/st-consumer-tsc-Tr6g7X
+npm error code EPERM
+npm error syscall open
+npm error path /Users/jonathanborgia/.npm/_cacache/tmp/***
+npm error errno -1
+npm error
+npm error Your cache folder contains root-owned files, due to a bug in previous versions of npm which has since been addressed.
+npm error
+npm error To permanently fix this problem, please run:
+npm error   sudo chown -R 501:20 "/Users/jonathanborgia/.npm"
+npm error Log files were not written due to an error writing to the directory: /Users/jonathanborgia/.npm/_logs
+npm error You can rerun the command with `--loglevel=verbose` to see the logs in your terminal
+
+    at genericNodeError (node:internal/errors:985:15)
+    at wrappedFn (node:internal/errors:539:14)
+    at checkExecSyncError (node:child_process:925:11)
+    at execFileSync (node:child_process:961:15)
+    at file:///private/tmp/st-parent-freshness-implementation-independent/c22-full-build-diagnostic/candidate/tools/verify-consumer-typecheck.mjs:80:5
+    at ModuleJob.run (node:internal/modules/esm/module_job:437:25)
+    at async node:internal/modules/esm/loader:639:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  status: 255,
+  signal: null,
+  output: [
+    null,
+    Buffer(0) [Uint8Array] [],
+    Buffer(594) [Uint8Array] [
+      110, 112, 109,  32, 101, 114, 114, 111, 114,  32,  99, 111,
+      100, 101,  32,  69,  80,  69,  82,  77,  10, 110, 112, 109,
+       32, 101, 114, 114, 111, 114,  32, 115, 121, 115,  99,  97,
+      108, 108,  32, 111, 112, 101, 110,  10, 110, 112, 109,  32,
+      101, 114, 114, 111, 114,  32, 112,  97, 116, 104,  32,  47,
+       85, 115, 101, 114, 115,  47, 106, 111, 110,  97, 116, 104,
+       97, 110,  98, 111, 114, 103, 105,  97,  47,  46, 110, 112,
+      109,  47,  95,  99,  97,  99,  97,  99, 104, 101,  47, 116,
+      109, 112,  47,  42,
+      ... 494 more items
+    ]
+  ],
+  pid: 16365,
+  stdout: Buffer(0) [Uint8Array] [],
+  stderr: Buffer(594) [Uint8Array] [
+    110, 112, 109,  32, 101, 114, 114, 111, 114,  32,  99, 111,
+    100, 101,  32,  69,  80,  69,  82,  77,  10, 110, 112, 109,
+     32, 101, 114, 114, 111, 114,  32, 115, 121, 115,  99,  97,
+    108, 108,  32, 111, 112, 101, 110,  10, 110, 112, 109,  32,
+    101, 114, 114, 111, 114,  32, 112,  97, 116, 104,  32,  47,
+     85, 115, 101, 114, 115,  47, 106, 111, 110,  97, 116, 104,
+     97, 110,  98, 111, 114, 103, 105,  97,  47,  46, 110, 112,
+    109,  47,  95,  99,  97,  99,  97,  99, 104, 101,  47, 116,
+    109, 112,  47,  42,
+    ... 494 more items
+  ]
+}
+
+Node.js v24.15.0

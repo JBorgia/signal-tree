@@ -1,0 +1,17 @@
+{
+  "inputs": [
+    "/private/tmp/st-native-combined-c19/SNAPSHOT-C19.json",
+    "/private/tmp/st-native-combined-c20/SNAPSHOT-C20.json",
+    "/private/tmp/st-c19-clear-guard-successor/SNAPSHOT-TESTS.json"
+  ],
+  "changes": [
+    {
+      "path": "packages/kernel/src/lib/entity-large-batches-v16-controls.spec.ts",
+      "base": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56",
+      "left": "3164534cc73d4bdb08aa348949218c5efef1c1be14a65431d15bd3f0d6aa1b56",
+      "right": "208f460fa23b0e2349bdcccaf453a6ef50992c09b3b48364c3624aab123ce06a",
+      "method": "incoming"
+    }
+  ],
+  "conflicts": []
+}

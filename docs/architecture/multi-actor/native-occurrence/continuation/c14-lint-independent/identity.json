@@ -1,0 +1,32 @@
+{
+  "manifest": "4b48ad0640fa4b480c072f0f8c05a72898422a5c3067d90e7a9bc40ccb701e30",
+  "patch": "b3c188fd18a5451a68345cf3bae558994ebf2aafb2ffb9ff0563f05787734169",
+  "baseManifest": "3f6ebe5bab4f82766422810aca4d710eb9f720ee16216dfa8e20c1a4bb03bae8",
+  "verifiedFilesEach": 3059,
+  "changed": {
+    "packages/kernel/src/lib/experimental-publication/lifecycle.ts": {
+      "base": "1d78b2bd0bf2baa50ec83ce44259aa62ce779b02f0730e2e74832a029c61a966",
+      "candidate": "7c024f1fc84721e5d42d0f20ac4860fd8426b5d5cab6bd831abc33ef7d591114"
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "base": "0a0a1a53cb1dd07b2583d50acac4adc930b2cea347cca4ba6b876f0dbbd7b608",
+      "candidate": "0c5d3281d3f3538a69248e3e648d3d4f5096828aaaafe079e14c4cd7ff7efb22"
+    },
+    "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts": {
+      "base": "6cb6c437149e80be2adb037fa683326df650c89c3ed4fa762d3b804cc15f908a",
+      "candidate": "e32cd6e32c5305f275ead8151bc295d85ff8c966184b98af6141c2371a34e9b4"
+    },
+    "packages/kernel/src/lib/scalar-native-support.spec.ts": {
+      "base": "c273bda02a0c7c7c0600dcb33d2dd19cd3f785da8679dddc2b18f7ea64b6b9c6",
+      "candidate": "74acda5f67e00ec0ad070b5ef1562b5f2e18bcc5eb18accb0d4124e99d52bfb1"
+    }
+  },
+  "evidence": {
+    "/private/tmp/st-c14-lint-cleanup/runs/cleaned-lint/first.log": "b6c170ee83f2e5d28d5562f992f61eff27d4bd8d47f8d609beb6de9592ec9fda",
+    "/private/tmp/st-c14-lint-cleanup/runs/source-types/first.log": "6cfaf851c76a05069dac1948701078aab5cb6e5d99dc177039eaba67c3132ca4",
+    "/private/tmp/st-c14-lint-cleanup/runs/spec-types/first.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb",
+    "/private/tmp/st-c14-lint-cleanup/runs/scalar-composition/first.log": "bf6da7b056ac7557db8bce496c45162dc933a74733c31e910428feee639750ff",
+    "/private/tmp/st-c14-lint-cleanup/FREEZE.json": "e5ee22298e1c7a24a34895ced5f8cc6024f874f49bf1ac770d667cb239bcf571",
+    "/private/tmp/st-c14-lint-cleanup/FROM-C14.patch": "b3c188fd18a5451a68345cf3bae558994ebf2aafb2ffb9ff0563f05787734169"
+  }
+}

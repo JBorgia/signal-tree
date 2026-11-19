@@ -1,0 +1,10 @@
+{
+  "candidate": "/private/tmp/st-v16-integration-evidence/dispatch-mutant",
+  "manifest": "d6b202163bb1456a1c44b31b5b03bfa1fd12953347e30d5fb072d48b2214aa30",
+  "delta": [
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts"
+  ],
+  "expectedFailure": "cold file alone: new nodeFacadeMaterialized or fieldFacadesMaterialized assertion, not comparison sentinel",
+  "compactMapDigest": "952aa5970af29798ed8f3794a76394992e8891655b6cbe8c3f0bd42a36b9e13e",
+  "manifestAlgorithm": "sha256 of exact MANIFEST.json bytes (matches parent identity convention)"
+}

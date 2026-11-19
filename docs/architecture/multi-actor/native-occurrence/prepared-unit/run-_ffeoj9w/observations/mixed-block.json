@@ -1,0 +1,18 @@
+{
+  "calls": 1,
+  "after": {
+    "plain": 3,
+    "x": 7,
+    "y": 0,
+    "z": 4
+  },
+  "sameSupport": true,
+  "error": "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Cannot update entity: mixed selected refusal [effect-validation-failed]",
+  "retryError": "undefined",
+  "final": {
+    "plain": 0,
+    "x": 0,
+    "y": 0,
+    "z": 4
+  }
+}

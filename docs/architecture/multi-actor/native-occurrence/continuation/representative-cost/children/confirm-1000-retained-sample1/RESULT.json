@@ -1,0 +1,21 @@
+{
+  "id": "confirm-1000-retained-sample1",
+  "ordinal": 42,
+  "profile": "confirm",
+  "size": 1000,
+  "arm": "retained",
+  "label": "sample1",
+  "exit": 0,
+  "pid": 70401,
+  "classification": "checked-sample-pass",
+  "valid": true,
+  "reason": null,
+  "validationError": null,
+  "remainingOwned": [],
+  "inputMismatches": [],
+  "childInvocationElapsedSeconds": 0.6993146250024438,
+  "telemetrySamples": 1,
+  "maxObservedOwnedRssBytes": 1097728,
+  "minimumObservedHostFreePercentage": 43.0,
+  "attempts": 1
+}

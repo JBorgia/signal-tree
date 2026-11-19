@@ -1,0 +1,16 @@
+{
+  "exit": -15,
+  "watchdog": {
+    "reason": "no-progress-180s",
+    "lastProgress": {
+      "kind": "case-start",
+      "at": "2026-11-02T20:31:06.175Z",
+      "file": "/private/tmp/st-native-combined-c21/candidate/packages/kernel/src/lib/entity-large-batches.spec.ts",
+      "name": "entity batches larger than the argument limit > setAll, replace and clear with membership observed"
+    },
+    "ownedPgid": 60688
+  },
+  "ownedGroupStillPresent": true,
+  "sourceUnchanged": true,
+  "changed": []
+}

@@ -1,0 +1,14 @@
+{
+  "cwd": "/private/tmp/st-collection-egress-successor/candidate",
+  "command": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "collection-natural-egress.spec.ts",
+    "--maxWorkers=1"
+  ],
+  "exit": 1
+}

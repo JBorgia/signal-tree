@@ -1,0 +1,3 @@
+PASS: 5 TypeScript files and embedded adopter example parse; Angular template parses.
+PASS: page imports only Angular core and public Angular facade; route remains dynamic with no static page/SDK import.
+No component execution, tests, typecheck, lint, AOT, style compilation, production build or browser rendering performed.

@@ -1,0 +1,26 @@
+{
+  "results": [
+    {
+      "name": "lost rejection receipt retains grant, then revokes before local-only overlap recovery",
+      "outcome": "PASS"
+    },
+    {
+      "name": "unsent reject retains overlap recovery without minting grant or delivering",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same-turn duplicate apply mints one usable grant and commits once",
+      "outcome": "PASS"
+    },
+    {
+      "name": "concurrent capacity ABA rejects bound observation and releases grant",
+      "outcome": "PASS"
+    },
+    {
+      "name": "accepted proposal does not erase later local work or allow its disposal",
+      "outcome": "PASS"
+    }
+  ],
+  "pageErrors": [],
+  "consoleErrors": []
+}

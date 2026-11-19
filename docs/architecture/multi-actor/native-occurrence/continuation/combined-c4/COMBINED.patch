@@ -1,0 +1,302 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -200,14 +200,32 @@
+       if (snapshots[6]) requirements.add(snapshots[6]);
+       if (snapshots[7]) requirements.add(snapshots[7].requirement);
+       const ready = [...requirements].every(lifecycle.nativeRequirementReady);
+-      const neutral = ready && [...requirements].every(requirement => {
++      const waiting = new Set<lifecycle.OwnerCell>();
++      const releasable = (requirement: Requirement): boolean => {
++        // A composite is eligible only when every constituent independently is.
++        if (requirement.components) return requirement.components.every(releasable);
+         const proof = lifecycle.nativeProof(requirement);
+-        return !proof.unknown && !proof.invalid && !proof.unavailableInput && !proof.terminalRejectedRoles &&
+-          proof.owners.length === 0 && (proof.destination?.length ?? 0) === 0 &&
+-          (proof.input?.length ?? 0) === 0 && (proof.validation?.length ?? 0) === 0 &&
+-          (proof.possible?.length ?? 0) === 0;
+-      });
+-      return { ready, neutral,
++        if (proof.invalid || proof.unavailableInput || proof.terminalRejectedRoles ||
++            proof.owners.length || (proof.destination?.length ?? 0) ||
++            (proof.input?.length ?? 0) || (proof.validation?.length ?? 0)) return false;
++        if (!proof.unknown && !(proof.possible?.length ?? 0)) return true;
++        // Do not erase arbitrary unknown input/origin/validation. Only the
++        // source's own window, classified before those facts could be cleared.
++        if (!requirement.retirementOwnWindowOnly || !proof.historicalWindow) return false;
++        for (const cell of proof.possible ?? []) {
++          if (cell.outcome === 'confirmed' || cell.outcome === 'rolled-back') continue;
++          if (!lifecycle.ownerCellCanTransition(cell)) return false;
++          waiting.add(cell);
++        }
++        return true;
++      };
++      const canRelease = ready && [...requirements].every(releasable);
++      const canRetire = canRelease && waiting.size === 0;
++      return { ready, canRetire,
++        onSettlement: canRelease && waiting.size ? (callback: () => void) => {
++          const releases = [...waiting].map(cell => lifecycle.onOwnerCellTransition(cell, callback));
++          return () => { for (const release of releases) release(); };
++        } : undefined,
+         current: () => snapshots[0] === fields.get(subject) && snapshots[1] === members.get(subject) &&
+           snapshots[2] === placements.get(subject) && snapshots[3] === views.get(subject) &&
+           snapshots[4] === visible.get(subject) && snapshots[5] === placementViews.get(subject) &&
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -14,6 +14,42 @@
+ export function pendingOwners():readonly OwnerCell[]{return [...pending];}
+ function wake(channel:object):void{queuedConnections.add(channel);if(wakeQueued)return;wakeQueued=true;queueMicrotask(()=>{wakeQueued=false;const queued=[...queuedConnections];queuedConnections.clear();for(const key of queued){const c=connections.get(key);if(c){for(const op of c.ops.values())refresh(op);c.wake();}}});}
+ function ownerWake(cell:OwnerCell):void{for(const op of cell.dependents)wake(op.channel);}
++// Exact-cell source retirement observers. They are neither recipient operations
++// nor readiness observers, and never execute on the transition stack.
++type OwnerTransitionObserver = { callback?: () => void; queued: boolean };
++const ownerTransitionObservers = new WeakMap<OwnerCell, Set<OwnerTransitionObserver>>();
++function queueOwnerObserver(observer: OwnerTransitionObserver): void {
++ if (observer.queued || !observer.callback) return;
++ observer.queued = true;
++ queueMicrotask(() => { observer.queued = false; observer.callback?.(); });
++}
++function notifyOwnerTransition(cell: OwnerCell): void {
++ for (const observer of ownerTransitionObservers.get(cell) ?? []) queueOwnerObserver(observer);
++}
++/** False for unavailable sources; disappearance never settles the captured cell. */
++export function ownerCellCanTransition(cell: OwnerCell): boolean {
++ return cell.outcome === 'pending' && sources.get(cell.owner)?.cells.get(cell.id) === cell;
++}
++export function onOwnerCellTransition(cell: OwnerCell, callback: () => void): () => void {
++ let observers = ownerTransitionObservers.get(cell);
++ if (!observers) ownerTransitionObservers.set(cell, observers = new Set());
++ const observer: OwnerTransitionObserver = { callback, queued: false };
++ observers.add(observer);
++ // Covers a terminal/disappearance race between assessment and subscription.
++ if (!ownerCellCanTransition(cell)) queueOwnerObserver(observer);
++ let active = true;
++ return () => {
++  if (!active) return;
++  active = false;
++  observer.callback = undefined;
++  observers!.delete(observer);
++  // This handle owns only its original observer set. A later registration may
++  // have replaced the cell's index after this set became empty.
++  if (!observers!.size && ownerTransitionObservers.get(cell) === observers)
++   ownerTransitionObservers.delete(cell);
++ };
++}
++
+ export function ownerTransition(owner:number,event:{kind:string;transactionId:number}):void{
+  const source=sources.get(owner);if(!source)return;
+  let cell=source.cells.get(event.transactionId);
+@@ -25,12 +61,12 @@
+  cell.outcome=outcome;pending.delete(cell);
+  // Synchronous normal/recovery handle enrollment can still obtain this cell.
+  const retired=cell;queueMicrotask(()=>{if(source.cells.get(retired.id)===retired&&retired.outcome!=='pending')source.cells.delete(retired.id);});
+- ownerWake(cell);
++ ownerWake(cell);notifyOwnerTransition(cell);
+ }
+ export function abandonOwnerSource(owner:number):void{
+  const source=sources.get(owner);if(!source)return;
+  // Unregister storage only. Native lifecycle alone determines terminal outcome.
+- for(const cell of source.cells.values()){pending.delete(cell);ownerWake(cell);}
++ for(const cell of source.cells.values()){pending.delete(cell);ownerWake(cell);notifyOwnerTransition(cell);}
+  source.cells.clear();sources.delete(owner);
+ }
+ export function enroll<T extends object>(handle:T,owner:number|undefined,id:number):T{
+@@ -73,7 +109,10 @@
+ }
+ /** Source-owned facts. Until horizon close only actual executing frames are held. */
+ export type NativeInput={readonly requirement:NativeRequirement;readonly owners:readonly OwnerCell[];readonly terminalRejectedRoles?:number};
+-export type NativeRequirement={readonly components?:readonly NativeRequirement[];proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
++export type NativeRequirement={
++/** Preparation provenance, never inferred from a compacted unknown bit. */
++readonly retirementOwnWindowOnly?: boolean;
++readonly components?:readonly NativeRequirement[];proof?:Proof;inputs:readonly NativeInput[];frames:readonly Frame[];known:readonly OwnerCell[];unknown:boolean;possible:readonly OwnerCell[];captureWindow:boolean};
+ // Readiness is independent of proof presence: composite proofs are live views.
+ const unfinishedRequirements=new WeakSet<NativeRequirement>();
+ const requirementListeners=new WeakMap<NativeRequirement,Set<()=>void>>();
+@@ -141,7 +180,7 @@
+  // Input completeness, not destination ownership, decides whether W applies.
+  const captureWindow=active.length===0||active.some(f=>f.declaredOwners===undefined)
+   ||inputs.some(input=>nativeProof(input.requirement).unavailableInput===true);
+- const requirement:NativeRequirement={known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
++ const requirement:NativeRequirement={retirementOwnWindowOnly:!unknown&&known.length===0&&inputs.length===0&&active.length===0,known:Object.freeze([...known]),unknown,inputs:Object.freeze([...inputs]),frames:active,possible:[],captureWindow};
+  unfinishedRequirements.add(requirement);
+  const evidence=nativeProof(requirement);
+  const adds:TerminalRecordPlan['adds'][number][]=[];
+--- /dev/null
++++ b/packages/kernel/src/lib/fixed-window-independent.spec.ts
+@@ -0,0 +1,50 @@
++import {expect,it} from 'vitest';
++import {entityMap,link,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getPositionRegistry} from './internals/position-registry';
++import {getPathNotifier} from './path-notifier';
++import * as life from './experimental-publication/lifecycle';
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++const owner=()=>signalTree({x:0},{enhancers:[transactions()]});
++const setup=async()=>{const tree=signalTree({rows:entityMap<{id:string;n:number},string>()});tree.$.rows.addOne({id:'a',n:1});await flush();const row=tree.$.rows.byIdOrFail('a'),b=getEntityPublicationBinding(row)!;return {tree,row,s:b.source,id:b.subject!};};
++type Receipt={read():Readonly<{state:string;reason?:string;basis?:string}>};
++type Declared=ReturnType<typeof link>&{declare(input:{kind:'independent'},body:()=>unknown):Receipt};
++const consume=(tree:ReturnType<typeof signalTree<{rows:ReturnType<typeof entityMap<{id:string;n:number},string>>}>>,target:ReturnType<typeof owner>)=>tree.updateAndReport(input=>{const rows=(input as unknown as {rows:{all:unknown[]}}).rows.all;expect(rows).toEqual([]);target.$.x(rows.length+1);return {};});
++// Runtime-backed cancellation falsifier: no synthetic owner cells.
++it('repeated cancellation of an old exact-cell observer cannot detach a newer observer',async()=>{
++ const o=owner(),q=o.transact(()=>o.$.x(7));let calls=0;
++ // Find exact cell without assuming the public handle exposes its native id.
++ const actual=life.pendingOwners().find(c=>c.owner===getPositionRegistry(o.$)!.id)!;
++ const old=life.onOwnerCellTransition(actual,()=>{});old();const next=life.onOwnerCellTransition(actual,()=>{calls++;});
++ try{old();q.confirm();expect(calls).toBe(0);await flush();expect(calls).toBe(1);}finally{next();o.destroy();}
++});
++for(const first of ['confirm','rollback'] as const)it(`late enrollment retains two captured owners and excludes later window: ${first}`,async()=>{
++ const {tree,s,id}=await setup(),a=owner(),b=owner(),later=owner(),target=owner();const p=a.transact(()=>a.$.x(7)),q=b.transact(()=>b.$.x(9));let c:Declared|undefined;
++ try{tree.$.rows.removeOne('a');await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement;expect(fact.retirementOwnWindowOnly).toBe(true);expect(life.nativeProof(fact).possible).toHaveLength(2);const r=later.transact(()=>later.$.x(11)),rBefore=r.inspect();const sent:number[]=[];c=link(target.$.x,{set:v=>{sent.push(v);}}) as Declared;const receipt=c.declare({kind:'independent'},()=>consume(tree,target));await flush();expect(sent).toEqual([]);p[first]();await flush();expect(sent).toEqual([]);expect(s.inspect().negativePresence).toBe(1);q.confirm();await flush();expect(sent).toEqual([1]);expect(s.inspect().negativePresence).toBe(0);expect(r.inspect()).toEqual(rBefore);const saved=receipt.read();expect(saved).toMatchObject({state:'started',basis:'surviving'});tree.destroy();await flush();expect(receipt.read()).toBe(saved);expect(life.nativeProof(fact).unknown).toBe(true);expect(life.nativeProof(fact).possible).toHaveLength(2);r.confirm();}finally{c?.dispose();tree.destroy();a.destroy();b.destroy();later.destroy();target.destroy();}
++});
++it('disappeared pending owner retains negative evidence for a newly enrolled reader',async()=>{
++ const {tree,s,id}=await setup(),o=owner(),target=owner();o.transact(()=>o.$.x(7));let c:Declared|undefined;
++ try{tree.$.rows.removeOne('a');await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement;const cell=life.nativeProof(fact).possible![0];o.destroy();await flush();expect(cell.outcome).toBe('pending');expect(life.ownerCellCanTransition(cell)).toBe(false);expect(s.inspect().retirementRequests).toBe(0);const sent:number[]=[];c=link(target.$.x,{set:v=>{sent.push(v);}}) as Declared;const receipt=c.declare({kind:'independent'},()=>consume(tree,target));await flush();expect(sent).toEqual([]);expect(receipt.read()).toMatchObject({state:'conservative',reason:'unknown'});expect(s.evidence()!.member(id,'ordinary')).toBe(fact);expect(s.inspect().negativePresence).toBe(1);tree.destroy();await flush();expect(s.inspect().retireCalls).toBe(0);expect(life.nativeProof(fact).possible![0]).toBe(cell);}finally{c?.dispose();tree.destroy();o.destroy();target.destroy();}
++});
++it('native abandoned outcome is not treated as confirmed or rejected-window discharge',async()=>{
++ const {tree,s,id}=await setup(),o=owner();o.transact(()=>o.$.x(7));
++ try{tree.$.rows.removeOne('a');await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement;const cell=life.nativeProof(fact).possible![0];life.ownerTransition(cell.owner,{kind:'abandoned',transactionId:cell.id});await flush();expect(cell.outcome).toBe('abandoned');expect(s.evidence()!.member(id,'ordinary')).toBe(fact);expect(s.inspect().negativePresence).toBe(1);expect(s.inspect().retirementRequests).toBe(0);expect(s.inspect().retireCalls).toBe(0);}finally{tree.destroy();o.destroy();}
++});
++it('queued earlier transition observer reentry cannot retire a fresh same-key lifetime',async()=>{
++ const {tree,row,s}=await setup(),o=owner();const q=o.transact(()=>o.$.x(7)),cell=life.pendingOwners().find(c=>c.owner===getPositionRegistry(o.$)!.id)!;let calls=0;
++ const cancel=life.onOwnerCellTransition(cell,()=>{calls++;tree.$.rows.addOne({id:'a',n:99});});
++ try{tree.$.rows.removeOne('a');await flush();q.confirm();expect(calls).toBe(0);await flush();expect(calls).toBe(1);expect(tree.$.rows.byIdOrFail('a')).not.toBe(row);expect(row()).toBeUndefined();expect(tree.$.rows.byIdOrFail('a').n()).toBe(99);expect(s.inspect().presence).toBe(1);expect(s.inspect().negativePresence).toBe(0);}finally{cancel();tree.destroy();o.destroy();}
++});
++it('destroy cancels already queued retirement notification without rewriting issued metadata',async()=>{
++ const {tree,s,id}=await setup(),o=owner();const q=o.transact(()=>o.$.x(7));
++ try{tree.$.rows.removeOne('a');await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement,proof=life.nativeProof(fact);q.confirm();tree.destroy();await flush();expect(s.inspect().retirementRequests).toBe(0);expect(s.inspect().retireCalls).toBe(0);expect(life.nativeProof(fact)).toBe(proof);expect(proof.unknown).toBe(true);expect(proof.possible![0].outcome).toBe('confirmed');}finally{tree.destroy();o.destroy();}
++});
++it('stale cancellation cannot strand a real source retirement registered later for the same cell',async()=>{
++ const {tree,s}=await setup(),o=owner(),q=o.transact(()=>o.$.x(7));const cell=life.pendingOwners().find(c=>c.owner===getPositionRegistry(o.$)!.id)!;
++ const cancelOld=life.onOwnerCellTransition(cell,()=>{});cancelOld();
++ try{tree.$.rows.removeOne('a');await flush();expect(s.inspect().retirementRequests).toBe(1);expect(s.inspect().negativePresence).toBe(1);cancelOld();q.confirm();await flush();expect(cell.outcome).toBe('confirmed');expect(s.inspect().negativePresence).toBe(0);expect(s.inspect().retirementRequests).toBe(0);}finally{tree.destroy();o.destroy();}
++});
++for(const role of ['input','validation'] as const)it(`confirmed actual ${role} is not released through the own-window class`,async()=>{
++ const {tree,s,id}=await setup(),o=owner(),q=o.transact(()=>o.$.x(7));let c:(ReturnType<typeof link>&{declare(input:{kind:'dependent';owners:readonly object[]},body:()=>unknown):Receipt})|undefined;
++ try{if(role==='input')o.updateAndReport(value=>{expect(value.x).toBe(7);tree.$.rows.removeOne('a');return {};});else{c=link(tree.$.rows,{set:()=>{}}) as typeof c;c!.declare({kind:'dependent',owners:[q]},()=>tree.$.rows.removeOne('a'));}await flush();const fact=s.evidence()!.member(id,'ordinary') as life.NativeRequirement,proof=life.nativeProof(fact);expect(fact.retirementOwnWindowOnly).toBe(false);expect(proof[role]?.some(cell=>cell.outcome==='pending')).toBe(true);q.confirm();await flush();expect(proof[role]?.some(cell=>cell.outcome==='confirmed')).toBe(true);expect(s.evidence()!.member(id,'ordinary')).toBe(fact);expect(s.inspect().negativePresence).toBe(1);expect(s.inspect().retireCalls).toBe(0);}finally{c?.dispose();tree.destroy();o.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/fixed-window-retirement.spec.ts
+@@ -0,0 +1,67 @@
++import {expect,it,vi} from 'vitest';
++import {writeFileSync} from 'node:fs';
++import {entityMap,signalTree,transactions} from '../index';
++import {getEntityPublicationBinding} from './internals/entity-publication';
++import {getPathNotifier} from './path-notifier';
++import {getPositionRegistry} from './internals/position-registry';
++import {withWriteContext} from './write-context';
++import * as life from './experimental-publication/lifecycle';
++const flush=async()=>{getPathNotifier().flushSync();for(let i=0;i<120;i++)await Promise.resolve();};
++const make=()=>signalTree({rows:entityMap<{id:string;n:number},string>()});
++const owner=()=>signalTree({x:0},{enhancers:[transactions()]});
++const setup=async()=>{const tree=make();tree.$.rows.addOne({id:'a',n:1});await flush();const row=tree.$.rows.byIdOrFail('a');const b=getEntityPublicationBinding(row)!;return {tree,row,source:b.source,id:b.subject!};};
++for(const outcome of ['confirm','rollback'] as const)it(`own-W terminal retirement preserves issued fact and all eight map drain: ${outcome}`,async()=>{
++ const {tree,row,source,id}=await setup(),o=owner();const q=o.transact(()=>o.$.x(7));tree.$.rows.removeOne('a');await flush();
++ const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;const proof=life.nativeProof(fact);
++ try{expect(fact.retirementOwnWindowOnly).toBe(true);expect(source.inspect().negativePresence).toBe(1);expect(source.inspect().retirementRequests).toBe(1);expect(proof.possible?.[0].outcome).toBe('pending');q[outcome]();expect(source.inspect().negativePresence).toBe(1);await flush();
++ for(const key of ['rows','fields','presence','visible','placements','viewRows','viewFields','placementViews','mappings','mappingViews','retirementRequests'])expect(source.inspect()[key],key).toBe(0);
++ expect(source.inspect().retireCalls).toBe(1);expect(source.evidence()!.member(id,'ordinary')).not.toBe(fact);expect(life.nativeProof(fact)).toBe(proof);expect(proof.unknown).toBe(true);expect(proof.possible).toHaveLength(1);expect(row()).toBeUndefined();
++ }finally{tree.destroy();o.destroy();}
++});
++it('two captured cells wait separately; later owner and dormant recipients do not extend the window',async()=>{
++ const {tree,source}=await setup(),a=owner(),b=owner(),late=owner();const p=a.transact(()=>a.$.x(1)),q=b.transact(()=>b.$.x(2));
++ try{tree.$.rows.removeOne('a');await flush();expect(source.inspect().retirementRequests).toBe(1);const r=late.transact(()=>late.$.x(3));p.confirm();await flush();expect(source.inspect().negativePresence).toBe(1);q.rollback();await flush();expect(source.inspect().negativePresence).toBe(0);expect(late.$.x()).toBe(3);r.confirm();}finally{tree.destroy();a.destroy();b.destroy();late.destroy();}
++});
++for(const cause of ['external','foreign-callback'] as const)it(`non-window source cause remains after terminality: ${cause}`,async()=>{
++ const {tree,source,id}=await setup(),o=owner();let q:ReturnType<typeof o.transact>;
++ if(cause==='external'){q=o.transact(()=>o.$.x(7));withWriteContext({origin:'external'},()=>tree.$.rows.removeOne('a'));}else q=o.transact(()=>tree.$.rows.removeOne('a'));
++ const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;
++ try{await flush();expect(fact.retirementOwnWindowOnly).toBe(false);q.confirm();await flush();expect(source.evidence()!.member(id,'ordinary')).toBe(fact);expect(source.inspect().negativePresence).toBe(1);expect(source.inspect().retirementRequests).toBe(0);
++ writeFileSync(`/private/tmp/st-fixed-window-retirement-cancellation-successor/provenance-${cause}.json`,JSON.stringify({rawUnknown:fact.unknown,ownWindowOnly:fact.retirementOwnWindowOnly,captureWindow:fact.captureWindow,proof:{...life.nativeProof(fact),possible:life.nativeProof(fact).possible?.map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}))}},(_key,value)=>value instanceof Set?[...value]:value,2)+'\n');
++ }finally{tree.destroy();o.destroy();}
++});
++it('owner disappearance retains exact unresolved proof but drops unavailable subscription',async()=>{
++ const {tree,source,id}=await setup(),o=owner();o.transact(()=>o.$.x(7));tree.$.rows.removeOne('a');await flush();const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;
++ try{expect(source.inspect().retirementRequests).toBe(1);o.destroy();await flush();expect(source.inspect().retirementRequests).toBe(0);expect(source.evidence()!.member(id,'ordinary')).toBe(fact);expect(life.nativeProof(fact).possible?.[0].outcome).toBe('pending');expect(source.inspect().negativePresence).toBe(1);}finally{tree.destroy();o.destroy();}
++});
++for(const stop of ['destroy','replace'] as const)it(`cancels exact transition subscription on ${stop}`,async()=>{
++ const {tree,source,id}=await setup(),o=owner();const q=o.transact(()=>o.$.x(7));let live=0,cancelled=0;
++ const original=life.onOwnerCellTransition;const spy=vi.spyOn(life,'onOwnerCellTransition').mockImplementation((cell,cb)=>{live++;const off=original(cell,cb);let active=true;return()=>{off();if(active){active=false;live--;cancelled++;}};});
++ try{tree.$.rows.removeOne('a');await flush();expect(live).toBe(1);if(stop==='destroy')tree.destroy();else source.requestRetirement(id,()=>false);await flush();expect(live).toBe(0);expect(cancelled).toBe(1);q.confirm();await flush();expect(source.inspect().retireCalls).toBe(0);}finally{spy.mockRestore();tree.destroy();o.destroy();}
++});
++it('queued settlement cannot delete a new lifetime at the same key',async()=>{
++ const {tree,source,row}=await setup(),o=owner();const q=o.transact(()=>o.$.x(7));
++ try{tree.$.rows.removeOne('a');await flush();q.confirm();tree.$.rows.addOne({id:'a',n:99});await flush();expect(row()).toBeUndefined();expect(tree.$.rows.byIdOrFail('a')).not.toBe(row);expect(tree.$.rows.byIdOrFail('a').n()).toBe(99);expect(source.inspect().presence).toBe(1);expect(source.inspect().negativePresence).toBe(0);}finally{tree.destroy();o.destroy();}
++});
++it('installed completion throw retains settlement request; stale prepared reader refuses after release',async()=>{
++ const {tree,source}=await setup(),o=owner();const q=o.transact(()=>o.$.x(7));const error=Object.freeze({sentinel:'complete'});
++ const off=source.subscribe({prepare:p=>p.physical.some(e=>e.structural?.kind==='remove')?{record:{writes:[],adds:[]},completion:{}}:undefined,complete(){throw error;}});
++ try{let caught:unknown;try{tree.$.rows.removeOne('a');}catch(e){caught=e;}expect(caught).toBe(error);off();await flush();expect(source.inspect().retirementRequests).toBe(1);const unit=source.prepare({owner:0,id:{},meta:undefined,physical:[],ordinary:[]})!;q.confirm();await flush();expect(source.inspect().presence).toBe(0);expect(()=>unit.finalize?.()).toThrow('changed before installation');}finally{off();tree.destroy();o.destroy();}
++});
++it('transition listener is queued, exact, race-safe and cancellable',async()=>{
++ const o=owner(),other=owner();const q=o.transact(()=>o.$.x(7)),r=other.transact(()=>other.$.x(8));const cells=life.pendingOwners();const cell=cells.find(c=>c.owner===getPositionRegistry(o.$)!.id)!;let count=0;
++ const off=life.onOwnerCellTransition(cell,()=>{count++;});
++ try{r.confirm();await flush();expect(count).toBe(0);q.confirm();expect(count).toBe(0);await flush();expect(count).toBe(1);let late=0;const cancel=life.onOwnerCellTransition(cell,()=>{late++;});cancel();await flush();expect(late).toBe(0);}finally{off();o.destroy();other.destroy();}
++});
++it('local pending removal keeps recovery authority and restores its exact lifetime',async()=>{
++ const tree=signalTree({rows:entityMap<{id:string;n:number},string>()},{enhancers:[transactions()]});tree.$.rows.addOne({id:'a',n:1});await flush();const row=tree.$.rows.byIdOrFail('a'),b=getEntityPublicationBinding(row)!,s=b.source;
++ try{const q=tree.transact(()=>tree.$.rows.removeOne('a'));await flush();const fact=s.evidence()!.member(b.subject!,'ordinary') as life.NativeRequirement;expect(fact.retirementOwnWindowOnly).toBe(false);expect(life.nativeProof(fact).owners.some(c=>c.outcome==='pending')).toBe(true);expect(s.inspect().retireCalls).toBe(0);q.rollback();await flush();expect(tree.$.rows.byIdOrFail('a')).toBe(row);expect(row.n()).toBe(1);expect(s.inspect().presence).toBe(1);expect(s.inspect().retireCalls).toBe(0);}finally{tree.destroy();}
++});
++it('inherited unknown input is not reclassified as an own window',async()=>{
++ const {tree,source,id}=await setup(),o=owner(),input=signalTree({x:0});withWriteContext({origin:'external'},()=>input.$.x(4));const q=o.transact(()=>o.$.x(7));
++ try{input.updateAndReport(value=>{expect(value.x).toBe(4);tree.$.rows.removeOne('a');return {};});await flush();const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;expect(fact.retirementOwnWindowOnly).toBe(false);q.confirm();await flush();expect(source.evidence()!.member(id,'ordinary')).toBe(fact);expect(source.inspect().negativePresence).toBe(1);expect(source.inspect().retirementRequests).toBe(0);}finally{tree.destroy();o.destroy();input.destroy();}
++});
++it('actual rejected input is retained rather than discharged like possible W',async()=>{
++ const {tree,source,id}=await setup(),input=owner();const q=input.transact(()=>input.$.x(7));
++ try{input.updateAndReport(value=>{expect(value.x).toBe(7);tree.$.rows.removeOne('a');return {};});await flush();const fact=source.evidence()!.member(id,'ordinary') as life.NativeRequirement;const proof=life.nativeProof(fact);expect(fact.retirementOwnWindowOnly).toBe(false);expect(proof.input?.some(cell=>cell.outcome==='pending')).toBe(true);q.rollback();await flush();expect(proof.input?.some(cell=>cell.outcome==='rolled-back')).toBe(true);expect(source.evidence()!.member(id,'ordinary')).toBe(fact);expect(source.inspect().negativePresence).toBe(1);expect(source.inspect().retireCalls).toBe(0);}finally{tree.destroy();input.destroy();}
++});
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -108,9 +108,12 @@
+ }
+ export interface EntityRetirementPlan {
+   readonly ready: boolean;
+-  readonly neutral: boolean;
++  /** Source facts may be neutral or have only a discharged own window. */
++  readonly canRetire: boolean;
+   current(): boolean;
+   onReady(callback: () => void): () => void;
++  /** Only exact live cells whose settlement could make this snapshot releasable. */
++  onSettlement?(callback: () => void): () => void;
+ }
+ type RetirementRequest = { eligible: () => boolean; release?: () => void; queued: boolean };
+ export interface EntityPublicationParticipant {
+@@ -171,9 +174,13 @@
+         request.release = plan.onReady(() => this.scheduleRetirement(subject, request));
+         return;
+       }
+-      // No owner-settlement subscription is implied by requirement readiness.
+-      // A ready non-neutral record remains source evidence; drop only the request.
+-      if (!plan.neutral) { this.cancelRetirement(subject); return; }
++      // Readiness and owner settlement are separate lifetimes. A permanently
++      // ineligible proof remains evidence, without retaining a dead request.
++      if (!plan.canRetire) {
++        if (plan.onSettlement) request.release = plan.onSettlement(() => this.scheduleRetirement(subject, request));
++        else this.cancelRetirement(subject);
++        return;
++      }
+       if (!request.eligible() || revision !== this.revisionToken || !plan.current()) {
+         this.cancelRetirement(subject); return;
+       }
+--- /dev/null
++++ b/packages/kernel/src/lib/owner-transition-cancellation.spec.ts
+@@ -0,0 +1,20 @@
++import {expect,it} from 'vitest';
++import {signalTree,transactions} from '../index';
++import {getPositionRegistry} from './internals/position-registry';
++import * as life from './experimental-publication/lifecycle';
++const flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve();};
++const setup=()=>{const tree=signalTree({x:0},{enhancers:[transactions()]});const pending=tree.transact(()=>tree.$.x(7));const cell=life.pendingOwners().find(c=>c.owner===getPositionRegistry(tree.$)!.id)!;return {tree,pending,cell};};
++for(const repeats of [1,3,10])it(`old release cannot erase replacement observer set after ${repeats} repeats`,async()=>{
++ const {tree,pending,cell}=setup();const old=life.onOwnerCellTransition(cell,()=>{throw Error('cancelled listener');});old();let first=0,second=0;
++ const a=life.onOwnerCellTransition(cell,()=>{first++;}),b=life.onOwnerCellTransition(cell,()=>{second++;});
++ try{for(let i=0;i<repeats;i++)old();a();a();pending.confirm();expect([first,second]).toEqual([0,0]);await flush();expect([first,second]).toEqual([0,1]);}finally{old();a();b();tree.destroy();}
++});
++it('repeated release cancels queued work but preserves a later queued registration',async()=>{
++ const {tree,pending,cell}=setup();let stale=0,current=0;const old=life.onOwnerCellTransition(cell,()=>{stale++;});let next=()=>{};
++ try{pending.confirm();old();old();next=life.onOwnerCellTransition(cell,()=>{current++;});old();expect([stale,current]).toEqual([0,0]);await flush();expect([stale,current]).toEqual([0,1]);next();next();}finally{old();next();tree.destroy();}
++});
++it('reentrant self-release may register a successor without reactivating the released observer',async()=>{
++ const {tree,pending,cell}=setup();const seen:string[]=[];let next=()=>{};let old=()=>{};
++ old=life.onOwnerCellTransition(cell,()=>{seen.push('old');old();next=life.onOwnerCellTransition(cell,()=>{seen.push('next');});old();});
++ try{pending.confirm();expect(seen).toEqual([]);await flush();expect(seen).toEqual(['old','next']);old();next();await flush();expect(seen).toEqual(['old','next']);}finally{old();next();tree.destroy();}
++});

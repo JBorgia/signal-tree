@@ -1,0 +1,146 @@
+[
+  {
+    "source": "AUDIT.json",
+    "archive": "AUDIT.json",
+    "sourceSha256": "a6c2e4b4db7f7c4bed6fecc23644b83e886253ae203431860c28b94867b5423d",
+    "archiveSha256": "a6c2e4b4db7f7c4bed6fecc23644b83e886253ae203431860c28b94867b5423d"
+  },
+  {
+    "source": "AUTHOR-EVIDENCE-SNAPSHOT.json",
+    "archive": "AUTHOR-EVIDENCE-SNAPSHOT.json",
+    "sourceSha256": "12609e7bd251dfa11c0681cf335822861b0fa9a6ec08a7ec9aa09ba15ae17763",
+    "archiveSha256": "12609e7bd251dfa11c0681cf335822861b0fa9a6ec08a7ec9aa09ba15ae17763"
+  },
+  {
+    "source": "AUTHOR-SUMMARY.json",
+    "archive": "AUTHOR-SUMMARY.json",
+    "sourceSha256": "ee927f0dea8a95b3e9e6beb547207636aae3141be69c1fa8a7006e7009fea0ca",
+    "archiveSha256": "ee927f0dea8a95b3e9e6beb547207636aae3141be69c1fa8a7006e7009fea0ca"
+  },
+  {
+    "source": "AUTHOR-SETUP-FIRST-FAILURE.txt",
+    "archive": "AUTHOR-SETUP-FIRST-FAILURE.txt",
+    "sourceSha256": "3c3a140c471cc0d1e45a9d692ca1d603be8f3c97cdbbf5148583264ef4fb554b",
+    "archiveSha256": "3c3a140c471cc0d1e45a9d692ca1d603be8f3c97cdbbf5148583264ef4fb554b"
+  },
+  {
+    "source": "audit.py",
+    "archive": "audit.py",
+    "sourceSha256": "0baee000e8b99083881a14347fbdfb75dfd9512d2a65ed7669095246a75731ec",
+    "archiveSha256": "0baee000e8b99083881a14347fbdfb75dfd9512d2a65ed7669095246a75731ec"
+  },
+  {
+    "source": "AUTHOR-REVIEW.md",
+    "archive": "AUTHOR-REVIEW.md",
+    "sourceSha256": "ba2e61cd71cfdc12f18fad1cefa10ca0c672f0a1172be6d198d6d54b202da588",
+    "archiveSha256": "ba2e61cd71cfdc12f18fad1cefa10ca0c672f0a1172be6d198d6d54b202da588"
+  },
+  {
+    "source": "AUTHOR-ROUTING-PROPOSAL.md",
+    "archive": "AUTHOR-ROUTING-PROPOSAL.md",
+    "sourceSha256": "f9694678571a3dd15dfb30d7381dc3e193c11697fadeb17f1dd8285b97d1e294",
+    "archiveSha256": "f9694678571a3dd15dfb30d7381dc3e193c11697fadeb17f1dd8285b97d1e294"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "90b99aa717f04b24e7297fec1258c41af8f29bb7fccd5fdd0d82126224d4f66b",
+    "archiveSha256": "90b99aa717f04b24e7297fec1258c41af8f29bb7fccd5fdd0d82126224d4f66b"
+  },
+  {
+    "source": "EVIDENCE-HASHES.json",
+    "archive": "EVIDENCE-HASHES.json",
+    "sourceSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+    "archiveSha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+  },
+  {
+    "source": "drop-proceed/RESULT.json",
+    "archive": "drop-proceed/RESULT.json",
+    "sourceSha256": "4f7bbc667d9bf79cb33408ad026043e225dd4d130abf6c648c86a5a74d9a932c",
+    "archiveSha256": "4f7bbc667d9bf79cb33408ad026043e225dd4d130abf6c648c86a5a74d9a932c"
+  },
+  {
+    "source": "drop-proceed/first.log",
+    "archive": "drop-proceed/first.log",
+    "sourceSha256": "77aa3f9edd422a6a14ca6965b7c5a41b24f35741035e3fd271346b0aee996ee2",
+    "archiveSha256": "77aa3f9edd422a6a14ca6965b7c5a41b24f35741035e3fd271346b0aee996ee2"
+  },
+  {
+    "source": "drop-proceed/samples.json",
+    "archive": "drop-proceed/samples.json",
+    "sourceSha256": "e716f6c0d3dbc16dc28ca64520e1d262905b4de2bce35165e314ef86306903ee",
+    "archiveSha256": "e716f6c0d3dbc16dc28ca64520e1d262905b4de2bce35165e314ef86306903ee"
+  },
+  {
+    "source": "drop-proceed/COMMAND.json",
+    "archive": "drop-proceed/COMMAND.json",
+    "sourceSha256": "76b6f9cfb02a648f88e15559d90fbfb66f05af1391c0045133b229c7fcbd7cf6",
+    "archiveSha256": "76b6f9cfb02a648f88e15559d90fbfb66f05af1391c0045133b229c7fcbd7cf6"
+  },
+  {
+    "source": "drop-proceed/PROCESS.json",
+    "archive": "drop-proceed/PROCESS.json",
+    "sourceSha256": "dd71f475450d84e001df922a3260c3c674c0281e8e8d82f97acabe50ecebafd8",
+    "archiveSha256": "dd71f475450d84e001df922a3260c3c674c0281e8e8d82f97acabe50ecebafd8"
+  },
+  {
+    "source": "hold-row/RESULT.json",
+    "archive": "hold-row/RESULT.json",
+    "sourceSha256": "4f7bbc667d9bf79cb33408ad026043e225dd4d130abf6c648c86a5a74d9a932c",
+    "archiveSha256": "4f7bbc667d9bf79cb33408ad026043e225dd4d130abf6c648c86a5a74d9a932c"
+  },
+  {
+    "source": "hold-row/first.log",
+    "archive": "hold-row/first.log",
+    "sourceSha256": "323f190b09f5e699a399951d6032ee5606a61bc76cd82a0fe550bb94d2635af5",
+    "archiveSha256": "323f190b09f5e699a399951d6032ee5606a61bc76cd82a0fe550bb94d2635af5"
+  },
+  {
+    "source": "hold-row/samples.json",
+    "archive": "hold-row/samples.json",
+    "sourceSha256": "25fb1e5078e44e3a3f7324a0f950492959775bad98f3f7c28df10b0f3c1f251f",
+    "archiveSha256": "25fb1e5078e44e3a3f7324a0f950492959775bad98f3f7c28df10b0f3c1f251f"
+  },
+  {
+    "source": "hold-row/COMMAND.json",
+    "archive": "hold-row/COMMAND.json",
+    "sourceSha256": "13b6304035c62db0a0f77a0399cd96d2624dbc19c64e0d1318c47ae6ae2ddb13",
+    "archiveSha256": "13b6304035c62db0a0f77a0399cd96d2624dbc19c64e0d1318c47ae6ae2ddb13"
+  },
+  {
+    "source": "hold-row/PROCESS.json",
+    "archive": "hold-row/PROCESS.json",
+    "sourceSha256": "7e711b0f8035211bef4db99ae65686570f5d0bd5ffde484ed038b2e1fc9ea335",
+    "archiveSha256": "7e711b0f8035211bef4db99ae65686570f5d0bd5ffde484ed038b2e1fc9ea335"
+  },
+  {
+    "source": "hold-proceed/RESULT.json",
+    "archive": "hold-proceed/RESULT.json",
+    "sourceSha256": "4f7bbc667d9bf79cb33408ad026043e225dd4d130abf6c648c86a5a74d9a932c",
+    "archiveSha256": "4f7bbc667d9bf79cb33408ad026043e225dd4d130abf6c648c86a5a74d9a932c"
+  },
+  {
+    "source": "hold-proceed/first.log",
+    "archive": "hold-proceed/first.log",
+    "sourceSha256": "3afd411758351b9a5c0fd44b3d94ff592fa05a4379048421b82165f3c0c5fb90",
+    "archiveSha256": "3afd411758351b9a5c0fd44b3d94ff592fa05a4379048421b82165f3c0c5fb90"
+  },
+  {
+    "source": "hold-proceed/samples.json",
+    "archive": "hold-proceed/samples.json",
+    "sourceSha256": "0be7da4846d52a8969c9f9fb6f86f9ec70d3d2c0b9a13cd6e39327dccc52d91d",
+    "archiveSha256": "0be7da4846d52a8969c9f9fb6f86f9ec70d3d2c0b9a13cd6e39327dccc52d91d"
+  },
+  {
+    "source": "hold-proceed/COMMAND.json",
+    "archive": "hold-proceed/COMMAND.json",
+    "sourceSha256": "9c3479c9a3fb3d8a2025ece8cad84c4664e852e159f65faa36cd22c108cb7b32",
+    "archiveSha256": "9c3479c9a3fb3d8a2025ece8cad84c4664e852e159f65faa36cd22c108cb7b32"
+  },
+  {
+    "source": "hold-proceed/PROCESS.json",
+    "archive": "hold-proceed/PROCESS.json",
+    "sourceSha256": "9d16181c8a97d0bb477f8725aab2aa5bcbedba3b653e7cc5ff63663e626a4758",
+    "archiveSha256": "9d16181c8a97d0bb477f8725aab2aa5bcbedba3b653e7cc5ff63663e626a4758"
+  }
+]

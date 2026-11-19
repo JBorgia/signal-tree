@@ -1,0 +1,7 @@
+{
+  "first": 7,
+  "error": "SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — Selected continuation did not prepare [effect-validation-failed]",
+  "lateError": "Error: Selected continuation cannot replay",
+  "value": 13,
+  "sameSupport": true
+}

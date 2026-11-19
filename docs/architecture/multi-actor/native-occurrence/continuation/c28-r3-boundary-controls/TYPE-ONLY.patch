@@ -1,0 +1,11 @@
+--- a/packages/kernel/src/lib/comparator-boundary-controls.spec.ts
++++ b/packages/kernel/src/lib/comparator-boundary-controls.spec.ts
+@@ -50,7 +50,7 @@
+     const final = [...sent], terminal = receipt?.read();
+     c.dispose(); tree.$.pair.x(9); await drain();
+     record({ case: 'late-confirm', calls, order, before, beforeReceipt, final, terminal,
+-      historical: historical.read(), error: error instanceof Error ? { message: error.message, ...error } : error,
++      historical: historical.read(), error: error instanceof Error ? { message: error.message, ...(error as object) } : error,
+       ownerUnchanged, afterDispose: sent });
+     expect(calls).toBe(1);
+     expect(order.slice(0, 3)).toEqual(['after-native-before-recipient', 'confirmed', 'after-recipient']);

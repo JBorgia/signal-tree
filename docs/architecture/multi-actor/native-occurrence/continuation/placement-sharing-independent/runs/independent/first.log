@@ -1,0 +1,63 @@
+
+> nx run kernel:test sharing-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs sharing-independent.spec.ts --maxWorkers=1
+
+(node:18936) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18946) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-placement-sharing-independent-review/candidate/packages/kernel
+
+(node:18953) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/physical/sharing-independent.spec.ts (2 tests | 1 failed) 16ms
+   × public final-front/order and rollback do not mutate captured physical stages 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/physical/sharing-independent.spec.ts > public final-front/order and rollback do not mutate captured physical stages
+Error: Entity with id 2 already exists
+ ❯ addManyInOrder src/lib/entity-signal.ts:2851:17
+    2849|       if (existingSubjectId !== undefined || processed) {
+    2850|         if (mode === 'strict') {
+    2851|           throw new Error(`Entity with id ${String(id)} already exists…
+       |                 ^
+    2852|         } else if (mode === 'skip') {
+    2853|           continue;
+ ❯ src/lib/entity-signal.ts:3967:40
+ ❯ withMembershipGroup src/lib/entity-signal.ts:1625:14
+ ❯ prependMany src/lib/entity-signal.ts:3967:14
+ ❯ Proxy.api.<computed> src/lib/entity-signal.ts:5120:16
+ ❯ Proxy.target.<computed> src/lib/internals/intercept-leaf-signals.ts:244:22
+ ❯ src/lib/physical/sharing-independent.spec.ts:32:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:09:41
+   Duration  1.19s (transform 682ms, setup 0ms, import 824ms, tests 16ms, environment 241ms)
+
+Warning: command "node tools/run-core-vitest.mjs sharing-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.7s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.7s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.7s

@@ -1,0 +1,68 @@
+[
+  {
+    "source": "PRIOR-OWNER-IDENTITIES.json",
+    "archive": "PRIOR-OWNER-IDENTITIES.json",
+    "sourceSha256": "f896ae92628b8d91852ef94260bbf4b8440ff3caa07a3101963b10031a5107e8",
+    "archiveSha256": "f896ae92628b8d91852ef94260bbf4b8440ff3caa07a3101963b10031a5107e8"
+  },
+  {
+    "source": "PRIOR-OWNER-ADJUDICATION.md",
+    "archive": "PRIOR-OWNER-ADJUDICATION.md",
+    "sourceSha256": "f1f5db9973cd03d490e0cd97833ca95681190d045f6e10f5b5d78afbae6aca22",
+    "archiveSha256": "f1f5db9973cd03d490e0cd97833ca95681190d045f6e10f5b5d78afbae6aca22"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "a88fd50d435f0029b92e213bb680089b88e0294675456f374c4c104ecf60b698",
+    "archiveSha256": "a88fd50d435f0029b92e213bb680089b88e0294675456f374c4c104ecf60b698"
+  },
+  {
+    "source": "implementation-review/RECEIPT-ADJUDICATION.md",
+    "archive": "implementation-review/RECEIPT-ADJUDICATION.md",
+    "sourceSha256": "0110df79b6b6a77d55fa527e4f01a264365d7cb7c27eaad736a7269f896b520c",
+    "archiveSha256": "0110df79b6b6a77d55fa527e4f01a264365d7cb7c27eaad736a7269f896b520c"
+  },
+  {
+    "source": "implementation-review/REVIEW-FROZEN.md",
+    "archive": "implementation-review/REVIEW-FROZEN.md",
+    "sourceSha256": "b1a816ef1e9c3ef75eb81e0adf817808edf6d8cdd98c4cf0f92868ddfbccd9da",
+    "archiveSha256": "b1a816ef1e9c3ef75eb81e0adf817808edf6d8cdd98c4cf0f92868ddfbccd9da"
+  },
+  {
+    "source": "implementation-review/FROZEN-IDENTITY.json",
+    "archive": "implementation-review/FROZEN-IDENTITY.json",
+    "sourceSha256": "a15708aa84be0534f18de8187345d65a36109c6180787b291e3ad3ea0b603128",
+    "archiveSha256": "a15708aa84be0534f18de8187345d65a36109c6180787b291e3ad3ea0b603128"
+  },
+  {
+    "source": "implementation-review/EQUAL-RETENTION.md",
+    "archive": "implementation-review/EQUAL-RETENTION.md",
+    "sourceSha256": "89d6095bbf2309513e5fa037dd066eb4ece070701647acf19d371e2d8e0c665b",
+    "archiveSha256": "89d6095bbf2309513e5fa037dd066eb4ece070701647acf19d371e2d8e0c665b"
+  },
+  {
+    "source": "implementation-review/PROVISIONAL.md",
+    "archive": "implementation-review/PROVISIONAL.md",
+    "sourceSha256": "23e56990609efacf9b1d2ff9e300b8c9b59a88228ecdf41580774180c2901f10",
+    "archiveSha256": "23e56990609efacf9b1d2ff9e300b8c9b59a88228ecdf41580774180c2901f10"
+  },
+  {
+    "source": "implementation-review/retention-source/private.ts",
+    "archive": "implementation-review/retention-source/private.ts",
+    "sourceSha256": "e149c3a27faba6092ea16f9ef9d785f1598529e8446da8fa38df6e82c3b439dd",
+    "archiveSha256": "e149c3a27faba6092ea16f9ef9d785f1598529e8446da8fa38df6e82c3b439dd"
+  },
+  {
+    "source": "implementation-review/retention-source/SHA256.txt",
+    "archive": "implementation-review/retention-source/SHA256.txt",
+    "sourceSha256": "743bd14c61c7f72d1effc42402febea8fb66f90161b7fefde0b4d9b583a71b3a",
+    "archiveSha256": "743bd14c61c7f72d1effc42402febea8fb66f90161b7fefde0b4d9b583a71b3a"
+  },
+  {
+    "source": "implementation-review/retention-source/lifecycle.ts",
+    "archive": "implementation-review/retention-source/lifecycle.ts",
+    "sourceSha256": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8",
+    "archiveSha256": "50167ad98f2d28de1511550a9653e1b115c18acc6ea2e79e02727d5e5a63f9c8"
+  }
+]

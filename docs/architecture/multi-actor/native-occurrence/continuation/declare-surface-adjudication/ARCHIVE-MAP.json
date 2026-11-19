@@ -1,0 +1,56 @@
+[
+  {
+    "source": "SHA256.json",
+    "archive": "SHA256.json",
+    "sourceSha256": "71298c75df0d7733e6defda207f62b94b73f51b1743b33b070686e7a048d8373",
+    "archiveSha256": "71298c75df0d7733e6defda207f62b94b73f51b1743b33b070686e7a048d8373"
+  },
+  {
+    "source": "ADJUDICATION.md",
+    "archive": "ADJUDICATION.md",
+    "sourceSha256": "d2513f66165f8f4caa22c26ff761216679ef69b8bfa780366e8f937a336398b1",
+    "archiveSha256": "d2513f66165f8f4caa22c26ff761216679ef69b8bfa780366e8f937a336398b1"
+  },
+  {
+    "source": "IDENTITY.json",
+    "archive": "IDENTITY.json",
+    "sourceSha256": "1869b99a5f21ac12388ac0804459b1765c48b124f1d6873a65612db3e1232143",
+    "archiveSha256": "1869b99a5f21ac12388ac0804459b1765c48b124f1d6873a65612db3e1232143"
+  },
+  {
+    "source": "root-authority/docs/audits/2026-10-29-multi-actor-product/README.md",
+    "archive": "root-authority/docs/audits/2026-10-29-multi-actor-product/README.md.gz",
+    "sourceSha256": "2bb0b1f2664760cdd49ea95912468c147b6802bd8048ef11f131e1ed92de4eb8",
+    "archiveSha256": "d07d9ea1ca2a18576273966ddeb0ca175900e301ec9ae316b879395aed386e51"
+  },
+  {
+    "source": "root-authority/docs/architecture/v15-production-surface-audit.md",
+    "archive": "root-authority/docs/architecture/v15-production-surface-audit.md.gz",
+    "sourceSha256": "3bda4188e2e4485ceac6ce303ce47dfa731346111d6543d0a9c7c73285f355f7",
+    "archiveSha256": "6873623e0f5614fbc8101a734abe243d2a3823a235009f00efd00217e3e4904d"
+  },
+  {
+    "source": "root-authority/docs/architecture/multi-actor/IMPLEMENTATION.md",
+    "archive": "root-authority/docs/architecture/multi-actor/IMPLEMENTATION.md.gz",
+    "sourceSha256": "5152f1b591b297bd3e069bad7aea1632ec40c45dbca079d5216eb8e7fdd7dde0",
+    "archiveSha256": "30460fcc40e6b9536ae1ea3647d4c4117d2a56d1ffe3a3d179ebbe58fe7fe497"
+  },
+  {
+    "source": "root-authority/docs/architecture/multi-actor/PLAN.md",
+    "archive": "root-authority/docs/architecture/multi-actor/PLAN.md.gz",
+    "sourceSha256": "8d1746835c158580713e4e0696c75296fbc962fd2197edd547834a536d70fa91",
+    "archiveSha256": "4c621dead3297a04d79e05a5526e536dc561d16464749231408ea112db9eec51"
+  },
+  {
+    "source": "root-authority/docs/architecture/multi-actor/native-occurrence/EXPLICIT-HANDOFF.md",
+    "archive": "root-authority/docs/architecture/multi-actor/native-occurrence/EXPLICIT-HANDOFF.md.gz",
+    "sourceSha256": "9031581bcbd60f05d4c23dd74cdd19d5f17be1844a166a1da94f3595ed1e7449",
+    "archiveSha256": "c25ac27fe56d1ec683cefe353e15957c4dde5c2ecabd248a3d30bc2fc35294e4"
+  },
+  {
+    "source": "root-authority/docs/architecture/multi-actor/native-occurrence/continuation/README.md",
+    "archive": "root-authority/docs/architecture/multi-actor/native-occurrence/continuation/README.md.gz",
+    "sourceSha256": "a84ec12420bdce5783c9308b8db157ffe857f697624dc0ab832174cc401c5384",
+    "archiveSha256": "2d099c286b722fd97ee93ff8fb08ad1092e56f58222508801cc97c71267e4d4c"
+  }
+]

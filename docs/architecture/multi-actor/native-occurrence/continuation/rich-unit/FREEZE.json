@@ -1,0 +1,8 @@
+{
+  "status": "frozen on covered rich/completion recurrence",
+  "source": "/private/tmp/st-rich-unit-successor/candidate",
+  "manifestSha256": "55ba1e3bb29ac66f1a493e196cee9b68853fa8ad30ac7067a7ea8e280bf871f5",
+  "runtimePatchSha256": "22a4c7349fb65d1ba348058eb557516480b584394708724581385f6ac969df4d",
+  "testsPatchSha256": "c3a383d7257e63bc5cd023b8559d9831c1087222ae9c8b305ac87028a45f947c",
+  "predecessorUnchanged": true
+}

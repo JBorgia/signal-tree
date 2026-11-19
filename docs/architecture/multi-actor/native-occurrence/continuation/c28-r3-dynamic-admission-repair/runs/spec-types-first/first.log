@@ -1,0 +1,32 @@
+
+Running 1 gates
+
+  · spec-types           FAIL (exit 1) ✗  spec files are typechecked (they were covered by NOTHING) — ratcheted per file, so a renamed public config option cannot silently void a test
+
+check-spec-types: 2 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/dynamic-admission-minimal.spec.ts: 1 error(s), baseline allows 0
+  packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts: 12 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/dynamic-admission-minimal.spec.ts(9,30): error TS2339: Property 'n' does not exist on type '{}'.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(20,4): error TS2349: This expression is not callable.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(21,4): error TS2349: This expression is not callable.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(21,41): error TS2349: This expression is not callable.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(31,50): error TS2349: This expression is not callable.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(31,59): error TS2349: This expression is not callable.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(31,65): error TS7006: Parameter 'v' implicitly has an 'any' type.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(31,73): error TS2349: This expression is not callable.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(46,8): error TS2769: No overload matches this call.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(76,9): error TS2769: No overload matches this call.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(76,18): error TS2769: No overload matches this call.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(77,43): error TS2769: No overload matches this call.
+packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts(80,23): error TS2769: No overload matches this call.
+
+
+──────────────────────────────────────────────────────────────────────────────
+0/1 passed, 1 failed, 0 known-red.

@@ -1,0 +1,35 @@
+
+> nx run kernel:test whole-bounded-qualification.spec.ts --testNamePattern=terminal owner characterization --maxWorkers=1
+
+> node tools/run-core-vitest.mjs whole-bounded-qualification.spec.ts --testNamePattern="terminal owner characterization" --maxWorkers=1
+
+(node:97401) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:97410) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-equal-whole-c16-qualification/candidate/packages/kernel
+
+(node:97420) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 11 skipped (13)
+   Start at  12:04:07
+   Duration  2.12s (transform 1.08s, setup 0ms, import 1.32s, tests 48ms, environment 603ms)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      2.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.9s

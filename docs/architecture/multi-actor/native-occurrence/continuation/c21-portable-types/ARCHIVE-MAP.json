@@ -1,0 +1,20 @@
+[
+  {
+    "source": "RESULT.json",
+    "archive": "RESULT.json",
+    "sourceSha256": "2f0fdd70f0b55d082feecbeeb533e97ad231dc69024cfa0dee3bae9b3f9c32c5",
+    "archiveSha256": "2f0fdd70f0b55d082feecbeeb533e97ad231dc69024cfa0dee3bae9b3f9c32c5"
+  },
+  {
+    "source": "first.log",
+    "archive": "first.log",
+    "sourceSha256": "f4413bed8819e23c2bcb9973d92b387f7a4488d023744d58b9a2bd2bfff43cb1",
+    "archiveSha256": "f4413bed8819e23c2bcb9973d92b387f7a4488d023744d58b9a2bd2bfff43cb1"
+  },
+  {
+    "source": "COMMAND.json",
+    "archive": "COMMAND.json",
+    "sourceSha256": "59d3cddc2289638f398c8fc6813bf0ffc7458f27ae51372036eddaf2ad80d02e",
+    "archiveSha256": "59d3cddc2289638f398c8fc6813bf0ffc7458f27ae51372036eddaf2ad80d02e"
+  }
+]

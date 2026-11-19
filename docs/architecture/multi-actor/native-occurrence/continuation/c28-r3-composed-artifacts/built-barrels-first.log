@@ -1,0 +1,7 @@
+✓ kernel — barrel resolves, 14 exports match source
+✓ angular — barrel resolves, 4 exports match source
+✓ react — barrel resolves, 1 exports match source
+✓ vue — barrel resolves, 2 exports match source
+✓ solid — barrel resolves, 2 exports match source
+
+All 5 package barrels resolve and match their source exports.

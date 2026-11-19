@@ -1,0 +1,1 @@
+Own argument extraction initially asserted eslint after removing exec+eslint; assertion stopped path-list preparation. Corrected extraction preserves exact original file set excluding helper only for its separately explicit --no-ignore invocation. No source or assertion change.

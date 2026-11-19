@@ -1,0 +1,15 @@
+retained-native-metadata true
+✔ realizes fresh tap reads and preserves later callback writes (9.330542ms)
+✔ keeps ordinary selected observation granular and native computations cached during the callback (1.190625ms)
+✔ preserves a callback selection followed by rekey (1.32175ms)
+✔ preserves a callback selection followed by clear (0.817959ms)
+✔ retains coherent native metadata on one callback-acquired reader (0.523625ms)
+✔ current-read real tap queries evaluate each recipe once across held ABA writes (0.967584ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 175.846875

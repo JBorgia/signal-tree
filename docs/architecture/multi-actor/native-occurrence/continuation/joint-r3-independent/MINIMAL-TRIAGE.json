@@ -1,0 +1,44 @@
+{
+  "c0": {
+    "exit": 0,
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "membership-reversal-delivery.spec.ts",
+      "--testNamePattern=left clear \\+ right clear",
+      "--maxWorkers=1"
+    ]
+  },
+  "candidate": {
+    "exit": 1,
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "membership-reversal-delivery.spec.ts",
+      "--testNamePattern=left clear \\+ right clear",
+      "--maxWorkers=1"
+    ]
+  },
+  "r2": {
+    "command": [
+      "corepack",
+      "pnpm",
+      "nx",
+      "test",
+      "kernel",
+      "--skip-nx-cache",
+      "membership-reversal-delivery.spec.ts",
+      "--testNamePattern=left clear \\+ right clear",
+      "--maxWorkers=1"
+    ],
+    "exit": 1
+  }
+}

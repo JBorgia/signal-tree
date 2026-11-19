@@ -1,0 +1,73 @@
+
+> nx run kernel:test scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1
+
+(node:61488) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61495) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-scalar-frame-publication-successor/candidate/packages/kernel
+
+(node:61502) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61503) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:61505) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/scalar-frame-publication.spec.ts (21 tests | 1 failed) 33ms
+   × mixed contribution protocol does not replay covered payload or suppress unrelated uncovered work: uncovered-last 3ms
+(node:61507) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/scalar-frame-publication.spec.ts > mixed contribution protocol does not replay covered payload or suppress unrelated uncovered work: uncovered-last
+AssertionError: expected { x: 2, y: +0 } to deeply equal { x: 9, y: +0 }
+
+- Expected
++ Received
+
+  {
+-   "x": 9,
++   "x": 2,
+    "y": 0,
+  }
+
+ ❯ src/lib/scalar-frame-publication.spec.ts:105:36
+    103|  const uncovered=()=>getPathNotifier().notify('x',9,0,'x',undefined,ge…
+    104|  try{if(order==='uncovered-first'){uncovered();tree.$.x(2);}else if(or…
+    105|  await flush();expect(sent.at(-1)).toEqual(order==='uncovered-first'?{…
+       |                                    ^
+    106|  }finally{c.dispose();tree.destroy();}
+    107| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 84 passed (85)
+   Start at  17:24:42
+   Duration  1.87s (transform 454ms, setup 0ms, import 748ms, tests 178ms, environment 638ms)
+
+Warning: command "node tools/run-core-vitest.mjs scalar-frame-publication.spec.ts branch-omission-correctness.spec.ts oracle-alignment-independent.spec.ts a1-installed-publication.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.2s

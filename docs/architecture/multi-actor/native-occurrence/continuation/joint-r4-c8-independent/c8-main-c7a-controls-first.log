@@ -1,0 +1,97 @@
+
+> nx run kernel:test singleton-row-reuse.spec.ts singleton-row-allocation.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts packet-admission-r1.spec.ts admission-refusal.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts dynamic-member-enrollment.spec.ts construction-resource-cleanup.spec.ts keyed-construction-cleanup.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs singleton-row-reuse.spec.ts singleton-row-allocation.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts packet-admission-r1.spec.ts admission-refusal.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts dynamic-member-enrollment.spec.ts construction-resource-cleanup.spec.ts keyed-construction-cleanup.spec.ts --maxWorkers=1
+
+(node:38962) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-combined-c8/candidate/packages/kernel
+
+(node:38987) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38989) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38991) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/singleton-row-reuse.spec.ts (8 tests | 1 failed) 22ms
+   × recipient finalizer reentry preserves escaped outer facts and refuses outer install 4ms
+(node:38992) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38993) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38994) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:38995) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39000) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-index-review.spec.ts (4 tests | 1 failed) 6ms
+   × later recipient finalizer source reentry refuses outer installation and retains newer facts 3ms
+(node:39029) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39030) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39042) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39043) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39044) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39045) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/packet-index-review.spec.ts > later recipient finalizer source reentry refuses outer installation and retains newer facts
+AssertionError: expected [Function] to throw error including 'source changed during finalization' but got 'Entity publication source changed bef…'
+
+Expected: "source changed during finalization"
+Received: "Entity publication source changed before installation"
+
+ ❯ src/lib/packet-index-review.spec.ts:30:29
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/lib/singleton-row-reuse.spec.ts > recipient finalizer reentry preserves escaped outer facts and refuses outer install
+AssertionError: expected [Function] to throw error including 'Entity publication source changed dur…' but got 'Entity publication source changed bef…'
+
+Expected: "Entity publication source changed during finalization"
+Received: "Entity publication source changed before installation"
+
+ ❯ src/lib/singleton-row-reuse.spec.ts:34:203
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 13 passed (15)
+      Tests  2 failed | 102 passed (104)
+   Start at  08:47:11
+   Duration  6.61s (transform 541ms, setup 0ms, import 1.67s, tests 1.52s, environment 2.30s)
+
+Warning: command "node tools/run-core-vitest.mjs singleton-row-reuse.spec.ts singleton-row-allocation.spec.ts packet-index-adversarial.spec.ts packet-index-review.spec.ts packet-admission-r1.spec.ts admission-refusal.spec.ts independent-refusal-branches.spec.ts point-admission-followup.spec.ts native-admission-handoff.spec.ts native-invocation-handoff.spec.ts entity-publication-work-lifetime.spec.ts publication-retirement-acceptance.spec.ts dynamic-member-enrollment.spec.ts construction-resource-cleanup.spec.ts keyed-construction-cleanup.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      7.0s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     7.0s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    7.0s

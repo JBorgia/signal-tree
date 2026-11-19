@@ -1,0 +1,8 @@
+{
+  "candidate": "/private/tmp/st-v16-integration-evidence/dispatch-mutant",
+  "manifest": "952aa5970af29798ed8f3794a76394992e8891655b6cbe8c3f0bd42a36b9e13e",
+  "delta": [
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts"
+  ],
+  "expectedFailure": "cold file alone: new nodeFacadeMaterialized or fieldFacadesMaterialized assertion, not comparison sentinel"
+}

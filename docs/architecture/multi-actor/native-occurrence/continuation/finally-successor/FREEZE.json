@@ -1,0 +1,8 @@
+{
+  "manifestSha256": "76dc7e600928ee36331a15674baa9a25960a78b2f97bee637dd693cac28fcb28",
+  "runtimePatchSha256": "acf6f4b98434f743721fe1311b3aaeb1af9d3d27b315cecbced62c539daeaf92",
+  "patchSha256": "617a4cf605d9473c211139c9bd038a2fc1e9c8096c16a51acb92630ec17e20ba",
+  "independentReview": "pending",
+  "composition": "not performed",
+  "predecessorUnchanged": true
+}

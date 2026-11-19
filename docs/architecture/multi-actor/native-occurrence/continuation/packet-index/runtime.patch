@@ -1,0 +1,112 @@
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -1,7 +1,7 @@
+ import type {NativeFieldEndpoint,NativeFieldSelections} from '../internals/native-field-selection';
+ import { getActiveWriteContext } from '../write-context';
+ import { combineTerminalRecords, type TerminalRecordPlan } from '../internals/intrinsic-mutation';
+-import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit } from '../internals/entity-publication';
++import { entityPublicationOrdinary, currentEntityPublicationInputs, registerEntityPublicationFactory, type EntityPublicationEvidence, type EntityPublicationEdit, type EntityPublicationPacket } from '../internals/entity-publication';
+ import * as lifecycle from './lifecycle';
+ import { currentNativePublicationInputs } from './private';
+ 
+@@ -13,6 +13,37 @@
+ const unavailable = lifecycle.unavailableRequirement;
+ const own = (row:unknown,key:string):boolean=>row!==null&&typeof row==='object'&&Object.prototype.hasOwnProperty.call(row,key);
+ const fieldValue = (row:unknown,key:string):unknown=>own(row,key)?(row as Record<string,unknown>)[key]:undefined;
++
++/** Check only source-owned admission structure, never caller payloads or proof cells.
++ * Private callbacks may read the packet; changing its membership/subject/kind
++ * invalidates preparation rather than letting a lookup outlive its authority.
++ */
++function captureAdmissionStructure(packet:EntityPublicationPacket):()=>void {
++  const steps=packet.steps,stepOrder=steps?.slice();
++  const arrays:{read:()=>readonly EntityPublicationEdit[]|undefined; original:readonly EntityPublicationEdit[]|undefined; entries:readonly EntityPublicationEdit[]}[]=[];
++  const edits=new Map<EntityPublicationEdit,{subject:number;structural:EntityPublicationEdit['structural'];kind:string|undefined}>();
++  const remember=(edit:EntityPublicationEdit)=>{if(!edits.has(edit))edits.set(edit,{subject:edit.subject,structural:edit.structural,kind:edit.structural?.kind});};
++  const array=(read:()=>readonly EntityPublicationEdit[]|undefined)=>{
++    const original=read(),entries=original?.slice()??[];
++    arrays.push({read,original,entries});for(const edit of entries)remember(edit);
++  };
++  array(()=>packet.ordinary);array(()=>packet.physical);
++  const removals=stepOrder?.map(step=>{
++    array(()=>step.ordinary);array(()=>step.physical);
++    const removal=step.authoredRemoval;if(removal)remember(removal);
++    return removal;
++  });
++  return ()=>{
++    const changed=()=>{throw new Error('Entity publication admission structure changed during preparation');};
++    if(packet.steps!==steps||steps?.length!==stepOrder?.length)changed();
++    for(let i=0;i<(stepOrder?.length??0);i++)if(steps![i]!==stepOrder![i]||stepOrder![i].authoredRemoval!==removals![i])changed();
++    for(const {read,original,entries}of arrays){
++      const current=read();if(current!==original||current?.length!==(original===undefined?undefined:entries.length))changed();
++      for(let i=0;i<entries.length;i++)if(current![i]!==entries[i])changed();
++    }
++    for(const [edit,fact]of edits)if(edit.subject!==fact.subject||edit.structural!==fact.structural||edit.structural?.kind!==fact.kind)changed();
++  };
++}
+ 
+ /** Only current support identities; values and placement remain native kernel truth. */
+ registerEntityPublicationFactory(() => {
+@@ -62,10 +93,21 @@
+       const inputs=[...currentNativePublicationInputs(),...currentEntityPublicationInputs().flatMap(input=>(input as {native?:readonly lifecycle.NativeInput[]}).native??[])];
+       const prepared=inspection?undefined:lifecycle.prepareNativeRequirement(owner?[owner]:[],!valid||meta?.origin!==undefined,inputs);
+       const requirement=prepared?.requirement??unavailable();
++      // This source-owned prepared packet has one ordered admitted sequence.
++      // Keep duplicates/tombstones in that sequence; only proposal lookup uses
++      // the last subject occurrence, exactly as the former reverse/find did.
++      // The index belongs to this preparation, never a source or observer cache.
++      const validateAdmission=captureAdmissionStructure(packet);
++      // With steps, the helper already owns its new sequence. Without steps,
++      // copy the source array so delayed support cannot observe later mutation.
++      const ordinaryEdits=packet.steps?entityPublicationOrdinary(packet):packet.ordinary.slice();
++      const lastOrdinaryBySubject=new Map<number,EntityPublicationEdit>();
++      for(const edit of ordinaryEdits)lastOrdinaryBySubject.set(edit.subject,edit);
++      const ordinarySubjects=[...lastOrdinaryBySubject.keys()];
+       const selectedFields=new Map<number,Map<string,NativeFieldEndpoint>>();
+       const beforeField=(subject:number,key:string):NativeFieldEndpoint=>fields.get(subject)?.get(key)??Object.freeze({present:false,value:undefined,requirement:members.get(subject)?.requirement??missing});
+       const proposal=(subject:number,key:string):NativeFieldEndpoint=>{
+-        const edit=[...entityPublicationOrdinary(packet)].reverse().find(edit=>edit.subject===subject);
++        const edit=lastOrdinaryBySubject.get(subject);
+         if(!edit)throw new Error('Missing admitted field publication');
+         return Object.freeze({present:own(edit.after,key),value:fieldValue(edit.after,key),requirement});
+       };
+@@ -73,6 +115,7 @@
+         let row=selectedFields.get(subject);if(!row)selectedFields.set(subject,row=new Map());row.set(key,value);
+       }};
+       const responsibility=packet.prepareResponsibility?.(selections);
++      validateAdmission();
+       const chosen=(edit:EntityPublicationEdit,key:string):NativeFieldEndpoint=>edit.restoredFields?.get(key)??selectedFields.get(edit.subject)?.get(key)??proposal(edit.subject,key);
+       const writes:TerminalRecordPlan['writes'][number][]=[];
+       const deletes:NonNullable<TerminalRecordPlan['deletes']>[number][]=[];
+@@ -111,7 +154,7 @@
+         if(edit.structural?.kind==='add')writes.push({map:visible,key:edit.subject,value:{requirement,present:true}},{map:placementViews,key:edit.subject,value:{requirement}});
+       }
+       if(packet.physicalOrder)for(const subject of packet.physicalOrder){physicalPlacements.set(subject,{requirement});writes.push({map:placementViews,key:subject,value:{requirement}});}
+-      for(const edit of entityPublicationOrdinary(packet)){
++      for(const edit of ordinaryEdits){
+         if(edit.structural?.kind==='remove'){
+           removed.add(edit.subject);nextFields.delete(edit.subject);nextViews.delete(edit.subject);
+           nextMembers.set(edit.subject,{present:false,requirement});
+@@ -160,7 +203,7 @@
+       selected.forEdit=edit=>selectedAt.get(edit)??selected;
+       const support=(subject?:number,field?:string):Requirement=>{
+         const sources:Requirement[]=[];
+-        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...entityPublicationOrdinary(packet).map(edit=>edit.subject)])]:[subject];
++        const selected=subject===undefined?[...new Set([...members.keys(),...fields.keys(),...ordinarySubjects])]:[subject];
+         if(subject===undefined){const order=new Map(placements);for(const id of removed)order.delete(id);for(const [id,value]of nextPlacements)order.set(id,value);sources.push(...order.values());}
+         for(const id of selected){
+           const member=nextMembers.get(id)??members.get(id);if(member)sources.push(member.requirement);
+@@ -172,7 +215,12 @@
+         // Transport D/I/W unchanged; actual native consumption alone maps D→I.
+         return lifecycle.combineNativeRequirements(sources);
+       };
+-      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
++      validateAdmission();
++      return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:()=>{
++        validateAdmission();
++        if(prepared)lifecycle.finalizeNativeRequirement(requirement);
++        validateAdmission();
++      }};
+     },
+     complete(){},
+     prepareRetirement(subject){

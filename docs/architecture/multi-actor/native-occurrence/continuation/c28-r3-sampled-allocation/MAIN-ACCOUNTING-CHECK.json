@@ -1,0 +1,62 @@
+[
+  {
+    "arm": "baseline",
+    "stage": "replacement",
+    "sampleCount": 2006,
+    "estimatedSampleBytes": 71322864,
+    "unresolvedSampleCount": 2,
+    "unresolvedSampleBytes": 121504,
+    "selfSizeSumCrossCheck": 71088472,
+    "sha256": "731bf40edc0d9809d007f527deeaaf9e3e1d44a853e0cce03827cbf451d78a49"
+  },
+  {
+    "arm": "baseline",
+    "stage": "undo",
+    "sampleCount": 3866,
+    "estimatedSampleBytes": 135127768,
+    "unresolvedSampleCount": 1,
+    "unresolvedSampleBytes": 36192,
+    "selfSizeSumCrossCheck": 134962912,
+    "sha256": "00031404cb8179bf344d61ce56668979dad71174fe3c204a1d1596b0f92ece0d"
+  },
+  {
+    "arm": "baseline",
+    "stage": "redo",
+    "sampleCount": 4356,
+    "estimatedSampleBytes": 151992312,
+    "unresolvedSampleCount": 0,
+    "unresolvedSampleBytes": 0,
+    "selfSizeSumCrossCheck": 151921480,
+    "sha256": "ad5abfb786b2deb8ccea6f6a1f28beee3fb388f07f6394db30cfd839bebc9d0e"
+  },
+  {
+    "arm": "indexed",
+    "stage": "replacement",
+    "sampleCount": 2056,
+    "estimatedSampleBytes": 73050592,
+    "unresolvedSampleCount": 3,
+    "unresolvedSampleBytes": 154504,
+    "selfSizeSumCrossCheck": 72894240,
+    "sha256": "bd6f6bbef55a45618370008a81357380a5a28d81a2be3e618bb0779f593d9a25"
+  },
+  {
+    "arm": "indexed",
+    "stage": "undo",
+    "sampleCount": 3891,
+    "estimatedSampleBytes": 135816088,
+    "unresolvedSampleCount": 0,
+    "unresolvedSampleBytes": 0,
+    "selfSizeSumCrossCheck": 135693584,
+    "sha256": "8164943d25fb096c4a7afe3a6b3c63437b786410141f59814fc5f7e3711bf5bc"
+  },
+  {
+    "arm": "indexed",
+    "stage": "redo",
+    "sampleCount": 4380,
+    "estimatedSampleBytes": 153097016,
+    "unresolvedSampleCount": 0,
+    "unresolvedSampleBytes": 0,
+    "selfSizeSumCrossCheck": 152992520,
+    "sha256": "64dc98e3bc871a583d2dd15dfe0db534b1a41d3253b3b9d745118dd235f4d041"
+  }
+]

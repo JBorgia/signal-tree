@@ -1,0 +1,29 @@
+{
+  "cwd": "/private/tmp/st-c21-partition-followups/candidate",
+  "argv": [
+    "corepack",
+    "pnpm",
+    "nx",
+    "test",
+    "kernel",
+    "--skip-nx-cache",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=/private/tmp/st-c21-partition-followups/progress-reporter.mjs",
+    "src/lib/public-selected-unit.spec.ts"
+  ],
+  "settings": {
+    "NX_DAEMON": "false",
+    "NX_ISOLATE_PLUGINS": "false",
+    "NX_TUI": "false",
+    "NX_CACHE_DIRECTORY": "/private/tmp/st-c21-partition-followups/nx-cache",
+    "NX_WORKSPACE_DATA_DIRECTORY": "/private/tmp/st-c21-partition-followups/nx-data",
+    "TMPDIR": "/private/tmp/st-c21-partition-followups/tmp",
+    "ST_VERIFY_PROGRESS": "/private/tmp/st-c21-partition-followups/progress",
+    "ST_PREPARED_REVIEW_OUTPUT": "/private/tmp/st-c21-partition-followups/observations",
+    "ST_PUBLIC_DIAGNOSTIC_OUTPUT": "/private/tmp/st-c21-partition-followups/public-output",
+    "NODE_OPTIONS": "--require=/private/tmp/st-c21-partition-followups/diagnostic-redirect.cjs"
+  },
+  "nodeBin": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin",
+  "noProgressSeconds": 180
+}

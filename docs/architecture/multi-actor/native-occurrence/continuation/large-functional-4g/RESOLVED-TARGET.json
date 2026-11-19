@@ -1,0 +1,12 @@
+{
+  "executor": "nx:run-commands",
+  "outputs": [
+    "{workspaceRoot}/coverage/{projectRoot}"
+  ],
+  "options": {
+    "command": "node tools/run-core-vitest.mjs",
+    "forwardAllArgs": true
+  },
+  "configurations": {},
+  "parallelism": true
+}

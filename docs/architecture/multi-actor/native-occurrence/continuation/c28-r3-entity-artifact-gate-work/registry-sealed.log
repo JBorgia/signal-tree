@@ -1,0 +1,7 @@
+
+Running 1 gates
+
+  · entity-registration-artifacts pass ✓  (packed and production-bundled entity registration: original 8 + lifecycle 6 + receipt 6, with selective no-Link control)
+
+──────────────────────────────────────────────────────────────────────────────
+1/1 passed, 0 failed, 0 known-red.

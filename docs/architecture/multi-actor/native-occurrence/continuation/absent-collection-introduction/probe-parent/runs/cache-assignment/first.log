@@ -1,0 +1,111 @@
+
+> nx run kernel:test absent-cache-assignment-diagnostic.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs absent-cache-assignment-diagnostic.spec.ts --maxWorkers=1
+
+(node:16611) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:16618) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel
+
+(node:16626) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/absent-cache-assignment-diagnostic.spec.ts > diagnostic original held re-add sequence
+omitted {"count":0} []
+{"phase":"before-add","records":[{"generation":0,"cache":{"generation":0,"value":{"count":0},"pendingObservation":false}},null,{"generation":0,"cache":{"generation":0,"value":{"value":{"all":[]}},"pendingObservation":false}}]}
+GENERATION 1 Error: 
+    at Object.set [as generation] (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts:176:125)
+    at markSnapshotInstalled (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/snapshot-installation.ts:37:28)
+    at advanceInstalledRead (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:442:27)
+    at /private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:1592:113
+    at EntityMutationFrame.commit (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/physical/entity-mutation-frame.ts:396:5)
+    at Object.install (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:1589:30)
+    at commitAndProjectEntityMutationFrame (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:1331:29)
+    at clear (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:4782:25)
+    at Proxy.api.<computed> (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:5304:11)
+    at /private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts:177:7
+GENERATION 2 Error: 
+    at Object.set [as generation] (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts:176:125)
+    at markSnapshotInstalled (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/snapshot-installation.ts:37:28)
+    at advanceInstalledRead (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:442:27)
+    at /private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:1592:113
+    at EntityMutationFrame.commit (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/physical/entity-mutation-frame.ts:396:5)
+    at Object.install (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:1589:30)
+    at commitAndProjectEntityMutationFrame (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:1331:29)
+    at addOneWithStructuralEffect (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:3203:23)
+    at addOne (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:4107:14)
+    at writePrepared (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/entity-signal.ts:5282:18)
+CACHE-WRITE {"generation":2,"value":{"value":{"all":[]}},"pendingObservation":true} Error: 
+    at Object.set [as cache] (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/absent-cache-assignment-diagnostic.spec.ts:175:132)
+    at materializeSnapshotNode (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/snapshot-authority.ts:124:14)
+    at snapshotMarkerNode (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/materialize-markers.ts:272:10)
+    at buildFromStore (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/utils.ts:365:15)
+    at unwrap (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/utils.ts:338:10)
+    at unwrapBranchForWriteCapture (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/utils.ts:349:7)
+    at ordinaryMemberSnapshot (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/plain-branch-membership.ts:111:12)
+    at ordinaryMemberSnapshot (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/plain-branch-membership.ts:101:16)
+    at setMemberPresence (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/member-membership.ts:965:62)
+    at reactivatePathOnWrite (/private/tmp/st-absent-collection-introduction/probe-parent/candidate/packages/kernel/src/lib/internals/member-membership.ts:524:5)
+{"phase":"after-add-before-demand","records":[{"generation":1,"cache":{"generation":1,"value":{"a":{"rows":{"all":[]}},"count":0},"pendingObservation":false}},{"generation":0,"cache":{"generation":0,"value":{"rows":{"all":[]}},"pendingObservation":false}},{"generation":2,"cache":{"generation":2,"value":{"value":{"all":[]}},"pendingObservation":false}}]}
+after {"whole":"{\"a\":{\"rows\":{\"all\":[]}},\"count\":0}","all":[{"id":"z","n":9}],"direct":{"a":{"rows":{"all":[]}},"count":0},"directAll":[{"id":"z","n":9}]}
+{"phase":"after-demand","records":[{"generation":1,"cache":{"generation":1,"value":{"a":{"rows":{"all":[]}},"count":0},"pendingObservation":false}},{"generation":0,"cache":{"generation":0,"value":{"rows":{"all":[]}},"pendingObservation":false}},{"generation":2,"cache":{"generation":2,"value":{"value":{"all":[]}},"pendingObservation":false}}]}
+
+ ❯ src/lib/absent-cache-assignment-diagnostic.spec.ts (1 test | 1 failed) 68ms
+   × diagnostic original held re-add sequence 66ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/absent-cache-assignment-diagnostic.spec.ts > diagnostic original held re-add sequence
+AssertionError: expected [ …(2) ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+@@ -1,7 +1,7 @@
+  [
+-   "{\"a\":{\"rows\":{\"all\":[{\"id\":\"z\",\"n\":9}]}},\"count\":0}",
++   "{\"a\":{\"rows\":{\"all\":[]}},\"count\":0}",
+    [
+      {
+        "id": "z",
+        "n": 9,
+      },
+
+ ❯ src/lib/absent-cache-assignment-diagnostic.spec.ts:179:26
+    177|  rows.addOne(Z);trace('after-add-before-demand');
+    178|  console.log('after',JSON.stringify({whole:whole(),all:all(),direct:tr…
+    179|  expect([whole(),all()]).toEqual(['{"a":{"rows":{"all":[{"id":"z","n":…
+       |                          ^
+    180| });
+    181|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  10:07:15
+   Duration  4.32s (transform 2.12s, setup 0ms, import 2.56s, tests 68ms, environment 1.38s)
+
+Warning: command "node tools/run-core-vitest.mjs absent-cache-assignment-diagnostic.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      5.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.6s

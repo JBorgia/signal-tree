@@ -1,0 +1,76 @@
+
+> nx run kernel:test publication-retirement-boundaries.spec.ts entity-lifetime-ledger-null.spec.ts entity-selection-lifetime.spec.ts subject-reclamation-coordinator.spec.ts reclamation-eligibility.spec.ts link-lifetime.spec.ts
+
+> node tools/run-core-vitest.mjs publication-retirement-boundaries.spec.ts entity-lifetime-ledger-null.spec.ts entity-selection-lifetime.spec.ts subject-reclamation-coordinator.spec.ts reclamation-eligibility.spec.ts link-lifetime.spec.ts
+
+(node:90789) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90892) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-publication-retirement-successor/candidate/packages/kernel
+
+(node:91063) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91069) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91070) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91060) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:91068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/publication-retirement-boundaries.spec.ts (9 tests | 2 failed) 45ms
+   × foreign absence is not discharged by owner confirm 13ms
+   × foreign absence is not discharged by owner rollback 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/publication-retirement-boundaries.spec.ts > foreign absence is not discharged by owner confirm
+ FAIL  src/lib/publication-retirement-boundaries.spec.ts > foreign absence is not discharged by owner rollback
+AssertionError: expected [ [ { id: 'b', n: 2 } ] ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   [
++     {
++       "id": "b",
++       "n": 2,
++     },
++   ],
++ ]
+
+ ❯ src/lib/publication-retirement-boundaries.spec.ts:30:150
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed | 4 passed (5)
+      Tests  2 failed | 43 passed (45)
+   Start at  17:02:07
+   Duration  1.78s (transform 2.92s, setup 0ms, import 3.87s, tests 187ms, environment 2.38s)
+
+Warning: command "node tools/run-core-vitest.mjs publication-retirement-boundaries.spec.ts entity-lifetime-ledger-null.spec.ts entity-selection-lifetime.spec.ts subject-reclamation-coordinator.spec.ts reclamation-eligibility.spec.ts link-lifetime.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.6s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.6s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.6s

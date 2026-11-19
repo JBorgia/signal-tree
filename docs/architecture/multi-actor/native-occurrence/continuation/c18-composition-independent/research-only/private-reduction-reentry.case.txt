@@ -1,0 +1,5 @@
+it('private author reentry during reduction keeps live selection and subsequent sibling payload',async()=>{
+ const s=fixture();s.q.confirm();let entered=false;const original=RecipientOccurrences.prototype.replace;
+ const spy=vi.spyOn(RecipientOccurrences.prototype,'replace').mockImplementation(function(this:RecipientOccurrences,...args){const result=original.apply(this,args);if(!entered){entered=true;s.c.declare({kind:'independent'},()=>s.t.$.a(2));}return result;});
+ try{s.c.declare({kind:'independent'},()=>s.t.$.a(1));await flush();expect(entered).toBe(true);expect(s.sent).toEqual([{a:2,b:0}]);s.c.declare({kind:'independent'},()=>s.t.$.b(3));await flush();expect(s.t.$()).toEqual({a:2,b:3});expect(s.sent).toEqual([{a:2,b:0},{a:2,b:3}]);}finally{spy.mockRestore();s.dispose();}
+});

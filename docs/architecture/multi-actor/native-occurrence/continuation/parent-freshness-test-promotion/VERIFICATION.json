@@ -1,0 +1,26 @@
+{
+  "promotedFiles": [
+    "packages/angular/src/lib/parent-freshness-entity.spec.ts",
+    "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+    "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-entity.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
+    "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts"
+  ],
+  "researchFilesPreservedOutsideCandidate": 9,
+  "onlyChanges": [
+    "packages/angular/src/lib/parent-freshness-focused.spec.ts",
+    "packages/kernel/src/lib/parent-freshness-focused.spec.ts"
+  ],
+  "allOtherBytesAndAssertionsUnchanged": true,
+  "allRuntimeAndConfigurationUnchanged": true,
+  "frozenSourceFilesVerified": 3047,
+  "frozenEvidenceFilesVerified": 282,
+  "envUnsetRuns": [
+    "kernel-no-output",
+    "angular-no-output",
+    "spec-types-no-output"
+  ],
+  "testAdditionPatchRoundtrip": "passed",
+  "validationBaseline": "accepted C8 proof, not C9"
+}

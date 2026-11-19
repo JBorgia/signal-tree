@@ -1,0 +1,13 @@
+{
+  "packages/kernel/src/enhancers/restoration/restoration.ts": "f07244d39d8f48995eedde33c9dc3ca919df4bd9c9e41de9ae655dcb5e6f8fed",
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "5cbf84279b4eb9106947da6340f5faf91b24af06113b1b5711d2de1d4f70d033",
+  "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "22e7971949c3a62c157e3207526fcf63e3c2df6bf0011dc3bf10ecdd06cccc0d",
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "20b9b5f47219658e83f722410c511f8c1519b2769c66b9fe59bc98a1fc192622",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "27a88b798bb1c47dbbd5d931f09fbe6238cc831195d244309bda4df23607a692",
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "cd77fa41a9fb862ad2a18bc53ae679d4d43c04446dc0a3a318a432ba1362e346",
+  "packages/kernel/src/lib/internals/plain-branch-membership.ts": "7c3bc031d97585d97d082c5d65a6b6be8027a5ce8785073c9cbb26cae1b851f0",
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "18d41061d6076e59e4c626c8400bd8d85a0de6a8473d452b5adf7d823fcebb60",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-port.ts": "20b6b9a61f387fb87a35aabcc12c25e1c41bc11bbf31e9b7d8ff41850f41092f",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "3295b2aba72d7b103e1a99c6d45f490632f0c1a3ab1e146551950b39eb980915",
+  "packages/kernel/src/lib/internals/scalar-admission-metadata.ts": "02230ed3d3d8f3a94f2e032378323d215a0d31648af8047d1fb2f232555f57c3"
+}

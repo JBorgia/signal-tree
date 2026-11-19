@@ -1,0 +1,18 @@
+{
+  "commit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "sourceManifestSha256": "da9bb5e49f78eb94c53d936728108334b935a222423ea45c846c5367368ae9d3",
+  "archiveSha256": "f68758a1fda1ccb3198098f97d1f0c4b254ce2def039c602d291b2deb72595ad",
+  "node": "v24.15.0",
+  "pnpm": "10.17.0",
+  "sourceFiles": 2517,
+  "dependencies": "/private/tmp/v16-transition-qualification/node_modules",
+  "versions": {
+    "nx": "23.1.0",
+    "vitest": "4.1.9",
+    "typescript": "6.0.3",
+    "@angular/core": "22.0.7",
+    "react": "19.2.8",
+    "vue": "3.5.42",
+    "solid-js": "1.9.15"
+  }
+}

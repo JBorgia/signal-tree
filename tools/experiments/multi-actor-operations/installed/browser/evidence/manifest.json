@@ -1,0 +1,214 @@
+{
+  "work": "/private/tmp/st-p4-browser-fLlJQx",
+  "sourceHead": "5727cd8fcf701128358674411400c019b137a5e4",
+  "commands": [
+    {
+      "name": "pack-tslib",
+      "command": "npm",
+      "args": [
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/tmp/st-p4-browser-fLlJQx/packs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/tslib@2.8.1/node_modules/tslib",
+      "exit": 0
+    },
+    {
+      "name": "pack-@angular-core",
+      "command": "npm",
+      "args": [
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/tmp/st-p4-browser-fLlJQx/packs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2/node_modules/@angular/core",
+      "exit": 0
+    },
+    {
+      "name": "pack-@angular-compiler",
+      "command": "npm",
+      "args": [
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/tmp/st-p4-browser-fLlJQx/packs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+compiler@22.0.7/node_modules/@angular/compiler",
+      "exit": 0
+    },
+    {
+      "name": "pack-@angular-common",
+      "command": "npm",
+      "args": [
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/tmp/st-p4-browser-fLlJQx/packs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+common@22.0.7_@angular+core@22.0.7_@angular+compiler@22.0.7_rxjs@7.8.2_zone.js@0.16.2__rxjs@7.8.2/node_modules/@angular/common",
+      "exit": 0
+    },
+    {
+      "name": "pack-@angular-platform-browser",
+      "command": "npm",
+      "args": [
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/tmp/st-p4-browser-fLlJQx/packs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+platform-browser@22.0.7_@angular+common@22.0.7_@angular+core@22.0.7_@angular+c_5694b40bc6992c4bf86a468dddfca8c7/node_modules/@angular/platform-browser",
+      "exit": 0
+    },
+    {
+      "name": "pack-rxjs",
+      "command": "npm",
+      "args": [
+        "pack",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        "/private/tmp/st-p4-browser-fLlJQx/packs"
+      ],
+      "cwd": "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/rxjs@7.8.2/node_modules/rxjs",
+      "exit": 0
+    },
+    {
+      "name": "install",
+      "command": "npm",
+      "args": [
+        "install",
+        "--offline",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/angular-common-22.0.7.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/angular-compiler-22.0.7.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/angular-core-22.0.7.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/angular-platform-browser-22.0.7.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/rxjs-7.8.2.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/signal-tree-angular-16.0.0-dev.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/signal-tree-kernel-16.0.0-dev.tgz",
+        "/private/tmp/st-p4-browser-fLlJQx/packs/tslib-2.8.1.tgz"
+      ],
+      "cwd": "/private/tmp/st-p4-browser-fLlJQx/consumer",
+      "exit": 0
+    },
+    {
+      "name": "aot",
+      "command": "/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node",
+      "args": [
+        "/Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@angular+compiler-cli@22.0.7_@angular+compiler@22.0.7_typescript@6.0.3/node_modules/@angular/compiler-cli/bundles/src/bin/ngc.js",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "/private/tmp/st-p4-browser-fLlJQx/consumer",
+      "exit": 0
+    }
+  ],
+  "hashes": {
+    "packs/angular-common-22.0.7.tgz": "86a088d61b39cd0963d2db901ba7fac5ef7ba603822608618c89b5ab774b8aa4",
+    "packs/angular-compiler-22.0.7.tgz": "90a583439606a9fa8eb9a89439440f6b74bbe5ae1e0286b7f102b7ea474b2dba",
+    "packs/angular-core-22.0.7.tgz": "c21ec1e85edd670c1eb3848679df406586acda492b4bd4a9be1d3cab6313fad1",
+    "packs/angular-platform-browser-22.0.7.tgz": "6a7f9978ea5fa10eb42aa95529ec0d537d8b7e691f38f0d44469d00d627a4926",
+    "packs/rxjs-7.8.2.tgz": "5de2d7488d8f484e88b133e4327c3c422f222029bb32a9dfbc4f18f4e41b0128",
+    "packs/signal-tree-angular-16.0.0-dev.tgz": "da6bf34cd1769f323ef26c43acd0cf388028e348a34a8fbbc8e976b01a800993",
+    "packs/signal-tree-kernel-16.0.0-dev.tgz": "64cfcda4aa980a4e27322693edf28d22c9aae54905d2e1d1b0c821ad455ac019",
+    "packs/tslib-2.8.1.tgz": "66f635d5eeabae44807534976913a102cf615b9a045368359c9f79ae6ee2119e",
+    "consumer/browser/ag-ui.d.mts": "b865e04a188d51ae7d364dbc32a8028798e60fa01b29b9eb118e91d1466eed8e",
+    "consumer/browser/ag-ui.mjs": "e6b3ccd93c9b2019e46e0bface3dc2812218bfe3e293c1258665f1d417870aef",
+    "consumer/browser/app.ts": "675eed2658fb972f78f7d126570b58911122c47a688a569338f3b31b69700849",
+    "consumer/browser/main.ts": "24d29c03d422d958d5da5aa20f9d2740c14b223264048685413cdd3d65b847af",
+    "consumer/browser/review-fixture.d.mts": "9774e3d955500dc3d464d2114589785fba67db85879c844652fca969213b87aa",
+    "consumer/browser/review-fixture.mjs": "653ae035ff584c4832b7b817431c5dd314920b75890de937e8e54d8ba287326f",
+    "consumer/coordinator.d.mts": "52c51ae3eb3efcfc299775f6860228510b4c512f8b9d2987e31f568d5a4dfefc",
+    "consumer/coordinator.mjs": "096140d4460b8b8e51148444bc4e7c6f5bf3f80f4373f6b0586d46ecd1fa539c",
+    "consumer/dispatch-fixture.d.mts": "59f924bc4701a203e4f2cfd7cf350ccc9096826406b3a17367cd73d570bbd525",
+    "consumer/dispatch-fixture.mjs": "3ba8cd1b48cdfd8c0dbc4936ac4ed806421be2a123813363d9fae70ea008dcb6",
+    "consumer/package-lock.json": "a1ed206e923084c7bb979c8caf87b42c5bc7a037e523cbb80a1695663d38a73a",
+    "consumer/package.json": "95c9c898de7f18de85ff77e845835bc8d0a52145ef228bac05c719eb28326526",
+    "site/app.js": "d95ca596a0cf429f075bc9599cb87de7e8917c34e145c8e1a0307fd28d039f0b",
+    "site/index.html": "1f483e0ba63a13baf2bc49ff87ed6a4555331be9e0028ed04f5c9d813b805c58"
+  },
+  "mode": "installed-artifact/full-AOT/browser-DOM/in-memory-authority",
+  "toolVersions": {
+    "node": "v24.15.0",
+    "angular": "22.0.7",
+    "typescript": "6.0.3",
+    "playwright": "1.56.1"
+  },
+  "url": "http://127.0.0.1:62443",
+  "chromium": "141.0.7390.37",
+  "results": {
+    "results": [
+      {
+        "name": "AG-UI draft needs review/apply; server receipt and native settlement remain separate",
+        "outcome": "PASS"
+      },
+      {
+        "name": "rejecting a reviewed proposal preserves an independent note without server execution",
+        "outcome": "PASS"
+      },
+      {
+        "name": "stale authoritative input version rejects ABA after review and preserves note",
+        "outcome": "PASS"
+      },
+      {
+        "name": "definitive persistence error rolls back locally without a server commit",
+        "outcome": "PASS"
+      },
+      {
+        "name": "lost acknowledgment retains authority; disposal refuses; retry commits once",
+        "outcome": "PASS"
+      },
+      {
+        "name": "disposing an unsent draft rejects it and destroys tree exactly once",
+        "outcome": "PASS"
+      },
+      {
+        "name": "settled session disposes without erasing accepted server state",
+        "outcome": "PASS"
+      },
+      {
+        "name": "terminal rejection retains local authority; overlap resolution enables local-only retry",
+        "outcome": "PASS"
+      },
+      {
+        "name": "post-terminal removal observer error is reported without retry or lost terminal outcome",
+        "outcome": "PASS"
+      },
+      {
+        "name": "protocol and forged transport context cannot mint consent; missing server grant blocks application",
+        "outcome": "PASS"
+      },
+      {
+        "name": "uncertain command retains its capped grant and owner until receipt retry then releases capacity",
+        "outcome": "PASS"
+      },
+      {
+        "name": "terminal receipt revokes grant while local recovery retains owner and never resends",
+        "outcome": "PASS"
+      },
+      {
+        "name": "human and declared embedded proposals share review, authority and local settlement",
+        "outcome": "PASS"
+      },
+      {
+        "name": "delayed embedded completion keeps its observed versions and rejects changed input without losing a note",
+        "outcome": "PASS"
+      },
+      {
+        "name": "in-session disposal cancels a producer before proposal without creating late authority",
+        "outcome": "PASS"
+      }
+    ],
+    "pageErrors": []
+  }
+}

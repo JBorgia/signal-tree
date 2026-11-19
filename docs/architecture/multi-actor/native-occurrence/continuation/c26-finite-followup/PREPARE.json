@@ -1,0 +1,5 @@
+{
+  "manifest": "8055911bdd78c9df536bc8a7e1ea8bf3e74427c64675fbc8d0a566c0d91aa38f",
+  "files": 3083,
+  "changes": "Preserved diagnostic patch, workload checkpoints extend to64/256; terminal assertions unchanged"
+}

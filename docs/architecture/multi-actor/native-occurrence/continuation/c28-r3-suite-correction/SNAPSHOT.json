@@ -1,0 +1,25 @@
+{
+  "frozen": true,
+  "baseManifestSha256": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3",
+  "manifestSha256": "3a6791b4440c375ee76f00163031754a2fa6270d98aba9545e54120886237db2",
+  "patchSha256": "d19ce4882792cb53aa730fcd04eb39cd0a208ba6b8a5da5b32a71154bf2f18e0",
+  "runtimeChanged": false,
+  "allManifestFilesCheckedAfterGates": 3095,
+  "results": {
+    "react-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "kernel-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    },
+    "spec-types-first": {
+      "exit": 0,
+      "timeout": false,
+      "sourceUnchanged": true
+    }
+  }
+}

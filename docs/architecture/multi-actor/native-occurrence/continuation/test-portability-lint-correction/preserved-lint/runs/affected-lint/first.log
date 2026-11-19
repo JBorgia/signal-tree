@@ -1,0 +1,66 @@
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/approved-current-obligation.spec.ts
+  1:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
+  1:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/fixed-window-retirement.spec.ts
+  2:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-dynamic-enrollment.spec.ts
+   1:1    error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+  55:138  error  Unexpected empty arrow function                                                              @typescript-eslint/no-empty-function
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-occurrence-terminal.spec.ts
+  1:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-prepared-boundary.spec.ts
+   2:1    error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+  24:163  error  Unexpected empty method 'complete'                                                           @typescript-eslint/no-empty-function
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/independent-prepared-unit.spec.ts
+  2:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts
+  1:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/optional-diagnostic.spec.ts
+  5:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/public-selected-unit.spec.ts
+  2:1  error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/recipient-window-review.spec.ts
+   2:1    error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+  34:135  error  Unexpected empty method 'set'                                                                @typescript-eslint/no-empty-function
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/rich-capture-getter-boundary.spec.ts
+   2:1    error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+  10:246  error  Unexpected empty method 'opaque'                                                             @typescript-eslint/no-empty-function
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/rich-capture-participant-boundary.spec.ts
+   2:1    error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+  13:358  error  Unexpected empty method 'complete'                                                           @typescript-eslint/no-empty-function
+
+/private/tmp/st-v16-integration-candidate/packages/kernel/src/lib/rich-source-preparation-boundary.spec.ts
+   2:1    error  Projects cannot be imported by a relative or absolute path, and must begin with a npm scope  @nx/enforce-module-boundaries
+  13:358  error  Unexpected empty method 'complete'                                                           @typescript-eslint/no-empty-function
+
+/private/tmp/st-v16-integration-candidate/tools/experiments/multi-actor-operations/installed/angular-runtime.mjs
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+/private/tmp/st-v16-integration-candidate/tools/experiments/multi-actor-operations/installed/angular.mjs
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+/private/tmp/st-v16-integration-candidate/tools/experiments/multi-actor-operations/installed/reference.component.ts
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+/private/tmp/st-v16-integration-candidate/tools/experiments/multi-actor-operations/installed/run.mjs
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+/private/tmp/st-v16-integration-candidate/tools/experiments/multi-actor-operations/installed/sealed-input.mjs
+  0:0  warning  File ignored because of a matching ignore pattern. Use "--no-ignore" to disable file ignore settings or use "--no-warn-ignored" to suppress this warning
+
+✖ 25 problems (20 errors, 5 warnings)
+

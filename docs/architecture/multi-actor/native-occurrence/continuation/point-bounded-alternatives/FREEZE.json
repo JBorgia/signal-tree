@@ -1,0 +1,48 @@
+{
+  "status": "frozen-A-proof-B-premise-stop-independent-review-pending",
+  "baselineManifestSha256": "73e4ecfde64ee05a1eed1eb1362e8ca6f18755b1192a3583454440ef4ad68c27",
+  "AmanifestSha256": "9375f98e076c48aa7c4885d09067a5d7308b7c93d9fc821d9d9c37f86f56f0ce",
+  "runtimePatchSha256": "4f306f1a002afc0281c1141447cb8d87522fa5f4d8909bfcea55a1b7c40769b1",
+  "researchTestsPatchSha256": "0b82d84a3a73aa45e2fa49bb912c6e72bf2da3758b47d7c0cee7cb946b752e45",
+  "expectationsSha256": "bd060838d282c643aa2b58f7a145a9bc3879bd4a65a8268a436f5ed77ffe51f7",
+  "runtimeChangesA": [
+    "packages/kernel/src/lib/experimental-publication/private.ts"
+  ],
+  "runtimeChangesB": [],
+  "unchangedBaselineFilesA": 3065,
+  "pairedFocusedControlsPassed": 55,
+  "sourceTypes": "pass",
+  "specTypes": "pass",
+  "unchangedPointBudget": "baseline13800/A13000 both fail less than2000",
+  "runResults": {
+    "baseline-controls-pathfix": {
+      "exit": 0,
+      "sourceUnchanged": true
+    },
+    "A-source-types": {
+      "exit": 0,
+      "sourceUnchanged": true
+    },
+    "baseline-point": {
+      "exit": 1,
+      "sourceUnchanged": true
+    },
+    "baseline-controls": {
+      "exit": 1,
+      "sourceUnchanged": true
+    },
+    "A-spec-types": {
+      "exit": 0,
+      "sourceUnchanged": true
+    },
+    "A-point": {
+      "exit": 1,
+      "sourceUnchanged": true
+    },
+    "A-controls": {
+      "exit": 0,
+      "sourceUnchanged": true
+    }
+  },
+  "fixturePathCorrectionOnly": true
+}

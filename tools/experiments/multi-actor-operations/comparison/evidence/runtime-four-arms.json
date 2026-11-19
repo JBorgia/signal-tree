@@ -1,0 +1,26 @@
+{
+  "node": "v24.15.0",
+  "typescript": "7.0.2",
+  "signalTree": {
+    "version": "16.0.0-dev",
+    "resolvedEntry": "file:///private/tmp/st-installed-review-6wmzqU/consumer/node_modules/@signal-tree/kernel/dist/index.js",
+    "entrySha256": "a91d2789824d429e69cd18ce29679dbd736fdeecb8dcbd5eac8d2dab018db799",
+    "declarationSha256": "d2070e4a3084373c313f01c8e9c433939f9c4b446b2fc77bbd0df3168dffa321",
+    "publicExportOnly": true
+  },
+  "tanstack": "1.0.0-rc.1",
+  "commonScenarioBodiesUnchanged": true,
+  "original27LogSha256": "9f4ec967d6e0f90387ce90aeb4a4fe4614bfb8bc6ac8fc12d04ddafad32fccd5",
+  "finalTests": {
+    "total": 44,
+    "common": 36,
+    "lifecycle": 8,
+    "passed": 44,
+    "skipped": 0
+  },
+  "strictTypes": {
+    "skipLibCheck": false,
+    "consumerNegativeControls": 3,
+    "exitCode": 0
+  }
+}

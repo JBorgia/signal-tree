@@ -1,0 +1,33 @@
+{
+  "manifestSha256": "dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148",
+  "files": 3045,
+  "mismatches": [],
+  "executedSequentially": true,
+  "results": [
+    {
+      "name": "source-types",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "spec-types",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "react",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "vue",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    },
+    {
+      "name": "solid",
+      "exit": 0,
+      "manifestMismatchesAfter": []
+    }
+  ]
+}

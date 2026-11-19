@@ -1,0 +1,101 @@
+[
+  {
+    "name": "kernel54",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 13.75057333393488,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "kernel59",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 9.864881542045623,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "source-types",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 6.502739208051935,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "public-types",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 4.461506374995224,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "spec-types",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 20.139717083075084,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "angular-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 10.017060457961634,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "react-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 15.199535749969073,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "vue-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 10.965922457980923,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  },
+  {
+    "name": "solid-focused",
+    "exit": 0,
+    "timeout": false,
+    "elapsedSeconds": 10.424316916964017,
+    "attempts": 1,
+    "sourceMismatches": [],
+    "frozenInputMismatches": [],
+    "ownedGroupPresent": false,
+    "manifest": "e0b64de42df330abff455d2ee1b981c99abee187a77269cd064f52f3b08505f3"
+  }
+]

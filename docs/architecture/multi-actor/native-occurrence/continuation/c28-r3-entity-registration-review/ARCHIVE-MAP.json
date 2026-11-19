@@ -1,0 +1,62 @@
+[
+  {
+    "source": "EVIDENCE.json",
+    "archive": "EVIDENCE.json",
+    "sourceSha256": "92c66e4ed90de449feb1df7abbb3a455d6ec44305ae7c1b8e5607e4377ee7dca",
+    "archiveSha256": "92c66e4ed90de449feb1df7abbb3a455d6ec44305ae7c1b8e5607e4377ee7dca"
+  },
+  {
+    "source": "IMPLEMENTATION.md",
+    "archive": "IMPLEMENTATION.md",
+    "sourceSha256": "1eec5b85f305bf92eded1bf714ebb1f1d7e6804d9773ee54987bafa0f9359a43",
+    "archiveSha256": "1eec5b85f305bf92eded1bf714ebb1f1d7e6804d9773ee54987bafa0f9359a43"
+  },
+  {
+    "source": "MODULE-GRAPH.json",
+    "archive": "MODULE-GRAPH.json",
+    "sourceSha256": "f3d385c3a3c1d262adbf9c0cf4c295bc4d533bad04bdd88de8c5850b354f4c0e",
+    "archiveSha256": "f3d385c3a3c1d262adbf9c0cf4c295bc4d533bad04bdd88de8c5850b354f4c0e"
+  },
+  {
+    "source": "LINK-MODULE-GRAPH.json",
+    "archive": "LINK-MODULE-GRAPH.json",
+    "sourceSha256": "9fa7bec1f2f7b5e9f824f039078088b2c93295ad7693987a3b7939533cbda44b",
+    "archiveSha256": "9fa7bec1f2f7b5e9f824f039078088b2c93295ad7693987a3b7939533cbda44b"
+  },
+  {
+    "source": "IMPLEMENTATION-IDENTITY.json",
+    "archive": "IMPLEMENTATION-IDENTITY.json",
+    "sourceSha256": "c76ffb7113c79878643267bfd14ab15deb231da87e1afff6d553a59242854795",
+    "archiveSha256": "c76ffb7113c79878643267bfd14ab15deb231da87e1afff6d553a59242854795"
+  },
+  {
+    "source": "EXPLICIT-VALUE-PREMISE.md",
+    "archive": "EXPLICIT-VALUE-PREMISE.md",
+    "sourceSha256": "3c5d85dc43715e294476ee35557c156a7cc37e5234d4f12abbf8886effe32ab9",
+    "archiveSha256": "3c5d85dc43715e294476ee35557c156a7cc37e5234d4f12abbf8886effe32ab9"
+  },
+  {
+    "source": "audit-graph.cjs",
+    "archive": "audit-graph.cjs",
+    "sourceSha256": "61acd5922f96e3ea85d14d8d974054afb56c3503c811dd990e25e7c5fa1399b7",
+    "archiveSha256": "61acd5922f96e3ea85d14d8d974054afb56c3503c811dd990e25e7c5fa1399b7"
+  },
+  {
+    "source": "audit-link-graph.cjs",
+    "archive": "audit-link-graph.cjs",
+    "sourceSha256": "6d6a42511a54ff0eae4f23f098f0734b7075781f5b2eedce6814ff64da525e19",
+    "archiveSha256": "6d6a42511a54ff0eae4f23f098f0734b7075781f5b2eedce6814ff64da525e19"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "8e5891ece436dcdfe16f67c2ce22e60d60f0cb1e6bf8f61bcec7cf2ce1b4185a",
+    "archiveSha256": "8e5891ece436dcdfe16f67c2ce22e60d60f0cb1e6bf8f61bcec7cf2ce1b4185a"
+  },
+  {
+    "source": "EXPLICIT-VALUE-IDENTITY.json",
+    "archive": "EXPLICIT-VALUE-IDENTITY.json",
+    "sourceSha256": "4d87763b3974c7f90361c063ce508d5afdc26855608e430e800f570bda4ddf98",
+    "archiveSha256": "4d87763b3974c7f90361c063ce508d5afdc26855608e430e800f570bda4ddf98"
+  }
+]

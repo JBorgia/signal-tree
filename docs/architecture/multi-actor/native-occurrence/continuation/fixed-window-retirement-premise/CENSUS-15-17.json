@@ -1,0 +1,86 @@
+[
+  {
+    "identity": "src/lib/entity-negative-publication-retirement.spec.ts > bare negative membership retains captured foreign obligation until confirm",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 15,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts",
+    "line": 33,
+    "sha256": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "logLine": 1585,
+    "observed": "AssertionError: expected 1 to be +0 // Object.is equality",
+    "category": "OPEN stronger terminal retention obligation",
+    "obligation": "Pending hold and useful terminal surviving send already pass. Failure is negativePresence=1 versus0 after terminality. Narrow owner-free retirement deliberately retains unknown/possible evidence and has no owner-settlement listener.",
+    "evidence": "entity-negative-publication-retirement:29\u201333; /private/tmp/st-publication-retirement-independent/REVIEW.md. Not waived; broader drain obligation remains unfulfilled/unadjudicated.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-negative-publication-retirement.spec.ts",
+        "--testNamePattern=^bare\\ negative\\ membership\\ retains\\ captured\\ foreign\\ obligation\\ until\\ confirm$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-negative-publication-retirement.spec.ts > bare negative membership retains captured foreign obligation until reject",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 16,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-negative-publication-retirement.spec.ts",
+    "line": 33,
+    "sha256": "e8edf40cbffd198c09f1f93cc19c8549467efae27c7a0b9609b94fd6aea9f31f",
+    "logLine": 1586,
+    "observed": "AssertionError: expected 1 to be +0 // Object.is equality",
+    "category": "OPEN stronger terminal retention obligation",
+    "obligation": "Pending hold and useful terminal surviving send already pass. Failure is negativePresence=1 versus0 after terminality. Narrow owner-free retirement deliberately retains unknown/possible evidence and has no owner-settlement listener.",
+    "evidence": "entity-negative-publication-retirement:29\u201333; /private/tmp/st-publication-retirement-independent/REVIEW.md. Not waived; broader drain obligation remains unfulfilled/unadjudicated.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-negative-publication-retirement.spec.ts",
+        "--testNamePattern=^bare\\ negative\\ membership\\ retains\\ captured\\ foreign\\ obligation\\ until\\ reject$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  },
+  {
+    "identity": "src/lib/entity-publication-work-lifetime.spec.ts > ordinary churn retires new metadata while retained receipts and old references stay detached",
+    "classification": "runtime-or-oracle-requires-disposition",
+    "id": 17,
+    "source": "/private/tmp/st-current-read-integration/candidate/packages/kernel/src/lib/entity-publication-work-lifetime.spec.ts",
+    "line": 51,
+    "sha256": "7ca2ca3c60b332b3cf01752618e409d9a8c0b0fc2d52f97865514dd7c26b6a94",
+    "logLine": 1605,
+    "observed": "AssertionError: presence after cycle 0: expected 1 to be +0 // Object.is equality",
+    "category": "REPAIR neutral retirement / combined replay",
+    "obligation": "Ordinary churn drains source maps while retained receipts/handles remain detached and positive sends occur.",
+    "evidence": "Retirement manifest 3be20bcf\u2026; independent22 pass; combined retirement-and-collection158 pass includes original lifetime spec.",
+    "replay": {
+      "cwd": "<fresh verified disposable copy of selected manifest>",
+      "argv": [
+        "corepack",
+        "pnpm",
+        "nx",
+        "test",
+        "kernel",
+        "--skip-nx-cache",
+        "--testFile=src/lib/entity-publication-work-lifetime.spec.ts",
+        "--testNamePattern=^ordinary\\ churn\\ retires\\ new\\ metadata\\ while\\ retained\\ receipts\\ and\\ old\\ references\\ stay\\ detached$",
+        "--maxWorkers=1"
+      ],
+      "status": "proposed, NOT RUN in this census"
+    }
+  }
+]

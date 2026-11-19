@@ -1,0 +1,21 @@
+{
+  "sourceTypes": "pass",
+  "specTypes": "pass",
+  "react": {
+    "files": 1,
+    "passed": 3,
+    "failed": 0
+  },
+  "vue": {
+    "files": 1,
+    "passed": 3,
+    "failed": 0
+  },
+  "solid": {
+    "files": 1,
+    "passed": 3,
+    "failed": 0
+  },
+  "sequential": true,
+  "scope": "Targeted counterpart composition only; C10 failures preserved; no full-suite repeats."
+}

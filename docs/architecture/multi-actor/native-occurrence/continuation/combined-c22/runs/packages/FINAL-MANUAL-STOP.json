@@ -1,0 +1,8 @@
+{
+  "verified": {
+    "2756": "2756   143  2756 node /private/tmp/st-native-combined-c22/candidate/node_modules/.bin/../rollup/dist/bin/rollup -c rollup.config.cjs",
+    "143": "143   141 99988 node ./node_modules/.bin/../nx/dist/bin/nx.js run-many -t build --projects=kernel,angular,react,vue,solid --parallel=1 --skip-nx-cache"
+  },
+  "action": "stop owned Angular group and Nx coordinator only",
+  "time": "2026-11-02T14:08:34-0700"
+}

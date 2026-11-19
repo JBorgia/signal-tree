@@ -1,0 +1,242 @@
+
+ NX   Running target build for 4 projects:
+
+- kernel
+- angular
+- vue
+- solid
+
+
+
+> nx run kernel:build
+
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/index.ts, /private/tmp/st-current-read-capability-proof/packages/kernel/src/adapter.ts, /private/tmp/st-current-read-capability-proof/packages/kernel/src/internals.ts → ../../dist/packages/kernel...
+kernel: (node:55703) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+kernel: (Use `node --trace-warnings ...` to show where the warning was created)
+kernel:   dist/adapter.js 3.618 KB
+kernel:   dist/internals.js 6.836 KB
+kernel:   dist/index.js 711 Bytes
+kernel:   dist/lib/internals/observation-substrate.js 4.483 KB
+kernel:   dist/lib/internals/owner-invalidation.js 3.213 KB
+kernel:   dist/lib/internals/canonical-snapshot.js 316 Bytes
+kernel:   dist/lib/internals/native-location-realization.js 9.731 KB
+kernel:   dist/lib/internals/native-tree-scalar-leaf-runtime.js 7.578 KB
+kernel:   dist/lib/internals/observation-adapter.js 210 Bytes
+kernel:   dist/lib/signal-tree.js 84.154 KB
+kernel:   dist/lib/internals/location-runtime.js 15.419 KB
+kernel:   dist/lib/internals/restoration-eligibility.js 4.964 KB
+kernel:   dist/lib/internals/node-shape.js 2.039 KB
+kernel:   dist/lib/internals/construction-branch.js 525 Bytes
+kernel:   dist/lib/internals/write-observation-scope.js 2.384 KB
+kernel:   dist/lib/write-context.js 2.497 KB
+kernel:   dist/enhancers/transactions/transactions.js 149.803 KB
+kernel:   dist/lib/internals/position-registry.js 3.111 KB
+kernel:   dist/lib/internals/tree-capabilities.js 3.656 KB
+kernel:   dist/lib/internals/write-observation.js 1.446 KB
+kernel:   dist/lib/internals/confirmed-turn-view.js 1.245 KB
+kernel:   dist/lib/internals/state-location-view.js 4.304 KB
+kernel:   dist/lib/internals/link-state-view.js 3.879 KB
+kernel:   dist/lib/internals/transaction-lifecycle-view.js 4.656 KB
+kernel:   dist/lib/internals/restoration-reader.js 4.249 KB
+kernel:   dist/lib/internals/entity-membership-view.js 7.692 KB
+kernel:   dist/lib/leaf.js 833 Bytes
+kernel:   dist/lib/readonly.js 68 Bytes
+kernel:   dist/lib/types.js 855 Bytes
+kernel:   dist/lib/undoable.js 2.767 KB
+kernel:   dist/lib/external.js 5.909 KB
+kernel:   dist/lib/internals/error-reporter.js 5.895 KB
+kernel:   dist/lib/link.js 29.702 KB
+kernel:   dist/enhancers/batching/batching.js 12.864 KB
+kernel:   dist/enhancers/restoration/restoration.js 168.737 KB
+kernel:   dist/enhancers/devtools/devtools.js 2.561 KB
+kernel:   dist/lib/internals/owned-mutation.js 6.944 KB
+kernel:   dist/lib/internals/owned-metadata.js 1.842 KB
+kernel:   dist/lib/internals/member-membership.js 31.545 KB
+kernel:   dist/lib/internals/intrinsic-mutation.js 4.381 KB
+kernel:   dist/lib/utils.js 24.365 KB
+kernel:   dist/lib/internals/owner-invalidation-port.js 427 Bytes
+kernel:   dist/lib/internals/cell-identity.js 2.79 KB
+kernel:   dist/lib/internals/production-substrate-stats.prod.js 97 Bytes
+kernel:   dist/lib/internals/tree-scalar-slot-runtime.js 7.54 KB
+kernel:   dist/lib/constants.js 2.888 KB
+kernel:   dist/enhancers/index.js 3.354 KB
+kernel:   dist/lib/internals/materialize-markers.js 23.161 KB
+kernel:   dist/lib/internals/path-observation-port.js 2.646 KB
+kernel:   dist/lib/internals/root-source.js 713 Bytes
+kernel:   dist/lib/internals/mutation-capture-runtime.js 2.607 KB
+kernel:   dist/lib/internals/tree-scalar-slot-port.js 528 Bytes
+kernel:   dist/lib/internals/tree-scalar-leaf-runtime.js 4.793 KB
+kernel:   dist/lib/internals/physical-commit-clock.js 726 Bytes
+kernel:   dist/lib/internals/merge-derived.js 6.423 KB
+kernel:   dist/lib/internals/snapshot-authority.js 2.659 KB
+kernel:   dist/lib/internals/utilities/is-built-in-object.js 1.689 KB
+kernel:   dist/lib/internals/exposed-publication.js 1.423 KB
+kernel:   dist/lib/internals/plain-branch-membership.js 35.572 KB
+kernel:   dist/lib/internals/physical-rows.js 1.48 KB
+kernel:   dist/lib/internals/causal-runtime/post-application-failure.js 1.306 KB
+kernel:   dist/lib/internals/subject-restoration-claims.js 5.724 KB
+kernel:   dist/lib/write-participation.js 2.433 KB
+kernel:   dist/lib/internals/commit-consequence.js 7.603 KB
+kernel:   dist/lib/internals/transaction-lifecycle-source.js 372 Bytes
+kernel:   dist/lib/internals/entity-membership-source.js 2.531 KB
+kernel:   dist/lib/internals/causal-runtime/applied-turn-projection.js 5.63 KB
+kernel:   dist/lib/internals/causal-runtime/target-transition.js 31 KB
+kernel:   dist/lib/internals/causal-runtime/pending-rollback.js 13.939 KB
+kernel:   dist/lib/internals/causal-runtime/transaction-lifecycle.js 10.069 KB
+kernel:   dist/lib/internals/causal-runtime/realization-context.js 2.385 KB
+kernel:   dist/lib/internals/causal-runtime/tree-realization-adapter.js 70.71 KB
+kernel:   dist/lib/internals/causal-runtime/turn-store.js 7.141 KB
+kernel:   dist/lib/internals/intercept-leaf-signals.js 12.475 KB
+kernel:   dist/lib/path-notifier.js 25.251 KB
+kernel:   dist/lib/internals/visit-tree.js 930 Bytes
+kernel:   dist/lib/internals/tooling-tree.js 193 Bytes
+kernel:   dist/lib/internals/entity-membership-inventory.js 8.318 KB
+kernel:   dist/lib/internals/link-state-source.js 1.436 KB
+kernel:   dist/lib/internals/restoration-source.js 908 Bytes
+kernel:   dist/lib/enhancer-types.js 148 Bytes
+kernel:   dist/lib/markers/entity-map.js 12.722 KB
+kernel:   dist/lib/internals/entity-projection-seed.js 2.897 KB
+kernel:   dist/lib/internals/entity-egress-projection.js 4.792 KB
+kernel:   dist/lib/internals/source-mutation.js 3.292 KB
+kernel:   dist/enhancers/devtools/devtools-impl.js 51.55 KB
+kernel:   dist/enhancers/restoration/order-boundary-evidence.js 4.962 KB
+kernel:   dist/lib/internals/causal-runtime/transient-rows.js 2.235 KB
+kernel:   dist/lib/internals/subject-reclamation-sink.js 4.575 KB
+kernel:   dist/lib/internals/utilities/append-all.js 378 Bytes
+kernel:   dist/lib/internals/utilities/deep-equal.js 12.457 KB
+kernel:   dist/lib/internals/runtime-tree-plan.js 309 Bytes
+kernel:   dist/lib/physical/prepare-entity-target.js 7.152 KB
+kernel:   dist/lib/internals/utilities/deep-clone.js 2.731 KB
+kernel:   dist/lib/internals/causal-runtime/scoped-value-addressing.js 221 Bytes
+kernel:   dist/lib/entity-signal.js 141.998 KB
+kernel:   dist/lib/physical/prepare-structural-target.js 2.55 KB
+kernel:   dist/lib/physical/entity-mutation-frame.js 5.477 KB
+kernel:   dist/lib/physical/entity-handle-resolution.js 478 Bytes
+kernel:   dist/lib/physical/entity-value-store.js 792 Bytes
+kernel:   dist/lib/physical/structural-store.js 14.599 KB
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (27:37): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-authority.ts:27:37
+kernel: [7m27[0m   c.equal(f.candidate.readVisible().y, y, 'visible y');
+kernel: [7m  [0m [91m                                    ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-authority.ts:27:37
+kernel: [7m27[0m   c.equal(f.candidate.readVisible().y, y, 'visible y');
+kernel: [7m  [0m [91m                                    ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-authority.ts (29:39): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-authority.ts:29:39
+kernel: [7m29[0m   c.equal(f.candidate.readCanonical().y, y, 'canonical y');
+kernel: [7m  [0m [91m                                      ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-authority.ts:29:39
+kernel: [7m29[0m   c.equal(f.candidate.readCanonical().y, y, 'canonical y');
+kernel: [7m  [0m [91m                                      ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (77:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:77:37
+kernel: [7m77[0m         f.candidate.readCanonical().x,
+kernel: [7m  [0m [91m                                    ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:77:37
+kernel: [7m77[0m         f.candidate.readCanonical().x,
+kernel: [7m  [0m [91m                                    ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (81:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:81:27
+kernel: [7m81[0m       c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+kernel: [7m  [0m [91m                          ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:81:27
+kernel: [7m81[0m       c.equal(snapshot(f).x, 1, 'pending overlay remains visible');
+kernel: [7m  [0m [91m                          ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (85:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:85:27
+kernel: [7m85[0m       c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+kernel: [7m  [0m [91m                          ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:85:27
+kernel: [7m85[0m       c.equal(snapshot(f).x, 2, 'external truth survives rejection');
+kernel: [7m  [0m [91m                          ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (158:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:158:25
+kernel: [7m158[0m     c.equal(snapshot(f).x, 2, 'later literal visible');
+kernel: [7m   [0m [91m                        ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:158:25
+kernel: [7m158[0m     c.equal(snapshot(f).x, 2, 'later literal visible');
+kernel: [7m   [0m [91m                        ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (163:25): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:163:25
+kernel: [7m163[0m     c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+kernel: [7m   [0m [91m                        ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:163:25
+kernel: [7m163[0m     c.equal(snapshot(f).x, 2, 'accept cannot replay older literal');
+kernel: [7m   [0m [91m                        ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (205:23): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:205:23
+kernel: [7m205[0m             c.equal(s.x, 0, 'refused x never published');
+kernel: [7m   [0m [91m                      ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:205:23
+kernel: [7m205[0m             c.equal(s.x, 0, 'refused x never published');
+kernel: [7m   [0m [91m                      ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (206:23): @rollup/plugin-typescript TS4111: Property 'y' comes from an index signature, so it must be accessed with ['y'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:206:23
+kernel: [7m206[0m             c.equal(s.y, 0, 'refused y never published');
+kernel: [7m   [0m [91m                      ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:206:23
+kernel: [7m206[0m             c.equal(s.y, 0, 'refused y never published');
+kernel: [7m   [0m [91m                      ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:27): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:27
+kernel: [7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+kernel: [7m   [0m [91m                          ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:27
+kernel: [7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+kernel: [7m   [0m [91m                          ~[0m
+kernel: (!) [plugin typescript] src/enhancers/transactions/semantics-composition.ts (350:37): @rollup/plugin-typescript TS4111: Property 'x' comes from an index signature, so it must be accessed with ['x'].
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:37
+kernel: [7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+kernel: [7m   [0m [91m                                    ~[0m
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/enhancers/transactions/semantics-composition.ts:350:37
+kernel: [7m350[0m       c.equal(snapshot(f).x, before.x, 'refused x unchanged');
+kernel: [7m   [0m [91m                                    ~[0m
+kernel: created ../../dist/packages/kernel in 2.9s
+kernel: /private/tmp/st-current-read-capability-proof/packages/kernel/src/index.ts, /private/tmp/st-current-read-capability-proof/packages/kernel/src/adapter.ts, /private/tmp/st-current-read-capability-proof/packages/kernel/src/internals.ts → ../../dist/packages/kernel/dist...
+kernel: created ../../dist/packages/kernel/dist in 1.1s
+
+> nx run angular:build
+
+angular: /private/tmp/st-current-read-capability-proof/packages/angular/src/index.ts → ../../dist/packages/angular...
+angular: (node:55741) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+angular: (Use `node --trace-warnings ...` to show where the warning was created)
+angular:   dist/index.js 862 Bytes
+angular:   dist/lib/observation-adapter.js 3.587 KB
+angular:   dist/lib/construction-input.js 1.646 KB
+angular:   dist/lib/define-store.js 1.853 KB
+angular:   dist/lib/to-writable-signal.js 3.67 KB
+angular: created ../../dist/packages/angular in 752ms
+
+> nx run vue:build
+
+vue: /private/tmp/st-current-read-capability-proof/packages/vue/src/index.ts → ../../dist/packages/vue...
+vue: (node:55756) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+vue: (Use `node --trace-warnings ...` to show where the warning was created)
+vue:   dist/index.js 782 Bytes
+vue:   dist/lib/construction-input.js 1.661 KB
+vue:   dist/lib/vue-observation.js 4.7 KB
+vue: created ../../dist/packages/vue in 716ms
+
+> nx run solid:build
+
+solid: /private/tmp/st-current-read-capability-proof/packages/solid/src/index.ts → ../../dist/packages/solid...
+solid: (node:55775) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+solid: (Use `node --trace-warnings ...` to show where the warning was created)
+solid:   dist/index.js 985 Bytes
+solid:   dist/lib/construction-input.js 2.068 KB
+solid:   dist/lib/solid-observation.js 4.703 KB
+solid: created ../../dist/packages/solid in 645ms
+
+
+
+ NX   Successfully ran target build for 4 projects
+
+
+  Run duration:      9.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.5s (2 tasks)
+  Recoverable time:  2.6s (29% of the run)
+
+  Recommendations:
+    - Increase parallelism to recover up to 2.6s → https://nx.dev/docs/concepts/ci-concepts/parallelization-distribution?utm_source=nx-cli&utm_medium=cli&utm_campaign=performance-report&utm_content=parallelization.
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.

@@ -1,0 +1,98 @@
+
+> nx run kernel:test packet-index-adversarial.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts --maxWorkers=1
+
+(node:75104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:75111) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-index-successor/baseline-check/packages/kernel
+
+(node:75118) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/packet-index-adversarial.spec.ts (23 tests | 5 failed) 9ms
+   × private admission mutation refuses before installation: append 2ms
+   × private admission mutation refuses before installation: subject 0ms
+   × private admission mutation refuses before installation: kind 0ms
+   × later private recipient mutation refuses at finalize, before prepared responsibility installs 0ms
+   × held support uses captured admitted subjects after source retirement and later private array mutation 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > private admission mutation refuses before installation: append
+ FAIL  src/lib/packet-index-adversarial.spec.ts > private admission mutation refuses before installation: subject
+ FAIL  src/lib/packet-index-adversarial.spec.ts > private admission mutation refuses before installation: kind
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/lib/packet-index-adversarial.spec.ts:91:31
+     89|   return undefined;
+     90|  }};
+     91|  try{expect(()=>s.prepare(p)).toThrow('admission structure changed');e…
+       |                               ^
+     92| });
+     93|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > later private recipient mutation refuses at finalize, before prepared responsibility installs
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ src/lib/packet-index-adversarial.spec.ts:97:54
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/lib/packet-index-adversarial.spec.ts > held support uses captured admitted subjects after source retirement and later private array mutation
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/lib/packet-index-adversarial.spec.ts:115:164
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 18 passed (23)
+   Start at  17:26:54
+   Duration  726ms (transform 403ms, setup 0ms, import 478ms, tests 9ms, environment 160ms)
+
+Warning: command "node tools/run-core-vitest.mjs packet-index-adversarial.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

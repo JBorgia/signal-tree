@@ -1,0 +1,15 @@
+/private/tmp/st-c28-r3-sampled-allocation/analyze.cjs:29
+  for(const sample of profile.samples){const node=nodes.get(sample.nodeId);if(!node)throw Error('Unresolved sample node');node.sampleBytes+=sample.size;node.sampleCount++;total+=sample.size;}
+                                                                                    ^
+
+Error: Unresolved sample node
+    at Object.<anonymous> (/private/tmp/st-c28-r3-sampled-allocation/analyze.cjs:29:91)
+    at Module._compile (node:internal/modules/cjs/loader:1830:14)
+    at Object..js (node:internal/modules/cjs/loader:1961:10)
+    at Module.load (node:internal/modules/cjs/loader:1553:32)
+    at Module._load (node:internal/modules/cjs/loader:1355:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.15.0

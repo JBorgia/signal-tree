@@ -1,0 +1,85 @@
+--- C2/packages/kernel/src/lib/internals/entity-publication.ts
++++ C3/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -47,6 +47,56 @@
+   readonly physicalOrder?: readonly number[];
+   readonly ordinaryOrder?: readonly number[];
+ }
++/** Private ownership boundary: metadata is source-owned, row payloads and proof
++ * objects are not. Weak marks avoid reprocessing queued point fragments; they
++ * contain no values, certificates or revision authority and do not retain keys.
++ */
++class AdmissionMetadata {
++  private readonly edits = new WeakSet<EntityPublicationEdit>();
++  private readonly arrays = new WeakSet<readonly EntityPublicationEdit[]>();
++  private readonly packets = new WeakSet<EntityPublicationPacket>();
++  private edit(edit: EntityPublicationEdit): void {
++    if (this.edits.has(edit)) return;
++    // Native producers supply mutable shells. Copy shared metadata before locking
++    // that same edit identity. A frozen shell cannot transfer ownership of
++    // borrowed mutable metadata: require stability without mutating those aliases.
++    if (!Object.isFrozen(edit)) {
++      if (edit.fields && !Object.isFrozen(edit.fields)) Object.defineProperty(edit,'fields',{value:Object.freeze([...edit.fields]),enumerable:true});
++      if (edit.structural) Object.defineProperty(edit,'structural',{value:Object.freeze({...edit.structural}),enumerable:true});
++    } else {
++      if (edit.fields && !Object.isFrozen(edit.fields) ||
++          edit.structural && !Object.isFrozen(edit.structural))
++        throw new Error('Frozen entity publication edit contains mutable admission metadata');
++    }
++    Object.freeze(edit);
++    this.edits.add(edit);
++  }
++  private array(edits: readonly EntityPublicationEdit[]): readonly EntityPublicationEdit[] {
++    if (this.arrays.has(edits)) return edits;
++    for (const edit of edits) this.edit(edit);
++    // These arrays are private source-issued membership, never user row payloads.
++    // Transfer their ownership once instead of duplicating every admitted list.
++    const result=Object.freeze(edits);
++    this.arrays.add(result);
++    return result;
++  }
++  prepare(packet:EntityPublicationPacket):EntityPublicationPacket {
++    if(this.packets.has(packet))return packet;
++    const steps=packet.steps?.map(step=>{
++      if(step.authoredRemoval)this.edit(step.authoredRemoval);
++      const footprint=step.authoredFootprint;
++      return Object.freeze({...step,
++        authoredFootprint:footprint?Object.freeze(footprint.kind==='fields'?{...footprint,fields:Object.freeze([...footprint.fields])}:{...footprint}):undefined,
++        ordinary:this.array(step.ordinary),physical:step.physical?this.array(step.physical):undefined});
++    });
++    const result=Object.freeze({...packet,ordinary:this.array(packet.ordinary),physical:this.array(packet.physical),
++      steps:steps?Object.freeze(steps):undefined,
++      ordinaryOrder:packet.ordinaryOrder?Object.freeze([...packet.ordinaryOrder]):undefined,
++      physicalOrder:packet.physicalOrder?Object.freeze([...packet.physicalOrder]):undefined});
++    this.packets.add(result);
++    return result;
++  }
++}
+ /** Opaque source-issued support; the reducer transports, never interprets, it. */
+ export interface EntityPublicationEvidence {
+   exclusions?():readonly (readonly [number,object])[];
+@@ -81,6 +131,7 @@
+ }
+ /** Native ownership lives with the collection even when there are no recipients. */
+ export class EntityPublicationSource {
++  private readonly admission = new AdmissionMetadata();
+   private native: EntityPublicationParticipant | undefined;
+   private readonly recipients = new Set<EntityPublicationParticipant>();
+   private recipientRevision = 0;
+@@ -151,6 +202,9 @@
+   }
+   preparePoint(packet:EntityPublicationPacket):PreparedPublicationUnit|undefined {
+     if(!pointPreparation)return this.prepare(packet);
++    // Refusal must not enroll a source or leave a phantom empty group behind.
++    // Complete all admission work before publishing deferred bookkeeping.
++    packet=this.admission.prepare(packet);
+     let group=pointPreparation.get(this);
+     if(!group){
+       const source=this;
+@@ -166,6 +220,7 @@
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
+     const retirementRevision = this.retirementRevision;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
++    packet=this.admission.prepare(packet);
+     const native = this.nativeParticipant();
+     const nativeUnit = native?.prepare(packet);
+     const fallbackRecord = native ? undefined : packet.prepareResponsibility?.();

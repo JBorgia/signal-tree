@@ -1,0 +1,9 @@
+{
+  "manifestSha256": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "entries": 3102,
+  "mismatches": [],
+  "candidate": "/private/tmp/st-c28-r3-composition/candidate",
+  "rootHEAD": "628d302dadb082a48c58528651c9088234d0a777",
+  "execution": "source inspection only; no runtime tests",
+  "excluded": "Tesla new trace verdict not read"
+}

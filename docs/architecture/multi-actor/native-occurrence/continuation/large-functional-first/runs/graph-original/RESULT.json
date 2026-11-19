@@ -1,0 +1,19 @@
+{
+  "id": "graph-original",
+  "arm": "original",
+  "exit": 0,
+  "qualified": true,
+  "classification": "graph-setup-pass",
+  "reason": null,
+  "cases": [],
+  "workerPids": [],
+  "remainingOwned": [],
+  "sourceMismatches": [],
+  "dependencyDrift": false,
+  "telemetrySamples": 122,
+  "maxObservedOwnedRssBytes": 487325696,
+  "minimumObservedHostFreePercentage": 31.0,
+  "elapsedSeconds": 109.38129966694396,
+  "attempts": 1,
+  "completedAt": "2026-11-03T18:13:10.128699+00:00"
+}

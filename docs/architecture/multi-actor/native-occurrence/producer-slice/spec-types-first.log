@@ -1,0 +1,15 @@
+check-spec-types: 3 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/core-independent-review.spec.ts: 2 error(s), baseline allows 0
+  packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts: 1 error(s), baseline allows 0
+  packages/kernel/src/lib/native-netzero-diagnostic.spec.ts: 1 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/core-independent-review.spec.ts(38,28): error TS2339: Property 'rows' does not exist on type 'Location<{ rows: EntityMapBuilder<{ id: string; x: number; }, string, Record<string, never>>; } | undefined>'.
+packages/kernel/src/lib/core-independent-review.spec.ts(39,39): error TS2345: Argument of type '{ (): { branch?: { rows: { all: { id: string; x: number; }[]; }; } | undefined; other: number; }; (value: { branch?: { rows: { id: string; x: number; }[] | { all: { id: string; x: number; }[]; }; } | undefined; other: number; }): void; (updater: (current: { ...; }) => { ...; }): void; } & NodeConstruction<...> & Tre...' is not assignable to parameter of type 'never'.
+packages/kernel/src/lib/native-equal-inverse-diagnostic.spec.ts(15,97): error TS2345: Argument of type '{ (): { branch: { rows: { all: { id: string; x: number; }[]; }; }; other: number; }; (value: { branch: { rows: { id: string; x: number; }[] | { all: { id: string; x: number; }[]; }; }; other: number; }): void; (updater: (current: { branch: { ...; }; other: number; }) => { ...; }): void; } & NodeConstruction<...> & T...' is not assignable to parameter of type 'never'.
+packages/kernel/src/lib/native-netzero-diagnostic.spec.ts(15,97): error TS2345: Argument of type '{ (): { branch: { rows: { all: { id: string; x: number; }[]; }; }; other: number; }; (value: { branch: { rows: { id: string; x: number; }[] | { all: { id: string; x: number; }[]; }; }; other: number; }): void; (updater: (current: { branch: { ...; }; other: number; }) => { ...; }): void; } & NodeConstruction<...> & T...' is not assignable to parameter of type 'never'.

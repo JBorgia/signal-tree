@@ -1,0 +1,32 @@
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -182,6 +182,7 @@
+    // Keep derived/branch/entity input evidence on the established admission path.
+    const exact=!!restoration||!admitted&&literal&&retained.owner!==undefined;
+    const relevance=exact?undefined:lifecycle.currentRelevance(retained.requirement as lifecycle.NativeRequirement,prepared.requirement);
++   lifecycle.__trace({kind:'admission',address:getNodeAddress(node),admitted,exact,retainedIsPredecessor:retained===predecessor,retainedReady:lifecycle.nativeRequirementReady(retained.requirement as lifecycle.NativeRequirement),predecessorReady:lifecycle.nativeRequirementReady(predecessor.requirement as lifecycle.NativeRequirement),invocationReady:lifecycle.nativeRequirementReady(prepared.requirement),mask:lifecycle.__traceCells(relevance??[]),predecessor:lifecycle.__traceProof(lifecycle.nativeProof(predecessor.requirement as lifecycle.NativeRequirement)),retained:lifecycle.__traceProof(lifecycle.nativeProof(retained.requirement as lifecycle.NativeRequirement)),invocation:lifecycle.__traceProof(lifecycle.nativeProof(prepared.requirement)),inputs:prepared.requirement.inputs.map(i=>({captured:lifecycle.__traceCells(i.owners),proof:lifecycle.__traceProof(lifecycle.nativeProof(i.requirement))})),protected:prepared.requirement.frames.map(f=>lifecycle.__traceCells(f.protectedOwners))});
+    const requirement=exact?retained.requirement as lifecycle.NativeRequirement:admitted&&!relevance?.size?prepared.requirement:lifecycle.combineScalarNativeRequirements(admitted?[prepared.requirement]:[retained.requirement as lifecycle.NativeRequirement,prepared.requirement],relevance);
+    const endpoint=requirement===retained.requirement?retained:Object.freeze({...retained,requirement});
+    const view=mutation.changed||mutation.physicalChanged||!existingView||existingView.requirement!==requirement?{requirement}:existingView;
+@@ -346,6 +347,7 @@
+   proofs.set(unit.fact,lifecycle.projectRevision(channel,unit.fact,effective,b.index.unresolved()!==0));
+   const prior=unit.previous&&proofs.get(unit.previous);
+   const noop=!unit.changed&&unit.fact.clean===(unit.previous?.clean??false)&&sameProof(prior&&lifecycle.currentObligations(prior,unit.relevance),lifecycle.currentObligations(effective,unit.relevance));
++  lifecycle.__trace({kind:'compare',relative:unit.relative,changed:unit.changed,clean:unit.fact.clean,previousClean:unit.previous?.clean??false,noop,mask:lifecycle.__traceCells(unit.relevance??[]),prior:lifecycle.__traceProof(prior),effective:lifecycle.__traceProof(effective),projectedPrior:lifecycle.__traceProof(prior&&lifecycle.currentObligations(prior,unit.relevance)),projectedEffective:lifecycle.__traceProof(lifecycle.currentObligations(effective,unit.relevance))});
+   if(noop){
+    lifecycle.noWrite(channel,unit.fact);
+    const predecessor=effectivePredecessor(unit.previous);noopPredecessors.set(unit.fact,predecessor);
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -526,3 +526,11 @@
+  refresh(op);return selected;
+ }
+ 
++
++// Trace-only immutable role observations; no callbacks/owner graph references.
++let __traceEnabled=false;let __traceEvents:unknown[]=[];
++export function __traceStart(){__traceEnabled=true;__traceEvents=[];}
++export function __traceTake(){const events=__traceEvents;__traceEvents=[];return events;}
++export function __trace(event:unknown){if(__traceEnabled)__traceEvents.push(event);}
++export function __traceCells(cells:Iterable<OwnerCell>){return [...cells].map(c=>({owner:c.owner,id:c.id,outcome:c.outcome}));}
++export function __traceProof(proof:Readonly<Proof>|undefined){return proof&&{roles:Object.fromEntries((['owners','destination','input','validation','possible'] as const).map(role=>[role,__traceCells(proof[role]??[])])),unknown:proof.unknown,invalid:proof.invalid,unavailableInput:!!proof.unavailableInput,historicalWindow:!!proof.historicalWindow,terminalRejectedRoles:proof.terminalRejectedRoles??0};}

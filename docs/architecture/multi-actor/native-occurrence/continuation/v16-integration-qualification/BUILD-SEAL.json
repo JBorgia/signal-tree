@@ -1,0 +1,11 @@
+{
+  "root": "/private/tmp/st-v16-integration-candidate",
+  "packages": [
+    "kernel",
+    "angular",
+    "react",
+    "vue",
+    "solid"
+  ],
+  "seal": "sha256-4e10ab551ba731818b9ab68941f7da013cd79c33920518c6eff2d8b501c8d012"
+}

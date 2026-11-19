@@ -1,0 +1,78 @@
+
+> nx run kernel:test entity-large-batches-v16-controls.spec.ts --testNamePattern=clearing --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-large-batches-v16-controls.spec.ts --testNamePattern=clearing --maxWorkers=1
+
+(node:39705) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:39712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c19-clear-find-attribution/candidate/packages/kernel
+
+(node:39719) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-large-batches-v16-controls.spec.ts (16 tests | 6 failed | 10 skipped) 535ms
+       × clearing with setAll([]) (256 rows) 83ms
+       × clearing with setAll([]) (1024 rows) 144ms
+       × clearing with setAll([]) (256 rows) 42ms
+       × clearing with setAll([]) (1024 rows) 116ms
+       × clearing with setAll([]) (256 rows) 31ms
+       × clearing with setAll([]) (1024 rows) 117ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-large-batches-v16-controls.spec.ts > pending rollback dominant structural effect search work > transactions > clearing with setAll([]) (256 rows)
+ FAIL  src/lib/entity-large-batches-v16-controls.spec.ts > pending rollback dominant structural effect search work > transactions, restoration > clearing with setAll([]) (256 rows)
+ FAIL  src/lib/entity-large-batches-v16-controls.spec.ts > pending rollback dominant structural effect search work > restoration, transactions > clearing with setAll([]) (256 rows)
+AssertionError: find predicate visits during rollback: expected 513 to be less than or equal to 512
+ ❯ src/lib/entity-large-batches-v16-controls.spec.ts:154:11
+    152|           visits,
+    153|           'find predicate visits during rollback'
+    154|         ).toBeLessThanOrEqual(
+       |           ^
+    155|           mode === 'replacing every id' ? 2 * count + 1 : 2 * count
+    156|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  src/lib/entity-large-batches-v16-controls.spec.ts > pending rollback dominant structural effect search work > transactions > clearing with setAll([]) (1024 rows)
+ FAIL  src/lib/entity-large-batches-v16-controls.spec.ts > pending rollback dominant structural effect search work > transactions, restoration > clearing with setAll([]) (1024 rows)
+ FAIL  src/lib/entity-large-batches-v16-controls.spec.ts > pending rollback dominant structural effect search work > restoration, transactions > clearing with setAll([]) (1024 rows)
+AssertionError: find predicate visits during rollback: expected 2049 to be less than or equal to 2048
+ ❯ src/lib/entity-large-batches-v16-controls.spec.ts:154:11
+    152|           visits,
+    153|           'find predicate visits during rollback'
+    154|         ).toBeLessThanOrEqual(
+       |           ^
+    155|           mode === 'replacing every id' ? 2 * count + 1 : 2 * count
+    156|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 10 skipped (16)
+   Start at  12:50:01
+   Duration  2.28s (transform 900ms, setup 0ms, import 1.08s, tests 535ms, environment 506ms)
+
+Warning: command "node tools/run-core-vitest.mjs entity-large-batches-v16-controls.spec.ts --testNamePattern=clearing --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      3.1s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     3.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    3.1s

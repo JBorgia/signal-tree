@@ -1,0 +1,62 @@
+[
+  {
+    "source": "SOURCE-IDENTITY.json",
+    "archive": "SOURCE-IDENTITY.json",
+    "sourceSha256": "f11368eb39e1d029c344f0a44a6582a41b95b3d1556538de65ba1008c2462681",
+    "archiveSha256": "f11368eb39e1d029c344f0a44a6582a41b95b3d1556538de65ba1008c2462681"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "006e24a4575431380c74f558e471808794ebeba31e2b724c431c3cd98424a489",
+    "archiveSha256": "006e24a4575431380c74f558e471808794ebeba31e2b724c431c3cd98424a489"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "cc831dd7e1012f2b3c5ac049f32f158c16fe9840ac08f0956e4a8d2c3ab1940d",
+    "archiveSha256": "cc831dd7e1012f2b3c5ac049f32f158c16fe9840ac08f0956e4a8d2c3ab1940d"
+  },
+  {
+    "source": "inputs/runtime-frozen.patch",
+    "archive": "inputs/runtime-frozen.patch",
+    "sourceSha256": "3cd1e93852c8550bc6a5cbdba45e28e5aa4aaee6a75233cfd3b01fa244ec03ef",
+    "archiveSha256": "3cd1e93852c8550bc6a5cbdba45e28e5aa4aaee6a75233cfd3b01fa244ec03ef"
+  },
+  {
+    "source": "inputs/BOUNDED-REPRESENTATION.md",
+    "archive": "inputs/BOUNDED-REPRESENTATION.md",
+    "sourceSha256": "5e6d8ff2b19d8a082e3a10ac8285a734a199ac5c4f311314e45aa2124a216afd",
+    "archiveSha256": "5e6d8ff2b19d8a082e3a10ac8285a734a199ac5c4f311314e45aa2124a216afd"
+  },
+  {
+    "source": "inputs/RETENTION-OBSERVATIONS.jsonl",
+    "archive": "inputs/RETENTION-OBSERVATIONS.jsonl",
+    "sourceSha256": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d",
+    "archiveSha256": "5d38e54e301b83c06d8f71b32415bdaf9ecee7ffa232ee2b9027d4495bbd126d"
+  },
+  {
+    "source": "inputs/research/equal-owner-retention-diagnostic.spec.ts",
+    "archive": "inputs/research/equal-owner-retention-diagnostic.spec.ts",
+    "sourceSha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f",
+    "archiveSha256": "6a1a72bbcb0cf9fbf752e3bef4a0e5e1c10f46fb86265a90ee700c59aea39d7f"
+  },
+  {
+    "source": "inputs/runs/retention-recorded/RESULT.json",
+    "archive": "inputs/runs/retention-recorded/RESULT.json",
+    "sourceSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66",
+    "archiveSha256": "bd8dd009623d3e28c18d5671313f71a5aea787ffa85717e566c922f36b0a7b66"
+  },
+  {
+    "source": "inputs/runs/retention-recorded/first.log",
+    "archive": "inputs/runs/retention-recorded/first.log",
+    "sourceSha256": "c9067c6ef237771a062ce6f6de8400a0a0b143797f1f9267a5129b37ce32fca4",
+    "archiveSha256": "c9067c6ef237771a062ce6f6de8400a0a0b143797f1f9267a5129b37ce32fca4"
+  },
+  {
+    "source": "inputs/runs/retention-recorded/COMMAND.json",
+    "archive": "inputs/runs/retention-recorded/COMMAND.json",
+    "sourceSha256": "4df90bb9cf52ef73a8068b83c3251cba57fd99b8cd746279fd2802796e5d9468",
+    "archiveSha256": "4df90bb9cf52ef73a8068b83c3251cba57fd99b8cd746279fd2802796e5d9468"
+  }
+]

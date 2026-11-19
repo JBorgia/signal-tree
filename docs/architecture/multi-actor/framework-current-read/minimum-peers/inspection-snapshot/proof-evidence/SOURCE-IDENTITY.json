@@ -1,0 +1,59 @@
+{
+  "commit": "87f6831fa60cafe87508f0ace84b7638698ca3b0",
+  "tree": "10e6be502fda139bb16ab7a72c426efc86ce8888",
+  "archiveSha256": "f68758a1fda1ccb3198098f97d1f0c4b254ce2def039c602d291b2deb72595ad",
+  "changedArchiveFiles": [
+    "packages/angular/src/lib/observation-adapter.ts",
+    "packages/kernel/src/adapter.ts",
+    "packages/kernel/src/lib/entity-signal.ts",
+    "packages/kernel/src/lib/internals/location-runtime.ts",
+    "packages/kernel/src/lib/internals/native-location-realization.ts",
+    "packages/kernel/src/lib/internals/observation-adapter.ts",
+    "packages/kernel/src/lib/signal-tree.ts",
+    "packages/solid/src/lib/solid-observation.ts",
+    "packages/vue/src/lib/vue-observation.ts"
+  ],
+  "addedPackageFiles": [
+    "packages/angular/src/lib/current-read-capability.spec.ts",
+    "packages/angular/src/lib/current-read-capability.typing.spec.ts",
+    "packages/angular/src/lib/selected-active-id-preparation.spec.ts",
+    "packages/angular/src/lib/selected-callback-facade.spec.ts",
+    "packages/kernel/src/lib/current-read-capability.spec.ts",
+    "packages/kernel/src/lib/selected-callback-facade.spec.ts",
+    "packages/react/src/selected-callback-facade.spec.tsx",
+    "packages/solid/src/lib/selected-callback-facade.spec.ts",
+    "packages/vue/src/lib/current-read-capability.spec.ts",
+    "packages/vue/src/lib/current-read-capability.typing.spec.ts",
+    "packages/vue/src/lib/selected-active-id-preparation.spec.ts",
+    "packages/vue/src/lib/selected-callback-facade.spec.ts"
+  ],
+  "priorEvidenceHashesVerified": 14,
+  "files": {
+    "packages/angular/src/lib/current-read-capability.spec.ts": "c845adc924555e7b91ab859ba762bc1125d4263482eeacb9442ab2e1f4e65e59",
+    "packages/angular/src/lib/current-read-capability.typing.spec.ts": "e599891c002412515aa30aee15826339643961d9695555c56e8ccd90da58fce7",
+    "packages/angular/src/lib/observation-adapter.ts": "1f9cb608b815fa234ba82b66aba385a08d8f8f54e4476b42599b810e73a53424",
+    "packages/angular/src/lib/selected-active-id-preparation.spec.ts": "acbab376daa21a6cfe32808ecf74434ade711757132edc767c623c4b5b038cf1",
+    "packages/angular/src/lib/selected-callback-facade.spec.ts": "f5483e0cf15e6b073c137ef50f5b51cb140c57b56b83803d1c793377e369b98e",
+    "packages/kernel/src/adapter.ts": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+    "packages/kernel/src/lib/current-read-capability.spec.ts": "e951238bb917bdb60b2965e27f8bbbd9a935d0125176aa2491c1ad7256810574",
+    "packages/kernel/src/lib/entity-signal.ts": "0d1f5c890b991976cb387145a2a4185d079514ecc67db962228ab3e1e58610c6",
+    "packages/kernel/src/lib/internals/location-runtime.ts": "170febbcadd01f0b7d556d5e80bd2312a2c944205a93eb9b61ff566a4f1f401d",
+    "packages/kernel/src/lib/internals/native-location-realization.ts": "6db3a9a744a42b3359803f787c7e84810c5e60a47caa49fe7888b85137b41b40",
+    "packages/kernel/src/lib/internals/observation-adapter.ts": "df7bb6b8642dca0eefe0a4cd61b0d14669711ad5723f893475263ac87c461574",
+    "packages/kernel/src/lib/selected-callback-facade.spec.ts": "ff50c90f285549bcd0d965a51d8be726d1476dd5e13ddae863b7be749654f96a",
+    "packages/kernel/src/lib/signal-tree.ts": "a8c417d8b26c2f0afce568ba3d69571258833ccf42cae0502de9bc09380d2b18",
+    "packages/react/src/selected-callback-facade.spec.tsx": "52731cfa9bf6d3f165c3e32d5642fd1bf3e7289420e06a6082a330517ca1c4f3",
+    "packages/solid/src/lib/selected-callback-facade.spec.ts": "6375753efbdf8007f15c275a0d4e25d60e6fa9ca7bf0d74e63c74fa6bb3965fb",
+    "packages/solid/src/lib/solid-observation.ts": "1007de2283f5af3c0c2ee2e535ccfe7bb926a0a4be73a9aab8ce097a2c69ec13",
+    "packages/vue/src/lib/current-read-capability.spec.ts": "aa1d788f243b27969b80197a2ba3fa7763121ae255717e73c3f98834e0787f42",
+    "packages/vue/src/lib/current-read-capability.typing.spec.ts": "75ddabe9915566b92e2d42288bd782959824ffd429387ae6820a1d98e8adc5eb",
+    "packages/vue/src/lib/selected-active-id-preparation.spec.ts": "05d118ddbd5fbc4f27aed441b8cfa3eefc96f076247f8cb53c41574698a5794f",
+    "packages/vue/src/lib/selected-callback-facade.spec.ts": "92e198d5db1772e5ec6fad15130f643cb2ce21485e748c58641c6e5c9dc2cd78",
+    "packages/vue/src/lib/vue-observation.ts": "cd1d1276fe946a7166f68addb3ca08a1375980ce82c816a47092fc8719fc2bce"
+  },
+  "patches": {
+    "source.patch": "98e4180b0700ade7a90fc5263552ce998522b9830fd25bc760fad550661089fa",
+    "tests.patch": "f29d16d9eaec396f951e63b32eb7953627d4c11d6084492d8ffd91c0c02cb9a5",
+    "candidate.patch": "c8db0ed469e42b425b3299204bca86965f59cf4880c3b7e06707ceb24d9b048c"
+  }
+}

@@ -1,0 +1,112 @@
+
+> nx run kernel:test native-certificate-successor.spec.ts
+
+> node tools/run-core-vitest.mjs native-certificate-successor.spec.ts
+
+(node:92452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:92459) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-occurrence-restoration-trace/candidate/packages/kernel
+
+(node:92466) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+RESTORATION_TRACE {"seq":18,"event":"entityPacket","data":{"physical":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}],"ordinary":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}],"steps":[{"ordinal":0,"ordinary":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}],"physical":[{"subject":1,"after":{"id":"a","x":0},"structural":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"path":"branch.rows.a","structuralRecord":{"kind":"add","subject":1,"key":"a","value":{"id":"a","x":0}},"fields":null}]}]}}
+
+stdout | src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+RESTORATION_TRACE {"seq":19,"event":"entityPacket","data":{"physical":[{"subject":1,"before":{"id":"a","x":0},"after":{"id":"a","x":7},"fields":["x"]}],"ordinary":[{"subject":1,"before":{"id":"a","x":0},"after":{"id":"a","x":7},"path":"branch.rows.a","fields":["x"]}]}}
+RESTORATION_TRACE {"seq":20,"event":"entityRecipientPrepared","data":{"affected":true,"changed":true,"next":[{"id":"a","x":7}],"supportEdits":[{"key":"1:f:x","before":{"id":8,"proof":{"unknown":false,"invalid":false,"owners":[]}},"after":{"id":9}}],"native":{"id":9}}}
+RESTORATION_TRACE {"seq":21,"event":"completeCollection","data":{"revision":37}}
+RESTORATION_TRACE {"seq":22,"event":"reduceUnit","data":{"revision":37,"kind":"collection","payload":[{"id":"a","x":7}],"native":{"id":9,"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":10,"outcome":"pending"}],"destination":[],"input":[]}},"proof":{"unknown":true,"invalid":false,"owners":[],"destination":[]}}}
+RESTORATION_TRACE {"seq":23,"event":"collectionSupportEdit","data":{"revision":37,"key":"1:f:x","after":{"id":9,"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":10,"outcome":"pending"}],"destination":[],"input":[]}}}}
+RESTORATION_TRACE {"seq":24,"event":"reducedSelection","data":{"revision":37,"payload":{"branch":{"rows":{"all":[{"id":"a","x":7}]}},"other":0},"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":10,"outcome":"pending"}],"destination":[],"input":[]},"unresolved":0}}
+
+stdout | src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+RESTORATION_TRACE {"seq":25,"event":"recursiveHydrate","data":{"path":"other","supplied":1,"hydrated":false}}
+RESTORATION_TRACE {"seq":26,"event":"prepareMembership","data":{"address":[],"key":"branch","present":false,"ordinary":{"before":{"present":true,"value":{"rows":{"all":[{"id":"a","x":7}]}}},"after":{"present":false}}}}
+RESTORATION_TRACE {"seq":27,"event":"completeMembership","data":{"units":[39]}}
+RESTORATION_TRACE {"seq":28,"event":"reduceUnit","data":{"revision":38,"kind":"field","payload":1,"native":{"id":11,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":29,"event":"reducedSelection","data":{"revision":38,"payload":{"branch":{"rows":{"all":[{"id":"a","x":7}]}},"other":1},"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":10,"outcome":"pending"}],"destination":[],"input":[]},"unresolved":0}}
+RESTORATION_TRACE {"seq":30,"event":"reduceUnit","data":{"revision":39,"kind":"membership","member":{"key":"branch","present":false,"ordinary":{"before":{"present":true,"value":{"rows":{"all":[{"id":"a","x":7}]}}},"after":{"present":false}}},"native":{"id":12,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":31,"event":"reducedSelection","data":{"revision":39,"payload":{"other":1},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]},"unresolved":0}}
+
+stdout | src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+RESTORATION_TRACE {"seq":32,"event":"recursiveHydrate","data":{"path":"branch","supplied":{"rows":{"all":[{"id":"a","x":7}]}},"hydrated":false}}
+RESTORATION_TRACE {"seq":33,"event":"entityPacket","data":{"physical":[{"subject":1,"before":{"id":"a","x":7},"after":{"id":"a","x":7},"path":"branch.rows.a","fields":[]}],"ordinary":[{"subject":1,"before":{"id":"a","x":7},"after":{"id":"a","x":7},"path":"branch.rows.a","fields":[]}],"steps":[{"ordinal":0,"ordinary":[{"subject":1,"before":{"id":"a","x":7},"after":{"id":"a","x":7},"path":"branch.rows.a","fields":[]}],"physical":[{"subject":1,"before":{"id":"a","x":7},"after":{"id":"a","x":7},"path":"branch.rows.a","fields":[]}]}]}}
+RESTORATION_TRACE {"seq":34,"event":"entityRecipientPrepared","data":{"affected":true,"changed":false,"next":[{"id":"a","x":7}],"supportEdits":[],"native":{"id":13}}}
+RESTORATION_TRACE {"seq":35,"event":"completeCollection","data":{"revision":40}}
+RESTORATION_TRACE {"seq":36,"event":"recursiveHydrate","data":{"path":"branch.rows","supplied":{"all":[{"id":"a","x":7}]},"hydrated":true}}
+RESTORATION_TRACE {"seq":37,"event":"recursiveHydrate","data":{"path":"other","supplied":2,"hydrated":false}}
+RESTORATION_TRACE {"seq":38,"event":"prepareMembership","data":{"address":[],"key":"branch","present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":{"rows":{"all":[]}}}}}}
+RESTORATION_TRACE {"seq":39,"event":"completeMembership","data":{"units":[42]}}
+RESTORATION_TRACE {"seq":40,"event":"reduceUnit","data":{"revision":40,"kind":"collection","payload":[{"id":"a","x":7}],"native":{"id":13,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":41,"event":"reducedSelection","data":{"revision":40,"payload":{"other":1},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]},"unresolved":0}}
+RESTORATION_TRACE {"seq":42,"event":"reduceUnit","data":{"revision":41,"kind":"field","payload":2,"native":{"id":14,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":43,"event":"reducedSelection","data":{"revision":41,"payload":{"other":2},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]},"unresolved":0}}
+RESTORATION_TRACE {"seq":44,"event":"reduceUnit","data":{"revision":42,"kind":"membership","member":{"key":"branch","present":true,"ordinary":{"before":{"present":false},"after":{"present":true,"value":{"rows":{"all":[]}}}}},"native":{"id":15,"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}},"proof":{"unknown":false,"invalid":false,"owners":[],"possible":[],"destination":[],"input":[]}}}
+RESTORATION_TRACE {"seq":45,"event":"reducedSelection","data":{"revision":42,"payload":{"branch":{"rows":{"all":[{"id":"a","x":7}]}},"other":2},"proof":{"unknown":true,"invalid":false,"owners":[],"possible":[{"id":10,"outcome":"pending"}],"destination":[],"input":[]},"unresolved":0}}
+
+ ❯ src/lib/native-certificate-successor.spec.ts (5 tests | 1 failed) 30ms
+   × omission then restored retained collection selects matching payload and support 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/native-certificate-successor.spec.ts > omission then restored retained collection selects matching payload and support
+AssertionError: expected { other: 1 } to deeply equal { Object (branch, other) }
+
+- Expected
++ Received
+
+  {
+-   "branch": {
+-     "rows": {
+-       "all": [
+-         {
+-           "id": "a",
+-           "x": 7,
+-         },
+-       ],
+-     },
+-   },
+-   "other": 2,
++   "other": 1,
+  }
+
+ ❯ src/lib/native-certificate-successor.spec.ts:61:23
+     59|   c.declare({kind:'independent'},()=>tree.$({other:1} as never));await…
+     60|   c.declare({kind:'independent'},()=>tree.$({branch:{rows:{all:[{id:'a…
+     61|   expect(sent.at(-1)).toEqual({branch:{rows:{all:[{id:'a',x:7}]}},othe…
+       |                       ^
+     62|  }finally{q.confirm();c.dispose();tree.destroy();foreign.destroy();}
+     63| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  12:54:19
+   Duration  774ms (transform 428ms, setup 0ms, import 514ms, tests 30ms, environment 153ms)
+
+Warning: command "node tools/run-core-vitest.mjs native-certificate-successor.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.2s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.1s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.1s

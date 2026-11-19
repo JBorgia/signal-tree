@@ -1,0 +1,157 @@
+--- /dev/null
++++ b/packages/kernel/src/lib/current-capture-r1.spec.ts
+@@ -0,0 +1,42 @@
++import {expect,it} from 'vitest';
++import {leaf,link,signalTree,transactions} from '../index';
++const drain=async()=>{for(let i=0;i<120;i++)await Promise.resolve();};
++const routes=['callable','recursive','report'] as const;
++type Route=typeof routes[number];
++const catchError=(work:()=>void)=>{try{work();}catch(error){return error;}return undefined;};
++for(const route of routes)it(`fresh current pending input: ${route}`,async()=>{
++ const source=signalTree({pair:{x:7}}),foreign=signalTree({q:0},{enhancers:[transactions()]}),target=signalTree({y:0});
++ const sent:number[]=[];const c=link(target.$.y,{set:v=>{sent.push(v);}});
++ try{
++  const saved=source.$();const q=foreign.transact(()=>foreign.$.q(7));const before=q.inspect();
++  foreign.updateAndReport(v=>{source.$.pair.x(v.q);return {};});await drain();let calls=0;
++  const consume=(v:{x:number})=>{calls++;expect(v).toEqual({x:7});target.$.y(v.x);};
++  const error=catchError(()=>c.declare({kind:'independent'},()=>{
++   if(route==='callable')source.$.pair(v=>{consume(v);return v;});
++   else if(route==='recursive')source.updateAndReport({pair:(v:{x:number})=>{consume(v);return v;}});
++   else source.updateAndReport(v=>{consume(v.pair);return {};});
++  }));await drain();
++  expect.soft(calls).toBe(1);expect.soft(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'after-callback',reason:'contradiction'});
++  expect.soft(sent).toEqual([]);expect(q.inspect()).toEqual(before);expect(saved).toEqual({pair:{x:7}});
++  q.confirm();await drain();await c.settled();await drain();expect(sent).toEqual([7]);c.dispose();target.$.y(9);await drain();expect(sent).toEqual([7]);
++ }finally{c.dispose();source.destroy();foreign.destroy();target.destroy();}
++});
++for(const route of routes)for(const claim of ['r','s','both'] as const)it(`opaque payload and current location: ${route}/${claim}`,async()=>{
++ const source=signalTree({pair:{x:0}},{enhancers:[transactions()]});
++ const r=source.transact(()=>source.$.pair.x(7));const saved=source.$.pair();
++ const holder=signalTree({pair:{input:leaf({x:0})}},{enhancers:[transactions()]});
++ const s=holder.transact(()=>holder.$.pair.input(saved));const rBefore=r.inspect(),sBefore=s.inspect();
++ const target=signalTree({y:0});const sent:number[]=[];const c=link(target.$.y,{set:v=>{sent.push(v);}});
++ try{
++  const cached=holder.$.pair();expect(cached.input).toBe(saved);let calls=0;
++  const consume=(v:{input:{x:number}})=>{calls++;expect(v.input).toBe(saved);target.$.y(v.input.x);};
++  const error=catchError(()=>c.declare({kind:'dependent',owners:claim==='r'?[r]:claim==='s'?[s]:[r,s]},()=>{
++   if(route==='callable')holder.$.pair(v=>{consume(v);return v;});
++   else if(route==='recursive')holder.updateAndReport({pair:(v:{input:{x:number}})=>{consume(v);return v;}});
++   else holder.updateAndReport(v=>{consume(v.pair);return {};});
++  }));await drain();expect(calls).toBe(1);expect(holder.$.pair.input()).toBe(saved);expect(r.inspect()).toEqual(rBefore);expect(s.inspect()).toEqual(sBefore);
++  if(claim==='both')expect.soft(error).toBeUndefined();else expect.soft(error).toMatchObject({code:'SIGNALTREE_PUBLICATION_DECLARATION_INVALID',stage:'after-callback',reason:'contradiction'});
++  expect.soft(sent).toEqual([]);r.confirm();await drain();expect.soft(sent).toEqual([]);s.confirm();await drain();await c.settled();await drain();expect(sent).toEqual([7]);
++  c.dispose();target.$.y(9);await drain();expect(sent).toEqual([7]);
++ }finally{c.dispose();source.destroy();holder.destroy();target.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/current-validation.spec.ts
+@@ -0,0 +1,24 @@
++import {expect,it} from 'vitest';
++import {link,signalTree,transactions} from '../index';
++const drain=async()=>{for(let i=0;i<160;i++)await Promise.resolve();};
++it('confirmed validator remains part of nested declaration completeness',async()=>{
++ const t=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});const sent:unknown[]=[];const c=link(t.$.pair,{set:v=>{sent.push(v);}});
++ try{const p=t.transact(()=>t.$.pair.x(7)),q=t.transact(()=>t.$.q(1));q.confirm();await drain();let calls=0;
++  expect(()=>c.declare({kind:'dependent',owners:[p]},()=>c.declare({kind:'dependent',owners:[p,q]},()=>{t.$.pair(v=>{calls++;return {...v};});}))).toThrow('contradiction');
++  expect(calls).toBe(1);await drain();expect(sent).toEqual([]);p.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();}
++});
++it('input captured pending then confirmed by updater remains fresh validation',async()=>{
++ const t=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});const sent:unknown[]=[];const c=link(t.$.pair,{set:v=>{sent.push(v);}});
++ try{const p=t.transact(()=>t.$.pair.x(7)),q=t.transact(()=>t.$.q(1));await drain();let calls=0;
++  expect(()=>c.declare({kind:'dependent',owners:[p]},()=>t.$(v=>{calls++;q.confirm();return {...v,pair:{...v.pair}};}))).toThrow('contradiction');
++  expect(calls).toBe(1);await drain();expect(sent).toEqual([]);p.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();}
++});
++it('validator pending at declaration entry does not become cleanup after confirmation',async()=>{
++ const t=signalTree({pair:{x:0,y:0},q:0},{enhancers:[transactions()]});const sent:unknown[]=[];const c=link(t.$.pair,{set:v=>{sent.push(v);}});
++ try{const p=t.transact(()=>t.$.pair.x(7)),q=t.transact(()=>t.$.q(1));await drain();
++  const receipt=c.declare({kind:'dependent',owners:[p,q]},()=>{q.confirm();t.$.pair(v=>({...v}));});await drain();
++  expect(receipt.read().state).not.toBe('no-write');expect(sent).toEqual([]);p.confirm();await drain();expect(sent).toEqual([{x:7,y:0}]);await c.settled();
++ }finally{c.dispose();t.destroy();}
++});
+--- /dev/null
++++ b/packages/kernel/src/lib/opaque-current-input.spec.ts
+@@ -0,0 +1,82 @@
++import { appendFileSync } from 'node:fs';
++import { expect, it } from 'vitest';
++import { leaf, link, signalTree, transactions } from '../index';
++const drain = async () => { for (let i = 0; i < 120; i++) await Promise.resolve(); };
++const errorRecord = (error: unknown) => error instanceof Error
++  ? { message: error.message, ...error } : error ?? null;
++const record = (value: unknown) => {
++  if (process.env.ST_OPAQUE_INPUT_OUTPUT) appendFileSync(process.env.ST_OPAQUE_INPUT_OUTPUT, JSON.stringify(value) + '\n');
++};
++
++for (const named of ['r', 's', 'both'] as const) {
++  it(`opaque saved payload r and current holder s are conjunctive: names ${named}`, async () => {
++    const source = signalTree({ x: 0 }, { enhancers: [transactions()] });
++    const holder = signalTree({ input: leaf({ x: 0 }) }, { enhancers: [transactions()] });
++    const target = signalTree({ y: 0 });
++    const sent: number[] = [];
++    const c = link(target.$.y, { set: value => { sent.push(value); } });
++    try {
++      const r = source.transact(() => source.$.x(7));
++      const saved = source.$();
++      const s = holder.transact(() => holder.$.input(saved));
++      const beforeR = r.inspect(), beforeS = s.inspect();
++      let calls = 0, same = false, error: unknown;
++      try {
++        c.declare({ kind: 'dependent', owners: named === 'r' ? [r] : named === 's' ? [s] : [r, s] }, () => {
++          holder.updateAndReport(current => {
++            calls++; same = current.input === saved;
++            target.$.y(current.input.x);
++            return {};
++          });
++        });
++      } catch (caught) { error = caught; }
++      await drain();
++      const initial = [...sent];
++      const ownersUnchanged = JSON.stringify([r.inspect(), s.inspect()]) === JSON.stringify([beforeR, beforeS]);
++      // Settle the sole named owner first: missing responsibility must still hold.
++      const first = named === 's' ? s : r, second = named === 's' ? r : s;
++      first.confirm(); await drain(); const afterFirst = [...sent];
++      second.confirm(); await drain(); await c.settled(); await drain();
++      const final = [...sent];
++      c.dispose(); target.$.y(8); await drain();
++      record({ named, calls, same, ownersUnchanged, error: errorRecord(error), initial, afterFirst, final, afterDispose: sent });
++      expect(calls).toBe(1); expect(same).toBe(true); expect(ownersUnchanged).toBe(true);
++      expect(saved).toEqual({ x: 7 }); expect(holder.$.input()).toBe(saved);
++      expect(initial).toEqual([]); expect(afterFirst).toEqual([]);
++      expect(final).toEqual([7]); expect(sent).toEqual([7]); expect(target.$.y()).toBe(8);
++      if (named === 'both') expect(error).toBeUndefined();
++      else expect(error).toMatchObject({ code: 'SIGNALTREE_PUBLICATION_DECLARATION_INVALID', stage: 'after-callback', reason: 'contradiction' });
++    } finally { c.dispose(); target.destroy(); holder.destroy(); source.destroy(); }
++  });
++}
++
++it('saved opaque payload predating new q is not recertified from its original source', async () => {
++  const source = signalTree({ pair: { x: 7 } });
++  const saved = source.$();
++  const holder = signalTree({ input: leaf(saved) });
++  const foreign = signalTree({ q: 0 }, { enhancers: [transactions()] });
++  const target = signalTree({ y: 0 });
++  const sent: number[] = [];
++  const c = link(target.$.y, { set: value => { sent.push(value); } });
++  try {
++    const q = foreign.transact(() => foreign.$.q(7));
++    const ownership = q.inspect(); let authorCalls = 0;
++    foreign.updateAndReport(current => { authorCalls++; source.$.pair.x(current.q); return {}; });
++    await drain(); let calls = 0, same = false, error: unknown;
++    try {
++      c.declare({ kind: 'independent' }, () => {
++        holder.updateAndReport(current => {
++          calls++; same = current.input === saved;
++          target.$.y(current.input.pair.x); return {};
++        });
++      });
++    } catch (caught) { error = caught; }
++    await drain(); const before = [...sent];
++    const ownerUnchanged = JSON.stringify(q.inspect()) === JSON.stringify(ownership);
++    q.confirm(); await drain(); await c.settled(); await drain();
++    record({ named: 'saved-before-q', authorCalls, calls, same, ownerUnchanged, error: errorRecord(error), before, after: sent });
++    expect([authorCalls, calls]).toEqual([1, 1]); expect(same).toBe(true); expect(ownerUnchanged).toBe(true);
++    expect(saved).toEqual({ pair: { x: 7 } }); expect(holder.$.input()).toBe(saved);
++    expect(sent).toEqual([7]); expect(before).toEqual([7]); expect(error).toBeUndefined();
++  } finally { c.dispose(); target.destroy(); foreign.destroy(); holder.destroy(); source.destroy(); }
++});

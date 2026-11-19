@@ -1,0 +1,127 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -1,3 +1,4 @@
++import { markPhysical } from './physical/placement-work-counters';
+ import { ordinaryAdmissionKey } from './physical/ordinary-key-evidence';
+ import type {SelectedRowIntent,SelectedRowEdit} from './internals/selected-write-operation';
+ import {type ClaimedFieldEndpoint,type NativeFieldEndpoint} from './internals/native-field-selection';
+@@ -1332,6 +1333,7 @@
+       }
+     }
+     const physicalPlacement = frame.preparePlacement();
++    markPhysical(physicalPlacement);
+     for (let index = 0; index < changes.length; index++) {
+       const change = changes[index];
+       if (change.structuralRecord?.kind !== 'add') continue;
+--- /dev/null
++++ b/packages/kernel/src/lib/physical/placement-work-counters.ts
+@@ -0,0 +1,11 @@
++import type { EntityPlacementStage } from './entity-placement-stage';
++let enabled = false;
++const totals: Record<string, Record<string, number>> = {};
++const physical = new WeakSet<object>();
++export function markPhysical(stage: object) { physical.add(stage); }
++export function intervalScope(stage: object) { return physical.has(stage) ? 'physicalInterval' : 'ordinaryInterval'; }
++export function bump(scope: string, key: string, count = 1) { if(enabled) { const row=totals[scope] ??= {}; row[key]=(row[key] ?? 0)+count; } }
++export function* mapEntries<K,V>(map: Map<K,V>, scope: string): Generator<[K,V]> { for(const entry of map) { bump(scope,'mapEntryTuples'); bump(scope,'mapVisits'); yield entry; } }
++export function* arrayEntries<T>(entries: readonly T[], scope:string): Generator<T> { for(const entry of entries) { bump(scope,'constructorVisits'); yield entry; } }
++export function reset() { for(const key of Object.keys(totals))delete totals[key]; enabled=true; }
++export function finish() { enabled=false; return structuredClone(totals); }
+--- a/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
++++ b/packages/kernel/src/lib/physical/entity-ordinary-topology.ts
+@@ -1,3 +1,4 @@
++import { bump, mapEntries, intervalScope } from './placement-work-counters';
+ import type { TopologyViewInterval } from '../internals/mutation-capture-runtime';
+ import { EntityPlacementStage } from './entity-placement-stage';
+ import type { StructuralEffect } from '../mutation-types';
+@@ -72,8 +73,9 @@
+     );
+   }
+   prepareInterval(stage: EntityPlacementStage<K>): TopologyViewInterval {
+-    const pairs = [...stage.patch].flatMap(([subject, after]) => {
+-      const before = stage.base(subject);
++    const scope=intervalScope(stage); bump(scope,'arrays',2);
++    const pairs = [...mapEntries(stage.patch,scope)].flatMap(([subject, after]) => {
++      bump(scope,'arrayVisits'); const before = stage.base(subject);
+       const equal =
+         before.present === after.present &&
+         (!before.present ||
+@@ -81,6 +83,8 @@
+             before.key === after.key &&
+             before.beforeSubject === after.beforeSubject &&
+             before.afterSubject === after.afterSubject));
++      bump(scope,'arrays');
++      if(!equal) { bump(scope,'rowClones',2); bump(scope,'pairRecords'); bump(scope,'freezes',3); bump(scope,'flattenVisits'); }
+       return equal
+         ? []
+         : [
+@@ -91,6 +95,7 @@
+             }),
+           ];
+     });
++    bump(scope,'intervalRecords'); bump(scope,'freezes',2); if(pairs.length)bump(scope,'continuityRecords');
+     return Object.freeze({
+       before: this.continuity,
+       after: pairs.length ? {} : this.continuity,
+--- a/packages/kernel/src/lib/physical/prepared-placement-visibility.ts
++++ b/packages/kernel/src/lib/physical/prepared-placement-visibility.ts
+@@ -1,3 +1,4 @@
++import { bump, mapEntries, arrayEntries } from './placement-work-counters';
+ import type { EntityPlacementStage } from './entity-placement-stage';
+ type Direction = 'before' | 'after';
+ type Run = { ids: number[]; size: number; counts: number[] };
+@@ -13,14 +14,12 @@
+   function build() {
+     if (built) return;
+     built = true;
+-    const present = new Map(
+-      [...physical.patch].filter(
+-        (
+-          entry
+-        ): entry is [number, Extract<(typeof entry)[1], { present: true }>] =>
+-          entry[1].present
+-      )
+-    );
++    const scope='visibilitySeed';
++    const seed = (bump(scope,'arrays'), [...mapEntries(physical.patch,scope)]);
++    bump(scope,'arrays');
++    const filtered = seed.filter((entry): entry is readonly [number, Extract<(typeof entry)[1], {present:true}>] => { bump(scope,'arrayVisits'); return entry[1].present; });
++    bump(scope,'maps');
++    const present = new Map(arrayEntries(filtered,scope));
+     const visited = new Set<number>();
+     for (const [id, row] of present) {
+       if (
+--- /dev/null
++++ b/packages/kernel/src/lib/physical/placement-work-accounting.spec.ts
+@@ -0,0 +1,15 @@
++import { appendFileSync } from 'node:fs';
++import { expect,it } from 'vitest';
++import { signalTree,entityMap } from '../../index';
++import { reset,finish } from './placement-work-counters';
++for(const size of [32,128,512]) for(const operation of ['setAll','prependMany'] as const) {
++ it(`${operation} ${size}: measured preparation allocations and traversal`,()=>{
++  const tree=signalTree({rows:entityMap<{id:number;n:number},number>()});
++  const input=Array.from({length:size},(_,id)=>({id,n:id}));
++  try { reset(); tree.$.rows[operation](input); const counts=finish();
++   expect(tree.$.rows.ids()).toEqual(input.map(row=>row.id));
++   expect(tree.$.rows.all()).toEqual(input);
++   appendFileSync(process.env.ST_PREPARED_REVIEW_OUTPUT+'/counts.jsonl',JSON.stringify({size,operation,counts})+'\n');
++  }finally{finish();tree.destroy();}
++ });
++}
+--- a/packages/kernel/src/lib/physical/entity-mutation-frame.ts
++++ b/packages/kernel/src/lib/physical/entity-mutation-frame.ts
+@@ -1,3 +1,4 @@
++import { mapEntries } from './placement-work-counters';
+ import type { EntityPlacementStage } from './entity-placement-stage';
+ import type { EntityValueTransition } from '../internals/entity-value-transition';
+ import { installTerminalRecord } from '../internals/intrinsic-mutation';
+@@ -178,7 +179,7 @@
+     const stagedSubjects =
+       this.finalFront || this.finalOrder ? new Map<K, number>() : undefined;
+     if (stagedSubjects) {
+-      for (const [id, row] of stage.patch) {
++      for (const [id, row] of mapEntries(stage.patch, 'keyLookup')) {
+         // Preserve the prior strict-equality lookup (including NaN) and first
+         // match while falling back to the existing committed key index.
+         if (

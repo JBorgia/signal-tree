@@ -1,0 +1,77 @@
+
+ NX   Running target build for project demo and 2 tasks it depends on:
+
+
+
+> nx run demo:generate-deep-typing-proofs
+
+
+> nx run demo:generate-versions
+
+demo: ✔ Wrote versions to apps/demo/src/app/version.ts: kernel=16.0.0-dev
+demo: ✔ Wrote demo library versions to apps/demo/src/app/library-versions.ts
+demo: Generated deep-typing proofs for depths 1-40.
+demo: (node:94937) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+demo: (Use `node --trace-warnings ...` to show where the warning was created)
+
+> nx run demo:build:production
+
+demo: (node:94941) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+demo: (Use `node --trace-warnings ...` to show where the warning was created)
+demo: [33m❯[39m Building...
+demo: (node:94941) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+demo: (Use `node --trace-warnings ...` to show where the warning was created)
+demo: [32m✔[39m Building...
+demo: [1mInitial chunk files[22m[2m | [22m[1mNames[22m                                [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+demo: [32mmain-KNAMFPWS.js[39m   [2m | [22m[2mmain[22m                                 [2m | [22m[36m657.02 kB[39m[2m | [22m              [36m169.44 kB[39m
+demo: [32mstyles-ACDZXSLE.css[39m[2m | [22m[2mstyles[22m                               [2m | [22m [36m25.69 kB[39m[2m | [22m                [36m4.66 kB[39m
+demo: [1m [22m                  [2m | [22m[1mInitial total[22m                        [2m | [22m[1m[91m682.71 kB[39m[22m[2m | [22m              [1m174.10 kB[22m
+demo: [1mLazy chunk files[22m   [2m | [22m[1mNames[22m                                [2m | [22m [1mRaw size[22m[2m | [22m[1mEstimated transfer size[22m
+demo: [32mchunk-DdvzntGN.js[39m  [2m | [22m[2mv15-benchmarks-component[22m             [2m | [22m[36m199.40 kB[39m[2m | [22m               [36m46.35 kB[39m
+demo: [32mchunk-CdhmNQyN.js[39m  [2m | [22m[2m-[22m                                    [2m | [22m[36m194.87 kB[39m[2m | [22m               [36m16.48 kB[39m
+demo: [32mchunk-NfE5QcQk.js[39m  [2m | [22m[2mlegacy-changelog-component[22m           [2m | [22m[36m112.78 kB[39m[2m | [22m               [36m25.93 kB[39m
+demo: [32mchunk-DS287olj.js[39m  [2m | [22m[2mdocumentation-component[22m              [2m | [22m [36m55.83 kB[39m[2m | [22m               [36m15.26 kB[39m
+demo: [32mchunk-DJowTF2K.js[39m  [2m | [22m[2mrecommended-architecture-component[22m   [2m | [22m [36m55.05 kB[39m[2m | [22m                [36m9.24 kB[39m
+demo: [32mchunk-DR2H0UYg.js[39m  [2m | [22m[2mwhy-causality-component[22m              [2m | [22m [36m50.96 kB[39m[2m | [22m               [36m11.43 kB[39m
+demo: [32mchunk-CNqEvkJn.js[39m  [2m | [22m[2marchitecture-overview-component[22m      [2m | [22m [36m46.56 kB[39m[2m | [22m               [36m11.55 kB[39m
+demo: [32mchunk-puPb88Qs.js[39m  [2m | [22m[2mrealistic-benchmark-history-component[22m[2m | [22m [36m46.49 kB[39m[2m | [22m               [36m10.51 kB[39m
+demo: [32mchunk-CtTii7aH.js[39m  [2m | [22m[2m-[22m                                    [2m | [22m [36m38.63 kB[39m[2m | [22m               [36m11.47 kB[39m
+demo: [32mchunk-DgD4ugXH.js[39m  [2m | [22m[2m-[22m                                    [2m | [22m [36m36.65 kB[39m[2m | [22m                [36m8.13 kB[39m
+demo: [32mchunk-0jXUhlEu.js[39m  [2m | [22m[2mdevtools-demo-component[22m              [2m | [22m [36m27.84 kB[39m[2m | [22m                [36m6.29 kB[39m
+demo: [32mchunk-CauftkVA.js[39m  [2m | [22m[2mbatching-demo-component[22m              [2m | [22m [36m26.69 kB[39m[2m | [22m                [36m5.43 kB[39m
+demo: [32mchunk-DjjvK0wV.js[39m  [2m | [22m[2mentities-demo-component[22m              [2m | [22m [36m24.50 kB[39m[2m | [22m                [36m5.32 kB[39m
+demo: [32mchunk-CTt9a9kJ.js[39m  [2m | [22m[2mrestoration-demo-component[22m           [2m | [22m [36m22.31 kB[39m[2m | [22m                [36m5.67 kB[39m
+demo: [32mchunk-Cboydpa3.js[39m  [2m | [22m[2mhome-component[22m                       [2m | [22m [36m19.94 kB[39m[2m | [22m                [36m4.78 kB[39m
+demo: [2m...and 9 more lazy chunks files. Use "--verbose" to show all the files.[22m
+demo: Application bundle generation failed. [14.295 seconds] - 2026-11-03T05:17:53.945Z
+demo: [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mIgnoring this import because "packages/kernel/src/lib/experimental-publication/entity.ts" was marked as having no side effects[0m [ignored-bare-import]
+demo:     packages/kernel/src/lib/link.ts:3:7:
+demo: [37m      3 │ import [32m'./experimental-publication/entity'[37m;
+demo:         ╵        [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+demo:   "sideEffects" is false in the enclosing "package.json" file:
+demo:     packages/kernel/package.json:7:2:
+demo: [37m      7 │   [32m"sideEffects"[37m: false,
+demo:         ╵   [32m~~~~~~~~~~~~~[0m
+demo: [33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mbundle initial exceeded maximum budget. Budget 525.00 kB was not met by 157.71 kB with a total of 682.71 kB.[0m
+demo: [31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mbundle initial exceeded maximum budget. Budget 570.00 kB was not met by 112.71 kB with a total of 682.71 kB.[0m
+
+
+
+ NX   Running target build for project demo and 2 tasks it depends on failed
+
+Failed tasks:
+
+- demo:build:production
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      16.4s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     16.3s (2 tasks)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        demo:build:production               16.0s
+        demo:generate-deep-typing-proofs    327ms

@@ -1,0 +1,13 @@
+[
+  {
+    "project": "kernel",
+    "file": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
+    "fullName": "opaque leaves retain terminal topology through restoration still refuses structural drift before reversing an atomic leaf sibling",
+    "duplicateOrdinal": 1,
+    "status": "failed",
+    "failureMessages": [
+      "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+expect@4.1.9/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/chai@6.2.2/node_modules/chai/index.js:1700:25)\n    at /private/tmp/st-native-broad-differential/predecessor/candidate/packages/kernel/src/lib/opaque-leaf-restoration.spec.ts:253:33\n    at processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at file:///private/tmp/v16-transition-qualification/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    ],
+    "fixtureClass": "unchanged"
+  }
+]

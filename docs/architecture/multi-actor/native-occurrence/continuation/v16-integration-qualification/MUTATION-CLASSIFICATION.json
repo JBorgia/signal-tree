@@ -1,0 +1,15 @@
+{
+  "classification": "identified behavioral kill",
+  "exit": 1,
+  "failedCases": 2,
+  "testedFile": "cold-row-responsibility.spec.ts",
+  "witness": "nodeFacadeMaterialized true, expected false",
+  "locations": [
+    "cold-row-responsibility.spec.ts:76 immediate post-undo",
+    "cold-row-responsibility.spec.ts:117 immediate post-rollback"
+  ],
+  "comparisonSentinelExecuted": false,
+  "timeout": false,
+  "remainingOwned": [],
+  "cleanBaseline": "focused-eleven exit0 11/11 before mutant; mutant separate copy, candidate never mutated"
+}

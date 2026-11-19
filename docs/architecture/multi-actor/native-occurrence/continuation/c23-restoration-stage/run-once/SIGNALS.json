@@ -1,0 +1,68 @@
+[
+  {
+    "pgid": 32016,
+    "witnesses": [
+      {
+        "pid": 32016,
+        "ppid": 31421,
+        "pgid": 32016,
+        "birth": "Mon Nov 2 14:42:55 2026",
+        "raw": "32016 31421 32016 Ss     0.0  35680 Mon Nov  2 14:42:55 2026     node tools/run-core-vitest.mjs src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+      },
+      {
+        "pid": 32037,
+        "ppid": 32016,
+        "pgid": 32016,
+        "birth": "Mon Nov 2 14:42:56 2026",
+        "raw": "32037 32016 32016 S      0.0  47248 Mon Nov  2 14:42:56 2026     node /Users/jonathanborgia/Library/pnpm/.tools/pnpm/10.17.0/node_modules/pnpm/bin/pnpm.cjs exec vitest run --config vitest.config.ts src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+      },
+      {
+        "pid": 32054,
+        "ppid": 32037,
+        "pgid": 32016,
+        "birth": "Mon Nov 2 14:42:57 2026",
+        "raw": "32054 32037 32016 S      0.0  54704 Mon Nov  2 14:42:57 2026     node /private/tmp/st-c23-restoration-stage-independent/candidate/node_modules/.bin/../vitest/vitest.mjs run --config vitest.config.ts src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+      },
+      {
+        "pid": 32065,
+        "ppid": 32054,
+        "pgid": 32016,
+        "birth": "Mon Nov 2 14:42:59 2026",
+        "raw": "32065 32054 32016 S      0.0  12032 Mon Nov  2 14:42:59 2026     /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+      },
+      {
+        "pid": 32067,
+        "ppid": 32054,
+        "pgid": 32016,
+        "birth": "Mon Nov 2 14:42:59 2026",
+        "raw": "32067 32054 32016 R     34.0 154048 Mon Nov  2 14:42:59 2026     /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node --experimental-import-meta-resolve --require /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/suppress-warnings.cjs --conditions node --conditions development /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/vitest@4.1.9_@edge-runtime+vm@3.2.0_@types+node@22.18.1_@vitest+coverage-v8@4.1.9_@vite_befef5c16c68f3fca6dbca1818f521f8/node_modules/vitest/dist/workers/forks.js"
+      }
+    ]
+  },
+  {
+    "pgid": 31403,
+    "witnesses": [
+      {
+        "pid": 31403,
+        "ppid": 31254,
+        "pgid": 31403,
+        "birth": "Mon Nov 2 14:41:52 2026",
+        "raw": "31403 31254 31403 Ss     0.0  43152 Mon Nov  2 14:41:52 2026     node /Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/corepack pnpm nx test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+      },
+      {
+        "pid": 31421,
+        "ppid": 31403,
+        "pgid": 31403,
+        "birth": "Mon Nov 2 14:41:53 2026",
+        "raw": "31421 31403 31403 S      0.0 223568 Mon Nov  2 14:41:53 2026     node ./node_modules/.bin/../nx/dist/bin/nx.js test kernel src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts --testNamePattern=^v16 restoration of turns larger than the argument limit jumps across a turn that cleared more rows than the argument limit$ --skip-nx-cache --maxWorkers=1 --reporter=default --reporter=/private/tmp/st-c23-restoration-stage-independent/recorder-reporter-v2.mjs"
+      },
+      {
+        "pid": 31812,
+        "ppid": 31421,
+        "pgid": 31403,
+        "birth": "Mon Nov 2 14:42:35 2026",
+        "raw": "31812 31421 31403 S      0.0  12208 Mon Nov  2 14:42:35 2026     /Users/jonathanborgia/code/signaltree/node_modules/.pnpm/@esbuild+darwin-arm64@0.25.12/node_modules/@esbuild/darwin-arm64/bin/esbuild --service=0.25.12 --ping"
+      }
+    ]
+  }
+]

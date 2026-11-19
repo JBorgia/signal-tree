@@ -1,0 +1,34 @@
+--- a/packages/kernel/src/lib/experimental-publication/lifecycle.ts
++++ b/packages/kernel/src/lib/experimental-publication/lifecycle.ts
+@@ -373,7 +373,7 @@
+  const h=stack.at(-1)?.horizon??{frames:new Set<Frame>(),requirements:new Set<NativeRequirement>(),open:0};
+  const frame:Frame={channel,connection:c,parents:[...stack],horizon:h,owners:[],unknown:true,invalid:false,view,ops:new Set(),installedOwners:new Set()};
+  h.frames.add(frame);h.open++;stack.push(frame);
+- let stage:'before-callback'|'after-callback'='before-callback';let thrown=false;let primary:unknown;let exitingError=false;
++ let stage:'before-callback'|'after-callback'='before-callback';let thrown=false;let primary:unknown;let exitingError=false;let completionFailed=false;let completionError:unknown;
+  try{
+   if(!isTraversableNode(input)||typeof input==='function'||typeof work!=='function')throw new SignalTreePublicationError(stage,'malformed');
+   const d=input as {kind?:unknown;owners?:unknown};const kind=d.kind;
+@@ -391,7 +391,6 @@
+   if(isTraversableNode(result))if(typeof(result as {then?:unknown}).then==='function')throw new SignalTreePublicationError(stage,'async-callback');
+   if(frameInvalid(frame))throw new SignalTreePublicationError(stage,'contradiction');
+   if(thrown)throw primary;
+-  return receipt;
+  }catch(error){
+   exitingError=true;
+   for(const f of stack)f.invalid=true;
+@@ -404,10 +403,12 @@
+  }finally{
+   stack.pop();h.open--;
+   try{if(h.open===0)finish(h);}catch(error){
+-   if(!exitingError)throw error;
+-   if(!reporting){reporting=true;try{c.report(error);}catch{/* completion reporting cannot replace the primary */}finally{reporting=false;}}
++   if(!exitingError){completionFailed=true;completionError=error;}
++   else if(!reporting){reporting=true;try{c.report(error);}catch{/* completion reporting cannot replace the primary */}finally{reporting=false;}}
+   }finally{wake(channel);}
+  }
++ if(completionFailed)throw completionError;
++ return receipt;
+ }
+ function makeReceipt(view:View):{read():State}{return Object.freeze({read:()=>view.value});}
+ export function diagnostics(){let cells=0,operations=0;for(const s of sources.values())cells+=s.cells.size;for(const c of connections.values())operations+=c.ops.size;return {sources:sources.size,pendingOwners:pending.size,ownerCells:cells,connections:connections.size,operations,activeFrames:stack.length};}

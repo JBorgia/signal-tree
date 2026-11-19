@@ -1,0 +1,81 @@
+{
+  "manifestSha256": "bc8926949819af2cab3b716b71a04b6f3f97a6be5117b954bbfa236b66dec90b",
+  "files": {
+    "packages/kernel/src/lib/internals/location-runtime.ts": {
+      "sha256": "30e259e15ccbc10b314217bea74be4075ded2b58fb18020887f8203b34d1a3b5",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/native-location-realization.ts": {
+      "sha256": "1df7533bdab24b862dcab4a580b42a6405f3ff93339e8eb13078f36eea7fe680",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation.ts": {
+      "sha256": "a7ea049153ec5f68ef017174fdecc4696bf36d31d7bcb399d281041e64172d34",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts": {
+      "sha256": "52fbe6757c711b19c45e5f60ce0264a52e993aecb4d7beadae7e658f4b7d948b",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/native-projection-observability.spec.ts": {
+      "sha256": "b115832fd17811562761944da54c8595e04e0329a4f7c56cf6bec4c2700cf6ed",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": {
+      "sha256": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts": {
+      "sha256": "08e290c23ee194877e87cb9430fffab1aa7842e580e01f90de640ecca358b34e",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/custom-markers.spec.ts": {
+      "sha256": "eb2a3b8a843913099c1de4a79eaf3f1a6966d864c5c07c89d5ac946b0c83aa4b",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/snapshot-authority.ts": {
+      "sha256": "2f9204df5375d74af84397cfe392fba5c751ce7feead6b6b08d6ca4536588354",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/materialize-markers.ts": {
+      "sha256": "304edf20f2acc9b42eb33f50b5783b76a2bfe5e843f1fa61b038ce7bb0bf9381",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/internals/location-runtime.spec.ts": {
+      "sha256": "7836045fbbf1d17e4cbe284e690e16ee802784bb1bf3d14d7d949cafdef1bbef",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/adapter.ts": {
+      "sha256": "85c18646c455d1a445cdfd9ab9450fcda143664058a9e87ecc4763a542048910",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/reactive-test-realization.ts": {
+      "sha256": "90e78553ebc8818f9ff3c68cf196bb1f8bde73ca2997352fd0f1a20390a0041e",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/signal-tree.ts": {
+      "sha256": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/entity-signal.ts": {
+      "sha256": "f4fd3b7795c17b3d57535296fd6e3517342a7732cf11c8918c6d320196c9775d",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/enhancers/restoration/restoration.ts": {
+      "sha256": "333a1e88f120fb7239e76285946227fa9dfb2d99d7ef9c5f438c61d0afa971d4",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/enhancers/devtools/devtools-impl.ts": {
+      "sha256": "3cc54d7b0e4f552cbbf81dda85358496df11f815d569643ba6b16443570313c9",
+      "matchesPremiseC21": true
+    },
+    "packages/kernel/src/lib/experimental-publication/private.ts": {
+      "sha256": "e7e036c669e7a4b4014db1d3af3fa11ead56fe0976363dcd1a63a0fe66cf4b25",
+      "matchesPremiseC21": null
+    },
+    "packages/kernel/src/lib/entity-granular-reactivity.spec.ts": {
+      "sha256": "83365544bcb4a572988125141bab0c28786a54b5a2279522f3eed0d9b7d9e872",
+      "matchesPremiseC21": null
+    }
+  }
+}

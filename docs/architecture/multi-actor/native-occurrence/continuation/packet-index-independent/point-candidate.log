@@ -1,0 +1,57 @@
+
+> nx run kernel:test entity-granular-reactivity.spec.ts --testNamePattern=a single-entity update does not rebuild --maxWorkers=1
+
+> node tools/run-core-vitest.mjs entity-granular-reactivity.spec.ts --testNamePattern="a single-entity update does not rebuild" --maxWorkers=1
+
+(node:90536) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:90689) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-packet-index-independent/candidate/packages/kernel
+
+(node:90896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/entity-granular-reactivity.spec.ts (10 tests | 1 failed | 9 skipped) 464ms
+     × a single-entity update does not rebuild the collection 463ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/entity-granular-reactivity.spec.ts > entityMap — collection queries are lazily derived (13.5.0) > a single-entity update does not rebuild the collection
+AssertionError: expected 27600 to be less than 2000
+ ❯ src/lib/entity-granular-reactivity.spec.ts:215:19
+    213|     const small = updates(2000);
+    214|     expect(updates(20000)).toBe(small);
+    215|     expect(small).toBeLessThan(2000);
+       |                   ^
+    216|     // Control: the counter sees a copy, so equality is not vacuous. T…
+    217|     // entries iterated and two copied, then three mapped.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 skipped (10)
+   Start at  17:31:42
+   Duration  1.49s (transform 600ms, setup 0ms, import 727ms, tests 464ms, environment 202ms)
+
+Warning: command "node tools/run-core-vitest.mjs entity-granular-reactivity.spec.ts --testNamePattern="a single-entity update does not rebuild" --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.9s

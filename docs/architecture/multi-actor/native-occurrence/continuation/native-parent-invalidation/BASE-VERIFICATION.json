@@ -1,0 +1,12 @@
+{
+  "c11": {
+    "manifestSha256": "dc21671bf92e2a74bd5798bfccfbc0b02d13e58dff4fe328758fd604d9f70148",
+    "verifiedFiles": 3045,
+    "changed": []
+  },
+  "c12": {
+    "manifestSha256": "d96cb84faeec4f098b4bba00deb9b82b108a33469b965978e4d248fa354b1df2",
+    "verifiedFiles": 3053,
+    "changed": []
+  }
+}

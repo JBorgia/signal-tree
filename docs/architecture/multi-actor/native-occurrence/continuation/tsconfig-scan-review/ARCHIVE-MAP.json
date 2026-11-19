@@ -1,0 +1,32 @@
+[
+  {
+    "source": "EVIDENCE.json",
+    "archive": "EVIDENCE.json",
+    "sourceSha256": "ec5b8c470094015c08230eb1e3798cdb2a0018d6c546cb10ea65f808e84b4d37",
+    "archiveSha256": "ec5b8c470094015c08230eb1e3798cdb2a0018d6c546cb10ea65f808e84b4d37"
+  },
+  {
+    "source": "import-inventory.cjs",
+    "archive": "import-inventory.cjs",
+    "sourceSha256": "06106bdc06becbf0013e334f88d88e97c5935eaf17d866dd5da32110221c809c",
+    "archiveSha256": "06106bdc06becbf0013e334f88d88e97c5935eaf17d866dd5da32110221c809c"
+  },
+  {
+    "source": "VERIFICATION.json",
+    "archive": "VERIFICATION.json",
+    "sourceSha256": "1fddcd039364367c7a8228a2bbf261f9f6744a245caffd7c60da0154ca6f1f39",
+    "archiveSha256": "1fddcd039364367c7a8228a2bbf261f9f6744a245caffd7c60da0154ca6f1f39"
+  },
+  {
+    "source": "IMPORTS.json",
+    "archive": "IMPORTS.json",
+    "sourceSha256": "35309b12503edb5d2dc0dda418e9233bc733bb5e1f120a0152fd389d7a396b10",
+    "archiveSha256": "35309b12503edb5d2dc0dda418e9233bc733bb5e1f120a0152fd389d7a396b10"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "6ad79875b4088a92fc742d06e30dd5bd0167530b92afc5f2d10b4ad0d2bfecb6",
+    "archiveSha256": "6ad79875b4088a92fc742d06e30dd5bd0167530b92afc5f2d10b4ad0d2bfecb6"
+  }
+]

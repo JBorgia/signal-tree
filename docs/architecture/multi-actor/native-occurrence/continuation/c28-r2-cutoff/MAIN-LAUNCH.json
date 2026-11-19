@@ -1,0 +1,22 @@
+{
+  "argv": [
+    "python3",
+    "/private/tmp/st-c28-r2-cutoff/run-focused.py",
+    "main-independent",
+    "test",
+    "kernel",
+    "approved-current-obligation.spec.ts",
+    "current-cutoff-r2.spec.ts",
+    "current-validation.spec.ts",
+    "cached-current-input.spec.ts",
+    "opaque-current-input.spec.ts",
+    "scalar-horizon-lifecycle-controls.spec.ts",
+    "--skip-nx-cache",
+    "--maxWorkers=1"
+  ],
+  "addedEnvironment": {
+    "ST_TWO_HISTORY_OUTPUT": "/private/tmp/st-c28-r2-cutoff/MAIN-AB.jsonl",
+    "ST_CACHED_INPUT_OUTPUT": "/private/tmp/st-c28-r2-cutoff/MAIN-CACHED.jsonl",
+    "ST_OPAQUE_INPUT_OUTPUT": "/private/tmp/st-c28-r2-cutoff/MAIN-OPAQUE.jsonl"
+  }
+}

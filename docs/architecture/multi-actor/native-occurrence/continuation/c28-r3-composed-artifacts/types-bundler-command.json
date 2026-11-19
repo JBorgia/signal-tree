@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "node",
+    "node_modules/typescript/bin/tsc",
+    "-p",
+    "tsconfig.bundler.json"
+  ],
+  "cwd": "/private/tmp/st-c28-r3-composed-artifacts/consumer",
+  "noProgressSeconds": 180
+}

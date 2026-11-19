@@ -1,0 +1,12 @@
+{
+  "c16": {
+    "manifestSha256": "611f7da2665e91f3c53a8aceeb32a2b878324d4db86ced489c2785e898d8e537",
+    "files": 3061,
+    "allMatch": true
+  },
+  "failed": {
+    "manifestSha256": "8ed29ecbbd0cb8cefcecff4bda5cb6351dd9e59ed7590fb571d412cc0a182d0b",
+    "files": 3064,
+    "allMatch": true
+  }
+}

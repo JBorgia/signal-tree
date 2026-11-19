@@ -1,0 +1,1 @@
+First audit failed at terminal sameEndpoint array: the later presence-only filter ran afterAll and overwrote the shared tmp diagnostic with []. No product assertion failed in this audit. Original qualification log and prior tool-read terminal observations remain preserved. Repeat terminal characterization without changing tests and archive its fresh diagnostic.

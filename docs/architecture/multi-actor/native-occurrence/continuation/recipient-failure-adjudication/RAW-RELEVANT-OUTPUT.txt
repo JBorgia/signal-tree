@@ -1,0 +1,23 @@
+ ✓ src/lib/recipient-window-independent.spec.ts (9 tests) 64ms
+ ✓ src/lib/recipient-source-permission.spec.ts (9 tests) 20ms
+ ✓ src/lib/publication-enrollment-adjudicated.spec.ts (16 tests) 109ms
+ ❯ src/lib/recipient-cause-classification.spec.ts (6 tests | 2 failed) 61ms
+ ✓ src/lib/publication-native-provenance.spec.ts (18 tests) 67ms
+stdout | src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment before-pending
+INPUT-ENROLLMENT {"mode":"branch","enrollment":"before-pending","receipt":{"state":"started","basis":"declared"},"sent":[{"x":1,"y":0}],"otherSent":[{"x":1,"y":0}],"physical":{"x":1,"y":0},"pendingOwner":7}
+stdout | src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment during-pending
+INPUT-ENROLLMENT {"mode":"branch","enrollment":"during-pending","receipt":{"state":"started","basis":"declared"},"sent":[{"x":1,"y":0}],"otherSent":[{"x":1,"y":0}],"physical":{"x":1,"y":0},"pendingOwner":7}
+stdout | src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment before-pending
+INPUT-ENROLLMENT {"mode":"root","enrollment":"before-pending","receipt":{"state":"started","basis":"declared"},"sent":[{"pair":{"x":0,"y":0},"x":1,"y":0}],"otherSent":[{"pair":{"x":0,"y":0},"x":1,"y":0}],"physical":{"pair":{"x":0,"y":0},"x":1,"y":0},"pendingOwner":7}
+stdout | src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment during-pending
+INPUT-ENROLLMENT {"mode":"root","enrollment":"during-pending","receipt":{"state":"started","basis":"declared"},"sent":[{"pair":{"x":0,"y":0},"x":1,"y":0}],"otherSent":[{"pair":{"x":0,"y":0},"x":1,"y":0}],"physical":{"pair":{"x":0,"y":0},"x":1,"y":0},"pendingOwner":7}
+ ❯ src/lib/aggregate-independent-input.spec.ts (4 tests | 4 failed) 57ms
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment before-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local branch updater retains useful progress with second enrollment during-pending
+ ❯ src/lib/aggregate-independent-input.spec.ts:32:21
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment before-pending
+ FAIL  src/lib/aggregate-independent-input.spec.ts > connection-local root updater retains useful progress with second enrollment during-pending
+ ❯ src/lib/aggregate-independent-input.spec.ts:32:21
+ FAIL  src/lib/recipient-cause-classification.spec.ts > domain-only: distinct fixed-window treatment and useful confirm
+ FAIL  src/lib/recipient-cause-classification.spec.ts > domain-only: distinct fixed-window treatment and useful rollback
+ ❯ src/lib/recipient-cause-classification.spec.ts:18:111

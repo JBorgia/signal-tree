@@ -1,0 +1,70 @@
+{
+  "facade": "angular",
+  "calls": 4,
+  "written": true,
+  "reached": true,
+  "events": [
+    {
+      "name": "warm-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 0
+        },
+        "probe": "marker-output"
+      },
+      "before": 0,
+      "after": 1
+    },
+    {
+      "name": "action-root",
+      "kind": "throw",
+      "sameSentinel": true,
+      "error": {
+        "name": "Error",
+        "message": "warm marker sentinel",
+        "stack": "Error: warm marker sentinel\n    at /private/tmp/st-parent-freshness-resumed/c8-proof/candidate/packages/angular/src/lib/bounded-reentry-targeted.spec.ts:22:97\n    at file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new ZoneAwarePromise (/private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23)\n    at runWithCancel (file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new ZoneAwarePromise (/private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/zone.js@0.16.2/node_modules/zone.js/fesm2015/zone.js:2226:23)\n    at runWithTimeout (file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///private/tmp/st-parent-freshness-resumed/c8-proof/candidate/node_modules/.pnpm/@vitest+runner@4.1.9/node_modules/@vitest/runner/dist/chunk-artifact.js:2955:64"
+      },
+      "before": 1,
+      "after": 2
+    },
+    {
+      "name": "immediate-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 1
+        },
+        "probe": "marker-output"
+      },
+      "before": 2,
+      "after": 3
+    },
+    {
+      "name": "installed-child",
+      "kind": "return",
+      "value": 1,
+      "before": 3,
+      "after": 3
+    },
+    {
+      "name": "later-write",
+      "kind": "return",
+      "value": null,
+      "before": 3,
+      "after": 3
+    },
+    {
+      "name": "after-write-root",
+      "kind": "return",
+      "value": {
+        "child": {
+          "n": 9
+        },
+        "probe": "marker-output"
+      },
+      "before": 3,
+      "after": 4
+    }
+  ]
+}

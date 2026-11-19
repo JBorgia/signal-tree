@@ -1,0 +1,47 @@
+{
+  "CENSUS-50.json": {
+    "sha256": "cba7b413fa9128d6cd6be4a13523f62b6f618b6b55e52ddaeb52a88c54358ad5",
+    "archive": "CENSUS-50.json",
+    "archiveSha256": "cba7b413fa9128d6cd6be4a13523f62b6f618b6b55e52ddaeb52a88c54358ad5"
+  },
+  "IDENTITY.json": {
+    "sha256": "9bbaba5dabbc4fa4d0fa7f47a5b848e585891758e3c03b576f752b515bca566a",
+    "archive": "IDENTITY.json",
+    "archiveSha256": "9bbaba5dabbc4fa4d0fa7f47a5b848e585891758e3c03b576f752b515bca566a"
+  },
+  "LATER-RECORDED-RUNS.json": {
+    "sha256": "b15288b4380284e1ec2a1e3296391129394b848b0059d8151eedc5ae53b56bf7",
+    "archive": "LATER-RECORDED-RUNS.json",
+    "archiveSha256": "b15288b4380284e1ec2a1e3296391129394b848b0059d8151eedc5ae53b56bf7"
+  },
+  "REPAIR-FIXTURE-IDENTITIES.json": {
+    "sha256": "1f2da2e723e017da999d012b8698e1c4fd598540a3d6a3839e33fced43d598b8",
+    "archive": "REPAIR-FIXTURE-IDENTITIES.json",
+    "archiveSha256": "1f2da2e723e017da999d012b8698e1c4fd598540a3d6a3839e33fced43d598b8"
+  },
+  "REPLAY-COMMANDS.txt": {
+    "sha256": "b163b51c8b8f8aa5126724ffa124d1fa09f213ecb99906dbfd453474e1dbe7d1",
+    "archive": "REPLAY-COMMANDS.txt",
+    "archiveSha256": "b163b51c8b8f8aa5126724ffa124d1fa09f213ecb99906dbfd453474e1dbe7d1"
+  },
+  "REPORT.md": {
+    "sha256": "d72d5a070f2c39e3abc040e7958f23857d495237e31b712138b1b57604db43ba",
+    "archive": "REPORT.md",
+    "archiveSha256": "d72d5a070f2c39e3abc040e7958f23857d495237e31b712138b1b57604db43ba"
+  },
+  "UNEXECUTED-ASSOCIATION.json": {
+    "sha256": "e06504b53777183ff70c329a1f8dc5c8788dd27a94618639844fb244eae4bcd5",
+    "archive": "UNEXECUTED-ASSOCIATION.json",
+    "archiveSha256": "e06504b53777183ff70c329a1f8dc5c8788dd27a94618639844fb244eae4bcd5"
+  },
+  "build-census.py": {
+    "sha256": "a197611e65c7b57bb20f4ef552c13f52a605d23aaafeaf63681baf96450534ac",
+    "archive": "build-census.py",
+    "archiveSha256": "a197611e65c7b57bb20f4ef552c13f52a605d23aaafeaf63681baf96450534ac"
+  },
+  "report-header.md": {
+    "sha256": "759e56a1138a59f86f4e84711e912b9c69e7b9c88f9430d7d34d103f713609c7",
+    "archive": "report-header.md",
+    "archiveSha256": "759e56a1138a59f86f4e84711e912b9c69e7b9c88f9430d7d34d103f713609c7"
+  }
+}

@@ -1,0 +1,11 @@
+# Executed isolated summary discriminator
+
+One invocation, exit0, no timeout: all45 B/Q summary comparisons pass. Original seven flattening comparisons and unsafe-provenance/source-disappearance controls also remain in the copied model and pass unchanged. Original model hash is unchanged after preparation and execution; extended model hash is unchanged during execution. No native runtime imported, modified, or executed.
+
+Command: `/Users/jonathanborgia/.nvm/versions/node/v24.15.0/bin/node /private/tmp/st-finalized-role-retirement-equivalence/summary-model.ts`. Exact command/deadline in COMMAND.json; source identities in DISCRIMINATOR-IDENTITY.json; raw output in summary-first.log; exit and hashes in RESULT.json. Log SHA256:6c7b9d0d2b6b24d2ee934c960a44b19a289963ac4b8610a90e7f54e0bef6c8b9.
+
+The separate model copies the original and exposes the original predicate's exact waiting-cell references only when canRelease, without changing its decisions. It adds static leaf classification, OR/identity-union composition, and dynamic outcome/exact-registry evaluation. Each case compares ready, canRelease, canRetire, and whether settlement subscription is offered. When canRelease is true, it compares subscription length and each cell by reference identity and order—not serialized owner/id equality. Partial waiting sets when release is false are deliberately not compared because production does not expose them.
+
+Cases cover duplicate cells and shared leaves, empty/nested composites (including ignored own fields), blocker ordering, arbitrary unknown, missing provenance/history, hard flags, terminal bits1/2/3, each actual role and role overlap, all four outcomes crossed with present/missing/replaced registry identities, mixed outcomes, and one cached summary across source disappearance/replacement/exact-restoration/confirmation. Three separate readiness-gating cases preserve unfinished/unactivated barriers; they do not simulate lifecycle scheduling.
+
+This supports the algebra for this finite closed-predicate model. It does not prove installed registration, callbacks, assessment/subscription race handling, cancellation, native readiness notification order, atomicity, GC, or general owner-history bounds. No new terminal policy is introduced. No retries, broad suites, or runtime patches.

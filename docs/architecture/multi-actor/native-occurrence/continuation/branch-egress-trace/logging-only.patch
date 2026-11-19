@@ -1,0 +1,89 @@
+--- a/packages/kernel/src/lib/link.ts
++++ b/packages/kernel/src/lib/link.ts
+@@ -630,6 +630,7 @@
+       fields
+     ) => {
+       if (disposed || !endpoint.set) return;
++      console.log('BRANCHTRACE',JSON.stringify({event:'link.notification',v,prev,path:_path,positions:_pos,meta,eligible}));
+       if(entityValueTransition(meta)?.publicationUnit || entityPublicationUnit(meta)) return;
+       // OWNER-PING-0. Two same-shaped trees give their collections the SAME
+       // local position id, so identity is (registry, position) — never the
+@@ -1036,6 +1037,7 @@
+     const receipt = research.refreshSource(consequenceKey);
+     if (!receipt || receipt.fact === researchFact) return;
+     researchFact = receipt.fact;
++    console.log('BRANCHTRACE',JSON.stringify({event:'link.refresh',eligible,receipt:receipt.payload}));
+     eligible = receipt.payload as T;
+     if(receipt.changed !== false) dirty = true;
+   };
+--- a/packages/kernel/src/lib/experimental-publication/private.ts
++++ b/packages/kernel/src/lib/experimental-publication/private.ts
+@@ -164,6 +164,7 @@
+  return {proof:b.index.proof(),present:!source||b.index.exposed(source)};
+ }
+ function prepareMembership(edit:MembershipPublicationEdit):PreparedPublicationUnit|undefined{
++ console.log('BRANCHTRACE',JSON.stringify({event:'membership.prepare',address:edit.address,key:edit.key,present:edit.present,ordinary:edit.ordinary,context:getActiveWriteContext()}));
+  const meta=getActiveWriteContext();
+  const domainKey=nodeStoreOf(edit.branch)??edit.branch;
+  const physicalView={requirement:unavailableInput()};
+@@ -183,6 +184,7 @@
+   const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown});facts.add(fact);
+   let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});const state=Object.freeze({present:edit.present,fact});
+   const unit:Unit={native:native.requirement,coverageUnknown:unknown,fact,previous,payload:undefined,changed:(b.presence.get(slot)?.present??true)!==edit.present,inputs:[],presence:{slot,state,ordinary:edit.ordinary},complete:false,resolve,promise};
++  console.log('BRANCHTRACE',JSON.stringify({event:'membership.unit',revision:fact.revision,previous:previous?.revision,address,changed:unit.changed,state:state.present,ordinary:unit.presence?.ordinary}));
+   const record=lifecycle.prepareRevision(channel,fact,known?[known]:[],unknown,fact.blockers,native.requirement);
+   records.push(combineTerminalRecords(record,{writes:[{map:bindings,key:channel,value:{...b,current:fact}},{map:b.presence,key:slot,value:state},{map:indexed.slots,key:edit.child,value:slot}],adds:[{set:b.pending,value:unit}]})!);parts.push({channel,unit});
+  }
+@@ -196,6 +198,7 @@
+   if(!proof)break; // The captured horizon has not finalized; no mutable stack lookup.
+   const authoredRequirement=lifecycle.combineNativeRequirements([requirementOf(proof),...(unit.native?[unit.native]:[])]);
+   const authoredProof=lifecycle.nativeProof(authoredRequirement);ownProofs.set(unit.fact,authoredProof);
++  console.log('BRANCHTRACE',JSON.stringify({event:'ready.before',revision:unit.fact.revision,previous:unit.previous?.revision,field:unit.relative,membership:unit.presence?.slot.address,memberPresent:unit.presence?.state.present,ordinary:unit.presence?.ordinary,payload:unit.payload,valuePayload:b.valuePayload,proof:{unknown:authoredProof.unknown,invalid:authoredProof.invalid,rejected:authoredProof.terminalRejectedRoles,owners:authoredProof.owners.map(x=>({owner:x.owner,outcome:x.outcome}))},completedPresence:[...b.completedPresence].map(([slot,state])=>({address:slot.address,present:state.present,revision:state.fact.revision}))}));
+   if(unit.collection){
+    const collection=b.collections.get(unit.collection.key);
+    if(collection){for(const edit of unit.collection.edits){
+@@ -246,6 +249,7 @@
+    if(predecessor)lifecycle.supersede(channel,predecessor);
+    b.projected=Object.freeze({fact:unit.fact,changed:unit.changed,payload:support.present?(b.aggregate?maskPayload(b):b.valuePayload):(b.source&&b.collections.has(b.source)?[]:undefined)});
+   }
++  console.log('BRANCHTRACE',JSON.stringify({event:'ready.after',effective:{unknown:effective.unknown,invalid:effective.invalid,rejected:effective.terminalRejectedRoles,owners:effective.owners.map(x=>({owner:x.owner,outcome:x.outcome}))},revision:unit.fact.revision,current:b.current?.revision,noop,changed:unit.changed,valuePayload:b.valuePayload,projected:b.projected?.payload,projectedRevision:b.projected?.fact.revision,completedPresence:[...b.completedPresence].map(([slot,state])=>({address:slot.address,present:state.present,revision:state.fact.revision}))}));
+   unit.payload=undefined;b.pending.delete(unit);unit.resolve();
+  }
+ }
+@@ -267,6 +271,7 @@
+  const fact:Fact=Object.freeze({revision:++serial,clean,blockers:Object.freeze([]),unknown});facts.add(fact);factChannels.set(fact,channel);
+  let resolve!:()=>void;const promise=new Promise<void>(r=>{resolve=r;});
+  const unit:Unit={native,coverageUnknown:unknown,fact,previous,payload:mutation.after,changed:mutation.changed,inputs:captured??[],field,relative:field?b.fields.get(field)?.relative:undefined,complete:false,resolve,promise};
++ console.log('BRANCHTRACE',JSON.stringify({event:'scalar.prepare',revision:fact.revision,previous:previous?.revision,relative:unit.relative,mutation,context:meta}));
+  const plan=lifecycle.prepareRevision(channel,fact,nativeKnown,unknown,fact.blockers,native,b.aggregate);
+  const edits:import('../internals/intrinsic-mutation').TerminalRecordPlan['writes'][number][]=[{map:bindings,key:channel,value:{...b,current:fact,...(!field?{valueFact:fact}:{})}}];if(field)edits.push({map:b.fieldFacts,key:field,value:fact});
+  const terminalEdits={writes:edits,adds:[{set:b.pending,value:unit},...(clean&&ingress?[{set:consumedIngress,value:ingress}]:[])]};
+@@ -413,7 +418,7 @@
+  * an older installed unit's permission. Prepared source units reduce separately.
+  */
+ export function project(channel:object,_meta:unknown,payload:unknown,relative?:readonly string[]):Fact|undefined{
+- const b=bindings.get(channel);if(!b||b.pending.size)return undefined;
++ const b=bindings.get(channel);console.log('BRANCHTRACE',JSON.stringify({event:'legacy.project',payload,relative,pending:b?.pending.size,current:b?.current?.revision,priorProjected:b?.projected?.payload,context:_meta}));if(!b||b.pending.size)return undefined;
+  const fact:Fact=Object.freeze({revision:++serial,clean:false,blockers:Object.freeze([]),unknown:true});facts.add(fact);
+  const unknownProof={owners:[],unknown:true,invalid:false};proofs.set(fact,unknownProof);ownProofs.set(fact,unknownProof);
+  const requirement=requirementOf(unknownProof);
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -201,6 +201,7 @@
+       const keep=inspection&&!equal;
+       if(keep!==has || keep&&!Object.is(inspectionBaseline.get(slotIndex),before))shadowPlans.push({slotIndex,keep,value:before});
+     }
++    console.log('BRANCHTRACE',JSON.stringify({event:'slot.frame.prepare',staged:[...staged],changed,shadowPlans,context:getActiveWriteContext()}));
+     if(getCommittedRevision()!==base)throw new Error('Reentrant scalar preparation');
+     let used=false;
+     return()=>{
+--- a/packages/kernel/src/lib/internals/member-membership.ts
++++ b/packages/kernel/src/lib/internals/member-membership.ts
+@@ -969,6 +969,7 @@
+             : Object.freeze({ present: false as const }),
+         })
+       : undefined;
++  console.log('BRANCHTRACE',JSON.stringify({event:'source.membership',address,key,physicalBefore,present,ordinaryBefore:edit.before,ordinaryAfter:edit.after,ordinary,context:getActiveWriteContext()}));
+   const unit =
+     prepare && registry && address
+       ? prepare({ registry, branch: parent, address, key, child, present, ordinary })

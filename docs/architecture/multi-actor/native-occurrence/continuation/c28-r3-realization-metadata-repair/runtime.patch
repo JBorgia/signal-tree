@@ -1,0 +1,344 @@
+--- a/packages/kernel/src/enhancers/restoration/restoration.ts
++++ b/packages/kernel/src/enhancers/restoration/restoration.ts
+@@ -3137,7 +3137,7 @@
+                     }
+                     frame.set(slot, value);
+                   }
+-                  const install = frame.prepareCommit?.({advanceRevision:false,publish:false});
++                  const install = frame.prepareCommit?.({advanceRevision:false,publish:false,admissionParticipation:'realized'});
+                   if (!install) throw new Error('Declarative scalar preparation unavailable');
+                   let result: ReturnType<typeof frame.commit> | undefined;
+                   return {
+@@ -3164,7 +3164,7 @@
+           scalarBinding,
+           {
+             prepareTarget: (members, scalars, turns) => ({
+-              ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)}))),
++              ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)})),undefined,'realized'),
+               includesScalars: true,
+             }),
+           }
+--- a/packages/kernel/src/enhancers/transactions/transactions.ts
++++ b/packages/kernel/src/enhancers/transactions/transactions.ts
+@@ -1,3 +1,4 @@
++import { scalarAdmissionMetadata } from '../../lib/internals/scalar-admission-metadata';
+ import {registerScalarSelection} from '../../lib/internals/native-scalar-selection';
+ import { scalarFrameMetadata } from '../../lib/internals/scalar-publication-coverage';
+ import {fieldEndpoints,bindFieldEndpoints,composeFieldEndpoints} from '../../lib/internals/native-field-selection';
+@@ -2852,7 +2853,9 @@
+       registry: getPositionRegistry(tree.$),
+     });
+     const recorded = resolveTransactionId(meta);
++    // Realized external input is not authored notification replay.
+     if (
++      getWriteParticipation(meta) !== 'realized' &&
+       recorded !== undefined &&
+       installedOperations.get(recorded)?.owners.has(resolvedPositionIds[0])
+     )
+@@ -2871,7 +2874,8 @@
+   };
+ 
+   const releaseScalarSelection=lifecycleRegistry?registerScalarSelection(lifecycleRegistry,(node,mutation,before,proposed,allowConfirmedRefresh)=>{
+-    const meta=getActiveWriteContext(),position=getOwnedPositionIds(node)?.[0];
++    const active=getActiveWriteContext();
++    const meta=mutation.admissionParticipation?scalarAdmissionMetadata(active,mutation):active,position=getOwnedPositionIds(node)?.[0];
+     if(!mutation.changed)return {endpoint:before.owner!==undefined&&!allowConfirmedRefresh?before:proposed};
+     if(isRestoring||meta?.origin==='restoration'||isInspectionWrite(meta)||getWriteParticipation(meta)==='realized'||meta?.transactionOwner!==transactionOwnerToken)return;
+     const id=resolveTransactionId(meta);
+@@ -3548,6 +3552,7 @@
+                 ? frame.prepareCommit({
+                     advanceRevision: false,
+                     publish: false,
++                    admissionParticipation: 'realized',
+                   })
+                 : undefined;
+               if (!install) throw new Error('Transaction scalar preparation unavailable');
+@@ -3616,7 +3621,7 @@
+       scalarBinding,
+       {
+         prepareTarget: (members, scalars, turns) => ({
+-          ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)}))),
++          ...preparePlainBranchMembers(tree.$ as object, members, [...(scalars ?? [])].map(([owner,after])=>({owner,after,turn:turns?.get(owner)})),undefined,'realized'),
+           includesScalars: true,
+         }),
+       },
+--- a/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -617,7 +617,7 @@
+         ? preparePlainBranchMembers(options.tree.$, memberTargets, authoredValueEffects.filter(effect=>
+             !effect.structural && effect.subjectId===undefined && effect.subjectFieldSegments===undefined &&
+             !hasInlineScopedAddress(effect) && !hasInlineSubjectAddress(effect) &&
+-            scalarSlotRuntime?.resolveScalarSlot(effect.owner)!==undefined).map(effect=>({owner:effect.owner,after:effect.after,turn:effect.turn})), publicationPhase)
++            scalarSlotRuntime?.resolveScalarSlot(effect.owner)!==undefined).map(effect=>({owner:effect.owner,after:effect.after,turn:effect.turn})), publicationPhase, 'realized')
+         : undefined;
+       // A scalar value an earlier turn left is superseded where a later
+       // turn's member write staged its location (`withoutSupersededScalars`).
+@@ -839,7 +839,7 @@
+    const groups=new Map<object,SelectedRowIntent[]>();for(const edit of edits){let group=groups.get(edit.source);if(!group)groups.set(edit.source,group=[]);group.push(edit);}
+    const plans=[...groups.values()].map(group=>group[0]!.prepare(group,publicationPhase));
+    if(!frame.prepareCommit)throw new Error('Selected scalar preparation unavailable');
+-   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>frame.prepareCommit!({advanceRevision:false,publish:false,publicationPhase}));
++   const installScalars=prepareWithScalarSelections(slots,scalarEffects,()=>frame.prepareCommit!({advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'}));
+    publicationPhase.seal();
+    if(clock.revision()!==revision)throw new Error('Selected operation preparation reentered installation');
+    active=false;edits.length=0;groups.clear();let installed=false;let scalarResult:ReturnType<typeof installScalars>|undefined;
+@@ -899,7 +899,7 @@
+         typeof effect.subjectId !== 'number'
+     );
+     const members = memberTargets.size
+-      ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects, publicationPhase)
++      ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects, publicationPhase, 'realized')
+       : undefined;
+     const entityEffects = effects.filter(
+       (effect) =>
+@@ -1032,7 +1032,7 @@
+     else assignPreparedSubjectValue(row.value, path, deepClone(after));
+   }
+   const members = memberTargets.size
+-    ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects, publicationPhase)
++    ? preparePlainBranchMembers(tree.$, memberTargets, scalarEffects, publicationPhase, 'realized')
+     : undefined;
+   const collections = [...rows].map(([collection, subjects]) => {
+     const prepare = collection.__preparePointValues;
+@@ -1043,7 +1043,7 @@
+   if (!frame.prepareCommit) return undefined;
+   const installScalars = members
+     ? () => undefined
+-    : frame.prepareCommit({ advanceRevision: false, publish: false,publicationPhase });
++    : frame.prepareCommit({ advanceRevision: false, publish: false,publicationPhase,admissionParticipation:'realized' });
+   publicationPhase.seal();
+   if (clock.revision() !== baseRevision)
+     throw new Error('Point realization preparation reentered installation');
+@@ -1607,7 +1607,7 @@
+       : meta;
+   };
+ 
+-  const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false,publicationPhase});
++  const installScalarFrame = scalarFrame?.prepareCommit?.({advanceRevision:false,publish:false,publicationPhase,admissionParticipation:'realized'});
+   if (scalarFrame && !installScalarFrame) throw new Error('Scalar realization preparation unavailable');
+   // One source frame sees this unit's complete ordered occupancy proposal.
+   const structuralGroups = new Map<CollectionNode, EntityStructureOperation[]>();
+@@ -1822,7 +1822,7 @@
+     frame.set(slotIndex, effect.after);
+   }
+ 
+-  const install = prepareWithScalarSelections(scalarSlotRuntime,effects,()=>frame.prepareCommit?.({publish:false,publicationPhase:outerPhase}));
++  const install = prepareWithScalarSelections(scalarSlotRuntime,effects,()=>frame.prepareCommit?.({publish:false,publicationPhase:outerPhase,admissionParticipation:'realized'}));
+   if (!install) throw new Error('Scalar realization preparation unavailable');
+   return {
+     commit(detachedCompletions): void {
+--- a/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
++++ b/packages/kernel/src/lib/internals/intercept-leaf-signals.ts
+@@ -1,3 +1,4 @@
++import { scalarAdmissionMetadata } from './scalar-admission-metadata';
+ import { withScalarPublicationCoverage } from './scalar-publication-coverage';
+ import type { WriteMetadata } from '../mutation-types';
+ import { isTraversableNode } from './node-shape';
+@@ -159,7 +160,7 @@
+     if(terminalRecord){
+       const terminalRelease=prepareTerminalMutations(node,(mutation)=>{
+         if(!mutation.changed)return;
+-        return terminalRecord.call(options,path,mutation.after,mutation.before,withMutationIntent(getActiveWriteContext(),mutation.intent),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
++        return terminalRecord.call(options,path,mutation.after,mutation.before,scalarAdmissionMetadata(getActiveWriteContext(),mutation),ownerPathOverride ?? getOwnerPath(node,path),getSubjectIds(node),getPositionIds(node));
+       });
+       if(terminalRelease)restorers.push(terminalRelease);
+     }
+--- a/packages/kernel/src/lib/internals/intrinsic-mutation.ts
++++ b/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+@@ -68,6 +68,8 @@
+ 
+ type TerminalPreparer = (mutation: IntrinsicMutation<unknown>) => TerminalRecordPlan | undefined;
+ export interface IntrinsicMutation<T> {
++  /** Classification of this prepared attempt only; never an ambient write scope. */
++  readonly admissionParticipation?: 'realized';
+   readonly preparedTerminal?: TerminalRecordPlan;
+   /** Precomputed physical equality, separate from ordinary admission. */
+   readonly physicalChanged?: boolean;
+--- a/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+@@ -121,11 +121,11 @@
+   }
+ 
+   prepareCommit(options?: {
+-    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+     publish?: boolean;
+   }): () => ScalarSlotCommitResult {
+     const install = this.frame.prepareCommit({
+-      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase, admissionParticipation: options?.admissionParticipation,
+     });
+     return () => {
+       const result = install();
+@@ -135,11 +135,11 @@
+   }
+ 
+   commit(options?: {
+-    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+     publish?: boolean;
+   }): ScalarSlotCommitResult {
+     const result = this.frame.commit({
+-      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase, admissionParticipation: options?.admissionParticipation,
+     });
+     if (options?.publish !== false) {
+       this.publication.publish(result);
+--- a/packages/kernel/src/lib/internals/plain-branch-membership.ts
++++ b/packages/kernel/src/lib/internals/plain-branch-membership.ts
+@@ -956,7 +956,8 @@
+     }
+   >,
+   scalarTargets?: readonly { owner: number; after: unknown; turn?: number }[],
+-  outerPhase?: PublicationPreparation
++  outerPhase?: PublicationPreparation,
++  admissionParticipation?: 'realized'
+ ): {
+   install(): void;
+   publish(): void;
+@@ -1117,7 +1118,7 @@
+   const frame = runtime.beginFrame();
+   for (const [slot, value] of values) frame.set(slot, value.after);
+   const installFrame =
+-    frame.prepareCommit?.({ advanceRevision: false, publish: false, publicationPhase: phase });
++    frame.prepareCommit?.({ advanceRevision: false, publish: false, publicationPhase: phase, admissionParticipation });
+   if (!installFrame)
+     throw new Error('Plain branch scalar frame cannot be prepared');
+   if (!outerPhase) phase.seal();
+--- a/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+@@ -106,11 +106,11 @@
+   }
+ 
+   prepareCommit(options?: {
+-    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+     publish?: boolean;
+   }): () => ScalarSlotCommitResult {
+     const install = this.frame.prepareCommit({
+-      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase, admissionParticipation: options?.admissionParticipation,
+     });
+     return () => {
+       const result = install();
+@@ -120,11 +120,11 @@
+   }
+ 
+   commit(options?: {
+-    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+     publish?: boolean;
+   }): ScalarSlotCommitResult {
+     const result = this.frame.commit({
+-      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase,
++      advanceRevision: options?.advanceRevision, publicationPhase: options?.publicationPhase, admissionParticipation: options?.admissionParticipation,
+     });
+     if (options?.publish !== false) {
+       this.publication.publish(result);
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-port.ts
+@@ -28,11 +28,11 @@
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
+   prepareCommit?(options?: {
+-    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+     publish?: boolean;
+   }): () => ScalarSlotCommitResult;
+   commit(options?: {
+-    advanceRevision?: boolean; publicationPhase?: PublicationPreparation;
++    advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized';
+     publish?: boolean;
+   }): ScalarSlotCommitResult;
+ }
+--- a/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
++++ b/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+@@ -45,8 +45,8 @@
+   set(slotIndex: SlotIndex, value: unknown): void;
+   update(slotIndex: SlotIndex, updater: (value: unknown) => unknown): void;
+   discard(): void;
+-  prepareCommit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): () => ScalarSlotCommitResult;
+-  commit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): ScalarSlotCommitResult;
++  prepareCommit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }): () => ScalarSlotCommitResult;
++  commit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }): ScalarSlotCommitResult;
+ }
+ 
+ export interface TreeScalarSlotRuntime {
+@@ -93,10 +93,10 @@
+     private readonly readValue: (slotIndex: SlotIndex) => unknown,
+     private readonly commitValues: (
+       staged: ReadonlyMap<SlotIndex, unknown>,
+-      options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }
++      options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }
+     ) => ScalarSlotCommitResult,
+     private readonly assertSlotIndex: (slotIndex: SlotIndex) => void,
+-    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }) => () => ScalarSlotCommitResult
++    private readonly prepareValues: (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }) => () => ScalarSlotCommitResult
+   ) {}
+ 
+   set(slotIndex: SlotIndex, value: unknown): void {
+@@ -120,14 +120,14 @@
+     this.staged.clear();
+   }
+ 
+-  prepareCommit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): () => ScalarSlotCommitResult {
++  prepareCommit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }): () => ScalarSlotCommitResult {
+     this.assertOpen();
+     this.closed = true;
+     if (this.getCommittedRevision() !== this.baseRevision) throw new Error('Stale scalar preparation');
+     return this.prepareValues(this.staged, options);
+   }
+ 
+-  commit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): ScalarSlotCommitResult {
++  commit(options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }): ScalarSlotCommitResult {
+     this.assertOpen();
+     this.closed = true;
+ 
+@@ -202,7 +202,9 @@
+   };
+ 
+   // Research-only preparation: run equality before any target installs.
+-  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation }): (() => ScalarSlotCommitResult) => {
++  const prepareSlots = (staged: ReadonlyMap<SlotIndex, unknown>, options?: { advanceRevision?: boolean; publicationPhase?: PublicationPreparation; admissionParticipation?: 'realized' }): (() => ScalarSlotCommitResult) => {
++    // Capture this frame's classification before callback-capable equality.
++    const admissionParticipation=options?.admissionParticipation;
+     const base=getCommittedRevision();
+     const changed=collectSlotChanges(staged);
+     const physical=new Set(changed.map(x=>x.slotIndex));
+@@ -222,7 +224,7 @@
+       if(keep!==has || keep&&!Object.is(inspectionBaseline.get(slotIndex),before))shadowPlans.push({slotIndex,keep,value:before});
+       const source = publicationSources[slotIndex];
+       if (source) {
+-        const mutation = {intent:'replace' as const, before, after:equal ? before : nextValue, changed:!equal, physicalChanged:physical.has(slotIndex), publicationPredecessors, deferPublicationFinalization:true};
++        const mutation = {admissionParticipation,intent:'replace' as const, before, after:equal ? before : nextValue, changed:!equal, physicalChanged:physical.has(slotIndex), publicationPredecessors, deferPublicationFinalization:true};
+         const terminal = !equal ? prepareScalarSourceTerminal(source,mutation) : undefined;
+         const publication = prepareScalarSourcePublication(source,{...mutation,preparedTerminal:terminal});
+         const unit = publication ? {...publication,record:combineTerminalRecords(terminal,publication.record)!} : terminal ? {record:terminal,completion:{}} : undefined;
+@@ -269,7 +271,7 @@
+       return {revision,changedSlots:changed.map(x=>x.slotIndex),...(publication ? {publication} : {})};
+     };
+   };
+-  const commitSlots = (staged:ReadonlyMap<SlotIndex,unknown>,options?:{advanceRevision?:boolean}):ScalarSlotCommitResult => prepareSlots(staged,options)();
++  const commitSlots = (staged:ReadonlyMap<SlotIndex,unknown>,options?:{advanceRevision?:boolean; publicationPhase?:PublicationPreparation; admissionParticipation?:'realized'}):ScalarSlotCommitResult => prepareSlots(staged,options)();
+   const commitSlotValue = <T>(slotIndex:SlotIndex,nextValue:T,options?:{advanceRevision?:boolean}):boolean => commitSlots(new Map([[slotIndex,nextValue]]),options).changedSlots.length>0;
+   const commitSlot = <T>(
+     slotIndex: SlotIndex,
+--- /dev/null
++++ b/packages/kernel/src/lib/internals/scalar-admission-metadata.ts
+@@ -0,0 +1,16 @@
++import type { WriteMetadata } from '../types';
++import type { IntrinsicMutation } from './intrinsic-mutation';
++
++/** Derive admission metadata without rebinding context visible to callbacks. */
++export function scalarAdmissionMetadata(
++  meta: WriteMetadata | undefined,
++  mutation: IntrinsicMutation<unknown>
++): WriteMetadata {
++  return {
++    ...(meta ?? {}),
++    mutationIntent: mutation.intent,
++    ...(mutation.admissionParticipation === 'realized'
++      ? { participation: 'realized' as const }
++      : {}),
++  };
++}

@@ -1,0 +1,22 @@
+{
+  "r1AllFreezeArtifactsUnchanged": true,
+  "r1SourceFilesVerified": 2970,
+  "allInheritedTestsUnchanged": true,
+  "runtimeChanges": {
+    "packages/kernel/src/lib/internals/entity-publication.ts": "dd71e57d59d1023b9d63e3ef4a2f7f975975f3de81d0f9f37d018f2ffad67330"
+  },
+  "newSpec": {
+    "packages/kernel/src/lib/admission-refusal.spec.ts": "61f29397dbf8fcd0285dc0f4d32e6e2f8009a073bddfcb4c9ad5cb939e0b87ed"
+  },
+  "artifacts": {
+    "SOURCE-SHA256.json": "872d18d5b66200e6f8254c0c0ee318eb2f2bfd30b7eefff6a0f6efcdb5f4496c",
+    "runtime.patch": "6086211ecf96ec46d3b07edff8e3e41677b246cb7d985dace86f969ceb05928f",
+    "tests.patch": "45bdd3ad7b4cb0a0c722a38b2a7902896c4a45bebe4fa8a790e199e97c06274b",
+    "focused-first.log": "cb9f70222da25dca68dfb602f32574ec6224668081da8c10c6eacc54c72e556d",
+    "original-precedence-refusal.log": "4a32a94c1e89333735b977460eeabd21e20ea4cb2184b07335955e1f29d6eae5",
+    "new-controls.log": "2728c632e46ade0ade231ee963b510e358cfdcf37f0f27156820adfcf8a041b2",
+    "point.log": "0614368e52324542902b9b072ab5c8de217c2deab624f2f1bc00e42ca6a80322",
+    "source-types.log": "63ee28da2cc58f12fddc8257a7b3e1b40168658c30efac36cd13c67a69ce9ed9",
+    "spec-types.log": "d96bf296ada40f7aab19740c790ec23835aeae7f307cf347a059d16fd348a7cb"
+  }
+}

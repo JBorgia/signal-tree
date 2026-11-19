@@ -1,0 +1,20 @@
+{
+  "exit": 0,
+  "noProgressTimeout": false,
+  "emittedPackages": [
+    "kernel",
+    "react",
+    "angular",
+    "vue",
+    "solid"
+  ],
+  "allFiveEmitted": true,
+  "allFiveHaveArtifacts": true,
+  "normalFullChainExit": true,
+  "sourceUnchanged": true,
+  "changedSourcePaths": [],
+  "reportRequests": 0,
+  "reports": [],
+  "remainingObservedDescendants": [],
+  "elapsedExecutionSeconds": 133.5535387910204
+}

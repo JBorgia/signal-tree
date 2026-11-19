@@ -1,0 +1,128 @@
+[
+  {
+    "source": "receipt-only-correction.patch",
+    "archive": "receipt-only-correction.patch",
+    "sourceSha256": "63a33940c9ca8dae0f36650078cc1408728ce725973bee224af9b2870956c76f",
+    "archiveSha256": "63a33940c9ca8dae0f36650078cc1408728ce725973bee224af9b2870956c76f"
+  },
+  {
+    "source": "ORIGINALS-VERIFIED.json",
+    "archive": "ORIGINALS-VERIFIED.json",
+    "sourceSha256": "42409b62225f3faf9218f3aac83b707d4d7db14e02c8600fb0b745b3bd4cdfcf",
+    "archiveSha256": "42409b62225f3faf9218f3aac83b707d4d7db14e02c8600fb0b745b3bd4cdfcf"
+  },
+  {
+    "source": "RECEIPT-ADJUDICATION-INPUT.md",
+    "archive": "RECEIPT-ADJUDICATION-INPUT.md",
+    "sourceSha256": "0110df79b6b6a77d55fa527e4f01a264365d7cb7c27eaad736a7269f896b520c",
+    "archiveSha256": "0110df79b6b6a77d55fa527e4f01a264365d7cb7c27eaad736a7269f896b520c"
+  },
+  {
+    "source": "COMMANDS.md",
+    "archive": "COMMANDS.md",
+    "sourceSha256": "ed3f3537db8155047f11eda6d579cd28948c5dc1f52a839c11688fd10bec1897",
+    "archiveSha256": "ed3f3537db8155047f11eda6d579cd28948c5dc1f52a839c11688fd10bec1897"
+  },
+  {
+    "source": "CURRENT-SPEC-INPUT.md",
+    "archive": "CURRENT-SPEC-INPUT.md",
+    "sourceSha256": "70ced47b98aabe1b8b05f30b835caf6b30f4c9311736dcab06a974377c742289",
+    "archiveSha256": "70ced47b98aabe1b8b05f30b835caf6b30f4c9311736dcab06a974377c742289"
+  },
+  {
+    "source": "SNAPSHOT.json",
+    "archive": "SNAPSHOT.json",
+    "sourceSha256": "b608b458277f7d43dedf835908a426b0c2437cefbb47937a12f1f18db5eb765b",
+    "archiveSha256": "b608b458277f7d43dedf835908a426b0c2437cefbb47937a12f1f18db5eb765b"
+  },
+  {
+    "source": "REVIEW.md",
+    "archive": "REVIEW.md",
+    "sourceSha256": "6ac80b2477acd1e7a889a82fb20a722ca9d321a0a1acffdeb0108c0b3890b6e2",
+    "archiveSha256": "6ac80b2477acd1e7a889a82fb20a722ca9d321a0a1acffdeb0108c0b3890b6e2"
+  },
+  {
+    "source": "authored-held-disposal.patch",
+    "archive": "authored-held-disposal.patch",
+    "sourceSha256": "45daf8c1b3e9f5ad1e5910bbf451bc5274d11cda59903024972e4e9ca573623a",
+    "archiveSha256": "45daf8c1b3e9f5ad1e5910bbf451bc5274d11cda59903024972e4e9ca573623a"
+  },
+  {
+    "source": "prepare.py",
+    "archive": "prepare.py",
+    "sourceSha256": "375483fc4b814ae514aa5fa9f88f27e9eea4452a7076e82388ed9c425a7f45d2",
+    "archiveSha256": "375483fc4b814ae514aa5fa9f88f27e9eea4452a7076e82388ed9c425a7f45d2"
+  },
+  {
+    "source": "FREEZE.json",
+    "archive": "FREEZE.json",
+    "sourceSha256": "8bb66bb4adee028b437bb8da5e23947c14999947604ef5ba4732533bf1d4ca7d",
+    "archiveSha256": "8bb66bb4adee028b437bb8da5e23947c14999947604ef5ba4732533bf1d4ca7d"
+  },
+  {
+    "source": "originals/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "archive": "originals/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "sourceSha256": "351c6cc27f9d0c7bc04ac714115d7f264fea841c28bf9129ccee1ab69be70f17",
+    "archiveSha256": "351c6cc27f9d0c7bc04ac714115d7f264fea841c28bf9129ccee1ab69be70f17"
+  },
+  {
+    "source": "originals/packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "archive": "originals/packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "sourceSha256": "fa426a26c613345d2c7e30def87e253963cab5d04873cd62339b1e4d52cd86cd",
+    "archiveSha256": "fa426a26c613345d2c7e30def87e253963cab5d04873cd62339b1e4d52cd86cd"
+  },
+  {
+    "source": "originals/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "archive": "originals/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "sourceSha256": "810abc2745af70cdec2b30559e52dfeebc0e04be4b80bdd238261e709ac61283",
+    "archiveSha256": "810abc2745af70cdec2b30559e52dfeebc0e04be4b80bdd238261e709ac61283"
+  },
+  {
+    "source": "originals/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "archive": "originals/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "sourceSha256": "566be62df00db45abbc05bf95ba305e2798667e322af608dc88ee944e9e71b87",
+    "archiveSha256": "566be62df00db45abbc05bf95ba305e2798667e322af608dc88ee944e9e71b87"
+  },
+  {
+    "source": "originals/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "archive": "originals/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "sourceSha256": "8ebefaa05d0a47499c971b78295875a9d503db812db297689f71d69d45ead0fa",
+    "archiveSha256": "8ebefaa05d0a47499c971b78295875a9d503db812db297689f71d69d45ead0fa"
+  },
+  {
+    "source": "files/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "archive": "files/packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
+    "sourceSha256": "1107c9e81c960dc7507690bfde9599aad87e8c40d811fc6eab0d8a5a914ca6f9",
+    "archiveSha256": "1107c9e81c960dc7507690bfde9599aad87e8c40d811fc6eab0d8a5a914ca6f9"
+  },
+  {
+    "source": "files/packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "archive": "files/packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
+    "sourceSha256": "d431664a34accaf94c46d76d0329e462fb0464cda4fa2c1ff0bb8d1afd190510",
+    "archiveSha256": "d431664a34accaf94c46d76d0329e462fb0464cda4fa2c1ff0bb8d1afd190510"
+  },
+  {
+    "source": "files/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "archive": "files/packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
+    "sourceSha256": "f0cf9ad14f4ddaeb4acc566fbe8b7cd47edf1615cbf363e8eec5a54f3a322ebe",
+    "archiveSha256": "f0cf9ad14f4ddaeb4acc566fbe8b7cd47edf1615cbf363e8eec5a54f3a322ebe"
+  },
+  {
+    "source": "files/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "archive": "files/packages/react/src/equal-owner-facade-controls.spec.tsx",
+    "sourceSha256": "7c7525c6fb3fa73d38a6afe7c5f8da49981bf4da49a417272005d8b4120867d1",
+    "archiveSha256": "7c7525c6fb3fa73d38a6afe7c5f8da49981bf4da49a417272005d8b4120867d1"
+  },
+  {
+    "source": "files/packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts",
+    "archive": "files/packages/kernel/src/lib/authored-held-receipt-disposal.spec.ts",
+    "sourceSha256": "3137c15af4c45b2c681f239e68c12b70057efa05f84b0ef12a1f85bd32bed692",
+    "archiveSha256": "3137c15af4c45b2c681f239e68c12b70057efa05f84b0ef12a1f85bd32bed692"
+  },
+  {
+    "source": "files/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "archive": "files/packages/kernel/src/lib/equal-owner-public-adversaries.spec.ts",
+    "sourceSha256": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0",
+    "archiveSha256": "c7056f6680adb446e384b97eab46217def9893077e9300a3aebc106a96a662a0"
+  }
+]

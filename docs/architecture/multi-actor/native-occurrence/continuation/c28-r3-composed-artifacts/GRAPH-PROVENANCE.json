@@ -1,0 +1,6 @@
+{
+  "budgetTool": "/private/tmp/st-c28-r3-composed-artifacts/candidate/tools/check-bundle-budget.mjs",
+  "sha256": "df55eac6244aa92a4972358fda41b8cbe809caf3c97745a814e9aa8aa8c7215a",
+  "outputOnlyInstrumentation": true,
+  "workloadsOptionsAndCeilingsUnchanged": true
+}

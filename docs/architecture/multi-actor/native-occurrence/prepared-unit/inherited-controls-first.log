@@ -1,0 +1,216 @@
+
+> nx run kernel:test native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts native-projection-observability.spec.ts batching.spec.ts batching-detachment.spec.ts
+
+> node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts native-projection-observability.spec.ts batching.spec.ts batching-detachment.spec.ts
+
+(node:30431) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30438) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-native-prepared-unit-successor/candidate/packages/kernel
+
+(node:30446) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30449) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30450) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30453) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30448) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30447) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+▲ [WARNING] Ignoring this import because "src/lib/experimental-publication/entity.ts" was marked as having no side effects [ignored-bare-import]
+
+    src/lib/link.ts:1:7:
+      1 │ import './experimental-publication/entity';
+        ╵        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  "sideEffects" is false in the enclosing "package.json" file:
+
+    package.json:7:2:
+      7 │   "sideEffects": false,
+        ╵   ~~~~~~~~~~~~~
+
+(node:30596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:30709) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/main-invocation-scope.spec.ts (3 tests | 1 failed) 44ms
+   × preclaim projection getter cannot lend inverse authority to a nested setter 15ms
+ ❯ src/lib/native-explicit-handoff.spec.ts (3 tests | 2 failed) 55ms
+   × registered projection interceptor preserves particular inverse continuation (coalesce=false) 42ms
+   × registered projection interceptor preserves particular inverse continuation (coalesce=true) 11ms
+ ❯ src/lib/native-invocation-handoff.spec.ts (5 tests | 1 failed) 58ms
+   × native same-field interceptor reentry cannot borrow outer inverse selection 26ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/main-invocation-scope.spec.ts > preclaim projection getter cannot lend inverse authority to a nested setter
+AssertionError: expected SignalTreeRollbackError: SignalTree could… { …(2) } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+SignalTreeRollbackError {
+  "message": "SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — ScalarSlotMutationFrame is already closed. [effect-validation-failed]",
+  "cause": {
+    "callbackError": undefined,
+    "cause": Error {
+      "message": "ScalarSlotMutationFrame is already closed.",
+    },
+    "compensation": [
+      {
+        "after": 7,
+        "before": 0,
+        "kind": "set",
+        "mutationIntent": undefined,
+        "ownerPath": "rows",
+        "path": "rows.a.x",
+        "position": 2,
+        "subject": 1,
+        "subjectFieldSegments": [
+          "x",
+        ],
+        Symbol(native-field-endpoints): {
+          "after": {
+            "owner": 1,
+            "present": true,
+            "requirement": {
+              "captureWindow": true,
+              "frames": [],
+              "inputs": [],
+              "known": [],
+              "possible": [],
+              "proof": {
+                "destination": [Array],
+                "historicalWindow": true,
+                "input": [Array],
+                "invalid": false,
+                "owners": [Array],
+                "possible": [Array],
+                "terminalRejectedRoles": 0,
+                "unavailableInput": false,
+                "unknown": false,
+                "validation": [Array],
+              },
+              "unknown": false,
+            },
+            "value": 7,
+          },
+          "before": {
+            "present": true,
+            "requirement": {
+              "captureWindow": true,
+              "frames": [],
+              "inputs": [],
+              "known": [],
+              "possible": [],
+              "proof": {
+                "destination": [Array],
+                "historicalWindow": true,
+                "input": [Array],
+                "invalid": false,
+                "owners": [Array],
+                "possible": [Array],
+                "terminalRejectedRoles": 0,
+                "unavailableInput": false,
+                "unknown": false,
+                "validation": [Array],
+              },
+              "unknown": false,
+            },
+            "value": 0,
+          },
+        },
+        Symbol(transaction source admission): {
+          "revision": 1,
+          "segment": 1,
+        },
+      },
+    ],
+    "errorMessage": "ScalarSlotMutationFrame is already closed.",
+    "kind": "effect-validation-failed",
+    "pendingTurnId": 2,
+  },
+  "code": "SIGNALTREE_ROLLBACK_FAILED",
+  "recovery": undefined,
+  "name": "SignalTreeRollbackError",
+}
+
+ ❯ src/lib/main-invocation-scope.spec.ts:31:135
+     29|  const q=tree.transact(()=>rows.replaceOne('a',row));await flush();
+     30|  const off=observeIntrinsicMutations(rows.byIdOrFail('a').x as object,…
+     31|  try{let error:unknown;try{q.rollback();}catch(e){error=e;}expect(ente…
+       |                                                                                                                                       ^
+     32| });
+     33|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/lib/native-explicit-handoff.spec.ts > registered projection interceptor preserves particular inverse continuation (coalesce=false)
+ FAIL  src/lib/native-explicit-handoff.spec.ts > registered projection interceptor preserves particular inverse continuation (coalesce=true)
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — ScalarSlotMutationFrame is already closed. [effect-validation-failed]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:410:3
+    408|   cause: RollbackFailureCause
+    409| ): SignalTreeRollbackError =>
+    410|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    411|
+    412| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4946:23
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4566:19
+ ❯ src/lib/native-explicit-handoff.spec.ts:13:8
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/lib/native-invocation-handoff.spec.ts > native same-field interceptor reentry cannot borrow outer inverse selection
+SignalTreeRollbackError: SignalTree could not rollback the pending transaction: compensating turn 2 failed validation — ScalarSlotMutationFrame is already closed. [effect-validation-failed]
+ ❯ createRollbackError src/enhancers/transactions/transactions.ts:410:3
+    408|   cause: RollbackFailureCause
+    409| ): SignalTreeRollbackError =>
+    410|   new SignalTreeRollbackError(explainRollbackFailure(cause), { cause }…
+       |   ^
+    411|
+    412| function cloneTurnEffect(effect: TurnEffect): TurnEffect {
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4946:23
+ ❯ Object.rollback src/enhancers/transactions/transactions.ts:4566:19
+ ❯ src/lib/native-invocation-handoff.spec.ts:32:8
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  3 failed | 8 passed (11)
+      Tests  4 failed | 61 passed (65)
+   Start at  15:16:30
+   Duration  1.80s (transform 5.01s, setup 0ms, import 6.93s, tests 756ms, environment 5.14s)
+
+Warning: command "node tools/run-core-vitest.mjs native-admission-handoff.spec.ts native-invocation-handoff.spec.ts native-admission-segments.spec.ts collection-contributor-core.spec.ts native-authored-footprint.spec.ts main-invocation-scope.spec.ts native-explicit-handoff.spec.ts native-projection-observability.spec.ts batching.spec.ts batching-detachment.spec.ts" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      2.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     2.3s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    2.3s

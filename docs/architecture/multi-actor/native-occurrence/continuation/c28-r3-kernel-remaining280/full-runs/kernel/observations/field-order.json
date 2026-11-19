@@ -1,0 +1,24 @@
+{
+  "pending": [
+    {
+      "id": "b",
+      "x": 0
+    },
+    {
+      "id": "a",
+      "x": 7
+    }
+  ],
+  "after": [
+    {
+      "id": "a",
+      "x": 0
+    },
+    {
+      "id": "b",
+      "x": 0
+    }
+  ],
+  "error": "undefined",
+  "confirmError": "Error: Cannot confirm a rolled back transaction"
+}

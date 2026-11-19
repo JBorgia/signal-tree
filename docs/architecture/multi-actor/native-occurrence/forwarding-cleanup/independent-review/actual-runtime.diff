@@ -1,0 +1,95 @@
+--- c47b/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
++++ cleanup/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+@@ -1,4 +1,4 @@
+-import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent} from '../selected-write-operation';
++import {openSelected,consumeSelected,closeSelected,type SelectedPreparation,type SelectedRowIntent,type SelectedOutcome} from '../selected-write-operation';
+ import { replaceSelectedLocation } from '../location-runtime';
+ import {fieldEndpoints} from '../native-field-selection';
+ import {getEntityPublicationBinding} from '../entity-publication';
+@@ -1857,8 +1857,9 @@
+     if (binding.field !== undefined) replaceSelectedLocation(target as import('../cell-runtime').Location<unknown>, value, selection);
+     else {
+       if (!binding.replaceSelected) throw new Error('Selected row replacement has no private continuation');
+-      const invocation=openSelected(value,selection);
+-      try{const request=consumeSelected(invocation);binding.replaceSelected(request.value,request.selection);}finally{closeSelected(invocation);}
++      const outcome:SelectedOutcome={failed:false};
++      const invocation=openSelected(value,selection,outcome);
++      try{const request=consumeSelected(invocation);binding.replaceSelected(request.value,request.selection);}finally{closeSelected(invocation);outcome.error=undefined;}
+     }
+   };
+ 
+--- c47b/packages/kernel/src/lib/internals/location-runtime.ts
++++ cleanup/packages/kernel/src/lib/internals/location-runtime.ts
+@@ -1,4 +1,4 @@
+-import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation} from './selected-write-operation';
++import {openSelected,closeSelected,failSelected,consumeSelected,selectedProceed,type SelectedInvocation,type SelectedOutcome} from './selected-write-operation';
+ import type { ClaimedFieldEndpoint } from './native-field-selection';
+ import { withEntityBoundPublicationInput } from './entity-publication';
+ import { markTreeCell } from './cell-identity';
+@@ -92,8 +92,9 @@
+ export function replaceSelectedLocation<T>(location: Location<T>, value: T, selection: ClaimedFieldEndpoint): void {
+   const binding = writableLocationBinding(location);
+   if (!binding.replaceSelected) throw new Error('Selected replacement has no private projection continuation');
+-  const invocation=openSelected(value,selection);
+-  try{binding.replaceSelected(invocation);if(invocation.failed)throw invocation.failure;if(invocation.phase==='open')throw new Error('Selected continuation did not prepare');}finally{closeSelected(invocation);}
++  const outcome:SelectedOutcome={failed:false};
++  const invocation=openSelected(value,selection,outcome);
++  try{binding.replaceSelected(invocation);if(outcome.failed)throw outcome.error;if(invocation.phase==='open')throw new Error('Selected continuation did not prepare');}finally{closeSelected(invocation);outcome.error=undefined;}
+ }
+ 
+ export function deriveLocation<T>(
+--- c47b/packages/kernel/src/lib/internals/selected-write-operation.ts
++++ cleanup/packages/kernel/src/lib/internals/selected-write-operation.ts
+@@ -15,20 +15,44 @@
+  stage(edit:SelectedRowIntent):void;
+  defer(delivery:()=>void):void;
+ }
++/** Dispatch owns this receipt; closed callbacks must not retain its error. */
++export interface SelectedOutcome { failed:boolean; error?:unknown }
++interface SelectedForwardingEdge { next?: (invocation:SelectedInvocation)=>void }
+ export interface SelectedInvocation {
+  phase:'open'|'consumed'|'closed';
+- failed?:boolean;failure?:unknown;
+  request?:{value:unknown;selection:ClaimedFieldEndpoint};
++ outcome?:SelectedOutcome;
++ edges?:Set<SelectedForwardingEdge>;
+ }
+-export function openSelected(value:unknown,selection:ClaimedFieldEndpoint):SelectedInvocation{return {phase:'open',request:{value,selection}};}
+-export function closeSelected(invocation:SelectedInvocation):void{invocation.phase='closed';invocation.request=undefined;invocation.failure=undefined;}
+-export function failSelected(invocation:SelectedInvocation,error:unknown):void{if(!invocation.failed){invocation.failed=true;invocation.failure=error;}invocation.phase='closed';invocation.request=undefined;}
++export function openSelected(value:unknown,selection:ClaimedFieldEndpoint,outcome:SelectedOutcome):SelectedInvocation {
++ return {phase:'open',request:{value,selection},outcome};
++}
++export function closeSelected(invocation:SelectedInvocation):void {
++ invocation.phase='closed';
++ for(const edge of invocation.edges??[])edge.next=undefined;
++ invocation.edges?.clear();invocation.edges=undefined;
++ invocation.request=undefined;invocation.outcome=undefined;
++}
++export function failSelected(invocation:SelectedInvocation,error:unknown):void {
++ const outcome=invocation.outcome;
++ if(outcome&&!outcome.failed){outcome.failed=true;outcome.error=error;}
++ closeSelected(invocation);
++}
+ export function consumeSelected(invocation:SelectedInvocation):{value:unknown;selection:ClaimedFieldEndpoint}{
+  if(invocation.phase!=='open'||!invocation.request)throw new Error('Selected continuation is closed or consumed');
+  const request=invocation.request;invocation.phase='consumed';invocation.request=undefined;return request;
+ }
+-/** Closure has no separate value, selection, target or operation reference. */
+-export function selectedProceed(invocation:SelectedInvocation,next:(invocation:SelectedInvocation)=>void):()=>void{
+- let forwarded=false;
+- return ()=>{if(forwarded||invocation.phase!=='open')throw new Error('Selected continuation cannot replay');forwarded=true;try{next(invocation);}catch(error){failSelected(invocation,error);throw error;}};
++/** Separate lexical scope: a saved wrapper retains only cleared edge/invocation records. */
++function makeSelectedProceed(invocation:SelectedInvocation,edge:SelectedForwardingEdge):()=>void {
++ return ()=>{
++  if(invocation.phase!=='open'||!edge.next)throw new Error('Selected continuation cannot replay');
++  const next=edge.next;edge.next=undefined;
++  try{next(invocation);}catch(error){failSelected(invocation,error);throw error;}
++ };
+ }
++export function selectedProceed(invocation:SelectedInvocation,next:(invocation:SelectedInvocation)=>void):()=>void {
++ if(invocation.phase!=='open'||!invocation.request)throw new Error('Selected continuation is closed or consumed');
++ const edge:SelectedForwardingEdge={next};
++ (invocation.edges??=new Set()).add(edge);
++ return makeSelectedProceed(invocation,edge);
++}

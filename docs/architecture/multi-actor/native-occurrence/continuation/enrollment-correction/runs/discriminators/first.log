@@ -1,0 +1,43 @@
+
+> nx run kernel:test recipient-source-permission.spec.ts native-admission-handoff.spec.ts native-authored-footprint.spec.ts aggregate-native-input-independent.spec.ts entity-native-input-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs recipient-source-permission.spec.ts native-admission-handoff.spec.ts native-authored-footprint.spec.ts aggregate-native-input-independent.spec.ts entity-native-input-independent.spec.ts --maxWorkers=1
+
+(node:65026) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65033) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-c12-enrollment-correction/candidate/packages/kernel
+
+(node:65040) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65041) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65046) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65047) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:65077) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  5 passed (5)
+      Tests  27 passed (27)
+   Start at  11:11:11
+   Duration  5.12s (transform 1.07s, setup 0ms, import 2.17s, tests 241ms, environment 1.96s)
+
+
+
+
+ NX   Successfully ran target test for project kernel
+
+
+  Run duration:      5.9s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     5.9s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    5.9s

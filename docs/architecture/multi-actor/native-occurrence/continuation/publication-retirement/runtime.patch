@@ -1,0 +1,309 @@
+--- a/packages/kernel/src/lib/entity-signal.ts
++++ b/packages/kernel/src/lib/entity-signal.ts
+@@ -376,6 +376,7 @@
+      * unseen owner could restore is unrecoverable.
+      */
+     hasRestorationAuthority?: boolean;
++    onDispose?: (callback: () => void) => () => void;
+   }
+ ): EntitySignal<E, K> {
+   const locations = options?.locationRuntime ?? NEUTRAL_LOCATION_RUNTIME;
+@@ -1404,21 +1405,45 @@
+       topologyUnit
+     );
+     publication.unit?.finalize?.();
+-    const result = frame.commit(
+-      observe ? () => observe(ordinaryPlan.changes) : undefined,
+-      responsibility,
+-      structuralFrontier,
+-      valueTransitions,
+-      () => { ordinaryPlan.install(); if(publication.unit) installTerminalRecord(publication.unit.record); }
+-    );
+-    if (options?.advancePhysicalRevision !== false) {
+-      physicalCommitClock?.advance();
+-    }
+-    // Delivery cannot preempt installation of the existing minimum responsibility.
+-    let publicationFailed=false;let publicationError:unknown;
+-    try{if(publication.unit)entityPublication.complete(publication.unit.completion);}catch(error){publicationFailed=true;publicationError=error;}
+-    try{membershipTap?.(MEMBERSHIP_FACTS,frame.mutations);}catch(error){if(!publicationFailed){publicationFailed=true;publicationError=error;}}
+-    if(publicationFailed)throw publicationError;
++    let installed = false;
++    let result: ReturnType<typeof frame.commit> | undefined;
++    let failed = false;
++    let firstError: unknown;
++    const attempt = (body: () => void) => {
++      try { body(); } catch (error) { if (!failed) { failed = true; firstError = error; } }
++    };
++    attempt(() => {
++      result = frame.commit(
++        observe ? () => observe(ordinaryPlan.changes) : undefined,
++        responsibility, structuralFrontier, valueTransitions,
++        () => {
++          ordinaryPlan.install();
++          if (publication.unit) installTerminalRecord(publication.unit.record);
++          installed = true;
++        }
++      );
++    });
++    if (installed) {
++      if (options?.advancePhysicalRevision !== false) physicalCommitClock?.advance();
++      // All completions are attempted before retirement, even after one throws.
++      attempt(() => { if (publication.unit) entityPublication.complete(publication.unit.completion); });
++      attempt(() => { membershipTap?.(MEMBERSHIP_FACTS, frame.mutations); });
++      // A missing lifetime is authority only because THIS frame installed its
++      // authorized forget. No caller may infer eligibility from missing alone.
++      for (const mutation of frame.mutations) {
++        if (mutation.kind === 'retire-retained-value' && mutation.forgetLifetime) {
++          const subject = mutation.subjectId;
++          entityPublication.requestRetirement(subject, () =>
++            resolveSubjectState(subject) === undefined && !ordinaryTopology.retains(subject));
++        }
++      }
++      // The existing no-owner kernel gate still decides physical reclamation.
++      // It must run for installed removals even if source completion threw.
++      const removed = [...new Set(frame.mutations.filter(mutation => mutation.kind === 'tombstone-subject').map(mutation => mutation.subjectId))];
++      attempt(() => reclaimRetiredSubjectsWithoutOwner(removed));
++    }
++    if (failed) throw firstError;
++    if (!result) throw new Error('Entity frame did not install');
+     return {
+       ...result,
+       valueResults,
+@@ -1591,6 +1616,7 @@
+   const hasRestorationAuthority = options?.hasRestorationAuthority ?? true;
+   const ownerId = options?.ownerId;
+   const entityPublication = new EntityPublicationSource();
++  options?.onDispose?.(() => entityPublication.dispose());
+   const physicalCommitClock = options?.physicalCommitClock;
+   const mutationCaptureRuntime = options?.mutationCaptureRuntime;
+   let positionId = (
+@@ -3502,7 +3528,7 @@
+     }
+ 
+     const result = commitAndProjectEntityMutationFrame(frame);
+-    if(forgetLifetime)entityPublication.retire(prepared.subjectId);
++    // Shared installed-frame completion requests publication retirement.
+     for (const changedSubjectId of result.physicallyChangedSubjectIds) {
+       if (forgetLifetime && changedSubjectId === prepared.subjectId) {
+         // NO PUBLISH for a forgotten subject, and this is load-bearing rather
+--- a/packages/kernel/src/lib/experimental-publication/entity.ts
++++ b/packages/kernel/src/lib/experimental-publication/entity.ts
+@@ -53,7 +53,7 @@
+       return [...result];
+     }}),
+     captureInput(subject,field){return {native:Object.freeze([...new Set(physicalViews(subject,field).map(view=>view.requirement))].map(lifecycle.captureNativeInput))};},
+-    inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size,negativePresence:[...members.values()].filter(member=>!member.present).length,placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size,negativeVisible:[...visible.values()].filter(view=>view.present===false).length,placementViews:placementViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
++    inspect(){return {rows:fields.size,fields:[...fields.values()].reduce((n,row)=>n+row.size,0),presence:members.size,negativePresence:[...members.values()].filter(member=>!member.present).length,placements:placements.size,viewRows:views.size,viewFields:[...views.values()].reduce((n,row)=>n+row.size,0),negativeViewFields:[...views.values()].reduce((n,row)=>n+[...row.values()].filter(view=>view.present===false).length,0),visible:visible.size,negativeVisible:[...visible.values()].filter(view=>view.present===false).length,placementViews:placementViews.size,mappings:mappings.size,mappingViews:mappingViews.size,preparedFieldEdits:acquisitions,retireCalls:retirements,inputFactVisits:inputVisits};},
+     prepare(packet){
+       const inspection=packet.meta?.participation==='inspection';
+       const meta=getActiveWriteContext()??packet.meta,id=meta?.transactionId;
+@@ -175,6 +175,38 @@
+       return {record:combineTerminalRecords(responsibility,prepared?.record,{writes,deletes,adds:[]})!,completion:inspection?{}:{requirement,support,facts:selected},finalize:prepared?()=>lifecycle.finalizeNativeRequirement(requirement):undefined};
+     },
+     complete(){},
+-    retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);retirements++;},
++    prepareRetirement(subject){
++      // Snapshot only this exact subject. Missing entries contribute no evidence.
++      const snapshots = [fields.get(subject), members.get(subject), placements.get(subject), views.get(subject), visible.get(subject), placementViews.get(subject), mappings.get(subject), mappingViews.get(subject)] as const;
++      const requirements = new Set<Requirement>();
++      for (const endpoint of snapshots[0]?.values() ?? []) requirements.add(endpoint.requirement as Requirement);
++      if (snapshots[1]) requirements.add(snapshots[1].requirement);
++      if (snapshots[2]) requirements.add(snapshots[2]);
++      for (const view of snapshots[3]?.values() ?? []) requirements.add(view.requirement);
++      if (snapshots[4]) requirements.add(snapshots[4].requirement);
++      if (snapshots[5]) requirements.add(snapshots[5].requirement);
++      if (snapshots[6]) requirements.add(snapshots[6]);
++      if (snapshots[7]) requirements.add(snapshots[7].requirement);
++      const ready = [...requirements].every(lifecycle.nativeRequirementReady);
++      const neutral = ready && [...requirements].every(requirement => {
++        const proof = lifecycle.nativeProof(requirement);
++        return !proof.unknown && !proof.invalid && !proof.unavailableInput && !proof.terminalRejectedRoles &&
++          proof.owners.length === 0 && (proof.destination?.length ?? 0) === 0 &&
++          (proof.input?.length ?? 0) === 0 && (proof.validation?.length ?? 0) === 0 &&
++          (proof.possible?.length ?? 0) === 0;
++      });
++      return { ready, neutral,
++        current: () => snapshots[0] === fields.get(subject) && snapshots[1] === members.get(subject) &&
++          snapshots[2] === placements.get(subject) && snapshots[3] === views.get(subject) &&
++          snapshots[4] === visible.get(subject) && snapshots[5] === placementViews.get(subject) &&
++          snapshots[6] === mappings.get(subject) && snapshots[7] === mappingViews.get(subject),
++        onReady(callback){
++          const releases = [...requirements].filter(requirement => !lifecycle.nativeRequirementReady(requirement))
++            .map(requirement => lifecycle.onNativeRequirementReady(requirement, callback));
++          return () => { for (const release of releases) release(); };
++        },
++      };
++    },
++    retire(subject){fields.delete(subject);members.delete(subject);placements.delete(subject);views.delete(subject);visible.delete(subject);placementViews.delete(subject);mappings.delete(subject);mappingViews.delete(subject);retirements++;},
+   };
+ });
+--- a/packages/kernel/src/lib/internals/entity-publication.ts
++++ b/packages/kernel/src/lib/internals/entity-publication.ts
+@@ -54,12 +54,20 @@
+   keyMapping(subject:number, view:'physical'|'ordinary'): object;
+   forEdit?(edit:EntityPublicationEdit):EntityPublicationEvidence;
+ }
++export interface EntityRetirementPlan {
++  readonly ready: boolean;
++  readonly neutral: boolean;
++  current(): boolean;
++  onReady(callback: () => void): () => void;
++}
++type RetirementRequest = { eligible: () => boolean; release?: () => void; queued: boolean };
+ export interface EntityPublicationParticipant {
+   seedRequested?():boolean;
+   prepare(packet: EntityPublicationPacket, native?: object): PreparedPublicationUnit | undefined;
+   complete(completion: object): void;
+   captureInput?(subject?: number, field?: string): object | undefined;
+   retire?(subject: number): void;
++  prepareRetirement?(subject: number): EntityRetirementPlan;
+   captureViews?(subject?: number,field?: string): readonly object[];
+   evidence?():EntityPublicationEvidence;
+   inspect?(): Readonly<Record<string,number>>;
+@@ -75,6 +83,57 @@
+   private readonly recipients = new Set<EntityPublicationParticipant>();
+   private recipientRevision = 0;
+   private revisionToken:object={};
++  // Distinct from ordinary staged installs: physical and ordinary plans may
++  // intentionally install in sequence. Retirement invalidates every old reader.
++  private retirementRevision: object = {};
++  private readonly retirements = new Map<number, RetirementRequest>();
++  private disposed = false;
++  /** Called only for a successfully installed kernel forget-lifetime mutation. */
++  requestRetirement(subject: number, eligible: () => boolean): void {
++    if (this.disposed) return;
++    this.cancelRetirement(subject);
++    const request: RetirementRequest = { eligible, queued: false };
++    this.retirements.set(subject, request);
++    this.scheduleRetirement(subject, request);
++  }
++  private cancelRetirement(subject: number): void {
++    const request = this.retirements.get(subject);
++    this.retirements.delete(subject);
++    request?.release?.();
++  }
++  private scheduleRetirement(subject: number, request: RetirementRequest): void {
++    if (request.queued || this.disposed || this.retirements.get(subject) !== request) return;
++    request.queued = true;
++    // Readiness can notify during finalize, before installation. Only recheck
++    // after the synchronous installed completion/reentry frontier has closed.
++    queueMicrotask(() => {
++      request.queued = false;
++      if (this.disposed || this.retirements.get(subject) !== request) return;
++      request.release?.(); request.release = undefined;
++      if (!request.eligible()) { this.cancelRetirement(subject); return; }
++      const revision = this.revisionToken;
++      const plan = this.native?.prepareRetirement?.(subject);
++      if (!plan) { this.cancelRetirement(subject); return; }
++      if (!plan.ready) {
++        request.release = plan.onReady(() => this.scheduleRetirement(subject, request));
++        return;
++      }
++      // No owner-settlement subscription is implied by requirement readiness.
++      // A ready non-neutral record remains source evidence; drop only the request.
++      if (!plan.neutral) { this.cancelRetirement(subject); return; }
++      if (!request.eligible() || revision !== this.revisionToken || !plan.current()) {
++        this.cancelRetirement(subject); return;
++      }
++      this.cancelRetirement(subject);
++      this.retire(subject);
++    });
++  }
++  dispose(): void {
++    this.disposed = true;
++    for (const subject of this.retirements.keys()) this.cancelRetirement(subject);
++    this.revisionToken = {};
++    this.retirementRevision = {};
++  }
+   revision():object { return this.revisionToken; }
+   private nativeParticipant(): EntityPublicationParticipant | undefined {
+     return this.native ??= factory?.(this);
+@@ -103,6 +162,7 @@
+   }
+   prepare(packet: EntityPublicationPacket): PreparedPublicationUnit | undefined {
+     const recipientRevision = this.recipientRevision,sourceRevision=this.revisionToken;
++    const retirementRevision = this.retirementRevision;
+     const parts: { participant: EntityPublicationParticipant; unit: PreparedPublicationUnit }[] = [];
+     const native = this.nativeParticipant();
+     const nativeUnit = native?.prepare(packet);
+@@ -118,14 +178,25 @@
+     return {
+       record: combineTerminalRecords(fallbackRecord,...parts.map(part => part.unit.record),{writes:[{map:{set:(_key:unknown,value:unknown)=>{this.revisionToken=value as object;}},key:undefined,value:{}}],adds:[]})!,
+       completion: { parts },
+-      finalize: () => { for (const part of parts) part.unit.finalize?.(); },
++      finalize: () => {
++        const validate = () => {
++          if (this.disposed || retirementRevision !== this.retirementRevision || recipientRevision !== this.recipientRevision)
++            throw new Error('Entity publication source changed before installation');
++        };
++        validate();
++        const beforeFinalize = this.revisionToken;
++        for (const part of parts) part.unit.finalize?.();
++        validate();
++        if (beforeFinalize !== this.revisionToken)
++          throw new Error('Entity publication source changed during finalization');
++      },
+     };
+   }
+   requestsSeed():boolean { return [...this.recipients].some(participant=>participant.seedRequested?.()); }
+   evidence():EntityPublicationEvidence|undefined { return this.nativeParticipant()?.evidence?.(); }
+   captureViews(subject?:number,field?:string): readonly object[] { return this.nativeParticipant()?.captureViews?.(subject,field)??[]; }
+-  inspect(): Readonly<Record<string,number>> { return {...(this.native?.inspect?.()??{}),recipients:this.recipients.size,native:this.native?1:0}; }
+-  retire(subject: number): void { this.native?.retire?.(subject); }
++  inspect(): Readonly<Record<string,number>> { return {...(this.native?.inspect?.()??{}),recipients:this.recipients.size,native:this.native?1:0,retirementRequests:this.retirements.size}; }
++  retire(subject: number): void { this.cancelRetirement(subject); this.native?.retire?.(subject); this.revisionToken = {}; this.retirementRevision = {}; }
+   complete(completion: object): void {
+     const point=pointCompletions.get(completion);if(point){point();return;}
+     const { parts } = completion as { parts: readonly {participant: EntityPublicationParticipant; unit: PreparedPublicationUnit}[] };
+--- a/packages/kernel/src/lib/internals/materialize-markers.ts
++++ b/packages/kernel/src/lib/internals/materialize-markers.ts
+@@ -91,6 +91,8 @@
+ export type HydrateMode = 'merge' | 'restore' | 'rehydrate' | 'transfer';
+ 
+ export interface MaterializationContext {
++  onDispose?: (callback: () => void) => () => void;
++  dispose?: () => void;
+   readonly locationRuntime: LocationRuntime;
+   positionRegistry: PositionRegistry;
+   positionTopologyEnabled: boolean;
+@@ -145,7 +147,20 @@
+   )
+ ): MaterializationContext {
+   const positionRegistry = createPositionRegistry();
++  const cleanup = new Set<() => void>();
++  let disposed = false;
+   return {
++    onDispose(callback) {
++      if (disposed) { callback(); return () => undefined; }
++      cleanup.add(callback);
++      return () => { cleanup.delete(callback); };
++    },
++    dispose() {
++      if (disposed) return;
++      disposed = true;
++      for (const callback of cleanup) callback();
++      cleanup.clear();
++    },
+     locationRuntime,
+     positionRegistry,
+     positionTopologyEnabled,
+--- a/packages/kernel/src/lib/markers/entity-map.ts
++++ b/packages/kernel/src/lib/markers/entity-map.ts
+@@ -291,6 +291,7 @@
+         path,
+         {
+           physicalCommitClock: context.physicalCommitClock,
++          onDispose: context.onDispose,
+           mutationCaptureRuntime: context.mutationCaptureRuntime,
+           // ADDRESS-REPAIR-1. The collection's own position is allocated
+           // here, and `path` IS its canonical address — both facts are known
+--- a/packages/kernel/src/lib/signal-tree.ts
++++ b/packages/kernel/src/lib/signal-tree.ts
+@@ -2025,6 +2025,7 @@
+         replaceLocation(destroyedSig, true);
+       } finally {
+         terminateOwnerInvalidation(tree as object);
++        materializationContext.dispose?.();
+         // Run registered cleanup functions (enhancers, subscriptions, etc.)
+         for (const fn of cleanupFns) {
+           try {

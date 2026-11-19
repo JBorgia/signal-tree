@@ -1,0 +1,12 @@
+{
+  "mode": "read-only design; no tests or candidate edits",
+  "C0ManifestSha256": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26",
+  "C0ManifestEntries": 2974,
+  "hashes": {
+    "/private/tmp/st-rich-unit-causal-trace/HEISENBERG-HANDOFF.md": "9e30f56c5036956a2b9e70e8c349a6b230b7f99a177f3377bbe87a03bb890eb3",
+    "/private/tmp/st-scalar-frame-publication-independent/REVIEW.md": "503965f44f4ff19d4d8ee949524dd9914ec356ca5be4aa9128419c7b5b60e25c",
+    "/private/tmp/st-rich-unit-successor/RESULTS.md": "145bef248915b9632f2f206ec28f8ec995c03c784c9150044435171f78186f3d",
+    "/private/tmp/st-rich-unit-successor/SCALAR-HANDOFF.md": "266b28728ebd7c48bf2847fe974b0ab01d4751e20fb315b12969e7fbb48bcefc",
+    "/private/tmp/st-native-combined-c/SNAPSHOT-C0.json": "f80a70476d3e110db83242f7a17ef02964d7bb7dcb5c071de7d89151e2547e26"
+  }
+}

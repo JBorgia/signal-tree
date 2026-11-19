@@ -1,0 +1,12 @@
+[
+  {
+    "path": "packages/kernel/src/lib/cold-row-responsibility.spec.ts",
+    "before": "9f979ca3a9c37853d2d67b6b7384698f4489fc0a7ceeca2c568ee8115b0e1205",
+    "after": "94c4ada74689878a35f0cd647a51a9882c42a4c768ba017dacbb8af1ce5c5e4b"
+  },
+  {
+    "path": "packages/kernel/src/lib/preparation-reader-comparison.spec.ts",
+    "before": "1d8ad5f2cd107b3762ec41c1932ec07243cabbdcf8cca324cd97ecf70a2ae4bd",
+    "after": "506d86e9bf328ef05c7e2ba2b4ab15d9655457bc20893570db5dab541b06bc85"
+  }
+]

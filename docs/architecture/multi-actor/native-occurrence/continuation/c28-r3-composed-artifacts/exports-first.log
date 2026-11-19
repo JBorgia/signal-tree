@@ -1,0 +1,19 @@
+Verifying package exports (published packages)...
+
+Checking angular...
+✅ angular exports verified
+
+Checking kernel...
+✅ kernel exports verified
+
+Checking react...
+✅ react exports verified
+
+Checking solid...
+✅ solid exports verified
+
+Checking vue...
+✅ vue exports verified
+
+
+✅ All package exports verified successfully

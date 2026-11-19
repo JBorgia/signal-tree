@@ -1,0 +1,37 @@
+--- a/packages/react/vitest.config.ts
++++ b/packages/react/vitest.config.ts
+@@ -6,7 +6,10 @@
+ 
+ export default defineConfig({
+   root: import.meta.dirname,
+-  plugins: [react(), tsconfigPaths()],
++  // Parse this project's referenced lib/spec configs, not archived workspace evidence.
++  plugins: [react(), tsconfigPaths({
++    projects: [fileURLToPath(new URL('./tsconfig.json', import.meta.url))],
++  })],
+   resolve: {
+     alias: {
+       '@signal-tree/kernel/adapter': fileURLToPath(
+--- a/apps/react-reference/vite.config.mts
++++ b/apps/react-reference/vite.config.mts
+@@ -1,4 +1,5 @@
+ /// <reference types='vitest' />
++import { fileURLToPath } from 'node:url';
+ import { defineConfig } from 'vite';
+ import react from '@vitejs/plugin-react';
+ import tsconfigPaths from 'vite-tsconfig-paths';
+@@ -28,7 +29,13 @@
+     port: 4200,
+     host: 'localhost',
+   },
+-  plugins: [react(), tsconfigPaths()],
++  // The app imports the React facade's source; retain both projects' references.
++  plugins: [react(), tsconfigPaths({
++    projects: [
++      fileURLToPath(new URL('./tsconfig.json', import.meta.url)),
++      fileURLToPath(new URL('../../packages/react/tsconfig.json', import.meta.url)),
++    ],
++  })],
+   build: {
+     outDir: '../../dist/apps/react-reference',
+     emptyOutDir: true,

@@ -1,0 +1,59 @@
+
+> nx run kernel:test joint-membership-seal-independent.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs joint-membership-seal-independent.spec.ts --maxWorkers=1
+
+(node:41168) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41175) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-joint-phase-r2-independent/candidate/packages/kernel
+
+(node:41182) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/joint-membership-seal-independent.spec.ts (2 tests | 1 failed) 21ms
+   × scalar and collection seal after all sibling preparation; membership=true 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/joint-membership-seal-independent.spec.ts > scalar and collection seal after all sibling preparation; membership=true
+Error: Plain branch member location is unavailable
+ ❯ preparePlainBranchMembers src/lib/internals/plain-branch-membership.ts:1078:13
+    1076|     const address = memberAddress(root, position);
+    1077|     if (!address)
+    1078|       throw new Error('Plain branch member location is unavailable');
+       |             ^
+    1079|     stage(address, target.present, target.value, target.turn);
+    1080|   }
+ ❯ preparePointRealization src/lib/internals/causal-runtime/tree-realization-adapter.ts:1019:7
+ ❯ src/lib/joint-membership-seal-independent.spec.ts:16:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:58:12
+   Duration  861ms (transform 475ms, setup 0ms, import 568ms, tests 21ms, environment 190ms)
+
+Warning: command "node tools/run-core-vitest.mjs joint-membership-seal-independent.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      1.3s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     1.2s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    1.2s

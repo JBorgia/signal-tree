@@ -1,0 +1,110 @@
+--- original.spec.ts
++++ retention-template.spec.ts
+@@ -1,3 +1,30 @@
++// BEGIN RETENTION-ONLY INSTRUMENTATION
++let retentionGcCalls = 0;
++const retentionDrain = async (): Promise<void> => {
++  await flush();
++  await new Promise<void>(resolve => setTimeout(resolve, 0));
++};
++async function retentionSamples(): Promise<void> {
++  if(typeof globalThis.gc !== 'function')throw new Error('Actual worker GC is required');
++  for(let sample=1;sample<=3;sample++) {
++    await retentionDrain();
++    globalThis.gc(); retentionGcCalls++;
++    await retentionDrain();
++    memoryStage(`restoration:gc-drain-${sample}`);
++  }
++}
++// END RETENTION-ONLY INSTRUMENTATION
++// BEGIN MEMORY-ONLY INSTRUMENTATION
++import { appendFileSync as appendMemoryRow } from 'node:fs';
++import { getHeapStatistics as memoryHeapStatistics } from 'node:v8';
++function memoryStage(stage: string): void {
++  if(typeof globalThis.gc !== 'function')throw new Error('Actual worker GC is required');
++  const sink=process.env['ST_MEMORY_OUTPUT'];
++  if(!sink)throw new Error('ST_MEMORY_OUTPUT is required');
++  const usage=process.memoryUsage(),v8=memoryHeapStatistics();
++  appendMemoryRow(sink,JSON.stringify({stage,at:Date.now(),pid:process.pid,node:process.version,execArgv:process.execArgv,size:LARGE,gcAvailable:typeof globalThis.gc==='function',gcCalls:retentionGcCalls,nodeOptions:process.env['NODE_OPTIONS'],...usage,heapSizeLimit:v8.heap_size_limit,totalAvailableSize:v8.total_available_size,usedHeapSize:v8.used_heap_size,numberOfNativeContexts:v8.number_of_native_contexts,numberOfDetachedContexts:v8.number_of_detached_contexts})+'\n');
++}
++// END MEMORY-ONLY INSTRUMENTATION
+ import { describe, expect, it } from 'vitest';
+ import { signalTree } from './signal-tree';
+ import { entityMap } from './markers/entity-map';
+@@ -31,40 +58,76 @@
+   // ~1–2.5 s alone and 7 s under parallel load (v15: ~0.7 s); membership
+   // observation itself adds little (probes/perf.log).
+   it('setAll, replace and clear with membership observed', () => {
++    memoryStage('membership:before-create'); // MEMORY-ONLY
+     const tree = signalTree({ rows: entityMap<Row, number>() });
++    memoryStage('membership:after-create'); // MEMORY-ONLY
+     const reader = entityMembershipReader(tree)!;
+     let events = 0;
+     const stop = reader.subscribe(() => events++);
+     try {
++    memoryStage('membership:before-seed'); // MEMORY-ONLY
+       tree.$.rows.setAll(rows(LARGE));
++    memoryStage('membership:after-seed'); // MEMORY-ONLY
++    memoryStage('membership:before-replace'); // MEMORY-ONLY
+       tree.$.rows.setAll(rows(LARGE, LARGE));
++    memoryStage('membership:after-replace'); // MEMORY-ONLY
++    memoryStage('membership:before-clear'); // MEMORY-ONLY
+       tree.$.rows.setAll([]);
++    memoryStage('membership:after-clear'); // MEMORY-ONLY
+       expect(tree.$.rows.count()).toBe(0);
+       expect(events).toBeGreaterThan(0);
++    memoryStage('membership:after-original-assertions'); // MEMORY-ONLY
+     } finally {
++    memoryStage('membership:before-stop'); // MEMORY-ONLY
+       stop();
++    memoryStage('membership:after-stop'); // MEMORY-ONLY
++    memoryStage('membership:before-destroy'); // MEMORY-ONLY
+       tree.destroy();
++    memoryStage('membership:after-destroy'); // MEMORY-ONLY
+     }
+   }, 60_000);
+ 
+   it('undo and redo of a setAll that replaced every row', async () => {
++    memoryStage('restoration:before-create'); // MEMORY-ONLY
+     const tree = signalTree(
+       { rows: entityMap<Row, number>() },
+       { enhancers: [restoration()] }
+     );
++    memoryStage('restoration:after-create'); // MEMORY-ONLY
+     try {
++    memoryStage('restoration:before-seed'); // MEMORY-ONLY
+       tree.$.rows.setAll(rows(LARGE));
++    memoryStage('restoration:after-seed'); // MEMORY-ONLY
+       await flush();
++    memoryStage('restoration:after-original-drain'); // MEMORY-ONLY
++    memoryStage('restoration:before-replace'); // MEMORY-ONLY
+       undoable(() => tree.$.rows.setAll(rows(LARGE, LARGE)));
++    memoryStage('restoration:after-replace'); // MEMORY-ONLY
+       await flush();
++    memoryStage('restoration:after-original-drain'); // MEMORY-ONLY
++    memoryStage('restoration:before-undo'); // MEMORY-ONLY
+       tree.undo();
++    memoryStage('restoration:after-undo'); // MEMORY-ONLY
+       expect(tree.$.rows.count()).toBe(LARGE);
+       expect(tree.$.rows.ids()[0]).toBe(0);
++    memoryStage('restoration:after-undo-assertions'); // MEMORY-ONLY
++    memoryStage('restoration:before-redo'); // MEMORY-ONLY
+       tree.redo();
++    memoryStage('restoration:after-redo'); // MEMORY-ONLY
+       expect(tree.$.rows.ids()[0]).toBe(LARGE);
++    memoryStage('restoration:after-redo-assertion'); // MEMORY-ONLY
++    await retentionDrain(); // RETENTION-ONLY
++    memoryStage('restoration:post-workload-drain'); // RETENTION-ONLY
+     } finally {
++    memoryStage('restoration:before-destroy'); // MEMORY-ONLY
+       tree.destroy();
++    memoryStage('restoration:after-destroy'); // MEMORY-ONLY
+     }
++    await flush(); // MEMORY-ONLY final bounded drain
++    memoryStage('restoration:after-final-drain'); // MEMORY-ONLY
++    await retentionDrain(); // RETENTION-ONLY
++    memoryStage('restoration:post-destroy-drain'); // RETENTION-ONLY
++    await retentionSamples(); // RETENTION-ONLY
+   }, 120_000);
+ });
+ 

@@ -1,0 +1,6 @@
+{
+  "packages/kernel/src/enhancers/restoration/omission-reason-companion.spec.ts": "b58219f560ceedfefd792c87e8056593b14edeed63fd49d26b42d5247db6bfea",
+  "packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts": "63b4841431311818a65ceb6b7607ed43be348b48804a3ad11b435c0587509d14",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "c24ae49cd4a82df718ad6b6e934af2d2015e9ba194560733a8f30f85515579d6",
+  "packages/kernel/src/lib/production-scalar-substrate.benchmark.spec.ts": "c1c2e3a2a141425045b2dcd4b5b9865d4a345c48ebb48c84affa978d9d4d7af8"
+}

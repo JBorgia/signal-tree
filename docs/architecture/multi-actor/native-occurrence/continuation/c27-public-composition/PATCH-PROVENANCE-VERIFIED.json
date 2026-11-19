@@ -1,0 +1,17 @@
+{
+  "allThreeMatchReviewedFreeze": true,
+  "patches": {
+    "public-surface.patch": {
+      "sha256": "818d99835b6bc58e80728655cb97098dbc76634a43e3ae3992fc26a51c89df2e",
+      "exit": 0
+    },
+    "internal-type-tightening.patch": {
+      "sha256": "d66239834bd87fee0688031d0b8cbfb33cd11ea4aaaf134201d63c531eaf2e84",
+      "exit": 0
+    },
+    "public-tests.patch": {
+      "sha256": "45d3a7d990047050b19e51635713646593ba482acf9eb8066edb05bd59fd4b61",
+      "exit": 0
+    }
+  }
+}

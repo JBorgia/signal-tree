@@ -1,0 +1,1 @@
+[{"arm": "baseline", "N": 512, "phaseRows": 29, "flagsAndLengths": "pass"}, {"arm": "indexed", "N": 512, "phaseRows": 29, "flagsAndLengths": "pass"}, {"arm": "indexed", "N": 2048, "phaseRows": 29, "flagsAndLengths": "pass"}, {"arm": "baseline", "N": 2048, "phaseRows": 29, "flagsAndLengths": "pass"}]

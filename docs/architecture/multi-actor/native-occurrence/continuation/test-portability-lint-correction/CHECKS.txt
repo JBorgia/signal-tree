@@ -1,0 +1,6 @@
+PASS: 15 TypeScript files parse; all 14 spec ASTs match after normalizing only helper import paths and removing comments.
+PASS: 14 exact relative helper imports resolve inside packages/kernel; moved helper is byte-identical.
+PASS: overlay-aware production tsconfig enumeration excludes helper and all specs; no included production source mentions optional-diagnostic.
+NOTE: Nx production cache input still includes test/optional-diagnostic.ts through projectRoot/**/*; this is not compilation or package inclusion.
+No tests, lint, typecheck, build, or Nx graph generation executed.
+PASS: git apply --check against preserved before/; affected candidate sources, lint receipts and reviewed build configurations unchanged from recorded identities.

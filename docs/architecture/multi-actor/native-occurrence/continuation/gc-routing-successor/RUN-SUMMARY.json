@@ -1,0 +1,64 @@
+[
+  {
+    "name": "baseline",
+    "result": "/private/tmp/st-c21-gc-routing-successor/candidate/artifacts/forwarding-retention/run-39vDqN/RESULT.json",
+    "exit": 0,
+    "passed": [
+      "hold-proceed-success",
+      "hold-proceed-skip",
+      "hold-proceed-caught",
+      "drop-proceed-success",
+      "drop-proceed-skip",
+      "drop-proceed-caught",
+      "hold-value-success",
+      "hold-value-skip",
+      "hold-value-caught",
+      "held-hold-proceed",
+      "held-drop-proceed",
+      "held-hold-row"
+    ],
+    "failed": []
+  },
+  {
+    "name": "retained-tree",
+    "result": "/private/tmp/st-c21-gc-routing-successor/mutants/retained-tree/candidate/artifacts/forwarding-retention/run-CAXSo1/RESULT.json",
+    "exit": 1,
+    "passed": [
+      "held-hold-proceed",
+      "held-drop-proceed",
+      "held-hold-row"
+    ],
+    "failed": [
+      "hold-proceed-success",
+      "hold-proceed-skip",
+      "hold-proceed-caught",
+      "drop-proceed-success",
+      "drop-proceed-skip",
+      "drop-proceed-caught",
+      "hold-value-success",
+      "hold-value-skip",
+      "hold-value-caught"
+    ]
+  },
+  {
+    "name": "held-positive",
+    "result": "/private/tmp/st-c21-gc-routing-successor/mutants/held-positive/candidate/artifacts/forwarding-retention/run-xVGSq2/RESULT.json",
+    "exit": 1,
+    "passed": [
+      "hold-proceed-success",
+      "hold-proceed-skip",
+      "hold-proceed-caught",
+      "drop-proceed-success",
+      "drop-proceed-skip",
+      "drop-proceed-caught",
+      "hold-value-success",
+      "hold-value-skip",
+      "hold-value-caught"
+    ],
+    "failed": [
+      "held-hold-proceed",
+      "held-drop-proceed",
+      "held-hold-row"
+    ]
+  }
+]

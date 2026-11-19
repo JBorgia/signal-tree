@@ -1,0 +1,9 @@
+{
+  "finalSpecSha256": "274508080f18421eff0b209bfa03795e8b26181b094f6e195bdfcf2bd5590112",
+  "base": "2a020da77e263693fbee66973bfba7072cb489a7cbde53bcda4336d686f820cd",
+  "runs": {
+    "integration-first": 1,
+    "integration-counterpart": 0,
+    "integration-spec-first": 0
+  }
+}

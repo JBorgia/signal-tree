@@ -1,0 +1,63 @@
+
+> nx run kernel:test independent-occupancy-supported-inverse.spec.ts occupancy-successor-realization.spec.ts --maxWorkers=1
+
+> node tools/run-core-vitest.mjs independent-occupancy-supported-inverse.spec.ts occupancy-successor-realization.spec.ts --maxWorkers=1
+
+(node:50313) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:50321) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ RUN  v4.1.9 /private/tmp/st-parent-freshness-implementation-independent/c11-occupancy-validity/candidate/packages/kernel
+
+(node:50383) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ src/lib/occupancy-successor-realization.spec.ts (5 tests | 1 failed) 74ms
+   × sparse revival and active transfer share placement dependencies without synthetic lifecycle 14ms
+(node:50398) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/occupancy-successor-realization.spec.ts > sparse revival and active transfer share placement dependencies without synthetic lifecycle
+AssertionError: expected { kind: 'structural-drift' } to be undefined
+
+- Expected:
+undefined
+
++ Received:
+{
+  "kind": "structural-drift",
+}
+
+ ❯ src/lib/occupancy-successor-realization.spec.ts:69:96
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 5 passed (6)
+   Start at  10:47:48
+   Duration  5.46s (transform 1.66s, setup 0ms, import 2.31s, tests 117ms, environment 2.31s)
+
+Warning: command "node tools/run-core-vitest.mjs independent-occupancy-supported-inverse.spec.ts occupancy-successor-realization.spec.ts --maxWorkers=1" exited with non-zero status code
+
+
+ NX   Running target test for project kernel failed
+
+Failed tasks:
+
+- kernel:test
+
+Hint: run the command with --verbose for more details.
+
+  Run duration:      6.8s
+  Cache:             Skipped (--skip-nx-cache)
+  Critical path:     6.8s (1 task)
+  Recoverable time:  <1ms
+
+  Recommendations:
+    - Cache: drop --skip-nx-cache to restore unchanged tasks instantly.
+    - Speed up or split the longest tasks on the critical path:
+        kernel:test    6.8s

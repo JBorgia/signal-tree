@@ -1,0 +1,39 @@
+{
+  "packages/kernel/src/lib/admission-refusal.spec.ts": {
+    "source": "/private/tmp/st-packet-point-admission-successor/candidate/packages/kernel/src/lib/admission-refusal.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/independent-refusal-branches.spec.ts": {
+    "source": "/private/tmp/st-packet-point-admission-successor/candidate/packages/kernel/src/lib/independent-refusal-branches.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/packet-admission-r1.spec.ts": {
+    "source": "/private/tmp/st-packet-point-admission-successor/candidate/packages/kernel/src/lib/packet-admission-r1.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/packet-index-adversarial.spec.ts": {
+    "source": "/private/tmp/st-packet-point-admission-successor/candidate/packages/kernel/src/lib/packet-index-adversarial.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/packet-index-review.spec.ts": {
+    "source": "/private/tmp/st-packet-point-admission-successor/candidate/packages/kernel/src/lib/packet-index-review.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/point-admission-followup.spec.ts": {
+    "source": "/private/tmp/st-packet-point-admission-successor/candidate/packages/kernel/src/lib/point-admission-followup.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/fixed-window-independent.spec.ts": {
+    "source": "/private/tmp/st-fixed-window-retirement-cancellation-successor/candidate/packages/kernel/src/lib/fixed-window-independent.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/fixed-window-retirement.spec.ts": {
+    "source": "/private/tmp/st-fixed-window-retirement-cancellation-successor/candidate/packages/kernel/src/lib/fixed-window-retirement.spec.ts",
+    "exact": true
+  },
+  "packages/kernel/src/lib/owner-transition-cancellation.spec.ts": {
+    "source": "/private/tmp/st-fixed-window-retirement-cancellation-successor/candidate/packages/kernel/src/lib/owner-transition-cancellation.spec.ts",
+    "exact": true
+  },
+  "lifecycle-exact-final-retirement": true
+}

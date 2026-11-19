@@ -1,0 +1,12 @@
+check-spec-types: 1 spec file(s) got WORSE.
+A new type error in a spec usually means the spec's premise no longer
+compiles as written — the shape that let a renamed config option pass
+silently and made an assertion vacuous.
+
+  packages/kernel/src/lib/construction-routes-review.spec.ts: 3 error(s), baseline allows 0
+
+Full tsc output:
+
+packages/kernel/src/lib/construction-routes-review.spec.ts(21,43): error TS2345: Argument of type '(edit: MembershipPublicationEdit) => { record: { writes: { map: Map<object, object>; key: {}; value: object; }[]; adds: never[]; }; completion: string; } | undefined' is not assignable to parameter of type 'MembershipPublicationPreparer'.
+packages/kernel/src/lib/construction-routes-review.spec.ts(21,335): error TS2352: Conversion of type 'object' to type 'string' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+packages/kernel/src/lib/construction-routes-review.spec.ts(21,355): error TS2367: This comparison appears to be unintentional because the types 'object' and 'string' have no overlap.

@@ -1,0 +1,23 @@
+{
+  "c47b": {
+    "packages/kernel/src/enhancers/restoration/restoration.ts": "b5264ba28f8a5c06078a966edd679910238634e619255a906a9e194e9eca29fb",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "a29b0d5eb41a492a118ed146f33162e6f15ac7aca7203d009cac4e5c9fb65117",
+    "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c",
+    "packages/kernel/src/lib/physical/entity-ordinary-topology.ts": "dcb418cd2273eee32e6464470c88a521e6c8958d03793744a16c59ac7e7a9ae5",
+    "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf",
+    "manifestSha256": "c47b821c5a805f5b37d6c0f5707098d9871fdf2575d22dcc3e12f4a4c93c81db"
+  },
+  "d3b": {
+    "packages/kernel/src/enhancers/restoration/restoration.ts": "b5264ba28f8a5c06078a966edd679910238634e619255a906a9e194e9eca29fb",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "efbf3852f88d0527f7a292b13036d9f99014c2d86c88c582799a2ad42fc4fcfb",
+    "packages/kernel/src/lib/internals/causal-runtime/ordinary-realization.ts": "ff4f969bbccb7fc42c6f1f031688a49843743cec4d250e01b13957c1af24a56c",
+    "packages/kernel/src/lib/physical/entity-ordinary-topology.ts": "dcb418cd2273eee32e6464470c88a521e6c8958d03793744a16c59ac7e7a9ae5",
+    "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf",
+    "manifestSha256": "d3b6da2906ae9cef72e5623b35eb6de3dee73d64b12f5c9bd408352aa627e73b"
+  },
+  "87f": {
+    "packages/kernel/src/enhancers/restoration/restoration.ts": "c8eff760937ac975de308013ca891afe2ebedb3249a20ed5e735dffe9f8eef7a",
+    "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts": "c3fec9f52a71aba93314cb1715003b27084548cf4f9914b4deb548299e2faea0",
+    "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts": "d7e4162601fbd6a91feca6742717e01defb36ada539ded0200f541c8ffe705bf"
+  }
+}

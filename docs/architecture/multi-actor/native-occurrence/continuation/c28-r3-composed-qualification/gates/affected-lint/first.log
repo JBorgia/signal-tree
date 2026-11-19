@@ -1,0 +1,70 @@
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/enhancers/restoration/restoration.ts
+  4804:13  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  4807:13  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/enhancers/transactions/transactions.ts
+  3046:3   error    'unsubscribePairedBoundaries' is never reassigned. Use 'const' instead  prefer-const
+  3446:81  warning  Forbidden non-null assertion                                            @typescript-eslint/no-non-null-assertion
+  4379:64  warning  Forbidden non-null assertion                                            @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/equal-owner-retention-diagnostic.spec.ts
+  28:14  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.ts
+   840:48  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   842:77  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+   850:97  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1029:46  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1285:46  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1294:33  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1617:22  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1636:92  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1648:72  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  1690:55  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  2028:68  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  2028:91  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/intrinsic-mutation.ts
+  349:22  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+  393:24  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/mutation-capture-runtime.ts
+  256:32  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts
+   57:36  error  Unsafe usage of ThrowStatement   no-unsafe-finally
+  286:26  error  Unsafe usage of ThrowStatement   no-unsafe-finally
+  366:26  error  Unsafe usage of ThrowStatement   no-unsafe-finally
+  415:15  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/plain-branch-membership.ts
+  1117:19  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts
+   63:36  error  Unsafe usage of ThrowStatement   no-unsafe-finally
+  227:15  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts
+  230:59  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/kernel/src/lib/scalar-responsibility-lifecycle.spec.ts
+  59:43  error  Unexpected empty arrow function              @typescript-eslint/no-empty-function
+  59:99  error  Unexpected empty method 'beforePublication'  @typescript-eslint/no-empty-function
+  77:12  error  Unexpected empty arrow function              @typescript-eslint/no-empty-function
+  77:31  error  Unexpected empty arrow function              @typescript-eslint/no-empty-function
+
+/private/tmp/st-c28-r3-composed-qualification/candidate/packages/react/src/branch-declaration-qualification.spec.tsx
+  21:48   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  32:120  error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  40:18   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  49:52   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  53:40   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  62:85   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  63:30   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  77:85   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  78:30   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+  81:87   error  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+✖ 43 problems (23 errors, 20 warnings)
+

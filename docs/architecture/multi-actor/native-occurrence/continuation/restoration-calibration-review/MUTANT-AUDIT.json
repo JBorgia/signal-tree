@@ -1,0 +1,70 @@
+[
+  {
+    "arm": "baseline",
+    "exit": 0,
+    "mutantHashReproduced": true,
+    "restorationVerified": true,
+    "failureSummaries": [
+      " Test Files  2 passed (2)",
+      "      Tests  6 passed (6)"
+    ]
+  },
+  {
+    "arm": "mutant-validation",
+    "exit": 1,
+    "mutantHashReproduced": true,
+    "restorationVerified": true,
+    "failureSummaries": [
+      "\u23af\u23af\u23af\u23af\u23af\u23af\u23af Failed Tests 6 \u23af\u23af\u23af\u23af\u23af\u23af\u23af",
+      "AssertionError: large-sequence N=3 jumpTo0 calibrated work: expected 19 to be less than or equal to 10",
+      "AssertionError: large-sequence N=3 jumpTo0 calibrated work: expected 19 to be less than or equal to 10",
+      "AssertionError: row work without attributed singleton: expected 18 to be less than or equal to 9",
+      "AssertionError: large-sequence N=32 jumpTo0 calibrated work: expected 193 to be less than or equal to 97",
+      "AssertionError: large-sequence N=32 jumpTo0 calibrated work: expected 193 to be less than or equal to 97",
+      "AssertionError: row work without attributed singleton: expected 192 to be less than or equal to 96",
+      "AssertionError: large-sequence N=256 jumpTo0 calibrated work: expected 1537 to be less than or equal to 769",
+      "AssertionError: large-sequence N=256 jumpTo0 calibrated work: expected 1537 to be less than or equal to 769",
+      "AssertionError: row work without attributed singleton: expected 1536 to be less than or equal to 768",
+      "AssertionError: paired N=3 jumpTo0 calibrated work: expected 18 to be less than or equal to 9",
+      "AssertionError: paired N=3 jumpTo0 calibrated work: expected 18 to be less than or equal to 9",
+      "AssertionError: row work without attributed singleton: expected 18 to be less than or equal to 9",
+      "AssertionError: paired N=32 jumpTo0 calibrated work: expected 192 to be less than or equal to 96",
+      "AssertionError: paired N=32 jumpTo0 calibrated work: expected 192 to be less than or equal to 96",
+      "AssertionError: row work without attributed singleton: expected 192 to be less than or equal to 96",
+      "AssertionError: paired N=256 jumpTo0 calibrated work: expected 1536 to be less than or equal to 768",
+      "AssertionError: paired N=256 jumpTo0 calibrated work: expected 1536 to be less than or equal to 768",
+      "AssertionError: row work without attributed singleton: expected 1536 to be less than or equal to 768",
+      " Test Files  2 failed (2)",
+      "      Tests  6 failed (6)"
+    ]
+  },
+  {
+    "arm": "mutant-snapshot",
+    "exit": 1,
+    "mutantHashReproduced": true,
+    "restorationVerified": true,
+    "failureSummaries": [
+      "\u23af\u23af\u23af\u23af\u23af\u23af\u23af Failed Tests 6 \u23af\u23af\u23af\u23af\u23af\u23af\u23af",
+      "AssertionError: large-sequence N=3 jumpTo1 calibrated work: expected 62 to be less than or equal to 38",
+      "AssertionError: large-sequence N=3 jumpTo1 calibrated work: expected 62 to be less than or equal to 38",
+      "AssertionError: row work without attributed singleton: expected 60 to be less than or equal to 36",
+      "AssertionError: large-sequence N=32 jumpTo1 calibrated work: expected 642 to be less than or equal to 386",
+      "AssertionError: large-sequence N=32 jumpTo1 calibrated work: expected 642 to be less than or equal to 386",
+      "AssertionError: row work without attributed singleton: expected 640 to be less than or equal to 384",
+      "AssertionError: large-sequence N=256 jumpTo1 calibrated work: expected 5122 to be less than or equal to 3074",
+      "AssertionError: large-sequence N=256 jumpTo1 calibrated work: expected 5122 to be less than or equal to 3074",
+      "AssertionError: row work without attributed singleton: expected 5120 to be less than or equal to 3072",
+      "AssertionError: paired N=3 jumpTo1 calibrated work: expected 61 to be less than or equal to 37",
+      "AssertionError: paired N=3 jumpTo1 calibrated work: expected 61 to be less than or equal to 37",
+      "AssertionError: row work without attributed singleton: expected 60 to be less than or equal to 36",
+      "AssertionError: paired N=32 jumpTo1 calibrated work: expected 641 to be less than or equal to 385",
+      "AssertionError: paired N=32 jumpTo1 calibrated work: expected 641 to be less than or equal to 385",
+      "AssertionError: row work without attributed singleton: expected 640 to be less than or equal to 384",
+      "AssertionError: paired N=256 jumpTo1 calibrated work: expected 5121 to be less than or equal to 3073",
+      "AssertionError: paired N=256 jumpTo1 calibrated work: expected 5121 to be less than or equal to 3073",
+      "AssertionError: row work without attributed singleton: expected 5120 to be less than or equal to 3072",
+      " Test Files  2 failed (2)",
+      "      Tests  6 failed (6)"
+    ]
+  }
+]

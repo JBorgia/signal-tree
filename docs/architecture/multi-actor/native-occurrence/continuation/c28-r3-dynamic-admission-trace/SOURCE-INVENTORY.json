@@ -1,0 +1,13 @@
+{
+  "packages/kernel/src/lib/internals/mutation-capture-runtime.ts": "7161d1455ba7c3e5ec123dab136aba57f1a05fc1c2ab77c4658859599004a00f",
+  "packages/kernel/src/lib/internals/owned-mutation.ts": "7494dcdb582ea09100dc9dda07cf581d8f13b592b3627acd25f7f8b5cadcf4e3",
+  "packages/kernel/src/enhancers/transactions/transactions.ts": "1eea7ff6af6710741a680aa9946d913b724175a701069ee68777c343d028306d",
+  "packages/kernel/src/lib/signal-tree.ts": "584b2e3529aff21a01a9def395d3de3abfe72ccaa77b09a159494966090575ee",
+  "packages/kernel/src/lib/internals/construction-allocation.ts": "9b5f5cdd0a28d114e2919f35475c529a5da076a2da8cbf8e383746f2983edd5c",
+  "packages/kernel/src/lib/internals/intercept-leaf-signals.ts": "14742ce7826533d05b837b5b4fc3baa35c93e84d92058609ec34a412f2dcda1e",
+  "packages/kernel/src/lib/internals/intrinsic-mutation.ts": "26427e765d01a4ef3f4939448c522ba2161c84b85c6c082b82bfa9dd5b2b5b30",
+  "packages/kernel/src/lib/internals/location-runtime.ts": "aaeb305182f93849c26a98372a42c0f7c0fb7dae79f9370ef61e98b7671663b2",
+  "packages/kernel/src/lib/internals/native-tree-scalar-leaf-runtime.ts": "83e9d1a6fc724b32912f7ca18a3b6514e8a952906e35c67704ab5610ca88a335",
+  "packages/kernel/src/lib/internals/tree-scalar-leaf-runtime.ts": "8393c35b7860054a3e8759c7e79388bbbc9f72c523dbb1e40ccdbf23dd170f3b",
+  "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.ts": "82b20709f8dd9098bbcf129b997b87328d3271e0bf55497e6ff0bf330894672c"
+}
