@@ -27,6 +27,9 @@
             "bench": {
               "define": { "__SIGNAL_TREE_BENCH__": "true" }
             },
+            "test-fake": {
+              "fileReplacements": [{ "replace": "src/app/subject.ts", "with": "src/app/subject.test-fake.ts" }]
+            },
             "production": {}
           },
           "defaultConfiguration": "bench"

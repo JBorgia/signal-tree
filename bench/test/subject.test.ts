@@ -23,3 +23,37 @@ test('the shim hands out native Angular leaves and collection cells', () => {
   assert.equal(rows.count(), 1);
   tree.destroy();
 });
+
+test('the fake subject enforces refuse, queue and merge holds, transactions and selective undo', async () => {
+  const { testFake } = await import('../subjects/test-fake.ts');
+  const tree = testFake.createTree({ a: { b: 0 } });
+  const leaf = tree.leaf<number>(['a', 'b']);
+  const user = { writer: 'user', origin: 'user' };
+  const agent = { writer: 'agent:planner', origin: 'agent' };
+
+  const release = tree.hold!(['a', 'b'], user);
+  assert.throws(() => tree.as!(agent, () => leaf.set(1)), /refused/);
+  tree.as!(user, () => leaf.set(2));
+  release();
+  const queue = tree.hold!(['a', 'b'], user, { kind: 'queue' });
+  tree.as!(agent, () => leaf.set(3));
+  assert.equal(leaf(), 2, 'queued while held');
+  queue();
+  assert.equal(leaf(), 3, 'applied when the hold ends');
+  const merge = tree.hold!(['a', 'b'], user, { kind: 'merge', merge: (current, incoming) => (current as number) + (incoming as number) });
+  tree.as!(agent, () => leaf.set(10));
+  assert.equal(leaf(), 13);
+  merge();
+
+  const tx = tree.as!(agent, () => tree.transact!(() => leaf.set(20)));
+  assert.deepEqual(tx.inspect(), [{ location: 'a/b', status: 'current' }]);
+  tx.rollback();
+  assert.equal(leaf(), 13);
+
+  tree.as!(user, () => tree.undoable!(() => leaf.set(30)));
+  const other = tree.leaf<number>(['a', 'c']);
+  tree.as!(agent, () => tree.undoable!(() => other.set(5)));
+  tree.undo!({ writer: agent.writer });
+  assert.equal(other(), undefined);
+  assert.equal(leaf(), 30, "the user's write survives the agent's undo");
+});

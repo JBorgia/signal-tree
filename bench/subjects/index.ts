@@ -12,6 +12,11 @@ export const SUBJECTS: Readonly<Record<string, SubjectEntry>> = {
     load: async () => (await import('./v15-shim.ts')).v15Shim,
     angularConfiguration: 'bench',
   },
+  /** The harness's own test double (bench/test); never a gate subject. */
+  'test-fake': {
+    load: async () => (await import('./test-fake.ts')).testFake,
+    angularConfiguration: 'bench,test-fake',
+  },
 };
 
 export const DEFAULT_SUBJECT = 'v15-shim';

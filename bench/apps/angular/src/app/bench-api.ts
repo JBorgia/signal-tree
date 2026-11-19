@@ -51,7 +51,7 @@ function planAgentBatch(fieldEdits: number, rows: number, firstRow: number, fiel
 
 export function installBenchApi(host: BenchHost, appRef: ApplicationRef): void {
   let pendingRows: PlainRow[] | undefined;
-  let soak: { stop(): void; status(): Record<string, unknown> } | undefined;
+  let soak: { stop(): void; runUntil(writes: number): Promise<void>; status(): Record<string, unknown> } | undefined;
 
   const settle = async () => {
     await appRef.whenStable();
@@ -233,52 +233,73 @@ export function installBenchApi(host: BenchHost, appRef: ApplicationRef): void {
       return { overwritten: held.cell() !== typed, refusals };
     },
 
-    /** S5: S2 + S4 traffic until stopped; `compressed` runs it back to back without waiting for real time. */
+    /**
+     * S5: S2 + S4 traffic. Full mode ticks every batchEveryMs of real time until
+     * stopped; compressed mode ticks only inside soak.runUntil, back to back, so
+     * the driver can sample the heap at exact write counts.
+     */
     'soak.start'(args) {
       const t = tree();
       const random = seededRandom(args['seed'] as number);
       const rowCount = args['rows'] as number;
       const fieldsPerUpdate = args['fieldsPerUpdate'] as number;
       const perBatch = Math.round(((args['rowUpdatesPerSecond'] as number) * (args['batchEveryMs'] as number)) / 1000);
-      const compressed = args['compressed'] === true;
       const as = need(t.as, 'writers');
+      need(t.transact, 'transactions');
       let writes = 0;
       let stopped = false;
-      let tick = 0;
-      const step = () => {
-        if (stopped) return;
+      let ticks = 0;
+      const tick = () => {
         const ids: number[] = [];
         const changes: Record<string, number | string>[] = [];
         for (let u = 0; u < perBatch; u++) {
           ids.push(Math.floor(random() * rowCount));
           changes.push(rowUpdate(random, fieldsPerUpdate));
         }
-        t.turn('S5.server', () => as.call(t, { writer: 'sync:server', origin: 'server' }, () => {
-          for (let u = 0; u < perBatch; u++) collection().updateOne(ids[u]!, changes[u] as Partial<Row>);
-        }));
+        t.turn('S5.server', () =>
+          as.call(t, { writer: 'sync:server', origin: 'server' }, () => {
+            for (let u = 0; u < perBatch; u++) collection().updateOne(ids[u]!, changes[u] as Partial<Row>);
+          }),
+        );
         writes += perBatch * fieldsPerUpdate;
-        as.call(t, USER, () => t.turn('S5.user', () => collection().updateOne(rowCount - 1, { f2: `u${tick}` } as Partial<Row>)));
+        as.call(t, USER, () => t.turn('S5.user', () => collection().updateOne(rowCount - 1, { f2: `u${ticks}` } as Partial<Row>)));
         writes += 1;
-        if (tick % 50 === 0) {
-          const plan = planAgentBatch(args['fieldEdits'] as number, args['agentRows'] as number, Math.floor(random() * (rowCount - 1000)), args['fields'] as number, tick);
-          need(t.transact, 'transactions');
+        if (ticks % 50 === 0) {
+          const first = Math.floor(random() * Math.max(1, rowCount - (args['agentRows'] as number)));
+          const plan = planAgentBatch(args['fieldEdits'] as number, args['agentRows'] as number, first, args['fields'] as number, ticks);
           const pending = t.as!(AGENT, () => t.transact!(() => applyPlan(plan)));
-          if (tick % 100 === 0) pending.rollback();
+          if (ticks % 100 === 0) pending.rollback();
           else pending.confirm();
           writes += args['fieldEdits'] as number;
-          if (t.undo && tick % 150 === 0) t.undo({ writer: AGENT.writer });
+          if (t.undo && ticks % 150 === 0) t.undo({ writer: AGENT.writer });
         }
-        tick++;
-        setTimeout(step, compressed ? 0 : (args['batchEveryMs'] as number));
+        ticks++;
       };
-      step();
+      if (args['compressed'] !== true) {
+        const loop = () => {
+          if (stopped) return;
+          tick();
+          setTimeout(loop, args['batchEveryMs'] as number);
+        };
+        loop();
+      }
       soak = {
         stop: () => {
           stopped = true;
         },
-        status: () => ({ writes, ticks: tick, collections: t.pluginCollections ? t.pluginCollections() : [] }),
+        async runUntil(target: number) {
+          while (!stopped && writes < target) {
+            tick();
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+        },
+        status: () => ({ writes, ticks, collections: t.pluginCollections ? t.pluginCollections() : [] }),
       };
       return {};
+    },
+    async 'soak.runUntil'(args) {
+      await need(soak, 'a running soak').runUntil(args['writes'] as number);
+      return need(soak, 'a running soak').status();
     },
     'soak.status'() {
       return need(soak, 'a running soak').status();

@@ -10,8 +10,9 @@ export const S5_SETUP = { fieldsPerUpdate: 3, seed: 11, heapSampleEveryMs: 5 * 6
  * selective undo where restoration exists) with every plugin the subject has
  * installed. Full mode runs `sessionHours` of real time; compressed mode
  * (nightly) runs the traffic back to back until `minWrites` field writes.
- * Heap: CDP-forced GC then Runtime.getHeapUsage at regular samples; growth over
- * the final half = (last sample - sample at the half-way point) / that sample.
+ * Heap: CDP-forced GC then Runtime.getHeapUsage at regular samples (by time
+ * in full mode, by writes in compressed mode); growth over the final half =
+ * (last sample - sample at the half-way point) / that sample.
  */
 export const S5: ScenarioDefinition = {
   id: 'S5',
@@ -58,26 +59,36 @@ export const S5: ScenarioDefinition = {
       const samples: { at: number; writes: number; heap: number }[] = [];
       let overCap = 0;
       const sample = async () => {
+        // The harness's own buffers (turn measures, frames) must not grow over the soak.
+        await page.drainPerf();
         const status = await page.invoke<{ writes: number; collections: { size: number; cap: number }[] }>('soak.status');
         overCap += status.collections.filter((collection) => collection.size > collection.cap).length;
         samples.push({ at: Date.now() - start, writes: status.writes, heap: await page.heapUsed() });
-        return status.writes;
       };
-      let nextSampleAt = ctx.s5Compressed ? minWrites / S5_SETUP.compressedSamples : S5_SETUP.heapSampleEveryMs;
-      for (;;) {
-        await sleep(S5_SETUP.pollMs);
-        const writes = (await page.invoke<{ writes: number }>('soak.status')).writes;
-        const progress = ctx.s5Compressed ? writes : Date.now() - start;
-        if (progress >= nextSampleAt) {
+      await sample();
+      if (ctx.s5Compressed) {
+        // Compressed: samples at every 1/compressedSamples of the writes; "half" is by writes.
+        for (let k = 1; k <= S5_SETUP.compressedSamples; k++) {
+          await page.invoke('soak.runUntil', { writes: (minWrites * k) / S5_SETUP.compressedSamples });
           await sample();
-          nextSampleAt += ctx.s5Compressed ? minWrites / S5_SETUP.compressedSamples : S5_SETUP.heapSampleEveryMs;
         }
-        if (ctx.s5Compressed ? writes >= minWrites : Date.now() - start >= durationMs) break;
+      } else {
+        // Full: real time, a sample every heapSampleEveryMs; "half" is by time.
+        let nextSampleAt = S5_SETUP.heapSampleEveryMs;
+        while (Date.now() - start < durationMs) {
+          await sleep(S5_SETUP.pollMs);
+          await page.drainPerf();
+          if (Date.now() - start >= nextSampleAt) {
+            await sample();
+            nextSampleAt += S5_SETUP.heapSampleEveryMs;
+          }
+        }
       }
       const final = await page.invoke<{ writes: number }>('soak.stop');
       await sample();
+      const axis = (s: { at: number; writes: number }) => (ctx.s5Compressed ? s.writes : s.at);
       const last = samples[samples.length - 1]!;
-      const half = samples.reduce((best, s) => (Math.abs(s.at - last.at / 2) < Math.abs(best.at - last.at / 2) ? s : best), samples[0]!);
+      const half = samples.reduce((best, s) => (Math.abs(axis(s) - axis(last) / 2) < Math.abs(axis(best) - axis(last) / 2) ? s : best), samples[0]!);
       return {
         heapGrowthFinalHalf: (last.heap - half.heap) / half.heap,
         collectionsOverCap: overCap,

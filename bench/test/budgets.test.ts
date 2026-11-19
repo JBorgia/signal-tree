@@ -33,3 +33,28 @@ test('composite gates compare scenarios that exist, and parameter $refs resolve'
   assert.equal(gateParameters(budgets, 'S2')['rows'], 50000);
   assert.equal(gateParameters(budgets, 'S1')['formBoundFields'], 500);
 });
+
+test('the evaluator passes, fails, or reports a missing metric for each kind of condition', async () => {
+  const { evaluateCondition } = await import('../runner/budgets.ts');
+  const { exitCode, verdict } = await import('../runner/harness.ts');
+  const le = { id: 'x', text: '', metric: 'm', op: '<=', value: 2 } as const;
+  assert.equal(evaluateCondition(le, { m: 2 }).pass, true);
+  assert.equal(evaluateCondition(le, { m: 2.01 }).pass, false);
+  assert.equal(evaluateCondition(le, {}).pass, null);
+  assert.equal(evaluateCondition({ ...le, op: '==', value: 0 }, { m: 0 }).pass, true);
+  assert.equal(evaluateCondition({ ...le, op: '==', value: 0 }, { m: 1e-9 }).pass, false);
+  assert.equal(evaluateCondition({ ...le, op: '>=', value: 0.95 }, { m: 0.9 }).pass, false);
+  assert.equal(evaluateCondition({ ...le, op: 'withinRelative', value: 0.1 }, { m: -0.1 }).pass, true);
+  assert.equal(evaluateCondition({ ...le, op: 'withinRelative', value: 0.1 }, { m: 0.11 }).pass, false);
+  const bound = { id: 'b', text: '', metric: 'c', op: 'ownerBound', coefficientUs: 0.5 } as const;
+  assert.equal(evaluateCondition(bound, { 'c@1': 1, 'c@2': 1.9, 'c@8': 5, 'c@32': 17 }).pass, true);
+  assert.equal(evaluateCondition(bound, { 'c@1': 1, 'c@2': 2.1, 'c@8': 5, 'c@32': 17 }).pass, false);
+  assert.equal(evaluateCondition(bound, { 'c@2': 1 }).pass, null);
+  assert.equal(verdict([{ id: 'a', text: '', pass: true, actual: 1 }, { id: 'b', text: '', pass: null, actual: null }]), null);
+  assert.equal(verdict([{ id: 'a', text: '', pass: false, actual: 1 }]), false);
+  const ran = { id: 'M1', title: '', status: 'ran' as const, pass: false };
+  assert.equal(exitCode({ M1: ran }, false), 1);
+  assert.equal(exitCode({ M1: ran }, true), 0);
+  assert.equal(exitCode({ S3: { id: 'S3', title: '', status: 'not-applicable' } }, false), 0);
+  assert.equal(exitCode({ M1: { ...ran, pass: true, regressions: [{ metric: 'm', baseline: 1, current: 2, worseBy: 1, threshold: 0.03, regressed: true }] } }, true), 1);
+});
