@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": { "analytics": false, "packageManager": "pnpm" },
+  "newProjectRoot": "",
+  "projects": {
+    "bench-angular": {
+      "projectType": "application",
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "bench",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "index": "src/index.html",
+            "tsConfig": "tsconfig.app.json",
+            "outputPath": { "base": "../../out/apps/angular/v15-shim", "browser": "" },
+            "optimization": true,
+            "sourceMap": false,
+            "outputHashing": "none",
+            "extractLicenses": false,
+            "define": { "__SIGNAL_TREE_BENCH__": "false" }
+          },
+          "configurations": {
+            "bench": {
+              "define": { "__SIGNAL_TREE_BENCH__": "true" }
+            },
+            "production": {}
+          },
+          "defaultConfiguration": "bench"
+        }
+      }
+    }
+  }
+}
