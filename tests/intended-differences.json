@@ -1,0 +1,4 @@
+{
+  "$comment": "Differences the oracle may report without failing. Owned by Jonathan. Each entry: { \"subjects\": [two subject names], \"pattern\"?: operation pattern, \"field\"?: outcome field (at least one of the two; '*' is a wildcard), \"reason\": why it is intended }. Validated by tests/oracle/src/intended.ts.",
+  "differences": []
+}
