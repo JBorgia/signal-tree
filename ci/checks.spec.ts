@@ -3,6 +3,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { ESLint } from 'eslint';
 import { describe, expect, it } from 'vitest';
 import { isRestrictedPath } from './entry-graph.mjs';
 import { checkBoundaries, violationsFor } from './boundaries.mjs';
@@ -110,5 +111,20 @@ describe('S6(c) byte identity without the plugin folders', () => {
     } finally {
       rmSync(coreDir, { recursive: true, force: true });
     }
+  });
+});
+
+describe('#9: tests cannot be skipped, focused or marked failing', () => {
+  const lint = async (code: string) => {
+    const [result] = await new ESLint({ cwd: join(import.meta.dirname, '..') }).lintText(code, { filePath: 'packages/core/src/probe.spec.ts' });
+    return result!.messages.map((m) => m.message);
+  };
+
+  it.each(['it.skip', 'it.only', 'test.todo', 'describe.skip', 'it.fails', 'it.skipIf(true)'])('rejects %s', async (call) => {
+    expect(await lint(`import { it, test, describe } from 'vitest';\n${call}('x', () => {});\n`)).toContain('Tests may not be skipped, focused or marked failing (#9).');
+  });
+
+  it('accepts a plain test', async () => {
+    expect(await lint(`import { it } from 'vitest';\nit('x', () => {});\n`)).toEqual([]);
   });
 });

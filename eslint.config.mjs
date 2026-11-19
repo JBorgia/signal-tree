@@ -28,4 +28,18 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // #9 (provisional, BRIEF.md 11.2): tests may not be switched off or narrowed
+    // with .skip, .only, .todo, .fails, .skipIf or .runIf.
+    files: ['packages/**/*.spec.ts', 'tests/**/*.ts', 'ci/**/*.spec.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'MemberExpression[object.name=/^(it|test|describe|suite)$/][property.name=/^(skip|only|todo|fails|skipIf|runIf)$/]',
+          message: 'Tests may not be skipped, focused or marked failing (#9).',
+        },
+      ],
+    },
+  },
 );
