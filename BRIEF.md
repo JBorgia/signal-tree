@@ -417,3 +417,35 @@ These rulings answer the agent's review items 1–17 by number. **Where they con
 17. **Enforcement.** Agents commit as a dedicated bot account. A ruleset on `main` requires PRs and the required status checks (tests, oracle, gates). Code-owner review is required for `BRIEF.md`, `bench/`, `tests/intended-differences.json`, `tests/port-manifest.json`, `CODEOWNERS`, and everything that decides which checks run or what passes: `ci/`, `.github/`, the oracle runner and its properties, the root `package.json` scripts, and the ESLint, Vitest and Playwright configs. The ruleset applies to admins (no bypass). Jonathan reviews collaborator write access.
 
 **Local unpushed work.** Before the reset, commit the uncommitted changes in `~/code/signaltree_1` and in the two dirty worktrees to their own branches, push each local-only branch, and archive-tag it like the rest. Move the evidence tarballs to storage outside git.
+
+## 11. Running unattended
+
+The agent works continuously from Phase 0 through Phase 8. **Where this section conflicts with sections 7, 8 or 10, it wins.** No rule in section 2 is relaxed, and no budget changes.
+
+### 11.1 Hard stops (the only reasons to wait)
+
+1. Any change to `budgets.json`, the scenario definitions, or the code-owned files listed in ruling 17. Open the PR; it waits for Jonathan's review.
+2. Any destructive repository operation not pre-approved in 11.3.
+3. Breaking a rule in section 2.
+4. Anything that needs first production adopter code or data.
+
+### 11.2 Everything else is asynchronous
+
+- **Questions.** Each question that section 8 would have stopped for becomes a GitHub issue labeled `needs-jonathan`. The issue carries the evidence and a recommended answer. The agent adopts the recommendation provisionally, marks the affected code with the issue number, and keeps working. When Jonathan answers differently, fixing it is the next task.
+- **Sign-offs.** Oracle difference rulings, `internal` manifest entries and baseline resets go through the same issue queue. Unresolved sign-offs block the **release** (Phase 8), not the next phase.
+- **Red gates.** A gate that stays red after three materially different approaches gets a `needs-jonathan` issue with the profile. The agent then keeps attacking it with new approaches and never lowers the budget. While a gate is red it may also work in the parallel lane below; it may not close the phase.
+- **Parallel lane.** Adapter work (Phase 7) depends only on the core and the adapter contract, so it may run once Phase 2 closes, in parallel with Phases 3–6. Each adapter still closes only on its own gates.
+- **Phase closes.** A phase closes when CI shows its gates green. Jonathan reviews phase reports asynchronously; his review does not block the next phase.
+- **Merging.** PRs that touch no code-owned path auto-merge when every required check passes. PRs that touch code-owned paths wait for Jonathan's review while other work continues.
+
+### 11.3 Pre-approved once, before the run starts
+
+Jonathan gives these in a single message: the reset (archive tags, branch deletion, the removal commit), `chaz-thoughts`, the ruleset, the bot account, the self-hosted runner, Vercel on `release/15.x`, the default budgets, and the version number of the new major.
+
+### 11.4 Mechanics
+
+- **Done check.** Phase 0 adds `ci/done-check.mjs`, which is code-owned. It exits 0 only when every item in section 9 holds. Otherwise it prints the next unmet item and the open `needs-jonathan` issues.
+- **Environment.** Run in an isolated container or VM, signed in as the bot account, whose GitHub token has write access but not admin.
+- **Continuation.** Claude Code's `/goal` with the condition "`node ci/done-check.mjs` exits 0". A `Stop` hook acts as the backstop: it blocks stopping while the done check fails, and lets the session stop after 20 consecutive blocked stops with no new commit, so a stuck session can't loop forever.
+- **Restarts.** A supervisor loop in `tmux` resumes the session with `--continue` whenever it exits before the done check passes, for example after a crash or a usage limit.
+- **Status.** At the end of each phase, and every 24 hours, the agent posts a status comment (the section 8 report format) on a pinned issue named `Rebuild status`.
