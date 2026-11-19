@@ -22,13 +22,14 @@
     "bench:test": "pnpm --filter @signal-tree/bench test"
   },
   "devDependencies": {
-    "@signal-tree/core": "workspace:*",
     "@eslint/js": "10.0.1",
+    "@signal-tree/core": "workspace:*",
     "@types/node": "^22.10.0",
     "esbuild": "0.28.2",
     "eslint": "10.14.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.1",
-    "vitest": "5.1.0"
+    "vitest": "5.1.0",
+    "yaml": "2.9.1"
   }
 }
