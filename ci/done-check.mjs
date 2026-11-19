@@ -5,7 +5,9 @@
 // Conventions the rest of the repository follows so this check can see them:
 // - Nightly workflow: .github/workflows/nightly.yml on main. Its jobs are named
 //   `gates (<adapter>)` for plain (the core), angular, vue, solid, preact and
-//   react, and `oracle (100k)`; each fails when any gate or difference fails.
+//   react, and `oracle (100k)`. This check reads the verdicts those jobs upload
+//   (artifacts nightly-gates-<adapter> and nightly-oracle), not the jobs'
+//   success: a results file that is record-only or unapproved counts as unmet.
 // - Behavior coverage: a test title carries the behavior ID in brackets, e.g.
 //   it('[T3] refuses with later-pending-dependency', ...).
 // - Release docs (Phase 8): README.md, CHANGELOG.md, docs/migration/from-14.md,
@@ -13,17 +15,44 @@
 // - first production adopter validation: a closed issue labeled adopter-validated, closed by
 //   Jonathan.
 // - The new major's version number lives in ci/done-check.config.json.
-import { execFileSync } from 'node:child_process';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { checkBoundaries } from './boundaries.mjs';
+import { CORE_ONLY_APP, pluginFolderIdentity, scanApp } from './core-bundle-scan.mjs';
+import { downloadArtifact, ghApi, repoSlug } from './github.mjs';
 import { repoRoot } from './entry-graph.mjs';
 import { validate as validateManifest } from './port-manifest.mjs';
 
 export const OWNER_LOGIN = 'JBorgia';
 export const ADAPTERS = ['plain', 'angular', 'vue', 'solid', 'preact', 'react'];
 export const NIGHTLY_JOBS = [...ADAPTERS.map((a) => `gates (${a})`), 'oracle (100k)'];
+/** Gates the harness runs (6.3 as amended by section 10). S6a and S6c are checked here by ci/core-bundle-scan.mjs. */
+export const REQUIRED_GATES = ['M1', 'M2', 'M3', 'S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6b', 'S7'];
+export const ORACLE_MIN_RUNS = 100_000;
+
+/** Why one nightly run does not show every gate green, or null. Reads the uploaded verdicts, not job success. */
+export function nightlyRunProblem(run) {
+  if (run.conclusion !== 'success') return `nightly run ${run.id} concluded ${run.conclusion}`;
+  for (const adapter of ADAPTERS) {
+    const results = run.results?.[adapter];
+    if (!results || results.error) return `nightly run ${run.id} has no gate results for ${adapter}${results?.error ? ` (${results.error})` : ''}`;
+    if (results.budgets?.approved !== true) return `nightly run ${run.id} (${adapter}) ran against unapproved budgets`;
+    if (results.recordOnly !== false) return `nightly run ${run.id} (${adapter}) was record-only`;
+    for (const gate of REQUIRED_GATES) {
+      const scenario = results.scenarios?.[gate];
+      if (!scenario || scenario.status !== 'ran') return `nightly run ${run.id} (${adapter}): ${gate} ${scenario ? scenario.status : 'missing'}`;
+      if (scenario.pass !== true) return `nightly run ${run.id} (${adapter}): ${gate} is not green`;
+      if ((scenario.regressions ?? []).some((r) => r.regressed)) return `nightly run ${run.id} (${adapter}): ${gate} regressed`;
+    }
+  }
+  const oracle = run.oracle;
+  if (!oracle || oracle.error) return `nightly run ${run.id} has no oracle report${oracle?.error ? ` (${oracle.error})` : ''}`;
+  if (!(oracle.runs >= ORACLE_MIN_RUNS)) return `nightly run ${run.id}: the oracle ran ${oracle.runs} sequences, fewer than ${ORACLE_MIN_RUNS}`;
+  if (oracle.uncoveredRuns !== 0) return `nightly run ${run.id}: the oracle found ${oracle.uncoveredRuns} sequences with unlisted differences`;
+  return null;
+}
 export const BEHAVIORS = [
   ...['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'],
   ...['R1', 'R2', 'R3', 'R4', 'E1', 'E2', 'L1', 'L2', 'L3', 'X1', 'X2'],
@@ -43,15 +72,15 @@ const SHORT_LIVED_DAYS = 7;
 export const ITEMS = [
   {
     title: 'Every gate in 6.3 is green for the core and every adapter on two consecutive nightly runs',
-    check: ({ nightly }) => {
+    check: ({ nightly, s6 }) => {
       if (nightly.error) return `could not read nightly runs: ${nightly.error}`;
       if (nightly.runs.length < 2) return `${nightly.runs.length} completed nightly run(s) on main; two consecutive green runs are needed`;
       for (const run of nightly.runs.slice(0, 2)) {
-        if (run.conclusion !== 'success') return `nightly run ${run.id} concluded ${run.conclusion}`;
-        const missing = NIGHTLY_JOBS.filter((name) => run.jobs[name] !== 'success');
-        if (missing.length) return `nightly run ${run.id} lacks a green ${missing.join(', ')}`;
+        const problem = nightlyRunProblem(run);
+        if (problem) return problem;
       }
-      return null;
+      if (s6.error) return `could not run the S6(a)/S6(c) scan: ${s6.error}`;
+      return s6.findings.length ? `S6: ${s6.findings[0]}` : null;
     },
   },
   {
@@ -85,10 +114,10 @@ export const ITEMS = [
     },
   },
   {
-    title: "Jonathan's first production adopter validation passes S1–S5 with real data on the slowest supported device",
-    check: ({ first production adopter }) => {
-      if (first production adopter.error) return `could not read issues: ${first production adopter.error}`;
-      return first production adopter.validated ? null : `no closed issue labeled adopter-validated closed by ${OWNER_LOGIN}`;
+    title: "Jonathan's validation with the first production adopter passes S1–S5 with real data on the slowest supported device",
+    check: ({ adopter }) => {
+      if (adopter.error) return `could not read issues: ${adopter.error}`;
+      return adopter.validated ? null : `no closed issue labeled adopter-validated closed by ${OWNER_LOGIN}`;
     },
   },
   {
@@ -178,18 +207,19 @@ function walk(dir, out = []) {
   return out;
 }
 
-function repoSlug(root) {
-  if (process.env.GITHUB_REPOSITORY) return process.env.GITHUB_REPOSITORY;
-  const url = execFileSync('git', ['remote', 'get-url', 'origin'], { cwd: root, encoding: 'utf8' }).trim();
-  return url.replace(/^.*github\.com[:/]/, '').replace(/\.git$/, '');
-}
-
-function ghApi(path) {
+/** Downloads a run's artifact by name and parses the newest JSON file matching `pattern` in it. */
+function artifactJson(repo, artifacts, name, pattern) {
+  const artifact = artifacts.find((a) => a.name === name && !a.expired);
+  if (!artifact) return { error: `artifact ${name} missing` };
+  const dir = mkdtempSync(join(tmpdir(), 'signal-tree-done-'));
   try {
-    const out = execFileSync('gh', ['api', '--paginate', '--slurp', path], { encoding: 'utf8', maxBuffer: 256 << 20, stdio: ['ignore', 'pipe', 'pipe'] });
-    return JSON.parse(out).flat();
+    downloadArtifact(repo, artifact.id, dir);
+    const file = walk(dir).filter((f) => pattern.test(f.split('/').pop())).sort().pop();
+    return file ? JSON.parse(readFileSync(file, 'utf8')) : { error: `no ${pattern} in ${name}` };
   } catch (error) {
-    throw new Error(`gh api ${path.split('?')[0]}: ${String(error.stderr || error.message).trim().split('\n')[0]}`, { cause: error });
+    return { error: String(error.message ?? error).split('\n')[0] };
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 }
 
@@ -215,13 +245,34 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
       .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
       .slice(0, 2);
     return {
-      runs: runs.map((run) => ({
-        id: run.id,
-        conclusion: run.conclusion,
-        jobs: Object.fromEntries(ghApi(`repos/${needRepo()}/actions/runs/${run.id}/jobs?per_page=100`).flatMap((p) => p.jobs ?? []).map((j) => [j.name, j.conclusion])),
-      })),
+      runs: runs.map((run) => {
+        const artifacts = ghApi(`repos/${needRepo()}/actions/runs/${run.id}/artifacts?per_page=100`).flatMap((p) => p.artifacts ?? []);
+        return {
+          id: run.id,
+          conclusion: run.conclusion,
+          results: Object.fromEntries(ADAPTERS.map((a) => [a, artifactJson(needRepo(), artifacts, `nightly-gates-${a}`, /^results-.+-latest\.json$/)])),
+          oracle: artifactJson(needRepo(), artifacts, 'nightly-oracle', /^.+-vs-.+\.json$/),
+        };
+      }),
     };
   });
+
+  const s6 = await (async () => {
+    try {
+      const scan = await scanApp(CORE_ONLY_APP, { root });
+      const identity = await pluginFolderIdentity({ coreDir: join(root, 'packages', 'core') });
+      return {
+        findings: [
+          ...scan.pluginInputs.map((f) => `plugin source in the core-only bundle: ${f}`),
+          ...scan.pluginSymbols.map(([name, plugin]) => `${plugin} symbol ${name} in the core-only bundle`),
+          ...scan.benchLeaks.map((n) => `bench-only ${n} in the production bundle`),
+          ...identity.differences,
+        ],
+      };
+    } catch (error) {
+      return { error: String(error.message ?? error).split('\n')[0] };
+    }
+  })();
 
   const coveredBehaviors = new Set();
   for (const file of [...walk(join(root, 'packages')), ...walk(join(root, 'tests'))].filter((f) => /\.(spec|test|prop)\.ts$/.test(f))) {
@@ -247,7 +298,7 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
     for (const line of processWordsIn(readFileSync(join(root, p), 'utf8'))) docs.processWords.push(`${p}:${line}`);
   }
 
-  const first production adopter = attempt(() => {
+  const adopter = attempt(() => {
     const issues = ghApi(`repos/${needRepo()}/issues?labels=adopter-validated&state=closed&per_page=100`).flatMap((p) => (Array.isArray(p) ? p : [p]));
     const validated = issues.some((i) => {
       const detail = ghApi(`repos/${needRepo()}/issues/${i.number}`)[0] ?? {};
@@ -286,7 +337,7 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
       .map((i) => `#${i.number} ${i.title}`),
   }));
 
-  return { nightly, coveredBehaviors, manifestProblems, budgetGates, rule7, docs, first production adopter, branches, mainTree, release, openQuestions };
+  return { nightly, s6, coveredBehaviors, manifestProblems, budgetGates, rule7, docs, adopter, branches, mainTree, release, openQuestions };
 }
 
 // -------------------------------------------------------------------- main
