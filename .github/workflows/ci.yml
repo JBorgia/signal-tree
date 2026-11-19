@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, 'rebuild/**']
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Typecheck, lint, boundaries, S6(a), tests, port manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the source tags the port manifest is built from
+        run: git fetch --no-tags --depth=1 origin refs/tags/v15.4.9:refs/tags/v15.4.9 refs/tags/v16.0.0-rc.1:refs/tags/v16.0.0-rc.1
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - name: Lint, 4.1 import boundaries and rule 7 reachability
+        run: pnpm lint
+      - name: S6(a) core-only bundle contains no plugin code
+        run: pnpm scan:core-bundle
+      - run: pnpm test
+      - name: Port manifest matches the source tags
+        run: pnpm manifest:check --tags

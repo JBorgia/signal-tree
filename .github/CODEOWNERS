@@ -1,0 +1,6 @@
+# BRIEF.md section 10, ruling 17: code-owner review is required for these paths.
+/BRIEF.md                         @JBorgia
+/bench/                           @JBorgia
+/tests/intended-differences.json  @JBorgia
+/tests/port-manifest.json         @JBorgia
+/.github/CODEOWNERS               @JBorgia
