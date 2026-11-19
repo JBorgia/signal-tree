@@ -1,0 +1,23 @@
+{
+  "name": "@signal-tree/oracle",
+  "version": "0.0.0-dev",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Differential semantics oracle: replays generated operation sequences against two subjects and reports every observable difference.",
+  "scripts": {
+    "oracle": "tsx src/cli.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "fast-check": "4.10.2",
+    "kernel-v15": "npm:@signal-tree/kernel@15.4.9",
+    "kernel-v16": "npm:@signal-tree/kernel@16.0.0-rc.1",
+    "tslib": "2.9.1",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "vitest": "5.1.0"
+  }
+}
