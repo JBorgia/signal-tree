@@ -14,7 +14,9 @@
   "scripts": {
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "vitest run",
-    "lint": "eslint packages ci && node ci/boundaries.mjs"
+    "lint": "eslint packages ci && node ci/boundaries.mjs",
+    "scan:core-bundle": "node ci/core-bundle-scan.mjs",
+    "manifest:check": "node ci/port-manifest.mjs check"
   },
   "devDependencies": {
     "@signal-tree/core": "workspace:*",
