@@ -379,3 +379,41 @@ The rebuild is done when all of the following are true on a main release tag. No
 - [ ] User docs, migration guides and the changelog are written for application developers, with no internal process language.
 - [ ] Jonathan's first production adopter validation passes S1–S5 with real data on the slowest supported device.
 - [ ] The repository holds one line of truth: main, release/15.x, and tags. No open long-lived branches, no evidence tarballs.
+
+## 10. Rulings on the Phase 0 review
+
+These rulings answer the agent's review items 1–17 by number. **Where they conflict with an earlier section, they win.**
+
+1. **Micro gates.** Decision 1 now reads: "absolute timings and bundle size are reported, never gated." M1–M3 remain gates because they measure ratios and allocations.
+2. **Merging and phase gates.**
+    - A PR may merge when all tests pass, no measured scenario regresses, every new code path is exercised by a test, and it implements only the current phase. A phase closes only when its gates are green.
+    - "No groundwork" now means two things: no PR or report claims completion (only a phase close does), and no unexercised code merges.
+    - S4 is split. S4a (apply, `inspect()`, rollback; no holds) closes Phase 3. S4b (selective undo) closes Phase 4. S4c (holds while the user types) closes Phase 5.
+    - S5 runs with whichever plugins exist at that phase. The final S5, with all three plugins, closes Phase 5.
+    - `inspect()` lives on the transaction handle, in the transactions plugin (T9). The writers plugin adds cross-writer publication status.
+3. **Oracle authority.** In Phase 0, run the oracle with v15.4.9 against v16.0.0-rc.1 and give Jonathan the list of differences. He rules on each one. Where v16 rc.1 covers a behavior, it is the authority by default. R3 now reads "as in v16.0.0-rc.1".
+4. **Turn lifecycle in core.** Core owns the turn lifecycle (open, pending, confirmed, rolled back), each with its `WriterContext`. It exposes read-only turn state and lifecycle events to plugins through `ScopeHandle`. Plugins still import only core. No work happens unless a turn is opened, so C1 holds.
+5. **Holds and supersession.**
+    - The `'refuse'`, `'queue'` and `merge` policies apply only to an explicit `hold()`.
+    - Writes into locations held by a pending transaction resolve by v16's supersession and dependency rules (T5).
+    - A refused write inside an agent turn rejects the whole turn atomically. The typed refusal names the location and its holder.
+    - In S7, "owners" means pending transactions plus declared holders on the location.
+6. **Turns versus chunks.** The publication unit is the chunk; the rollback unit is the ingest. The ingest handle captures the `WriterContext` when it is called, and rolling back an ingest is one compensating turn.
+7. **Allowed public API:** every v16.0.0-rc.1 public export (renamed only where 4.4 says), plus `hold()` and its release, `history.undo({ writer })`, `tree.as()`, `tree.turn()`, the `plugins` option, `.use()`, the `setAll` chunk option and `signalTree(state, { adapter })`. Anything else, stop and ask. Rule 9 governs prose only; type names such as `PublicationReceipt` are fine.
+8. **Allocation and drift.** `route(cell, next)` is one shared function, not a closure per leaf. Drift detection uses the framework's own version counter (the Angular signal node's `version`; each adapter documents its own in the conformance kit), never a stored copy of the value.
+9. **Phase 0 baselines.** Phase 0 records baselines for M1–M3, S1 and S2 only. Each other scenario gets its baseline when its phase lands. Switching a measured implementation resets its baseline only with Jonathan's sign-off.
+10. **Measurement fixes.**
+    - S6(c) becomes a byte-identity check: the core-only bundle has identical bytes with and without the plugin folders present.
+    - S7 becomes an upper bound: `cost(n) ≤ cost(1) + n × 0.5 µs` at Node 1× (a provisional coefficient), and an uncontended write is unchanged (±10%) with 10 vs 10,000 links.
+    - Pin the Chrome version through the Playwright lock. M1–M3 run in Node at 1×.
+    - Reference apps may be added by PR with Jonathan's review. `budgets.json` and the scenario definitions stay frozen.
+    - Gates run on a dedicated self-hosted runner, which Jonathan provisions.
+11. **Attribution.** Mark per turn, not per write, behind a bench-only build flag. The flag must be absent from production bundles, which the symbol scan verifies. Attribute long frames by overlap with those marks.
+12. **Port manifest:** the union of both tags, `packages/` only (959 spec paths).
+13. **Stray branches.** Archive-tag and delete `master`, `chaz-thoughts` and `release/15.3.0`. `chaz-thoughts` needs Jonathan's explicit yes.
+14. **signaltree.io.** Jonathan points Vercel at `release/15.x` before any branch is deleted. The agent waits for confirmation.
+15. **Removal list.** Also remove `.agents/`, `.claude/`, `.codex/`, `.cursorrules`, `RELEASE_PROCESS.md`, `V9_PLAN.md`, `apps/`, `api/`, `.github/instructions/`, `.github/skills/` and `.github/VALIDATION_GUIDE.md`. `main` keeps only `LICENSE`, `NOTICE`, `BRIEF.md`, the two pointer files and the new scaffold.
+16. **Tarballs:** "no evidence tarballs" applies to `main`'s tree. History and tags are not rewritten.
+17. **Enforcement.** Agents commit as a dedicated bot account. A ruleset on `main` requires PRs and the required status checks (tests, oracle, gates). Code-owner review is required for `BRIEF.md`, `bench/`, `tests/intended-differences.json`, `tests/port-manifest.json` and `CODEOWNERS`. The ruleset applies to admins (no bypass). Jonathan reviews collaborator write access.
+
+**Local unpushed work.** Before the reset, commit the uncommitted changes in `~/code/signaltree_1` and in the two dirty worktrees to their own branches, push each local-only branch, and archive-tag it like the rest. Move the evidence tarballs to storage outside git.
