@@ -1,5 +1,5 @@
 {
-  "$comment": "Machine-readable transcription of BRIEF.md 6.2 (scale) and 6.3 (gates) as modified by Jonathan's rulings of Nov 19, 2026. Owned by Jonathan (CODEOWNERS); frozen once approved. 'text' quotes the brief or the ruling; 'metric' names the harness result key a condition reads; 'ruling' cites the ruling that changed the brief.",
+  "$comment": "Machine-readable transcription of BRIEF.md 6.2 (scale) and 6.3 (gates) as modified by Jonathan's rulings of Nov 19, 2026. Owned by Jonathan (CODEOWNERS); frozen once approved. 'text' quotes the brief or the ruling; 'metric' names the harness result key a condition reads; 'ruling' cites the ruling that changed the brief. A condition judged 'every-run' must hold in every run (actual = the worst run); any other condition is judged on the median of the runs. Every gated metric needs a finite value from each required run (5, or the gate's 'runs').",
   "source": "BRIEF.md 6.2 and 6.3, as of Nov 19, 2026, with rulings 1, 2, 4, 5 and 7 and provisional issues #12 and #13",
   "approved": false,
   "scale": {
@@ -11,6 +11,33 @@
     "largestFormBoundFields": 500,
     "sessionLengthHours": 8,
     "slowestSupportedDevice": { "text": "CI machine at 4× CPU throttle", "cpuThrottlingRate": 4 }
+  },
+  "noiseFloors": {
+    "$comment": "Absolute noise floors, in each metric's own unit, for metrics that can read 0. When a metric reads 0 in an A/A set or its baseline median is 0, its noise is max(floor, |median B - median A|) and a regression is an absolute worsening greater than that. A floor is the smallest change the instrument can tell from noise: one count, the 5 µs timer step, one allocation in the 1M writes.",
+    "M1.allocationsPerWrite": 0.000001,
+    "M1.allocatedBytesPerWrite": 0.000016,
+    "S1.storeWorkMs": 0.005,
+    "S1.longFramesDuringKeystroke": 1,
+    "S2.longTasksAttributedToStore": 1,
+    "S2.longFramesOverlappingStore": 1,
+    "S2.longAnimationFrames": 1,
+    "S2.storeShareOfMainThread": 0.0001,
+    "S2.storeShareOfWallTime": 0.0001,
+    "S2.storeHeapOverheadRatio": 0.01,
+    "S2.storeHeapOverheadAfterLoadRatio": 0.01,
+    "S2.storeHeapOverheadAfterRunRatio": 0.01,
+    "S2.storeMsPerBatch": 0.005,
+    "S2.storeMsMaxBatch": 0.005,
+    "S2.storeMs": 0.005,
+    "S3.maxMainThreadTaskMs": 1,
+    "S3.longAnimationFrames": 1,
+    "S4a.agentApplyMs": 0.005,
+    "S4a.inspectMs": 0.005,
+    "S4a.rollbackMs": 0.005,
+    "S4b.selectiveUndoMs": 0.005,
+    "S4c.heldValueOverwrites": 1,
+    "S5.heapGrowthFinalHalf": 0.005,
+    "S5.collectionsOverCap": 1
   },
   "defaultEnvironment": {
     "text": "Budget (at 4× throttle unless noted)",
@@ -24,7 +51,7 @@
       "parameters": { "allocationWrites": 1000000 },
       "conditions": [
         { "id": "M1.ratio", "text": "≤ 2.0× a raw native write in the same framework (Node, 1×)", "metric": "writeRatioVsNative", "op": "<=", "value": 2.0 },
-        { "id": "M1.alloc", "text": "zero allocations per write over 1M writes (C1)", "metric": "allocationsPerWrite", "op": "==", "value": 0 }
+        { "id": "M1.alloc", "text": "zero allocations per write over 1M writes (C1)", "metric": "allocationsPerWrite", "op": "==", "value": 0, "judge": "every-run" }
       ],
       "reported": [
         { "text": "absolute timings are reported, never gated", "metric": "subjectWriteNs", "ruling": 1 },
@@ -76,7 +103,7 @@
         "storeCharge": { "text": "#12 (provisional): a long frame is charged to the store only when the store's marked time inside it is greater than (frame duration − 50 ms)", "longTaskMs": 50 }
       },
       "conditions": [
-        { "id": "S2.longTasks", "text": "Zero long tasks attributed to the store (long animation frames charged by #12, provisional; the plain overlap count is reported)", "metric": "longTasksAttributedToStore", "op": "==", "value": 0, "ruling": 7 },
+        { "id": "S2.longTasks", "text": "Zero long tasks attributed to the store (long animation frames charged by #12, provisional; the plain overlap count is reported)", "metric": "longTasksAttributedToStore", "op": "==", "value": 0, "ruling": 7, "judge": "every-run" },
         { "id": "S2.share", "text": "store ≤ 10% of main-thread time", "metric": "storeShareOfMainThread", "op": "<=", "value": 0.10 },
         { "id": "S2.heap", "text": "store heap overhead ≤ 1× the retained size of the plain row objects", "metric": "storeHeapOverheadRatio", "op": "<=", "value": 1 }
       ],
@@ -117,7 +144,7 @@
       "ruling": 2,
       "parameters": { "fieldEdits": { "$ref": "scale.agentBatch.fieldEdits" }, "rows": { "$ref": "scale.agentBatch.rows" }, "keystrokeEveryMs": 100 },
       "conditions": [
-        { "id": "S4c.held", "text": "User's held value never overwritten (W2)", "metric": "heldValueOverwrites", "op": "==", "value": 0 },
+        { "id": "S4c.held", "text": "User's held value never overwritten (W2)", "metric": "heldValueOverwrites", "op": "==", "value": 0, "judge": "every-run" },
         { "id": "S4c.keystroke", "text": "each user keystroke processed ≤ 50 ms", "metric": "maxKeystrokeMs", "op": "<=", "value": 50 }
       ]
     },
@@ -129,9 +156,10 @@
         "plugins": { "text": "whichever plugins exist at that phase; the final S5 has all three", "transactions": true, "restoration": { "retain": 100 }, "writers": true },
         "nightlyCompression": { "text": "nightly may compress time but must apply at least 2M writes", "minWrites": 2000000 }
       },
+      "runs": { "text": "the weekly full-length S5 runs once (#14); the nightly compressed S5 keeps the usual 5 runs", "full": 1 },
       "conditions": [
         { "id": "S5.heap", "text": "Heap growth over the final half of the run ≤ 2%", "metric": "heapGrowthFinalHalf", "op": "<=", "value": 0.02 },
-        { "id": "S5.caps", "text": "every plugin's internal collections stay at or below their configured caps", "metric": "collectionsOverCap", "op": "==", "value": 0 }
+        { "id": "S5.caps", "text": "every plugin's internal collections stay at or below their configured caps", "metric": "collectionsOverCap", "op": "==", "value": 0, "judge": "every-run" }
       ]
     },
     "S6": {

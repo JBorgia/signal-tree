@@ -7,6 +7,8 @@ export interface MetricSpec {
   /** Which direction is a regression; 'none' metrics are recorded but never compared. */
   readonly better: 'lower' | 'higher' | 'none';
   readonly description: string;
+  /** Can read 0: budgets.json must give it an absolute noise floor (when it is compared). */
+  readonly zeroable?: boolean;
 }
 
 export type MetricValues = Record<string, number>;
@@ -24,7 +26,7 @@ export interface RunContext {
   readonly cpuThrottlingRate: number;
   /** Directory of the reference app built against the subject (browser scenarios). */
   readonly appDir: string | undefined;
-  /** S5: nightly compressed mode (BRIEF 6.3: may compress time but must apply at least 2M writes). */
+  /** S5: nightly compressed mode (BRIEF 6.3: may compress time but must apply at least 2M writes); false = the full session length. */
   readonly s5Compressed: boolean;
   /** Records a non-numeric fact about the run (browser version, measurement source). */
   note(key: string, value: string | number): void;

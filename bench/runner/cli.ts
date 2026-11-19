@@ -13,7 +13,7 @@ import { DEFAULT_SUBJECT, loadSubject } from '../subjects/index.ts';
 import { missingCapabilities } from '../subjects/types.ts';
 import { ALLOCATION_NODE_FLAGS, type allocationProbeSelfTest } from './alloc-probe.ts';
 import { gateParameters, loadBudgets } from './budgets.ts';
-import { applyBaseline, exitCode, Harness, type ResultsFile } from './harness.ts';
+import { applyBaseline, exitCode, Harness, resolveRecordOnly, type ResultsFile } from './harness.ts';
 import { OUT_DIR } from './paths.ts';
 import { runChild } from './process.ts';
 import { RUNS_PER_SCENARIO } from './stats.ts';
@@ -26,8 +26,10 @@ const USAGE = `usage: pnpm bench [ids...] [options]
   --aa-pairs <n>    repeat the A/A pair n times and keep the largest noise (default 1)
   --baseline <file> compare medians with a results or A/A file; regression = worse by more than max(3%, A/A noise)
   --noise <file>    A/A file to take noise from (default: the baseline's own A/A noise, if it has one)
-  --record-only     exit 0 when gates are red (recording baselines); errors and regressions still fail
-  --s5-compressed   nightly S5: compress time, at least the budgeted minimum of writes
+  --record-only     exit 0 when gates are red (recording baselines), only while budgets.json is unapproved;
+                    errors and regressions still fail
+  --s5-compressed   nightly S5 (the default): compressed time, at least the budgeted minimum of writes, 5 runs
+  --s5-full         weekly S5: the full session length, with budgets.json's run count
   --skip-build      reuse the reference app already built under bench/out/apps
   --out <dir>       write results there instead of bench/out
   --list            print scenarios, required capabilities and applicability, then exit
@@ -60,7 +62,9 @@ function fmt(value: number | undefined): string {
 
 function printSummary(file: ResultsFile): void {
   const lines: string[] = [];
-  lines.push(`subject ${file.subject.id} · budgets ${file.budgets.approved ? 'approved' : 'NOT approved'} · ${file.kind === 'aa' ? 'A/A' : 'results'}`);
+  lines.push(
+    `subject ${file.subject.id} · budgets ${file.budgets.approved ? 'approved' : 'NOT approved'} · ${file.kind === 'aa' ? 'A/A' : 'results'}${file.recordOnly ? ' · recording only' : ''}`,
+  );
   for (const result of Object.values(file.scenarios)) {
     if (result.status === 'not-applicable') {
       lines.push(`${result.id.padEnd(4)} not applicable: subject lacks ${result.missingCapabilities!.join(', ')}`);
@@ -70,24 +74,20 @@ function printSummary(file: ResultsFile): void {
       lines.push(`${result.id.padEnd(4)} checked by ${result.owner}`);
       continue;
     }
-    if (result.status === 'error') {
-      lines.push(`${result.id.padEnd(4)} ERROR ${result.error?.split('\n')[0]}`);
-      continue;
-    }
-    const state = result.pass === true ? 'pass' : result.pass === false ? 'FAIL' : 'incomplete';
-    lines.push(`${result.id.padEnd(4)} ${state}`);
-    for (const condition of result.conditions ?? []) {
+    lines.push(`${result.id.padEnd(4)} ${result.status === 'error' ? `ERROR ${result.error?.split('\n')[0]}` : result.pass ? 'pass' : 'FAIL'}`);
+    for (const condition of result.conditions) {
       const actual = typeof condition.actual === 'number' ? fmt(condition.actual) : JSON.stringify(condition.actual);
-      lines.push(`     ${condition.pass === true ? 'ok  ' : condition.pass === false ? 'FAIL' : '??  '} ${condition.id}: ${actual} (${condition.text})`);
+      lines.push(`     ${condition.pass ? 'ok  ' : 'FAIL'} ${condition.id}: ${actual} (${condition.text})${condition.detail ? ` — ${condition.detail}` : ''}`);
     }
     if (result.aa) {
-      const noise = Object.entries(result.aa.noise)
-        .map(([metric, value]) => `${metric} ${(value * 100).toFixed(1)}%`)
-        .join(', ');
-      lines.push(`     A/A noise: ${noise}`);
+      const relative = Object.entries(result.aa.noise.relative).map(([metric, value]) => `${metric} ${(value * 100).toFixed(1)}%`);
+      const absolute = Object.entries(result.aa.noise.absolute).map(([metric, value]) => `${metric} ±${fmt(value)}`);
+      lines.push(`     A/A noise: ${[...relative, ...absolute].join(', ')}`);
     }
-    for (const regression of result.regressions ?? []) {
-      if (regression.regressed) lines.push(`     REGRESSION ${regression.metric}: ${fmt(regression.baseline)} -> ${fmt(regression.current)} (+${(regression.worseBy * 100).toFixed(1)}% > ${(regression.threshold * 100).toFixed(1)}%)`);
+    for (const r of result.regressions) {
+      if (!r.regressed) continue;
+      const by = r.mode === 'relative' ? `+${(r.worseBy * 100).toFixed(1)}% > ${(r.threshold * 100).toFixed(1)}%` : r.mode === 'absolute' ? `+${fmt(r.worseBy)} > ${fmt(r.threshold)}` : '';
+      lines.push(`     REGRESSION ${r.metric}: ${fmt(r.baseline)} -> ${fmt(r.current)} ${by}${r.error ? ` (${r.error})` : ''}`);
     }
   }
   process.stdout.write(`${lines.join('\n')}\n`);
@@ -104,6 +104,7 @@ async function main(): Promise<number> {
       noise: { type: 'string' },
       'record-only': { type: 'boolean', default: false },
       's5-compressed': { type: 'boolean', default: false },
+      's5-full': { type: 'boolean', default: false },
       'skip-build': { type: 'boolean', default: false },
       out: { type: 'string' },
       list: { type: 'boolean', default: false },
@@ -143,6 +144,10 @@ async function main(): Promise<number> {
     return 0;
   }
 
+  if (values['s5-full'] && values['s5-compressed']) throw new Error('--s5-full and --s5-compressed are exclusive');
+  const s5Mode = values['s5-full'] ? 'full' : 'compressed';
+  const { recordOnly, notice } = resolveRecordOnly(values['record-only'], budgets.approved);
+  if (notice) process.stderr.write(`${notice}\n`);
   const aaPairs = Number(values['aa-pairs']);
   if (!Number.isInteger(aaPairs) || aaPairs < 1) throw new Error('--aa-pairs must be a positive integer');
   const commit = git(['rev-parse', 'HEAD']);
@@ -152,6 +157,7 @@ async function main(): Promise<number> {
     startedAt: new Date().toISOString(),
     git: { commit, dirty: commit === null ? null : (git(['status', '--porcelain']) ?? '') !== '' },
     budgets: { sha256, approved: budgets.approved },
+    recordOnly,
     subject: { id: subject.id, description: subject.description, packages: subject.packages, capabilities: [...subject.capabilities] },
     environment: {
       node: process.version,
@@ -163,6 +169,7 @@ async function main(): Promise<number> {
     },
     runsPerScenario: RUNS_PER_SCENARIO,
     aaPairs: values.aa ? aaPairs : 0,
+    s5Mode,
     baseline: values.baseline,
     scenarios: {},
   };
@@ -171,10 +178,10 @@ async function main(): Promise<number> {
     aa: values.aa,
     aaPairs,
     skipBuild: values['skip-build'],
-    s5Compressed: values['s5-compressed'],
+    s5Mode,
   });
   file.scenarios = await harness.run(selected);
-  if (values.baseline) applyBaseline(file.scenarios, values.baseline, values.noise);
+  if (values.baseline) applyBaseline(file.scenarios, budgets, values.baseline, values.noise);
 
   file.finishedAt = new Date().toISOString();
   const outDir = values.out ? resolve(values.out) : OUT_DIR;
@@ -185,7 +192,7 @@ async function main(): Promise<number> {
   copyFileSync(path, join(outDir, `${file.kind}-${subject.id}-latest.json`));
   printSummary(file);
   process.stdout.write(`results: ${path}\n`);
-  return exitCode(file.scenarios, values['record-only']);
+  return exitCode(file.scenarios, recordOnly);
 }
 
 process.exitCode = await main();

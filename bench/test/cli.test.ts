@@ -22,6 +22,7 @@ function bench(args: string[], faults = ''): { status: number | null; file: Resu
     env: { ...process.env, BENCH_FAKE_FAULTS: faults },
   });
   const subject = args[args.indexOf('--subject') + 1]!;
+  // File names are part of the contract: <kind>-<subject>-latest.json.
   const kind = args.includes('--aa') ? 'aa' : 'results';
   const file = JSON.parse(readFileSync(join(out, `${kind}-${subject}-latest.json`), 'utf8')) as ResultsFile;
   return { status: result.status, file, out: result.stdout + result.stderr };
@@ -52,7 +53,7 @@ test('A/A mode records two sets of five runs and the noise of every metric', () 
   const m2 = file.scenarios['M2']!;
   assert.equal(m2.runs!.length, 10);
   assert.deepEqual(new Set(m2.runs!.map((r) => r.set)), new Set(['A', 'B']));
-  assert.ok(Number.isFinite(m2.aa!.noise['readRatioVsNative']));
+  assert.ok(Number.isFinite(m2.aa!.noise.relative['readRatioVsNative']));
   assert.ok(m2.median!['readRatioVsNative']! > 0);
 });
 
@@ -66,7 +67,7 @@ test('a median worse than the baseline by more than max(3%, noise) is a regressi
 
 test('A/A noise above the change widens the threshold, so the same change is not a regression', () => {
   const wide = JSON.parse(readFileSync(aaPath, 'utf8')) as ResultsFile;
-  wide.scenarios['M2']!.aa!.noise = { readRatioVsNative: 1000, subjectReadNs: 1000 };
+  wide.scenarios['M2']!.aa!.noise = { relative: { readRatioVsNative: 1000, subjectReadNs: 1000 }, absolute: {}, zero: [] };
   const noisePath = join(tempOut(), 'noise.json');
   writeFileSync(noisePath, JSON.stringify(wide));
   const { status, file } = bench(['M2', '--subject', 'test-fake', '--baseline', aaPath, '--noise', noisePath, '--record-only'], 'slowRead');
@@ -77,5 +78,21 @@ test('A/A noise above the change widens the threshold, so the same change is not
 test('a red gate fails the run unless --record-only', () => {
   const red = bench(['M2', '--subject', 'test-fake'], 'slowRead');
   assert.equal(red.file.scenarios['M2']!.pass, false);
+  assert.equal(red.file.recordOnly, false);
   assert.equal(red.status, 1);
+});
+
+test('results files keep the contract ci/done-check.mjs reads', () => {
+  const { file } = bench(['M2', 'S3', 'S6a', 'S6c', 'S7', '--subject', 'v15-shim', '--record-only']);
+  assert.equal(typeof file.budgets.approved, 'boolean');
+  assert.equal(file.recordOnly, !file.budgets.approved, 'record-only is in effect only while unapproved');
+  assert.equal(file.subject.id, 'v15-shim');
+  for (const result of Object.values(file.scenarios)) {
+    assert.ok(['ran', 'not-applicable', 'external', 'error'].includes(result.status), result.id);
+    assert.ok(Array.isArray(result.conditions) && Array.isArray(result.regressions), result.id);
+    if (result.status === 'ran' || result.status === 'error') assert.equal(typeof result.pass, 'boolean', result.id);
+  }
+  assert.equal(file.scenarios['M2']!.status, 'ran');
+  assert.equal(file.scenarios['S3']!.status, 'not-applicable');
+  assert.equal(file.scenarios['S6a']!.status, 'external');
 });

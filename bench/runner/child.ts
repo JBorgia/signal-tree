@@ -32,7 +32,22 @@ export interface IsolateRequest {
   readonly args: unknown;
 }
 
+/**
+ * Test hook for the harness tests: a planted fault written `name@n` applies
+ * only to run n, so a test can make one run of several fail.
+ */
+function faultsForRun(runIndex: number): void {
+  const faults = process.env['BENCH_FAKE_FAULTS'];
+  if (!faults?.includes('@')) return;
+  process.env['BENCH_FAKE_FAULTS'] = faults
+    .split(',')
+    .filter((fault) => !fault.includes('@') || Number(fault.split('@')[1]) === runIndex)
+    .map((fault) => fault.split('@')[0])
+    .join(',');
+}
+
 async function runScenario(request: ScenarioRequest): Promise<ScenarioReply> {
+  faultsForRun(request.runIndex);
   const definition = findDefinition(request.scenario);
   if (definition.kind !== 'scenario') throw new Error(`${request.scenario} is not a runnable scenario`);
   const subject = await loadSubject(request.subject);

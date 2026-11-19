@@ -5,10 +5,9 @@
  * check can fail.
  */
 import assert from 'node:assert/strict';
-import { mkdtempSync } from 'node:fs';
+import { mkdirSync, mkdtempSync } from 'node:fs';
 import { join } from 'node:path';
-import { loadBudgets } from '../runner/budgets.ts';
-import type { ConditionResult } from '../runner/budgets.ts';
+import { loadBudgets, type Budgets, type ConditionResult } from '../runner/budgets.ts';
 import { Harness, type RequestBase, type ScenarioResult } from '../runner/harness.ts';
 import { TMP_DIR } from '../runner/paths.ts';
 import { findDefinition } from '../scenarios/index.ts';
@@ -40,24 +39,40 @@ export function smaller(request: RequestBase): RequestBase {
   return { ...request, params, scale: SMALL_SCALE, cpuThrottlingRate: 1 };
 }
 
-/** Runs one gate once on the fake subject with `faults` planted. */
-export async function runOnFake(id: string, faults: readonly string[], options: { skipBuild?: boolean } = {}): Promise<ScenarioResult> {
+export interface FakeRunOptions {
+  /** Runs per measurement; default 1. `undefined` keeps the harness's own count (budgets.json). */
+  readonly runs?: number | undefined;
+  readonly aa?: boolean;
+  readonly s5Mode?: 'compressed' | 'full';
+  readonly budgets?: Budgets;
+  /** Further changes to the request, after the smaller scale. */
+  readonly tweak?: (request: RequestBase) => RequestBase;
+  /** Planted harness defects (BENCH_HARNESS_FAULTS). */
+  readonly harnessFaults?: readonly string[];
+  /** The status the run must end in (default 'ran'). */
+  readonly status?: ScenarioResult['status'];
+}
+
+/** Runs one gate on the fake subject with `faults` planted (a fault written name@n applies to run n only). */
+export async function runOnFake(id: string, faults: readonly string[], options: FakeRunOptions = {}): Promise<ScenarioResult> {
   process.env['BENCH_FAKE_FAULTS'] = faults.join(',');
+  process.env['BENCH_HARNESS_FAULTS'] = (options.harnessFaults ?? []).join(',');
   try {
-    const harness = new Harness(budgets, await loadSubject('test-fake'), {
-      aa: false,
+    const harness = new Harness(options.budgets ?? budgets, await loadSubject('test-fake'), {
+      aa: options.aa ?? false,
       aaPairs: 1,
-      skipBuild: options.skipBuild ?? true,
-      s5Compressed: true,
-      runs: 1,
-      override: smaller,
+      skipBuild: true,
+      s5Mode: options.s5Mode ?? 'compressed',
+      runs: 'runs' in options ? options.runs : 1,
+      override: (request) => (options.tweak ?? ((r: RequestBase) => r))(smaller(request)),
       log: () => undefined,
     });
     const result = (await harness.run([findDefinition(id)]))[id]!;
-    assert.equal(result.status, 'ran', result.error);
+    assert.equal(result.status, options.status ?? 'ran', result.error);
     return result;
   } finally {
     delete process.env['BENCH_FAKE_FAULTS'];
+    delete process.env['BENCH_HARNESS_FAULTS'];
   }
 }
 
@@ -78,5 +93,6 @@ export function assertFails(result: ScenarioResult, ...ids: string[]): void {
 }
 
 export function tempOut(): string {
+  mkdirSync(TMP_DIR, { recursive: true });
   return mkdtempSync(join(TMP_DIR, 'test-'));
 }

@@ -21,9 +21,9 @@ export const S4a: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection', 'writers', 'transactions', 'transactionInspect'],
   metrics: {
-    agentApplyMs: { unit: 'ms', better: 'lower', description: 'agent batch applied in a transaction (store turn)' },
-    inspectMs: { unit: 'ms', better: 'lower', description: 'inspect() of the pending transaction' },
-    rollbackMs: { unit: 'ms', better: 'lower', description: 'rollback() of the agent batch' },
+    agentApplyMs: { unit: 'ms', better: 'lower', description: 'agent batch applied in a transaction (store turn)', zeroable: true },
+    inspectMs: { unit: 'ms', better: 'lower', description: 'inspect() of the pending transaction', zeroable: true },
+    rollbackMs: { unit: 'ms', better: 'lower', description: 'rollback() of the agent batch', zeroable: true },
   },
   run: (ctx) =>
     withBenchPage(ctx, async (page) => {
@@ -42,7 +42,7 @@ export const S4b: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection', 'writers', 'restoration', 'selectiveUndo'],
   metrics: {
-    selectiveUndoMs: { unit: 'ms', better: 'lower', description: "undo({ writer: 'agent:planner' }) of the agent batch" },
+    selectiveUndoMs: { unit: 'ms', better: 'lower', description: "undo({ writer: 'agent:planner' }) of the agent batch", zeroable: true },
     userEditKept: { unit: 'bool', better: 'none', description: "1 when the user's own edit survived the selective undo" },
   },
   run: (ctx) =>
@@ -76,7 +76,7 @@ export const S4c: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection', 'collectionFieldWrite', 'writers', 'hold'],
   metrics: {
-    heldValueOverwrites: { unit: 'count', better: 'lower', description: "agent batches after which the user's held value differed from what the user typed" },
+    heldValueOverwrites: { unit: 'count', better: 'lower', description: "agent batches after which the user's held value differed from what the user typed", zeroable: true },
     maxKeystrokeMs: { unit: 'ms', better: 'lower', description: 'slowest keystroke, keydown to next paint (#13)' },
     agentRefusals: { unit: 'count', better: 'none', description: 'agent row updates refused' },
   },

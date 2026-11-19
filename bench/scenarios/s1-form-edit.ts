@@ -19,12 +19,12 @@ export const S1: ScenarioDefinition = {
   environment: 'browser',
   requires: ['leaf'],
   metrics: {
-    storeWorkMs: { unit: 'ms', better: 'lower', description: 'store turn of the keystroke' },
+    storeWorkMs: { unit: 'ms', better: 'lower', description: 'store turn of the keystroke', zeroable: true },
     interactionMs: { unit: 'ms', better: 'lower', description: '#13: keydown to the next paint' },
     eventTimingMs: { unit: 'ms', better: 'none', description: 'Event Timing duration, when reported (8 ms granularity, 16 ms floor)' },
     interactionProcessingMs: { unit: 'ms', better: 'none', description: 'Event Timing input delay plus processing, when reported' },
     eventTimingReported: { unit: 'bool', better: 'none', description: '1 when Event Timing reported the interaction' },
-    longFramesDuringKeystroke: { unit: 'frames', better: 'lower', description: 'long animation frames while the keystroke was handled' },
+    longFramesDuringKeystroke: { unit: 'frames', better: 'lower', description: 'long animation frames while the keystroke was handled', zeroable: true },
   },
   run: (ctx) =>
     withBenchPage(ctx, async (page) => {

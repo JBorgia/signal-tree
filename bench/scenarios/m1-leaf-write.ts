@@ -18,8 +18,8 @@ export const M1: ScenarioDefinition = {
   requires: ['leaf'],
   metrics: {
     writeRatioVsNative: { unit: 'x', better: 'lower', description: 'subject ns per write / native ns per write' },
-    allocationsPerWrite: { unit: 'allocations', better: 'lower', description: 'heap allocations per subject write' },
-    allocatedBytesPerWrite: { unit: 'B', better: 'lower', description: 'heap bytes allocated per subject write' },
+    allocationsPerWrite: { unit: 'allocations', better: 'lower', description: 'heap allocations per subject write', zeroable: true },
+    allocatedBytesPerWrite: { unit: 'B', better: 'lower', description: 'heap bytes allocated per subject write', zeroable: true },
     subjectWriteNs: { unit: 'ns', better: 'lower', description: 'subject leaf write (reported, never gated)' },
     nativeWriteNs: { unit: 'ns', better: 'none', description: 'raw Angular signal.set (reported, never gated)' },
     nativeAllocationsPerWrite: { unit: 'allocations', better: 'none', description: 'allocations per raw native write' },

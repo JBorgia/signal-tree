@@ -13,9 +13,9 @@ export const S3: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection', 'chunkedSetAll'],
   metrics: {
-    maxMainThreadTaskMs: { unit: 'ms', better: 'lower', description: 'longest long animation frame during the replace' },
+    maxMainThreadTaskMs: { unit: 'ms', better: 'lower', description: 'longest long animation frame during the replace', zeroable: true },
     totalMs: { unit: 'ms', better: 'lower', description: 'wall time of the chunked replace (reported)' },
-    longAnimationFrames: { unit: 'frames', better: 'lower', description: 'long animation frames during the replace' },
+    longAnimationFrames: { unit: 'frames', better: 'lower', description: 'long animation frames during the replace', zeroable: true },
   },
   run: (ctx) =>
     withBenchPage(ctx, async (page) => {
