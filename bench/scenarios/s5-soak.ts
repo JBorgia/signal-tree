@@ -20,9 +20,10 @@ export const S5: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection', 'writers', 'transactions', 'pluginCollectionSizes'],
   metrics: {
-    heapGrowthFinalHalf: { unit: 'ratio', better: 'lower', description: 'heap growth over the final half of the run' },
-    collectionsOverCap: { unit: 'count', better: 'lower', description: 'plugin collections seen above their configured cap' },
+    heapGrowthFinalHalf: { unit: 'ratio', better: 'lower', description: 'heap growth over the final half of the run', zeroable: true },
+    collectionsOverCap: { unit: 'count', better: 'lower', description: 'plugin collections seen above their configured cap', zeroable: true },
     writes: { unit: 'writes', better: 'none', description: 'field writes applied' },
+    markEntriesMax: { unit: 'entries', better: 'none', description: 'most signal-tree: entries the harness found at one drain (bounded by the turns between drains)' },
     durationMs: { unit: 'ms', better: 'none', description: 'run length' },
   },
   run: (ctx) =>
@@ -58,9 +59,16 @@ export const S5: ScenarioDefinition = {
       const minWrites = p.nightlyCompression.minWrites;
       const samples: { at: number; writes: number; heap: number }[] = [];
       let overCap = 0;
+      let markEntriesMax = 0;
+      // The harness's own buffers (turn measures, frames) must not grow over the soak:
+      // every drain clears what it read, and anything left is a harness defect.
+      const drain = async () => {
+        const drained = await page.drainPerf();
+        markEntriesMax = Math.max(markEntriesMax, drained.markEntries);
+        if (drained.markEntriesLeft > 0) throw new Error(`harness defect: ${drained.markEntriesLeft} signal-tree: entries stayed in the performance buffer after a drain`);
+      };
       const sample = async () => {
-        // The harness's own buffers (turn measures, frames) must not grow over the soak.
-        await page.drainPerf();
+        await drain();
         const status = await page.invoke<{ writes: number; collections: { size: number; cap: number }[] }>('soak.status');
         overCap += status.collections.filter((collection) => collection.size > collection.cap).length;
         samples.push({ at: Date.now() - start, writes: status.writes, heap: await page.heapUsed() });
@@ -77,7 +85,7 @@ export const S5: ScenarioDefinition = {
         let nextSampleAt = S5_SETUP.heapSampleEveryMs;
         while (Date.now() - start < durationMs) {
           await sleep(S5_SETUP.pollMs);
-          await page.drainPerf();
+          await drain();
           if (Date.now() - start >= nextSampleAt) {
             await sample();
             nextSampleAt += S5_SETUP.heapSampleEveryMs;
@@ -94,6 +102,7 @@ export const S5: ScenarioDefinition = {
         collectionsOverCap: overCap,
         writes: final.writes,
         durationMs: last.at,
+        markEntriesMax,
       };
     }),
 };

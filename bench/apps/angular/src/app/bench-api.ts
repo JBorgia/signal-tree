@@ -95,8 +95,9 @@ export function installBenchApi(host: BenchHost, appRef: ApplicationRef): void {
     'collection.load'() {
       const rows = need(pendingRows, 'generated rows');
       tree().turn('collection.setAll', () => collection().setAll(rows as Row[]));
+      // Release the page's own reference: from here only the store holds the rows (S2's heap overhead).
       pendingRows = undefined;
-      return { setAllMs: lastTurnMs('collection.setAll'), count: collection().count() };
+      return { setAllMs: lastTurnMs('collection.setAll'), count: collection().count(), harnessHoldsRows: pendingRows !== undefined };
     },
 
     async 'collection.render'(args) {

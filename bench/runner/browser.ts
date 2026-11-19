@@ -44,6 +44,10 @@ export interface PerfDrain {
   readonly events: EventEntry[];
   readonly turns: TurnEntry[];
   readonly keys: KeyEstimate[];
+  /** `signal-tree:` marks and measures found, all consumed and cleared. */
+  readonly markEntries: number;
+  /** `signal-tree:` entries still in the buffer after clearing: always 0 unless clearing broke. */
+  readonly markEntriesLeft: number;
 }
 
 /** Installed before any app script runs. */
@@ -110,7 +114,7 @@ export interface BenchPage {
   heapUsed(): Promise<number>;
   /** CDP Performance.getMetrics TaskDuration: main-thread task time so far, in ms. */
   mainThreadTaskMs(): Promise<number>;
-  /** Returns and clears the in-page long animation frames, event timings, key estimates and turn measures. */
+  /** Returns and clears the in-page long animation frames, event timings, key estimates and every `signal-tree:` entry. */
   drainPerf(): Promise<PerfDrain>;
   settle(frames?: number): Promise<void>;
   close(): Promise<void>;
@@ -172,17 +176,23 @@ export async function openBenchPage(options: OpenOptions): Promise<BenchPage> {
         return task.value * 1000;
       },
       async drainPerf() {
-        return page.evaluate(() => {
+        // Test hook: BENCH_HARNESS_FAULTS=keepMarks plants a harness that forgets to clear (test/harness-buffers.test.ts).
+        const keep = (process.env['BENCH_HARNESS_FAULTS'] ?? '').split(',').includes('keepMarks');
+        return page.evaluate((keepMarks) => {
           const perf = (window as unknown as { __benchPerf: { loaf: unknown[]; events: unknown[]; keys: unknown[] } }).__benchPerf;
-          const turns = (performance.getEntriesByName('signal-tree:turn') as PerformanceMeasure[]).map((entry) => ({
-            label: String(entry.detail),
-            startTime: entry.startTime,
-            duration: entry.duration,
-          }));
-          performance.clearMeasures('signal-tree:turn');
-          const out = { loaf: perf.loaf.splice(0), events: perf.events.splice(0), keys: perf.keys.splice(0), turns };
-          return out;
-        }) as Promise<PerfDrain>;
+          const ours = performance.getEntries().filter((entry) => entry.name.startsWith('signal-tree:'));
+          const turns = ours
+            .filter((entry): entry is PerformanceMeasure => entry.entryType === 'measure' && entry.name === 'signal-tree:turn')
+            .map((entry) => ({ label: String(entry.detail), startTime: entry.startTime, duration: entry.duration }));
+          if (!keepMarks) {
+            for (const name of new Set(ours.map((entry) => entry.name))) {
+              performance.clearMarks(name);
+              performance.clearMeasures(name);
+            }
+          }
+          const markEntriesLeft = performance.getEntries().filter((entry) => entry.name.startsWith('signal-tree:')).length;
+          return { loaf: perf.loaf.splice(0), events: perf.events.splice(0), keys: perf.keys.splice(0), turns, markEntries: ours.length, markEntriesLeft };
+        }, keep) as Promise<PerfDrain>;
       },
       async settle(frames = 2) {
         await page.evaluate(async (count) => {
