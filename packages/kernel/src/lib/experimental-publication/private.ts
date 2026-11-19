@@ -1,3 +1,4 @@
+import { appendAll } from '../internals/utilities/append-all';
 import {prepareScalarSelection,restoredScalarSelection} from '../internals/native-scalar-selection';
 import type {NativeFieldEndpoint} from '../internals/native-field-selection';
 import { stampScalarNotification } from '../internals/scalar-publication-coverage';
@@ -125,15 +126,15 @@ function suppliedViews(node:object,supplied?:unknown,currentSource=false):Native
  for(const edge of getRetainedMembershipPath(node)){const view=memberViews.get(edge.child);if(view)own.push(view);if(!edge.present)return own;}
  if(isWritableLocation(node)){
   const view=nativeViews.get(node);if(view)own.push(view);
-  if(currentSource&&supplied!==null&&typeof supplied==='object')own.push(...(snapshotViews.get(supplied)??[]));
+  if(currentSource&&supplied!==null&&typeof supplied==='object')appendAll(own,snapshotViews.get(supplied)??[]);
   return own;
  }
  const storage=nodeStoreOf(node)??node;
- own.push(...(negativeViews.get(storage)?.values()??[]));
+ for(const view of negativeViews.get(storage)?.values()??[])own.push(view);
  for(const key of Object.keys(storage)){
   const descriptor=Object.getOwnPropertyDescriptor(storage,key);if(!descriptor||!('value'in descriptor)||!isTraversableNode(descriptor.value))continue;
   const value=supplied!==null&&typeof supplied==='object'?(supplied as Record<string,unknown>)[key]:undefined;
-  own.push(...suppliedViews(descriptor.value,value,currentSource));
+  appendAll(own,suppliedViews(descriptor.value,value,currentSource));
  }
  return own;
 }

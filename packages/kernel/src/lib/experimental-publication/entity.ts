@@ -121,7 +121,7 @@ export const createEntityPublicationParticipant: () => EntityPublicationParticip
     }
     const result:View[]=[...visible.values(),...placementViews.values()];
     for(const [,fact]of retired?.entries()??[]){result.push(fact.visible);if(fact.placement)result.push(fact.placement);}
-    for(const [id,row]of views)if(visibleAt(id)?.present!==false)result.push(...row.values());
+    for(const [id,row]of views)if(visibleAt(id)?.present!==false)for(const view of row.values())result.push(view);
     inputVisits+=result.length;return result;
   };
   const wholeInputRequirements=():readonly Requirement[]=>{
