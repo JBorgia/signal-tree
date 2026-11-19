@@ -192,6 +192,8 @@ export async function measureBuildHeap(args: BuildArgs): Promise<{ plainBytes: n
   let sum = 0;
   for (const handle of handles) sum += handle();
   readSink += sum;
+  // Drop the plain state so only what the tree retains is in the next heap reading.
+  // eslint-disable-next-line no-useless-assignment
   built = undefined;
   const withTree = await usedHeap();
   const treeBytes = withTree - base;

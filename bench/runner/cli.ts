@@ -52,10 +52,6 @@ function git(args: string[]): string | null {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
-function log(message: string): void {
-  process.stderr.write(`${message}\n`);
-}
-
 function fmt(value: number | undefined): string {
   if (value === undefined || !Number.isFinite(value)) return String(value);
   const abs = Math.abs(value);

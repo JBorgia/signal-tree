@@ -1,0 +1,64 @@
+name: Nightly
+
+# BRIEF.md 6.1: every scenario, S5 included, and the oracle at 100,000
+# sequences. ci/done-check.mjs reads this workflow on main: it needs a green
+# `gates (<adapter>)` job for plain, angular, vue, solid, preact and react, and
+# a green `oracle (100k)` job, on two consecutive runs. Each adapter's job is
+# added when that adapter exists.
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  gates-angular:
+    name: gates (angular)
+    runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install the Chromium pinned by the Playwright lock
+        run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
+      # Phase 0: the 15.4.9 shim fails the budgets by design (record-only, ruling 9).
+      - name: Every scenario, S5 compressed
+        run: pnpm bench all --s5-compressed --record-only
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-gates-angular
+          path: bench/out/*.json
+          if-no-files-found: ignore
+
+  oracle:
+    name: oracle (100k)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Zero unlisted differences over 100,000 sequences
+        run: pnpm oracle --a v16 --b v16 --runs 100000
+      - name: Keep the oracle report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-oracle
+          path: tests/oracle/out/
+          if-no-files-found: ignore

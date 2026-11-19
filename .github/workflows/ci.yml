@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   checks:
-    name: Typecheck, lint, boundaries, S6(a), tests, port manifest
+    name: Typecheck, lint, boundaries, S6, tests, port manifest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,4 +58,57 @@ jobs:
         with:
           name: oracle-report
           path: tests/oracle/out/
+          if-no-files-found: ignore
+
+  gates:
+    # Ruling 10: gates run on the dedicated self-hosted runner. Until Jonathan sets
+    # SIGNAL_TREE_GATES_RUNNER (#14), they run on ubuntu-latest, record-only.
+    name: Gates (Angular reference app)
+    runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
+    timeout-minutes: 120
+    concurrency:
+      group: gates-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install the Chromium pinned by the Playwright lock (ruling 10)
+        run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
+      - name: Typecheck the harness
+        run: pnpm --filter @signal-tree/bench typecheck
+      - name: Harness self-tests
+        run: pnpm bench:test
+      - name: Fetch main's latest baseline and A/A noise
+        if: github.ref != 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run=$(gh run list -R "$GITHUB_REPOSITORY" --workflow ci.yml --branch main --status success --limit 1 --json databaseId -q '.[0].databaseId')
+          if [ -n "$run" ] && gh run download "$run" -R "$GITHUB_REPOSITORY" -n gate-results -D "$RUNNER_TEMP/main-gates"; then
+            echo "BASELINE_ARGS=--baseline $RUNNER_TEMP/main-gates/aa-latest.json" >> "$GITHUB_ENV"
+          else
+            echo "No baseline on main yet; this run only records."
+          fi
+      # Phase 0: the measured subject is the 15.4.9 shim, which fails the budgets by
+      # design; ruling 9 only records its baselines. Remove --record-only when the
+      # new core becomes the subject (a code-owned change).
+      - name: PR gates (M1–M3, S1, S3, S6, S7)
+        if: github.ref != 'refs/heads/main'
+        run: pnpm bench M1 M2 M3 S1 S3 S6 S7 --record-only $BASELINE_ARGS
+      - name: Main's baselines and A/A noise (M1–M3, S1, S2; ruling 9)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          pnpm bench M1 M2 M3 S1 S2 --aa --record-only
+          cp bench/out/aa-*-latest.json bench/out/aa-latest.json
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-results
+          path: bench/out/*.json
           if-no-files-found: ignore

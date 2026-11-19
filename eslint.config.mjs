@@ -8,7 +8,7 @@ import tseslint from 'typescript-eslint';
 const restrictedWords = ['experimental', 'research', 'prototype', 'spike'];
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/node_modules/**'] },
+  { ignores: ['**/dist/**', '**/node_modules/**', 'bench/out/**', 'tests/oracle/out/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -31,7 +31,7 @@ export default tseslint.config(
   {
     // #9 (provisional, BRIEF.md 11.2): tests may not be switched off or narrowed
     // with .skip, .only, .todo, .fails, .skipIf or .runIf.
-    files: ['packages/**/*.spec.ts', 'tests/**/*.ts', 'ci/**/*.spec.ts'],
+    files: ['packages/**/*.spec.ts', 'tests/**/*.ts', 'ci/**/*.spec.ts', 'bench/test/**/*.ts'],
     rules: {
       'no-restricted-syntax': [
         'error',
