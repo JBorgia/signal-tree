@@ -21,9 +21,19 @@
 #   SIGNAL_TREE_ISOLATED=1        required; confirms this is the isolated machine
 #   SIGNAL_TREE_STATE_DIR         default ~/.signal-tree-unattended (session ID, hook state, logs)
 #   SIGNAL_TREE_VERIFY_DIR        default $SIGNAL_TREE_STATE_DIR/verify
-#   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"
+#   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"; may not set the model
+#
+# One session at a time: the supervisor holds the agent lock (refs/agent/lock
+# on the remote, see lock.mjs) for as long as it runs, and refuses to start
+# while another session holds it.
+#
+# The main loop always runs on Opus (MODEL below): every run passes --model and
+# the same model in its settings, extra arguments may not set a model or a
+# fallback model, and a run that reports any other model stops the supervisor.
 #   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 set -uo pipefail
+
+readonly MODEL=claude-opus-5-5
 
 main() {
   if [[ "${SIGNAL_TREE_ISOLATED:-}" != 1 ]]; then
@@ -36,6 +46,12 @@ main() {
   export SIGNAL_TREE_STATE_DIR=${SIGNAL_TREE_STATE_DIR:-$HOME/.signal-tree-unattended}
   export SIGNAL_TREE_VERIFY_DIR=${SIGNAL_TREE_VERIFY_DIR:-$SIGNAL_TREE_STATE_DIR/verify}
   local claude_args=${SIGNAL_TREE_CLAUDE_ARGS:---permission-mode bypassPermissions}
+  if [[ $claude_args == *--model* || $claude_args == *--fallback-model* ]]; then
+    echo "Refusing to start: the main loop is pinned to $MODEL; SIGNAL_TREE_CLAUDE_ARGS may not set a model." >&2
+    exit 2
+  fi
+  # These would override the model the settings give (ANTHROPIC_MODEL outranks settings).
+  unset ANTHROPIC_MODEL ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL
   local log=$SIGNAL_TREE_STATE_DIR/session.log
   mkdir -p "$SIGNAL_TREE_STATE_DIR"
 
@@ -52,11 +68,18 @@ main() {
   local session_id
   session_id=$(cat "$session_file")
 
+  # One agent session at a time, across machines.
+  sync_verifier || exit 1
+  local lock_cmd="node $SIGNAL_TREE_VERIFY_DIR/ci/unattended/lock.mjs"
+  (cd "$WORK_DIR" && $lock_cmd acquire --session "$session_id") || exit 4
+  trap '(cd "$WORK_DIR" && '"$lock_cmd"' release --session '"$session_id"')' EXIT
+
   # The hook command resets the verifier to origin/main before running the hook
   # from it, so the hook and the done check are always main's versions.
   local hook='git -C "$SIGNAL_TREE_VERIFY_DIR" fetch -q origin main && git -C "$SIGNAL_TREE_VERIFY_DIR" reset -q --hard origin/main && git -C "$SIGNAL_TREE_VERIFY_DIR" clean -qfdx -e node_modules && node "$SIGNAL_TREE_VERIFY_DIR/ci/unattended/stop-hook.mjs"'
   local settings
-  settings=$(jq -cn --arg cmd "$hook" '{hooks: {Stop: [{hooks: [{type: "command", command: $cmd, timeout: 600}]}]}}')
+  # switchModelsOnFlag: false stops Claude Code re-running a flagged request on an older model.
+  settings=$(jq -cn --arg cmd "$hook" --arg model "$MODEL" '{model: $model, switchModelsOnFlag: false, hooks: {Stop: [{hooks: [{type: "command", command: $cmd, timeout: 600}]}]}}')
 
   local backoff=60
   while true; do
@@ -71,17 +94,26 @@ main() {
     fi
 
     local started=$SECONDS
+    local run_log=$SIGNAL_TREE_STATE_DIR/run.log
     if (( fresh )); then
       # shellcheck disable=SC2086
-      claude -p --session-id "$session_id" --settings "$settings" $claude_args --output-format stream-json --verbose \
-        "/goal node ci/done-check.mjs exits 0" >> "$log" 2>&1
+      claude -p --session-id "$session_id" --settings "$settings" $claude_args --model "$MODEL" --output-format stream-json --verbose \
+        "/goal node ci/done-check.mjs exits 0" > "$run_log" 2>&1
       fresh=0
     else
       # shellcheck disable=SC2086
-      claude -p --resume "$session_id" --settings "$settings" $claude_args --output-format stream-json --verbose \
-        "Continue the rebuild from BRIEF.md where you left off. The goal stands: node ci/done-check.mjs exits 0." >> "$log" 2>&1
+      claude -p --resume "$session_id" --settings "$settings" $claude_args --model "$MODEL" --output-format stream-json --verbose \
+        "Continue the rebuild from BRIEF.md where you left off. The goal stands: node ci/done-check.mjs exits 0." > "$run_log" 2>&1
     fi
     local status=$?
+    cat "$run_log" >> "$log"
+    local ran_on
+    # Every model the run reports: the init event and each assistant message.
+    ran_on=$(jq -r 'select(.type == "system" and .subtype == "init") .model, select(.type == "assistant") .message.model' "$run_log" 2>/dev/null | sort -u | grep -v -x -e "$MODEL" -e '' | paste -sd, -)
+    if [[ -n $ran_on ]]; then
+      report "The unattended session ran on $ran_on instead of $MODEL. The supervisor has stopped; the main loop must run on Opus."
+      exit 5
+    fi
     echo "$(date -u +%FT%TZ) claude exited with $status after $((SECONDS - started))s" >> "$log"
 
     # A quick exit usually means a usage limit or an outage: back off, up to 30 minutes.
@@ -99,6 +131,14 @@ sync_verifier() {
     git -C "$SIGNAL_TREE_VERIFY_DIR" reset -q --hard origin/main &&
     git -C "$SIGNAL_TREE_VERIFY_DIR" clean -qfdx -e node_modules &&
     (cd "$SIGNAL_TREE_VERIFY_DIR" && pnpm install --frozen-lockfile --prefer-offline > /dev/null)
+}
+
+report() {
+  local issue=${SIGNAL_TREE_STATUS_ISSUE:-}
+  if [[ -z $issue ]]; then
+    issue=$(gh issue list --state open --search 'in:title "Rebuild status"' --json number,title --jq '.[] | select(.title == "Rebuild status") | .number' | head -1)
+  fi
+  if [[ -n $issue ]]; then gh issue comment "$issue" --body "$1"; else echo "$1" >&2; fi
 }
 
 report_stuck() {
