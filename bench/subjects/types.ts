@@ -60,8 +60,9 @@ export interface TreeOptions {
     readonly writers?: boolean;
   };
   /**
-   * S6(b): 'scoped-plugins' attaches every plugin to a different 10% subtree
-   * (the subject splits the top-level keys of the state into 10% shares).
+   * S6(b): 'scoped-plugins' attaches every plugin the subject has to a
+   * different 10% subtree (the subject splits the top-level keys of the state
+   * into 10% shares; the measured leaves and rows stay outside them).
    */
   readonly variant?: 'bare' | 'scoped-plugins';
 }

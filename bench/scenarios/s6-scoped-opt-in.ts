@@ -7,11 +7,15 @@ export const S6a: ExternalDefinition = {
   owner: 'ci/core-bundle-scan.mjs',
 };
 
-/** S6(b): M1, S1 and S2 rerun with every plugin attached to a different 10% subtree, against a bare tree. */
+/**
+ * S6(b): M1, S1 and S2 rerun with every plugin the subject has attached to a
+ * different 10% subtree (the 'scoped-plugins' variant), against a bare tree.
+ * Phase 3 has only transactions, so the phase's S6 covers the plugins that exist.
+ */
 export const S6b: CompositeDefinition = {
   id: 'S6b',
   title: 'Every plugin attached to a different 10% subtree: M1, S1, S2 within ±5% of a bare tree',
-  requires: ['scopedPlugins', 'transactions', 'restoration', 'writers'],
+  requires: ['scopedPlugins'],
   compare: { scenarios: ['M1', 'S1', 'S2'], variant: 'scoped-plugins', against: 'bare' },
 };
 
