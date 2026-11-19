@@ -1,7 +1,18 @@
 /**
  * Deterministic data for the scenarios. Shared by the Node micro gates and the
  * reference app, so every subject sees the same shapes and values.
+ *
+ * Plain state is returned as JSON.parse produces it, the shape a server
+ * payload has. Built by keyed stores instead, V8 leaves these objects in
+ * dictionary mode and their heap depends on what ran before: in Node, 100,000
+ * leaves measured 2.4-6.3 MB that way and 0.87 MB parsed; 50,000 × 20 rows
+ * 54 MB that way and 25 MB parsed. The parsed size is the plain-state heap
+ * M3 and S2 compare against.
  */
+
+function asParsedJson<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
 
 /** mulberry32: a small seeded PRNG; returns floats in [0, 1). */
 export function seededRandom(seed: number): () => number {
@@ -38,7 +49,7 @@ export function makeRows(rows: number, fields: number, salt = 0): PlainRow[] {
     for (let f = 1; f < fields; f++) row[names[f]!] = fieldValue(i, f, salt);
     out[i] = row as PlainRow;
   }
-  return out;
+  return asParsedJson(out);
 }
 
 /** The changes of one server row update: new values for the first `count` non-id fields. */
@@ -80,5 +91,5 @@ export function makeLeafState(leaves: number, perBranch: number, accessed: numbe
     const i = k * step + (k % perBranch);
     accessedPaths.push([`b${Math.floor(i / perBranch)}`, `l${i % perBranch}`]);
   }
-  return { state, accessedPaths };
+  return { state: asParsedJson(state), accessedPaths };
 }

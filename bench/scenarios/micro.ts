@@ -7,6 +7,7 @@
  * side run the same code against a different cell.
  */
 import { signal, type WritableSignal } from '@angular/core';
+import { setImmediate } from 'node:timers/promises';
 import { getHeapStatistics } from 'node:v8';
 import { allocationProbeSelfTest, countAllocations } from '../runner/alloc-probe.ts';
 import { loadSubject } from '../subjects/index.ts';
@@ -29,8 +30,16 @@ function gc(): void {
   collect();
 }
 
-function usedHeap(): number {
-  gc();
+/**
+ * V8 heap in use after full GCs. Each GC follows an event-loop turn: objects
+ * a WeakRef touched stay alive until the current job ends, and finalizers
+ * only run between jobs, so a synchronous gc() can still count them.
+ */
+async function usedHeap(): Promise<number> {
+  for (let i = 0; i < 3; i++) {
+    await setImmediate();
+    gc();
+  }
   return getHeapStatistics().used_heap_size;
 }
 
@@ -153,6 +162,8 @@ export async function measureBuildTime(args: BuildArgs): Promise<{ coldMs: numbe
   return { coldMs: cold.ms, warmMedianMs: median(warm) };
 }
 
+const CELL_SAMPLE = 10_000;
+
 /**
  * M3 heap: retained heap of the tree (built from the state, 10 leaves accessed
  * and held, the caller's reference to the state dropped) against the plain
@@ -164,15 +175,16 @@ export async function measureBuildHeap(args: BuildArgs): Promise<{ plainBytes: n
   buildAndAccess(subject, { ...args, leaves: Math.min(args.leaves, 1000) }).tree.destroy();
 
   // Warm native cell creation too (feedback vectors are heap objects).
-  readSink += makeLeafState(args.accessed, args.perBranch, args.accessed).accessedPaths.map((_, k) => signal(k)).length;
+  readSink += Array.from({ length: CELL_SAMPLE }, (_, k) => signal(k)).length;
 
-  const base = usedHeap();
+  const base = await usedHeap();
   let built: { state: object; accessedPaths: string[][] } | undefined = makeLeafState(args.leaves, args.perBranch, args.accessed);
-  const withState = usedHeap();
-  const cells = built.accessedPaths.map((_, k) => signal(k));
-  const withCells = usedHeap();
+  const withState = await usedHeap();
+  // 10 cells are below heap-counter noise, so measure CELL_SAMPLE cells and scale to `accessed`.
+  const cells = Array.from({ length: CELL_SAMPLE }, (_, k) => signal(k));
+  const withCells = await usedHeap();
   const plainBytes = withState - base;
-  const cellsBytes = withCells - withState;
+  const cellsBytes = ((withCells - withState) * args.accessed) / CELL_SAMPLE;
   cells.length = 0;
 
   const tree = subject.createTree(built.state, { variant: args.variant });
@@ -181,7 +193,7 @@ export async function measureBuildHeap(args: BuildArgs): Promise<{ plainBytes: n
   for (const handle of handles) sum += handle();
   readSink += sum;
   built = undefined;
-  const withTree = usedHeap();
+  const withTree = await usedHeap();
   const treeBytes = withTree - base;
   // Keep the tree and the handles alive until after the measurement.
   readSink += handles.length + (tree ? 0 : 1);
