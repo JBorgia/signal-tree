@@ -14,9 +14,10 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "lint": "eslint packages ci && node ci/boundaries.mjs",
+    "lint": "eslint packages ci tests && node ci/boundaries.mjs",
     "scan:core-bundle": "node ci/core-bundle-scan.mjs",
-    "manifest:check": "node ci/port-manifest.mjs check"
+    "manifest:check": "node ci/port-manifest.mjs check",
+    "oracle": "pnpm --filter @signal-tree/oracle oracle"
   },
   "devDependencies": {
     "@signal-tree/core": "workspace:*",
