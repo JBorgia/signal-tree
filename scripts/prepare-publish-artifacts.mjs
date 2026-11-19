@@ -1,52 +1,21 @@
 #!/usr/bin/env node
 /**
- * Everything a tarball needs beyond `nx build`, in ONE place, failing loudly.
+ * Verify that the package build emitted everything its tarball declares.
  *
- * ## The defect this replaces
- *
- * Three publish scripts each carried the same block:
- *
- *     if [ -f "apps/demo/public/llms.txt" ] && [ -d "dist/packages/kernel" ]; then
- *         cp apps/demo/public/llms.txt dist/packages/kernel/llms.txt
- *     fi
- *
- * If either path is missing, all three **silently skip it** and publish
- * `@signal-tree/kernel` without the `llms.txt` that primes retrieval-aware agents —
- * a stated differentiator, absent, with no error anywhere. npm compounds it: a
- * `files` glob that matches nothing produces no warning at all, so the tarball
- * ships light and looks fine.
- *
- * Three copies of a conditional that can only fail quietly is the same shape as
- * every other silent-pass defect on record here. This is one copy, it is not
- * conditional, and it verifies the result rather than assuming it.
- *
- * ## What it does
- *
- *   1. ships the AI skills into every package that declares them,
- *   2. copies llms.txt / llms-full.txt into the core tarball,
- *   3. verifies every `files` entry of every package actually resolves.
- *
- * Step 3 is the point. Steps 1 and 2 could both be wrong in a new way tomorrow;
- * the verification is what notices.
+ * The Rollup build owns the final publishable layout. This verifier deliberately
+ * performs no post-build copying: a missing asset is a build failure, not a
+ * condition that a later release script may repair differently.
  *
  * Usage:
  *   node scripts/prepare-publish-artifacts.mjs
  *   node scripts/prepare-publish-artifacts.mjs --verify-only
  */
 import { execFileSync } from 'node:child_process';
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-} from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const VERIFY_ONLY = process.argv.includes('--verify-only');
-
 const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
   .map((entry) => entry.name)
@@ -58,24 +27,6 @@ const PACKAGES = readdirSync(join(ROOT, 'packages'), { withFileTypes: true })
     );
   })
   .sort();
-
-/**
- * Source → destination, relative to the repo root. Both must exist.
- *
- * `llms.txt` moved to the repo root (AI-SEMANTIC-DISCOVERABILITY-0) and is
- * copied into all three primary package tarballs here, the one place a
- * missing source hard-fails instead of silently shipping without it — kernel
- * alone left it unreachable from an application that installed only
- * `@signal-tree/angular` or `@signal-tree/react`, which is what the AI
- * discoverability row's "every primary package surface" requirement actually
- * means for a real consumer. There is no `llms-full.txt`; do not add an entry
- * for one until it exists.
- */
-const COPIES = [
-  ['llms.txt', 'dist/packages/kernel/llms.txt'],
-  ['llms.txt', 'dist/packages/angular/llms.txt'],
-  ['llms.txt', 'dist/packages/react/llms.txt'],
-];
 
 function run(label, argv) {
   process.stdout.write(`  · ${label} ... `);
@@ -95,29 +46,6 @@ if (!existsSync(join(ROOT, 'dist/packages/kernel'))) {
       '  This script prepares a build; it does not produce one.'
   );
   process.exit(1);
-}
-
-if (!VERIFY_ONLY) {
-  console.log('\nPreparing publish artifacts\n');
-
-  for (const [from, to] of COPIES) {
-    const src = join(ROOT, from);
-    // NOT conditional. A missing source is the failure this script exists to
-    // surface — skipping it is how the file went missing from a tarball
-    // unnoticed in the first place.
-    if (!existsSync(src)) {
-      console.error(
-        `\n✗ ${from} does not exist.\n` +
-          `  The publish scripts used to skip this silently and ship core\n` +
-          `  without it. Either produce the file or remove its entry from\n` +
-          `  @signal-tree/kernel's "files" — do not restore the silent skip.`
-      );
-      process.exit(1);
-    }
-    mkdirSync(dirname(join(ROOT, to)), { recursive: true });
-    copyFileSync(src, join(ROOT, to));
-    console.log(`  · copied ${from} → ${to}`);
-  }
 }
 
 console.log('\nVerifying every declared `files` entry resolves\n');

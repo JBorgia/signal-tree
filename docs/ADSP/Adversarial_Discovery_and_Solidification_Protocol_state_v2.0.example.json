@@ -1,0 +1,197 @@
+{
+  "schemaVersion": "2.0",
+  "run": {
+    "id": "EXAMPLE-FOCUSED-0",
+    "protocolVersion": "2.0",
+    "profile": "P1",
+    "profileRationale": "One localized semantic risk with a direct behavioral discriminator.",
+    "mode": "DISCOVERY",
+    "stage": "OBSERVED",
+    "status": "IN_PROGRESS",
+    "createdAt": "2026-09-03T00:00:00Z",
+    "updatedAt": "2026-09-03T00:10:00Z",
+    "decisionOwner": "Example code owner",
+    "tags": ["example"]
+  },
+  "orientation": {
+    "repository": "example/repository",
+    "revision": "0123456789abcdef",
+    "branch": "feature/example",
+    "dirtyState": {
+      "status": "CLEAN",
+      "patchHash": null,
+      "ownedPaths": [],
+      "foreignPaths": []
+    },
+    "currentArtifacts": ["src/example.ts", "src/example.spec.ts"],
+    "controllersRead": ["AGENTS.md"],
+    "environmentGuards": ["workspace root matches current checkout"],
+    "capturedAt": "2026-09-03T00:00:00Z"
+  },
+  "question": {
+    "property": "A failed operation leaves the owner usable for the next valid operation.",
+    "ownerQuestion": "Which existing owner is responsible for recovery after failure?",
+    "scope": {
+      "include": ["failure", "successor operation"],
+      "exclude": ["public API changes"]
+    },
+    "prohibitedChanges": ["no second lifecycle owner"],
+    "inheritedFraming": null,
+    "proposedMechanism": null
+  },
+  "budget": {
+    "maxReviewRounds": 1,
+    "maxOpenHypotheses": 2,
+    "deadline": null,
+    "stopConditions": ["successor operation passes or owner contradiction is reproduced"],
+    "requiredArtifacts": ["focused test"]
+  },
+  "hypotheses": [
+    {
+      "id": "H-01",
+      "statement": "The existing owner remains live after handling the failure.",
+      "status": "SUPPORTED",
+      "dependsOn": []
+    }
+  ],
+  "claims": [
+    {
+      "id": "C-01",
+      "statement": "The owner accepts a valid successor operation after failure.",
+      "scope": "The exercised failure and successor pair.",
+      "status": "OBSERVED",
+      "owner": "existing owner",
+      "evidenceRefs": ["E-01"],
+      "counterEvidenceRefs": [],
+      "falsifierRefs": ["F-01"],
+      "nonClaimRefs": ["NC-01"],
+      "supersedes": [],
+      "supersededBy": []
+    }
+  ],
+  "nonClaims": [
+    {
+      "id": "NC-01",
+      "statement": "This does not establish recovery for every failure class."
+    }
+  ],
+  "falsifiers": [
+    {
+      "id": "F-01",
+      "hypothesisRef": "H-01",
+      "observation": "Trigger one failure, then execute a valid successor operation.",
+      "expectedIfSupported": "The successor succeeds and reaches the expected state.",
+      "expectedIfFalsified": "The successor is ignored, rejected, or observes a dead owner.",
+      "absenceClaim": false,
+      "positiveControlRef": "CTRL-01",
+      "status": "DID_NOT_FIRE",
+      "evidenceRefs": ["E-01"]
+    }
+  ],
+  "controls": [
+    {
+      "id": "CTRL-01",
+      "kind": "KNOWN_BAD",
+      "description": "A deliberately terminated owner causes the successor assertion to fail.",
+      "status": "PASSED",
+      "evidenceRefs": ["E-01"]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E-01",
+      "kind": "TEST",
+      "claimRefs": ["C-01"],
+      "revision": "0123456789abcdef",
+      "dirtyPatchHash": null,
+      "commandOrTool": "test successor recovery",
+      "inputs": ["src/example.spec.ts"],
+      "artifactHashes": {},
+      "environment": {
+        "runtime": "example"
+      },
+      "rawResultRef": "test-output/example.txt",
+      "observation": "The successor operation reached and changed the expected state.",
+      "interpretation": "The existing owner remained live for this failure class.",
+      "integrity": {
+        "reach": "PROVEN",
+        "read": "PROVEN",
+        "discriminate": "PROVEN"
+      },
+      "positiveControlRef": "CTRL-01",
+      "limitations": ["one failure class"],
+      "observedAt": "2026-09-03T00:10:00Z"
+    }
+  ],
+  "reviews": [],
+  "decisions": [],
+  "invariants": [
+    {
+      "id": "I-01",
+      "statement": "Failure handling preserves successor liveness.",
+      "carrierState": "CARRIED",
+      "carrierRefs": ["E-01"],
+      "vacuousReason": null
+    }
+  ],
+  "freeze": null,
+  "reopen": null,
+  "implementation": {
+    "decisionRef": null,
+    "frozenOwner": null,
+    "requirementRefs": [],
+    "changedPaths": [],
+    "architectureOverrideWarnings": []
+  },
+  "migration": {
+    "targetDecisionRef": null,
+    "callers": [],
+    "compatibilityOwnersAdded": [],
+    "currentGuidanceUpdated": false,
+    "historicalRecordsPreserved": true
+  },
+  "release": {
+    "candidateId": null,
+    "revision": null,
+    "tag": null,
+    "immutable": false,
+    "authorizedBy": null,
+    "oneCheckoutOneBuild": false,
+    "gateRegisterEvidenceRef": null,
+    "candidateArtifactHashes": {},
+    "registryArtifactHashes": {},
+    "packedConsumerEvidenceRefs": [],
+    "publicationStatus": "NOT_REQUESTED"
+  },
+  "validations": [
+    {
+      "id": "V-01",
+      "kind": "FOCUSED_TEST",
+      "command": "test successor recovery",
+      "status": "PASSED",
+      "evidenceRef": "E-01"
+    }
+  ],
+  "events": [
+    {
+      "sequence": 1,
+      "timestamp": "2026-09-03T00:00:00Z",
+      "actor": "Example investigator",
+      "action": "Oriented the run",
+      "fromStage": null,
+      "toStage": "ORIENTED",
+      "evidenceRefs": [],
+      "note": null
+    },
+    {
+      "sequence": 2,
+      "timestamp": "2026-09-03T00:10:00Z",
+      "actor": "Example investigator",
+      "action": "Recorded controlled observation",
+      "fromStage": "ORIENTED",
+      "toStage": "OBSERVED",
+      "evidenceRefs": ["E-01"],
+      "note": "Intermediate transition events are omitted only in this compact example."
+    }
+  ]
+}

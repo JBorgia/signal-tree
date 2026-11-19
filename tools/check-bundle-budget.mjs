@@ -29,8 +29,7 @@
  */
 import { build } from 'esbuild';
 import { gzipSync } from 'node:zlib';
-import { mkdtempSync, writeFileSync, statSync } from 'node:fs';
-import { execSync } from 'node:child_process';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -51,42 +50,15 @@ const REPO_NODE_MODULES = new URL('../node_modules', import.meta.url).pathname;
  * staleness invisible. Every budget "verification" in between was measuring
  * code nobody had written yet.
  *
- * So the gate builds for itself now rather than trusting what it finds. Nx
- * caches, so a fresh tree costs a cache hit; an unbuilt one costs a build,
- * which is the correct price for a number that claims to describe the code.
+ * `verify-gates.mjs` now owns one production build for the whole verification
+ * run and seals `dist/` while checks consume it. Rebuilding here would violate
+ * that artifact boundary and make concurrent checks observe different output.
  *
  * Timestamps were tried first and rejected: an Nx cache RESTORE writes correct
  * output without bumping mtimes, so "source newer than dist" reports a stale
  * build that is not stale. A check with false alarms gets disabled, which
  * leaves you back here.
  */
-const BUILD_PROJECTS = 'kernel';
-
-function ensureBuilt() {
-  try {
-    execSync(`npx nx run-many -t build --projects=${BUILD_PROJECTS}`, {
-      cwd: new URL('..', import.meta.url).pathname,
-      stdio: 'pipe',
-    });
-  } catch (err) {
-    console.error(
-      `\n❌ Could not build the packages this gate measures.\n` +
-        `   It reads dist/, so it refuses to report a number rather than\n` +
-        `   report one for whatever happens to be there.\n\n` +
-        String(err.stdout ?? err.message).slice(-1500)
-    );
-    process.exit(1);
-  }
-  try {
-    statSync(CORE);
-  } catch {
-    console.error(`\n❌ Build reported success but ${CORE} is missing.\n`);
-    process.exit(1);
-  }
-}
-
-ensureBuilt();
-
 // id -> { code, budgetKB }
 const TARGETS = {
   'signaltree-bare': {

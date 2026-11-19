@@ -1,0 +1,452 @@
+version: '2.0-candidate'
+name: Adversarial Discovery & Solidification Protocol
+short_name: ADSP
+status: candidate
+normative_source: Adversarial_Discovery_and_Solidification_Protocol_v2.0.md
+state_schema: Adversarial_Discovery_and_Solidification_Protocol_state_v2.0.schema.json
+orchestration_contract: Adversarial_Discovery_and_Solidification_Protocol_orchestration_v2.0.md
+supersedes: null
+historical_predecessor: Adversarial_Discovery_and_Solidification_Protocol_v1.1.md
+
+purpose: >-
+  Apply proportional, falsification-first evidence discipline to high-risk
+  architecture, ownership, migration, performance, type, lifecycle, and release
+  decisions while keeping routine work lightweight.
+
+core_rules:
+  - id: CORE-01
+    title: Profile before procedure
+    requirement: >-
+      Classify P0-P3 before choosing artifacts or reviewers; use the smallest
+      profile that can expose consequential failure modes and record any
+      de-escalation.
+    machine_checks:
+      - run.profile is present
+      - run.profile_rationale is present
+  - id: CORE-02
+    title: Read current artifacts before deriving the question
+    requirement: >-
+      Record current revision, dirty-state ownership, active controller, later
+      rulings, and relevant artifacts before accepting an inherited framing.
+    machine_checks:
+      - orientation.revision is present
+      - orientation.dirty_state is classified
+      - orientation.current_artifacts is not empty
+  - id: CORE-03
+    title: Property and owner before mechanism
+    requirement: >-
+      State the observable property and smallest truthful owner before proposing
+      implementation; preserve admitted requirements rather than incumbent
+      mechanisms.
+    machine_checks:
+      - question.property is present
+      - question.owner_question is present
+      - question.proposed_mechanism is absent before framing
+  - id: CORE-04
+    title: Falsifier and positive control before consequential change
+    requirement: >-
+      At P1+, preregister a concrete falsifier and prove every meaningful absence
+      observation path can produce a known positive.
+    machine_checks:
+      - P1+ requires falsifiers
+      - every absence falsifier references a positive control
+  - id: CORE-05
+    title: Reach read discriminate
+    requirement: >-
+      Mechanism evidence must prove the operation reached the mechanism, read the
+      property directly, and discriminate an implementation without it.
+    machine_checks:
+      - decision evidence has reach status
+      - decision evidence has read status
+      - mechanism claims require discriminate status
+  - id: CORE-06
+    title: Test the named boundary
+    requirement: >-
+      Public, packed, consumer, type, async, lifecycle, and generated claims must
+      cross their actual boundary; evidence-erasing casts invalidate type proof.
+    machine_checks:
+      - public claims reference public-boundary evidence
+      - artifact claims reference artifact hashes
+      - type evidence records checker inclusion and cast policy
+  - id: CORE-07
+    title: Flip authority after freeze
+    requirement: >-
+      Discovery treats incumbent behavior as evidence; implementation treats the
+      frozen contract and owner as authority and incumbent implementation as
+      non-binding evidence only.
+    machine_checks:
+      - run.mode is explicit
+      - implementation mode references a decision or freeze
+  - id: CORE-08
+    title: Reopen only on demonstrated contradiction
+    requirement: >-
+      Reopen requires an admitted requirement, deterministic discriminator,
+      frozen owner, attempted compliant implementation, architecture-level
+      falsification, and stated incompatible claims.
+    machine_checks:
+      - REOPEN mode satisfies all reopen_gate fields
+  - id: CORE-09
+    title: Every surviving invariant needs a carrier
+    requirement: >-
+      Classify surviving invariants as CARRIED, VACUOUS, or ORPHANED; ORPHANED is
+      a hard stop, and compound operations require successor controls.
+    machine_checks:
+      - retirement decisions classify every invariant
+      - ORPHANED blocks closure
+  - id: CORE-10
+    title: Separate observations interpretations decisions and non-claims
+    requirement: >-
+      Preserve raw observations separately from inference and human decisions;
+      quarantine uncontrolled contradictions and bound every positive claim.
+    machine_checks:
+      - evidence observation is separate from interpretation
+      - authority decisions name authority
+      - frozen claims include non_claims
+  - id: CORE-11
+    title: Evidence machinery is a system under test
+    requirement: >-
+      Validate tests, harnesses, generators, greps, gates, graph nodes, and
+      reviewer independence with relevant known-bad controls and composed runs.
+    machine_checks:
+      - custom gates reference liveness evidence
+      - generated artifacts reference stale-check evidence
+      - P3 references composed gate-register evidence
+  - id: CORE-12
+    title: Evidence and write boundaries are exact
+    requirement: >-
+      Identify revision, dirty state, inputs, environment, artifacts, and hashes;
+      stage reviewed paths only and preserve immutable release evidence.
+    machine_checks:
+      - evidence identifies revision
+      - release candidates have immutable identity and hashes
+      - commit records list reviewed paths
+
+profiles:
+  P0:
+    name: Routine
+    triggers:
+      - private and reversible change
+      - no public semantic ambiguity
+      - no identity lifecycle concurrency persistence migration or release risk
+    required:
+      - property
+      - focused_executable_check
+      - normal_quality_gates
+    prohibited_by_default:
+      - experiment_matrix
+      - adversarial_seats
+      - freeze_record
+  P1:
+    name: Focused
+    triggers:
+      - one localized semantic risk
+    required:
+      - orientation_snapshot
+      - property_and_owner_question
+      - falsifier
+      - positive_control
+      - permanent_carrier
+      - one_review_pass
+  P2:
+    name: Full
+    triggers:
+      - public API or type
+      - identity or ownership
+      - async race or lifecycle
+      - persistence or retirement
+      - nontrivial architecture boundary
+    required:
+      - structured_run_state
+      - applicable_modules
+      - independent_challenge
+      - permanent_conformance
+      - freeze_or_terminal_disposition
+  P3:
+    name: Release critical
+    triggers:
+      - major architecture
+      - production migration
+      - security-sensitive release
+      - performance memory compatibility or public numeric claim
+    required:
+      - all_P2_requirements
+      - exact_artifact_chain
+      - composed_gate_register
+      - gate_liveness_controls
+      - packed_consumers
+      - immutable_candidate_identity
+      - post_publication_integrity
+      - human_release_authority
+
+modes:
+  DISCOVERY:
+    authority: incumbent_behavior_as_evidence
+    terminal_states: [OBSERVED, QUARANTINED, STOPPED, SOLIDIFICATION_READY]
+  SOLIDIFICATION:
+    authority: evidence_and_owner_disposition
+    terminal_states: [FROZEN, TERMINAL_AS_POSED, SPLIT]
+  IMPLEMENTATION:
+    authority: frozen_contract_and_owner
+    terminal_states: [CONFORMANT, REOPEN_PENDING, BLOCKED]
+  REOPEN:
+    authority: six_part_reopen_gate
+    terminal_states: [REOPENED, RETURN_TO_IMPLEMENTATION, TERMINAL_AS_POSED]
+  RELEASE:
+    authority: exact_candidate_artifacts_and_human_authorization
+    terminal_states: [RELEASED, BLOCKED, SUPERSEDED]
+
+architecture_override_warnings:
+  - OLD_OWNER_PRESERVATION
+  - REPRESENTATION_VETO
+  - TEST_LED_DESIGN
+  - PARALLEL_OWNER_CREATION
+  - RELOCATION_NOT_RETIREMENT
+  - COMPATIBILITY_BY_INERTIA
+  - DIFFICULTY_AS_FALSIFICATION
+  - MECHANISM_BEFORE_OWNER
+  - ABSENCE_AS_REQUIREMENT_LOSS
+  - PRESENCE_AS_REQUIREMENT
+hard_warnings:
+  - PARALLEL_OWNER_CREATION
+
+stages:
+  - id: INTAKE
+    exit_guard: profile mode budget and decision owner recorded
+  - id: ORIENTED
+    exit_guard: revision dirty state current artifacts and controller recorded
+  - id: FRAMED
+    exit_guard: property owner question scope and non-stipulating hypotheses recorded
+  - id: PREREGISTERED
+    exit_guard: falsifiers positive controls outcomes prohibited changes and stop conditions recorded
+  - id: CONTROLLED
+    exit_guard: observation path detects relevant known positive or negative
+  - id: OBSERVED
+    exit_guard: raw result environment and reach status recorded
+  - id: INTERPRETED
+    exit_guard: observation inference limitations and counterevidence separated
+  - id: DECIDED
+    exit_guard: bounded disposition and authority recorded
+  - id: IMPLEMENTING
+    exit_guard: frozen owner requirements and focused implementation falsifier named
+  - id: CONFORMANT
+    exit_guard: permanent conformance and invariant carrier classifications pass
+  - id: FROZEN
+    exit_guard: claims nonclaims rivals carriers and reopening conditions recorded
+  - id: MIGRATING
+    exit_guard: migration adds no compatibility owner or migration-only architecture
+  - id: RELEASE_READY
+    exit_guard: release module passes for exact candidate
+  - id: RELEASED
+    exit_guard: registry and real-consumer verification match candidate integrity
+  - id: CLOSED
+    exit_guard: all obligations disposed or explicitly deferred with owner
+
+reopen_gate:
+  required_fields:
+    - admitted_requirement
+    - deterministic_discriminator
+    - frozen_owner
+    - compliant_attempts
+    - architecture_falsification
+    - incompatible_frozen_claims
+  reject_reasons:
+    - implementation_difficulty
+    - migration_pressure
+    - failing_archaeological_test
+    - representation_failure_only
+
+invariant_carrier_states:
+  CARRIED: surviving permanent test or gate proves the invariant
+  VACUOUS: final architecture makes the scenario impossible
+  ORPHANED: scenario remains possible but no surviving carrier proves it
+blocking_carrier_states: [ORPHANED]
+
+claim_states:
+  - OPEN
+  - OBSERVED
+  - INFERRED
+  - DECIDED_BY_AUTHORITY
+  - FROZEN
+  - FALSIFIED
+  - QUARANTINED
+  - SUPERSEDED
+  - RETIRED_HISTORICAL_ONLY
+
+evidence_integrity:
+  triad: [REACH, READ, DISCRIMINATE]
+  absence_requires:
+    - observation_domain
+    - known_positive_control
+    - temporal_authority_if_async
+    - nonclaim
+  type_requires:
+    - exact_relation
+    - negative_assertions_when_applicable
+    - no_evidence_erasing_cast
+    - checker_includes_fixture
+    - public_boundary_for_public_claim
+    - packed_consumer_for_shipped_declaration
+    - relevant_module_resolution_modes
+  generated_requires:
+    - deterministic_generator
+    - stale_or_missing_output_check
+    - checker_self_test_through_real_failure_path
+    - declared_outputs_or_forced_execution
+    - compile_only_runtime_separation
+    - generator_backed_published_claims
+
+gate_economics:
+  required:
+    - named_user
+    - observed_defect_class
+    - mechanically_decidable_property
+    - bounded_maintenance_cost
+    - relevant_liveness_control
+    - composed_register_execution
+  states: [PROVEN, PROVEN_INDIRECTLY, BLIND, ERRORED, NOT_APPLICABLE]
+  blind_or_errored_blocks_release: true
+
+modules:
+  public_api_and_types:
+    triggers: [public_symbol, public_declaration, package_export, framework_carrier]
+    required:
+      - public_reachability_inventory
+      - public_boundary_carrier
+      - exact_type_and_negative_controls
+      - explicit_carrier_sensitive_forwarding
+      - packed_consumer_skipLibCheck_false
+      - relevant_resolution_modes
+      - declaration_and_artifact_validation
+  async_lifecycle_persistence:
+    triggers: [async, scheduler, retry, error_channel, disposal, persistence, settlement]
+    required:
+      - slow_A_fast_B
+      - fail_then_recover
+      - teardown_while_pending
+      - successor_operation
+      - temporal_absence_control
+      - error_channel_disposition
+      - cleanup_failure_isolation
+      - direct_truth_inspection
+  identity_and_ownership:
+    triggers: [address, key, identity, owner, revision, reuse, weak_reference, adapter_contract]
+    required:
+      - identity_dimension_matrix
+      - held_handle_control
+      - retire_rekey_reuse_control
+      - quiescent_GC_when_applicable
+      - value_neutral_transition
+      - single_mutable_authority
+  migration_and_retirement:
+    triggers: [major_migration, deletion, replacement, legacy_api]
+    required:
+      - independently_derived_target
+      - target_contract_freeze
+      - categorized_reference_inventory
+      - behavior_disposition
+      - invariant_carrier_disposition
+      - current_guidance_update
+      - historical_truth_preservation
+  performance_and_memory:
+    triggers: [benchmark, performance_claim, memory_claim, optimization, bundle_claim]
+    required:
+      - equivalent_operation_contract
+      - timing_boundaries
+      - interleaving_warmup_repetition_robust_statistic
+      - noise_floor_control
+      - preregistered_scaling_criterion
+      - retained_and_peak_memory_when_applicable
+      - quiescence_when_applicable
+      - generated_numeric_claim
+      - closure_threshold
+  release_and_artifact:
+    triggers: [release, publish, tag, registry, package_candidate]
+    required:
+      - ambient_environment_validation
+      - frozen_dependency_state
+      - one_checkout_one_build
+      - complete_gate_register
+      - gate_liveness_controls
+      - CI_resource_topology
+      - stable_proof_baselines
+      - exact_artifact_validation
+      - packed_consumers
+      - immutable_candidate_identity
+      - single_authorized_publication_path
+      - integrity_equal_idempotent_retry
+      - post_publication_integrity_and_consumer
+  documentation_and_claims:
+    triggers: [public_docs, release_claim, numeric_claim, AI_guidance]
+    required:
+      - current_teaching_authority
+      - generator_backed_numbers
+      - source_artifact_docs_AI_alignment
+      - historical_labeling
+      - bounded_mechanical_gates
+      - prose_review
+      - claim_scope_evidence_nonclaim
+
+release_invariants:
+  - validate ambient workspace configuration before tools run
+  - use one checkout and one build for candidate validation and publication
+  - bound parallelism to CI resource topology
+  - run composed release gate register
+  - prove every custom gate can fail under a relevant defect
+  - freeze proof baselines when moving baselines make the claim vacuous
+  - validate manifests entries provenance hygiene declaration docs and workspace specs
+  - typecheck exact tarballs in fresh consumers under relevant resolution modes
+  - treat candidate tags and hashes as immutable evidence
+  - require explicit human release authorization
+  - skip existing registry versions only when candidate and registry integrity match
+  - verify registry integrity and real consumer behavior after publication
+
+adversarial_review:
+  required_for:
+    - P2 architecture ownership public API or feature survival decision
+    - P3 architecture or product-surface decision
+  seats: [KILLER, ABSENCE_ARCHITECT, DEFENDER]
+  independence_rule: withhold each seats output and nonessential context from the others
+  rival_packet_fields: [claim, premises, capability, falsifier, nonclaims]
+  opposition_failure_establishes_survival: false
+  missing_premise_disposition: TERMINAL_AS_POSED
+
+closure_requirements:
+  - current question and mode explicit
+  - current artifacts inspected
+  - falsifier and positive control executed
+  - evidence integrity status recorded
+  - observation and interpretation separated
+  - rivals and rejected alternatives recorded
+  - smallest truthful owner assigned
+  - permanent conformance present
+  - invariant carriers all CARRIED or VACUOUS
+  - claims and nonclaims explicit
+  - reopening conditions explicit
+  - implementation migration and release obligations separately tracked
+
+protocol_metrics:
+  - pre_release_defects_vs_post_release_defects
+  - gate_and_tool_maintenance_fraction
+  - decision_cycle_time_by_profile
+  - reopened_frozen_decisions
+  - blind_and_errored_gates
+  - repeated_debates_prevented
+  - artifacts_per_closed_decision
+
+human_authority_required_for:
+  - product_value
+  - risk_acceptance
+  - public_contract_freeze
+  - ownership_choice_when_multiple_viable_owners_remain
+  - security_or_legal_disposition
+  - release_authorization
+
+portability:
+  orchestration_engines:
+    - human_checklist
+    - VS_Code_agent
+    - CI_workflow
+    - LangGraph
+    - Temporal
+    - custom_state_machine
+  engine_specific_concepts_normative: false
