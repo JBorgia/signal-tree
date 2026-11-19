@@ -481,10 +481,10 @@ Previous history must not expose the first production adopter or Jonathan's empl
 
 ### 12.3 Approvals (section 11.3)
 
-- **Reset: approved.** It runs after the scrub. Do not delete `codex/v15-15.4.9-release` until Jonathan confirms Vercel deploys from `release/15.x`.
+- **Reset: approved.** It runs after the scrub. `codex/v15-15.4.9-release` is archived and deleted like every other retired branch.
 - **`chaz-thoughts`:** archive-tag and delete with the rest.
 - **Version: 16.0.0.** Prereleases of the new core continue from `16.0.0-rc.2`. At the first new prerelease, deprecate `16.0.0-rc.1` on npm with: "16.0.0 was rebuilt; use 16.0.0-rc.2 or later."
 - **Agent identity:** a GitHub App installed on this repository only, with contents, pull requests, issues and checks permissions; no administration permission. Walk Jonathan through creating it, then set up ruleset 17 with no bypass for anyone.
-- **Vercel:** Jonathan switches the production branch himself after `release/15.x` exists.
+- **Vercel:** out of scope until Phase 8. Jonathan disconnects the Vercel Git integration, and the site keeps serving its last build. Phase 8 sets up deployment of the new docs.
 - **Machines:** two cloud VMs. One is a dedicated-CPU gate runner; the other is an isolated VM for the agent. File their exact specifications as one issue for Jonathan to provision.
 - **Budgets:** stay `"approved": false` until PR #15's fixes are merged and baselines are recorded on the gate runner.
