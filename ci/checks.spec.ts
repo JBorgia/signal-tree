@@ -114,7 +114,8 @@ describe('S6(c) byte identity without the plugin folders', () => {
   });
 });
 
-describe('#9: tests cannot be skipped, focused or marked failing', () => {
+// ESLint's first start loads typescript-eslint, which can take several seconds on a busy machine.
+describe('#9: tests cannot be skipped, focused or marked failing', { timeout: 60_000 }, () => {
   const lint = async (code: string) => {
     const [result] = await new ESLint({ cwd: join(import.meta.dirname, '..') }).lintText(code, { filePath: 'packages/core/src/probe.spec.ts' });
     return result!.messages.map((m) => m.message);
