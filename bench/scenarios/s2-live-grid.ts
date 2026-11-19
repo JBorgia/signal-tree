@@ -20,10 +20,13 @@ export const S2_SETUP = { fieldsPerUpdate: 3, seed: 2026 } as const;
  *   turn (ruling 7) are reported next to it.
  * - Store share: summed turn time / main-thread task time (CDP
  *   Performance.getMetrics TaskDuration) over the window.
- * - Heap overhead: CDP-forced GC, then Runtime.getHeapUsage. plain = heap with
- *   the generated rows minus heap before; overhead = heap with only the store
- *   holding the data minus heap with only the plain rows; measured after
- *   loading and after the window (grid unrendered); the larger counts.
+ * - Heap overhead = (store heap - plain-row heap) / plain-row heap, from
+ *   CDP-forced GC then Runtime.getHeapUsage. plain-row heap = heap with the
+ *   generated rows minus heap before. The page drops its own reference to the
+ *   rows inside the load (checked), so store heap = heap - heap before with
+ *   only the store holding the data. Measured after loading and after the
+ *   window (grid unrendered); the larger counts. A store that keeps the rows
+ *   it was given reads about 0; one that also keeps a full copy, about 1.
  */
 export const S2: ScenarioDefinition = {
   id: 'S2',
@@ -31,18 +34,18 @@ export const S2: ScenarioDefinition = {
   environment: 'browser',
   requires: ['collection'],
   metrics: {
-    longTasksAttributedToStore: { unit: 'frames', better: 'lower', description: '#12: long frames that would not be long without the store' },
-    longFramesOverlappingStore: { unit: 'frames', better: 'lower', description: 'long frames overlapping any store turn (reported)' },
-    storeShareOfMainThread: { unit: 'ratio', better: 'lower', description: 'store turn time / main-thread task time' },
-    storeHeapOverheadRatio: { unit: 'x', better: 'lower', description: 'store heap overhead / retained plain rows' },
-    storeHeapOverheadAfterLoadRatio: { unit: 'x', better: 'lower', description: 'overhead right after setAll' },
-    storeHeapOverheadAfterRunRatio: { unit: 'x', better: 'lower', description: 'overhead after the update window' },
-    storeShareOfWallTime: { unit: 'ratio', better: 'lower', description: 'store turn time / window wall time' },
-    storeMsPerBatch: { unit: 'ms', better: 'lower', description: 'median store turn per batch' },
-    storeMsMaxBatch: { unit: 'ms', better: 'lower', description: 'longest store turn' },
-    longAnimationFrames: { unit: 'frames', better: 'lower', description: 'all long animation frames in the window' },
+    longTasksAttributedToStore: { unit: 'frames', better: 'lower', description: '#12: long frames that would not be long without the store', zeroable: true },
+    longFramesOverlappingStore: { unit: 'frames', better: 'lower', description: 'long frames overlapping any store turn (reported)', zeroable: true },
+    storeShareOfMainThread: { unit: 'ratio', better: 'lower', description: 'store turn time / main-thread task time', zeroable: true },
+    storeHeapOverheadRatio: { unit: 'x', better: 'lower', description: 'store heap overhead / retained plain rows', zeroable: true },
+    storeHeapOverheadAfterLoadRatio: { unit: 'x', better: 'lower', description: 'overhead right after setAll', zeroable: true },
+    storeHeapOverheadAfterRunRatio: { unit: 'x', better: 'lower', description: 'overhead after the update window', zeroable: true },
+    storeShareOfWallTime: { unit: 'ratio', better: 'lower', description: 'store turn time / window wall time', zeroable: true },
+    storeMsPerBatch: { unit: 'ms', better: 'lower', description: 'median store turn per batch', zeroable: true },
+    storeMsMaxBatch: { unit: 'ms', better: 'lower', description: 'longest store turn', zeroable: true },
+    longAnimationFrames: { unit: 'frames', better: 'lower', description: 'all long animation frames in the window', zeroable: true },
     mainThreadTaskMs: { unit: 'ms', better: 'none', description: 'main-thread task time in the window' },
-    storeMs: { unit: 'ms', better: 'lower', description: 'summed store turn time in the window' },
+    storeMs: { unit: 'ms', better: 'lower', description: 'summed store turn time in the window', zeroable: true },
     setAllMs: { unit: 'ms', better: 'lower', description: 'initial setAll turn' },
     plainRowsBytes: { unit: 'B', better: 'none', description: 'retained plain row objects' },
     batchesApplied: { unit: 'batches', better: 'none', description: 'batches applied in the window' },
@@ -54,8 +57,9 @@ export const S2: ScenarioDefinition = {
       await page.invoke('mount.collection', { variant: ctx.variant });
       const heapBefore = await page.heapUsed();
       await page.invoke('collection.generate', { rows: p['rows'], fields: p['fields'] });
-      const heapPlain = await page.heapUsed();
-      const load = await page.invoke<{ setAllMs: number }>('collection.load');
+      const plain = (await page.heapUsed()) - heapBefore;
+      const load = await page.invoke<{ setAllMs: number; harnessHoldsRows: boolean }>('collection.load');
+      if (load.harnessHoldsRows) throw new Error('the page still holds the generated rows; the store heap would include them');
       const heapLoaded = await page.heapUsed();
       await page.invoke('collection.render', { rendered: p['rendered'], fields: p['fields'] });
       await page.settle(3);
@@ -81,9 +85,8 @@ export const S2: ScenarioDefinition = {
       const frames = inWindow(perf.loaf);
       const storeMs = turns.reduce((sum, turn) => sum + turn.duration, 0);
       const mainThreadTaskMs = taskAfter - taskBefore;
-      const plain = heapPlain - heapBefore;
-      const afterLoad = (heapLoaded - heapPlain) / plain;
-      const afterRun = (heapAfter - heapPlain) / plain;
+      const afterLoad = (heapLoaded - heapBefore - plain) / plain;
+      const afterRun = (heapAfter - heapBefore - plain) / plain;
       const sortedTurns = turns.map((turn) => turn.duration).sort((a, b) => a - b);
       return {
         longTasksAttributedToStore: framesChargedToStore(frames, turns, (p['storeCharge'] as unknown as { longTaskMs: number }).longTaskMs).length,

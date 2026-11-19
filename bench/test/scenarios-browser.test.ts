@@ -3,7 +3,8 @@ import { mkdirSync } from 'node:fs';
 import { before, test } from 'node:test';
 import { buildAngularApp } from '../runner/app-build.ts';
 import { TMP_DIR } from '../runner/paths.ts';
-import { assertEvaluated, assertFails, condition, runOnFake } from './helpers.ts';
+import type { RequestBase } from '../runner/harness.ts';
+import { assertEvaluated, assertFails, budgets, condition, runOnFake } from './helpers.ts';
 
 // One build of the reference app against the fake subject (the "test-fake"
 // angular.json configuration swaps src/app/subject.ts); every test reuses it.
@@ -54,4 +55,60 @@ test('S6(b) reruns M1, S1 and S2 with scoped plugins; cost outside the scopes fa
   assert.deepEqual(Object.keys(planted.compared!), ['M1', 'S1', 'S2']);
   assertEvaluated(planted);
   assertFails(planted, 'S6b.within:M1.writeRatioVsNative');
+});
+
+test('a never budget fails when one run of three breaks it, though the median is clean', async () => {
+  const result = await runOnFake('S4c', ['ignoreHolds@2'], { runs: 3 });
+  assert.equal(result.median!['heldValueOverwrites'], 0, 'two clean runs of three: the median reads 0');
+  const held = condition(result, 'S4c.held');
+  assert.equal(held.pass, false);
+  assert.ok((held.actual as number) > 0, 'actual is the worst run');
+  assert.match(held.detail!, /run 2 of 3/);
+});
+
+test('a metric that reads 0 in an A/A set without a noise floor is an error that fails the run', async () => {
+  const floors = { ...budgets.noiseFloors };
+  delete (floors as Record<string, number>)['S1.longFramesDuringKeystroke'];
+  const result = await runOnFake('S1', [], { aa: true, budgets: { ...budgets, noiseFloors: floors }, status: 'error' });
+  assert.match(result.error!, /S1\.longFramesDuringKeystroke/);
+  assert.equal(result.pass, false);
+  assert.ok(result.aa!.noise.zero.includes('longFramesDuringKeystroke'));
+  const clean = await runOnFake('S1', [], { aa: true });
+  assert.ok(clean.aa!.noise.zero.includes('longFramesDuringKeystroke'), 'with its floor the same A/A run is fine');
+});
+
+test("S5's soak leaves the harness's heap flat and its mark buffer bounded; a harness that keeps marks is caught", async () => {
+  const clean = await runOnFake('S5', [], { tweak: (r) => ({ ...r, params: { ...r.params, nightlyCompression: { minWrites: 60_000 } } }) });
+  assert.ok(clean.median!['heapGrowthFinalHalf']! <= 0.02, `final-half heap growth ${clean.median!['heapGrowthFinalHalf']}`);
+  assert.ok(clean.median!['markEntriesMax']! > 0 && clean.median!['markEntriesMax']! < 200, `mark entries per drain ${clean.median!['markEntriesMax']}`);
+  const planted = await runOnFake('S5', [], { harnessFaults: ['keepMarks'], status: 'error' });
+  assert.match(planted.error!, /stayed in the performance buffer/);
+});
+
+test('S2 heap overhead reads about 0 for a store that shares the rows and about 1 for one that also copies them', async () => {
+  const big = (r: RequestBase) => ({ ...r, params: { ...r.params, rows: 20_000 } });
+  const sharing = await runOnFake('S2', [], { tweak: big });
+  const copying = await runOnFake('S2', ['copyRows'], { tweak: big });
+  const shared = sharing.median!['storeHeapOverheadAfterLoadRatio']!;
+  const copied = copying.median!['storeHeapOverheadAfterLoadRatio']!;
+  assert.ok(Math.abs(shared) < 0.1, `sharing store read ${shared}`);
+  // A copy cannot share V8's internalized strings the way the parsed rows do among themselves, so about 0.9 in Chromium.
+  assert.ok(copied > 0.75 && copied < 1.25, `copying store read ${copied}`);
+});
+
+test('the weekly full-length S5 takes its run count from budgets.json (1); the nightly keeps 5', async () => {
+  const { Harness } = await import('../runner/harness.ts');
+  const { loadSubject } = await import('../subjects/index.ts');
+  const subject = await loadSubject('test-fake');
+  const options = { aa: false, aaPairs: 1, skipBuild: true } as const;
+  assert.equal(new Harness(budgets, subject, { ...options, s5Mode: 'full' }).runsFor('S5'), 1);
+  assert.equal(new Harness(budgets, subject, { ...options, s5Mode: 'compressed' }).runsFor('S5'), 5);
+  const full = await runOnFake('S5', [], {
+    runs: undefined,
+    s5Mode: 'full',
+    tweak: (r) => ({ ...r, params: { ...r.params, sessionHours: 3 / 3600 } }),
+  });
+  assert.equal(full.runs!.length, 1);
+  assert.equal(full.requiredRuns, 1);
+  assertEvaluated(full);
 });

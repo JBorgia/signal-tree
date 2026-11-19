@@ -19,6 +19,7 @@
  *   ownerCost      S7: each owner of the written location adds 1 µs
  *   linksScan      S7: every write walks every link in the tree
  *   slowRead       harness tests: every leaf read does extra work
+ *   copyRows       S2 heap: setAll keeps a full copy next to the rows it was given
  */
 import { signal, untracked, type Signal, type WritableSignal } from '@angular/core';
 import { measuredTurn } from './bench-flag.ts';
@@ -192,8 +193,33 @@ function yieldToBrowser(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
 
+/**
+ * A deep copy shaped like the rows themselves: parsed from JSON (as the
+ * harness makes its rows) with each distinct string duplicated once, so the
+ * copy does not share the originals' strings. Object spread would not do: the
+ * reference app's build lowers it to a helper whose objects are several
+ * times larger than the parsed rows.
+ */
+function deepCopy(rows: readonly Record<string, unknown>[]): Record<string, unknown>[] {
+  const strings = new Map<string, string>();
+  return JSON.parse(JSON.stringify(rows), (_key, value: unknown) => {
+    if (typeof value !== 'string') return value;
+    let copy = strings.get(value);
+    if (copy === undefined) {
+      copy = `${value} `.slice(0, -1);
+      strings.set(value, copy);
+    }
+    return copy;
+  }) as Record<string, unknown>[];
+}
+
 class FakeCollection<E, K extends string | number> implements SubjectCollection<E, K> {
-  private rows = new Map<K, Record<string, unknown>>();
+  /** The rows array the caller gave to setAll, kept as is (a sharing store). */
+  private list: Record<string, unknown>[] = [];
+  /** Position of each id, built only when ids are not their positions. */
+  private index: Map<K, number> | undefined;
+  /** copyRows fault: a full copy kept next to the given rows (a copying store). */
+  private copy: Record<string, unknown>[] | undefined;
   /** Cells handed out for rendering; rows written without one get a transient cell. */
   private readonly cells = new Map<string, Cell & { readonly value: WritableSignal<unknown>; readonly id: K; readonly field: string }>();
   private readonly store: FakeStore;
@@ -210,9 +236,23 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
     return `${this.path}/${String(id)}/${field}`;
   }
 
+  private position(id: K): number | undefined {
+    if (typeof id === 'number' && this.list[id]?.[this.idField] === id) return id;
+    if (!this.index) {
+      this.index = new Map();
+      this.list.forEach((row, i) => this.index!.set(row[this.idField] as K, i));
+    }
+    return this.index.get(id);
+  }
+
+  private row(id: K): Record<string, unknown> | undefined {
+    const at = this.position(id);
+    return at === undefined ? undefined : this.list[at];
+  }
+
   private commitField(id: K, field: string, value: unknown): void {
-    const row = this.rows.get(id);
-    if (row) this.rows.set(id, { ...row, [field]: value });
+    const at = this.position(id);
+    if (at !== undefined) this.list[at] = { ...this.list[at], [field]: value };
     this.cells.get(this.key(id, field))?.value.set(value);
   }
 
@@ -220,30 +260,30 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
     const key = this.key(id, field);
     let cell = this.cells.get(key);
     if (!cell) {
-      const value = signal(this.rows.get(id)?.[field]);
-      cell = { key, id, field, value, read: () => this.rows.get(id)?.[field], apply: (next) => this.commitField(id, field, next) };
+      const value = signal(this.row(id)?.[field]);
+      cell = { key, id, field, value, read: () => this.row(id)?.[field], apply: (next) => this.commitField(id, field, next) };
       this.cells.set(key, cell);
     }
     return cell;
   }
 
-  private replace(next: Map<K, Record<string, unknown>>): void {
-    this.rows = next;
-    for (const cell of this.cells.values()) cell.value.set(next.get(cell.id)?.[cell.field]);
+  private replace(rows: readonly Record<string, unknown>[]): void {
+    this.list = rows as Record<string, unknown>[];
+    this.index = undefined;
+    this.copy = this.store.faults.has('copyRows') ? deepCopy(rows) : undefined;
+    for (const cell of this.cells.values()) cell.value.set(this.row(cell.id)?.[cell.field]);
   }
 
   setAll(rows: readonly E[]): void {
-    const next = new Map<K, Record<string, unknown>>();
-    for (const row of rows as readonly Record<string, unknown>[]) next.set(row[this.idField] as K, row);
-    this.replace(next);
+    this.replace(rows as readonly Record<string, unknown>[]);
   }
 
   async setAllChunked(rows: readonly E[]): Promise<void> {
-    const next = new Map<K, Record<string, unknown>>();
     if (this.store.faults.has('longChunk')) busyMs(80);
+    const next: Record<string, unknown>[] = [];
     let chunkStart = performance.now();
     for (const row of rows as readonly Record<string, unknown>[]) {
-      next.set(row[this.idField] as K, row);
+      next.push(row);
       if (performance.now() - chunkStart > 8) {
         await yieldToBrowser();
         chunkStart = performance.now();
@@ -253,11 +293,11 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   updateOne(id: K, changes: Partial<E>): void {
-    if (!this.rows.has(id)) return;
+    if (this.position(id) === undefined) return;
     for (const [field, value] of Object.entries(changes as Record<string, unknown>)) {
       const cell: Cell = this.cells.get(this.key(id, field)) ?? {
         key: this.key(id, field),
-        read: () => this.rows.get(id)?.[field],
+        read: () => this.row(id)?.[field],
         apply: (next) => this.commitField(id, field, next),
       };
       this.store.write(cell, value);
@@ -273,7 +313,7 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   count(): number {
-    return this.rows.size;
+    return this.list.length;
   }
 }
 
