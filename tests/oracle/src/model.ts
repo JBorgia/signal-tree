@@ -4,6 +4,12 @@
 // which is the authority for behavior it covers. Subjects translate these
 // operations into their own API and report outcomes in this shape, so the
 // runner and comparator stay implementation-neutral (BRIEF.md 5.3 item 2).
+//
+// Provisional, pending Jonathan's answers (BRIEF.md 11.2):
+// - #6: no writer identity in these operations; v15 and v16 have none. The new
+//   core's subject maps `external()` to writer 'server' and everything else to
+//   writer 'user'; W1–W4 are checked as properties of the new core alone.
+// - #7: no entityMap `move`; v16 has none, so it is covered by new-core tests.
 
 /** Scalar leaves in the fixture state. `cfg` is the one branch. */
 export const LEAF_PATHS = ['a', 'cfg.p', 'cfg.q'] as const;
