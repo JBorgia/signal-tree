@@ -16,5 +16,8 @@
   },
   "peerDependencies": {
     "@angular/core": "^22.0.0"
+  },
+  "devDependencies": {
+    "@angular/core": "22.2.4"
   }
 }
