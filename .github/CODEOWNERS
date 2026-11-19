@@ -1,6 +1,26 @@
-# BRIEF.md section 10, ruling 17: code-owner review is required for these paths.
+# BRIEF.md section 10, ruling 17 (as amended): code-owner review is required
+# for the specification, the harness, the oracle, and everything that decides
+# which checks run or what passes.
 /BRIEF.md                         @JBorgia
 /bench/                           @JBorgia
 /tests/intended-differences.json  @JBorgia
 /tests/port-manifest.json         @JBorgia
-/.github/CODEOWNERS               @JBorgia
+/tests/oracle/                    @JBorgia
+/ci/                              @JBorgia
+/.github/                         @JBorgia
+/package.json                     @JBorgia
+/eslint.config.mjs                @JBorgia
+/vitest.config.ts                 @JBorgia
+
+# These also change what a gate measures or whether a check runs.
+# pnpm-lock.yaml pins every tool and, through Playwright, the Chrome version (ruling 10).
+/pnpm-lock.yaml                   @JBorgia
+# pnpm-workspace.yaml decides which packages exist, so which entry points the checks see.
+/pnpm-workspace.yaml              @JBorgia
+# .nvmrc is the Node version CI and the micro gates run on.
+/.nvmrc                           @JBorgia
+# .npmrc decides how dependencies resolve.
+/.npmrc                           @JBorgia
+# tsconfig.base.json sets the strictness the typecheck enforces; tsconfig.json what it covers.
+/tsconfig.base.json               @JBorgia
+/tsconfig.json                    @JBorgia

@@ -6,10 +6,10 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "exports": {
-    ".": { "types": "./src/index.ts", "default": "./src/index.ts" }
-  },
-  "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
   },
   "dependencies": {
     "@signal-tree/core": "workspace:*"
