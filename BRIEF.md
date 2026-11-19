@@ -449,3 +449,42 @@ Jonathan gives these in a single message: the reset (archive tags, branch deleti
 - **Continuation.** Claude Code's `/goal` with the condition "`node ci/done-check.mjs` exits 0". A `Stop` hook acts as the backstop: it blocks stopping while the done check fails, and lets the session stop after 20 consecutive blocked stops with no new commit, so a stuck session can't loop forever.
 - **Restarts.** A supervisor loop in `tmux` resumes the session with `--continue` whenever it exits before the done check passes, for example after a crash or a usage limit.
 - **Status.** At the end of each phase, and every 24 hours, the agent posts a status comment (the section 8 report format) on a pinned issue named `Rebuild status`.
+
+## 12. Owner decisions, November 19
+
+**This section overrides every earlier section, ruling and issue answer it conflicts with.**
+
+### 12.1 The spec is the only authority
+
+Previous versions of SignalTree, and their dependencies, must not shape the result.
+
+1. **Behavior.** Only the behaviors written in sections 5.1 and 5.2 are requirements. No old version is an authority on anything. Ruling 3's "v16 is the default authority" is withdrawn, and so is the issue #10 answer "v16 wins except where defective". An old behavior that is not in the tables does not carry over. If one seems necessary, file an issue proposing a new table row with its test.
+2. **API.** The public API is designed fresh from section 4. Ruling 7's "every v16.0.0-rc.1 public export" is withdrawn. Section 4 names (for example `changeId`) are spec names, not inherited ones. Anything not in section 4 needs an issue.
+3. **No old code or tests.** Do not copy, port or adapt source code or test code from any previous version. Every test is written new, from the spec, and tagged with the behavior ID it proves, for example `[T3]`.
+4. **The oracle becomes a test generator.** It may replay operation sequences against the published old packages only to check behaviors listed in 5.1, comparing on those behaviors' observable outcomes. Where an old package disagrees with the spec, the spec wins and the case becomes a new test. The old packages stay dev-only under `tests/oracle/` and are removed from the repository before the 16.0.0 release.
+5. **The port manifest becomes a coverage map.** `tests/port-manifest.json` maps each old spec file to the 5.1/5.2 behavior IDs it touched, or to `not-carried` with a one-line reason. It records coverage only; nothing is ported from it.
+6. **Spec tests are protected.** A code-owned `tests/spec-tests.json` records a content hash for every test tagged with a behavior ID. CI fails when a tagged test changes without a matching update to that file. This replaces the port-manifest hashing from issue #9.
+
+### 12.2 History scrub, before anything else destructive
+
+Previous history must not expose the first production adopter or Jonathan's employer.
+
+1. Work on a fresh mirror clone with `git filter-repo`, rewriting every branch and tag:
+    - delete files describing the adopter's internals (`docs/audits/2026-07/v3-consumer-reuse-audit.md`, the rc1 findings document in `docs/architecture/`, `docs/migration/post-rc1-workstream.md`, `docs/audits/2026-11-18-adoption-workflow/`, and any other file whose subject is that codebase);
+    - in file contents and commit messages, replace every remaining mention of the adopter's or the employer's name with "first production adopter";
+    - rewrite every author and committer email at the employer's domain, and every occurrence in file contents, to Jonathan's GitHub noreply address.
+2. **Verify** that zero matches remain across all refs, file contents and commit messages, and that only the expected files changed. Keep the old-to-new hash map outside the repository.
+3. Recreate the release tags as annotated, unsigned tags on the rewritten commits. Jonathan re-signs them later with a personal key.
+4. Force-push all rewritten refs, then rebase the open PRs (#3, #11, #15) onto the new history.
+5. Draft a GitHub Support request for Jonathan to send, asking them to purge cached views and pull-request refs of the old commits.
+6. In the repository, write "first production adopter" wherever this brief named the adopter. Rename the adopter's validation label to `adopter-validated`.
+
+### 12.3 Approvals (section 11.3)
+
+- **Reset: approved.** It runs after the scrub. Do not delete `codex/v15-15.4.9-release` until Jonathan confirms Vercel deploys from `release/15.x`.
+- **`chaz-thoughts`:** archive-tag and delete with the rest.
+- **Version: 16.0.0.** Prereleases of the new core continue from `16.0.0-rc.2`. At the first new prerelease, deprecate `16.0.0-rc.1` on npm with: "16.0.0 was rebuilt; use 16.0.0-rc.2 or later."
+- **Agent identity:** a GitHub App installed on this repository only, with contents, pull requests, issues and checks permissions; no administration permission. Walk Jonathan through creating it, then set up ruleset 17 with no bypass for anyone.
+- **Vercel:** Jonathan switches the production branch himself after `release/15.x` exists.
+- **Machines:** two cloud VMs. One is a dedicated-CPU gate runner; the other is an isolated VM for the agent. File their exact specifications as one issue for Jonathan to provision.
+- **Budgets:** stay `"approved": false` until PR #15's fixes are merged and baselines are recorded on the gate runner.
