@@ -1,0 +1,173 @@
+{
+  "$comment": "Machine-readable transcription of BRIEF.md 6.2 (scale) and 6.3 (gates) as modified by Jonathan's rulings of Nov 19, 2026. Owned by Jonathan (CODEOWNERS); frozen once approved. 'text' quotes the brief or the ruling; 'metric' names the harness result key a condition reads; 'ruling' cites the ruling that changed the brief.",
+  "source": "BRIEF.md 6.2 and 6.3, as of Nov 19, 2026, with rulings 1, 2, 4, 5 and 7",
+  "approved": false,
+  "scale": {
+    "$comment": "6.2. Defaults until Jonathan replaces them with first production adopter numbers.",
+    "largestCollection": { "rows": 50000, "fields": 20 },
+    "rowsRenderedAtOnce": 1000,
+    "sustainedServerUpdates": { "rowUpdatesPerSecond": 500, "batchEveryMs": 100 },
+    "agentBatch": { "fieldEdits": 1000, "rows": 200 },
+    "largestFormBoundFields": 500,
+    "sessionLengthHours": 8,
+    "slowestSupportedDevice": { "text": "CI machine at 4× CPU throttle", "cpuThrottlingRate": 4 }
+  },
+  "defaultEnvironment": {
+    "text": "Budget (at 4× throttle unless noted)",
+    "runtime": "browser",
+    "cpuThrottlingRate": 4
+  },
+  "gates": {
+    "M1": {
+      "scenario": "Leaf write with no interceptor in scope",
+      "environment": { "runtime": "node", "cpuThrottlingRate": 1, "ruling": 1 },
+      "parameters": { "allocationWrites": 1000000 },
+      "conditions": [
+        { "id": "M1.ratio", "text": "≤ 2.0× a raw native write in the same framework (Node, 1×)", "metric": "writeRatioVsNative", "op": "<=", "value": 2.0 },
+        { "id": "M1.alloc", "text": "zero allocations per write over 1M writes (C1)", "metric": "allocationsPerWrite", "op": "==", "value": 0 }
+      ],
+      "reported": [
+        { "text": "absolute timings are reported, never gated", "metric": "subjectWriteNs", "ruling": 1 },
+        { "text": "absolute timings are reported, never gated", "metric": "nativeWriteNs", "ruling": 1 }
+      ]
+    },
+    "M2": {
+      "scenario": "Leaf read through a held handle",
+      "environment": { "runtime": "node", "cpuThrottlingRate": 1, "ruling": 1 },
+      "conditions": [
+        { "id": "M2.ratio", "text": "≤ 1.2× a raw native read (Node, 1×)", "metric": "readRatioVsNative", "op": "<=", "value": 1.2 }
+      ],
+      "reported": [
+        { "text": "absolute timings are reported, never gated", "metric": "subjectReadNs", "ruling": 1 },
+        { "text": "absolute timings are reported, never gated", "metric": "nativeReadNs", "ruling": 1 }
+      ]
+    },
+    "M3": {
+      "scenario": "Build a tree from 100,000 leaves of initial state and access 10 of them",
+      "environment": { "runtime": "node", "cpuThrottlingRate": 1, "ruling": 1 },
+      "parameters": { "leaves": 100000, "accessed": 10 },
+      "conditions": [
+        { "id": "M3.heap", "text": "≤ 2× the heap of the plain state plus 10 native cells (C6)", "metric": "heapRatioVsPlainPlusCells", "op": "<=", "value": 2 }
+      ],
+      "reported": [
+        { "text": "≤ 1 ms in the brief; absolute timings are reported, never gated", "metric": "buildAndAccessMs", "ruling": 1 }
+      ]
+    },
+    "S1": {
+      "scenario": "Form edit: one keystroke in the 500-field form",
+      "parameters": { "formBoundFields": { "$ref": "scale.largestFormBoundFields" }, "keystrokes": 1 },
+      "conditions": [
+        { "id": "S1.store", "text": "Store work ≤ 1 ms", "metric": "storeWorkMs", "op": "<=", "value": 1 },
+        { "id": "S1.interaction", "text": "whole interaction processing ≤ 50 ms", "metric": "interactionMs", "op": "<=", "value": 50 }
+      ]
+    },
+    "S2": {
+      "scenario": "Live grid: 50k × 20 collection, 1,000 rows rendered, 500 updates/s for 60 s",
+      "parameters": {
+        "rows": { "$ref": "scale.largestCollection.rows" },
+        "fields": { "$ref": "scale.largestCollection.fields" },
+        "rendered": { "$ref": "scale.rowsRenderedAtOnce" },
+        "rowUpdatesPerSecond": { "$ref": "scale.sustainedServerUpdates.rowUpdatesPerSecond" },
+        "batchEveryMs": { "$ref": "scale.sustainedServerUpdates.batchEveryMs" },
+        "durationSeconds": 60
+      },
+      "conditions": [
+        { "id": "S2.longTasks", "text": "Zero long tasks attributed to the store (long animation frames attributed by overlap with the signal-tree: marks)", "metric": "longTasksAttributedToStore", "op": "==", "value": 0, "ruling": 7 },
+        { "id": "S2.share", "text": "store ≤ 10% of main-thread time", "metric": "storeShareOfMainThread", "op": "<=", "value": 0.10 },
+        { "id": "S2.heap", "text": "store heap overhead ≤ 1× the retained size of the plain row objects", "metric": "storeHeapOverheadRatio", "op": "<=", "value": 1 }
+      ]
+    },
+    "S3": {
+      "scenario": "Bulk replace of 50k rows with { chunk: 'auto' }",
+      "parameters": { "rows": { "$ref": "scale.largestCollection.rows" }, "fields": { "$ref": "scale.largestCollection.fields" }, "chunk": "auto" },
+      "conditions": [
+        { "id": "S3.task", "text": "No main-thread task over 50 ms", "metric": "maxMainThreadTaskMs", "op": "<=", "value": 50 }
+      ],
+      "reported": [
+        { "text": "total time reported", "metric": "totalMs" }
+      ]
+    },
+    "S4a": {
+      "scenario": "Agent batch: agent apply, inspect(), rollback, no holds",
+      "ruling": 2,
+      "parameters": { "fieldEdits": { "$ref": "scale.agentBatch.fieldEdits" }, "rows": { "$ref": "scale.agentBatch.rows" } },
+      "conditions": [
+        { "id": "S4a.apply", "text": "agent apply ≤ 8 ms", "metric": "agentApplyMs", "op": "<=", "value": 8 },
+        { "id": "S4a.inspect", "text": "inspect() ≤ 2 ms", "metric": "inspectMs", "op": "<=", "value": 2 },
+        { "id": "S4a.rollback", "text": "rollback ≤ 8 ms", "metric": "rollbackMs", "op": "<=", "value": 8 }
+      ]
+    },
+    "S4b": {
+      "scenario": "Agent batch: selective undo",
+      "ruling": 2,
+      "parameters": { "fieldEdits": { "$ref": "scale.agentBatch.fieldEdits" }, "rows": { "$ref": "scale.agentBatch.rows" } },
+      "conditions": [
+        { "id": "S4b.undo", "text": "selective undo ≤ 8 ms", "metric": "selectiveUndoMs", "op": "<=", "value": 8 }
+      ]
+    },
+    "S4c": {
+      "scenario": "Agent batch applied while the user types into a held field every 100 ms",
+      "ruling": 2,
+      "parameters": { "fieldEdits": { "$ref": "scale.agentBatch.fieldEdits" }, "rows": { "$ref": "scale.agentBatch.rows" }, "keystrokeEveryMs": 100 },
+      "conditions": [
+        { "id": "S4c.held", "text": "User's held value never overwritten (W2)", "metric": "heldValueOverwrites", "op": "==", "value": 0 },
+        { "id": "S4c.keystroke", "text": "each user keystroke processed ≤ 50 ms", "metric": "maxKeystrokeMs", "op": "<=", "value": 50 }
+      ]
+    },
+    "S5": {
+      "scenario": "Soak: 8 hours of S2 + S4 traffic with the plugins that exist at the phase installed; the final S5 has transactions, restoration({ retain: 100 }) and writers",
+      "ruling": 2,
+      "parameters": {
+        "sessionHours": { "$ref": "scale.sessionLengthHours" },
+        "plugins": { "text": "whichever plugins exist at that phase; the final S5 has all three", "transactions": true, "restoration": { "retain": 100 }, "writers": true },
+        "nightlyCompression": { "text": "nightly may compress time but must apply at least 2M writes", "minWrites": 2000000 }
+      },
+      "conditions": [
+        { "id": "S5.heap", "text": "Heap growth over the final half of the run ≤ 2%", "metric": "heapGrowthFinalHalf", "op": "<=", "value": 0.02 },
+        { "id": "S5.caps", "text": "every plugin's internal collections stay at or below their configured caps", "metric": "collectionsOverCap", "op": "==", "value": 0 }
+      ]
+    },
+    "S6": {
+      "scenario": "Scoped opt-in",
+      "parts": {
+        "S6a": {
+          "text": "a core-only bundle contains no plugin code (symbol scan)",
+          "owner": "ci/core-bundle-scan.mjs",
+          "ruling": 4
+        },
+        "S6b": {
+          "text": "with every plugin attached to a different 10% subtree, M1, S1 and S2 stay within ±5% of a bare tree",
+          "parameters": { "subtreeShare": 0.10 },
+          "compare": { "scenarios": ["M1", "S1", "S2"], "variant": "scoped-plugins", "against": "bare" },
+          "conditions": [
+            { "id": "S6b.within", "text": "within ±5% of a bare tree", "op": "withinRelative", "value": 0.05 }
+          ]
+        },
+        "S6c": {
+          "text": "the core-only bundle has identical bytes with and without the plugin folders",
+          "owner": "ci/core-bundle-scan.mjs",
+          "ruling": 4
+        }
+      }
+    },
+    "S7": {
+      "scenario": "Contention: a write to a location held by 1, 2, 8 and 32 owners, where owners = pending transactions plus declared holders on the location",
+      "environment": { "runtime": "node", "cpuThrottlingRate": 1, "ruling": 5 },
+      "parameters": { "owners": [1, 2, 8, 32], "linksElsewhere": [10, 10000] },
+      "conditions": [
+        { "id": "S7.bound", "text": "cost(n) ≤ cost(1) + n × 0.5 µs at Node 1× (provisional coefficient), for n = 1, 2, 8, 32 owners", "metric": "writeCostUs", "op": "ownerBound", "coefficientUs": 0.5, "provisional": true, "ruling": 5 },
+        { "id": "S7.links", "text": "an uncontended write is unchanged (±10%) with 10 vs 10,000 links elsewhere (C4)", "metric": "uncontendedLinksDelta", "op": "withinRelative", "value": 0.10 }
+      ]
+    },
+    "Q1": {
+      "scenario": "Correctness",
+      "owner": "tests and the oracle, not this harness",
+      "conditions": [
+        { "id": "Q1.ported", "text": "100% of ported tests pass" },
+        { "id": "Q1.oracle", "text": "the oracle finds zero unlisted differences" },
+        { "id": "Q1.adapters", "text": "every adapter passes its conformance and bypass suites" }
+      ]
+    }
+  },
+  "reportedNeverGated": ["bundle sizes", "nanoseconds per isolated operation", "construction microseconds"]
+}
