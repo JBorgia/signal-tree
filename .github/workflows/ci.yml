@@ -29,7 +29,7 @@ jobs:
       - run: pnpm typecheck
       - name: Lint, 4.1 import boundaries and rule 7 reachability
         run: pnpm lint
-      - name: S6(a) core-only bundle contains no plugin code
+      - name: S6(a) no plugin code, S6(c) byte identity, no bench-only code in production
         run: pnpm scan:core-bundle
       - run: pnpm test
       - name: Port manifest matches the source tags
