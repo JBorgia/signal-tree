@@ -24,6 +24,7 @@ const SCALAR_WRITES = new Set(['setLeaf', 'updateLeaf', 'setBranch']);
 export const T10 = instanceProperty({
   id: 'T10',
   row: ROW,
+  clauses: { a: 'observer errors reach onTreeError', b: 'reported with [ST2034]', c: 'transact() and confirm() are not stranded' },
   reason: 'The per-second cap is not tested: a sequence makes fewer than 50 observer calls and has no clock.',
   instances(trace) {
     const analysis = analyze(trace);
@@ -42,7 +43,8 @@ export const T10 = instanceProperty({
             'not-reported',
             { onTreeErrorEvents: `at least ${throws}` },
             { onTreeErrorEvents: treeErrors.length },
-            `the observer threw ${throws} time(s) at step ${s.index}`
+            `the observer threw ${throws} time(s) at step ${s.index}`,
+            'a'
           )
         );
       }
@@ -54,7 +56,8 @@ export const T10 = instanceProperty({
           'no-ST2034',
           { code: 'ST2034' },
           { codes: codes as string[] },
-          `observer error at step ${s.index} reported with [ST2034]`
+          `observer error at step ${s.index} reported with [ST2034]`,
+          'b'
         )
       );
       if (s.op.kind === 'transact' && s.op.body.every((w) => SCALAR_WRITES.has(w.kind))) {
@@ -65,7 +68,8 @@ export const T10 = instanceProperty({
             'transact-stranded',
             { transact: 'ok' },
             { transact: outcomeSummary(s.outcome) },
-            `transact() at step ${s.index} with a throwing observer`
+            `transact() at step ${s.index} with a throwing observer`,
+            'c'
           )
         );
       }
@@ -79,7 +83,8 @@ export const T10 = instanceProperty({
               'confirm-stranded',
               { confirm: 'ok' },
               { confirm: outcomeSummary(s.outcome) },
-              `confirm(tx${tx.index}) at step ${s.index} with a throwing observer`
+              `confirm(tx${tx.index}) at step ${s.index} with a throwing observer`,
+              'c'
             )
           );
         }

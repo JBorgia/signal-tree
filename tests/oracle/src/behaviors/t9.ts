@@ -53,6 +53,12 @@ function changesOf(s: StepInfo): InspectValue['changes'] | undefined {
 export const T9 = instanceProperty({
   id: 'T9',
   row: ROW,
+  clauses: {
+    a: "each status is 'current' or 'superseded'",
+    b: 'while pending, every changed location is reported',
+    c: "while pending, an untouched change is 'current'",
+    d: 'after confirm() or rollback(), the report is a snapshot',
+  },
   instances(trace) {
     const analysis = analyze(trace);
     const found: Instance[] = [];
@@ -71,7 +77,8 @@ export const T9 = instanceProperty({
           'unknown-status',
           { statuses: "each 'current' or 'superseded'" },
           { statuses },
-          `inspect(tx${tx.index}) at step ${s.index}`
+          `inspect(tx${tx.index}) at step ${s.index}`,
+          'a'
         )
       );
       const pending = txStatus(tx, s.index) === 'pending';
@@ -88,7 +95,8 @@ export const T9 = instanceProperty({
               'change-not-reported',
               { reported: [...tx.changed] },
               { paths: changes.map((c) => c.path), missing },
-              `inspect(tx${tx.index}) while pending reports each location it changed`
+              `inspect(tx${tx.index}) while pending reports each location it changed`,
+              'b'
             )
           );
         }
@@ -107,7 +115,8 @@ export const T9 = instanceProperty({
               'standing-change-not-current',
               { path: c.path, status: 'current' },
               { path: c.path, status: c.status },
-              `nothing wrote ${c.path} after tx${tx.index}, so its contribution stands`
+              `nothing wrote ${c.path} after tx${tx.index}, so its contribution stands`,
+              'c'
             )
           );
         }
@@ -124,7 +133,8 @@ export const T9 = instanceProperty({
               'snapshot-changed',
               first.changes,
               changes as unknown as Json,
-              `inspect(tx${tx.index}) after settlement matches the report at step ${first.step}`
+              `inspect(tx${tx.index}) after settlement matches the report at step ${first.step}`,
+              'd'
             )
           );
         }

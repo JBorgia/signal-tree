@@ -26,6 +26,11 @@ export const ROW =
 export const T3 = instanceProperty({
   id: 'T3',
   row: ROW,
+  clauses: {
+    a: 'older rollback while a newer overlapping one is pending refuses with later-pending-dependency',
+    b: 'rollback of the newer one succeeds',
+    c: 'rollback of the older one after the newer was rolled back succeeds',
+  },
   instances(trace) {
     const analysis = analyze(trace);
     const found: Instance[] = [];
@@ -42,7 +47,8 @@ export const T3 = instanceProperty({
             observed.status === 'refused' ? `cause-${observed.cause ?? 'none'}` : 'rollback-completed',
             { status: 'refused', cause: 'later-pending-dependency' },
             observed,
-            `rollback(${tx}) while newer overlapping tx${ctx.pendingNewer.map((t) => t.index).join(', tx')} is pending`
+            `rollback(${tx}) while newer overlapping tx${ctx.pendingNewer.map((t) => t.index).join(', tx')} is pending`,
+            'a'
           )
         );
         continue;
@@ -68,7 +74,8 @@ export const T3 = instanceProperty({
             'newer-rollback-refused',
             { status: 'ok' },
             observed,
-            `rollback(${tx}), the newer of two overlapping pending transactions`
+            `rollback(${tx}), the newer of two overlapping pending transactions`,
+            'b'
           )
         );
       } else if (ctx.rolledBackNewer.length > 0) {
@@ -79,7 +86,8 @@ export const T3 = instanceProperty({
             'older-rollback-refused',
             { status: 'ok' },
             observed,
-            `rollback(${tx}) after the newer overlapping tx${ctx.rolledBackNewer.map((t) => t.index).join(', tx')} was rolled back`
+            `rollback(${tx}) after the newer overlapping tx${ctx.rolledBackNewer.map((t) => t.index).join(', tx')} was rolled back`,
+            'c'
           )
         );
       }

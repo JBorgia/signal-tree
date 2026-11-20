@@ -53,6 +53,13 @@ export interface SpecCase {
   };
 }
 
+export interface ClauseStats {
+  /** Per subject: sequences where the clause was checked and held every time. */
+  readonly holds: Record<string, number>;
+  /** Per subject: sequences where the clause was checked and violated at least once. */
+  readonly violates: Record<string, number>;
+}
+
 export interface BehaviorStats {
   /** Sequences in which the behavior applied on at least one subject. */
   exercised: number;
@@ -60,6 +67,8 @@ export interface BehaviorStats {
   readonly holds: Record<string, number>;
   /** Per subject: sequences where it applied and was violated at least once. */
   readonly violates: Record<string, number>;
+  /** For a property with clauses: the same counts per clause. */
+  readonly clauses: Record<string, ClauseStats>;
 }
 
 export interface ViolationGroup {
@@ -116,20 +125,31 @@ export interface Evaluation {
   readonly trace: SpecTrace;
   /** Verdicts of the properties that apply. */
   readonly verdicts: ReadonlyMap<BehaviorId, Verdict>;
+  /** Every instance of the properties that apply. */
+  readonly instances: ReadonlyMap<BehaviorId, readonly Verdict[]>;
 }
 
 /** Replays `sequence` on `subject` and evaluates every property that applies. */
 export async function evaluate(subject: Subject, sequence: Sequence, properties: readonly Property[]): Promise<Evaluation> {
   const trace: SpecTrace = { sequence, records: await runSequence(subject, sequence) };
   const verdicts = new Map<BehaviorId, Verdict>();
+  const instances = new Map<BehaviorId, readonly Verdict[]>();
   for (const property of properties) {
     try {
-      if (property.applies(trace)) verdicts.set(property.id, property.check(trace));
+      if (!property.applies(trace)) continue;
+      verdicts.set(property.id, property.check(trace));
+      const all = property.instances(trace);
+      for (const v of all) {
+        if (property.clauses ? v.clause === undefined || !(v.clause in property.clauses) : v.clause !== undefined) {
+          throw new Error(`verdict at step ${v.step} names clause ${String(v.clause)}, which ${property.id} does not declare`);
+        }
+      }
+      instances.set(property.id, all);
     } catch (thrown) {
       throw new PropertyError(property.id, subject.name, sequence, thrown);
     }
   }
-  return { subject: subject.name, trace, verdicts };
+  return { subject: subject.name, trace, verdicts, instances };
 }
 
 export function arbitraryFor(options: Pick<GenerateOptions, 'subjects' | 'plugins' | 'maxSteps'>) {
@@ -159,12 +179,14 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
   const properties = catalog.filter(isProperty);
   const arb = arbitraryFor(options);
 
+  const zeros = () => Object.fromEntries(subjects.map((s) => [s.name, 0]));
   const stats = new Map<BehaviorId, BehaviorStats>();
   for (const p of properties) {
     stats.set(p.id, {
       exercised: 0,
-      holds: Object.fromEntries(subjects.map((s) => [s.name, 0])),
-      violates: Object.fromEntries(subjects.map((s) => [s.name, 0])),
+      holds: zeros(),
+      violates: zeros(),
+      clauses: Object.fromEntries(Object.keys(p.clauses ?? {}).map((c) => [c, { holds: zeros(), violates: zeros() }])),
     });
   }
   const violations = new Map<string, Target & { count: number }>();
@@ -177,10 +199,19 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
       const run = index++;
       const applied = new Set<BehaviorId>();
       for (const subject of subjects) {
-        const { verdicts } = await evaluate(subject, sequence, properties);
+        const { verdicts, instances } = await evaluate(subject, sequence, properties);
         for (const [behavior, verdict] of verdicts) {
           applied.add(behavior);
           const s = stats.get(behavior) as BehaviorStats;
+          const byClause = new Map<string, boolean>();
+          for (const v of instances.get(behavior) ?? []) {
+            if (v.clause !== undefined) byClause.set(v.clause, (byClause.get(v.clause) ?? true) && v.holds);
+          }
+          for (const [clause, held] of byClause) {
+            const c = s.clauses[clause] as ClauseStats;
+            const counts = held ? c.holds : c.violates;
+            counts[subject.name] = (counts[subject.name] ?? 0) + 1;
+          }
           if (verdict.holds) {
             s.holds[subject.name] = (s.holds[subject.name] ?? 0) + 1;
             if (!holding.has(behavior)) holding.set(behavior, { behavior, subject, kind: undefined, firstRun: run, sequence });

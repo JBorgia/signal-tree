@@ -21,6 +21,7 @@ export const ROW =
 export const T2 = instanceProperty({
   id: 'T2',
   row: ROW,
+  clauses: { a: 'a refused rollback changes nothing', b: 'confirm() stays available', c: 'a retried rollback() stays available' },
   instances(trace) {
     const analysis = analyze(trace);
     const found: Instance[] = [];
@@ -50,7 +51,8 @@ export const T2 = instanceProperty({
             after,
             same
               ? `the refused rollback at step ${s.index} changed nothing`
-              : `the rollback at step ${s.index} refused but changed state or history`
+              : `the rollback at step ${s.index} refused but changed state or history`,
+              'a'
           )
         );
       }
@@ -69,7 +71,8 @@ export const T2 = instanceProperty({
             { confirm: summary(next.outcome) },
             ok
               ? `confirm() after the refused rollback at step ${s.index} succeeded`
-              : `confirm() after the refused rollback at step ${s.index} was not available`
+              : `confirm() after the refused rollback at step ${s.index} was not available`,
+              'b'
           )
         );
       } else {
@@ -84,7 +87,8 @@ export const T2 = instanceProperty({
             { rollback: summary(o) },
             ok
               ? `the retried rollback at step ${next.index} was available`
-              : `the retried rollback at step ${next.index} failed without naming a cause`
+              : `the retried rollback at step ${next.index} failed without naming a cause`,
+              'c'
           )
         );
       }
