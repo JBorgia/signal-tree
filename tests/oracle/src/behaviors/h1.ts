@@ -12,6 +12,9 @@
 // (c) each of those runs read the whole hydrated state.
 // A hydration that throws fails (a). Origin 'server' is not checked: the
 // published packages have no writer identity. Steps after destroy() are D1's.
+// A key that disagrees with selectId(row) is reported under O3 at the step
+// that made it. A key that is always selectId(row) survives a snapshot that
+// carries rows only, so (a) fails on keys only after O3 has reported one.
 import type { HydrateValue, Json, StateView } from '../model.js';
 import { canonical } from '../trace.js';
 import { analyze, destroyedAt } from './analysis.js';

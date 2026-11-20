@@ -14,7 +14,7 @@ const watch = (reader: Reader, react: Reaction = { kind: 'none' }): Step => step
 const leaf = (path: LeafPath): Reader => ({ kind: 'leaf', path });
 const sequence = (...steps: Step[]): Sequence => ({ config: { transactions: true, restoration: true }, steps });
 
-const kinds: readonly OpKind[] = [...MODEL_KINDS, 'observe', 'destroy', 'hydrate', 'scopeAwait'];
+const kinds: readonly OpKind[] = [...MODEL_KINDS, 'observe', 'destroy', 'hydrate', 'scopeAwait', 'changeId'];
 const model = (name: string, options: ModelOptions = {}) => modelSubject(name, { kinds, restoration: true, ...options });
 const correct = model('correct');
 
@@ -60,6 +60,20 @@ describe('O2: one turn, one change', () => {
 describe('O3: every read path agrees', () => {
   it('catches a count() that lags the rows', async () => {
     await caught('O3', { staleCount: true }, sequence(write({ kind: 'addOne', row: { id: 'r1', n: 0, m: 0 } })), 'read-paths-disagree');
+  });
+
+  // BRIEF.md 4.4: a row's key is always selectId(row), here row => row.id.
+  const rekeyed = sequence(write({ kind: 'addOne', row: { id: 'r1', n: 0, m: 0 } }), write({ kind: 'changeId', from: 'r1', to: 'r2' }));
+
+  it('catches a key change that leaves the id field, so the key is not selectId(row)', async () => {
+    const v = await caught('O3', { changeIdKeepsField: true }, rekeyed, 'key-not-selectId');
+    expect(v).toMatchObject({ step: 1, observed: { keysNotSelected: ['r2: "r1"'] } });
+  });
+
+  it('reports the published kernels, which change the key and keep the id field', async () => {
+    const { provenance, verdicts } = await judge([await loadSubject('v15'), await loadSubject('v16')], 'O3', rekeyed);
+    expect(provenance).toEqual({ v15: 'violates', v16: 'violates' });
+    expect(verdicts['v16']).toMatchObject({ kind: 'key-not-selectId', step: 1 });
   });
 });
 
