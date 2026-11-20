@@ -1,4 +1,4 @@
-// The behavior IDs of BRIEF.md 5.1, 5.2 and 12.4, in table order. Every list
+// The behavior IDs of BRIEF.md 5.1, 5.2, 12.4 and 12.5, in table order. Every list
 // of IDs in ci/ comes from here; behavior-ids.spec.ts checks it against the
 // tables in BRIEF.md, so a new row cannot be missed in one place.
 export const BEHAVIOR_IDS = [
@@ -9,6 +9,9 @@ export const BEHAVIOR_IDS = [
   'W1', 'W2', 'W3', 'W4',
   // 12.4
   'O1', 'O2', 'O3', 'O4', 'X3', 'D1', 'D2', 'W5', 'H1',
+  // 12.5
+  'R5', 'R6', 'R7', 'R8', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8',
+  'E3', 'E4', 'L4', 'L5', 'T11', 'T12', 'T13', 'H2', 'X4', 'X5', 'X6', 'F1', 'W6',
 ];
 
 /** A fresh global pattern for a bracketed behavior ID in a test title, for example `[T3]`. Longest IDs first, so T10 is not read as T1. */
