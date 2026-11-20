@@ -83,8 +83,10 @@ jobs:
     # SIGNAL_TREE_GATES_RUNNER (#14), falling back to ubuntu-latest until it exists.
     name: Gates (Angular reference app)
     needs: pr-lookup
+    # Never on a fork's pull request: the gates runner is self-hosted and the repository public.
     if: >-
-      always() && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+      always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+      && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
       || (github.event_name == 'push' && needs.pr-lookup.outputs.open != 'true'))
     runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
     timeout-minutes: 120
@@ -132,3 +134,19 @@ jobs:
           name: gate-results
           path: bench/out/*.json
           if-no-files-found: ignore
+
+  no-attribution:
+    # Required check (ruling 17's ruleset): no commit in the pull request and
+    # not its description may carry tool attribution (ci/attribution.mjs).
+    name: No tool attribution in commits or description
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - name: Check every commit in the pull request and its description
+        run: node ci/no-attribution.mjs --base "${{ github.event.pull_request.base.sha }}" --head "${{ github.event.pull_request.head.sha }}"

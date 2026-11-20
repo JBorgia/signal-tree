@@ -12,6 +12,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
+    "prepare": "node ci/setup.mjs",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "lint": "eslint packages ci tests bench && node ci/boundaries.mjs",
