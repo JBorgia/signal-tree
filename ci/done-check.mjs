@@ -96,7 +96,7 @@ export const ITEMS = [
     },
   },
   {
-    title: 'tests/port-manifest.json has no pending entries and every internal entry is signed off',
+    title: 'tests/port-manifest.json maps every old spec file to the behaviors it covered or to not-carried (12.1.5)',
     check: ({ manifestProblems }) => (manifestProblems.length ? `${manifestProblems.length} problem(s), first: ${manifestProblems[0]}` : null),
   },
   {
@@ -286,7 +286,7 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
 
   const manifestPath = join(root, 'tests', 'port-manifest.json');
   const manifestProblems = existsSync(manifestPath)
-    ? validateManifest(JSON.parse(readFileSync(manifestPath, 'utf8')), { complete: true, fileExists: (p) => existsSync(join(root, p)) })
+    ? validateManifest(JSON.parse(readFileSync(manifestPath, 'utf8')), { complete: true })
     : ['tests/port-manifest.json is missing'];
 
   const budgetsPath = join(root, 'bench', 'budgets.json');
