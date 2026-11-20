@@ -35,6 +35,31 @@ jobs:
       - name: Port manifest matches the source tags
         run: pnpm manifest:check --tags
 
+  oracle:
+    name: Oracle, v16.0.0-rc.1 against itself, 10,000 sequences
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck the oracle
+        run: pnpm --filter @signal-tree/oracle typecheck
+      - name: Oracle self-tests
+        run: pnpm --filter @signal-tree/oracle test
+      - name: Zero differences over 10,000 sequences
+        run: pnpm oracle --a v16 --b v16 --runs 10000
+      - name: Keep the oracle report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: oracle-report
+          path: tests/oracle/out/
+          if-no-files-found: ignore
+
   no-attribution:
     # Required check (ruling 17's ruleset): no commit in the pull request and
     # not its description may carry tool attribution (ci/attribution.mjs).
