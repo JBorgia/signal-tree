@@ -18,6 +18,7 @@ import {
   type OpKind,
   type Outcome,
   type Row,
+  type RowField,
   type TreeConfig,
   type WriteOp,
   kindsOf,
@@ -42,14 +43,15 @@ interface KernelLocation {
 
 interface KernelRowNode extends KernelLocation {
   readonly n: KernelLocation;
+  readonly m: KernelLocation;
 }
 
 interface KernelRows {
   addOne(row: Row): unknown;
   addMany(rows: Row[], opts: { mode: string }): unknown;
   setAll(rows: Row[]): void;
-  updateOne(id: string, changes: { n: number }): void;
-  updateMany(ids: string[], changes: { n: number }): void;
+  updateOne(id: string, changes: Partial<Record<RowField, number>>): void;
+  updateMany(ids: string[], changes: Partial<Record<RowField, number>>): void;
   upsertOne(row: Row): unknown;
   upsertMany(rows: Row[]): unknown;
   removeOne(id: string): void;
@@ -383,7 +385,7 @@ class KernelSession implements Session {
 
   #write(w: WriteOp): Json | undefined {
     const rows = this.#tree.$.rows;
-    const copy = (r: Row): Row => ({ id: r.id, n: r.n });
+    const copy = (r: Row): Row => ({ id: r.id, n: r.n, m: r.m });
     switch (w.kind) {
       case 'setLeaf':
         this.#leaf(w.path)(w.value);
@@ -402,10 +404,10 @@ class KernelSession implements Session {
         rows.setAll(w.rows.map(copy));
         return undefined;
       case 'updateOne':
-        rows.updateOne(w.id, { n: w.n });
+        rows.updateOne(w.id, { [w.field]: w.value });
         return undefined;
       case 'updateMany':
-        rows.updateMany([...w.ids], { n: w.n });
+        rows.updateMany([...w.ids], { [w.field]: w.value });
         return undefined;
       case 'upsertOne':
         return toJson(rows.upsertOne(copy(w.row)));
@@ -431,7 +433,7 @@ class KernelSession implements Session {
       case 'setField': {
         const node = rows.byId(w.id);
         if (!node) return { found: false };
-        node.n(w.n);
+        node[w.field](w.value);
         return undefined;
       }
     }

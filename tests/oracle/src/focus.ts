@@ -15,6 +15,7 @@ import {
   type LinkSource,
   type Op,
   type OpKind,
+  type Row,
   type RowKey,
   type Sequence,
   type Step,
@@ -51,8 +52,8 @@ const location = fc.oneof(
       read ? { kind: 'updateLeaf', path, delta: v } : { kind: 'setLeaf', path, value: v },
   })),
   key.map((id) => ({
-    setup: [{ kind: 'addOne', row: { id, n: 0 } }] as WriteOp[],
-    write: (v: number): WriteOp => ({ kind: 'updateOne', id, n: v }),
+    setup: [{ kind: 'addOne', row: { id, n: 0, m: 0 } }] as WriteOp[],
+    write: (v: number): WriteOp => ({ kind: 'updateOne', id, field: 'n', value: v }),
   }))
 );
 
@@ -99,15 +100,94 @@ const newerTruth: Shape = {
     })
     .map(({ keys: [from, to], n, variant, leafToo, v }) => {
       const rekey = variant.startsWith('rekey');
-      const body: WriteOp[] = [rekey ? { kind: 'changeId', from, to } : { kind: 'updateOne', id: from, n }];
+      const body: WriteOp[] = [rekey ? { kind: 'changeId', from, to } : { kind: 'updateOne', id: from, field: 'n', value: n }];
       if (leafToo) body.push({ kind: 'setLeaf', path: 'a', value: v });
       const id: RowKey = rekey ? to : from;
-      const truth: WriteOp = variant.endsWith('remove') ? { kind: 'removeOne', id } : { kind: 'updateOne', id, n: other(n) };
+      const truth: WriteOp = variant.endsWith('remove')
+        ? { kind: 'removeOne', id }
+        : { kind: 'updateOne', id, field: 'n', value: other(n) };
       return [
-        one(write({ kind: 'addOne', row: { id: from, n: 0 } })),
+        one(write({ kind: 'addOne', row: { id: from, n: 0, m: 0 } })),
         one(transact(body)),
         one(write(truth, 'external')),
         one(settle('rollback', 0)),
+        one(settle('confirm', 0)),
+      ];
+    }),
+};
+
+/**
+ * A transaction, then one later write that touches its locations in a way T4
+ * counts (an unread overwrite, a re-insert, a same-value row replace, setAll,
+ * clear, an inbound link value), or only another field of its row (T5), by
+ * an ordinary write or newer truth, optionally in the rollback's own turn;
+ * then rollback (T4, T5, T7).
+ */
+const laterTouch: Shape = {
+  needs: [
+    'transact',
+    'rollback',
+    'confirm',
+    'setLeaf',
+    'addOne',
+    'updateOne',
+    'removeOne',
+    'replaceOne',
+    'setAll',
+    'clear',
+    'linkOpen',
+    'linkPush',
+  ],
+  plugins: true,
+  segments: fc
+    .record({
+      k: key,
+      v: value,
+      variant: fc.constantFrom('unread-leaf', 'unread-field', 'other-field', 'same-row', 'reinsert', 'set-all', 'clear', 'link'),
+      truth: fc.boolean(),
+      sameTurn: fc.boolean(),
+    })
+    .map(({ k, v, variant, truth, sameTurn }) => {
+      const row = (n: number): Row => ({ id: k, n, m: 0 });
+      const field = (f: 'n' | 'm', value: number): WriteOp => ({ kind: 'updateOne', id: k, field: f, value });
+      const setup: Step[] = [step(write({ kind: 'addOne', row: row(0) }))];
+      let body: WriteOp[] = [field('n', v)];
+      let later: WriteOp | undefined;
+      switch (variant) {
+        case 'unread-leaf':
+          body = [{ kind: 'setLeaf', path: 'a', value: v }];
+          later = { kind: 'setLeaf', path: 'a', value: other(v) };
+          break;
+        case 'unread-field':
+          later = field('n', other(v));
+          break;
+        case 'other-field':
+          later = field('m', v);
+          break;
+        case 'same-row':
+          later = { kind: 'replaceOne', id: k, row: row(v) };
+          break;
+        case 'reinsert':
+          body = [{ kind: 'removeOne', id: k }];
+          later = { kind: 'addOne', row: row(0) };
+          break;
+        case 'set-all':
+          later = { kind: 'setAll', rows: [row(v)] };
+          break;
+        case 'clear':
+          later = { kind: 'clear' };
+          break;
+        case 'link':
+          setup.push(step({ kind: 'linkOpen', source: 'a', mode: 'sync' }));
+          body = [{ kind: 'setLeaf', path: 'a', value: v }];
+          break;
+      }
+      const touch: Op = later ? write(later, truth ? 'external' : 'none') : { kind: 'linkPush', link: 0, value: other(v) };
+      const rollback = step(settle('rollback', 0));
+      return [
+        setup,
+        one(transact(body)),
+        ...(sameTurn ? [[step(touch, true), rollback]] : [one(touch), [rollback]]),
         one(settle('confirm', 0)),
       ];
     }),
@@ -120,10 +200,10 @@ const heldRow: Shape = {
   segments: fc
     .record({ k: key, n: value, reuse: fc.constantFrom<'addOne' | 'upsertOne'>('addOne', 'upsertOne'), early: fc.boolean() })
     .map(({ k, n, reuse, early }) => [
-      one(write({ kind: 'addOne', row: { id: k, n: 0 } })),
+      one(write({ kind: 'addOne', row: { id: k, n: 0, m: 0 } })),
       [step({ kind: 'rowHold', id: k }), ...(early ? [step({ kind: 'rowHeldRead', handle: 0 })] : [])],
       one(write({ kind: 'removeOne', id: k })),
-      one(write({ kind: reuse, row: { id: k, n } })),
+      one(write({ kind: reuse, row: { id: k, n, m: 0 } })),
       one({ kind: 'rowHeldWrite', handle: 0, n: other(n) }),
       one({ kind: 'rowHeldRead', handle: 0 }),
     ]),
@@ -251,6 +331,7 @@ export function focusedArb(options: {
   const shapes = [
     overlapping(options.kinds.has('inspect')),
     newerTruth,
+    laterTouch,
     heldRow,
     undoOverNewer,
     undoAroundTransaction,

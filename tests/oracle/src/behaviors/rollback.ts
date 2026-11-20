@@ -1,82 +1,96 @@
 // What happened to a transaction's locations between the step that opened it
 // and a rollback of it. T3–T7 each name a situation in these terms (a newer
-// overlapping transaction still open, a later confirmed write that depends on
-// the change, newer truth that removed or updated a row, a rollback's
-// compensation); a property applies only when the situation is unambiguous,
-// so its expected outcome is the row's and nothing else.
+// pending transaction on its locations, a later confirmed write that touched
+// them, newer truth that removed a row or wrote another field of one, a
+// rollback's compensation).
 //
-// How a later write relates to the change, per location:
-// - removed: a row it left absent. By newer truth that is supersession (T5).
-// - depends: a row it updated (present before and after; T5 calls an update
-//   by newer truth "depends"), or a leaf it read and rewrote (updateLeaf).
-// - unclassified: a leaf it overwrote without reading it, or a row it
-//   re-inserted. No row says whether that depends on the change.
-// A transaction that wrote the whole collection (setAll, clear) is treated as
-// covering every row: whether a later change to a row it left alone overlaps
-// it is not fixed by the rows, so such a change makes the context ambiguous.
-// So does a later write that names one of the transaction's locations but
-// leaves its value as it was (rewriting the same value, or a setAll that
-// keeps a removed row absent): no row says whether that depends on the change.
-// And so does a later write in the turn the rollback runs in (no turn ended
-// between them): no row says whether a write is confirmed before its turn ends.
-import type { Op, WriteOp } from '../model.js';
+// Locations follow T4 (see Loc and Touches in analysis.ts): the transaction's
+// locations are the ones it changed; a later step counts on them when its
+// writes touched an overlapping location, whether or not it read the value,
+// wrote the value already there (unless the seam skipped it), re-inserted a
+// removed key, replaced the collection, ran in the rollback's own turn or
+// came from a link (linkPush, linkRetrieve). A later write relates to the
+// change, per location:
+// - removed: a location in a row it removed (present before the write,
+//   absent after). By newer truth that is supersession (T5); by anyone else
+//   it is a touch like any other (T4).
+// - depends: any other touched location.
+// A later write that touched only other fields of a row the transaction
+// changed is a side write: neither (T5), so a rollback keeps it.
+//
+// Skipped (the context is ambiguous), one reason each:
+// - the transaction or a step after it whose state could not be read, or
+//   whose writes do not reproduce the state it left: what it touched cannot
+//   be seen;
+// - an inbound link value that would leave the state as it was: whether it
+//   landed cannot be seen;
+// - a step touching a row the transaction rewrote without changing its key or
+//   presence (replace, setAll keeping it): T4 counts touches of locations the
+//   transaction "changed", and no row says whether such a rewrite changed one;
+// - a link value that removed a row the transaction changed: no row says
+//   whether a link is "another writer context", so T4 (dependency) and T5
+//   (supersession) disagree;
+// - a declaration's work on the transaction's locations: it may belong to the
+//   pending owners it names, so no row says whether it is a confirmed write;
+// - an undo or redo on the transaction's locations: it may be reversing the
+//   transaction's own entry, which no row covers while it is pending;
+// - a confirm, or a write that failed, that changed the transaction's
+//   locations: which writes it made cannot be seen;
+// - a rollback of an older transaction that changed them: reachable only
+//   after that rollback ignored T3.
 import {
   analyze,
-  intersection,
-  isRowLoc,
-  rowAt,
+  hasRow,
+  isExistenceLoc,
+  names,
+  overlapping,
+  overlapsAny,
+  rowKeyOf,
   txStatus,
-  writeTargets,
   type Analysis,
   type Loc,
   type TxInfo,
 } from './analysis.js';
 import type { SpecTrace } from '../trace.js';
 
-/** A later write that changed some of the transaction's locations and still stands. */
+export type WriteBy =
+  /** an ordinary top-level write, or a write through a held row handle */
+  | 'write'
+  /** a write inside external(): truth from another authority */
+  | 'external'
+  /** an inbound link value (linkPush, linkRetrieve) */
+  | 'link'
+  /** a newer transaction, confirmed before the rollback */
+  | 'confirmed-transaction';
+
+/** A later write that touched some of the transaction's locations. */
 export interface LaterWrite {
   readonly step: number;
-  /**
-   * write     an ordinary top-level write, or a write through a held row handle
-   * external  a write inside external(): truth from another authority
-   * confirmed-transaction  a newer transaction, confirmed before the rollback
-   */
-  readonly by: 'write' | 'external' | 'confirmed-transaction';
-  /** The transaction's locations it changed. */
+  readonly by: WriteBy;
+  /** The transaction's locations it touched. */
   readonly locs: ReadonlySet<Loc>;
-  /** Of those, rows it left absent. */
+  /** Of those, locations in rows it removed. */
   readonly removed: ReadonlySet<Loc>;
-  /** Of those, rows it updated and leaves it read and rewrote: the write depends on the change. */
+  /** Of those, the rest. */
   readonly depends: ReadonlySet<Loc>;
-  /** Of those, leaves it overwrote unread and rows it re-inserted. */
-  readonly unclassified: ReadonlySet<Loc>;
 }
 
-/** Whether a step that ran names `loc` in one of its writes (writes, transactions, declarations). */
-export function names(op: Op, status: string, loc: Loc): boolean {
-  if (status !== 'ok' && status !== 'error') return false;
-  const writes: readonly WriteOp[] = op.kind === 'write' ? [op.write] : op.kind === 'transact' || op.kind === 'declare' ? op.body : [];
-  return writes.some((w) => {
-    const t = writeTargets(w);
-    return t.locs.includes(loc) || (t.allRows && isRowLoc(loc));
-  });
-}
-
-/** Whether `op` reads a leaf before writing it: its first write naming `loc` is updateLeaf. */
-function readsFirst(op: Op, loc: Loc): boolean {
-  const writes: readonly WriteOp[] = op.kind === 'write' ? [op.write] : op.kind === 'transact' ? op.body : [];
-  const first = writes.find((w) => writeTargets(w).locs.includes(loc));
-  return first?.kind === 'updateLeaf';
+/** A later write that touched fields of rows the transaction changed, none of them overlapping a location it changed. */
+export interface SideWrite {
+  readonly step: number;
+  readonly by: WriteBy;
+  readonly locs: ReadonlySet<Loc>;
 }
 
 export interface RollbackContext {
   readonly step: number;
   readonly tx: TxInfo;
-  /** Newer transactions, still pending, whose changes overlap this one's. */
+  /** Newer transactions, still pending, that touched this one's locations. */
   readonly pendingNewer: readonly TxInfo[];
-  /** Newer overlapping transactions already rolled back. */
+  /** Newer transactions on this one's locations already rolled back. */
   readonly rolledBackNewer: readonly TxInfo[];
   readonly later: readonly LaterWrite[];
+  readonly side: readonly SideWrite[];
   /** Steps where rolling back a newer transaction changed this one's locations. */
   readonly compensations: readonly number[];
   /** Why the rows do not fix the outcome, if they do not. */
@@ -93,15 +107,25 @@ export function rollbackContext(analysis: Analysis, step: number): RollbackConte
   return info.unknown ? { ...ctx, ambiguous: [...ctx.ambiguous, "the rollback step's effect could not be read"] } : ctx;
 }
 
+const list = (locs: Iterable<Loc>) => [...locs].join(', ');
+
 /** What happened to a pending transaction's locations from the step that opened it up to (not including) `step`. */
 export function contextAt(analysis: Analysis, tx: TxInfo, step: number): RollbackContext {
   const pendingNewer: TxInfo[] = [];
   const rolledBackNewer: TxInfo[] = [];
   const later: LaterWrite[] = [];
+  const side: SideWrite[] = [];
   const compensations: number[] = [];
   const ambiguous: string[] = [];
   if (tx.unknown) ambiguous.push('the transaction changed state that could not be read');
-  const wholeCollection = writesWholeCollection(tx);
+  if (!tx.touches) ambiguous.push("the transaction's writes do not reproduce the state it left");
+  const changedRows = new Set([...tx.changed].map(rowKeyOf).filter((k): k is string => k !== undefined));
+  const rewritten = new Set(
+    [...(tx.touches?.sure ?? []), ...(tx.touches?.maybe ?? [])]
+      .filter((loc) => isExistenceLoc(loc) && !tx.changed.has(loc))
+      .map((loc) => rowKeyOf(loc) as string)
+  );
+  const outside = (loc: Loc) => !overlapsAny([loc], tx.changed);
   for (let j = tx.step + 1; j < step; j++) {
     const s = analysis.steps[j];
     if (!s) continue;
@@ -109,45 +133,51 @@ export function contextAt(analysis: Analysis, tx: TxInfo, step: number): Rollbac
       ambiguous.push(`step ${j}: state could not be read`);
       continue;
     }
-    if (wholeCollection && [...s.changed].some((loc) => isRowLoc(loc) && !tx.changed.has(loc))) {
-      ambiguous.push(`step ${j}: changed a row the transaction's whole-collection write covers`);
-      continue;
-    }
-    const hit = intersection(s.changed, tx.changed);
-    const unchangedNamed = [...tx.changed].filter((loc) => !hit.has(loc) && names(s.op, s.outcome.status, loc));
-    if (unchangedNamed.length > 0) {
-      ambiguous.push(`step ${j}: ${s.op.kind} rewrote ${unchangedNamed.join(', ')} without changing it`);
-      continue;
-    }
-    if (hit.size === 0) continue;
-    const removed = new Set<Loc>();
-    const depends = new Set<Loc>();
-    const unclassified = new Set<Loc>();
-    for (const loc of hit) {
-      if (isRowLoc(loc)) {
-        const key = loc.slice(5);
-        if (rowAt(s.after, key) === undefined) removed.add(loc);
-        else if (rowAt(s.before, key) !== undefined) depends.add(loc);
-        else unclassified.add(loc);
-      } else if (readsFirst(s.op, loc)) {
-        depends.add(loc);
-      } else {
-        unclassified.add(loc);
+    const t = s.touches;
+    if (!t) {
+      if (overlapsAny(s.changed, tx.changed) || [...tx.changed].some((loc) => names(s.op, s.outcome.status, loc))) {
+        ambiguous.push(`step ${j}: its writes do not reproduce the state it left`);
       }
+      continue;
     }
-    const sameTurn = analysis.trace.sequence.steps.slice(j, step).every((x) => x.sameTick);
-    const write = (by: LaterWrite['by']) => {
-      if (sameTurn) ambiguous.push(`step ${j}: a write in the rollback's own turn`);
-      else later.push({ step: j, by, locs: hit, removed, depends, unclassified });
+    const hit = overlapping(t.sure, tx.changed);
+    const maybe = [...overlapping(t.maybe, tx.changed)].filter((loc) => !hit.has(loc));
+    if (maybe.length > 0) {
+      ambiguous.push(`step ${j}: may have touched ${list(maybe)}`);
+      continue;
+    }
+    const rewrite = [...t.sure, ...t.maybe].filter((loc) => rewritten.has(rowKeyOf(loc) ?? '') && outside(loc));
+    if (rewrite.length > 0) {
+      ambiguous.push(`step ${j}: touched ${list(rewrite)}, in a row the transaction rewrote without changing its key or presence`);
+      continue;
+    }
+    const sideLocs = new Set([...t.sure].filter((loc) => changedRows.has(rowKeyOf(loc) ?? '') && outside(loc)));
+    if (hit.size === 0 && sideLocs.size === 0) continue;
+    const write = (by: WriteBy) => {
+      const removed = new Set<Loc>();
+      const depends = new Set<Loc>();
+      for (const loc of hit) {
+        const key = rowKeyOf(loc);
+        const gone = key !== undefined && hasRow(s.before, key) === true && hasRow(s.after, key) === false;
+        (gone ? removed : depends).add(loc);
+      }
+      if (by === 'link' && removed.size > 0) {
+        ambiguous.push(`step ${j}: a link value removed ${list(removed)}`);
+        return;
+      }
+      if (hit.size > 0) later.push({ step: j, by, locs: hit, removed, depends });
+      if (sideLocs.size > 0) side.push({ step: j, by, locs: sideLocs });
     };
     const { op, outcome } = s;
     if (op.kind === 'transact' && s.tx !== undefined) {
       const other = analysis.txs[s.tx] as TxInfo;
       const status = txStatus(other, step);
-      if (status === 'pending') pendingNewer.push(other);
-      else if (status === 'rolledBack') rolledBackNewer.push(other);
-      else write('confirmed-transaction');
+      if (status === 'confirmed') write('confirmed-transaction');
+      else if (hit.size === 0) continue;
+      else if (status === 'pending') pendingNewer.push(other);
+      else rolledBackNewer.push(other);
     } else if (op.kind === 'rollback' && outcome.status === 'ok' && s.tx !== undefined) {
+      if (hit.size === 0) continue;
       const other = analysis.txs[s.tx] as TxInfo;
       if (other.step > tx.step) compensations.push(j);
       else ambiguous.push(`step ${j}: rolling back an older transaction changed this one's locations`);
@@ -155,32 +185,14 @@ export function contextAt(analysis: Analysis, tx: TxInfo, step: number): Rollbac
       write(op.wrap === 'external' ? 'external' : 'write');
     } else if (op.kind === 'rowHeldWrite' && outcome.status === 'ok') {
       write('write');
-    } else {
-      ambiguous.push(`step ${j}: ${op.kind} (${outcome.status}) changed ${[...hit].join(', ')}`);
+    } else if ((op.kind === 'linkPush' || op.kind === 'linkRetrieve') && outcome.status === 'ok') {
+      write('link');
+    } else if (hit.size > 0) {
+      ambiguous.push(`step ${j}: ${op.kind} (${outcome.status}) touched ${list(hit)}`);
     }
   }
-  return { step, tx, pendingNewer, rolledBackNewer, later, compensations, ambiguous };
+  return { step, tx, pendingNewer, rolledBackNewer, later, side, compensations, ambiguous };
 }
-
-/**
- * Whether a rekey (changeId) is involved: in the transaction, or in a later
- * step or newer transaction that touched its locations. Violation kinds carry
- * a `-rekey` suffix then, because these properties read a rekey as changing
- * the row (location granularity is the row), which the rows do not spell out.
- */
-export function involvesRekey(analysis: Analysis, ctx: RollbackContext): boolean {
-  const rekeys = (op: Op) =>
-    (op.kind === 'write' ? [op.write] : op.kind === 'transact' ? op.body : []).some((w) => w.kind === 'changeId');
-  if (ctx.tx.body.some((w) => w.kind === 'changeId')) return true;
-  const steps = [...ctx.later.map((w) => w.step), ...[...ctx.pendingNewer, ...ctx.rolledBackNewer].map((t) => t.step)];
-  return steps.some((j) => {
-    const s = analysis.steps[j];
-    return s !== undefined && rekeys(s.op);
-  });
-}
-
-/** Whether a transaction's body writes the whole collection. */
-export const writesWholeCollection = (tx: TxInfo): boolean => tx.body.some((w) => w.kind === 'setAll' || w.kind === 'clear');
 
 /** Every rollback of a pending transaction in the trace, with its context. */
 export function rollbackContexts(trace: SpecTrace): RollbackContext[] {
@@ -193,16 +205,22 @@ export function rollbackContexts(trace: SpecTrace): RollbackContext[] {
   return contexts;
 }
 
-/** Later writes that depend on the change. */
-export const dependents = (ctx: RollbackContext): LaterWrite[] => ctx.later.filter((w) => w.depends.size > 0);
+/** Later writes T4 counts: every touching write except a removal by newer truth, which T5 calls supersession. */
+export const dependents = (ctx: RollbackContext): LaterWrite[] =>
+  ctx.later.filter((w) => w.depends.size > 0 || (w.removed.size > 0 && w.by !== 'external'));
 
-/**
- * Later writes no row classifies: an unread overwrite, a re-insert, or a
- * removal by an ordinary write (T5 calls only removal by newer truth
- * supersession). A context containing one is left alone.
- */
-export const unclassified = (ctx: RollbackContext): LaterWrite[] =>
-  ctx.later.filter((w) => w.unclassified.size > 0 || (w.removed.size > 0 && w.by !== 'external'));
+/** Keys of rows newer truth removed, when every later write is such a removal; undefined otherwise. */
+export function supersededOnly(ctx: RollbackContext): Set<string> | undefined {
+  if (ctx.pendingNewer.length > 0 || ctx.ambiguous.length > 0 || ctx.later.length === 0) return undefined;
+  if (!ctx.later.every((w) => w.by === 'external' && w.depends.size === 0)) return undefined;
+  return new Set(ctx.later.flatMap((w) => [...w.removed].map((loc) => rowKeyOf(loc) as string)));
+}
+
+/** Locations newer truth wrote beside the transaction's own in rows it changed, outside rows in `gone`. */
+export const truthSide = (ctx: RollbackContext, gone: ReadonlySet<string> = new Set()): Set<Loc> =>
+  new Set(
+    ctx.side.filter((w) => w.by === 'external').flatMap((w) => [...w.locs].filter((loc) => !gone.has(rowKeyOf(loc) ?? '')))
+  );
 
 export type RollbackObserved =
   | { readonly status: 'refused'; readonly cause: string | null; readonly class: string }
