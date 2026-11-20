@@ -11,7 +11,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R3",
+        "O3",
+        "O4",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/absent-path-write.spec.ts",
@@ -19,7 +25,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R3",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/angular-realization-invariants.spec.ts",
@@ -27,7 +38,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "V6"
+      ]
     },
     {
       "source": "packages/angular/src/lib/angular-validation-null.spec.ts",
@@ -35,35 +50,42 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/audit-entity-terminals.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: Date/Map/typed-array entity fields expose no payload methods, plus audit helper signatures; no row states these types"
     },
     {
       "source": "packages/angular/src/lib/audit-native-tooling.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/audit-observation-lifecycle.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/batching-dynamic-field.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins coalesce() batching, which the spec drops (12.5, #51)"
     },
     {
       "source": "packages/angular/src/lib/construction-bound-realization.spec.ts",
@@ -71,7 +93,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V6"
+      ]
     },
     {
       "source": "packages/angular/src/lib/construction-boundaries.spec.ts",
@@ -79,7 +103,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/construction-input.spec.ts",
@@ -87,7 +113,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V3"
+      ]
     },
     {
       "source": "packages/angular/src/lib/construction-input.typing.spec.ts",
@@ -95,28 +123,28 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: old construction-input types; section 4 designs the API fresh and no row states these types"
     },
     {
       "source": "packages/angular/src/lib/construction-resource-cleanup.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "white-box: injects throws through an internal membership-publication hook and asserts slot counts and native cell identity; no user seam"
     },
     {
       "source": "packages/angular/src/lib/current-read-capability.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "drives the adapter's internal current-read cell factory directly (call counts, cleanup, error recovery); no public surface involved"
     },
     {
       "source": "packages/angular/src/lib/current-read-capability.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: activeId/all typed as Angular Signal; section 4 designs the API fresh and no row states these types"
     },
     {
       "source": "packages/angular/src/lib/declarative-construction.typing.spec.ts",
@@ -124,14 +152,18 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: derived-recipe and canUndo types of the old construction API; section 4 designs the API fresh, no row states them"
     },
     {
       "source": "packages/angular/src/lib/declared-publication-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/define-store.spec.ts",
@@ -139,7 +171,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/define-store.typing.spec.ts",
@@ -147,7 +182,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: defineStore expose:'readonly' type narrowing; section 4 designs the API fresh and no row states it"
     },
     {
       "source": "packages/angular/src/lib/demarcation.spec.ts",
@@ -165,7 +200,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R3",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/e-active-selection.spec.ts",
@@ -173,7 +212,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/e-composition-nulls.spec.ts",
@@ -181,7 +222,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/e-granularity.spec.ts",
@@ -189,7 +232,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/e2s0-identity-function.spec.ts",
@@ -197,21 +242,24 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "design probe over hand-built handle schemes on a plain array leaf; asserts test-local constructs, not SignalTree entity handles"
     },
     {
       "source": "packages/angular/src/lib/effective-presence-install-reentry.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "white-box: drives the internal invalidation group to pin query install-revision capture under predicate reentry; no user seam"
     },
     {
       "source": "packages/angular/src/lib/effective-presence-successor.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/entity-field-materialization.spec.ts",
@@ -219,7 +267,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "E2",
+        "L1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/entity-granular-reactivity.spec.ts",
@@ -227,21 +280,31 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/entity-native-obligation-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/equal-owner-facade-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2",
+        "O3"
+      ]
     },
     {
       "source": "packages/angular/src/lib/histc2-form-dom.spec.ts",
@@ -249,7 +312,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "F1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/histc2-form-ingress.spec.ts",
@@ -257,7 +323,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "F1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/histc2-signal-forms.spec.ts",
@@ -265,35 +334,47 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "F1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/hydration-accessor.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: whole-value hydration and link admission types for collection-containing trees; no row states these types"
     },
     {
       "source": "packages/angular/src/lib/integrated-cold-collection.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O3"
+      ]
     },
     {
       "source": "packages/angular/src/lib/joint-native-frontier.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/angular/src/lib/joint-rich-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/angular/src/lib/kernel-comparison.benchmark.spec.ts",
@@ -301,21 +382,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "benchmark: kernel vs raw Angular signal creation/read/write overhead bounds; performance is gated by section 6 M/S gates, not rows"
     },
     {
       "source": "packages/angular/src/lib/keyed-construction-cleanup.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "white-box: internal keyed member materialization identity and slot release after refused hooks and creation rollback; no user seam"
     },
     {
       "source": "packages/angular/src/lib/link-native-address.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4"
+      ]
     },
     {
       "source": "packages/angular/src/lib/native-leaf-experiment.spec.ts",
@@ -323,7 +406,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "X1",
+        "O1",
+        "O3"
+      ]
     },
     {
       "source": "packages/angular/src/lib/native-storage-0-contract.spec.ts",
@@ -341,35 +430,47 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/open-record-access.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: open Record members typed unknown rather than child handles; no row states these types"
     },
     {
       "source": "packages/angular/src/lib/parent-freshness-entity.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/parent-freshness-focused.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/parent-snapshot-currentness.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/plain-member-absence-observation.spec.ts",
@@ -377,14 +478,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/projection-transaction-current.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O3",
+        "V6"
+      ]
     },
     {
       "source": "packages/angular/src/lib/public-root-initialization.spec.ts",
@@ -392,7 +502,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the package root alone yields native Angular signal carriers for leaves and entity fields; old API shape, no behavior row"
     },
     {
       "source": "packages/angular/src/lib/public-surface.spec.ts",
@@ -400,7 +510,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "T5",
+        "R1",
+        "X1",
+        "F1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/reactivity-contract.spec.ts",
@@ -408,7 +525,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/readonly.typing.spec.ts",
@@ -416,7 +535,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: readonly views expose native Angular signal types; section 4 designs the API fresh and no row states it"
     },
     {
       "source": "packages/angular/src/lib/restoration-reactivity.spec.ts",
@@ -424,28 +543,45 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "O2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/scalar-frame-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L4"
+      ]
     },
     {
       "source": "packages/angular/src/lib/selected-active-id-preparation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/angular/src/lib/selected-callback-facade.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/angular/src/lib/ssr-transfer.spec.ts",
@@ -453,7 +589,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/angular/src/lib/subject-epoch-non-retaining-observer.spec.ts",
@@ -461,7 +599,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "D2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/subject-state-weak-realization.spec.ts",
@@ -469,21 +611,35 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "D2"
+      ]
     },
     {
       "source": "packages/angular/src/lib/transaction-realization.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/angular/src/lib/whole-value-new-keys.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O3",
+        "V1",
+        "T11"
+      ]
     },
     {
       "source": "packages/kernel/src/active-transaction-context.spec.ts",
@@ -6627,21 +6783,24 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/react/src/lib/hydration-accessor.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: whole-value hydration and link admission types for collection-containing trees; no row states these types"
     },
     {
       "source": "packages/react/src/lib/open-record-access.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: open Record members typed unknown rather than child handles; no row states these types"
     },
     {
       "source": "packages/react/src/public-surface.typing.spec.ts",
@@ -6649,7 +6808,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: React package export names and types; section 4 designs the API fresh and no row states them"
     },
     {
       "source": "packages/react/src/use-signal-tree.typing.spec.ts",
@@ -6657,7 +6816,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: useSignalTree selector signature; section 4 designs the API fresh and no row states it"
     },
     {
       "source": "packages/solid/src/lib/absent-collection.spec.ts",
