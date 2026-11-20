@@ -28,6 +28,9 @@ export function workflowProblems({ ci, nightly, soak }) {
     problems.push('ci.yml gates: a branch with an open PR must run the gates through pull_request only');
   }
   if (!ci.jobs['pr-lookup']) problems.push('ci.yml: missing the pr-lookup job');
+  if (!condition.includes('github.event.pull_request.head.repo.full_name == github.repository')) {
+    problems.push('ci.yml gates: must never run a fork\'s pull request on the self-hosted runner');
+  }
 
   const nightlyJobs = Object.values(nightly?.jobs ?? {});
   const named = (name) => nightlyJobs.find((j) => j.name === name);

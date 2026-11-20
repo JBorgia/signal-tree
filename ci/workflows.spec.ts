@@ -15,6 +15,7 @@ describe('gate workflows', () => {
     ['the fail-closed baseline script removed', (w) => void (w.ci.jobs.gates.steps = w.ci.jobs.gates.steps.filter((s: { run?: string }) => !String(s.run ?? '').includes('gate-baseline'))), /fails closed/],
     ['a per-ref concurrency group', (w) => void (w.ci.jobs.gates.concurrency.group = 'gates-${{ github.ref }}'), /shared/],
     ['gates on every push, PR or not', (w) => void (w.ci.jobs.gates.if = 'always()'), /pull_request only/],
+    ['gates on a fork\'s pull request', (w) => void (w.ci.jobs.gates.if = String(w.ci.jobs.gates.if).replace("github.event.pull_request.head.repo.full_name == github.repository", 'true')), /fork/],
     ['no oracle (100k) job', (w) => void delete w.nightly.jobs.oracle, /oracle \(100k\)/],
     ['a nightly gates job uploading under another name', (w) => void (w.nightly.jobs['gates-angular'].steps.at(-1).with.name = 'results'), /nightly-gates-angular/],
     ['a daily soak', (w) => void (w.soak.on.schedule[0].cron = '0 1 * * *'), /weekly/],
