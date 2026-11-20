@@ -20,8 +20,9 @@ describe('coverage map validation (BRIEF.md 12.1.5)', () => {
     expect(validate({ entries: [entry({ covers: ['T1'], pending: true })] })).toHaveLength(1);
   });
 
-  it('accepts only 5.1/5.2 behavior IDs, each once', () => {
-    expect(validate({ entries: [entry({ covers: ['T11'] })] })).toHaveLength(1);
+  it('accepts only behavior IDs from 5.1, 5.2, 12.4 and 12.5, each once', () => {
+    expect(validate({ entries: [entry({ covers: ['T14'] })] })).toHaveLength(1);
+    expect(validate({ entries: [entry({ covers: ['T11', 'O1', 'V8'] })] })).toEqual([]);
     expect(validate({ entries: [entry({ covers: [] })] })).toHaveLength(1);
     expect(validate({ entries: [entry({ covers: ['R2', 'R2'] })] })).toHaveLength(1);
   });

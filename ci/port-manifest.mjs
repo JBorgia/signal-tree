@@ -1,6 +1,6 @@
 // tests/port-manifest.json: the coverage map (BRIEF.md 12.1.5). One entry per
 // spec file under packages/ at tags v15.4.9 and v16.0.0-rc.1, recording which
-// behavior IDs (5.1, 5.2 and 12.4) that old file touched ("covers"), or "notCarried" with a
+// behavior IDs (5.1, 5.2, 12.4 and 12.5) that old file touched ("covers"), or "notCarried" with a
 // one-line reason, or "pending" until it is classified. It records coverage
 // only: no test is ported from it (12.1.3).
 //
@@ -59,7 +59,7 @@ export function validate(manifest, { complete = false } = {}) {
     if (kinds[0] === 'covers') {
       const ids = e.covers;
       if (!Array.isArray(ids) || ids.length === 0) problems.push(`${at}: "covers" must list at least one behavior ID`);
-      else if (ids.some((id) => !BEHAVIOR_IDS.includes(id))) problems.push(`${at}: "covers" may hold only behavior IDs from 5.1, 5.2 and 12.4`);
+      else if (ids.some((id) => !BEHAVIOR_IDS.includes(id))) problems.push(`${at}: "covers" may hold only behavior IDs from 5.1, 5.2, 12.4 and 12.5`);
       else if (new Set(ids).size !== ids.length) problems.push(`${at}: "covers" lists an ID twice`);
     } else if (kinds[0] === 'notCarried') {
       if (typeof e.notCarried !== 'string' || e.notCarried.trim().length === 0 || e.notCarried.includes('\n')) problems.push(`${at}: "notCarried" needs a one-line reason`);

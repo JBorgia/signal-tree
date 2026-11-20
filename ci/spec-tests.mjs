@@ -1,5 +1,5 @@
 // tests/spec-tests.json (BRIEF.md 12.1.6): a content hash for every test tagged
-// with a behavior ID from sections 5.1, 5.2 and 12.4, for example `[T3]`. CI fails
+// with a behavior ID from sections 5.1, 5.2, 12.4 and 12.5, for example `[T3]`. CI fails
 // when a tagged test is added, changed or removed without the same change to
 // tests/spec-tests.json, which is code-owned, so changing a spec test needs
 // Jonathan's review.

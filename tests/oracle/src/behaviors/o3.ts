@@ -10,11 +10,32 @@
 // - byId(key) finds a row exactly for the keys ids() lists; its whole read
 //   equals all()'s row at that key's position, and each field read on its own
 //   equals that row's field.
-// A path that throws while the others read does not agree. Steps after the
-// tree is destroyed are D1's: there every read must throw.
+// A path that throws while the others read does not agree.
+//
+// The key invariant (BRIEF.md 4.4: "A row's key is always selectId(row)") is
+// checked here too, on every subject: after every turn, each key ids() lists
+// equals selectId of the row all() holds at that position, with the
+// vocabulary's selector, the default `row => row.id`. A changeId or replace
+// that moves a row to a key its id field does not name breaks it; so does any
+// path to a row whose key and selected field disagree.
+//
+// Steps after the tree is destroyed are D1's: there every read must throw.
 import type { Json, Observation, ReadPaths, StateView } from '../model.js';
 import { canonical } from '../trace.js';
 import { analyze, destroyedAt } from './analysis.js';
+
+/** The vocabulary's selector (model.ts): every subject builds its collection with `selectId: (row) => row.id`. */
+const selectId = (row: Json): Json | undefined => (isRecord(row) ? row['id'] : undefined);
+
+/** Keys that are not selectId of the row stored under them, as `key: selectId`. */
+export function keysNotSelected(state: StateView): string[] {
+  const { ids, rows } = state;
+  if (!Array.isArray(ids) || !Array.isArray(rows) || ids.length !== rows.length) return [];
+  return ids.flatMap((key, i) => {
+    const selected = selectId(rows[i] as Json);
+    return same(selected, key) ? [] : [`${String(key)}: ${canonical(selected)}`];
+  });
+}
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW = '**Read-path consistency.** After every turn, all read paths (leaf, row field, `byId`, `all()`, `ids()`, `count()`, snapshot) agree.';
@@ -75,6 +96,19 @@ export const O3 = instanceProperty({
     const destroyed = destroyedAt(analysis);
     for (const s of analysis.steps) {
       if (destroyed !== undefined && s.index >= destroyed) break;
+      if (s.after) {
+        const wrong = keysNotSelected(s.after);
+        found.push(
+          verdict(
+            wrong.length === 0,
+            s.index,
+            'key-not-selectId',
+            { keysNotSelected: [] },
+            { keysNotSelected: wrong },
+            `every row's key after step ${s.index} is selectId(row)`
+          )
+        );
+      }
       const off = pathDisagreements(s.observation);
       if (!off) continue;
       found.push(

@@ -5,7 +5,7 @@ import type { Json } from '../model.js';
 import type { SpecTrace } from '../trace.js';
 import { analyze, destroyedAt } from './analysis.js';
 
-/** Every behavior in BRIEF.md 5.1, 5.2 and 12.4, in table order. */
+/** Every behavior in BRIEF.md 5.1, 5.2, 12.4 and 12.5, in table order. */
 export const BEHAVIOR_IDS = [
   'T1',
   'T2',
@@ -41,6 +41,31 @@ export const BEHAVIOR_IDS = [
   'D2',
   'W5',
   'H1',
+  'R5',
+  'R6',
+  'R7',
+  'R8',
+  'V1',
+  'V2',
+  'V3',
+  'V4',
+  'V5',
+  'V6',
+  'V7',
+  'V8',
+  'E3',
+  'E4',
+  'L4',
+  'L5',
+  'T11',
+  'T12',
+  'T13',
+  'H2',
+  'X4',
+  'X5',
+  'X6',
+  'F1',
+  'W6',
 ] as const;
 export type BehaviorId = (typeof BEHAVIOR_IDS)[number];
 

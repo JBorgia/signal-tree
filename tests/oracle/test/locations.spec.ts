@@ -2,7 +2,9 @@
 // Planted kernels that get the field/existence distinction wrong must be
 // caught; the correct model must hold.
 import { describe, expect, it } from 'vitest';
+import { analyze } from '../src/behaviors/analysis.js';
 import { judge } from '../src/generator.js';
+import { runSequence } from '../src/run.js';
 import type { Op, Row, Sequence, Step, WriteOp } from '../src/model.js';
 import { MODEL_KINDS, modelSubject } from './model-subject.js';
 
@@ -199,6 +201,46 @@ describe('ruling 3: an inbound link value is newer truth (another writer context
     const seq = sequence(linkA, transact({ kind: 'setLeaf', path: 'a', value: 1 }), push(2), rollback);
     for (const id of ['T4', 'T5'] as const) {
       expect((await judge([correct, completes], id, seq)).provenance, id).toEqual({ correct: 'holds', completes: 'violates' });
+    }
+  });
+});
+
+// BRIEF.md 4.4: a row's key is always selectId(row). The touch simulation
+// runs changeId and replaceOne both ways (4.4, and as the published kernels
+// do), so a subject that follows 4.4 has its key changes seen, not skipped.
+describe('key changes are seen under 4.4 and as the published kernels run them', () => {
+  const keyKinds = [...kinds, 'changeId' as const, 'observe' as const];
+  const conforming = modelSubject('conforming', { kinds: keyKinds, restoration: true });
+  const asPublished = { changeIdKeepsField: true, replaceKeepsKey: true };
+  const published = modelSubject('published', { kinds: keyKinds, restoration: true, ...asPublished });
+  const rekey: WriteOp = { kind: 'changeId', from: 'r1', to: 'r2' };
+  const replace: WriteOp = { kind: 'replaceOne', id: 'r1', row: { id: 'r3', n: 1, m: 0 } };
+
+  it.each([
+    ['changeId', rekey, ['rows.r1', 'rows.r2'], ['rows.r1', 'rows.r2']],
+    ['a replace whose row has another id', replace, ['rows.r1', 'rows.r3'], ['rows.r1']],
+  ])('gives %s a touch set on both', async (_, w, under44, asPublished) => {
+    const seq = sequence(write(add), write(w));
+    for (const [subject, want] of [[conforming, under44], [published, asPublished]] as const) {
+      const records = await runSequence(subject, seq);
+      const touches = analyze({ sequence: seq, records }).steps[1]?.touches;
+      expect(touches && [...touches.sure].sort(), subject.name).toEqual(want);
+    }
+  });
+
+  it.each([
+    ['changeId', rekey],
+    ['a replace whose row has another id', replace],
+  ])('%s: T4, R2 and O1 judge it on a conforming subject instead of skipping it', async (_, w) => {
+    const t4 = sequence(write(add), transact(field('n', 1)), write(w), rollback);
+    const r2: Sequence = {
+      config: { transactions: false, restoration: true },
+      steps: [write(add), write(field('n', 1), 'undoable'), write(w), step({ kind: 'undo' })],
+    };
+    const o1 = sequence(write(add), step({ kind: 'observe', reader: { kind: 'leaf', path: 'a' }, react: { kind: 'none' } }), write(w));
+    for (const [id, seq] of [['T4', t4], ['R2', r2], ['O1', o1]] as const) {
+      const { provenance } = await judge([conforming, published], id, seq);
+      expect(provenance, id).toEqual({ conforming: 'holds', published: 'holds' });
     }
   });
 });

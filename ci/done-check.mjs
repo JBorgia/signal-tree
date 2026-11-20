@@ -86,7 +86,7 @@ export const ITEMS = [
     },
   },
   {
-    title: 'Every behavior in 5.1, 5.2 and 12.4 is covered by tests, and the test generator finds no spec violation by the new core at 100,000 sequences',
+    title: 'Every behavior in 5.1, 5.2, 12.4 and 12.5 is covered by tests, and the test generator finds no spec violation by the new core at 100,000 sequences',
     check: ({ coveredBehaviors }) => {
       const missing = BEHAVIORS.filter((id) => !coveredBehaviors.has(id));
       return missing.length ? `no test title carries ${missing.map((id) => `[${id}]`).join(', ')}` : null;

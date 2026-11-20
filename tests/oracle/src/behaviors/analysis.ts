@@ -149,7 +149,8 @@ export function hasRow(state: StateView | undefined, key: string): boolean | und
  * - a row's existence is written a row object the caller allocated, which
  *   Object.is never finds equal, so it is touched even when the row it
  *   leaves looks the same ("wrote the same value").
- * Each vocabulary write, as both published kernels run it:
+ * Each vocabulary write (where BRIEF.md 4.4 and the published kernels differ,
+ * both are simulated; see Semantics):
  * - setLeaf, updateLeaf, setBranch: the leaves whose value it changes;
  * - updateOne, updateMany, setField: the fields whose value it changes (none
  *   on a missing key: updateOne and updateMany refuse, setField does nothing);
@@ -158,7 +159,8 @@ export function hasRow(state: StateView | undefined, key: string): boolean | und
  * - addOne, prependOne, addMany: the existence of each row added, and with
  *   mode overwrite of each listed row replaced (strict refuses a listed or
  *   repeated key; skip leaves a listed key alone);
- * - replaceOne: the existence of the key replaced (the row keeps its key);
+ * - replaceOne: the existence of the key replaced, and under 4.4, when the
+ *   new row's id differs, of that id too (the replace is a key change);
  * - removeOne, removeMany: the existence of each row removed;
  * - changeId: the existence of both keys (nothing when they are equal);
  * - setAll: the existence of every row listed before or after; clear: of
@@ -202,13 +204,27 @@ function simMatches(sim: Sim, view: LocValues): boolean {
 }
 
 /**
+ * How a subject runs the two writes whose meaning moved with BRIEF.md 4.4 ("a
+ * row's key is always selectId(row)", with the selector `row => row.id`):
+ * spec    changeId sets the moved row's id field; a replaceOne whose row has
+ *         another id is a key change to that id (refused when it is taken);
+ * legacy  as the published kernels run them: changeId keeps the row's id
+ *         field, and replaceOne keeps the key whatever the new row's id.
+ * A step is simulated under 4.4's semantics first and the published kernels'
+ * second; the first that reproduces the state the subject left gives its
+ * touches. Every other write means the same under both.
+ */
+type Semantics = 'spec' | 'legacy';
+const SEMANTICS: readonly Semantics[] = ['spec', 'legacy'];
+
+/**
  * Applies one vocabulary write to `sim` as Touches describes, adding what it
  * touched to `sure`. False when the write refuses (a duplicate add, a
  * missing key) and so touches nothing. Checked afterwards against the state
  * the subject left: a step whose writes do not reproduce that state has no
  * touch set (`touches` undefined).
  */
-function simWrite(sim: Sim, w: WriteOp, sure: Set<Loc>): boolean {
+function simWrite(sim: Sim, w: WriteOp, sure: Set<Loc>, semantics: Semantics): boolean {
   const { rows } = sim;
   const setScalar = (loc: Loc, v: Json) => {
     if (Object.is(sim.scalars.get(loc), v)) return;
@@ -296,17 +312,56 @@ function simWrite(sim: Sim, w: WriteOp, sure: Set<Loc>): boolean {
       if (!row || (w.from !== w.to && rows.has(w.to))) return false;
       if (w.from === w.to) return true;
       rows.delete(w.from);
-      rows.set(w.to, row);
+      rows.set(w.to, semantics === 'spec' ? { ...row, id: w.to } : row);
       sure.add(existenceLoc(w.from));
       sure.add(existenceLoc(w.to));
       return true;
     }
     case 'replaceOne':
-      // The row keeps its key; its content, `id` field included, is replaced.
       if (!rows.has(w.id)) return false;
-      put(w.id, w.row);
+      if (semantics === 'legacy' || w.row.id === w.id) {
+        // The row keeps its key; its content, `id` field included, is replaced.
+        put(w.id, w.row);
+        return true;
+      }
+      // A key change: the replaced row moves to the key its new id selects.
+      if (rows.has(w.row.id)) return false;
+      drop(w.id);
+      put(w.row.id, w.row);
       return true;
   }
+}
+
+/** Runs `groups` one after another from `before` under one semantics; the touches of each, and the state they leave. */
+function simGroups(
+  before: StateView | undefined,
+  groups: readonly (readonly WriteOp[])[],
+  semantics: Semantics
+): { sim: Sim; touched: Set<Loc>[] } | undefined {
+  const sim = simOf(before);
+  if (!sim) return undefined;
+  const touched: Set<Loc>[] = [];
+  for (const group of groups) {
+    const sure = new Set<Loc>();
+    for (const w of group) if (!simWrite(sim, w, sure, semantics)) return undefined;
+    touched.push(sure);
+  }
+  return { sim, touched };
+}
+
+/** The first semantics whose run of `groups` reproduces `after` (4.4's before the published kernels'). */
+function reproduce(
+  before: StateView | undefined,
+  after: StateView | undefined,
+  groups: readonly (readonly WriteOp[])[]
+): { sim: Sim; touched: Set<Loc>[] } | undefined {
+  if (!after) return undefined;
+  const view = locValues(after);
+  for (const semantics of SEMANTICS) {
+    const run = simGroups(before, groups, semantics);
+    if (run && simMatches(run.sim, view)) return run;
+  }
+  return undefined;
 }
 
 /**
@@ -471,12 +526,10 @@ function touchesOf(
   changed: ReadonlySet<Loc>
 ): Touches | undefined {
   if (!writes) return { sure: changed, maybe: NONE };
-  const sim = simOf(before);
-  if (!sim || !after) return undefined;
-  const sure = new Set<Loc>();
-  for (const w of writes) if (!simWrite(sim, w, sure)) return undefined;
-  if (!simMatches(sim, locValues(after))) return undefined;
-  if (inbound && before && simMatches(sim, locValues(before))) return { sure: NONE, maybe: sure };
+  const run = reproduce(before, after, [writes]);
+  if (!run) return undefined;
+  const sure = run.touched[0] as Set<Loc>;
+  if (inbound && before && simMatches(run.sim, locValues(before))) return { sure: NONE, maybe: sure };
   return { sure, maybe: NONE };
 }
 
@@ -489,15 +542,7 @@ export function touchesOfGroups(
   after: StateView | undefined,
   groups: readonly (readonly WriteOp[])[]
 ): Set<Loc>[] | undefined {
-  const sim = simOf(before);
-  if (!sim || !after) return undefined;
-  const out: Set<Loc>[] = [];
-  for (const group of groups) {
-    const sure = new Set<Loc>();
-    for (const w of group) if (!simWrite(sim, w, sure)) return undefined;
-    out.push(sure);
-  }
-  return simMatches(sim, locValues(after)) ? out : undefined;
+  return reproduce(before, after, groups)?.touched;
 }
 
 const cache = new WeakMap<SpecTrace, Analysis>();
@@ -720,11 +765,21 @@ export function locsOfPath(path: string): { readonly locs: readonly Loc[]; reado
   return { locs: [match[2] === undefined ? existenceLoc(key) : fieldLoc(key, match[2])], allRows: false };
 }
 
-/** Steps whose op changes `key`'s identity: a changeId naming it, top level or in a body. */
+/**
+ * Whether a write may change a row's key: a changeId, or (BRIEF.md 4.4) a
+ * replaceOne whose row has another id, which is a key change under 4.4 and
+ * keeps the old key on the published kernels.
+ */
+export const changesKey = (w: WriteOp): boolean =>
+  (w.kind === 'changeId' && w.from !== w.to) || (w.kind === 'replaceOne' && w.row.id !== w.id);
+
+/** Steps whose op may change `key`'s identity: a key change naming it, top level or in a body. */
 export function rekeys(op: Op, key: string): boolean {
   const writes: readonly WriteOp[] =
     op.kind === 'write' ? [op.write] : op.kind === 'transact' || op.kind === 'declare' ? op.body : [];
-  return writes.some((w) => w.kind === 'changeId' && (w.from === key || w.to === key));
+  const names = (w: WriteOp) =>
+    w.kind === 'changeId' ? w.from === key || w.to === key : w.kind === 'replaceOne' && (w.id === key || w.row.id === key);
+  return writes.some((w) => changesKey(w) && names(w));
 }
 
 /** An outcome in the terms properties report: `ok`, or the refusal's class, cause and message. */
@@ -760,8 +815,10 @@ export function writeTargets(w: WriteOp): { readonly locs: readonly Loc[]; reado
     case 'updateMany':
       return { locs: w.ids.map((id) => fieldLoc(id, w.field)), allRows: false };
     case 'removeOne':
-    case 'replaceOne':
       return { locs: [existenceLoc(w.id)], allRows: false };
+    case 'replaceOne':
+      // Under 4.4 a replace whose row has another id moves the row to that key.
+      return { locs: w.row.id === w.id ? [existenceLoc(w.id)] : [existenceLoc(w.id), existenceLoc(w.row.id)], allRows: false };
     case 'removeMany':
       return { locs: w.ids.map(existenceLoc), allRows: false };
     case 'changeId':

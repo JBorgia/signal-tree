@@ -110,6 +110,10 @@ export interface ModelOptions {
   readonly scopeCarries?: boolean;
   /** Planted (H1): hydration writes each leaf as its own turn. */
   readonly hydrateInParts?: boolean;
+  /** Planted (O3): changeId moves the row to the new key but leaves its id field, so the key is not selectId(row). */
+  readonly changeIdKeepsField?: boolean;
+  /** As the published kernels: replaceOne keeps the key even when the new row has another id. */
+  readonly replaceKeepsKey?: boolean;
 }
 
 class ModelRefusal extends Error {}
@@ -669,11 +673,31 @@ class ModelSession implements Session {
           touched.add(`rows.${r.id}`);
         }
         break;
+      case 'changeId': {
+        // BRIEF.md 4.4: a key change that keeps the row; changeId sets the id field the default selector reads.
+        const row = s.rows.get(w.from);
+        if (!row) throw new Error(`Entity with id ${w.from} not found`);
+        if (w.from === w.to) break;
+        if (s.rows.has(w.to)) throw new Error(`Cannot change id to ${w.to}: already in use`);
+        s.rows.delete(w.from);
+        s.rows.set(w.to, this.#options.changeIdKeepsField ? row : { ...row, id: w.to });
+        touched.add(`rows.${w.from}`);
+        touched.add(`rows.${w.to}`);
+        break;
+      }
       case 'replaceOne':
-        // The row keeps its key; its content is replaced.
+        // Its content is replaced; a new id is a key change (BRIEF.md 4.4: a row's key is always selectId(row)).
         if (!s.rows.has(w.id)) throw new Error(`Entity with id ${w.id} not found`);
-        s.rows.set(w.id, { ...w.row });
+        if (this.#options.replaceKeepsKey || w.row.id === w.id) {
+          s.rows.set(w.id, { ...w.row });
+          touched.add(`rows.${w.id}`);
+          break;
+        }
+        if (s.rows.has(w.row.id)) throw new Error(`Cannot change id to ${w.row.id}: already in use`);
+        s.rows.delete(w.id);
+        s.rows.set(w.row.id, { ...w.row });
         touched.add(`rows.${w.id}`);
+        touched.add(`rows.${w.row.id}`);
         break;
       default:
         throw new Error(`unreachable: ${w.kind}`);

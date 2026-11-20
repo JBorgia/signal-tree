@@ -18,11 +18,12 @@
 //     rollback succeeds, every other location the transaction changed
 //     returns to its value before the transaction, the removed rows stay
 //     removed, and fields newer truth wrote in the transaction's other rows
-//     keep their values. A transaction that rekeyed a row is left to T6,
-//     which says where that row ends up; one that removed, replaced or
-//     rekeyed a superseded row's key in its own body (clear, setAll,
-//     removeOne, replaceOne, ...) is left alone, since whether the row it
-//     left is the same entity is not fixed by the rows.
+//     keep their values. A transaction that may change a row's key
+//     (changeId, or a replace whose row has another id: analysis.ts
+//     changesKey) is left to T6, which says where that row ends up; one
+//     that removed, replaced or rekeyed a superseded row's key in its own
+//     body (clear, setAll, removeOne, replaceOne, ...) is left alone, since
+//     whether the row it left is the same entity is not fixed by the rows.
 // (b) Newer truth touched a location the transaction changed without
 //     removing its row: the rollback refuses (T4 checks the cause). A
 //     transaction that replaced a row, or kept it through setAll, changed
@@ -34,7 +35,7 @@
 //     each field newer truth wrote keeps the value it had just before the
 //     rollback.
 import type { Json, WriteOp } from '../model.js';
-import { analyze, existenceLoc, locValues, rowKeyOf, withRowFields, type Analysis, type Loc } from './analysis.js';
+import { analyze, changesKey, existenceLoc, locValues, rowKeyOf, withRowFields, type Analysis, type Loc } from './analysis.js';
 import {
   dependents,
   isNewerTruth,
@@ -57,7 +58,7 @@ function replacesKey(w: WriteOp, key: string): boolean {
     case 'removeMany':
       return (w.ids as readonly string[]).includes(key);
     case 'replaceOne':
-      return w.id === key;
+      return w.id === key || w.row.id === key;
     case 'changeId':
       return w.from === key || w.to === key;
     default:
@@ -130,7 +131,7 @@ export const T5 = instanceProperty({
       const observed = rollbackOutcome(ctx, analysis);
       const superseded = supersededOnly(ctx);
       if (superseded) {
-        if (superseded.size === 0 || ctx.tx.body.some((w) => w.kind === 'changeId')) continue;
+        if (superseded.size === 0 || ctx.tx.body.some(changesKey)) continue;
         if ([...superseded].some((key) => ctx.tx.body.some((w) => replacesKey(w, key)))) continue;
         const rest = completedRest(analysis, ctx, superseded, truthSide(ctx, superseded));
         if (!rest) continue;
