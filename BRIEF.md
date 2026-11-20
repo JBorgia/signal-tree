@@ -225,7 +225,7 @@ Spec paths are relative to packages/ at tag v16.0.0-rc.1.
 | T10 | A throwing observer never strands transact(); observer errors reach onTreeError (at most 50 per tree per second) and [ST2034] | kernel/src/lib/tree-error-public-contract.spec.ts, after-commit-0.spec.ts |
 | R1 | Undo applies only to operations marked undoable() and requires restoration() | kernel/src/enhancers/restoration/restoration.spec.ts |
 | R2 | Undo refuses the whole operation if it would overwrite a newer write | restoration suite (74 spec files) |
-| R3 | Undo and redo after a settled transaction, and after an overlapping rollback, behave as in 15.3.1 | restoration suite |
+| R3 | Undo after a confirmed transaction reverses that transaction's undoable writes as one operation, or refuses whole per R2. An undo entry whose transaction was rolled back has nothing to reverse: undo skips it and removes it from history. Redo re-applies exactly what undo reversed, or refuses whole if a newer write would be overwritten. | restoration suite |
 | R4 | History is bounded and its memory is released | restoration suite |
 | E1 | A held row handle belongs to its entity lifetime; a reused key never retargets an old handle | kernel/src/lib/entity-\*.spec.ts |
 | E2 | Field carriers are stable per handle and created on first access | entity suites |
