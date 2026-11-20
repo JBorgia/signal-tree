@@ -17,6 +17,8 @@
 // So does a later write that names one of the transaction's locations but
 // leaves its value as it was (rewriting the same value, or a setAll that
 // keeps a removed row absent): no row says whether that depends on the change.
+// And so does a later write in the turn the rollback runs in (no turn ended
+// between them): no row says whether a write is confirmed before its turn ends.
 import type { Op, WriteOp } from '../model.js';
 import {
   analyze,
@@ -133,7 +135,11 @@ export function contextAt(analysis: Analysis, tx: TxInfo, step: number): Rollbac
         unclassified.add(loc);
       }
     }
-    const write = (by: LaterWrite['by']) => later.push({ step: j, by, locs: hit, removed, depends, unclassified });
+    const sameTurn = analysis.trace.sequence.steps.slice(j, step).every((x) => x.sameTick);
+    const write = (by: LaterWrite['by']) => {
+      if (sameTurn) ambiguous.push(`step ${j}: a write in the rollback's own turn`);
+      else later.push({ step: j, by, locs: hit, removed, depends, unclassified });
+    };
     const { op, outcome } = s;
     if (op.kind === 'transact' && s.tx !== undefined) {
       const other = analysis.txs[s.tx] as TxInfo;
