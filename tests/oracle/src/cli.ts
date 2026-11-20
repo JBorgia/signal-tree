@@ -2,10 +2,14 @@
 // pnpm --filter @signal-tree/oracle oracle --determinism --subject v16 --runs 10000
 // pnpm --filter @signal-tree/oracle oracle replay out/cases/<id>.json
 //
-// Exit codes. generate: 0 done (a subject violating a property is a finding,
-// not a failure), 2 bad arguments, 3 generator error (a property threw, or an
-// asynchronous error escaped every sequence). --determinism: 0 every replay
-// identical, 1 a replay differed, 2 bad arguments, 3 harness error.
+// Exit codes (gate.ts EXIT). generate: 0 done; 1 the core violated a
+// property; 4 a generatable behavior was checked on the core fewer times than
+// the floor; 5 both; 2 bad arguments; 3 generator error (a property threw, or
+// an asynchronous error escaped every sequence). 1, 4 and 5 arise only when
+// the core is registered and selected (it is by default once registered);
+// an old package (v15, v16) violating a property is a finding, never a
+// failure. --determinism: 0 every replay identical, 1 a replay differed,
+// 2 bad arguments, 3 harness error.
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +17,7 @@ import { parseArgs } from 'node:util';
 import { CATALOG, isProperty } from './behaviors/catalog.js';
 import { checkDeterminism } from './determinism.js';
 import type { PluginMode } from './generate.js';
+import { CORE_SUBJECT, EXIT } from './gate.js';
 import { evaluate, generate, PropertyError, type SpecCase } from './generator.js';
 import { formatSequence, type Outcome } from './model.js';
 import { writeDeterminismReport, writeSpecReport } from './report.js';
@@ -41,6 +46,10 @@ Options:
   --max-steps <n>      steps per sequence at most (default 30)
   --shrink-budget <n>  property evaluations per minimization (default 300)
   --out <dir>          report directory (default tests/oracle/out)
+
+generate exits 0 when done, 1 when the core (subject "${CORE_SUBJECT}") violates a property,
+4 when a generatable behavior has fewer core instances than the floor (runs / 100),
+5 for both, 2 on bad arguments, 3 on a generator error. Old packages are never gated.
 `;
 
 class UsageError extends Error {}
@@ -134,20 +143,41 @@ async function main(): Promise<number> {
     const started = performance.now();
     const result = await generate({ subjects, runs, seed, plugins, maxSteps, shrinkBudget, onProgress: progress(started, runs) });
     const files = writeSpecReport(outDir, result);
+    const { report } = files;
+    const names = subjects.map((s) => s.name);
     out.write(
-      `${runs} sequences, seed ${seed}, subjects ${subjects.map((s) => s.name).join(', ')}: generation ${(result.generateMs / 1000).toFixed(1)} s, minimization ${(result.shrinkMs / 1000).toFixed(1)} s\n`
+      `${runs} sequences, seed ${seed}, subjects ${names.join(', ')}: generation ${(result.generateMs / 1000).toFixed(1)} s, minimization ${(result.shrinkMs / 1000).toFixed(1)} s\n`
     );
-    for (const entry of CATALOG) {
-      const stats = result.stats.get(entry.id);
-      if (!stats) {
-        out.write(`  ${entry.id.padEnd(4)} not generated\n`);
+    out.write(`floor: ${report.floor.required} instances per generatable behavior (one per ${report.floor.sequencesPerInstance} sequences); * marks a count below it\n`);
+    out.write(`${''.padEnd(9)}${names.map((n) => `${n} holds/violates/instances`.padEnd(30)).join('')}\n`);
+    const cellFor = (h: number, v: number, floor?: number) => `${h}/${v}/${h + v}${floor !== undefined && h + v < floor ? ' *' : ''}`.padEnd(30);
+    for (const [id, b] of Object.entries(report.behaviors)) {
+      if (!b.generatable) {
+        out.write(`  ${id.padEnd(7)}not generated (excluded from the floor)\n`);
         continue;
       }
-      const counts = subjects.map((s) => `${s.name} ${stats.holds[s.name]} holds / ${stats.violates[s.name]} violates`);
-      out.write(`  ${entry.id.padEnd(4)} exercised ${String(stats.exercised).padStart(5)}: ${counts.join(', ')}\n`);
+      const floor = 'required' in b.floor ? b.floor.required : undefined;
+      out.write(`  ${id.padEnd(7)}${names.map((n) => cellFor(b.holds[n] ?? 0, b.violates[n] ?? 0, floor)).join('')}\n`);
+      for (const [clause, c] of Object.entries(b.clauses ?? {})) {
+        const cells = names.map((n) => ((c.instances[n] ?? 0) === 0 ? 'NEVER REACHED'.padEnd(30) : cellFor(c.holds[n] ?? 0, c.violates[n] ?? 0)));
+        out.write(`    (${clause})  ${cells.join('')}${c.text}\n`);
+      }
+    }
+    for (const u of report.unreachedClauses) {
+      out.write(`!! ${u.behavior}(${u.clause}) never reached on ${u.subjects.join(', ')}: ${u.text}\n`);
+    }
+    const gate = report.gate;
+    if (!gate.applied) out.write(`core gate: not applied ("${gate.subject}" is not a subject of this run)\n`);
+    else if (gate.exitCode === EXIT.ok) out.write(`core gate: passed\n`);
+    else {
+      const reasons = [
+        ...gate.violated.map((v) => `${v.behavior} violated in ${v.sequences} sequence(s)`),
+        ...gate.belowFloor.map((f) => `${f.behavior} has ${f.instances} instance(s), below ${gate.floor}`),
+      ];
+      out.write(`core gate: FAILED (exit ${gate.exitCode}): ${reasons.join('; ')}\n`);
     }
     out.write(`${result.cases.length} cases in ${files.cases}\nreport: ${files.markdown}\n        ${files.json}\n`);
-    return 0;
+    return gate.exitCode;
   }
 
   if (command === 'replay') {
@@ -178,16 +208,16 @@ try {
   const stray = takeStrayAsyncErrors();
   if (stray.length) {
     process.stderr.write(`harness: ${stray.length} asynchronous errors outside any sequence: ${canonical(stray[0])}\n`);
-    code = 3;
+    code = EXIT.generator;
   }
   process.exitCode = code;
 } catch (error) {
   if (error instanceof UsageError || (error as { code?: string }).code === 'ERR_PARSE_ARGS_UNKNOWN_OPTION') {
     process.stderr.write(`${(error as Error).message}\n\n${USAGE}`);
-    process.exitCode = 2;
+    process.exitCode = EXIT.usage;
   } else {
     process.stderr.write(`${error instanceof PropertyError ? 'generator error: ' : ''}${(error as Error).stack ?? String(error)}\n`);
-    process.exitCode = 3;
+    process.exitCode = EXIT.generator;
   }
 } finally {
   uninstall();
