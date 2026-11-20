@@ -57,7 +57,8 @@ export async function checkDeterminism(options: DeterminismOptions): Promise<Det
       options.onProgress?.(run + 1, runs);
       return true;
     }),
-    { seed, numRuns: runs }
+    // A failure here is a harness error, not a mismatch; report it as is, without shrinking.
+    { seed, numRuns: runs, endOnFailure: true }
   );
   if (pass.failed) throw pass.errorInstance ?? new Error('determinism pass failed');
   return { subject: subject.name, runs, seed, mismatches, ...(first ? { first } : {}), ms: performance.now() - started };

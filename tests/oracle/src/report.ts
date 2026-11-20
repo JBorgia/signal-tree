@@ -96,7 +96,8 @@ export function writeSpecReport(dir: string, result: GenerateResult): { json: st
 
 /**
  * Writes determinism-report.json and, when a spec report is already in `dir`,
- * records the result in its `determinism` field so one artifact carries both.
+ * records the result in its `determinism` field (and its Markdown) so one
+ * artifact carries both.
  */
 export function writeDeterminismReport(dir: string, result: DeterminismResult): string {
   mkdirSync(dir, { recursive: true });
@@ -112,6 +113,11 @@ export function writeDeterminismReport(dir: string, result: DeterminismResult): 
       mismatches: result.mismatches,
     };
     writeFileSync(specFile, `${JSON.stringify({ ...report, determinism }, null, 2)}\n`);
+    const markdown = join(dir, REPORT_MARKDOWN);
+    if (existsSync(markdown)) {
+      const text = readFileSync(markdown, 'utf8').replace(/\n## Determinism\n[\s\S]*$/, '\n');
+      writeFileSync(markdown, `${text.trimEnd()}\n\n${determinismMarkdown(determinism)}`);
+    }
   }
   return file;
 }
@@ -163,8 +169,10 @@ function toMarkdown(report: SpecReport, cases: readonly SpecCase[]): string {
       );
     }
   }
-  if (report.determinism) {
-    lines.push('## Determinism', '', `${report.determinism.subject}: ${report.determinism.mismatches} mismatches in ${report.determinism.runs} sequences.`, '');
-  }
+  if (report.determinism) lines.push(determinismMarkdown(report.determinism));
   return lines.join('\n');
+}
+
+function determinismMarkdown(d: DeterminismReport): string {
+  return `## Determinism\n\n${d.subject}: ${d.mismatches} mismatches in ${d.runs} sequences, seed ${d.seed}.\n`;
 }

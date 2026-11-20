@@ -197,7 +197,8 @@ export async function generate(options: GenerateOptions): Promise<GenerateResult
       options.onProgress?.(run + 1, runs);
       return true;
     }),
-    { seed, numRuns: runs }
+    // A failure here is a generator error (a property threw); report it as is, without shrinking.
+    { seed, numRuns: runs, endOnFailure: true }
   );
   if (pass.failed) throw pass.errorInstance ?? new Error('generation pass failed');
   const generateMs = performance.now() - started;
