@@ -6824,7 +6824,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "O3",
+        "O4",
+        "V1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/absent-path-write.spec.ts",
@@ -6832,42 +6839,57 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/audit-entity-terminals.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types: Date/Map/typed-array entity fields expose no payload methods; tooling helpers accept the tree. Old API types only"
     },
     {
       "source": "packages/solid/src/lib/audit-native-tooling.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1",
+        "V2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/audit-observation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/batching-dynamic-field.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins coalesce() batching, which the spec drops (12.5, #51)"
     },
     {
       "source": "packages/solid/src/lib/declared-publication-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/designated-collection-omission.spec.ts",
@@ -6875,7 +6897,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "V1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/entity-field-materialization.spec.ts",
@@ -6883,63 +6910,92 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "E2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/entity-native-obligation-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/equal-owner-facade-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/hydration-accessor.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types for whole-value snapshot writes and link() admission on collection branches (not SSR hydration); old API types only"
     },
     {
       "source": "packages/solid/src/lib/integrated-cold-collection.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/joint-native-frontier.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/solid/src/lib/joint-rich-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/link-native-address.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4"
+      ]
     },
     {
       "source": "packages/solid/src/lib/native-publication-error-boundary.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T10",
+        "O2",
+        "O3",
+        "X3"
+      ]
     },
     {
       "source": "packages/solid/src/lib/opaque-leaf-restoration.spec.ts",
@@ -6947,21 +7003,31 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "V2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/open-record-access.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types for open Record branches (arbitrary keys unknown, readonly members kept); old API types only"
     },
     {
       "source": "packages/solid/src/lib/parent-freshness-counterparts.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/solid/src/lib/plain-member-absence-observation.spec.ts",
@@ -6969,35 +7035,57 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O2",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/solid/src/lib/projection-transaction-current.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/solid/src/lib/saved-inspection-snapshot-isolation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/scalar-frame-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L4"
+      ]
     },
     {
       "source": "packages/solid/src/lib/selected-callback-facade.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/solid/src/lib/solid-observation.spec.ts",
@@ -7005,21 +7093,35 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "O1",
+        "O2"
+      ]
     },
     {
       "source": "packages/solid/src/lib/transaction-realization.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/solid/src/lib/whole-value-new-keys.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O3",
+        "V1",
+        "T11"
+      ]
     },
     {
       "source": "packages/vue/src/lib/absent-collection.spec.ts",
@@ -7027,7 +7129,17 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T5",
+        "R1",
+        "R3",
+        "O2",
+        "O3",
+        "O4",
+        "X3",
+        "V1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/absent-path-write.spec.ts",
@@ -7035,35 +7147,46 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/audit-entity-terminals.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types: Date/Map/typed-array entity fields expose no payload methods; tooling helpers accept the tree. Old API types only"
     },
     {
       "source": "packages/vue/src/lib/audit-native-tooling.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1",
+        "V2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/audit-observation-lifecycle.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/batching-dynamic-field.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins coalesce() batching, which the spec drops (12.5, #51)"
     },
     {
       "source": "packages/vue/src/lib/construction-input.spec.ts",
@@ -7071,7 +7194,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V2",
+        "V3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/construction-input.typing.spec.ts",
@@ -7079,28 +7205,34 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types rejecting Vue refs/computeds as state and typing terminal payloads; old API types only"
     },
     {
       "source": "packages/vue/src/lib/current-read-capability.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/current-read-capability.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time check that entity activeId/all are Vue ComputedRefs; old API types only"
     },
     {
       "source": "packages/vue/src/lib/declared-publication-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/designated-collection-omission.spec.ts",
@@ -7108,7 +7240,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "V1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/entity-field-materialization.spec.ts",
@@ -7116,105 +7253,161 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "E2",
+        "L1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/entity-native-obligation-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/entity-projection-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/entity-selection-lifetime.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "O1",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/equal-owner-facade-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/hydration-accessor.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types for whole-value snapshot writes and link() admission on collection branches (not SSR hydration); old API types only"
     },
     {
       "source": "packages/vue/src/lib/integrated-cold-collection.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/joint-direct-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/joint-direct-probe.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/joint-native-frontier.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/joint-rich-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/joint-rollback-frontier.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/link-native-address.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/opaque-leaf-restoration-hidden.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "V2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "V2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/opaque-leaf-restoration.spec.ts",
@@ -7222,14 +7415,20 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "V2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/open-record-access.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time types for open Record branches (arbitrary keys unknown, readonly members kept); old API types only"
     },
     {
       "source": "packages/vue/src/lib/ownership.spec.ts",
@@ -7237,14 +7436,20 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/parent-freshness-counterparts.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/plain-member-absence-observation.spec.ts",
@@ -7252,56 +7457,96 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O2",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/prepared-selection-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T10",
+        "E1",
+        "O2",
+        "O3",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/projection-transaction-current.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/restoration-index-sync.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "O2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/scalar-frame-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/selected-active-id-preparation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/selected-callback-facade.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3",
+        "O4"
+      ]
     },
     {
       "source": "packages/vue/src/lib/settlement-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/terminal-carriers.spec.ts",
@@ -7309,7 +7554,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V2"
+      ]
     },
     {
       "source": "packages/vue/src/lib/tooling-admission.spec.ts",
@@ -7317,14 +7564,24 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T8",
+        "R1",
+        "R3",
+        "D1"
+      ]
     },
     {
       "source": "packages/vue/src/lib/transaction-realization.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/vue-observation.spec.ts",
@@ -7332,7 +7589,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "O1",
+        "O2",
+        "O3"
+      ]
     },
     {
       "source": "packages/vue/src/lib/vue-observation.typing.spec.ts",
@@ -7340,14 +7603,19 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time Ref/ComputedRef typing, asReadonly type-only view and link() value types; old API types only; asReadonly is not an X2 reader"
     },
     {
       "source": "packages/vue/src/lib/whole-value-new-keys.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O3",
+        "V1",
+        "T11"
+      ]
     }
   ]
 }
