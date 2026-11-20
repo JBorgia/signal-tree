@@ -1,4 +1,4 @@
-// The behavior catalog: one entry per BRIEF.md 5.1 and 5.2 row, in table
+// The behavior catalog: one entry per BRIEF.md 5.1, 5.2 and 12.4 row, in table
 // order. A row the operation vocabulary can express has a property module;
 // any other row is listed with the reason it cannot be generated yet.
 // Where a row leaves room, the properties' readings are provisional pending
@@ -24,6 +24,9 @@ import { BEHAVIOR_IDS, type BehaviorId, type CatalogEntry, type Property, type U
 
 const NEW_BEHAVIOR =
   'New behavior (5.2): the published packages have no writer identity, holds or chunked ingest, so replaying them cannot exhibit it; it is tested against the new core.';
+
+const ROWS_12_4 =
+  'Added in BRIEF.md 12.4; the properties for the rows the vocabulary can express follow in this pull request.';
 
 const UNEXPRESSED: readonly Unexpressed[] = [
   {
@@ -76,6 +79,60 @@ const UNEXPRESSED: readonly Unexpressed[] = [
     generatable: false,
     row: "A large ingest can be chunked ({ chunk: 'auto' }) and yields between chunks. Each chunk is atomic to observers, and the whole ingest can be rolled back as one turn",
     reason: NEW_BEHAVIOR,
+  },
+  {
+    id: 'O1',
+    generatable: false,
+    row: '**Fine-grained observation.** A reader re-runs only when a location it read changed (as defined in T4). A write the seam skips as unchanged re-runs nothing. A row or `byId` reader does not re-run for writes to other rows.',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'O2',
+    generatable: false,
+    row: '**Turn atomicity for observers.** Every observer sees a turn (including undo, redo, rollback and one chunk of an ingest) as one change: it runs at most once per turn and never sees part of a turn applied. History state (`canUndo`, `canRedo`, position) changes in the same turn.',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'O3',
+    generatable: false,
+    row: '**Read-path consistency.** After every turn, all read paths (leaf, row field, `byId`, `all()`, `ids()`, `count()`, snapshot) agree.',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'O4',
+    generatable: false,
+    row: "**Reentrant writes.** A write made by an observer while a turn is being published is applied after that turn as its own turn, attributed to the observer's writer context. It is never lost or merged into the turn being published.",
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'X3',
+    generatable: false,
+    row: '**Fault containment.** When an observer, link or plugin throws during any publication (including undo, redo and rollback), every other observer, link and plugin still runs, and state stays consistent. Errors are reported per T10 and are never thrown to the writer whose write was being published.',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'D1',
+    generatable: false,
+    row: '**Disposal.** Destroying a tree, or the Angular injector or Vue effect scope that owns it, releases every cell, subscription, link and plugin state. Afterwards every read or write throws a typed error, and teardown errors reach `onTreeError`.',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'D2',
+    generatable: false,
+    row: '**Released memory.** A removed row or field releases its memory once no history entry, pending transaction or held handle references it.',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'W5',
+    generatable: false,
+    row: '**Synchronous context.** A writer context and turn membership never carry across an `await`. Async work captures its context explicitly, as the ingest handle does (ruling 6).',
+    reason: ROWS_12_4,
+  },
+  {
+    id: 'H1',
+    generatable: false,
+    row: "**Hydration.** State serialized on the server and hydrated on the client yields identical values. Hydration is one turn with origin `'server'`.",
+    reason: ROWS_12_4,
   },
 ];
 

@@ -13,7 +13,7 @@ const step = (op: Step['op']): Step => ({ op, sameTick: false });
 describe('the behavior catalog', () => {
   const brief = readFileSync(fileURLToPath(new URL('../../../BRIEF.md', import.meta.url)), 'utf8');
 
-  it('has one entry per 5.1 and 5.2 row, in table order, each quoting its row verbatim', () => {
+  it('has one entry per 5.1, 5.2 and 12.4 row, in table order, each quoting its row verbatim', () => {
     expect(CATALOG.map((e) => e.id)).toEqual([...BEHAVIOR_IDS]);
     for (const entry of CATALOG) {
       expect(brief, entry.id).toContain(`| ${entry.id} | ${entry.row} |`);
@@ -24,7 +24,7 @@ describe('the behavior catalog', () => {
     for (const entry of CATALOG) {
       if (!entry.generatable) expect(entry.reason.length, entry.id).toBeGreaterThan(0);
     }
-    expect(CATALOG.filter((e) => e.id.startsWith('W')).every((e) => !e.generatable)).toBe(true);
+    expect(CATALOG.filter((e) => ['W1', 'W2', 'W3', 'W4'].includes(e.id)).every((e) => !e.generatable)).toBe(true);
   });
 });
 

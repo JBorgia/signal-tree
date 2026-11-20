@@ -1,6 +1,6 @@
 // tests/port-manifest.json: the coverage map (BRIEF.md 12.1.5). One entry per
 // spec file under packages/ at tags v15.4.9 and v16.0.0-rc.1, recording which
-// 5.1/5.2 behavior IDs that old file touched ("covers"), or "notCarried" with a
+// behavior IDs (5.1, 5.2 and 12.4) that old file touched ("covers"), or "notCarried" with a
 // one-line reason, or "pending" until it is classified. It records coverage
 // only: no test is ported from it (12.1.3).
 //
@@ -12,6 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { BEHAVIOR_IDS } from './behavior-ids.mjs';
 import { repoRoot } from './entry-graph.mjs';
 
 export const SOURCE_TAGS = ['v15.4.9', 'v16.0.0-rc.1'];
@@ -37,11 +38,7 @@ export function generate(root = repoRoot) {
   return { sources: SOURCE_TAGS, selection: 'packages/**/*.spec.ts', entries };
 }
 
-export const BEHAVIOR_IDS = [
-  'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10',
-  'R1', 'R2', 'R3', 'R4', 'E1', 'E2', 'L1', 'L2', 'L3', 'X1', 'X2',
-  'W1', 'W2', 'W3', 'W4',
-];
+export { BEHAVIOR_IDS };
 
 /** Returns the problems with a coverage map; `complete` also rejects pending entries. */
 export function validate(manifest, { complete = false } = {}) {
@@ -62,7 +59,7 @@ export function validate(manifest, { complete = false } = {}) {
     if (kinds[0] === 'covers') {
       const ids = e.covers;
       if (!Array.isArray(ids) || ids.length === 0) problems.push(`${at}: "covers" must list at least one behavior ID`);
-      else if (ids.some((id) => !BEHAVIOR_IDS.includes(id))) problems.push(`${at}: "covers" may hold only 5.1/5.2 behavior IDs`);
+      else if (ids.some((id) => !BEHAVIOR_IDS.includes(id))) problems.push(`${at}: "covers" may hold only behavior IDs from 5.1, 5.2 and 12.4`);
       else if (new Set(ids).size !== ids.length) problems.push(`${at}: "covers" lists an ID twice`);
     } else if (kinds[0] === 'notCarried') {
       if (typeof e.notCarried !== 'string' || e.notCarried.trim().length === 0 || e.notCarried.includes('\n')) problems.push(`${at}: "notCarried" needs a one-line reason`);
