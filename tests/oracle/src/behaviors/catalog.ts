@@ -1,6 +1,8 @@
 // The behavior catalog: one entry per BRIEF.md 5.1 and 5.2 row, in table
 // order. A row the operation vocabulary can express has a property module;
 // any other row is listed with the reason it cannot be generated yet.
+// Where a row leaves room, the properties' readings are provisional pending
+// Jonathan's answer on #23 (BRIEF.md 11.2).
 import { E1 } from './e1.js';
 import { E2 } from './e2.js';
 import { L1 } from './l1.js';
@@ -35,7 +37,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
     generatable: false,
     row: 'Undo and redo after a settled transaction, and after an overlapping rollback, behave as in 15.3.1',
     reason:
-      'The row defines its outcome as an old version\'s behavior ("as in 15.3.1"; ruling 3: "as in v16.0.0-rc.1"), and 12.1.1 withdraws old versions as authorities, so it states no outcome to check. It needs a restated row.',
+      'The row defines its outcome as an old version\'s behavior ("as in 15.3.1"; ruling 3: "as in v16.0.0-rc.1"), and 12.1.1 withdraws old versions as authorities, so it states no outcome to check. It needs a restated row (#22, proposed and provisionally adopted).',
   },
   {
     id: 'R4',
