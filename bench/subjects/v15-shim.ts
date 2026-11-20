@@ -5,8 +5,11 @@
  * WritableSignal), EntitySignal.setAll / updateOne / byId / count.
  *
  * The shim only adapts names; it installs no enhancers and does not extend
- * v15. 15.4.9 has no chunked setAll, holds, writer identity or scoped plugins,
- * so those capabilities are absent and their scenarios report "not applicable".
+ * v15. Row field writes, addOne, removeOne, all() and byId are v15's own
+ * EntitySignal members (a row's fields are writable leaves). 15.4.9 has no
+ * chunked setAll, holds, writer identity or scoped plugins, and the shim
+ * installs no transactions or restoration, so those capabilities are absent
+ * and their scenarios, or S8's operations, report "not applicable".
  * v15 has no turn API either: turn() runs fn as is and only adds the bench
  * measure around it.
  *
@@ -52,7 +55,10 @@ function runLazyReads(lazy: LazyReads): void {
 interface V15EntitySignal {
   setAll(rows: unknown[]): void;
   updateOne(id: string | number, changes: Record<string, unknown>): void;
+  addOne(row: unknown): string | number;
+  removeOne(id: string | number): void;
   byId(id: string | number): Record<string, unknown> | undefined;
+  readonly all: () => unknown[];
   readonly count: () => number;
 }
 
@@ -79,7 +85,7 @@ function walk(root: unknown, path: Path): unknown {
   return node;
 }
 
-const CAPABILITIES: ReadonlySet<Capability> = new Set<Capability>(['leaf', 'build', 'collection']);
+const CAPABILITIES: ReadonlySet<Capability> = new Set<Capability>(['leaf', 'build', 'collection', 'collectionFieldWrite', 'collectionAddRemove', 'collectionReads']);
 
 export const v15Shim: StoreSubject = {
   id: 'v15-shim',
@@ -121,6 +127,27 @@ export const v15Shim: StoreSubject = {
             reads?.rows.add(id);
             reads?.fields.add(field);
             return row[field] as Signal<E[F]>;
+          },
+          writableField<F extends keyof E & string>(id: K, field: F): WritableSignal<E[F]> {
+            const row = entities.byId(id);
+            if (!row) throw new Error(`v15-shim: no row ${String(id)}`);
+            reads?.rows.add(id);
+            reads?.fields.add(field);
+            return row[field] as WritableSignal<E[F]>;
+          },
+          addOne(row) {
+            const id = entities.addOne(row);
+            if (reads?.rows.has(id)) reads.touched.add(id);
+          },
+          removeOne(id) {
+            entities.removeOne(id);
+            if (reads?.rows.has(id)) reads.touched.add(id);
+          },
+          all() {
+            return entities.all() as E[];
+          },
+          byId(id) {
+            return entities.byId(id);
           },
           count() {
             return entities.count();

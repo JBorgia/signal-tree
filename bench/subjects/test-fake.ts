@@ -20,6 +20,8 @@
  *   linksScan      S7: every write walks every link in the tree
  *   slowRead       harness tests: every leaf read does extra work
  *   copyRows       S2 heap: setAll keeps a full copy next to the rows it was given
+ *   scanById       S8: byId walks every row of the collection on each call
+ *   copyAll        S8: all() returns a fresh copy of the rows on each call
  */
 import { signal, untracked, type Signal, type WritableSignal } from '@angular/core';
 import { measuredTurn } from './bench-flag.ts';
@@ -38,8 +40,8 @@ import type {
 } from './types.ts';
 
 const ALL: readonly Capability[] = [
-  'leaf', 'build', 'collection', 'collectionFieldWrite', 'chunkedSetAll', 'writers', 'hold', 'transactions',
-  'transactionInspect', 'restoration', 'selectiveUndo', 'links', 'scopedPlugins', 'pluginCollectionSizes',
+  'leaf', 'build', 'collection', 'collectionFieldWrite', 'collectionAddRemove', 'collectionReads', 'chunkedSetAll', 'writers', 'hold',
+  'transactions', 'transactionInspect', 'restoration', 'selectiveUndo', 'links', 'scopedPlugins', 'pluginCollectionSizes',
 ];
 
 function readFaults(): ReadonlySet<string> {
@@ -59,9 +61,25 @@ function busyMs(ms: number): void {
   while (performance.now() < end);
 }
 
+/**
+ * Work every row write and membership change does, standing in for a store's
+ * bookkeeping (about 0.5 µs). Without it these cost tens of nanoseconds, and
+ * the cache misses a 100,000-row collection adds to them would decide S8's
+ * ratios on their own, so S8's self-tests could not tell a planted walk from
+ * a clean store.
+ */
+const ROW_OPERATION_WORK = 400;
+
 let sink = 0;
 function extraWork(iterations: number): void {
   for (let i = 0; i < iterations; i++) sink = (sink + i * 31) | 0;
+}
+
+/** ROW_OPERATION_WORK iterations of a multiply-add chain that never overflows a small integer, so it stays optimized. */
+function rowOperationWork(): void {
+  let acc = sink & 0xfffff;
+  for (let i = 0; i < ROW_OPERATION_WORK; i++) acc = (acc * 31 + i) & 0xfffff;
+  sink = acc;
 }
 
 /** A location as the seam sees it: how to read it and how to store a value the seam accepted. */
@@ -243,12 +261,13 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   private position(id: K): number | undefined {
+    // Once rows have moved (removeOne), the index answers without reading the row.
+    if (this.index) return this.index.get(id);
     if (typeof id === 'number' && this.list[id]?.[this.idField] === id) return id;
-    if (!this.index) {
-      this.index = new Map();
-      this.list.forEach((row, i) => this.index!.set(row[this.idField] as K, i));
-    }
-    return this.index.get(id);
+    const index = new Map<K, number>();
+    this.list.forEach((row, i) => index.set(row[this.idField] as K, i));
+    this.index = index;
+    return index.get(id);
   }
 
   private row(id: K): Record<string, unknown> | undefined {
@@ -257,6 +276,7 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   private commitField(id: K, field: string, value: unknown): void {
+    rowOperationWork();
     const at = this.position(id);
     if (at !== undefined) this.list[at] = { ...this.list[at], [field]: value };
     this.cells.get(this.key(id, field))?.value.set(value);
@@ -300,6 +320,39 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
       }
     }
     this.replace(next);
+  }
+
+  /** Appends; ids that are not their positions are found through the index from then on. */
+  addOne(row: E): void {
+    rowOperationWork();
+    this.list.push(row as Record<string, unknown>);
+    this.index?.set((row as Record<string, unknown>)[this.idField] as K, this.list.length - 1);
+  }
+
+  /** Swaps the last row into the removed row's place, so removal is O(1); the fake keeps no order. */
+  removeOne(id: K): void {
+    rowOperationWork();
+    const at = this.position(id);
+    if (at === undefined) return;
+    const last = this.list.length - 1;
+    const moved = this.list[last]!;
+    this.list[at] = moved;
+    this.list.pop();
+    this.index?.delete(id);
+    if (at !== last) this.index?.set(moved[this.idField] as K, at);
+  }
+
+  all(): readonly E[] {
+    return (this.store.faults.has('copyAll') ? this.list.slice() : this.list) as unknown as readonly E[];
+  }
+
+  byId(id: K): unknown {
+    if (this.store.faults.has('scanById')) {
+      let found: Record<string, unknown> | undefined;
+      for (let i = 0; i < this.list.length; i++) if (this.list[i]![this.idField] === id) found = this.list[i];
+      return found;
+    }
+    return this.row(id);
   }
 
   updateOne(id: K, changes: Partial<E>): void {

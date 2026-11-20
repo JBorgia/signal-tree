@@ -84,7 +84,7 @@ test('the zero and never budgets are judged on every run', () => {
     .filter((condition) => condition.judge === 'every-run')
     .map((condition) => condition.id)
     .sort();
-  assert.deepEqual(judged, ['M1.alloc', 'S2.longTasks', 'S4c.held', 'S5.caps']);
+  assert.deepEqual(judged, ['M1.alloc', 'S2.longTasks', 'S4c.held', 'S5.caps', 'S8.allAlloc', 'S8.byIdAlloc']);
 });
 
 test('every compared metric that can read 0 has a noise floor, and every floor names one', () => {

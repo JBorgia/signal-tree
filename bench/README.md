@@ -18,7 +18,7 @@ Results are written to `bench/out/` and never committed.
 
 Where the budgets leave a detail open, the harness does the following.
 
-**Node scenarios (M1, M2, M3, S7)**
+**Node scenarios (M1, M2, M3, S7, S8)**
 - Each side of a comparison (the store and a plain Angular signal) runs in
   its own process, and the order alternates between runs. Angular runs in
   production mode.
@@ -36,6 +36,37 @@ Where the budgets leave a detail open, the harness does the following.
 - S7 writes as `user` to a location whose owners alternate between open
   transactions and holders whose merge keeps the incoming value. The tree size
   stays the same while the number of links varies.
+- S8 times each operation with the collection at 1,000 and at 100,000 rows of
+  20 fields (the S2 rows). Each size runs in its own process, each operation
+  on its own tree, and the order of the sizes alternates between runs.
+  - Only the operations are timed, in batches; setting up and putting the
+    collection back happen between batches. A round is enough batches for
+    5 ms of timed work (measured again after warm-up; at most 50 ms of wall
+    time), and the result is the median time per operation of 21 rounds after
+    5 warm-up rounds.
+  - Row operations go to 16 rows spread evenly over the collection, the same
+    16 at both sizes. A store that walks the rows to reach one walks half of
+    them on average, while one that does not keeps those rows in cache at both
+    sizes.
+  - setAll alternates between two sets of rows with the same ids and different
+    values, each handed over as it is. Its cost is the call's time divided by
+    the row count, per row written.
+  - addOne adds 16 rows with new ids, removed again untimed. Re-adding the same
+    ids would grow those keys' chains in a V8 Map until a rehash, which comes
+    later the larger the map is.
+  - removeOne removes 16 rows spread over the collection, each id once every
+    rows ÷ 16 batches, and re-adds them untimed.
+  - Transact + rollback opens a transaction that writes one field of one row
+    and rolls it back. Undo makes 50 undoable one-row writes untimed (the
+    history keeps 100), then times the 50 undos.
+  - all() and byId are read repeatedly with nothing written in between. Their
+    allocations are counted as M1 counts them, in another process per size.
+    Growth is bytes per call at 100,000 rows minus at 1,000: bytes, because a
+    copied array is one allocation at any size. The count is exact to about
+    one allocation in the counted calls (15.4.9's byId read 0.99999 per call
+    once), hence the small allowance in budgets.json.
+  - An operation the subject lacks is not measured, and its conditions are
+    reported as not applicable; the rest of S8 is judged without them.
 
 **Browser scenarios (S1–S5)**
 - Chromium is the build pinned by the Playwright version in the lockfile,

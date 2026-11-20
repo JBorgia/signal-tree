@@ -20,7 +20,7 @@ import { RUNS_PER_SCENARIO } from './stats.ts';
 import type { AnyDefinition } from './types.ts';
 
 const USAGE = `usage: pnpm bench [ids...] [options]
-  ids               gate ids (M1 M2 M3 S1 S2 S3 S4a S4b S4c S5 S6a S6b S6c S7 Q1), groups (M, S, S4, S6) or all (default)
+  ids               gate ids (M1 M2 M3 S1 S2 S3 S4a S4b S4c S5 S6a S6b S6c S7 S8 Q1), groups (M, S, S4, S6) or all (default)
   --subject <id>    store subject (default ${DEFAULT_SUBJECT})
   --aa              A/A mode: two interleaved sets of ${RUNS_PER_SCENARIO} runs per scenario; records noise per metric
   --aa-pairs <n>    repeat the A/A pair n times and keep the largest noise (default 1)
@@ -37,7 +37,7 @@ const USAGE = `usage: pnpm bench [ids...] [options]
 
 const GROUPS: Record<string, string[]> = {
   M: ['M1', 'M2', 'M3'],
-  S: ['S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6a', 'S6b', 'S6c', 'S7'],
+  S: ['S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6a', 'S6b', 'S6c', 'S7', 'S8'],
   S4: ['S4a', 'S4b', 'S4c'],
   S6: ['S6a', 'S6b', 'S6c'],
 };
@@ -78,6 +78,9 @@ function printSummary(file: ResultsFile): void {
     for (const condition of result.conditions) {
       const actual = typeof condition.actual === 'number' ? fmt(condition.actual) : JSON.stringify(condition.actual);
       lines.push(`     ${condition.pass ? 'ok  ' : 'FAIL'} ${condition.id}: ${actual} (${condition.text})${condition.detail ? ` — ${condition.detail}` : ''}`);
+    }
+    for (const skipped of result.conditionsNotApplicable ?? []) {
+      lines.push(`     n/a  ${skipped.id} (${skipped.text}) — subject lacks ${skipped.missingCapabilities.join(', ')}`);
     }
     if (result.aa) {
       const relative = Object.entries(result.aa.noise.relative).map(([metric, value]) => `${metric} ${(value * 100).toFixed(1)}%`);
