@@ -7,7 +7,7 @@
  * Planted faults make one budget check fail each. They are read when a tree
  * is created, from BENCH_FAKE_FAULTS in Node or __BENCH_FAKE_FAULTS__ in the
  * page (runner/browser.ts copies the variable into the page):
- *   longChunk      S3: the first chunk of setAll({ chunk: 'auto' }) blocks for 80 ms
+ *   longChunk      S3: the first chunk of setAll({ chunk: 'auto' }) blocks for LONG_CHUNK_MS, then yields
  *   slowApply      S4a: transact() blocks 30 ms
  *   slowInspect    S4a: inspect() blocks 10 ms
  *   slowRollback   S4a: rollback() blocks 30 ms
@@ -47,6 +47,12 @@ function readFaults(): ReadonlySet<string> {
   const raw = g.__BENCH_FAKE_FAULTS__ ?? g.process?.env?.['BENCH_FAKE_FAULTS'] ?? '';
   return new Set(raw.split(',').filter(Boolean));
 }
+
+/**
+ * longChunk's block, by the wall clock: well past S3's 50 ms so that load on
+ * the machine cannot hide it.
+ */
+export const LONG_CHUNK_MS = 200;
 
 function busyMs(ms: number): void {
   const end = performance.now() + ms;
@@ -279,7 +285,11 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   async setAllChunked(rows: readonly E[]): Promise<void> {
-    if (this.store.faults.has('longChunk')) busyMs(80);
+    if (this.store.faults.has('longChunk')) {
+      // A chunk of its own: the yield ends it before anything asks for a render (issue #75).
+      busyMs(LONG_CHUNK_MS);
+      await yieldToBrowser();
+    }
     const next: Record<string, unknown>[] = [];
     let chunkStart = performance.now();
     for (const row of rows as readonly Record<string, unknown>[]) {

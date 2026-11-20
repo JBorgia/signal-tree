@@ -4,6 +4,7 @@ import { before, test } from 'node:test';
 import { buildAngularApp } from '../runner/app-build.ts';
 import { TMP_DIR } from '../runner/paths.ts';
 import type { RequestBase } from '../runner/harness.ts';
+import { LONG_CHUNK_MS } from '../subjects/test-fake.ts';
 import { assertEvaluated, assertFails, budgets, condition, runOnFake } from './helpers.ts';
 
 // One build of the reference app against the fake subject (the "test-fake"
@@ -17,8 +18,17 @@ test('S3 runs on chunked setAll and fails S3.task when a chunk blocks', async ()
   assertEvaluated(await runOnFake('S3', []));
   const planted = await runOnFake('S3', ['longChunk']);
   assertEvaluated(planted);
+  const raw = String(planted.runs![0]!.notes['longFrames']);
+  const frames = JSON.parse(raw) as { startTime: number; duration: number; blockingDuration: number }[];
+  // First that the observer saw the planted chunk at all, as a task: blocking time is what a frame's tasks spend past
+  // 50 ms, so a frame that is merely long (a render after unseen work) does not count. Then its length, then the verdict.
+  assert.ok(frames.length > 0, `the observer reported no long animation frame; frames: ${raw}`);
+  const chunk = frames.reduce((a, b) => (b.blockingDuration > a.blockingDuration ? b : a));
+  assert.ok(chunk.blockingDuration >= LONG_CHUNK_MS - 50, `no frame held the ${LONG_CHUNK_MS} ms chunk as a task; frames: ${raw}`);
+  assert.ok(chunk.duration >= LONG_CHUNK_MS, `frames: ${raw}`);
+  assert.ok(planted.median!['maxMainThreadTaskMs']! >= LONG_CHUNK_MS, `frames: ${raw}`);
   assertFails(planted, 'S3.task');
-  assert.ok(planted.median!['totalMs']! > 0);
+  assert.ok(planted.median!['totalMs']! >= LONG_CHUNK_MS);
 });
 
 test('S4a runs a transaction with inspect() and rollback, and each budget can fail', async () => {

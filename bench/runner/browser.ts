@@ -52,20 +52,21 @@ export interface PerfDrain {
 
 /** Installed before any app script runs. */
 const INIT_SCRIPT = `(() => {
-  const perf = { loaf: [], events: [], keys: [] };
+  const loaf = (entries) => { for (const e of entries) perf.loaf.push({
+    startTime: e.startTime, duration: e.duration, blockingDuration: e.blockingDuration,
+    scripts: (e.scripts || []).map((s) => ({ invoker: s.invoker, sourceURL: s.sourceURL, duration: s.duration })),
+  }); };
+  const events = (entries) => { for (const e of entries) perf.events.push({
+    name: e.name, startTime: e.startTime, duration: e.duration,
+    processingStart: e.processingStart, processingEnd: e.processingEnd, interactionId: e.interactionId,
+  }); };
+  const loafObserver = new PerformanceObserver((list) => loaf(list.getEntries()));
+  const eventObserver = new PerformanceObserver((list) => events(list.getEntries()));
+  // drainPerf takes entries the browser has queued but not yet delivered to the callbacks.
+  const perf = { loaf: [], events: [], keys: [], flush: () => { loaf(loafObserver.takeRecords()); events(eventObserver.takeRecords()); } };
   Object.defineProperty(window, '__benchPerf', { value: perf });
-  new PerformanceObserver((list) => {
-    for (const e of list.getEntries()) perf.loaf.push({
-      startTime: e.startTime, duration: e.duration, blockingDuration: e.blockingDuration,
-      scripts: (e.scripts || []).map((s) => ({ invoker: s.invoker, sourceURL: s.sourceURL, duration: s.duration })),
-    });
-  }).observe({ type: 'long-animation-frame', buffered: true });
-  new PerformanceObserver((list) => {
-    for (const e of list.getEntries()) perf.events.push({
-      name: e.name, startTime: e.startTime, duration: e.duration,
-      processingStart: e.processingStart, processingEnd: e.processingEnd, interactionId: e.interactionId,
-    });
-  }).observe({ type: 'event', durationThreshold: 16, buffered: true });
+  loafObserver.observe({ type: 'long-animation-frame', buffered: true });
+  eventObserver.observe({ type: 'event', durationThreshold: 16, buffered: true });
   // #13: keydown to next paint. The rAF callback runs in the next frame before
   // paint; a message posted from it is handled in the first task after that frame.
   addEventListener('keydown', (e) => {
@@ -179,7 +180,8 @@ export async function openBenchPage(options: OpenOptions): Promise<BenchPage> {
         // Test hook: BENCH_HARNESS_FAULTS=keepMarks plants a harness that forgets to clear (test/harness-buffers.test.ts).
         const keep = (process.env['BENCH_HARNESS_FAULTS'] ?? '').split(',').includes('keepMarks');
         return page.evaluate((keepMarks) => {
-          const perf = (window as unknown as { __benchPerf: { loaf: unknown[]; events: unknown[]; keys: unknown[] } }).__benchPerf;
+          const perf = (window as unknown as { __benchPerf: { loaf: unknown[]; events: unknown[]; keys: unknown[]; flush(): void } }).__benchPerf;
+          perf.flush();
           const ours = performance.getEntries().filter((entry) => entry.name.startsWith('signal-tree:'));
           const turns = ours
             .filter((entry): entry is PerformanceMeasure => entry.entryType === 'measure' && entry.name === 'signal-tree:turn')
