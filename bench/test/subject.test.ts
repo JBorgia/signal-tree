@@ -5,9 +5,9 @@ import { collectionSeed } from '../subjects/seed.ts';
 import { missingCapabilities } from '../subjects/types.ts';
 import { v15Shim } from '../subjects/v15-shim.ts';
 
-test('on the 15.4.9 shim exactly M1, M2, M3, S1 and S2 are applicable', () => {
+test('on the 15.4.9 shim exactly M1, M2, M3, S1, S2 and S8 are applicable', () => {
   const runnable = DEFINITIONS.filter((d) => d.kind !== 'external' && missingCapabilities(v15Shim, d.requires).length === 0).map((d) => d.id);
-  assert.deepEqual(runnable, ['M1', 'M2', 'M3', 'S1', 'S2']);
+  assert.deepEqual(runnable, ['M1', 'M2', 'M3', 'S1', 'S2', 'S8']);
 });
 
 test('the shim hands out native Angular leaves and collection cells', () => {

@@ -32,7 +32,7 @@ export const OWNER_LOGIN = 'JBorgia';
 export const ADAPTERS = ['plain', 'angular', 'vue', 'solid', 'preact', 'react'];
 export const NIGHTLY_JOBS = [...ADAPTERS.map((a) => `gates (${a})`), 'oracle (100k)'];
 /** Gates the harness runs (6.3 as amended by section 10). S6a and S6c are checked here by ci/core-bundle-scan.mjs. */
-export const REQUIRED_GATES = ['M1', 'M2', 'M3', 'S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6b', 'S7'];
+export const REQUIRED_GATES = ['M1', 'M2', 'M3', 'S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6b', 'S7', 'S8'];
 export const ORACLE_MIN_RUNS = 100_000;
 /**
  * Non-vacuity floor (Jonathan's ruling): every generatable behavior checked on

@@ -130,10 +130,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node ci/gate-baseline.mjs --out "$RUNNER_TEMP/main-gates"
       # --record-only takes effect only while budgets.json has "approved": false;
-      # once approved, red gates fail the job (finding 4).
-      - name: PR gates (M1–M3, S1, S3, S6, S7)
+      # once approved, red gates fail the job (finding 4). S8 (scaling) is a
+      # Node gate like M1–M3; main records no S8 baseline until the new core's
+      # Phase 1 (ruling 9), so it is compared with nothing until then.
+      - name: PR gates (M1–M3, S1, S3, S6–S8)
         if: github.ref != 'refs/heads/main'
-        run: pnpm bench M1 M2 M3 S1 S3 S6 S7 --record-only $BASELINE_ARGS
+        run: pnpm bench M1 M2 M3 S1 S3 S6 S7 S8 --record-only $BASELINE_ARGS
       - name: Main's baselines and A/A noise (M1–M3, S1, S2; ruling 9)
         if: github.ref == 'refs/heads/main'
         run: |

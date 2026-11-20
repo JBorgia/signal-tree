@@ -14,7 +14,7 @@
 //   node stop-hook.mjs --is-stuck   exit 0 if the last stop was let through as stuck
 //                                   and no commit has landed since; used by supervise.sh
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -106,7 +106,9 @@ function main() {
   process.exit(0);
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Node runs the main module from its real path; compare with that, or a path through a
+// symlink (macOS /var, a linked home) would skip main and exit 0 having done nothing.
+if (import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   try {
     main();
   } catch (error) {

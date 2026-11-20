@@ -9,7 +9,9 @@
  * Results contract (read by ci/done-check.mjs): top level budgets.approved,
  * recordOnly (the effective value) and subject.id; per scenario status, pass
  * (true or false whenever the scenario ran or errored), conditions[] and
- * regressions[] (always arrays).
+ * regressions[] (always arrays). conditionsNotApplicable[] lists conditions a
+ * subject could not be measured on (S8's operations it lacks); they are not
+ * in conditions[] and do not count toward pass.
  */
 import { readFileSync } from 'node:fs';
 import { DEFINITIONS } from '../scenarios/index.ts';
@@ -23,7 +25,9 @@ import {
   noiseFloor,
   requiredRuns,
   type Budgets,
+  type Condition,
   type ConditionResult,
+  type Evidence,
 } from './budgets.ts';
 import type { ScenarioReply, ScenarioRequest } from './child.ts';
 import { runChild } from './process.ts';
@@ -45,6 +49,8 @@ export interface ScenarioResult {
   conditions: ConditionResult[];
   regressions: Regression[];
   missingCapabilities?: string[];
+  /** Conditions not evaluated because the subject lacks the capabilities their metric needs (S8's operations); they do not count toward pass. */
+  conditionsNotApplicable?: NotApplicableCondition[];
   owner?: string;
   error?: string;
   environment?: { runtime: string; cpuThrottlingRate: number };
@@ -94,6 +100,33 @@ function scenarioOf(id: string): ScenarioDefinition {
   const definition = DEFINITIONS.find((d) => d.id === id);
   if (!definition || definition.kind !== 'scenario') throw new Error(`${id} is not a runnable scenario`);
   return definition;
+}
+
+export interface NotApplicableCondition {
+  id: string;
+  text: string;
+  missingCapabilities: string[];
+}
+
+/**
+ * Evaluates a scenario's conditions. A condition whose metric needs
+ * capabilities the subject lacks (ScenarioDefinition.metricRequires) is not
+ * evaluated and goes to `notApplicable`; every other condition is evaluated,
+ * so a metric the scenario failed to produce still fails.
+ */
+export function judgeConditions(
+  definition: ScenarioDefinition,
+  subject: StoreSubject,
+  conditions: readonly Condition[],
+  evidence: Evidence,
+): { conditions: ConditionResult[]; notApplicable: NotApplicableCondition[] } {
+  const out: { conditions: ConditionResult[]; notApplicable: NotApplicableCondition[] } = { conditions: [], notApplicable: [] };
+  for (const condition of conditions) {
+    const missing = missingCapabilities(subject, definition.metricRequires?.[condition.metric ?? ''] ?? []);
+    if (missing.length) out.notApplicable.push({ id: condition.id, text: condition.text, missingCapabilities: missing });
+    else out.conditions.push(evaluateCondition(condition, evidence));
+  }
+  return out;
 }
 
 /** A scenario passes only when it has conditions and every one passed. */
@@ -204,7 +237,9 @@ export class Harness {
     }
     // Every run of the measurement is evidence for 'every-run' conditions (both A/A sets).
     const evidence = { median: result.median, runs: records.map((r) => r.metrics), requiredRuns: required };
-    result.conditions = (gateEntry(this.budgets, definition.id).conditions ?? []).map((condition) => evaluateCondition(condition, evidence));
+    const judged = judgeConditions(definition, this.subject, gateEntry(this.budgets, definition.id).conditions ?? [], evidence);
+    result.conditions = judged.conditions;
+    if (judged.notApplicable.length) result.conditionsNotApplicable = judged.notApplicable;
     result.pass = result.status === 'ran' && verdict(result.conditions);
     return result;
   }

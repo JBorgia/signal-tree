@@ -9,6 +9,7 @@ import { S4a, S4b, S4c } from './s4-agent.ts';
 import { S5 } from './s5-soak.ts';
 import { S6a, S6b, S6c } from './s6-scoped-opt-in.ts';
 import { S7 } from './s7-contention.ts';
+import { S8 } from './s8-scaling.ts';
 
 /** Every gate of BRIEF 6.3 (as modified by the rulings) the harness knows, in report order. */
 export const DEFINITIONS: readonly AnyDefinition[] = [
@@ -26,6 +27,7 @@ export const DEFINITIONS: readonly AnyDefinition[] = [
   { kind: 'composite', ...S6b },
   { kind: 'external', ...S6c },
   { kind: 'scenario', ...S7 },
+  { kind: 'scenario', ...S8 },
   { kind: 'external', id: 'Q1', title: 'Correctness', owner: 'ported tests, the oracle and the adapter suites' },
 ];
 

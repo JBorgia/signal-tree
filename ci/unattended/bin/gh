@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# gh for the unattended runner. supervise.sh puts this directory first on PATH
+# and sets SIGNAL_TREE_REAL_GH to the real gh, resolved once at start; this
+# never searches PATH for it.
+#
+# Every call runs as the signal-tree-ci GitHub App: GH_TOKEN is set from
+# ../app-token.mjs each time (a cached token, refreshed 10 minutes before it
+# expires), so a long session never runs gh with an expired token, and no
+# other token is used.
+#
+# Jonathan's ruling: the App turns on auto-merge (merge commit) for each PR it
+# opens. After a successful `gh pr create` this runs
+# `gh pr merge <url> --auto --merge`, but only for a PR from a branch of
+# JBorgia/signal-tree into its main, never a fork's. Otherwise, or if turning
+# auto-merge on fails, it warns, and the exit status is still pr create's.
+set -uo pipefail
+
+readonly REPO=JBorgia/signal-tree
+here=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
+
+real_gh=${SIGNAL_TREE_REAL_GH:-}
+if [[ $real_gh != /* || ! -f $real_gh || ! -x $real_gh || $real_gh -ef ${BASH_SOURCE[0]} ]]; then
+  echo "gh (signal-tree-ci): SIGNAL_TREE_REAL_GH must be the absolute path of the real gh; start the session through supervise.sh." >&2
+  exit 127
+fi
+
+unset GITHUB_TOKEN GH_ENTERPRISE_TOKEN GITHUB_ENTERPRISE_TOKEN
+if ! GH_TOKEN=$(node "$here/../app-token.mjs" token); then
+  echo "gh (signal-tree-ci): no GitHub App token, so gh was not run." >&2
+  exit 1
+fi
+export GH_TOKEN
+
+# The pr subcommand, skipping the --repo flag gh also accepts before it.
+pr_subcommand() {
+  [[ ${1:-} == pr ]] || return 0
+  shift
+  while (( $# )); do
+    case $1 in
+      -R | --repo) shift; (( $# )) && shift ;;
+      -*) shift ;;
+      *) echo "$1"; return 0 ;;
+    esac
+  done
+}
+
+# Turns on auto-merge for the PR at $1 if it is from a branch of REPO into main.
+auto_merge() {
+  local view cross base url re="^https://github\.com/$REPO/pull/[0-9]+\$"
+  if ! view=$("$real_gh" pr view "$1" --json isCrossRepository,baseRefName,url); then
+    echo "gh (signal-tree-ci): warning: could not look up $1, so auto-merge was not turned on." >&2
+    return
+  fi
+  read -r cross base url <<< "$(jq -r '[.isCrossRepository, .baseRefName, .url] | map(tostring) | join(" ")' <<< "$view" 2> /dev/null)"
+  if [[ $cross != false || $base != main || ! $url =~ $re ]]; then
+    echo "gh (signal-tree-ci): warning: $1 is not a pull request from a $REPO branch into main (cross-repository: ${cross:-?}, base: ${base:-?}), so auto-merge was not turned on." >&2
+    return
+  fi
+  if ! "$real_gh" pr merge "$url" --auto --merge >&2; then
+    echo "gh (signal-tree-ci): warning: could not turn on auto-merge for $url; the pull request itself was created." >&2
+  fi
+}
+
+case $(pr_subcommand "$@") in
+  create | new) ;;
+  *) exec "$real_gh" "$@" ;;
+esac
+
+out=$("$real_gh" "$@")
+status=$?
+[[ -n $out ]] && printf '%s\n' "$out"
+if (( status == 0 )); then
+  url=$(printf '%s\n' "$out" | grep -Eo 'https://github\.com/[^/[:space:]]+/[^/[:space:]]+/pull/[0-9]+' | tail -1)
+  if [[ -z $url ]]; then
+    echo "gh (signal-tree-ci): warning: gh pr create printed no pull request URL, so auto-merge was not turned on." >&2
+  else
+    auto_merge "$url"
+  fi
+fi
+exit "$status"

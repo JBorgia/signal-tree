@@ -2780,7 +2780,7 @@
       "in": [
         "v15.4.9"
       ],
-      "notCarried": "timing guard that a transaction of transient rows scales linearly; performance is gated by the M/S gates in section 6, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/enhancers/transactions/transactions-contract.typing.spec.ts",
@@ -4183,7 +4183,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "work-count: counts internal mutation-index work for setAll/updateMany; performance is gated by section 6 M/S gates, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/entity-granular-reactivity.spec.ts",
@@ -4482,14 +4482,14 @@
       "in": [
         "v15.4.9"
       ],
-      "notCarried": "work-count: prepending fresh rows does not walk existing order (spied structural store); performance is gated by section 6, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/entity-projection-allocation.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "notCarried": "allocation test: all() allocates no discarded key/value tuples; performance is gated by section 6 M/S gates, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/entity-projection-order.spec.ts",
@@ -6011,7 +6011,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "work-count test of slot preparation, installation and equality calls; work and performance are gated by section 6 M/S gates, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/internals/subject-restoration-claims.spec.ts",
@@ -7103,7 +7103,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "asserts one-field capture and rollback visit no untouched collection members; work-count test; performance is gated by the section 6 M/S gates, not by rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/occupancy-successor-realization.spec.ts",
@@ -7414,7 +7414,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "asserts a clear rollback pairs physical edits without repeated scans; work-count test; performance is gated by the section 6 M/S gates, not by rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/parent-freshness-entity.spec.ts",
@@ -7527,7 +7527,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "asserts rollback does not rebuild every pending addition prefix; work-count test; performance is gated by the section 6 M/S gates, not by rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/persistence-decompose-0.spec.ts",
@@ -7662,7 +7662,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "work-count bound on prepend snapshot visits plus internal frame endpoints and domain ordering; performance is an M/S gate, not a row"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/plain-branch-membership.spec.ts",
@@ -7713,7 +7713,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "counts Map/array allocations of point results; allocation work is gated by the section 6 M/S gates, not by rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/point-result-demand.spec.ts",
@@ -7764,7 +7764,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "asserts fresh setAll anchor work is linear in collection size; work is gated by the section 6 M/S gates, not by rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/prepared-placement-index.spec.ts",
@@ -7837,7 +7837,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "notCarried": "complexity guards and scaling reports for scalar/entity writes and undo-of-remove; performance is gated by the section 6 M/S gates, not by rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/production-stats-guards.spec.ts",
@@ -8245,7 +8245,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "work-count test: counts physical row writes and dependency reads during jumpTo; performance is gated by section 6 M/S gates, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/restoration-scoped-capture.spec.ts",
@@ -8528,7 +8528,7 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "notCarried": "allocation test: counts Map allocations for populated point rows; performance is gated by section 6 M/S gates, not rows"
+      "notCarried": "performance: gated by S8"
     },
     {
       "source": "packages/kernel/src/lib/singleton-row-reuse.spec.ts",

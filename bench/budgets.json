@@ -37,7 +37,9 @@
     "S4b.selectiveUndoMs": 0.005,
     "S4c.heldValueOverwrites": 1,
     "S5.heapGrowthFinalHalf": 0.005,
-    "S5.collectionsOverCap": 1
+    "S5.collectionsOverCap": 1,
+    "S8.allAllocatedBytesGrowth": 0.00016,
+    "S8.byIdAllocatedBytesGrowth": 0.00016
   },
   "defaultEnvironment": {
     "text": "Budget (at 4× throttle unless noted)",
@@ -192,6 +194,35 @@
       "conditions": [
         { "id": "S7.bound", "text": "cost(n) ≤ cost(1) + n × 0.5 µs at Node 1× (provisional coefficient), for n = 1, 2, 8, 32 owners", "metric": "writeCostUs", "op": "ownerBound", "coefficientUs": 0.5, "provisional": true, "ruling": 5 },
         { "id": "S7.links", "text": "an uncontended write is unchanged (±10%) with 10 vs 10,000 links elsewhere (C4)", "metric": "uncontendedLinksDelta", "op": "withinRelative", "value": 0.10 }
+      ]
+    },
+    "S8": {
+      "scenario": "Scaling: leaf write, row field write, addOne, removeOne, setAll, updateOne, transact + rollback of one row, undo of one row, all() and byId at 1,000 and 100,000 rows",
+      "source": "Jonathan's spec for S8, Nov 20, 2026: the work-count and complexity tests marked notCarried 'gated by section 6' need a gate that a superlinear algorithm cannot pass at fixed sizes",
+      "environment": { "runtime": "node", "cpuThrottlingRate": 1 },
+      "parameters": {
+        "rows": [1000, 100000],
+        "fields": { "$ref": "scale.largestCollection.fields" },
+        "allocationCalls": 100000
+      },
+      "baseline": {
+        "text": "Recorded only until the new core's baselines exist: S8's baselines come from the new core in Phase 1 (ruling 9: each scenario gets its baseline when its phase lands). On the 15.4.9 shim it is recorded, never baselined.",
+        "phase": 1,
+        "ruling": 9
+      },
+      "conditions": [
+        { "id": "S8.leafWrite", "text": "leaf write: the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "leafWriteRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.rowFieldWrite", "text": "row field write: the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "rowFieldWriteRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.addOne", "text": "addOne: the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "addOneRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.removeOne", "text": "removeOne: the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "removeOneRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.setAll", "text": "setAll (per row written: total time divided by the row count): the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "setAllRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.updateOne", "text": "updateOne: the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "updateOneRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.transactRollback", "text": "transact + rollback of one row (open, write one row field, roll back): the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "transactRollbackRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.undo", "text": "undo of one row (an undoable write to one row, then undo; only the undo is timed): the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "undoRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.all", "text": "all(): the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "allRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.byId", "text": "byId: the per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×)", "metric": "byIdRatio", "op": "<=", "value": 2.0 },
+        { "id": "S8.allAlloc", "text": "allocations per all() call must not grow with collection size: bytes allocated per call at 100,000 rows ≤ at 1,000 + 0.1 B (the count is exact to about one allocation in the counted calls; a per-call copy grows by a pointer per row)", "metric": "allAllocatedBytesGrowth", "op": "<=", "value": 0.1, "judge": "every-run" },
+        { "id": "S8.byIdAlloc", "text": "allocations per byId call must not grow with collection size: bytes allocated per call at 100,000 rows ≤ at 1,000 + 0.1 B (the count is exact to about one allocation in the counted calls; a per-call copy grows by a pointer per row)", "metric": "byIdAllocatedBytesGrowth", "op": "<=", "value": 0.1, "judge": "every-run" }
       ]
     },
     "Q1": {

@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { LOCK_REF, acquire, holder, release } from './lock.mjs';
+import { LOCK_REF, acquire, holder, lockIdentity, release } from './lock.mjs';
 import { BLOCK_LIMIT, decide, isStuck } from './stop-hook.mjs';
 
 describe('Stop hook decision', () => {
@@ -96,6 +96,27 @@ describe('agent lock', () => {
       expect(acquire({ cwd: b, session: 'session-b' })).toMatchObject({ acquired: true });
       expect(release({ cwd: b, session: 'session-b' })).toMatchObject({ released: true });
       expect(holder({ cwd: a })).toBeNull();
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('commits the lock as Jonathan, or as SIGNAL_TREE_GIT_NAME and SIGNAL_TREE_GIT_EMAIL, whatever git config says', () => {
+    expect(lockIdentity({})).toEqual({ name: 'Jonathan Borgia', email: 'jonathanborgia@gmail.com' });
+    expect(lockIdentity({ SIGNAL_TREE_GIT_NAME: 'Borgia', SIGNAL_TREE_GIT_EMAIL: 'other@example.com' })).toEqual({ name: 'Borgia', email: 'other@example.com' });
+    const { root, a } = setup();
+    try {
+      sh(a, 'config', 'user.name', 'Someone Else');
+      sh(a, 'config', 'user.email', 'someone@example.com');
+      const who = (sha: string) => sh(a, 'log', '-1', '--format=%an <%ae> / %cn <%ce>', sha).stdout.trim();
+      const first = acquire({ cwd: a, session: 'session-a' });
+      expect(who(first.holder.sha)).toBe(`${lockIdentity().name} <${lockIdentity().email}> / ${lockIdentity().name} <${lockIdentity().email}>`);
+      release({ cwd: a, session: 'session-a' });
+      const jonathan = acquire({ cwd: a, session: 'session-b', identity: lockIdentity({}) });
+      expect(who(jonathan.holder.sha)).toBe('Jonathan Borgia <jonathanborgia@gmail.com> / Jonathan Borgia <jonathanborgia@gmail.com>');
+      release({ cwd: a, session: 'session-b' });
+      const other = acquire({ cwd: a, session: 'session-c', identity: lockIdentity({ SIGNAL_TREE_GIT_NAME: 'Borgia', SIGNAL_TREE_GIT_EMAIL: 'other@example.com' }) });
+      expect(who(other.holder.sha)).toBe('Borgia <other@example.com> / Borgia <other@example.com>');
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
