@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Supervisor for the unattended rebuild (BRIEF.md section 11.4).
 #
-# Run it inside the isolated container or VM, signed in to gh as the bot
-# account, from the agent's checkout of JBorgia/signal-tree:
+# Run it inside the isolated container or VM, from the agent's checkout of
+# JBorgia/signal-tree, with the variables under Environment set:
 #
 #   SIGNAL_TREE_ISOLATED=1 tmux new-session -d -s rebuild ci/unattended/supervise.sh
 #
@@ -22,12 +22,40 @@
 #   SIGNAL_TREE_STATE_DIR         default ~/.signal-tree-unattended (session ID, hook state, logs)
 #   SIGNAL_TREE_VERIFY_DIR        default $SIGNAL_TREE_STATE_DIR/verify
 #   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"; may not set the model
+#   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 #   ANTHROPIC_API_KEY             required: the API key from the VM's secret store (#16)
+#   SIGNAL_TREE_APP_ID            required: the signal-tree-ci GitHub App's ID
+#   SIGNAL_TREE_APP_INSTALLATION_ID  required: the App's installation ID on JBorgia/signal-tree
+#   SIGNAL_TREE_APP_KEY_FILE      required: path to the App's private key (.pem) in the VM's secret store
+#   SIGNAL_TREE_GIT_NAME          default "Jonathan Borgia": author and committer name of every commit
+#   SIGNAL_TREE_GIT_EMAIL         default jonathanborgia@gmail.com: author and committer email
+#
+# Exit status: 0 done; 1 setup failed; 2 not the isolated machine, or extra
+# arguments set a model; 3 stuck; 4 the agent lock is held or could not be
+# taken; 5 a run used another model; 6 no ANTHROPIC_API_KEY; 7 a run could not
+# authenticate to Anthropic; 8 the GitHub App variables are missing or the key
+# file is unreadable; 9 no GitHub App token could be minted, or git would not
+# use it.
 #
 # Authentication (Jonathan's ruling on #16): Claude Code uses an Anthropic API
 # key from the VM's secret store, never a browser login. The supervisor
 # refuses to start without one, clears any OAuth token from its environment,
 # and stops (instead of retrying) when a run ends on an authentication error.
+#
+# GitHub identity (BRIEF.md 12.3 and Jonathan's rulings): the signal-tree-ci
+# GitHub App authenticates every push and gh call, and turns on auto-merge
+# (merge commit) for each PR it opens; commits keep Jonathan as author and
+# committer. At start the supervisor copies app-token.mjs and the gh wrapper
+# (bin/gh) from its own directory into $SIGNAL_TREE_STATE_DIR/github-app, so a
+# branch switch in the agent's checkout cannot remove them, and mints one token
+# to fail fast. In its own environment only, which the session and its hooks
+# inherit (no git config file is written), it then
+#   - unsets GH_TOKEN and GITHUB_TOKEN, so no personal token is ever used;
+#   - makes app-token.mjs git's only credential helper for https://github.com,
+#     and rewrites github.com SSH remotes to HTTPS so pushes go through it;
+#   - sets GIT_AUTHOR_* and GIT_COMMITTER_* from SIGNAL_TREE_GIT_NAME and
+#     SIGNAL_TREE_GIT_EMAIL (the agent lock's commit uses them too);
+#   - puts the gh wrapper first on PATH.
 #
 # One session at a time: the supervisor holds the agent lock (refs/agent/lock
 # on the remote, see lock.mjs) for as long as it runs, and refuses to start
@@ -40,7 +68,6 @@
 # No tool attribution: the session's settings turn attribution off
 # ("attribution": false from Claude Code 2.1.281; on older versions the
 # commit and PR attribution texts are emptied and the session URL is off).
-#   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 set -uo pipefail
 
 readonly MODEL=claude-opus-5-5
@@ -51,6 +78,7 @@ main() {
     exit 2
   fi
 
+  SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
   WORK_DIR=$(git rev-parse --show-toplevel)
   export SIGNAL_TREE_WORK_DIR=$WORK_DIR
   export SIGNAL_TREE_STATE_DIR=${SIGNAL_TREE_STATE_DIR:-$HOME/.signal-tree-unattended}
@@ -67,8 +95,24 @@ main() {
     exit 6
   fi
   unset CLAUDE_CODE_OAUTH_TOKEN
+  # GitHub sees only the signal-tree-ci App, never a personal token.
+  unset GH_TOKEN GITHUB_TOKEN GH_ENTERPRISE_TOKEN GITHUB_ENTERPRISE_TOKEN
+  local missing='' name
+  for name in SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE; do
+    [[ -n ${!name:-} ]] || missing+=" $name"
+  done
+  if [[ -n $missing ]]; then
+    echo "Refusing to start: set$missing from the VM's secret store; the agent reaches GitHub only as the signal-tree-ci GitHub App." >&2
+    exit 8
+  fi
+  if [[ ! -f $SIGNAL_TREE_APP_KEY_FILE || ! -r $SIGNAL_TREE_APP_KEY_FILE ]]; then
+    echo "Refusing to start: SIGNAL_TREE_APP_KEY_FILE ($SIGNAL_TREE_APP_KEY_FILE) is not a readable file; it must be the App's private key." >&2
+    exit 8
+  fi
+  export SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE
   local log=$SIGNAL_TREE_STATE_DIR/session.log
   mkdir -p "$SIGNAL_TREE_STATE_DIR"
+  use_github_app "$SCRIPT_DIR" "$SIGNAL_TREE_STATE_DIR/github-app" || exit 9
 
   if [[ ! -d $SIGNAL_TREE_VERIFY_DIR/.git ]]; then
     git clone -q "$(git -C "$WORK_DIR" remote get-url origin)" "$SIGNAL_TREE_VERIFY_DIR" || exit 1
@@ -147,6 +191,48 @@ main() {
       backoff=60
     fi
   done
+}
+
+# Sets this environment up to reach GitHub as the signal-tree-ci App (see
+# "GitHub identity" above): installs app-token.mjs and bin/gh from $1 into $2,
+# points git, gh and the commit identity at them, then mints a token and checks
+# that git would use it. Prints the reason and returns 1 on any failure.
+use_github_app() {
+  local from=$1 app_dir=$2 helper user
+  if ! { mkdir -p "$app_dir/bin" &&
+    install_file "$from/app-token.mjs" "$app_dir/app-token.mjs" 644 &&
+    install_file "$from/bin/gh" "$app_dir/bin/gh" 755; }; then
+    echo "Refusing to start: could not install the GitHub App helpers into $app_dir." >&2
+    return 1
+  fi
+  printf -v helper '!node %q git-credential' "$app_dir/app-token.mjs"
+  # The empty helper clears any inherited one (a gh login, a keychain), so the App's is the only one.
+  export GIT_CONFIG_COUNT=4 \
+    GIT_CONFIG_KEY_0=credential.https://github.com.helper GIT_CONFIG_VALUE_0= \
+    GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1="$helper" \
+    GIT_CONFIG_KEY_2=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_2=git@github.com: \
+    GIT_CONFIG_KEY_3=url.https://github.com/.insteadOf GIT_CONFIG_VALUE_3=ssh://git@github.com/ \
+    GIT_TERMINAL_PROMPT=0
+  export SIGNAL_TREE_GIT_NAME=${SIGNAL_TREE_GIT_NAME:-Jonathan Borgia}
+  export SIGNAL_TREE_GIT_EMAIL=${SIGNAL_TREE_GIT_EMAIL:-jonathanborgia@gmail.com}
+  export GIT_AUTHOR_NAME=$SIGNAL_TREE_GIT_NAME GIT_COMMITTER_NAME=$SIGNAL_TREE_GIT_NAME \
+    GIT_AUTHOR_EMAIL=$SIGNAL_TREE_GIT_EMAIL GIT_COMMITTER_EMAIL=$SIGNAL_TREE_GIT_EMAIL
+  export PATH=$app_dir/bin:$PATH
+
+  if ! node "$app_dir/app-token.mjs" token > /dev/null; then
+    echo "Refusing to start: could not mint a GitHub App installation token (the reason is above)." >&2
+    return 1
+  fi
+  user=$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill 2>/dev/null | sed -n 's/^username=//p')
+  if [[ $user != x-access-token ]]; then
+    echo "Refusing to start: git would not use the App's credentials for https://github.com (the GIT_CONFIG_* environment needs git 2.31 or later)." >&2
+    return 1
+  fi
+}
+
+# Copies $1 to $2 with mode $3, replacing $2 in one step.
+install_file() {
+  cp "$1" "$2.new.$$" && chmod "$3" "$2.new.$$" && mv -f "$2.new.$$" "$2"
 }
 
 # The error text of a run that failed to authenticate, or nothing.

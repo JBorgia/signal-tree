@@ -11,16 +11,27 @@
 //   node lock.mjs release --force            clear a lock left by a session that died
 //   node lock.mjs status                     print the holder, if any
 //
+// The lock commit is pushed to GitHub, so it carries Jonathan's identity like
+// every other commit: SIGNAL_TREE_GIT_NAME and SIGNAL_TREE_GIT_EMAIL, the same
+// variables supervise.sh uses, defaulting to Jonathan Borgia
+// <jonathanborgia@gmail.com>.
+//
 // Exit status: 0 done; 3 held by another session; 1 any other failure.
 import { execFileSync } from 'node:child_process';
+import { realpathSync } from 'node:fs';
 import { hostname } from 'node:os';
 import { pathToFileURL } from 'node:url';
 
 export const LOCK_REF = 'refs/agent/lock';
 const EMPTY_TREE = '4b825dc642cb6eb9a060e54bf8d69288fbee4904';
 
-function git(cwd, args, input) {
-  return execFileSync('git', args, { cwd, input, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+function git(cwd, args, { input, env } = {}) {
+  return execFileSync('git', args, { cwd, input, env, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+}
+
+/** Author and committer of the lock commit. */
+export function lockIdentity(env = process.env) {
+  return { name: env.SIGNAL_TREE_GIT_NAME || 'Jonathan Borgia', email: env.SIGNAL_TREE_GIT_EMAIL || 'jonathanborgia@gmail.com' };
 }
 
 /** The current holder, or null when the lock is free. */
@@ -42,11 +53,13 @@ export function holder({ cwd, remote = 'origin' }) {
  * now holds it (newly or already), or { acquired: false, holder } when another
  * session does.
  */
-export function acquire({ cwd, session, remote = 'origin', now = new Date() }) {
+export function acquire({ cwd, session, remote = 'origin', now = new Date(), identity = lockIdentity() }) {
   const current = holder({ cwd, remote });
   if (current) return current.session === session ? { acquired: true, holder: current, reused: true } : { acquired: false, holder: current };
   const info = { session, host: hostname(), pid: process.ppid, cwd, startedAt: now.toISOString() };
-  const sha = git(cwd, ['-c', 'user.name=signal-tree-agent-lock', '-c', 'user.email=agent-lock@localhost', 'commit-tree', EMPTY_TREE, '-m', JSON.stringify(info)]);
+  // The environment outranks any user.name or user.email in git config.
+  const env = { ...process.env, GIT_AUTHOR_NAME: identity.name, GIT_AUTHOR_EMAIL: identity.email, GIT_COMMITTER_NAME: identity.name, GIT_COMMITTER_EMAIL: identity.email };
+  const sha = git(cwd, ['commit-tree', EMPTY_TREE, '-m', JSON.stringify(info)], { env });
   try {
     // An empty expected value means "only if the ref does not exist": the server rejects the push otherwise.
     git(cwd, ['push', '-q', `--force-with-lease=${LOCK_REF}:`, remote, `${sha}:${LOCK_REF}`]);
@@ -99,7 +112,9 @@ function main() {
   return 1;
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Node runs the main module from its real path; compare with that, or a path through a
+// symlink (macOS /var, a linked home) would skip main and exit 0 having done nothing.
+if (import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href) {
   try {
     process.exit(main());
   } catch (error) {
