@@ -44,6 +44,11 @@ const PUBLISHERS = new Set<Op['kind']>([
 export const X3 = instanceProperty({
   id: 'X3',
   row: ROW,
+  clauses: {
+    a: 'the fault is never thrown to the writer',
+    b: 'every other observer still runs',
+    c: 'state stays consistent',
+  },
   reason: 'Plugins that throw are not in the vocabulary; links running on is left to L1; error reporting is T10.',
   instances(trace) {
     const analysis = analyze(trace);
@@ -67,7 +72,8 @@ export const X3 = instanceProperty({
           'fault-thrown-to-writer',
           { outcome: 'not the fault' },
           outcome.status === 'error' ? { error: outcome.error.class, message: outcome.error.message } : outcome.status,
-          `${op.kind} at step ${s.index} published while ${linkFault ? 'a failing endpoint' : 'an observer'} threw`
+          `${op.kind} at step ${s.index} published while ${linkFault ? 'a failing endpoint' : 'an observer'} threw`,
+          'a'
         )
       );
       // (b) every other observer due to run still ran.
@@ -87,7 +93,8 @@ export const X3 = instanceProperty({
               'other-observer-skipped',
               { observer: o.index, ran: true },
               { observer: o.index, ran: false },
-              `observer ${o.index} on ${formatReader(o.reader)} while observer ${t.index} on the same reader threw at step ${s.index}`
+              `observer ${o.index} on ${formatReader(o.reader)} while observer ${t.index} on the same reader threw at step ${s.index}`,
+              'b'
             )
           );
         }
@@ -101,7 +108,8 @@ export const X3 = instanceProperty({
             'write-partly-applied',
             { applied: 'every write of the operation' },
             { applied: 'the state does not match the operation\'s writes' },
-            `${op.kind} at step ${s.index} returned while a fault was raised`
+            `${op.kind} at step ${s.index} returned while a fault was raised`,
+            'c'
           )
         );
       }
@@ -114,7 +122,8 @@ export const X3 = instanceProperty({
             'read-paths-disagree',
             { disagreements: [] },
             { disagreements: off },
-            `read paths after the fault at step ${s.index}`
+            `read paths after the fault at step ${s.index}`,
+            'c'
           )
         );
       }

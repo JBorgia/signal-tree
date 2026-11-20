@@ -36,6 +36,7 @@ function leafOf(state: StateView | { readError: unknown }, path: LeafPath): Json
 export const O4 = instanceProperty({
   id: 'O4',
   row: ROW,
+  clauses: { a: 'a reentrant write is never lost', b: 'a reentrant write is never merged into the turn being published' },
   reason: '"Attributed to the observer\'s writer context" is not checked: the published packages have no writer identity.',
   instances(trace) {
     const analysis = analyze(trace);
@@ -60,7 +61,8 @@ export const O4 = instanceProperty({
             last.error ? 'reentrant-write-refused' : 'reentrant-write-lost',
             { [path]: last.value },
             last.error ? { error: last.error.class, message: last.error.message } : { [path]: held ?? null },
-            `observer ${last.observer} wrote ${path}=${last.value} while step ${s.index} was published`
+            `observer ${last.observer} wrote ${path}=${last.value} while step ${s.index} was published`,
+            'a'
           )
         );
       }
@@ -88,7 +90,8 @@ export const O4 = instanceProperty({
               { [w.path]: `not ${w.value}` },
               { [w.path]: seen },
               `observer ${o.index} on ${formatReader(o.reader)} ran for step ${s.index}'s turn ` +
-                `after observer ${w.observer} wrote ${w.path}=${w.value}`
+                `after observer ${w.observer} wrote ${w.path}=${w.value}`,
+                'b'
             )
           );
         }

@@ -53,6 +53,11 @@ const describe = (e: ErrorInfo): Json => ({ class: e.class, message: e.message }
 export const D1 = instanceProperty({
   id: 'D1',
   row: ROW,
+  clauses: {
+    a: 'every read or write after destroy throws a typed error',
+    b: 'the state read after destroy throws a typed error',
+    c: 'no observer runs and no link delivers after destroy',
+  },
   afterDestroy: true,
   reason: 'Framework owners (Angular injector, Vue effect scope) and teardown errors are not in the vocabulary.',
   instances(trace) {
@@ -72,7 +77,8 @@ export const D1 = instanceProperty({
             outcome.status === 'ok' ? 'operation-ran-after-destroy' : 'untyped-error-after-destroy',
             { status: 'refused', typed: true },
             outcome.status === 'ok' ? { status: 'ok' } : { status: 'refused', ...(describe(outcome.error) as object) },
-            `${op.kind} at step ${s.index}, after destroy() at step ${destroyed}`
+            `${op.kind} at step ${s.index}, after destroy() at step ${destroyed}`,
+            'a'
           )
         );
       }
@@ -86,7 +92,8 @@ export const D1 = instanceProperty({
           'readError' in state ? 'untyped-read-error-after-destroy' : 'read-after-destroy',
           { read: 'refused', typed: true },
           'readError' in state ? { read: 'refused', ...(describe(state.readError) as object) } : { read: 'ok' },
-          `state read after step ${s.index}, after destroy() at step ${destroyed}`
+          `state read after step ${s.index}, after destroy() at step ${destroyed}`,
+          'b'
         )
       );
       // (c) released subscriptions and links.
@@ -100,7 +107,8 @@ export const D1 = instanceProperty({
             runs > 0 ? 'observer-ran-after-destroy' : 'link-delivered-after-destroy',
             { observerRuns: 0, deliveries: 0 },
             { observerRuns: runs, deliveries },
-            `subscriptions and links at step ${s.index}, after destroy() at step ${destroyed}`
+            `subscriptions and links at step ${s.index}, after destroy() at step ${destroyed}`,
+            'c'
           )
         );
       }

@@ -75,6 +75,10 @@ function unchangedBy(
 export const W5 = instanceProperty({
   id: 'W5',
   row: ROW,
+  clauses: {
+    a: 'transact: rollback keeps writes made after the await',
+    b: 'undoable: undo keeps writes made after the await',
+  },
   reason: 'Turn membership is checked through transact() and undoable(); the writer-context half needs writer identity, which the published packages lack.',
   instances(trace) {
     const analysis = analyze(trace);
@@ -113,7 +117,8 @@ export const W5 = instanceProperty({
           { state: kept.expected },
           { state: kept.observed },
           `${at.op.kind}() at step ${at.index} of the ${s.op.scope}() scope at step ${s.index}, ` +
-            `which wrote ${[...afterOnly].join(', ')} after its await`
+            `which wrote ${[...afterOnly].join(', ')} after its await`,
+            s.op.scope === 'transact' ? 'a' : 'b'
         )
       );
     }

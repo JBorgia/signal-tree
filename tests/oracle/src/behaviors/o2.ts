@@ -36,6 +36,11 @@ const history = (h: StepInfo['observation']['restoration']): Json | undefined =>
 export const O2 = instanceProperty({
   id: 'O2',
   row: ROW,
+  clauses: {
+    a: 'every observer runs at most once per turn',
+    b: 'each run sees the whole turn applied',
+    c: 'history state changes in the same turn',
+  },
   reason: 'Chunked ingest is not in the published packages; history state is read as the operation returns, so its change is checked against the drain that follows.',
   instances(trace) {
     const analysis = analyze(trace);
@@ -53,7 +58,7 @@ export const O2 = instanceProperty({
           const runs = runsIn([s], o.index);
           if (runs === 0) continue;
           const detail = `observer ${o.index} in the turn of step ${s.index}`;
-          found.push(verdict(runs === 1, s.index, 'ran-twice-in-one-turn', { runs: 1 }, { runs }, detail));
+          found.push(verdict(runs === 1, s.index, 'ran-twice-in-one-turn', { runs: 1 }, { runs }, detail, 'a'));
           const saw = (s.observation.observerEvents ?? []).flatMap((e) => (e.kind === 'run' && e.observer === o.index ? [view(e.saw)] : []));
           const partial = saw.filter((v) => v !== undefined && v !== after);
           if (after !== undefined && saw.some((v) => v !== undefined)) {
@@ -64,7 +69,8 @@ export const O2 = instanceProperty({
                 'saw-part-of-turn',
                 { saw: s.after as unknown as Json },
                 { saw: partial.map((v) => JSON.parse(v as string) as Json) },
-                `observer ${o.index} ran during the turn of step ${s.index}`
+                `observer ${o.index} ran during the turn of step ${s.index}`,
+                'b'
               )
             );
           }
@@ -83,7 +89,8 @@ export const O2 = instanceProperty({
           'history-changed-after-turn',
           { atReturn: now },
           { atReturn, afterDrain: now },
-          `history state at step ${s.index} (${s.op.kind})`
+          `history state at step ${s.index} (${s.op.kind})`,
+          'c'
         )
       );
     }
