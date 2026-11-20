@@ -25,6 +25,23 @@ function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => setTimeout(resolve, 0)));
 }
 
+/**
+ * Runs `fn` from a task of the page's own (a posted message), not from the
+ * task Playwright's evaluate runs in. Long animation frames do not count work
+ * in that DevTools-protocol task as a task: a long first chunk that yields
+ * before anything asks for a render is never reported (issue #75).
+ */
+function inPageTask<T>(fn: () => Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const channel = new MessageChannel();
+    channel.port1.onmessage = () => {
+      channel.port1.close();
+      fn().then(resolve, reject);
+    };
+    channel.port2.postMessage(0);
+  });
+}
+
 function need<T>(value: T | undefined, name: string): T {
   if (value === undefined) throw new Error(`subject ${subject.id} lacks ${name}`);
   return value;
@@ -151,13 +168,19 @@ export function installBenchApi(host: BenchHost, appRef: ApplicationRef): void {
       });
     },
 
-    /** S3: chunked bulk replace; resolves with the total wall time. */
+    /**
+     * S3: chunked bulk replace; resolves with the total wall time. The rows
+     * are made here; the replace starts in a page task, so its first chunk
+     * is a task the long animation frames see.
+     */
     async 'collection.setAllChunked'(args) {
       const rows = makeRows(args['rows'] as number, args['fields'] as number, 1);
       const chunked = need(collection().setAllChunked, 'chunkedSetAll');
-      const start = performance.now();
-      await chunked.call(collection(), rows as Row[]);
-      return { totalMs: performance.now() - start, count: collection().count() };
+      return inPageTask(async () => {
+        const start = performance.now();
+        await chunked.call(collection(), rows as Row[]);
+        return { totalMs: performance.now() - start, count: collection().count() };
+      });
     },
 
     /** S4a: agent batch in a transaction, then inspect() and rollback(). */

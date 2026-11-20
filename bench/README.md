@@ -70,7 +70,9 @@ Where the budgets leave a detail open, the harness does the following.
     reads about 1. It is measured after loading and again after the minute,
     with the table removed; the larger of the two counts.
 - S3 replaces 50,000 loaded rows with 50,000 new ones while the table is
-  shown. Long tasks are the long animation frames the browser reports.
+  shown. Long tasks are the long animation frames the browser reports. The
+  replace starts in a task of the page's own, because the frames do not count
+  work in the task Playwright's evaluate runs in as a task (issue #75).
 - S4: the agent edits 1,000 fields spread over 200 shown rows, 5 per row. The
   undo history keeps 100 entries. In the typing test the user's field is one
   of the agent's targets; the user types every 100 ms and the agent sends a
