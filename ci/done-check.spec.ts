@@ -19,8 +19,13 @@ const greenResults = (): Results => ({
   recordOnly: false,
   scenarios: Object.fromEntries(REQUIRED_GATES.map((g: string) => [g, { status: 'ran', pass: true, regressions: [{ regressed: false }] }])),
 });
-/** Catalog entries the generator cannot express yet; a report marks them not generatable. */
-const NOT_GENERATABLE = new Set(['T8', 'R4', 'L3', 'X2', 'W1', 'W2', 'W3', 'W4']);
+/** Catalog entries the generator cannot express yet (as of 12.5); a report marks them not generatable. */
+const NOT_GENERATABLE = new Set(
+  ['T8', 'R4', 'L3', 'X2', 'W1', 'W2', 'W3', 'W4', 'D2'].concat(
+    ['R5', 'R6', 'R7', 'R8', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'E3', 'E4', 'L4', 'L5'],
+    ['T11', 'T12', 'T13', 'H2', 'X4', 'X5', 'X6', 'F1', 'W6']
+  )
+);
 type BehaviorReport = { generatable: boolean; holds: Record<string, number>; violates: Record<string, number>; instances: Record<string, number> };
 /** A nightly spec-report.json in which the core holds everything, every generatable behavior exactly at the floor. */
 const greenOracle = () => ({
@@ -169,9 +174,16 @@ describe('the nightly oracle report', () => {
     const report = greenOracle();
     report.behaviors['T6']!.instances['core'] = 999;
     report.behaviors['R3']!.instances['core'] = 12;
-    expect(oracleReportProblem(report)).toBe(
-      'below the floor of 1000 instances on the new core: T6 (999), R3 (12); excluded as not generatable: T8, R4, L3, X2, W1, W2, W3, W4'
-    );
+    const excluded = BEHAVIORS.filter((id: string) => NOT_GENERATABLE.has(id)).join(', ');
+    expect(oracleReportProblem(report)).toBe(`below the floor of 1000 instances on the new core: T6 (999), R3 (12); excluded as not generatable: ${excluded}`);
+  });
+
+  it('reads every behavior the report lists, not a fixed list of IDs', () => {
+    const report = greenOracle();
+    expect(Object.keys(report.behaviors)).toEqual([...BEHAVIORS]);
+    const last = BEHAVIORS[BEHAVIORS.length - 1] as string;
+    report.behaviors[last] = { generatable: true, holds: { core: 0 }, violates: { core: 0 }, instances: { core: 0 } };
+    expect(oracleReportProblem(report)).toMatch(new RegExp(`: ${last} \\(0\\);`));
   });
 
   it('rejects a run of fewer than 100,000 sequences', () => {
