@@ -44,6 +44,7 @@ const one = (op: Op): Step[] => [step(op)];
 
 const key = fc.constantFrom(...ROW_KEYS);
 const twoKeys = fc.tuple(key, key).filter(([a, b]) => a !== b);
+const threeKeys = fc.tuple(key, key, key).filter(([a, b, c]) => a !== b && b !== c && a !== c);
 const leaf = fc.constantFrom(...LEAF_PATHS);
 const value = fc.integer({ min: 1, max: 3 });
 /** A value in 1..3 other than `v`. */
@@ -195,6 +196,43 @@ const laterTouch: Shape = {
         ...(sameTurn ? [[step(touch, true), rollback]] : [one(touch), [rollback]]),
         one(settle('confirm', 0)),
       ];
+    }),
+};
+
+/**
+ * A transaction rekeys a row, another writer (external()) deletes the row
+ * under its new key, then the transaction is rolled back (T6). The rest of
+ * the turn varies: a leaf write, an update to a second row, or nothing; the
+ * deletion is removeOne or removeMany. The deletion names nothing else the
+ * turn changed, so the rest of the turn is there to reverse (a second row
+ * deleted too would be T5's supersession), and never the old key, which
+ * would rewrite a location the rekey already emptied.
+ */
+const rekeyedRowDeleted: Shape = {
+  needs: ['transact', 'rollback', 'confirm', 'addOne', 'updateOne', 'removeOne', 'removeMany', 'changeId', 'setLeaf'],
+  plugins: true,
+  segments: fc
+    .record({
+      keys: threeKeys,
+      n: value,
+      v: value,
+      leafToo: fc.boolean(),
+      secondRow: fc.boolean(),
+      removal: fc.constantFrom<'removeOne' | 'removeMany'>('removeOne', 'removeMany'),
+      undoable: fc.boolean(),
+      settleAfter: fc.boolean(),
+    })
+    .map(({ keys: [from, to, second], n, v, leafToo, secondRow, removal, undoable, settleAfter }) => {
+      const setup = [step(write({ kind: 'addOne', row: { id: from, n, m: 0 } }))];
+      if (secondRow) setup.push(step(write({ kind: 'addOne', row: { id: second, n: 0, m: 0 } })));
+      const body: WriteOp[] = [{ kind: 'changeId', from, to }];
+      if (leafToo) body.push({ kind: 'setLeaf', path: 'a', value: v });
+      if (secondRow) body.push({ kind: 'updateOne', id: second, field: 'n', value: v });
+      const deletion: WriteOp =
+        removal === 'removeOne' ? { kind: 'removeOne', id: to } : { kind: 'removeMany', ids: secondRow ? [to] : [to, second] };
+      const segments: Step[][] = [setup, one(transact(body, undoable)), one(write(deletion, 'external')), one(settle('rollback', 0))];
+      if (settleAfter) segments.push(one(settle('confirm', 0)));
+      return segments;
     }),
 };
 
@@ -434,6 +472,7 @@ export function focusedArb(options: {
     overlapping(options.kinds.has('inspect')),
     newerTruth,
     laterTouch,
+    rekeyedRowDeleted,
     heldRow,
     undoOverNewer,
     undoAroundTransaction,
