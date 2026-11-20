@@ -134,6 +134,8 @@ jobs:
         run: |
           pnpm bench M1 M2 M3 S1 S2 --aa --record-only
           cp bench/out/aa-*-latest.json bench/out/aa-latest.json
+          # Where the baseline was recorded; PR runs compare only with one from the gate runner.
+          printf '{"runnerEnvironment":"%s","runnerName":"%s"}\n' "$RUNNER_ENVIRONMENT" "$RUNNER_NAME" > bench/out/recorded-on.json
       - name: Keep the results
         if: always()
         uses: actions/upload-artifact@v4
