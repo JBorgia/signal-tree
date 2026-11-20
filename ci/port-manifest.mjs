@@ -1,10 +1,13 @@
-// tests/port-manifest.json (BRIEF.md 5.3 item 1): one entry per spec file
-// under packages/ at tags v15.4.9 and v16.0.0-rc.1, each with a disposition.
+// tests/port-manifest.json: the coverage map (BRIEF.md 12.1.5). One entry per
+// spec file under packages/ at tags v15.4.9 and v16.0.0-rc.1, recording which
+// 5.1/5.2 behavior IDs that old file touched ("covers"), or "notCarried" with a
+// one-line reason, or "pending" until it is classified. It records coverage
+// only: no test is ported from it (12.1.3).
 //
-//   node ci/port-manifest.mjs generate        write the manifest from the tags (all pending)
-//   node ci/port-manifest.mjs check           validate entries and the files they name
-//   node ci/port-manifest.mjs check --tags    also prove the entries are exactly the tags' spec files
-//   node ci/port-manifest.mjs check --complete  also require no pending and every internal entry signed off
+//   node ci/port-manifest.mjs generate          write the map from the tags (all pending)
+//   node ci/port-manifest.mjs check             validate the entries
+//   node ci/port-manifest.mjs check --tags      also prove the entries are exactly the tags' spec files
+//   node ci/port-manifest.mjs check --complete  also require that no entry is pending
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -30,12 +33,18 @@ export function specsAtTags(tags = SOURCE_TAGS, root = repoRoot) {
 }
 
 export function generate(root = repoRoot) {
-  const entries = specsAtTags(SOURCE_TAGS, root).map((e) => ({ ...e, disposition: 'pending' }));
+  const entries = specsAtTags(SOURCE_TAGS, root).map((e) => ({ ...e, pending: true }));
   return { sources: SOURCE_TAGS, selection: 'packages/**/*.spec.ts', entries };
 }
 
-/** Returns the problems with a manifest object; `fileExists` is injectable for tests. */
-export function validate(manifest, { fileExists = (p) => existsSync(join(repoRoot, p)), complete = false } = {}) {
+export const BEHAVIOR_IDS = [
+  'T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10',
+  'R1', 'R2', 'R3', 'R4', 'E1', 'E2', 'L1', 'L2', 'L3', 'X1', 'X2',
+  'W1', 'W2', 'W3', 'W4',
+];
+
+/** Returns the problems with a coverage map; `complete` also rejects pending entries. */
+export function validate(manifest, { complete = false } = {}) {
   const problems = [];
   if (!Array.isArray(manifest?.entries)) return ['manifest has no entries array'];
   let previous = '';
@@ -45,23 +54,22 @@ export function validate(manifest, { fileExists = (p) => existsSync(join(repoRoo
     else if (e.source <= previous) problems.push(`${at}: entries must be sorted and unique`);
     else previous = e.source;
     if (!Array.isArray(e?.in) || e.in.length === 0 || e.in.some((t) => !SOURCE_TAGS.includes(t))) problems.push(`${at}: "in" must list the source tags that contain it`);
-    switch (e?.disposition) {
-      case 'pending':
-        if (complete) problems.push(`${at}: still pending`);
-        break;
-      case 'ported':
-        if (typeof e.target !== 'string' || !fileExists(e.target)) problems.push(`${at}: ported needs a "target" test file that exists`);
-        break;
-      case 'superseded':
-        if (typeof e.coveredBy !== 'string' || !fileExists(e.coveredBy.split('::')[0])) problems.push(`${at}: superseded needs a "coveredBy" test file that exists`);
-        break;
-      case 'internal':
-        if (typeof e.reason !== 'string' || e.reason.trim().length === 0 || e.reason.includes('\n')) problems.push(`${at}: internal needs a one-line "reason"`);
-        if (typeof e.signedOff !== 'boolean') problems.push(`${at}: internal needs "signedOff" (true only after Jonathan's review)`);
-        else if (complete && !e.signedOff) problems.push(`${at}: internal entry not signed off`);
-        break;
-      default:
-        problems.push(`${at}: disposition must be pending, ported, superseded or internal`);
+    const kinds = ['covers', 'notCarried', 'pending'].filter((k) => e?.[k] !== undefined);
+    if (kinds.length !== 1) {
+      problems.push(`${at}: needs exactly one of "covers", "notCarried" or "pending"`);
+      continue;
+    }
+    if (kinds[0] === 'covers') {
+      const ids = e.covers;
+      if (!Array.isArray(ids) || ids.length === 0) problems.push(`${at}: "covers" must list at least one behavior ID`);
+      else if (ids.some((id) => !BEHAVIOR_IDS.includes(id))) problems.push(`${at}: "covers" may hold only 5.1/5.2 behavior IDs`);
+      else if (new Set(ids).size !== ids.length) problems.push(`${at}: "covers" lists an ID twice`);
+    } else if (kinds[0] === 'notCarried') {
+      if (typeof e.notCarried !== 'string' || e.notCarried.trim().length === 0 || e.notCarried.includes('\n')) problems.push(`${at}: "notCarried" needs a one-line reason`);
+    } else if (e.pending !== true) {
+      problems.push(`${at}: "pending" must be true`);
+    } else if (complete) {
+      problems.push(`${at}: still pending`);
     }
   }
   return problems;
@@ -94,7 +102,8 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   } else if (command === 'check') {
     const manifest = JSON.parse(readFileSync(MANIFEST_PATH, 'utf8'));
     const problems = [...validate(manifest, { complete: flags.includes('--complete') }), ...(flags.includes('--tags') ? compareWithTags(manifest) : [])];
-    const counts = manifest.entries.reduce((acc, e) => ({ ...acc, [e.disposition]: (acc[e.disposition] ?? 0) + 1 }), {});
+    const kind = (e) => (e.covers ? 'covered' : e.notCarried ? 'not carried' : 'pending');
+    const counts = manifest.entries.reduce((acc, e) => ({ ...acc, [kind(e)]: (acc[kind(e)] ?? 0) + 1 }), {});
     for (const p of problems) console.log(`FAIL ${p}`);
     console.log(`${manifest.entries.length} entries: ${Object.entries(counts).map(([k, v]) => `${v} ${k}`).join(', ')}`);
     process.exit(problems.length ? 1 : 0);
