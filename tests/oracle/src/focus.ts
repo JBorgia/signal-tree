@@ -12,6 +12,7 @@ import {
   LEAF_PATHS,
   OBSERVED_PATHS,
   ROW_KEYS,
+  type DeclarationKind,
   type LeafPath,
   type LinkSource,
   type Op,
@@ -451,6 +452,47 @@ const disposal: fc.Arbitrary<Step[]> = fc
     return [step({ kind: 'destroy' }), ...after.map((i) => step(later[i] as Op))];
   });
 
+/**
+ * Publication declarations on an open link (L2): a link on a location,
+ * optionally a pending transaction there, declarations that name it as a
+ * contributing owner, declare independence or unknown completeness, and one
+ * invalid declaration (a kind the API does not define), then the
+ * transaction settles, the endpoint acknowledges and settled() is probed.
+ * Every receipt is read in each observation.
+ */
+const publicationDeclarations: Shape = {
+  needs: ['linkOpen', 'declare', 'linkAck', 'linkSettled', 'transact', 'confirm', 'rollback', 'setLeaf', 'setBranch', 'upsertOne'],
+  plugins: true,
+  segments: fc
+    .record({
+      source: fc.constantFrom<LinkSource>('a', 'cfg', 'rows'),
+      mode: fc.constantFrom<'sync' | 'deferred'>('sync', 'deferred'),
+      pending: fc.boolean(),
+      valid: fc.array(fc.constantFrom<DeclarationKind>('dependent', 'independent', 'unknown'), { maxLength: 2 }),
+      invalidFirst: fc.boolean(),
+      v: value,
+      settleAs: fc.constantFrom<'confirm' | 'rollback'>('confirm', 'rollback'),
+    })
+    .map(({ source, mode, pending, valid, invalidFirst, v, settleAs }) => {
+      const w = (n: number): WriteOp =>
+        source === 'a'
+          ? { kind: 'setLeaf', path: 'a', value: n }
+          : source === 'cfg'
+            ? { kind: 'setBranch', p: n, q: n }
+            : { kind: 'upsertOne', row: { id: 'r0', n, m: 0 } };
+      const declare = (declaration: DeclarationKind, n: number): Step[] =>
+        one({ kind: 'declare', link: 0, declaration, owners: declaration === 'dependent' ? [0] : [], body: [w(n)] });
+      const invalid = declare('malformed', v);
+      const declarations = valid.map((kind, i) => declare(kind, other(v + i)));
+      const segments: Step[][] = [one({ kind: 'linkOpen', source, mode })];
+      if (pending) segments.push(one(transact([w(v)])));
+      segments.push(...(invalidFirst ? [invalid, ...declarations] : [...declarations, invalid]));
+      if (pending) segments.push(one(settle(settleAs, 0)));
+      segments.push(one({ kind: 'linkAck', link: 0, ok: true }), one({ kind: 'linkSettled', link: 0 }));
+      return segments;
+    }),
+};
+
 /** Mixes random steps into the gaps between a shape's segments, mostly none. */
 function withNoise(segments: fc.Arbitrary<Step[][]>, noise: fc.Arbitrary<Step>, maxSteps: number): fc.Arbitrary<Step[]> {
   const gap = fc.oneof(
@@ -480,6 +522,7 @@ export function focusedArb(options: {
     disposedLink,
     observed,
     awaitScope,
+    publicationDeclarations,
   ].filter(
     (shape) => shape.needs.every((kind) => options.kinds.has(kind)) && !(shape.plugins && options.plugins === 'none')
   );
