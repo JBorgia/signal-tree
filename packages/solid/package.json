@@ -6,15 +6,18 @@
   "sideEffects": false,
   "license": "Apache-2.0",
   "exports": {
-    ".": { "types": "./src/index.ts", "default": "./src/index.ts" }
-  },
-  "scripts": {
-    "typecheck": "tsc -p tsconfig.json"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
   },
   "dependencies": {
     "@signal-tree/core": "workspace:*"
   },
   "peerDependencies": {
     "solid-js": "^1.9.0"
+  },
+  "devDependencies": {
+    "solid-js": "1.9.18"
   }
 }

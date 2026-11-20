@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+// Rejects a commit whose message carries tool attribution (see ci/attribution.mjs).
+// Installed by ci/setup.mjs, which `pnpm install` runs.
+import { readFileSync } from 'node:fs';
+import { findAttribution } from '../attribution.mjs';
+
+const message = readFileSync(process.argv[2], 'utf8')
+  .split('\n')
+  .filter((line) => !line.startsWith('#'))
+  .join('\n');
+const found = findAttribution(message);
+if (found.length) {
+  console.error('Commit rejected: this repository does not allow tool attribution in commit messages.');
+  for (const f of found) console.error(`  line ${f.line} (${f.name}): ${f.text}`);
+  console.error('Remove those lines and commit again.');
+  process.exit(1);
+}

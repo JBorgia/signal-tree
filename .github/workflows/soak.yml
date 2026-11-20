@@ -1,0 +1,39 @@
+name: Weekly soak
+
+# Ruling on #14: the full 8-hour S5 runs weekly on the dedicated gates runner
+# (the nightly runs the compressed S5). It never runs on GitHub-hosted runners,
+# whose 6-hour job limit an 8-hour soak would exceed.
+
+on:
+  schedule:
+    - cron: '41 1 * * 6'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  soak-angular:
+    name: soak (angular)
+    if: vars.SIGNAL_TREE_GATES_RUNNER != ''
+    runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER) }}
+    timeout-minutes: 600
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install the Chromium pinned by the Playwright lock
+        run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
+      - name: Full 8-hour S5
+        run: pnpm bench S5 --s5-full --record-only
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soak-angular
+          path: bench/out/*.json
+          if-no-files-found: ignore

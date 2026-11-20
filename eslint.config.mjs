@@ -8,7 +8,7 @@ import tseslint from 'typescript-eslint';
 const restrictedWords = ['experimental', 'research', 'prototype', 'spike'];
 
 export default tseslint.config(
-  { ignores: ['**/dist/**', '**/node_modules/**'] },
+  { ignores: ['**/dist/**', '**/node_modules/**', 'bench/out/**', 'tests/oracle/out/**'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -24,6 +24,20 @@ export default tseslint.config(
           patterns: restrictedWords.flatMap((word) => [
             { group: [`**/${word}`, `**/${word}/**`, `**/${word}[-_.]*`, `**/*[-_.]${word}`, `**/*[-_.]${word}[-_.]*`], message: `Rule 7: modules named or living under "${word}" stay out of shipping code.` },
           ]),
+        },
+      ],
+    },
+  },
+  {
+    // #9 (provisional, BRIEF.md 11.2): tests may not be switched off or narrowed
+    // with .skip, .only, .todo, .fails, .skipIf or .runIf.
+    files: ['packages/**/*.spec.ts', 'tests/**/*.ts', 'ci/**/*.spec.ts', 'bench/test/**/*.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'MemberExpression[object.name=/^(it|test|describe|suite)$/][property.name=/^(skip|only|todo|fails|skipIf|runIf)$/]',
+          message: 'Tests may not be skipped, focused or marked failing (#9).',
         },
       ],
     },
