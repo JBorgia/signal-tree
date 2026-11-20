@@ -4,19 +4,29 @@
 // them, newer truth that removed a row or wrote another field of one, a
 // rollback's compensation).
 //
-// Locations follow T4 (see Loc and Touches in analysis.ts): the transaction's
-// locations are the ones it changed; a later step counts on them when its
-// writes touched an overlapping location, whether or not it read the value,
-// wrote the value already there (unless the seam skipped it), re-inserted a
-// removed key, replaced the collection, ran in the rollback's own turn or
-// came from a link (linkPush, linkRetrieve). A later write relates to the
-// change, per location:
+// Locations follow T4 (see Loc, Touches and changedLocations in analysis.ts).
+// The transaction's locations are the ones it changed: those whose value it
+// changed, plus the existence of each row whose existence it touched (a
+// replace, or a setAll that keeps a key, changes the row's existence). A later
+// step counts on them when its writes touched an overlapping location,
+// whether or not it read the value, wrote the value already there (unless
+// the seam skipped it), re-inserted a removed key, replaced the collection,
+// ran in the rollback's own turn or came from a link (linkPush,
+// linkRetrieve).
+//
+// Newer truth is a later write by another writer context: a write inside
+// external(), or an incoming link value (origin 'sync'). A later write
+// relates to the change, per location:
 // - removed: a location in a row it removed (present before the write,
-//   absent after). By newer truth that is supersession (T5); by anyone else
-//   it is a touch like any other (T4).
+//   absent after). By newer truth that is supersession (T5), which T4
+//   excepts; by anyone else it is a touch like any other (T4).
 // - depends: any other touched location.
 // A later write that touched only other fields of a row the transaction
 // changed is a side write: neither (T5), so a rollback keeps it.
+// Each later write is classified on its own: a supersession removal does not
+// excuse another write's dependency, on the same row or elsewhere, before or
+// after the removal (a write under the key after newer truth removed the row
+// touches the existence the transaction changed, so it depends).
 //
 // Skipped (the context is ambiguous), one reason each:
 // - the transaction or a step after it whose state could not be read, or
@@ -24,12 +34,6 @@
 //   be seen;
 // - an inbound link value that would leave the state as it was: whether it
 //   landed cannot be seen;
-// - a step touching a row the transaction rewrote without changing its key or
-//   presence (replace, setAll keeping it): T4 counts touches of locations the
-//   transaction "changed", and no row says whether such a rewrite changed one;
-// - a link value that removed a row the transaction changed: no row says
-//   whether a link is "another writer context", so T4 (dependency) and T5
-//   (supersession) disagree;
 // - a declaration's work on the transaction's locations: it may belong to the
 //   pending owners it names, so no row says whether it is a confirmed write;
 // - an undo or redo on the transaction's locations: it may be reversing the
@@ -41,7 +45,6 @@
 import {
   analyze,
   hasRow,
-  isExistenceLoc,
   names,
   overlapping,
   overlapsAny,
@@ -58,7 +61,7 @@ export type WriteBy =
   | 'write'
   /** a write inside external(): truth from another authority */
   | 'external'
-  /** an inbound link value (linkPush, linkRetrieve) */
+  /** an inbound link value (linkPush, linkRetrieve): another writer context, origin 'sync' */
   | 'link'
   /** a newer transaction, confirmed before the rollback */
   | 'confirmed-transaction';
@@ -119,13 +122,8 @@ export function contextAt(analysis: Analysis, tx: TxInfo, step: number): Rollbac
   const ambiguous: string[] = [];
   if (tx.unknown) ambiguous.push('the transaction changed state that could not be read');
   if (!tx.touches) ambiguous.push("the transaction's writes do not reproduce the state it left");
-  const changedRows = new Set([...tx.changed].map(rowKeyOf).filter((k): k is string => k !== undefined));
-  const rewritten = new Set(
-    [...(tx.touches?.sure ?? []), ...(tx.touches?.maybe ?? [])]
-      .filter((loc) => isExistenceLoc(loc) && !tx.changed.has(loc))
-      .map((loc) => rowKeyOf(loc) as string)
-  );
-  const outside = (loc: Loc) => !overlapsAny([loc], tx.changed);
+  const changedRows = new Set([...tx.locs].map(rowKeyOf).filter((k): k is string => k !== undefined));
+  const outside = (loc: Loc) => !overlapsAny([loc], tx.locs);
   for (let j = tx.step + 1; j < step; j++) {
     const s = analysis.steps[j];
     if (!s) continue;
@@ -135,20 +133,15 @@ export function contextAt(analysis: Analysis, tx: TxInfo, step: number): Rollbac
     }
     const t = s.touches;
     if (!t) {
-      if (overlapsAny(s.changed, tx.changed) || [...tx.changed].some((loc) => names(s.op, s.outcome.status, loc))) {
+      if (overlapsAny(s.changed, tx.locs) || [...tx.locs].some((loc) => names(s.op, s.outcome.status, loc))) {
         ambiguous.push(`step ${j}: its writes do not reproduce the state it left`);
       }
       continue;
     }
-    const hit = overlapping(t.sure, tx.changed);
-    const maybe = [...overlapping(t.maybe, tx.changed)].filter((loc) => !hit.has(loc));
+    const hit = overlapping(t.sure, tx.locs);
+    const maybe = [...overlapping(t.maybe, tx.locs)].filter((loc) => !hit.has(loc));
     if (maybe.length > 0) {
       ambiguous.push(`step ${j}: may have touched ${list(maybe)}`);
-      continue;
-    }
-    const rewrite = [...t.sure, ...t.maybe].filter((loc) => rewritten.has(rowKeyOf(loc) ?? '') && outside(loc));
-    if (rewrite.length > 0) {
-      ambiguous.push(`step ${j}: touched ${list(rewrite)}, in a row the transaction rewrote without changing its key or presence`);
       continue;
     }
     const sideLocs = new Set([...t.sure].filter((loc) => changedRows.has(rowKeyOf(loc) ?? '') && outside(loc)));
@@ -160,10 +153,6 @@ export function contextAt(analysis: Analysis, tx: TxInfo, step: number): Rollbac
         const key = rowKeyOf(loc);
         const gone = key !== undefined && hasRow(s.before, key) === true && hasRow(s.after, key) === false;
         (gone ? removed : depends).add(loc);
-      }
-      if (by === 'link' && removed.size > 0) {
-        ambiguous.push(`step ${j}: a link value removed ${list(removed)}`);
-        return;
       }
       if (hit.size > 0) later.push({ step: j, by, locs: hit, removed, depends });
       if (sideLocs.size > 0) side.push({ step: j, by, locs: sideLocs });
@@ -205,21 +194,24 @@ export function rollbackContexts(trace: SpecTrace): RollbackContext[] {
   return contexts;
 }
 
-/** Later writes T4 counts: every touching write except a removal by newer truth, which T5 calls supersession. */
+/** Whether a later write is newer truth: by another writer context (T5). */
+export const isNewerTruth = (by: WriteBy): boolean => by === 'external' || by === 'link';
+
+/** Later writes T4 counts: every touching write except a removal by newer truth, which T5 classifies as supersession. */
 export const dependents = (ctx: RollbackContext): LaterWrite[] =>
-  ctx.later.filter((w) => w.depends.size > 0 || (w.removed.size > 0 && w.by !== 'external'));
+  ctx.later.filter((w) => w.depends.size > 0 || (w.removed.size > 0 && !isNewerTruth(w.by)));
 
 /** Keys of rows newer truth removed, when every later write is such a removal; undefined otherwise. */
 export function supersededOnly(ctx: RollbackContext): Set<string> | undefined {
   if (ctx.pendingNewer.length > 0 || ctx.ambiguous.length > 0 || ctx.later.length === 0) return undefined;
-  if (!ctx.later.every((w) => w.by === 'external' && w.depends.size === 0)) return undefined;
+  if (!ctx.later.every((w) => isNewerTruth(w.by) && w.depends.size === 0)) return undefined;
   return new Set(ctx.later.flatMap((w) => [...w.removed].map((loc) => rowKeyOf(loc) as string)));
 }
 
 /** Locations newer truth wrote beside the transaction's own in rows it changed, outside rows in `gone`. */
 export const truthSide = (ctx: RollbackContext, gone: ReadonlySet<string> = new Set()): Set<Loc> =>
   new Set(
-    ctx.side.filter((w) => w.by === 'external').flatMap((w) => [...w.locs].filter((loc) => !gone.has(rowKeyOf(loc) ?? '')))
+    ctx.side.filter((w) => isNewerTruth(w.by)).flatMap((w) => [...w.locs].filter((loc) => !gone.has(rowKeyOf(loc) ?? '')))
   );
 
 export type RollbackObserved =

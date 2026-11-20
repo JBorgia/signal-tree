@@ -3,8 +3,8 @@
 //
 // The transaction rekeyed a row (changeId from -> to: before it, `from` was
 // listed and `to` was not; after it, the reverse). Later another writer
-// removed the row under `to`. "Another writer" is read as a write inside
-// external(), the vocabulary's only other author. When every later write on
+// removed the row under `to`. "Another writer" is read as newer truth: a
+// write inside external() or an inbound link value. When every later write on
 // the transaction's locations is such a removal (rollback.ts reads which
 // writes touch them; a rekey touches the existence of both keys), the
 // rollback succeeds, every other location the transaction changed returns to
@@ -20,7 +20,8 @@ export const ROW =
 export const T6 = instanceProperty({
   id: 'T6',
   row: ROW,
-  reason: '"Another writer" is read as a write inside external(); the published packages have no writer identity.',
+  reason:
+    '"Another writer" is read as a write inside external() or an inbound link value; the published packages have no writer identity.',
   instances(trace) {
     const analysis = analyze(trace);
     const found: Instance[] = [];
@@ -52,7 +53,7 @@ export const T6 = instanceProperty({
           observed.status === 'ok' ? 'rest-not-reversed' : 'rollback-refused',
           { status: 'ok', state: rest.expected },
           { ...observed, state: rest.observed },
-          `rollback(tx${ctx.tx.index}) after the row it rekeyed ${rekey.from}->${rekey.to} was deleted by external()`
+          `rollback(tx${ctx.tx.index}) after the row it rekeyed ${rekey.from}->${rekey.to} was deleted by newer truth`
         )
       );
     }

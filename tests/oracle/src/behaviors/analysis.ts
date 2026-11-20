@@ -306,6 +306,17 @@ function simWrite(sim: Sim, w: WriteOp, sure: Set<Loc>): boolean {
   }
 }
 
+/**
+ * The locations an operation changed in T4's terms: those whose value it
+ * changed, plus the existence of every row whose existence it touched. A
+ * replace, or a setAll that keeps a key, leaves the row present with the
+ * same key but still changes its existence, which every field of the row
+ * depends on (ruling on #26).
+ */
+export function changedLocations(changed: ReadonlySet<Loc>, touches: Touches | undefined): Set<Loc> {
+  return new Set([...changed, ...[...(touches?.sure ?? [])].filter(isExistenceLoc)]);
+}
+
 /** The writes an inbound link value makes on its source: the value written as the source's own write. */
 function linkWrites(source: LinkSource, value: number): WriteOp[] {
   switch (source) {
@@ -360,8 +371,10 @@ export interface TxInfo {
   readonly step: number;
   readonly body: readonly WriteOp[];
   readonly undoable: boolean;
-  /** Locations the opening step changed. */
+  /** Locations whose value the opening step changed. */
   readonly changed: ReadonlySet<Loc>;
+  /** The locations it changed in T4's terms (see changedLocations). */
+  readonly locs: ReadonlySet<Loc>;
   /** Locations its body touched; undefined when the body does not reproduce the state it left. */
   readonly touches: Touches | undefined;
   readonly unknown: boolean;
@@ -552,7 +565,16 @@ export function analyze(trace: SpecTrace): Analysis {
     }
     info.touches = touchesOf(writes, inbound, before, after, changed);
     if (info.tx !== undefined && op.kind === 'transact') {
-      txs.push({ index: txs.length, step: index, body: op.body, undoable: op.undoable, changed, touches: info.touches, unknown });
+      txs.push({
+        index: txs.length,
+        step: index,
+        body: op.body,
+        undoable: op.undoable,
+        changed,
+        locs: changedLocations(changed, info.touches),
+        touches: info.touches,
+        unknown,
+      });
     }
     steps.push(info);
   });

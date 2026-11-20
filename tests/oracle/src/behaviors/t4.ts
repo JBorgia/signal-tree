@@ -14,9 +14,14 @@
 // write touched one of its locations (rollback.ts reads the location rules):
 // an ordinary or external write, a write through a held row handle, an
 // inbound link value, or a newer transaction confirmed before the rollback.
-// Every touch counts except a removal by newer truth (external()), which T5
-// calls supersession; a primitive written equal to the value it replaces is
-// skipped by the seam and is not a write. Expected: refused with cause
+// Every touch counts except a removal by newer truth (external() or an
+// inbound link value), which T5 classifies as supersession; a primitive
+// written equal to the value it replaces is skipped by the seam and is not a
+// write. Where newer truth removed a row and other later writes also touched
+// the transaction's locations, the removal is supersession and the other
+// writes are judged as usual: any one of them that touched a location the
+// transaction changed (in that row or elsewhere, before or after the removal)
+// still requires the refusal. Expected: refused with cause
 // later-confirmed-dependency. Skipped when a newer transaction on its
 // locations is still pending (T3 names that cause) or rollback.ts finds the
 // context ambiguous.

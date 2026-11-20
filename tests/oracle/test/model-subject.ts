@@ -1,8 +1,18 @@
 // A tiny in-memory subject for testing the generator itself: leaf, branch
-// and a few entity writes, optimistic transactions with field-level rollback
-// checks, optional undo/redo, and options that plant a defect, fix the cause
-// a rollback refuses with, or make replays differ.
-import type { LeafPath, Observation, Op, OpKind, Outcome, Row, WriteOp } from '../src/model.js';
+// and a few entity writes, inbound link values, optimistic transactions with
+// field-level rollback checks, optional undo/redo, and options that plant a
+// defect, fix the cause a rollback refuses with, or make replays differ.
+import {
+  payloadFor,
+  type LeafPath,
+  type LinkSource,
+  type Observation,
+  type Op,
+  type OpKind,
+  type Outcome,
+  type Row,
+  type WriteOp,
+} from '../src/model.js';
 import { attempt, HandleTable, type Session, type Subject } from '../src/subject.js';
 
 export const MODEL_KINDS: readonly OpKind[] = [
@@ -39,13 +49,23 @@ export interface ModelOptions {
   readonly conflicts?: Conflicts;
   /** Planted: rollback restores each row the transaction changed whole, over other writers' fields. */
   readonly restoreWholeRows?: boolean;
+  /**
+   * Planted: an operation that replaced a row, or kept it through setAll,
+   * changed only the field values that differ, not the row's existence, so a
+   * later write to another field of that row is not a dependency.
+   */
+  readonly rewriteIsFieldOnly?: boolean;
+  /** Planted: an inbound link value is the tree's own write, not newer truth, so its removal of a row is a dependency. */
+  readonly linkIsOrdinary?: boolean;
+  /** Planted: once newer truth removed a row, other later writes on that row stop counting as dependencies. */
+  readonly supersessionMasks?: boolean;
   /** Each session adds a different offset to leaf writes, so replays of one sequence differ. */
   readonly nondeterministic?: boolean;
   /**
    * Adds undo and redo. Every undoable() write and undoable transaction gets a
    * history entry when it runs; undo skips and removes entries whose
-   * transaction was rolled back, and undo and redo refuse when a newer write
-   * would be overwritten.
+   * transaction was rolled back, and undo and redo refuse when a later write
+   * touched a location they would write (R2, R3).
    */
   readonly restoration?: boolean;
   /** Planted: undo restores only the first location an entry changed. */
@@ -56,6 +76,8 @@ export interface ModelOptions {
   readonly keepRolledBack?: boolean;
   /** Planted: redo re-applies even over a newer write. */
   readonly redoOverwrites?: boolean;
+  /** Planted: redo refuses only when a location it re-applies no longer holds the value undo left there. */
+  readonly redoByValue?: boolean;
 }
 
 class ModelRefusal extends Error {}
@@ -136,10 +158,13 @@ function changedLocs(before: State, after: State): string[] {
 interface Entry {
   readonly before: State;
   readonly after: State;
-  /** Locations the operation changed. */
+  /** Locations the operation changed, in T4's terms (see `changedIn`). */
   readonly locs: readonly string[];
   readonly tx?: number;
   rolledBack: boolean;
+  undone: boolean;
+  /** Log length when it was last applied (recorded or redone), or undone. */
+  at: number;
 }
 
 /** One write in the order it ran, with what it touched (a write the seam skips touches nothing). */
@@ -147,11 +172,16 @@ interface Logged {
   readonly touched: ReadonlySet<string>;
   /** Rows it removed. */
   readonly removed: ReadonlySet<string>;
-  readonly external: boolean;
+  /** Newer truth: a write inside external() or an inbound link value. */
+  readonly truth: boolean;
   /** The transaction whose body ran it. */
   readonly tx?: number;
   /** A rollback's compensation (T7: never a dependency). */
   readonly compensation?: boolean;
+  /** An undo's or redo's own write. */
+  readonly restoration?: boolean;
+  /** The history entry of the operation that made it. */
+  entry?: Entry;
 }
 
 interface Tx {
@@ -166,6 +196,7 @@ interface Tx {
 class ModelSession implements Session {
   #state: State = { a: 0, cfg: { p: 0, q: 0 }, rows: new Map() };
   readonly #txs = new HandleTable<Tx>();
+  readonly #links = new HandleTable<LinkSource>();
   readonly #log: Logged[] = [];
   readonly #supports: ReadonlySet<OpKind>;
   readonly #options: ModelOptions;
@@ -182,13 +213,37 @@ class ModelSession implements Session {
     this.#restoration = restoration && !!options.restoration;
   }
 
+  /**
+   * The locations an operation that ran from `before` and logged from `logAt`
+   * changed, in T4's terms: those whose value differs, plus the existence of
+   * every row its writes touched (a replace, or a setAll keeping the key,
+   * changes the row's existence).
+   */
+  #changedIn(before: State, logAt: number): string[] {
+    const locs = new Set(changedLocs(before, this.#state));
+    if (!this.#options.rewriteIsFieldOnly) {
+      for (const w of this.#log.slice(logAt)) for (const t of w.touched) if (isExistence(t)) locs.add(t);
+    }
+    return [...locs];
+  }
+
   /** Runs `fn` and, when it is undoable and restoration is on, records a history entry. */
   #recorded(undoable: boolean, fn: () => void, tx?: number): Entry | undefined {
     const before = copy(this.#state);
+    const logAt = this.#log.length;
     fn();
     if (!undoable || !this.#restoration) return undefined;
     const after = copy(this.#state);
-    const entry: Entry = { before, after, locs: changedLocs(before, after), ...(tx === undefined ? {} : { tx }), rolledBack: false };
+    const entry: Entry = {
+      before,
+      after,
+      locs: this.#changedIn(before, logAt),
+      ...(tx === undefined ? {} : { tx }),
+      rolledBack: false,
+      undone: false,
+      at: this.#log.length,
+    };
+    for (const w of this.#log.slice(logAt)) w.entry = entry;
     this.#history.splice(this.#index + 1);
     this.#history.push(entry);
     this.#index = this.#history.length - 1;
@@ -196,11 +251,25 @@ class ModelSession implements Session {
   }
 
   /** Runs `fn` (which changes state outside the write vocabulary) and logs what it changed. */
-  #logged(fn: () => void, compensation = false): void {
+  #logged(fn: () => void, kind: 'compensation' | 'restoration'): void {
     const before = copy(this.#state);
     fn();
     const touched = new Set(changedLocs(before, this.#state));
-    this.#log.push({ touched, removed: removedRows(before, this.#state), external: false, compensation });
+    this.#log.push({ touched, removed: removedRows(before, this.#state), truth: false, [kind]: true });
+  }
+
+  /**
+   * Whether a write logged from `at` that still stands touched a location
+   * overlapping `locs`. Undo's and redo's own writes, writes of operations
+   * now undone, writes of rolled-back transactions and their compensation do
+   * not stand (R2).
+   */
+  #touchedSince(at: number, locs: readonly string[]): boolean {
+    return this.#log.slice(at).some((w) => {
+      if (w.compensation || w.restoration || w.entry?.undone) return false;
+      if (w.tx !== undefined && this.#txs.all()[w.tx]?.settled === 'rolledBack') return false;
+      return [...w.touched].some((t) => locs.some((l) => overlaps(t, l)));
+    });
   }
 
   #undo(): void {
@@ -210,24 +279,31 @@ class ModelSession implements Session {
     }
     const entry = this.#history[this.#index];
     if (!entry) return;
-    if (!this.#options.undoOverwrites && entry.locs.some((l) => get(this.#state, l) !== get(entry.after, l))) {
+    if (!this.#options.undoOverwrites && this.#touchedSince(entry.at, entry.locs)) {
       throw new ModelRefusal('undo refused [newer-write]', { cause: { kind: 'newer-write' } });
     }
     this.#logged(() => {
       for (const l of this.#options.undoPartial ? entry.locs.slice(0, 1) : entry.locs) put(this.#state, l, get(entry.before, l));
-    });
+    }, 'restoration');
+    entry.undone = true;
+    entry.at = this.#log.length;
     this.#index--;
   }
 
   #redo(): void {
     const entry = this.#history[this.#index + 1];
     if (!entry) return;
-    if (!this.#options.redoOverwrites && entry.locs.some((l) => get(this.#state, l) !== get(entry.before, l))) {
+    const newer = this.#options.redoByValue
+      ? entry.locs.some((l) => get(this.#state, l) !== get(entry.before, l))
+      : this.#touchedSince(entry.at, entry.locs);
+    if (!this.#options.redoOverwrites && newer) {
       throw new ModelRefusal('redo refused [newer-write]', { cause: { kind: 'newer-write' } });
     }
     this.#logged(() => {
       for (const l of entry.locs) put(this.#state, l, get(entry.after, l));
-    });
+    }, 'restoration');
+    entry.undone = false;
+    entry.at = this.#log.length;
     this.#index++;
   }
 
@@ -245,8 +321,8 @@ class ModelSession implements Session {
     const counts = (touched: ReadonlySet<string>): string[] => tx.changed.filter((loc) => [...touched].some((t) => hits(t, loc)));
     const own = this.#txs.all().indexOf(tx);
     const superseded = new Set<string>();
+    const depends: string[] = [];
     let pending = false;
-    let confirmed = false;
     for (const w of this.#log.slice(tx.logAt)) {
       if (w.compensation || w.tx === own) continue;
       const by = w.tx === undefined ? undefined : this.#txs.all()[w.tx];
@@ -254,10 +330,12 @@ class ModelSession implements Session {
       const hit = counts(w.touched);
       if (hit.length === 0) continue;
       if (by && !by.settled) pending = true;
-      else if (!w.external || !hit.every((loc) => w.removed.has(keyOf(loc) ?? ''))) confirmed = true;
-      else for (const loc of hit) superseded.add(keyOf(loc) as string);
+      // Each write on its own: newer truth's removal supersedes, every other touch depends (T4, T5).
+      else if (w.truth && hit.every((loc) => w.removed.has(keyOf(loc) ?? ''))) for (const loc of hit) superseded.add(keyOf(loc) as string);
+      else depends.push(...hit);
     }
-    const cause = pending ? 'later-pending-dependency' : confirmed ? 'later-confirmed-dependency' : undefined;
+    const masked = this.#options.supersessionMasks ? depends.filter((loc) => !superseded.has(keyOf(loc) ?? '')) : depends;
+    const cause = pending ? 'later-pending-dependency' : masked.length > 0 ? 'later-confirmed-dependency' : undefined;
     if (cause) throw new ModelRefusal(`rollback refused [${cause}]`, { cause: { kind: cause } });
     this.#logged(() => {
       const back = tx.changed.filter((loc) => !superseded.has(keyOf(loc) ?? ''));
@@ -265,12 +343,16 @@ class ModelSession implements Session {
         ? [...new Set(back.map((loc) => (keyOf(loc) === undefined ? loc : `rows.${keyOf(loc)}`)))]
         : [...back.filter(isExistence), ...back.filter((loc) => !isExistence(loc))];
       for (const loc of restore) put(this.#state, loc, get(tx.before, loc));
-    }, true);
+    }, 'compensation');
   }
 
   apply(op: Op): Outcome {
     const kind = op.kind === 'write' ? op.write.kind : op.kind;
     const nested = op.kind === 'transact' ? op.body.map((w) => w.kind) : [];
+    if (op.kind === 'linkOpen' || op.kind === 'linkPush') {
+      if (!this.#supports.has(op.kind)) return { status: 'unsupported', detail: `model has no ${op.kind}` };
+      return this.#link(op);
+    }
     if (![kind, ...nested].every((k) => this.#supports.has(k))) {
       return { status: 'unsupported', detail: `model has no ${kind}` };
     }
@@ -295,7 +377,7 @@ class ModelSession implements Session {
             },
             index
           );
-          const tx: Tx = { before, changed: changedLocs(before, this.#state), logAt, settled: false, ...(entry ? { entry } : {}) };
+          const tx: Tx = { before, changed: this.#changedIn(before, logAt), logAt, settled: false, ...(entry ? { entry } : {}) };
           return { tx: this.#txs.add(tx) };
         });
       case 'undo':
@@ -330,8 +412,27 @@ class ModelSession implements Session {
     }
   }
 
+  /** An inbound link value is the source's own write, by another writer context (origin 'sync'). */
+  #link(op: Extract<Op, { kind: 'linkOpen' | 'linkPush' }>): Outcome {
+    if (op.kind === 'linkOpen') return { status: 'ok', value: { link: this.#links.add(op.source) } };
+    const resolved = this.#links.resolve(op.link);
+    if (!resolved) return { status: 'skipped', detail: 'no link open' };
+    const source = resolved.item;
+    const value = payloadFor(source, op.value);
+    const w: WriteOp =
+      source === 'a'
+        ? { kind: 'setLeaf', path: 'a', value: value as number }
+        : source === 'cfg'
+          ? { kind: 'setBranch', p: op.value, q: op.value }
+          : { kind: 'setAll', rows: value as unknown as Row[] };
+    return attempt(() => {
+      this.#write(w, !this.#options.linkIsOrdinary);
+      return { link: resolved.index };
+    });
+  }
+
   /** Applies one write and logs what it touched; a value equal to the one there is skipped (Object.is), a row object never is. */
-  #write(w: WriteOp, external: boolean, tx?: number): string | undefined {
+  #write(w: WriteOp, truth: boolean, tx?: number): string | undefined {
     const s = this.#state;
     const before = copy(s);
     const touched = new Set<string>();
@@ -379,10 +480,16 @@ class ModelSession implements Session {
           touched.add(`rows.${r.id}`);
         }
         break;
+      case 'replaceOne':
+        // The row keeps its key; its content is replaced.
+        if (!s.rows.has(w.id)) throw new Error(`Entity with id ${w.id} not found`);
+        s.rows.set(w.id, { ...w.row });
+        touched.add(`rows.${w.id}`);
+        break;
       default:
         throw new Error(`unreachable: ${w.kind}`);
     }
-    this.#log.push({ touched, removed: removedRows(before, s), external, ...(tx === undefined ? {} : { tx }) });
+    this.#log.push({ touched, removed: removedRows(before, s), truth, ...(tx === undefined ? {} : { tx }) });
     return value;
   }
 

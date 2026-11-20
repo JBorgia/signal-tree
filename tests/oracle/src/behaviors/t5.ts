@@ -6,7 +6,11 @@
 // another field of the same row is neither: rollback keeps it
 //
 // "Newer truth" is read as a later write inside external() (truth from
-// another authority); an ordinary write is not called truth by the row.
+// another authority) or an inbound link value (another writer context,
+// origin 'sync'); an ordinary write is not called truth by the row. An
+// inbound link value replaces its whole source (a rows link runs setAll), so
+// it never writes only another field of a row: (c) is reached by external()
+// alone.
 // Locations, touches and ambiguous contexts are rollback.ts's.
 // (a) Every later write on the transaction's locations is newer truth that
 //     removed their row (a removal touches existence, which every field of
@@ -20,7 +24,10 @@
 //     removeOne, replaceOne, ...) is left alone, since whether the row it
 //     left is the same entity is not fixed by the rows.
 // (b) Newer truth touched a location the transaction changed without
-//     removing its row: the rollback refuses (T4 checks the cause).
+//     removing its row: the rollback refuses (T4 checks the cause). A
+//     transaction that replaced a row, or kept it through setAll, changed
+//     the row's existence, so newer truth writing any of its fields is this
+//     case, not (c).
 // (c) Nothing later touched the transaction's locations, and newer truth
 //     wrote other fields of rows it changed: the rollback succeeds, every
 //     location the transaction changed returns to its value before it, and
@@ -28,7 +35,15 @@
 //     rollback.
 import type { Json, WriteOp } from '../model.js';
 import { analyze, existenceLoc, locValues, rowKeyOf, withRowFields, type Analysis, type Loc } from './analysis.js';
-import { dependents, rollbackContexts, rollbackOutcome, supersededOnly, truthSide, type RollbackContext } from './rollback.js';
+import {
+  dependents,
+  isNewerTruth,
+  rollbackContexts,
+  rollbackOutcome,
+  supersededOnly,
+  truthSide,
+  type RollbackContext,
+} from './rollback.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 /** Whether a write may end one entity's life under `key` (so a row there afterwards may be another entity). */
@@ -92,7 +107,7 @@ export function completedRest(
     return want === got;
   };
   let restored = true;
-  const back = [...ctx.tx.changed].filter((loc) => !gone.has(rowKeyOf(loc) ?? ''));
+  const back = [...ctx.tx.locs].filter((loc) => !gone.has(rowKeyOf(loc) ?? ''));
   for (const loc of withRowFields(back, before)) if (!check(loc, before.values.get(loc))) restored = false;
   for (const key of gone) if (!check(existenceLoc(key), undefined)) restored = false;
   let keptOk = true;
@@ -106,7 +121,8 @@ const completedKind = (observed: { status: string }, rest: CompletedRest, refuse
 export const T5 = instanceProperty({
   id: 'T5',
   row: ROW,
-  reason: '"Newer truth" is read as a write inside external(); removal or update by an ordinary write is left to T4.',
+  reason:
+    '"Newer truth" is read as a write inside external() or an inbound link value; removal or update by an ordinary write is left to T4.',
   instances(trace) {
     const analysis = analyze(trace);
     const found: Instance[] = [];
@@ -148,7 +164,7 @@ export const T5 = instanceProperty({
         );
         continue;
       }
-      const truth = dependents(ctx).filter((w) => w.by === 'external' && w.depends.size > 0);
+      const truth = dependents(ctx).filter((w) => isNewerTruth(w.by) && w.depends.size > 0);
       if (truth.length === 0) continue;
       found.push(
         verdict(

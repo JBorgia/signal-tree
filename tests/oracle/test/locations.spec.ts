@@ -7,7 +7,7 @@ import type { Op, Row, Sequence, Step, WriteOp } from '../src/model.js';
 import { MODEL_KINDS, modelSubject } from './model-subject.js';
 
 const step = (op: Op, sameTick = false): Step => ({ op, sameTick });
-const write = (w: WriteOp, wrap: 'none' | 'external' = 'none', sameTick = false): Step =>
+const write = (w: WriteOp, wrap: 'none' | 'external' | 'undoable' = 'none', sameTick = false): Step =>
   step({ kind: 'write', write: w, wrap }, sameTick);
 const transact = (...body: WriteOp[]): Step => step({ kind: 'transact', undoable: false, body });
 const rollback = step({ kind: 'rollback', tx: 0 });
@@ -16,7 +16,7 @@ const row = (n: number, m = 0): Row => ({ id: 'r1', n, m });
 const add: WriteOp = { kind: 'addOne', row: row(0) };
 const field = (f: 'n' | 'm', value: number): WriteOp => ({ kind: 'updateOne', id: 'r1', field: f, value });
 
-const kinds = [...MODEL_KINDS, 'setAll' as const];
+const kinds = [...MODEL_KINDS, 'setAll' as const, 'replaceOne' as const, 'linkOpen' as const, 'linkPush' as const];
 const correct = modelSubject('correct', { kinds });
 
 describe('T5: a write to another field of the same row is neither supersession nor dependency', () => {
@@ -107,5 +107,98 @@ describe('T4: every touching write counts', () => {
   it('does not count a write the seam skips: the same number written again', async () => {
     const { provenance } = await judge([correct, completes], 'T4', sequence(transact(setA(1)), write(setA(1)), rollback));
     expect(provenance).toEqual({ correct: 'n/a', completes: 'n/a' });
+  });
+});
+
+// Rulings on #26.
+const refused = { status: 'refused', cause: 'later-confirmed-dependency' };
+
+describe('ruling 1: T4 excepts a removal T5 classifies as supersession', () => {
+  it('does not expect a refusal when newer truth removed the row', async () => {
+    const refuses = modelSubject('refuses', { kinds, rollbackCause: 'later-confirmed-dependency' });
+    const seq = sequence(write(add), transact(field('n', 1)), write({ kind: 'removeOne', id: 'r1' }, 'external'), rollback);
+    expect((await judge([correct, refuses], 'T4', seq)).provenance).toEqual({ correct: 'n/a', refuses: 'n/a' });
+    expect((await judge([correct, refuses], 'T5', seq)).provenance).toEqual({ correct: 'holds', refuses: 'violates' });
+  });
+
+  // Mixed: the removal is supersession, and every other later write is judged under T4 as usual.
+  const masks = modelSubject('masks', { kinds, supersessionMasks: true });
+  it.each([
+    [
+      'a dependency on the row before newer truth removed it',
+      sequence(write(add), transact(field('n', 1)), write(field('n', 2)), write({ kind: 'removeOne', id: 'r1' }, 'external'), rollback),
+    ],
+    [
+      'a write under the key after newer truth removed the row',
+      sequence(write(add), transact(field('n', 1)), write({ kind: 'removeOne', id: 'r1' }, 'external'), write(add), rollback),
+    ],
+  ])('still expects a refusal for %s, and catches a kernel that lets the removal excuse it', async (_, seq) => {
+    const { provenance, verdicts } = await judge([correct, masks], 'T4', seq);
+    expect(provenance).toEqual({ correct: 'holds', masks: 'violates' });
+    expect(verdicts['masks']).toMatchObject({ kind: 'rollback-completed', expected: refused, observed: { status: 'ok' } });
+  });
+});
+
+describe('ruling 2: a replace, or a setAll that keeps the key, changes the row\'s existence', () => {
+  const fieldOnly = modelSubject('field-only', { kinds, rewriteIsFieldOnly: true, restoration: true });
+  const restoring = modelSubject('correct', { kinds, restoration: true });
+  const rewrites: [string, WriteOp][] = [
+    ['replaceOne', { kind: 'replaceOne', id: 'r1', row: row(1) }],
+    ['setAll keeping the key', { kind: 'setAll', rows: [row(1)] }],
+  ];
+
+  it.each(rewrites)('T4: a later write to another field depends on a transaction that ran %s', async (_, rewrite) => {
+    const seq = sequence(write(add), transact(rewrite), write(field('m', 2)), rollback);
+    const { provenance, verdicts } = await judge([correct, fieldOnly], 'T4', seq);
+    expect(provenance).toEqual({ correct: 'holds', 'field-only': 'violates' });
+    expect(verdicts['field-only']).toMatchObject({ kind: 'rollback-completed', expected: refused });
+  });
+
+  it.each(rewrites)('T3: a newer pending transaction writing another field overlaps one that ran %s', async (_, rewrite) => {
+    const seq = sequence(write(add), transact(rewrite), transact(field('m', 2)), rollback);
+    const { provenance, verdicts } = await judge([correct, fieldOnly], 'T3', seq);
+    expect(provenance).toEqual({ correct: 'holds', 'field-only': 'violates' });
+    expect(verdicts['field-only']).toMatchObject({
+      expected: { status: 'refused', cause: 'later-pending-dependency' },
+      observed: { status: 'ok' },
+    });
+  });
+
+  it.each(rewrites)('R2: undo of an undoable %s refuses after a write to another field', async (_, rewrite) => {
+    const seq: Sequence = {
+      config: { transactions: false, restoration: true },
+      steps: [write(add), write(rewrite, 'undoable'), write(field('m', 2)), step({ kind: 'undo' })],
+    };
+    const { provenance, verdicts } = await judge([restoring, fieldOnly], 'R2', seq);
+    expect(provenance).toEqual({ correct: 'holds', 'field-only': 'violates' });
+    expect(verdicts['field-only']).toMatchObject({ kind: 'overwrote-newer-write', expected: { status: 'refused' } });
+  });
+});
+
+describe('ruling 3: an inbound link value is newer truth (another writer context)', () => {
+  const linkRows = step({ kind: 'linkOpen', source: 'rows', mode: 'sync' });
+  // payloadFor('rows', 0) is [{ id: 'r0', n: 0, m: 0 }]: the rows link replaces the collection without r1.
+  const push = (value: number) => step({ kind: 'linkPush', link: 0, value });
+
+  it('reads a link value that removed the row as supersession, and catches a kernel that treats it as a dependency', async () => {
+    const ordinary = modelSubject('ordinary', { kinds, linkIsOrdinary: true });
+    const seq = sequence(write(add), linkRows, transact(field('n', 1), { kind: 'setLeaf', path: 'a', value: 1 }), push(0), rollback);
+    const t5 = await judge([correct, ordinary], 'T5', seq);
+    expect(t5.provenance).toEqual({ correct: 'holds', ordinary: 'violates' });
+    expect(t5.verdicts['correct']?.expected).toEqual({ status: 'ok', state: { a: 0, 'rows.r1': 'absent' } });
+    expect(t5.verdicts['ordinary']).toMatchObject({
+      kind: 'superseded-rollback-refused',
+      observed: { status: 'refused', cause: 'later-confirmed-dependency' },
+    });
+    expect((await judge([correct, ordinary], 'T4', seq)).provenance).toEqual({ correct: 'n/a', ordinary: 'n/a' });
+  });
+
+  it('reads a link value on a changed location as a dependency', async () => {
+    const completes = modelSubject('completes', { kinds, conflicts: 'none' });
+    const linkA = step({ kind: 'linkOpen', source: 'a', mode: 'sync' });
+    const seq = sequence(linkA, transact({ kind: 'setLeaf', path: 'a', value: 1 }), push(2), rollback);
+    for (const id of ['T4', 'T5'] as const) {
+      expect((await judge([correct, completes], id, seq)).provenance, id).toEqual({ correct: 'holds', completes: 'violates' });
+    }
   });
 });

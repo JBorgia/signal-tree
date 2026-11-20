@@ -4,10 +4,12 @@
 // Applies where the history is fixed by the trace alone: every undoable
 // operation so far is a top-level undoable() write that changed something,
 // and no redo() has succeeded (R3 covers undo around transactions). The
-// operation undo() targets is the most recent one not undone. When a later
-// write that still stands (not itself undone, not a rolled-back transaction
-// or a rollback's compensation) touched a location overlapping one it
-// changed, in T4's terms (analysis.ts Touches: unread overwrites, the value
+// operation undo() targets is the most recent one not undone; the locations
+// it changed are T4's (analysis.ts changedLocations: a replace, or a setAll
+// that keeps a key, changes the row's existence). When a later write that
+// still stands (not itself undone, not a rolled-back transaction or a
+// rollback's compensation) touched a location overlapping one it changed, in
+// T4's terms (analysis.ts Touches: unread overwrites, the value
 // already there unless the seam skipped it, re-inserts, setAll and clear,
 // same-turn writes and inbound link values all count), undo() must refuse
 // (throw) and change nothing. Skipped, because what the later step touched
@@ -16,7 +18,7 @@
 // possible (an inbound link value that would leave the state as it was).
 import type { Json } from '../model.js';
 import { canonical } from '../trace.js';
-import { analyze, names, overlapping, txStatus, type Loc } from './analysis.js';
+import { analyze, changedLocations, names, overlapping, txStatus, type Loc } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
@@ -43,8 +45,8 @@ export const R2 = instanceProperty({
       if (op.kind === 'transact' && op.undoable && ran) fixed = false;
       if (op.kind === 'redo' && outcome.status === 'ok') fixed = false;
       if (op.kind === 'write' && op.wrap === 'undoable' && ran) {
-        if (outcome.status !== 'ok' || s.unknown || s.changed.size === 0) fixed = false;
-        else stack.push({ step: s.index, locs: s.changed });
+        if (outcome.status !== 'ok' || s.unknown || !s.touches || s.changed.size === 0) fixed = false;
+        else stack.push({ step: s.index, locs: changedLocations(s.changed, s.touches) });
         continue;
       }
       if (op.kind !== 'undo' || !ran) continue;

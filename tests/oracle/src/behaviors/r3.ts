@@ -5,7 +5,8 @@
 // if any later write touched a location it would re-apply (as defined in T4).
 //
 // Locations and touches are T4's (analysis.ts): a newer write "on" a set of
-// locations touched one overlapping them.
+// locations touched one overlapping them, and an operation that replaced a
+// row, or kept it through setAll, changed (and re-applies) its existence.
 // (a) At an undo() whose most recent undoable operation is an undoable
 //     transaction confirmed before it, with no undo() or redo() succeeding in
 //     between: when no newer write still stands on the transaction's
@@ -23,27 +24,28 @@
 //     with no undoable operation in between, and where every location that
 //     undo changed was last written by an undoable operation or a redo (so
 //     what it reversed is one operation, not a write it overwrote, which is
-//     R2's matter): when no newer write still stands on the locations that
-//     undo changed, redo() succeeds, gives each of them back the value it had
-//     before the undo, and changes nothing else; when one stands and redoing
-//     would put a different value there, it refuses (throws) and changes
-//     nothing.
+//     R2's matter): the locations it would re-apply are the ones that undo
+//     changed, plus the existence of a row whose existence the undone
+//     operation touched. When no newer write still stands on them, redo()
+//     succeeds, gives each of them back the value it had before the undo, and
+//     changes nothing else; when one stands (whatever value it left), it
+//     refuses (throws) and changes nothing.
 //
 // Not checked: an undo or redo while a pending transaction has changed any
-// of the locations involved (the row is about settled transactions); a newer
-// write that left the value redo would restore ("would be overwritten" is
-// not "touched", and the row does not say redo follows R2); history observed
-// mid-turn; and a newer step whose touches cannot be seen (its state could
-// not be read, its writes do not reproduce the state it left, or an inbound
-// link value would leave the state as it was).
+// of the locations involved (the row is about settled transactions); history
+// observed mid-turn; and a newer step whose touches cannot be seen (its state
+// could not be read, its writes do not reproduce the state it left, or an
+// inbound link value would leave the state as it was).
 import type { Json } from '../model.js';
 import { canonical } from '../trace.js';
 import {
   analyze,
+  existenceLoc,
   locValues,
   names,
   overlapping,
   overlapsAny,
+  rowKeyOf,
   txStatus,
   withRowFields,
   type Analysis,
@@ -94,7 +96,7 @@ function newerWrites(a: Analysis, from: number, until: number, locs: ReadonlySet
 }
 
 const pendingOn = (a: Analysis, at: number, locs: ReadonlySet<Loc>) =>
-  a.txs.some((t) => txStatus(t, at) === 'pending' && (t.unknown || overlapsAny(t.changed, locs)));
+  a.txs.some((t) => txStatus(t, at) === 'pending' && (t.unknown || overlapsAny(t.locs, locs)));
 
 const read = (v: string | undefined): Json => (v === undefined ? ABSENT : (JSON.parse(v) as Json));
 
@@ -124,7 +126,7 @@ function restoreVerdict(
       if (restoresTo.values.get(loc) !== after.values.get(loc)) same = false;
     }
     // Redo re-applies exactly what undo reversed: nothing outside it changes.
-    const outside = clause === 'c' ? [...s.changed].filter((loc) => !locs.has(loc)) : [];
+    const outside = clause === 'c' ? [...s.changed].filter((loc) => !overlapsAny([loc], locs)) : [];
     const ok = status === 'ok' && same && outside.length === 0;
     return verdict(
       ok,
@@ -134,11 +136,6 @@ function restoreVerdict(
       { status, state: observed, ...(clause === 'c' ? { changesOutside: outside } : {}) },
       detail
     );
-  }
-  if (clause === 'c') {
-    // Redo refuses when a newer write "would be overwritten": one left a value other than the one redo restores.
-    const overwritten = new Set(newer.flatMap((n) => [...n.locs]));
-    if (![...overwritten].some((loc) => now.values.get(loc) !== restoresTo.values.get(loc))) return undefined;
   }
   const unchanged = canonical(s.before) === canonical(s.after);
   return verdict(
@@ -180,11 +177,11 @@ export const R3 = instanceProperty({
         const status = txStatus(tx, s.index);
 
         if (status === 'confirmed') {
-          if (steps[tx.step - 1]?.sameTick || pendingOn(analysis, s.index, tx.changed)) continue;
+          if (steps[tx.step - 1]?.sameTick || pendingOn(analysis, s.index, tx.locs)) continue;
           const opened = analysis.steps[tx.step]?.before;
-          const newer = newerWrites(analysis, tx.step, s.index, tx.changed);
+          const newer = newerWrites(analysis, tx.step, s.index, tx.locs);
           if (!opened || !newer) continue;
-          const v = restoreVerdict('a', s, tx.changed, locValues(opened), newer, `undo() at step ${s.index} after tx${tx.index} was confirmed`);
+          const v = restoreVerdict('a', s, tx.locs, locValues(opened), newer, `undo() at step ${s.index} after tx${tx.index} was confirmed`);
           if (v) found.push(v);
         } else if (status === 'rolledBack') {
           // The entry shows: the history grew by one when the transaction opened and held until this undo.
@@ -222,9 +219,15 @@ export const R3 = instanceProperty({
           return w !== undefined && !w.unknown && ((marked(w) && ran(w)) || succeeded(w, 'redo'));
         });
         if (!fromOperations) continue;
-        const newer = newerWrites(analysis, last.index, s.index, reversed);
+        // Re-applying an operation that touched a row's existence touches it again.
+        const reapply = new Set(reversed);
+        for (const loc of reversed) {
+          const key = rowKeyOf(loc);
+          if (key !== undefined && lastWriter(loc)?.touches?.sure.has(existenceLoc(key))) reapply.add(existenceLoc(key));
+        }
+        const newer = newerWrites(analysis, last.index, s.index, reapply);
         if (!newer) continue;
-        const v = restoreVerdict('c', s, reversed, locValues(last.before), newer, `redo() at step ${s.index} after undo() at step ${last.index}`);
+        const v = restoreVerdict('c', s, reapply, locValues(last.before), newer, `redo() at step ${s.index} after undo() at step ${last.index}`);
         if (v) found.push(v);
       }
     }
