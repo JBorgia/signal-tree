@@ -488,3 +488,21 @@ Previous history must not expose the first production adopter or Jonathan's empl
 - **Vercel:** out of scope until Phase 8. Jonathan disconnects the Vercel Git integration, and the site keeps serving its last build. Phase 8 sets up deployment of the new docs.
 - **Machines:** two cloud VMs. One is a dedicated-CPU gate runner; the other is an isolated VM for the agent. File their exact specifications as one issue for Jonathan to provision.
 - **Budgets:** stay `"approved": false` until PR #15's fixes are merged and baselines are recorded on the gate runner.
+
+### 12.4 Behaviors added from the coverage map
+
+The coverage map found user-visible behaviors that old tests pinned but no row specified. These rows join 5.1 with the same force: every row needs tagged tests, generator properties where they can be generated, and floors.
+
+| ID | Behavior |
+| --- | --- |
+| O1 | **Fine-grained observation.** A reader re-runs only when a location it read changed (as defined in T4). A write the seam skips as unchanged re-runs nothing. A row or `byId` reader does not re-run for writes to other rows. |
+| O2 | **Turn atomicity for observers.** Every observer sees a turn (including undo, redo, rollback and one chunk of an ingest) as one change: it runs at most once per turn and never sees part of a turn applied. History state (`canUndo`, `canRedo`, position) changes in the same turn. |
+| O3 | **Read-path consistency.** After every turn, all read paths (leaf, row field, `byId`, `all()`, `ids()`, `count()`, snapshot) agree. |
+| O4 | **Reentrant writes.** A write made by an observer while a turn is being published is applied after that turn as its own turn, attributed to the observer's writer context. It is never lost or merged into the turn being published. |
+| X3 | **Fault containment.** When an observer, link or plugin throws during any publication (including undo, redo and rollback), every other observer, link and plugin still runs, and state stays consistent. Errors are reported per T10 and are never thrown to the writer whose write was being published. |
+| D1 | **Disposal.** Destroying a tree, or the Angular injector or Vue effect scope that owns it, releases every cell, subscription, link and plugin state. Afterwards every read or write throws a typed error, and teardown errors reach `onTreeError`. |
+| D2 | **Released memory.** A removed row or field releases its memory once no history entry, pending transaction or held handle references it. |
+| W5 | **Synchronous context.** A writer context and turn membership never carry across an `await`. Async work captures its context explicitly, as the ingest handle does (ruling 6). |
+| H1 | **Hydration.** State serialized on the server and hydrated on the client yields identical values. Hydration is one turn with origin `'server'`. |
+
+**Classification rule from now on:** a `notCarried` reason may describe only implementation detail (internals, old types, probes, the old API's shapes). Any old test that pins a behavior a user would notice, and that no row covers, becomes an issue proposing a row, never a `notCarried` entry.
