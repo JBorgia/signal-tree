@@ -1,182 +1,194 @@
-// pnpm --filter @signal-tree/oracle oracle --a v15 --b v16 --runs 10000 [--seed N]
+// pnpm --filter @signal-tree/oracle oracle generate --runs 10000 [--seed N]
+// pnpm --filter @signal-tree/oracle oracle --determinism --subject v16 --runs 10000
+// pnpm --filter @signal-tree/oracle oracle replay out/cases/<id>.json
 //
-// Exit codes: 0 no unlisted differences, 1 unlisted differences found,
-// 2 bad arguments or an invalid intended-differences file, 3 the harness saw
-// an asynchronous error outside any sequence.
+// Exit codes. generate: 0 done (a subject violating a property is a finding,
+// not a failure), 2 bad arguments, 3 generator error (a property threw, or an
+// asynchronous error escaped every sequence). --determinism: 0 every replay
+// identical, 1 a replay differed, 2 bad arguments, 3 harness error.
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { IntendedDifferencesError, loadIntended } from './intended.js';
-import { readFileSync } from 'node:fs';
-import { formatSequence, type Sequence } from './model.js';
-import { replay, replaySequence, runOracle } from './oracle.js';
-import { describeOutcome, sides, writeReport } from './report.js';
-import { installAsyncErrorCapture, takeStrayAsyncErrors } from './run.js';
-import { AUTHORITY, SUBJECTS, loadSubject } from './subjects/registry.js';
+import { CATALOG, isProperty } from './behaviors/catalog.js';
+import { checkDeterminism } from './determinism.js';
 import type { PluginMode } from './generate.js';
-import { canonical } from './compare.js';
+import { evaluate, generate, PropertyError, type SpecCase } from './generator.js';
+import { formatSequence, type Outcome } from './model.js';
+import { writeDeterminismReport, writeSpecReport } from './report.js';
+import { installAsyncErrorCapture, takeStrayAsyncErrors } from './run.js';
+import type { Subject } from './subject.js';
+import { DEFAULT_SUBJECTS, SUBJECTS, loadSubject } from './subjects/registry.js';
+import { canonical } from './trace.js';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-const USAGE = `Usage: oracle --a <subject> --b <subject> [options]
+const USAGE = `Usage:
+  oracle generate [options]                      generate sequences, check every behavior property,
+                                                 write out/spec-report.{json,md} and out/cases/*.json
+  oracle --determinism --subject <name> [options]  replay each sequence twice on one subject;
+                                                 fail on any difference
+  oracle replay <case.json> [--subjects a,b]      replay a case and print each subject's verdict
 
 Subjects: ${Object.keys(SUBJECTS).join(', ')}
 
 Options:
+  --subjects <a,b>     subjects to replay (generate, replay; default ${DEFAULT_SUBJECTS.join(',')})
+  --subject <name>     subject to check (--determinism)
   --runs <n>           sequences to generate (default 1000)
   --seed <n>           fast-check seed (default 20261119)
   --plugins <mode>     any | none | all: plugins each sequence installs (default any)
   --max-steps <n>      steps per sequence at most (default 30)
-  --shrink-budget <n>  property runs per difference group while shrinking (default 400)
-  --intended <file>    intended differences (default tests/intended-differences.json)
+  --shrink-budget <n>  property evaluations per minimization (default 300)
   --out <dir>          report directory (default tests/oracle/out)
-  --replay <path>      replay one fast-check path (from a report) and print both traces
-  --replay-group <n>   replay group n's minimal sequence from the last report for this pair
 `;
 
-function fail(message: string): never {
-  process.stderr.write(`${message}\n\n${USAGE}`);
-  process.exit(2);
-}
+class UsageError extends Error {}
 
 function int(value: string | undefined, fallback: number, name: string): number {
   if (value === undefined) return fallback;
   const n = Number(value);
-  if (!Number.isSafeInteger(n) || n < 0) fail(`--${name} must be a non-negative integer`);
+  if (!Number.isSafeInteger(n) || n < 0) throw new UsageError(`--${name} must be a non-negative integer`);
   return n;
 }
 
+async function subjectsNamed(list: string | undefined): Promise<Subject[]> {
+  const names = list ? list.split(',').map((n) => n.trim()).filter(Boolean) : [...DEFAULT_SUBJECTS];
+  if (names.length === 0) throw new UsageError('--subjects names no subject');
+  for (const name of names) if (!SUBJECTS[name]) throw new UsageError(`unknown subject "${name}"`);
+  return Promise.all(names.map(loadSubject));
+}
+
+const progress = (started: number, runs: number) => {
+  const every = Math.max(1, Math.floor(runs / 10));
+  return (done: number, total: number) => {
+    if (done % every === 0 || done === total) {
+      process.stderr.write(`  ${done}/${total} sequences, ${((performance.now() - started) / 1000).toFixed(1)} s\n`);
+    }
+  };
+};
+
+function describeOutcome(outcome: Outcome): string {
+  switch (outcome.status) {
+    case 'ok':
+      return outcome.value === undefined ? 'ok' : `ok ${canonical(outcome.value)}`;
+    case 'error': {
+      const e = outcome.error;
+      return `throws ${e.class}${e.causeKind ? ` (${e.causeKind})` : ''}: ${e.message}`;
+    }
+    default:
+      return `${outcome.status} (${outcome.detail})`;
+  }
+}
+
 async function main(): Promise<number> {
-  const { values } = parseArgs({
+  const { values, positionals } = parseArgs({
     options: {
-      a: { type: 'string' },
-      b: { type: 'string' },
+      determinism: { type: 'boolean' },
+      subject: { type: 'string' },
+      subjects: { type: 'string' },
       runs: { type: 'string' },
       seed: { type: 'string' },
       plugins: { type: 'string' },
       'max-steps': { type: 'string' },
       'shrink-budget': { type: 'string' },
-      intended: { type: 'string' },
       out: { type: 'string' },
-      replay: { type: 'string' },
-      'replay-group': { type: 'string' },
       help: { type: 'boolean' },
     },
-    allowPositionals: false,
+    allowPositionals: true,
   });
   if (values.help) {
     process.stdout.write(USAGE);
     return 0;
   }
-  if (!values.a || !values.b) fail('--a and --b are required');
   const plugins = (values.plugins ?? 'any') as PluginMode;
-  if (!['any', 'none', 'all'].includes(plugins)) fail('--plugins must be any, none or all');
+  if (!['any', 'none', 'all'].includes(plugins)) throw new UsageError('--plugins must be any, none or all');
   const runs = int(values.runs, 1000, 'runs');
   const seed = int(values.seed, 20261119, 'seed');
   const maxSteps = int(values['max-steps'], 30, 'max-steps');
-  const shrinkBudget = int(values['shrink-budget'], 400, 'shrink-budget');
-  const intendedFile = resolve(values.intended ?? resolve(packageDir, '..', 'intended-differences.json'));
+  const shrinkBudget = int(values['shrink-budget'], 300, 'shrink-budget');
   const outDir = resolve(values.out ?? resolve(packageDir, 'out'));
+  const [command, ...rest] = positionals;
+  const out = process.stdout;
 
-  let intended;
-  try {
-    intended = loadIntended(intendedFile);
-  } catch (error) {
-    if (error instanceof IntendedDifferencesError) {
-      process.stderr.write(`${error.message}\n`);
-      return 2;
-    }
-    throw error;
-  }
-
-  let a, b;
-  try {
-    [a, b] = await Promise.all([loadSubject(values.a), loadSubject(values.b)]);
-  } catch (error) {
-    fail((error as Error).message);
-  }
-
-  const uninstall = installAsyncErrorCapture();
-  const defaults = [
-    plugins === 'any' ? '' : ` --plugins ${plugins}`,
-    maxSteps === 30 ? '' : ` --max-steps ${maxSteps}`,
-  ].join('');
-  const command = `pnpm --filter @signal-tree/oracle oracle --a ${a.name} --b ${b.name}`;
-  const replayCommand = (path: string) => `${command} --seed ${seed}${defaults} --replay ${path}`;
-  const replayGroupCommand = (group: number) => `${command} --replay-group ${group}`;
-  const reportJson = resolve(outDir, `${a.name}-vs-${b.name}.json`);
-
-  try {
-    if (values.replay !== undefined || values['replay-group'] !== undefined) {
-      let replayed;
-      if (values.replay !== undefined) {
-        replayed = await replay({ a, b, seed, plugins, maxSteps, intended }, values.replay);
-      } else {
-        const n = int(values['replay-group'], 0, 'replay-group');
-        const report = JSON.parse(readFileSync(reportJson, 'utf8')) as { groups: { example: { sequence: Sequence } }[] };
-        const group = report.groups[n - 1];
-        if (!group) fail(`${reportJson} has no group ${n}`);
-        replayed = await replaySequence({ a, b, intended }, group.example.sequence);
-      }
-      const { sequence, comparison, traces } = replayed;
-      const out = process.stdout;
-      out.write(`${formatSequence(sequence).join('\n')}\n\n`);
-      traces[0].forEach((ra, i) => {
-        const rb = traces[1][i]!;
-        out.write(`step ${i} ${ra.label}\n`);
-        out.write(`  ${a.name}: ${describeOutcome(ra.outcome)}  state ${canonical(ra.observation.state)}\n`);
-        out.write(`  ${b.name}: ${describeOutcome(rb.outcome)}  state ${canonical(rb.observation.state)}\n`);
-      });
-      const d = comparison.uncovered;
-      out.write(d ? `\nfirst unlisted difference at step ${d.step}: ${d.key}\n` : '\nno unlisted difference\n');
-      return d ? 1 : 0;
-    }
-
+  if (values.determinism) {
+    if (command !== undefined) throw new UsageError('--determinism takes no command');
+    if (!values.subject) throw new UsageError('--determinism needs --subject');
+    if (!SUBJECTS[values.subject]) throw new UsageError(`unknown subject "${values.subject}"`);
+    const subject = await loadSubject(values.subject);
     const started = performance.now();
-    const step = Math.max(1, Math.floor(runs / 10));
-    const result = await runOracle({
-      a,
-      b,
-      runs,
-      seed,
-      plugins,
-      maxSteps,
-      intended,
-      shrinkBudget,
-      onProgress: (done, total) => {
-        if (done % step === 0 || done === total) {
-          process.stderr.write(`  ${done}/${total} sequences, ${((performance.now() - started) / 1000).toFixed(1)} s\n`);
-        }
-      },
-    });
-    const authority = a.name === AUTHORITY || b.name === AUTHORITY ? AUTHORITY : undefined;
-    const files = writeReport(outDir, result, {
-      aDescription: a.description,
-      bDescription: b.description,
-      ...(authority && a.name !== b.name ? { authority } : {}),
-      replayCommand,
-      replayGroupCommand,
-    });
-    const uncoveredRuns = result.groups.reduce((sum, g) => sum + g.count, 0);
-    const out = process.stdout;
-    out.write(
-      `${a.name} vs ${b.name}: ${runs} sequences, seed ${seed}, compare ${(result.compareMs / 1000).toFixed(1)} s, shrink ${(result.shrinkMs / 1000).toFixed(1)} s\n`
-    );
-    out.write(`unlisted differences: ${uncoveredRuns} sequences in ${result.groups.length} groups; intended: ${result.coveredRuns} sequences\n`);
-    result.groups.forEach((g, i) => {
-      const [aSide, bSide] = sides(g);
-      out.write(`  ${i + 1}. ${g.pattern} | ${g.field} | ${a.name}: ${aSide} | ${b.name}: ${bSide} | ${g.count}\n`);
-    });
-    out.write(`report: ${files.markdown}\n        ${files.json}\n`);
-    const stray = takeStrayAsyncErrors();
-    if (stray.length) {
-      process.stderr.write(`harness: ${stray.length} asynchronous errors outside any sequence: ${canonical(stray[0])}\n`);
-      return 3;
+    const result = await checkDeterminism({ subject, runs, seed, plugins, maxSteps, onProgress: progress(started, runs) });
+    const file = writeDeterminismReport(outDir, result);
+    out.write(`determinism ${subject.name}: ${result.mismatches} mismatches in ${runs} sequences, seed ${seed}, ${(result.ms / 1000).toFixed(1)} s\n`);
+    if (result.first) {
+      out.write(`first at run ${result.first.run}, record ${result.first.record}:\n${formatSequence(result.first.sequence).join('\n')}\n`);
+      out.write(`  first replay:  ${canonical(result.first.a)}\n  second replay: ${canonical(result.first.b)}\n`);
     }
-    return uncoveredRuns === 0 ? 0 : 1;
-  } finally {
-    uninstall();
+    out.write(`report: ${file}\n`);
+    return result.mismatches === 0 ? 0 : 1;
   }
+
+  if (command === 'generate') {
+    if (rest.length) throw new UsageError(`unexpected argument "${rest[0]}"`);
+    const subjects = await subjectsNamed(values.subjects);
+    const started = performance.now();
+    const result = await generate({ subjects, runs, seed, plugins, maxSteps, shrinkBudget, onProgress: progress(started, runs) });
+    const files = writeSpecReport(outDir, result);
+    out.write(
+      `${runs} sequences, seed ${seed}, subjects ${subjects.map((s) => s.name).join(', ')}: generation ${(result.generateMs / 1000).toFixed(1)} s, minimization ${(result.shrinkMs / 1000).toFixed(1)} s\n`
+    );
+    for (const entry of CATALOG) {
+      const stats = result.stats.get(entry.id);
+      if (!stats) {
+        out.write(`  ${entry.id.padEnd(4)} not generated\n`);
+        continue;
+      }
+      const counts = subjects.map((s) => `${s.name} ${stats.holds[s.name]} holds / ${stats.violates[s.name]} violates`);
+      out.write(`  ${entry.id.padEnd(4)} exercised ${String(stats.exercised).padStart(5)}: ${counts.join(', ')}\n`);
+    }
+    out.write(`${result.cases.length} cases in ${files.cases}\nreport: ${files.markdown}\n        ${files.json}\n`);
+    return 0;
+  }
+
+  if (command === 'replay') {
+    const [file, ...extra] = rest;
+    if (!file || extra.length) throw new UsageError('replay takes one case file');
+    const c = JSON.parse(readFileSync(resolve(file), 'utf8')) as SpecCase;
+    const subjects = await subjectsNamed(values.subjects);
+    const properties = CATALOG.filter(isProperty);
+    out.write(`${formatSequence(c.sequence).join('\n')}\n\nexpected (${c.behaviors.join(', ')}) at step ${c.step}: ${canonical(c.expected)}\n`);
+    for (const subject of subjects) {
+      const { trace, verdicts } = await evaluate(subject, c.sequence, properties);
+      out.write(`\n${subject.name}:\n`);
+      for (const record of trace.records) out.write(`  ${record.index} ${record.label}: ${describeOutcome(record.outcome)}\n`);
+      for (const [id, v] of verdicts) {
+        out.write(`  ${id} ${v.holds ? 'holds' : `violates (${v.kind})`} at step ${v.step}: ${v.detail}\n`);
+        if (!v.holds) out.write(`     expected ${canonical(v.expected)}\n     observed ${canonical(v.observed)}\n`);
+      }
+    }
+    return 0;
+  }
+
+  throw new UsageError(command === undefined ? 'name a command: generate, replay, or --determinism' : `unknown command "${command}"`);
 }
 
-process.exitCode = await main();
+const uninstall = installAsyncErrorCapture();
+try {
+  let code = await main();
+  const stray = takeStrayAsyncErrors();
+  if (stray.length) {
+    process.stderr.write(`harness: ${stray.length} asynchronous errors outside any sequence: ${canonical(stray[0])}\n`);
+    code = 3;
+  }
+  process.exitCode = code;
+} catch (error) {
+  if (error instanceof UsageError || (error as { code?: string }).code === 'ERR_PARSE_ARGS_UNKNOWN_OPTION') {
+    process.stderr.write(`${(error as Error).message}\n\n${USAGE}`);
+    process.exitCode = 2;
+  } else {
+    process.stderr.write(`${error instanceof PropertyError ? 'generator error: ' : ''}${(error as Error).stack ?? String(error)}\n`);
+    process.exitCode = 3;
+  }
+} finally {
+  uninstall();
+}

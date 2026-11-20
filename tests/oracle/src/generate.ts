@@ -24,7 +24,7 @@ import {
 export type PluginMode = 'any' | 'none' | 'all';
 
 export interface GenerateOptions {
-  /** Operation kinds to generate: normally the union of both subjects' supports. */
+  /** Operation kinds to generate: normally the union of the subjects' supports. */
   readonly kinds: ReadonlySet<OpKind>;
   readonly plugins: PluginMode;
   /** Upper bound on steps per sequence. */
@@ -164,17 +164,15 @@ function configArb(mode: PluginMode): fc.Arbitrary<TreeConfig> {
 }
 
 /**
- * Kinds to generate for a pair: everything either subject supports. A kind
- * only one supports is still generated; the other reports it `unsupported`.
+ * Kinds to generate: everything any subject supports. A kind only some
+ * support is still generated; the others report it `unsupported`.
  */
-export function generationKinds(a: { supports: ReadonlySet<OpKind> }, b: { supports: ReadonlySet<OpKind> }): Set<OpKind> {
-  return new Set([...a.supports, ...b.supports]);
+export function generationKinds(subjects: readonly { supports: ReadonlySet<OpKind> }[]): Set<OpKind> {
+  return new Set(subjects.flatMap((s) => [...s.supports]));
 }
 
-export function sequenceArb(options: GenerateOptions): fc.Arbitrary<Sequence> {
-  const kinds = new Set(
-    [...options.kinds].filter((kind) => options.plugins !== 'none' || pluginForKind(kind) === undefined)
-  );
+/** One step drawn from every allowed operation kind, weighted by WEIGHTS. */
+export function stepArb(kinds: ReadonlySet<OpKind>): fc.Arbitrary<Step> {
   const write = writeArb(kinds);
   const control = controlArbs(write);
   const alternatives: { arbitrary: fc.Arbitrary<Op>; weight: number }[] = [];
@@ -192,13 +190,19 @@ export function sequenceArb(options: GenerateOptions): fc.Arbitrary<Sequence> {
     if (kinds.has(kind)) alternatives.push({ arbitrary, weight: WEIGHTS[kind] });
   }
   if (alternatives.length === 0) throw new Error('no operation kinds to generate');
-  const step: fc.Arbitrary<Step> = fc.record({
+  return fc.record({
     op: fc.oneof(...alternatives),
     sameTick: weighted<boolean>([false, 9], [true, 1]),
   });
+}
+
+export function sequenceArb(options: GenerateOptions): fc.Arbitrary<Sequence> {
+  const kinds = new Set(
+    [...options.kinds].filter((kind) => options.plugins !== 'none' || pluginForKind(kind) === undefined)
+  );
   return fc.record({
     config: configArb(options.plugins),
     // size 'max': lengths spread over the whole range, not fast-check's small default.
-    steps: fc.array(step, { minLength: 1, maxLength: options.maxSteps, size: 'max' }),
+    steps: fc.array(stepArb(kinds), { minLength: 1, maxLength: options.maxSteps, size: 'max' }),
   });
 }
