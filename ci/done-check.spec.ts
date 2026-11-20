@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { ADAPTERS, BEHAVIORS, ITEMS, REQUIRED_GATES, behaviorIdsIn, evaluate, gateIdsIn, nightlyRunProblem, processWordsIn } from './done-check.mjs';
+import {
+  ADAPTERS,
+  BEHAVIORS,
+  ITEMS,
+  ORACLE_MIN_INSTANCES,
+  REQUIRED_GATES,
+  behaviorIdsIn,
+  evaluate,
+  gateIdsIn,
+  nightlyRunProblem,
+  oracleReportProblem,
+  processWordsIn,
+} from './done-check.mjs';
 
 type Results = { budgets: { approved: boolean }; recordOnly: boolean; scenarios: Record<string, { status: string; pass: boolean | null; regressions: { regressed: boolean }[] }> };
 const greenResults = (): Results => ({
@@ -7,11 +19,32 @@ const greenResults = (): Results => ({
   recordOnly: false,
   scenarios: Object.fromEntries(REQUIRED_GATES.map((g: string) => [g, { status: 'ran', pass: true, regressions: [{ regressed: false }] }])),
 });
+/** Catalog entries the generator cannot express yet (as of 12.5); a report marks them not generatable. */
+const NOT_GENERATABLE = new Set(
+  ['T8', 'R4', 'L3', 'X2', 'W1', 'W2', 'W3', 'W4', 'D2'].concat(
+    ['R5', 'R6', 'R7', 'R8', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7', 'V8', 'E3', 'E4', 'L4', 'L5'],
+    ['T11', 'T12', 'T13', 'H2', 'X4', 'X5', 'X6', 'F1', 'W6']
+  )
+);
+type BehaviorReport = { generatable: boolean; holds: Record<string, number>; violates: Record<string, number>; instances: Record<string, number> };
+/** A nightly spec-report.json in which the core holds everything, every generatable behavior exactly at the floor. */
+const greenOracle = () => ({
+  runs: 100_000,
+  subjects: [{ name: 'v15' }, { name: 'v16' }, { name: 'core' }],
+  violations: [{ behavior: 'T3', subject: 'v16', count: 144 }],
+  determinism: { subject: 'v16', runs: 100_000, mismatches: 0 } as { subject: string; runs: number; mismatches: number } | undefined,
+  behaviors: Object.fromEntries(
+    BEHAVIORS.map((id: string) => {
+      const n = NOT_GENERATABLE.has(id) ? 0 : ORACLE_MIN_INSTANCES;
+      return [id, { generatable: !NOT_GENERATABLE.has(id), holds: { v16: 3, core: n }, violates: { v16: 1, core: 0 }, instances: { v16: 4, core: n } }];
+    })
+  ) as Record<string, BehaviorReport>,
+});
 const greenRun = (id: number) => ({
   id,
   conclusion: 'success',
   results: Object.fromEntries(ADAPTERS.map((a: string) => [a, greenResults()])) as Record<string, Results>,
-  oracle: { runs: 100_000, subjects: [{ name: 'v16' }, { name: 'core' }], violations: [{ behavior: 'T3', subject: 'v16', count: 144 }], determinism: { mismatches: 0 } } as Record<string, unknown> & { runs: number; subjects: { name: string }[]; violations: { behavior: string; subject: string; count: number }[]; determinism: { mismatches: number } },
+  oracle: greenOracle(),
 });
 
 const done = () => ({
@@ -35,43 +68,47 @@ describe('done check', () => {
     expect(evaluate(done())).toEqual([]);
   });
 
-  // Each case breaks exactly one item; it must be reported, and be the first unmet one.
-  const cases: Array<[number, string, (f: Facts) => void]> = [
-    [0, 'one green nightly run', (f) => void (f.nightly.runs = [greenRun(1)])],
-    [0, 'a red nightly run', (f) => void (f.nightly.runs[1]!.conclusion = 'failure')],
-    [0, 'a nightly run without react results', (f) => void delete f.nightly.runs[0]!.results['react']],
-    [0, 'record-only results (job green, gates red)', (f) => void (f.nightly.runs[0]!.results['angular'].recordOnly = true)],
-    [0, 'results against unapproved budgets', (f) => void (f.nightly.runs[1]!.results['plain'].budgets.approved = false)],
-    [0, 'a red gate inside a green job', (f) => void (f.nightly.runs[0]!.results['vue'].scenarios['S4c'].pass = false)],
-    [0, 'a gate with no verdict', (f) => void (f.nightly.runs[0]!.results['vue'].scenarios['S2'].pass = null)],
-    [0, 'a gate that did not run', (f) => void (f.nightly.runs[0]!.results['solid'].scenarios['S7'].status = 'not-applicable')],
-    [0, 'a regression', (f) => void (f.nightly.runs[1]!.results['preact'].scenarios['M1'].regressions = [{ regressed: true }])],
-    [0, 'an oracle short of 100,000 sequences', (f) => void (f.nightly.runs[0]!.oracle.runs = 10_000)],
-    [0, 'a spec violation by the new core', (f) => void f.nightly.runs[1]!.oracle.violations.push({ behavior: 'T3', subject: 'core', count: 2 })],
-    [0, 'a generator run without the new core', (f) => void (f.nightly.runs[0]!.oracle.subjects = [{ name: 'v16' }])],
-    [0, 'nondeterministic replays', (f) => void (f.nightly.runs[0]!.oracle.determinism.mismatches = 1)],
-    [0, 'an S6 scan finding', (f) => void (f.s6.findings = ['unminified bundles differ'])],
-    [0, 'nightly runs that could not be read', (f) => void (f.nightly = { error: 'gh: not logged in' } as never)],
-    [1, 'a behavior no test covers', (f) => void f.coveredBehaviors.delete('W3')],
-    [2, 'a pending manifest entry', (f) => void (f.manifestProblems = ['entry 3: still pending'])],
-    [3, 'no gate proving C4', (f) => void f.budgetGates.ids.delete('S7')],
-    [4, 'a reachable experimental module', (f) => void (f.rule7 = ['@signal-tree/core: rule 7: reaches packages/core/src/spike.ts'])],
-    [5, 'a missing migration guide', (f) => void (f.docs.missing = ['docs/migration/from-14.md'])],
-    [5, 'process language in the changelog', (f) => void (f.docs.processWords = ['CHANGELOG.md:12'])],
-    [6, 'no adopter validation', (f) => void (f.adopter.validated = false)],
-    [7, 'a long-lived branch', (f) => void f.branches.list.push({ name: 'codex/old', ageDays: 30 })],
-    [7, 'a tarball on main', (f) => void f.mainTree.paths.push('docs/evidence.tar.gz')],
-    [8, 'no version number for the new major', (f) => void (f.release = { major: null } as never)],
-    [8, 'an untagged main', (f) => void (f.release.tagged = false)],
+  // Each case breaks the listed items and nothing else; they must be reported in section 9 order.
+  const oracle = (f: Facts, run: number) => f.nightly.runs[run]!.oracle;
+  const cases: Array<[number[], string, (f: Facts) => void]> = [
+    [[0, 1], 'one green nightly run', (f) => void (f.nightly.runs = [greenRun(1)])],
+    [[0], 'a red nightly run', (f) => void (f.nightly.runs[1]!.conclusion = 'failure')],
+    [[0], 'a nightly run without react results', (f) => void delete f.nightly.runs[0]!.results['react']],
+    [[0], 'record-only results (job green, gates red)', (f) => void (f.nightly.runs[0]!.results['angular'].recordOnly = true)],
+    [[0], 'results against unapproved budgets', (f) => void (f.nightly.runs[1]!.results['plain'].budgets.approved = false)],
+    [[0], 'a red gate inside a green job', (f) => void (f.nightly.runs[0]!.results['vue'].scenarios['S4c'].pass = false)],
+    [[0], 'a gate with no verdict', (f) => void (f.nightly.runs[0]!.results['vue'].scenarios['S2'].pass = null)],
+    [[0], 'a gate that did not run', (f) => void (f.nightly.runs[0]!.results['solid'].scenarios['S7'].status = 'not-applicable')],
+    [[0], 'a regression', (f) => void (f.nightly.runs[1]!.results['preact'].scenarios['M1'].regressions = [{ regressed: true }])],
+    [[0], 'an S6 scan finding', (f) => void (f.s6.findings = ['unminified bundles differ'])],
+    [[0, 1], 'nightly runs that could not be read', (f) => void (f.nightly = { error: 'gh: not logged in' } as never)],
+    [[1], 'a behavior no test covers', (f) => void f.coveredBehaviors.delete('W3')],
+    [[1], 'an oracle short of 100,000 sequences', (f) => void (oracle(f, 0).runs = 99_999)],
+    [[1], 'a spec violation by the new core', (f) => void oracle(f, 1).violations.push({ behavior: 'T3', subject: 'core', count: 2 })],
+    [[1], 'a generator run without the new core', (f) => void (oracle(f, 0).subjects = [{ name: 'v16' }])],
+    [[1], 'nondeterministic replays', (f) => void (oracle(f, 0).determinism!.mismatches = 1)],
+    [[1], 'a report with no determinism check', (f) => void (oracle(f, 1).determinism = undefined)],
+    [[1], 'one generatable behavior under 1,000 core instances', (f) => void (oracle(f, 0).behaviors['T6']!.instances['core'] = 999)],
+    [[1], 'a report that does not list a behavior', (f) => void delete oracle(f, 1).behaviors['R3']],
+    [[1], 'no oracle report in a nightly run', (f) => void ((f.nightly.runs[0] as { oracle: unknown }).oracle = { error: 'artifact nightly-oracle missing' })],
+    [[2], 'a pending manifest entry', (f) => void (f.manifestProblems = ['entry 3: still pending'])],
+    [[3], 'no gate proving C4', (f) => void f.budgetGates.ids.delete('S7')],
+    [[4], 'a reachable experimental module', (f) => void (f.rule7 = ['@signal-tree/core: rule 7: reaches packages/core/src/spike.ts'])],
+    [[5], 'a missing migration guide', (f) => void (f.docs.missing = ['docs/migration/from-14.md'])],
+    [[5], 'process language in the changelog', (f) => void (f.docs.processWords = ['CHANGELOG.md:12'])],
+    [[6], 'no adopter validation', (f) => void (f.adopter.validated = false)],
+    [[7], 'a long-lived branch', (f) => void f.branches.list.push({ name: 'codex/old', ageDays: 30 })],
+    [[7], 'a tarball on main', (f) => void f.mainTree.paths.push('docs/evidence.tar.gz')],
+    [[8], 'no version number for the new major', (f) => void (f.release = { major: null } as never)],
+    [[8], 'an untagged main', (f) => void (f.release.tagged = false)],
   ];
 
-  it.each(cases)('reports item %i for %s', (index, _name, breakIt) => {
+  it.each(cases)('reports items %j for %s', (indexes, _name, breakIt) => {
     const facts = done();
     breakIt(facts);
     const unmet = evaluate(facts);
-    expect(unmet).toHaveLength(1);
-    expect(unmet[0]!.title).toBe(ITEMS[index]!.title);
-    expect(unmet[0]!.missing).toEqual(expect.any(String));
+    expect(unmet.map((u: { title: string }) => ITEMS.findIndex((i: { title: string }) => i.title === u.title))).toEqual(indexes);
+    for (const u of unmet) expect(u.missing).toEqual(expect.any(String));
   });
 
   it('lists every unmet item in section 9 order', () => {
@@ -125,5 +162,42 @@ describe('gate IDs in budgets.json', () => {
 describe('nightly verdicts', () => {
   it('reads a fully green run as green', () => {
     expect(nightlyRunProblem(greenRun(9))).toBeNull();
+  });
+});
+
+describe('the nightly oracle report', () => {
+  it('accepts the core at the floor, with old-package violations and not-generatable entries at zero', () => {
+    expect(oracleReportProblem(greenOracle())).toBeNull();
+  });
+
+  it('names every behavior below 1,000 core instances with its count, and the excluded entries', () => {
+    const report = greenOracle();
+    report.behaviors['T6']!.instances['core'] = 999;
+    report.behaviors['R3']!.instances['core'] = 12;
+    const excluded = BEHAVIORS.filter((id: string) => NOT_GENERATABLE.has(id)).join(', ');
+    expect(oracleReportProblem(report)).toBe(`below the floor of 1000 instances on the new core: T6 (999), R3 (12); excluded as not generatable: ${excluded}`);
+  });
+
+  it('reads every behavior the report lists, not a fixed list of IDs', () => {
+    const report = greenOracle();
+    expect(Object.keys(report.behaviors)).toEqual([...BEHAVIORS]);
+    const last = BEHAVIORS[BEHAVIORS.length - 1] as string;
+    report.behaviors[last] = { generatable: true, holds: { core: 0 }, violates: { core: 0 }, instances: { core: 0 } };
+    expect(oracleReportProblem(report)).toMatch(new RegExp(`: ${last} \\(0\\);`));
+  });
+
+  it('rejects a run of fewer than 100,000 sequences', () => {
+    const report = greenOracle();
+    report.runs = 10_000;
+    expect(oracleReportProblem(report)).toBe('the oracle ran 10000 sequences, fewer than 100000');
+  });
+
+  it('counts holds + violates when a report has no instances field', () => {
+    const report = greenOracle();
+    const t1 = report.behaviors['T1'] as Partial<BehaviorReport>;
+    delete t1.instances;
+    t1.holds = { core: 600 };
+    t1.violates = { core: 0 };
+    expect(oracleReportProblem(report)).toMatch(/: T1 \(600\);/);
   });
 });

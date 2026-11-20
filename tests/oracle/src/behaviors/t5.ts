@@ -122,6 +122,11 @@ const completedKind = (observed: { status: string }, rest: CompletedRest, refuse
 export const T5 = instanceProperty({
   id: 'T5',
   row: ROW,
+  clauses: {
+    a: 'newer truth removed the row: rollback reverses the rest of the turn',
+    b: 'newer truth touched a location the transaction changed: rollback refuses',
+    c: 'newer truth wrote another field of a row it changed: rollback keeps it',
+  },
   reason:
     '"Newer truth" is read as a write inside external() or an inbound link value; removal or update by an ordinary write is left to T4.',
   instances(trace) {
@@ -142,7 +147,8 @@ export const T5 = instanceProperty({
             completedKind(observed, rest, 'superseded-rollback-refused'),
             { status: 'ok', state: rest.expected },
             { ...observed, state: rest.observed },
-            `rollback(tx${ctx.tx.index}) after newer truth removed ${[...superseded].map(existenceLoc).join(', ')}`
+            `rollback(tx${ctx.tx.index}) after newer truth removed ${[...superseded].map(existenceLoc).join(', ')}`,
+            'a'
           )
         );
         continue;
@@ -160,7 +166,8 @@ export const T5 = instanceProperty({
             completedKind(observed, rest, 'other-field-rollback-refused'),
             { status: 'ok', state: rest.expected },
             { ...observed, state: rest.observed },
-            `rollback(tx${ctx.tx.index}) after newer truth wrote ${[...kept].join(', ')}, beside the fields it changed`
+            `rollback(tx${ctx.tx.index}) after newer truth wrote ${[...kept].join(', ')}, beside the fields it changed`,
+            'c'
           )
         );
         continue;
@@ -174,7 +181,8 @@ export const T5 = instanceProperty({
           'dependent-rollback-completed',
           { status: 'refused' },
           observed,
-          `rollback(tx${ctx.tx.index}) after newer truth touched ${[...new Set(truth.flatMap((w) => [...w.depends]))].join(', ')}`
+          `rollback(tx${ctx.tx.index}) after newer truth touched ${[...new Set(truth.flatMap((w) => [...w.depends]))].join(', ')}`,
+          'b'
         )
       );
     }

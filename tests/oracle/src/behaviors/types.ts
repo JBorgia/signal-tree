@@ -80,6 +80,8 @@ export interface Verdict {
   readonly step: number;
   /** For a violation, a short filename-safe name for how it was violated; violations are grouped by it. */
   readonly kind: string;
+  /** The clause of the row it checks, for a property with clauses (a key of Property.clauses). */
+  readonly clause?: string;
 }
 
 export interface Property {
@@ -89,10 +91,14 @@ export interface Property {
   readonly row: string;
   /** Clauses of the row this property does not check, and how it reads ambiguous wording. */
   readonly reason?: string;
+  /** The row's clauses this property checks separately, by key (`a`, `b`, …); every verdict names one. */
+  readonly clauses?: Readonly<Record<string, string>>;
   /** Whether the replayed sequence exercises the behavior. */
   applies(trace: SpecTrace): boolean;
   /** The first violation in the trace, or a holding verdict. Throws when the property does not apply. */
   check(trace: SpecTrace): Verdict;
+  /** Every place in the trace where the behavior is checked, with its verdict. */
+  instances(trace: SpecTrace): readonly Verdict[];
 }
 
 export interface Unexpressed {
@@ -118,6 +124,7 @@ export function instanceProperty(def: {
   readonly row: string;
   readonly reason?: string;
   readonly afterDestroy?: boolean;
+  readonly clauses?: Readonly<Record<string, string>>;
   readonly instances: (trace: SpecTrace) => readonly Instance[];
 }): Property {
   const cache = new WeakMap<SpecTrace, readonly Instance[]>();
@@ -136,6 +143,8 @@ export function instanceProperty(def: {
     generatable: true,
     row: def.row,
     ...(def.reason ? { reason: def.reason } : {}),
+    ...(def.clauses ? { clauses: def.clauses } : {}),
+    instances: of,
     applies: (trace) => of(trace).length > 0,
     check: (trace) => {
       const all = of(trace);
@@ -156,7 +165,16 @@ export function violates(step: number, kind: string, expected: Json, observed: J
   return { holds: false, expected, observed, detail, step, kind };
 }
 
-/** A holding or violating instance, by `ok`. */
-export function verdict(ok: boolean, step: number, kind: string, expected: Json, observed: Json, detail: string): Instance {
-  return ok ? holds(step, expected, observed, detail) : violates(step, kind, expected, observed, detail);
+/** A holding or violating instance, by `ok`, optionally naming the clause it checks. */
+export function verdict(
+  ok: boolean,
+  step: number,
+  kind: string,
+  expected: Json,
+  observed: Json,
+  detail: string,
+  clause?: string
+): Instance {
+  const v = ok ? holds(step, expected, observed, detail) : violates(step, kind, expected, observed, detail);
+  return clause === undefined ? v : { ...v, clause };
 }

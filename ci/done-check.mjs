@@ -7,7 +7,9 @@
 //   `gates (<adapter>)` for plain (the core), angular, vue, solid, preact and
 //   react, and `oracle (100k)`. This check reads the verdicts those jobs upload
 //   (artifacts nightly-gates-<adapter> and nightly-oracle), not the jobs'
-//   success: a results file that is record-only or unapproved counts as unmet.
+//   success: a results file that is record-only or unapproved counts as unmet,
+//   and so does a spec-report.json in which the new core violates a property or
+//   was checked fewer than 1,000 times on any generatable behavior.
 // - Behavior coverage: a test title carries the behavior ID in brackets, e.g.
 //   it('[T3] refuses with later-pending-dependency', ...).
 // - Release docs (Phase 8): README.md, CHANGELOG.md, docs/migration/from-14.md,
@@ -32,7 +34,13 @@ export const NIGHTLY_JOBS = [...ADAPTERS.map((a) => `gates (${a})`), 'oracle (10
 /** Gates the harness runs (6.3 as amended by section 10). S6a and S6c are checked here by ci/core-bundle-scan.mjs. */
 export const REQUIRED_GATES = ['M1', 'M2', 'M3', 'S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6b', 'S7'];
 export const ORACLE_MIN_RUNS = 100_000;
-/** The generator's subject for the new core; old packages violating the spec are expected (12.1.4). */
+/**
+ * Non-vacuity floor (Jonathan's ruling): every generatable behavior checked on
+ * the new core at least 1,000 times in a 100,000-sequence nightly run. Mirrors
+ * NIGHTLY_FLOOR in tests/oracle/src/gate.ts.
+ */
+export const ORACLE_MIN_INSTANCES = 1_000;
+/** The generator's subject for the new core (CORE_SUBJECT in tests/oracle/src/gate.ts); old packages violating the spec are expected (12.1.4). */
 export const ORACLE_SUBJECT = 'core';
 
 /** Why one nightly run does not show every gate green, or null. Reads the uploaded verdicts, not job success. */
@@ -50,13 +58,37 @@ export function nightlyRunProblem(run) {
       if ((scenario.regressions ?? []).some((r) => r.regressed)) return `nightly run ${run.id} (${adapter}): ${gate} regressed`;
     }
   }
-  const oracle = run.oracle;
-  if (!oracle || oracle.error) return `nightly run ${run.id} has no oracle report${oracle?.error ? ` (${oracle.error})` : ''}`;
-  if (!(oracle.runs >= ORACLE_MIN_RUNS)) return `nightly run ${run.id}: the oracle ran ${oracle.runs} sequences, fewer than ${ORACLE_MIN_RUNS}`;
-  if (!(oracle.subjects ?? []).some((s) => s.name === ORACLE_SUBJECT)) return `nightly run ${run.id}: the generator did not run on the new core`;
+  return null;
+}
+
+/** Checked instances of a behavior on the new core: `instances`, or holds + violates in an older report. */
+const coreInstances = (b) => b.instances?.[ORACLE_SUBJECT] ?? (b.holds?.[ORACLE_SUBJECT] ?? 0) + (b.violates?.[ORACLE_SUBJECT] ?? 0);
+
+/**
+ * Why a nightly spec-report.json does not show the new core holding every
+ * property at 100,000 sequences, each generatable behavior checked on it at
+ * least ORACLE_MIN_INSTANCES times, with deterministic replays; or null.
+ * Behaviors the report marks not generatable are excluded from the floor.
+ */
+export function oracleReportProblem(oracle) {
+  if (!oracle || oracle.error) return `no oracle report${oracle?.error ? ` (${oracle.error})` : ''}`;
+  if (!(oracle.runs >= ORACLE_MIN_RUNS)) return `the oracle ran ${oracle.runs} sequences, fewer than ${ORACLE_MIN_RUNS}`;
+  if (!(oracle.subjects ?? []).some((s) => s.name === ORACLE_SUBJECT)) return 'the generator did not run on the new core';
   const violations = (oracle.violations ?? []).filter((v) => v.subject === ORACLE_SUBJECT).reduce((n, v) => n + (v.count ?? 1), 0);
-  if (violations) return `nightly run ${run.id}: the new core violates the spec in ${violations} generated sequence(s)`;
-  if (oracle.determinism && oracle.determinism.mismatches !== 0) return `nightly run ${run.id}: replays were not deterministic`;
+  if (violations) return `the new core violates the spec in ${violations} generated sequence(s)`;
+  if (!oracle.determinism) return 'the report records no determinism check';
+  if (oracle.determinism.mismatches !== 0) return 'replays were not deterministic';
+  const behaviors = oracle.behaviors ?? {};
+  const unlisted = BEHAVIORS.filter((id) => !behaviors[id]);
+  if (unlisted.length) return `the report lists no ${unlisted.join(', ')}`;
+  const excluded = BEHAVIORS.filter((id) => behaviors[id].generatable === false);
+  const below = BEHAVIORS.filter((id) => behaviors[id].generatable !== false)
+    .map((id) => [id, coreInstances(behaviors[id])])
+    .filter(([, n]) => !(n >= ORACLE_MIN_INSTANCES));
+  if (below.length) {
+    const list = below.map(([id, n]) => `${id} (${n})`).join(', ');
+    return `below the floor of ${ORACLE_MIN_INSTANCES} instances on the new core: ${list}${excluded.length ? `; excluded as not generatable: ${excluded.join(', ')}` : ''}`;
+  }
   return null;
 }
 export const BEHAVIORS = BEHAVIOR_IDS;
@@ -86,10 +118,18 @@ export const ITEMS = [
     },
   },
   {
-    title: 'Every behavior in 5.1, 5.2, 12.4 and 12.5 is covered by tests, and the test generator finds no spec violation by the new core at 100,000 sequences',
-    check: ({ coveredBehaviors }) => {
+    title:
+      'Every behavior in 5.1, 5.2, 12.4 and 12.5 is covered by tests, and on two consecutive nightly runs of 100,000 sequences the test generator finds no spec violation by the new core and checks every generatable behavior on it at least 1,000 times',
+    check: ({ coveredBehaviors, nightly }) => {
       const missing = BEHAVIORS.filter((id) => !coveredBehaviors.has(id));
-      return missing.length ? `no test title carries ${missing.map((id) => `[${id}]`).join(', ')}` : null;
+      if (missing.length) return `no test title carries ${missing.map((id) => `[${id}]`).join(', ')}`;
+      if (nightly.error) return `could not read nightly runs: ${nightly.error}`;
+      if (nightly.runs.length < 2) return `${nightly.runs.length} completed nightly run(s) on main; two consecutive oracle reports are needed`;
+      for (const run of nightly.runs.slice(0, 2)) {
+        const problem = oracleReportProblem(run.oracle);
+        if (problem) return `nightly run ${run.id}: ${problem}`;
+      }
+      return null;
     },
   },
   {

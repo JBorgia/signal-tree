@@ -12,6 +12,7 @@ import {
   LEAF_PATHS,
   OBSERVED_PATHS,
   ROW_KEYS,
+  type DeclarationKind,
   type LeafPath,
   type LinkSource,
   type Op,
@@ -44,6 +45,7 @@ const one = (op: Op): Step[] => [step(op)];
 
 const key = fc.constantFrom(...ROW_KEYS);
 const twoKeys = fc.tuple(key, key).filter(([a, b]) => a !== b);
+const threeKeys = fc.tuple(key, key, key).filter(([a, b, c]) => a !== b && b !== c && a !== c);
 const leaf = fc.constantFrom(...LEAF_PATHS);
 const value = fc.integer({ min: 1, max: 3 });
 /** A value in 1..3 other than `v`. */
@@ -65,6 +67,8 @@ const location = fc.oneof(
 /** Two overlapping transactions settled in a chosen order (T2, T3, T4, T7, T9, X1). */
 const overlapping = (inspect: boolean): Shape => ({
   needs: ['transact', 'confirm', 'rollback', 'setLeaf', 'updateLeaf', 'addOne', 'updateOne'],
+  // T3 and T7 come almost only from here; weighted up to clear twice their floor (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
@@ -72,7 +76,12 @@ const overlapping = (inspect: boolean): Shape => ({
       v: value,
       read: fc.boolean(),
       undoable: fc.boolean(),
-      order: fc.constantFrom('older-first', 'newer-first', 'confirm-newer'),
+      // The two rollback orders reach T3 and T7; confirm-newer reaches T4, which has more sources.
+      order: fc.oneof(
+        { arbitrary: fc.constant('older-first' as const), weight: 2 },
+        { arbitrary: fc.constant('newer-first' as const), weight: 2 },
+        { arbitrary: fc.constant('confirm-newer' as const), weight: 1 }
+      ),
       look: fc.boolean(),
     })
     .map(({ at, v, read, undoable, order, look }) => {
@@ -94,6 +103,8 @@ const overlapping = (inspect: boolean): Shape => ({
 /** A transaction, then newer truth that removes or updates its row, then rollback (T4, T5, T6). */
 const newerTruth: Shape = {
   needs: ['transact', 'rollback', 'confirm', 'addOne', 'updateOne', 'removeOne', 'changeId', 'setLeaf'],
+  // Most of T5's instances come from here (#29).
+  weight: 3,
   plugins: true,
   segments: fc
     .record({
@@ -198,15 +209,63 @@ const laterTouch: Shape = {
     }),
 };
 
+/**
+ * A transaction rekeys a row, another writer (external()) deletes the row
+ * under its new key, then the transaction is rolled back (T6). The rest of
+ * the turn varies: a leaf write, an update to a second row, or nothing; the
+ * deletion is removeOne or removeMany. The deletion names nothing else the
+ * turn changed, so the rest of the turn is there to reverse (a second row
+ * deleted too would be T5's supersession), and never the old key, which
+ * would rewrite a location the rekey already emptied.
+ */
+const rekeyedRowDeleted: Shape = {
+  needs: ['transact', 'rollback', 'confirm', 'addOne', 'updateOne', 'removeOne', 'removeMany', 'changeId', 'setLeaf'],
+  // T6 comes almost only from here (#29).
+  weight: 4,
+  plugins: true,
+  segments: fc
+    .record({
+      keys: threeKeys,
+      n: value,
+      v: value,
+      leafToo: fc.boolean(),
+      secondRow: fc.boolean(),
+      removal: fc.constantFrom<'removeOne' | 'removeMany'>('removeOne', 'removeMany'),
+      undoable: fc.boolean(),
+      settleAfter: fc.boolean(),
+    })
+    .map(({ keys: [from, to, second], n, v, leafToo, secondRow, removal, undoable, settleAfter }) => {
+      const setup = [step(write({ kind: 'addOne', row: { id: from, n, m: 0 } }))];
+      if (secondRow) setup.push(step(write({ kind: 'addOne', row: { id: second, n: 0, m: 0 } })));
+      const body: WriteOp[] = [{ kind: 'changeId', from, to }];
+      if (leafToo) body.push({ kind: 'setLeaf', path: 'a', value: v });
+      if (secondRow) body.push({ kind: 'updateOne', id: second, field: 'n', value: v });
+      const deletion: WriteOp =
+        removal === 'removeOne' ? { kind: 'removeOne', id: to } : { kind: 'removeMany', ids: secondRow ? [to] : [to, second] };
+      const segments: Step[][] = [setup, one(transact(body, undoable)), one(write(deletion, 'external')), one(settle('rollback', 0))];
+      if (settleAfter) segments.push(one(settle('confirm', 0)));
+      return segments;
+    }),
+};
+
 /** A held row handle whose key is removed and reused (E1, E2). */
 const heldRow: Shape = {
   needs: ['addOne', 'upsertOne', 'removeOne', 'rowHold', 'rowHeldRead', 'rowHeldWrite'],
+  // E1 and E2 come only from here (#29).
+  weight: 4,
   plugins: false,
   segments: fc
-    .record({ k: key, n: value, reuse: fc.constantFrom<'addOne' | 'upsertOne'>('addOne', 'upsertOne'), early: fc.boolean() })
-    .map(({ k, n, reuse, early }) => [
+    .record({ k: key, n: value, reuse: fc.constantFrom<'addOne' | 'upsertOne'>('addOne', 'upsertOne'), readFirst: fc.boolean() })
+    .map(({ k, n, reuse, readFirst }) => [
       one(write({ kind: 'addOne', row: { id: k, n: 0, m: 0 } })),
-      [step({ kind: 'rowHold', id: k }), ...(early ? [step({ kind: 'rowHeldRead', handle: 0 })] : [])],
+      // Two accesses while the row lives (a write of the value it already has), so E2
+      // always has a carrier to compare, whatever the handle does once the row is gone.
+      [
+        step({ kind: 'rowHold', id: k }),
+        ...(readFirst
+          ? [step({ kind: 'rowHeldRead', handle: 0 }), step({ kind: 'rowHeldWrite', handle: 0, n: 0 })]
+          : [step({ kind: 'rowHeldWrite', handle: 0, n: 0 }), step({ kind: 'rowHeldRead', handle: 0 })]),
+      ],
       one(write({ kind: 'removeOne', id: k })),
       one(write({ kind: reuse, row: { id: k, n, m: 0 } })),
       one({ kind: 'rowHeldWrite', handle: 0, n: other(n) }),
@@ -217,12 +276,20 @@ const heldRow: Shape = {
 /** An undoable write, a newer write, then undo (R1, R2, R3, X1). */
 const undoOverNewer: Shape = {
   needs: ['undo', 'redo', 'setLeaf', 'updateLeaf'],
+  // R2 comes almost only from here; weighted up to clear twice its floor (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
       path: leaf,
       v: value,
-      newer: fc.constantFrom('same', 'read', 'elsewhere', 'shared-turn'),
+      // 'same' and 'read' overwrite the undoable write and reach R2; the others reach R1 and R3.
+      newer: fc.oneof(
+        { arbitrary: fc.constant('same' as const), weight: 2 },
+        { arbitrary: fc.constant('read' as const), weight: 2 },
+        { arbitrary: fc.constant('elsewhere' as const), weight: 1 },
+        { arbitrary: fc.constant('shared-turn' as const), weight: 1 }
+      ),
       redo: fc.boolean(),
     })
     .map(({ path, v, newer, redo }) => {
@@ -252,6 +319,8 @@ const undoOverNewer: Shape = {
 /** An undoable transaction confirmed or rolled back, then undo and redo around a newer write (R3). */
 const undoAroundTransaction: Shape = {
   needs: ['transact', 'confirm', 'rollback', 'undo', 'redo', 'setLeaf'],
+  // R3's clauses (a) and (c) come mostly from here (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
@@ -324,7 +393,8 @@ const disposedLink: Shape = {
  */
 const observed: Shape = {
   needs: ['observe', 'addOne', 'setLeaf', 'updateOne', 'setField', 'transact', 'rollback', 'undo'],
-  weight: 2,
+  // O4's reentrant writes come mostly from here (#29).
+  weight: 3,
   plugins: true,
   segments: fc
     .record({
@@ -413,6 +483,47 @@ const disposal: fc.Arbitrary<Step[]> = fc
     return [step({ kind: 'destroy' }), ...after.map((i) => step(later[i] as Op))];
   });
 
+/**
+ * Publication declarations on an open link (L2): a link on a location,
+ * optionally a pending transaction there, declarations that name it as a
+ * contributing owner, declare independence or unknown completeness, and one
+ * invalid declaration (a kind the API does not define), then the
+ * transaction settles, the endpoint acknowledges and settled() is probed.
+ * Every receipt is read in each observation.
+ */
+const publicationDeclarations: Shape = {
+  needs: ['linkOpen', 'declare', 'linkAck', 'linkSettled', 'transact', 'confirm', 'rollback', 'setLeaf', 'setBranch', 'upsertOne'],
+  plugins: true,
+  segments: fc
+    .record({
+      source: fc.constantFrom<LinkSource>('a', 'cfg', 'rows'),
+      mode: fc.constantFrom<'sync' | 'deferred'>('sync', 'deferred'),
+      pending: fc.boolean(),
+      valid: fc.array(fc.constantFrom<DeclarationKind>('dependent', 'independent', 'unknown'), { maxLength: 2 }),
+      invalidFirst: fc.boolean(),
+      v: value,
+      settleAs: fc.constantFrom<'confirm' | 'rollback'>('confirm', 'rollback'),
+    })
+    .map(({ source, mode, pending, valid, invalidFirst, v, settleAs }) => {
+      const w = (n: number): WriteOp =>
+        source === 'a'
+          ? { kind: 'setLeaf', path: 'a', value: n }
+          : source === 'cfg'
+            ? { kind: 'setBranch', p: n, q: n }
+            : { kind: 'upsertOne', row: { id: 'r0', n, m: 0 } };
+      const declare = (declaration: DeclarationKind, n: number): Step[] =>
+        one({ kind: 'declare', link: 0, declaration, owners: declaration === 'dependent' ? [0] : [], body: [w(n)] });
+      const invalid = declare('malformed', v);
+      const declarations = valid.map((kind, i) => declare(kind, other(v + i)));
+      const segments: Step[][] = [one({ kind: 'linkOpen', source, mode })];
+      if (pending) segments.push(one(transact([w(v)])));
+      segments.push(...(invalidFirst ? [invalid, ...declarations] : [...declarations, invalid]));
+      if (pending) segments.push(one(settle(settleAs, 0)));
+      segments.push(one({ kind: 'linkAck', link: 0, ok: true }), one({ kind: 'linkSettled', link: 0 }));
+      return segments;
+    }),
+};
+
 /** Mixes random steps into the gaps between a shape's segments, mostly none. */
 function withNoise(segments: fc.Arbitrary<Step[][]>, noise: fc.Arbitrary<Step>, maxSteps: number): fc.Arbitrary<Step[]> {
   const gap = fc.oneof(
@@ -434,6 +545,7 @@ export function focusedArb(options: {
     overlapping(options.kinds.has('inspect')),
     newerTruth,
     laterTouch,
+    rekeyedRowDeleted,
     heldRow,
     undoOverNewer,
     undoAroundTransaction,
@@ -441,6 +553,7 @@ export function focusedArb(options: {
     disposedLink,
     observed,
     awaitScope,
+    publicationDeclarations,
   ].filter(
     (shape) => shape.needs.every((kind) => options.kinds.has(kind)) && !(shape.plugins && options.plugins === 'none')
   );

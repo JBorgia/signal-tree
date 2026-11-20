@@ -29,6 +29,11 @@ const view = (s: StateView | { readError: unknown }): string | undefined =>
 export const H1 = instanceProperty({
   id: 'H1',
   row: ROW,
+  clauses: {
+    a: 'hydrated values are identical',
+    b: 'hydration is one turn',
+    c: 'each observer run reads the whole hydrated state',
+  },
   reason: "Origin 'server' is not checked: the published packages have no writer identity. Hydration is read as a whole-value write of the parsed snapshot into a fresh tree.",
   instances(trace) {
     const analysis = analyze(trace);
@@ -47,7 +52,8 @@ export const H1 = instanceProperty({
             'hydration-failed',
             { values: s.before as unknown as Json },
             { error: outcome.error.class, message: outcome.error.message },
-            `hydrate() at step ${s.index}`
+            `hydrate() at step ${s.index}`,
+            'a'
           )
         );
         continue;
@@ -63,7 +69,8 @@ export const H1 = instanceProperty({
           'hydrated-values-differ',
           { values: s.before as unknown as Json },
           { values: value.state as unknown as Json },
-          `hydrate() at step ${s.index}`
+          `hydrate() at step ${s.index}`,
+          'a'
         )
       );
       for (const o of value.observers) {
@@ -74,7 +81,8 @@ export const H1 = instanceProperty({
             'hydration-in-several-turns',
             { runs: 'at most 1' },
             { runs: o.saw.length },
-            `observer on ${o.path} of the hydrated tree`
+            `observer on ${o.path} of the hydrated tree`,
+            'b'
           )
         );
         const partial = o.saw.map(view).filter((v) => v !== undefined && v !== hydrated);
@@ -86,7 +94,8 @@ export const H1 = instanceProperty({
               'hydration-seen-partly',
               { saw: value.state as unknown as Json },
               { saw: partial.map((v) => JSON.parse(v as string) as Json) },
-              `observer on ${o.path} of the hydrated tree`
+              `observer on ${o.path} of the hydrated tree`,
+              'c'
             )
           );
         }

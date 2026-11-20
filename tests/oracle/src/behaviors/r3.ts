@@ -137,7 +137,8 @@ function restoreVerdict(
       status === 'ok' ? `${clause}-${verb}-not-exact` : `${clause}-${verb}-refused-without-newer-write`,
       { status: 'ok', state: expected, ...(clause === 'c' ? { changesOutside: [] } : {}) },
       { status, state: observed, ...(clause === 'c' ? { changesOutside: outside } : {}) },
-      detail
+      detail,
+      clause
     );
   }
   const unchanged = canonical(s.before) === canonical(s.after);
@@ -147,7 +148,8 @@ function restoreVerdict(
     status === 'refused' ? `${clause}-${verb}-refusal-changed-state` : `${clause}-${verb}-over-newer-write`,
     { status: 'refused', state: s.before as unknown as Json },
     { status, state: s.after as unknown as Json },
-    `${detail}; newer write at step ${newer.map((n) => n.step.index).join(', ')}`
+    `${detail}; newer write at step ${newer.map((n) => n.step.index).join(', ')}`,
+    clause
   );
 }
 
@@ -161,6 +163,11 @@ function historyLength(a: Analysis, i: number): number | undefined {
 export const R3 = instanceProperty({
   id: 'R3',
   row: ROW,
+  clauses: {
+    a: 'undo after confirm reverses the transaction as one operation, or refuses whole per R2',
+    b: "undo removes a rolled-back transaction's entry from history",
+    c: 'redo re-applies exactly what undo reversed, or refuses whole over a newer write',
+  },
   reason:
     '"Nothing of it is reversed" (clause b) is not observable: after the rollback its locations already hold their earlier values, and reversing it once later writes moved them looks the same as undoing those writes (R1). Clause b\'s history check needs the subject to show the entry; a subject that never records an entry for an unsettled transaction is not reached by it. Undo or redo while a pending transaction has changed the locations involved is not checked.',
   instances(trace) {
@@ -202,7 +209,8 @@ export const R3 = instanceProperty({
               'b-rolled-back-entry-kept',
               { historyLength: `at most ${opened - 1}` },
               { historyLength: after ?? null },
-              `undo() at step ${s.index}: the entry of tx${tx.index}, rolled back at step ${tx.settled?.step}, is in history`
+              `undo() at step ${s.index}: the entry of tx${tx.index}, rolled back at step ${tx.settled?.step}, is in history`,
+              'b'
             )
           );
         }

@@ -52,13 +52,18 @@ jobs:
         run: pnpm --filter @signal-tree/oracle typecheck
       - name: Oracle self-tests
         run: pnpm --filter @signal-tree/oracle test
-      # BRIEF.md 12.1.4: the oracle is a spec-driven test generator. Replays must be
-      # deterministic (the gate); old packages violating the spec is expected and
-      # reported, because the spec wins and each such case becomes a new test.
-      - name: Replays are deterministic over 10,000 sequences
-        run: pnpm oracle --determinism --subject v16 --runs 10000
-      - name: Spec cases from the old packages (report only)
+      # BRIEF.md 12.1.4: the oracle is a spec-driven test generator. Old packages
+      # violating the spec is expected and reported, because the spec wins and each
+      # such case becomes a new test. The new core is gated: once it is registered
+      # as the subject `core`, generate exits non-zero when it violates a property
+      # or when a generatable behavior is checked on it fewer than 100 times
+      # (tests/oracle/src/gate.ts). Until then this step is a no-op gate.
+      - name: Spec properties hold on the core, each checked at least 100 times
         run: pnpm oracle generate --runs 10000 --seed 20261119
+      # After generate, so the result is also recorded in its spec-report.json.
+      - name: Replays are deterministic over 10,000 sequences
+        if: ${{ !cancelled() }}
+        run: pnpm oracle --determinism --subject v16 --runs 10000
       - name: Keep the oracle report
         if: always()
         uses: actions/upload-artifact@v4

@@ -25,8 +25,11 @@ export const SUBJECTS: Readonly<Record<string, () => Promise<Subject>>> = {
     }),
 };
 
-/** Subjects `generate` replays when none are named. */
-export const DEFAULT_SUBJECTS = ['v15', 'v16'] as const;
+/**
+ * Subjects `generate` replays when none are named: every registered one, so
+ * the core is checked, and gated (gate.ts), as soon as it is registered here.
+ */
+export const DEFAULT_SUBJECTS: readonly string[] = Object.keys(SUBJECTS);
 
 export async function loadSubject(name: string): Promise<Subject> {
   const load = SUBJECTS[name];
