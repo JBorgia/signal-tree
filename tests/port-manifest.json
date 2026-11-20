@@ -491,7 +491,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W5",
+        "T11",
+        "W6"
+      ]
     },
     {
       "source": "packages/kernel/src/batching-ownership.spec.ts",
@@ -499,7 +503,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "T13"
+      ]
     },
     {
       "source": "packages/kernel/src/carrier-propagation.typing.spec.ts",
@@ -507,7 +514,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins neutral Location/ReadableCell carrier types through construction, derived, entity and asReadonly; API is designed fresh (12.1.2), no row states it"
     },
     {
       "source": "packages/kernel/src/enhancers/batching/batching-adversarial.spec.ts",
@@ -2049,7 +2056,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3"
+      ]
     },
     {
       "source": "packages/kernel/src/kernel-carrier.typing.spec.ts",
@@ -2057,7 +2066,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins kernel leaves, destroyed and entity surfaces to neutral carrier types; API is designed fresh (12.1.2), no row states carriers"
     },
     {
       "source": "packages/kernel/src/lib/a1-independent-review.spec.ts",
@@ -3724,7 +3733,11 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/acquire-projection.spec.ts",
@@ -3732,7 +3745,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/auto-batching.spec.ts",
@@ -3740,7 +3756,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/applied-turn-projection.spec.ts",
@@ -3748,7 +3766,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal AppliedTurnProjection's applied/redo indexes and frontiers on synthetic turns; rows specify undo/redo outcomes, not this index"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/authority-assessment.spec.ts",
@@ -3756,7 +3774,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts assessConfirmedUndo's turn selection per position authority on synthetic turns; no row specifies scoped undo-authority selection"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/causal-runtime.contract.spec.ts",
@@ -3764,14 +3782,25 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T4",
+        "T5",
+        "T6",
+        "T8",
+        "R2",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/committed-entity-selected-unit.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/confirmed-redo.spec.ts",
@@ -3779,7 +3808,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/confirmed-rollback-composition.spec.ts",
@@ -3787,7 +3818,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/confirmed-structural-rollback-composition.spec.ts",
@@ -3795,7 +3828,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/confirmed-undo.spec.ts",
@@ -3803,7 +3839,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/effect-applier.spec.ts",
@@ -3811,7 +3850,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts applyReversalPlan hands planner-ordered effects to the atomic port and leaves bookkeeping alone on failure; no row specifies plan application"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/greenfield-transactions.spec.ts",
@@ -3819,56 +3858,73 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T2",
+        "T4",
+        "T8",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-independent-invalidation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-invalidation-containment.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-live-subject.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "E1",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/heterogeneous-reentry-publication.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/insertion-order.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts the internal orderInsertions planner's anchor-based placement and cycle refusal on plain lists; planner output, not a tree"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/net-order-delta.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts turn order-delta composition, a 2,000-turn property run and linear anchor reads; no row specifies order deltas, and work is an M/S gate"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/order-delta-rebase.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts order-delta rebase drops excluded rows exactly; no row specifies collection order-delta algebra"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/pending-confirmation.spec.ts",
@@ -3876,7 +3932,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T8",
+        "T10",
+        "R3",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/pending-rollback-composition.spec.ts",
@@ -3884,7 +3945,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T3",
+        "T4",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/pending-rollback.spec.ts",
@@ -3892,7 +3957,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/place-field-reversals-while-rows-exist.spec.ts",
@@ -3900,14 +3972,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the reversal planner moves field reversals after a row's re-add and before its removal; no row specifies internal reversal ordering"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/planner-contiguous-boundaries.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts planner scoping of field reversals by owner, lifetime and contiguous turn slices; no row specifies internal reversal planning"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/post-application-failure.spec.ts",
@@ -3915,7 +3987,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/realization-context.spec.ts",
@@ -3923,7 +3997,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the realization-context source's projected values and baseline folding of evicted turns; no row specifies this internal projection"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/reapply-planner.spec.ts",
@@ -3931,7 +4005,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts planConfirmedReapply builds a pure forward plan and refuses evicted turns; no row specifies redo planning internals"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/reclamation-eligibility.spec.ts",
@@ -3939,7 +4013,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal reclamation-eligibility verdict for tombstoned subjects on synthetic turns; an assessor, not a release"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/redo-assessment.spec.ts",
@@ -3947,7 +4021,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts assessConfirmedRedo's prefix/authority eligibility verdicts on synthetic turns; no row specifies redo eligibility selection"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/reversal-planner.spec.ts",
@@ -3955,14 +4029,17 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts planConfirmedReversal builds pure reverse-order plans from surviving boundaries; no row specifies undo planning internals"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/rich-source-completion-boundary.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/structural-pending-rollback-composition.spec.ts",
@@ -3970,7 +4047,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T3",
+        "T4",
+        "T5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/subject-reclamation-coordinator.spec.ts",
@@ -3978,21 +4060,24 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/target-transition-key-handoff.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts structural key-handoff detection (same owner, Object.is keys, indexed scan); no row specifies declarative target selection"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/target-transition-removed-anchor.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts declarative-target placement when an anchor was removed by the same transition; no row specifies collection order targets"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/target-transition.spec.ts",
@@ -4000,7 +4085,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts declarative whole-collection target compilation (SubjectId order, key swaps, owner isolation, prepare-before-install); no row specifies it"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/transaction-capture-bridge.spec.ts",
@@ -4008,7 +4093,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the capture bridge maps write metadata to transaction effects, filtered by owner/id and realization; no row specifies capture mapping"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/tree-realization-adapter.spec.ts",
@@ -4016,14 +4101,18 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "E2",
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/turn-order-record.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts drainTurnOrders treats cancelling reorders as no change and keeps uncomposable records; no row specifies turn order records"
     },
     {
       "source": "packages/kernel/src/lib/internals/causal-runtime/turn-store.spec.ts",
@@ -4031,7 +4120,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts TurnStore admission, promotion, discard, duplicate-id rejection and capacity-eviction indexes; rows specify outcomes, not this store"
     },
     {
       "source": "packages/kernel/src/lib/internals/cell-identity.spec.ts",
@@ -4039,7 +4128,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal cell-identity classifier (tree leaves yes, plain functions or fake .set no); an internal predicate, not a reader or writer"
     },
     {
       "source": "packages/kernel/src/lib/internals/commit-consequence.spec.ts",
@@ -4047,7 +4136,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal commit-consequence registry's per-(owner, id) buffering, discard and rethrow, driven directly with callbacks"
     },
     {
       "source": "packages/kernel/src/lib/internals/custom-markers.spec.ts",
@@ -4055,7 +4144,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins the old registerMarkerProcessor/materializeMarkers extension API (not root app API in v16) and its warnings; an old API shape"
     },
     {
       "source": "packages/kernel/src/lib/internals/derived.spec.ts",
@@ -4063,7 +4152,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diag-journal-1-grouping.spec.ts",
@@ -4071,7 +4162,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-1-correlation.spec.ts",
@@ -4079,7 +4172,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-eviction.spec.ts",
@@ -4087,7 +4182,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-ownership.spec.ts",
@@ -4095,7 +4192,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X2",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/diag-journal-1-retention.spec.ts",
@@ -4103,7 +4203,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X2",
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/flush-0.spec.ts",
@@ -4111,7 +4214,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe of the internal path notifier: when its frames carry a write's full fact per enhancer composition and flush driver; no user-facing reader"
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/flush-probe.spec.ts",
@@ -4119,7 +4222,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe of the internal path notifier recording which enhancer compositions make scalar writes observable to it; internal seam"
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/journal-live-0.spec.ts",
@@ -4127,7 +4230,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts capture rules of the internal, unexported diagnostic journal (flush driver, per-tree scope, dispose, overflow); internal tooling"
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/leaf-observation-support-0.spec.ts",
@@ -4135,7 +4238,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe checking that the causal-runtime capability predicts leaf observability per composition; no row specifies capability predicates"
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/owner-evidence-0.spec.ts",
@@ -4143,7 +4246,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe for a discriminator of unowned collection frames on the path notifier; no row specifies notifier frame classification"
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/owner-scope-0.spec.ts",
@@ -4151,7 +4254,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe recording whether notifier frames carry ownerId per write path; ownerId is tree identity, and no row specifies frame tree tagging"
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/supersession-0.spec.ts",
@@ -4159,7 +4262,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/diagnostics/tree-capabilities-live.spec.ts",
@@ -4167,14 +4272,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe tying the old causal-runtime capability flag to enhancer composition; an old API shape and internal capability"
     },
     {
       "source": "packages/kernel/src/lib/internals/dynamic-realization-composition-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts realized slot-frame commits inside transact() keep their internal admission-participation flag across composition and reentry"
     },
     {
       "source": "packages/kernel/src/lib/internals/enhancer-requirements.spec.ts",
@@ -4182,14 +4287,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins the old enhancers-array capability-requirement validation and its message; an old API shape, configuration is designed fresh (12.1.2)"
     },
     {
       "source": "packages/kernel/src/lib/internals/entity-topology-placement.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts the internal egress projection places held subjects by final-order anchors for any arrival order; planner output, not a tree"
     },
     {
       "source": "packages/kernel/src/lib/internals/intercept-leaf-signals.spec.ts",
@@ -4197,7 +4302,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/intrinsic-mutation-pay-for-use.spec.ts",
@@ -4205,21 +4312,24 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal intrinsic-mutation hooks attach on demand and count releases per source; a pay-for-use optimization, gated by M/S not rows"
     },
     {
       "source": "packages/kernel/src/lib/internals/lazy-runtime-activation.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts capture activation after an empty lifetime prefix keeps delivery and addresses stable; no row specifies runtime activation"
     },
     {
       "source": "packages/kernel/src/lib/internals/link-lifetime-retention.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/location-runtime-retention.spec.ts",
@@ -4227,7 +4337,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/location-runtime.spec.ts",
@@ -4235,7 +4349,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/marker-materialization.spec.ts",
@@ -4243,7 +4361,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/merge-derived-guardrail.spec.ts",
@@ -4251,21 +4371,27 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/native-adapter-flush-error.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/native-epoch-error-drain.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/native-epoch-publication.spec.ts",
@@ -4273,14 +4399,19 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/native-group-error-boundary.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/native-projection-observability.spec.ts",
@@ -4288,7 +4419,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal intrinsic-mutation hook reports before/after on native projection writes and detaches on release; an internal seam"
     },
     {
       "source": "packages/kernel/src/lib/internals/provenance-spike.spec.ts",
@@ -4296,35 +4427,40 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/realization-admission-metadata.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal admission-participation flags for slot frames, preparation reentry and equality throws inside transact()"
     },
     {
       "source": "packages/kernel/src/lib/internals/restoration-metadata.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts restoration designation metadata keeps enumerable evidence without materializing absent fields; no row specifies this metadata shape"
     },
     {
       "source": "packages/kernel/src/lib/internals/scalar-completion-precedence.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/scalar-install-accounting.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "work-count test of slot preparation, installation and equality calls; work and performance are gated by section 6 M/S gates, not rows"
     },
     {
       "source": "packages/kernel/src/lib/internals/subject-restoration-claims.spec.ts",
@@ -4332,7 +4468,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the subject-restoration-claims registry's per-owner retain/release counting and bounds; no row specifies claim bookkeeping"
     },
     {
       "source": "packages/kernel/src/lib/internals/tree-capabilities.spec.ts",
@@ -4340,7 +4476,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the capability resolver's transitive closure, idempotence and acyclicity; no row specifies capability resolution"
     },
     {
       "source": "packages/kernel/src/lib/internals/tree-physical-substrate.spec.ts",
@@ -4348,7 +4484,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/tree-scalar-slot-runtime.spec.ts",
@@ -4356,7 +4495,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/internals/utilities/deep-equal-cycles.spec.ts",
@@ -4364,7 +4505,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal deepEqual helper on cycles, own keys and constructor gating; helper-level only, no write or reader"
     },
     {
       "source": "packages/kernel/src/lib/internals/utilities/deep-equal-parity.spec.ts",
@@ -4372,7 +4513,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "refactor guard: the internal deepEqual loop conversion agrees with the old implementation on 20,000 pairs; helper parity only"
     },
     {
       "source": "packages/kernel/src/lib/internals/utilities/deep-equal.property.spec.ts",
@@ -4380,7 +4521,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "property tests of the internal deepEqual helper (reflexive, symmetric, NaN, built-ins); helper-level only, no write or reader"
     },
     {
       "source": "packages/kernel/src/lib/internals/utilities/shared-utils.spec.ts",
@@ -4388,7 +4529,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal deepClone helper copies nested values, built-ins and cycles, including its manual fallback; internal utility"
     },
     {
       "source": "packages/kernel/src/lib/internals/utilities/shared.spec.ts",
@@ -4396,7 +4537,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts basics of the internal deepClone, deepEqual and isBuiltInObject helpers; internal utilities"
     },
     {
       "source": "packages/kernel/src/lib/internals/write-observation-scope.spec.ts",
@@ -4404,7 +4545,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1",
+        "W5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/joint-atomic-preparation.spec.ts",
@@ -6604,7 +6748,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins asReadonly() typing through the public barrel (reads typed, writes rejected); API is designed fresh (12.1.2), no row states it"
     },
     {
       "source": "packages/kernel/src/react-observation-contract.typing.spec.ts",
@@ -6612,7 +6756,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins ReadonlyLocation.subscribe and adapter-only observeOwnerInvalidation types; API is designed fresh (12.1.2), no row states it"
     },
     {
       "source": "packages/kernel/src/tooling-admission.typing.spec.ts",
@@ -6620,7 +6764,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins which tree spellings the tooling readers admit at compile time; X2's read-only rule is not asserted, API is designed fresh (12.1.2)"
     },
     {
       "source": "packages/react/src/joint-rich-publication.spec.ts",
