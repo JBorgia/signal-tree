@@ -11,7 +11,10 @@
 //     stands);
 // (b) and (c) skip transactions that rekey a row: a rekey spans two keys, so
 //     which key names the change, and whether a write to the other key
-//     supersedes it, is not fixed by the row.
+//     supersedes it, is not fixed by the row. They also skip a transaction
+//     whose own change set cannot be told apart from other writes in its step
+//     (analysis.ts TxInfo.unknown: an unreadable state, a scope that awaited,
+//     an observer's reentrant write).
 // (d) once confirm() or rollback() succeeded, every later inspect() returns
 //     the same report (the snapshot).
 // Locations are T4's (analysis.ts): a path names a leaf, a row field
@@ -78,7 +81,7 @@ export const T9 = instanceProperty({
           );
         }
       }
-      if (pending && !rekeys) {
+      if (pending && !rekeys && !tx.unknown) {
         const between = analysis.steps.slice(tx.step + 1, s.index);
         const untouched = (locs: readonly Loc[]) =>
           between.every((b) => !b.unknown && !overlapsAny(b.changed, locs) && locs.every((loc) => !mayWrite(b.op, loc)));

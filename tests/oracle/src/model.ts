@@ -15,7 +15,11 @@
 // same way every subject does:
 // - a `transact` that returns ok opens the next transaction handle;
 // - every applied `linkOpen` (ok or error) opens the next link handle;
-// - a `rowHold` that returns ok with a `handle` opens the next row handle.
+// - a `rowHold` that returns ok with a `handle` opens the next row handle;
+// - a `scopeAwait` with scope `transact` that returns ok opens the next
+//   transaction handle;
+// - an `observe` that returns ok with an `observer` value opens the next
+//   observer handle.
 // A step's reference is resolved modulo the handles opened before it.
 
 /** Scalar leaves in the fixture state. `cfg` is the one branch. */
@@ -55,6 +59,31 @@ export type LinkSource = (typeof LINK_SOURCES)[number];
 export type LinkMode = 'sync' | 'deferred' | 'failing';
 
 export type AddManyMode = 'strict' | 'skip' | 'overwrite';
+
+/**
+ * A read path an `observe` observer subscribes to (BRIEF.md 12.4 O1): a leaf,
+ * one field of the row `rows.byId(id)` returns when the observer opens, or a
+ * collection reader.
+ */
+export type Reader =
+  | { readonly kind: 'leaf'; readonly path: LeafPath }
+  | { readonly kind: 'field'; readonly id: RowKey; readonly field: RowField }
+  | { readonly kind: 'all' }
+  | { readonly kind: 'ids' }
+  | { readonly kind: 'count' };
+
+/**
+ * What an `observe` observer does each time it runs, after recording the run:
+ * none   nothing more
+ * throw  throws (a faulty observer, X3)
+ * write  writes `path` with a value no other operation writes (10, 11, ...),
+ *        a reentrant write (O4); at most once between two observations, so
+ *        a chain of reentrant writes always ends
+ */
+export type Reaction =
+  | { readonly kind: 'none' }
+  | { readonly kind: 'throw' }
+  | { readonly kind: 'write'; readonly path: LeafPath };
 
 /** Locations an observer can subscribe to: the scalar leaves and the `cfg` branch. */
 export const OBSERVED_PATHS = ['a', 'cfg.p', 'cfg.q', 'cfg'] as const;
@@ -146,7 +175,27 @@ export type Op =
   /** Read the row through a held handle: ok with `{ handle, value, carrier }`. */
   | { readonly kind: 'rowHeldRead'; readonly handle: number }
   /** Write field `n` through a held handle: ok with `{ handle, carrier }`. */
-  | { readonly kind: 'rowHeldWrite'; readonly handle: number; readonly n: number };
+  | { readonly kind: 'rowHeldWrite'; readonly handle: number; readonly n: number }
+  /** Subscribe an observer to `reader`; ok with `{ observer }`, ok with `{ found: false }` for a field of a missing row. */
+  | { readonly kind: 'observe'; readonly reader: Reader; readonly react: Reaction }
+  /** tree.destroy(). */
+  | { readonly kind: 'destroy' }
+  /**
+   * Serialize the tree through its snapshot read, hydrate a fresh tree (same
+   * plugins, with an observer on each leaf) by a whole-value write of the
+   * parsed snapshot, and report the fresh tree: ok with HydrateValue.
+   */
+  | { readonly kind: 'hydrate' }
+  /**
+   * Run `scope(async () => { before; await; after })` with scope transact()
+   * or undoable(); the step waits for the body to finish.
+   */
+  | {
+      readonly kind: 'scopeAwait';
+      readonly scope: 'transact' | 'undoable';
+      readonly before: readonly WriteOp[];
+      readonly after: readonly WriteOp[];
+    };
 
 export type ControlKind = Exclude<Op['kind'], 'write'>;
 /** Every operation kind a subject may or may not support. */
@@ -170,6 +219,10 @@ export const CONTROL_KINDS: readonly ControlKind[] = [
   'rowHold',
   'rowHeldRead',
   'rowHeldWrite',
+  'observe',
+  'destroy',
+  'hydrate',
+  'scopeAwait',
 ];
 
 export const ALL_KINDS: readonly OpKind[] = [...WRITE_KINDS, ...CONTROL_KINDS];
@@ -254,8 +307,51 @@ export interface Observation {
   readonly treeErrors: readonly { readonly operation: string; readonly path?: string; readonly error: ErrorInfo }[];
   /** console.warn / console.error calls since the previous observation. */
   readonly warnings: readonly { readonly level: 'warn' | 'error'; readonly st?: string; readonly message: string }[];
-  /** Times an `observerOpen` observer was notified (and threw) since the previous observation. */
+  /**
+   * Times an observer was notified and threw since the previous observation:
+   * every `observerOpen` observer, and `observe` observers with react throw.
+   */
   readonly observerThrows: number;
+  /**
+   * What `observe` observers did since the previous observation, in order: a
+   * run (with the state it read when it ran) or a reentrant write it made.
+   */
+  readonly observerEvents?: readonly ObserverEvent[];
+  /** Every read path read now; absent when the subject cannot read them all. */
+  readonly paths?: ReadPaths | { readonly readError: ErrorInfo };
+  /** Restoration state read as the step's operation returned, before any drain. */
+  readonly restorationAtReturn?: NonNullable<Observation['restoration']>;
+}
+
+export type ObserverEvent =
+  | { readonly kind: 'run'; readonly observer: number; readonly saw: StateView | { readonly readError: ErrorInfo } }
+  | {
+      readonly kind: 'write';
+      readonly observer: number;
+      readonly path: LeafPath;
+      readonly value: number;
+      readonly error?: ErrorInfo;
+    };
+
+/** The state through every read path O3 names. */
+export interface ReadPaths {
+  /** Each leaf read on its own. */
+  readonly leaves: { readonly a: Json; readonly 'cfg.p': Json; readonly 'cfg.q': Json };
+  /** The `cfg` branch read whole. */
+  readonly branch: Json;
+  /** The root snapshot read, `tree.$()`. */
+  readonly snapshot: Json;
+  readonly count: Json;
+  /** `byId(key)` for every key in ROW_KEYS: the row read whole and each field read on its own; null when byId returns nothing. */
+  readonly byId: Readonly<Record<string, { readonly row: Json; readonly fields: Readonly<Record<string, Json>> } | null>>;
+}
+
+/** The value a `hydrate` step returns. */
+export interface HydrateValue {
+  /** The fresh tree after hydration. */
+  readonly state: StateView | { readonly readError: ErrorInfo };
+  /** One per leaf observer on the fresh tree: how often it ran during hydration, and what it read each time. */
+  readonly observers: readonly { readonly path: string; readonly saw: readonly (StateView | { readonly readError: ErrorInfo })[] }[];
 }
 
 /**
@@ -298,7 +394,12 @@ export function pluginForKind(kind: OpKind): Plugin | undefined {
 
 /** Plugins a step needs that `config` does not install. */
 export function missingPlugins(op: Op, config: TreeConfig): readonly Plugin[] {
-  const plugin = pluginForKind(op.kind === 'write' ? op.write.kind : op.kind);
+  const plugin =
+    op.kind === 'scopeAwait'
+      ? op.scope === 'transact'
+        ? 'transactions'
+        : undefined
+      : pluginForKind(op.kind === 'write' ? op.write.kind : op.kind);
   return plugin && !config[plugin] ? [plugin] : [];
 }
 
@@ -310,8 +411,22 @@ export function kindsOf(op: Op): readonly OpKind[] {
     case 'transact':
     case 'declare':
       return [op.kind, ...op.body.map((w) => w.kind)];
+    case 'scopeAwait':
+      return [op.kind, ...op.before.map((w) => w.kind), ...op.after.map((w) => w.kind)];
     default:
       return [op.kind];
+  }
+}
+
+/** A reader in dot form: `a`, `rows.r1.n`, `rows.all()`. */
+export function formatReader(r: Reader): string {
+  switch (r.kind) {
+    case 'leaf':
+      return r.path;
+    case 'field':
+      return `rows.${r.id}.${r.field}`;
+    default:
+      return `rows.${r.kind}()`;
   }
 }
 
@@ -326,6 +441,10 @@ export function patternOf(op: Op): string {
       return `declare(${op.declaration})`;
     case 'linkOpen':
       return `linkOpen(${op.mode})`;
+    case 'observe':
+      return `observe(${op.react.kind})`;
+    case 'scopeAwait':
+      return `scopeAwait(${op.scope})`;
     default:
       return op.kind;
   }
@@ -419,6 +538,16 @@ export function formatOp(op: Op): string {
       return `rowHeldRead(h${op.handle})`;
     case 'rowHeldWrite':
       return `rowHeldWrite(h${op.handle},n=${op.n})`;
+    case 'observe': {
+      const react = op.react.kind === 'write' ? `, writes ${op.react.path}` : op.react.kind === 'throw' ? ', throws' : '';
+      return `observe(${formatReader(op.reader)}${react})`;
+    }
+    case 'destroy':
+      return 'destroy()';
+    case 'hydrate':
+      return 'hydrate()';
+    case 'scopeAwait':
+      return `${op.scope}(async () => { ${op.before.map(formatWrite).join('; ')}; await; ${op.after.map(formatWrite).join('; ')} })`;
   }
 }
 

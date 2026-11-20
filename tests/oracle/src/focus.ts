@@ -3,8 +3,9 @@
 // back in a chosen order, a row removed by newer truth after a transaction
 // rekeyed it, a held handle whose key is reused). Each shape lays out those
 // steps with random parameters; random steps from the uniform vocabulary are
-// mixed in between. Shapes only arrange operations: what any outcome should
-// be is still decided by the behavior properties alone.
+// mixed in between, and one focused sequence in five ends with destroy() and
+// a few operations after it (D1). Shapes only arrange operations: what any
+// outcome should be is still decided by the behavior properties alone.
 import fc from 'fast-check';
 import type { PluginMode } from './generate.js';
 import {
@@ -15,6 +16,8 @@ import {
   type LinkSource,
   type Op,
   type OpKind,
+  type Reaction,
+  type Reader,
   type Row,
   type RowKey,
   type Sequence,
@@ -26,6 +29,8 @@ import {
 interface Shape {
   /** Operation kinds the shape uses; it is left out when any is not generated. */
   readonly needs: readonly OpKind[];
+  /** Relative frequency among the shapes; 2 when absent (so a newer shape can be drawn half as often as the others). */
+  readonly weight?: number;
   readonly plugins: boolean;
   /** Segments; random steps may be mixed in between them. */
   readonly segments: fc.Arbitrary<Step[][]>;
@@ -311,6 +316,103 @@ const disposedLink: Shape = {
     }),
 };
 
+/**
+ * Observers on a leaf and on a row, some throwing or writing reentrantly, then
+ * writes that reach them, skip them (the same value again, another row,
+ * another field) or publish a whole turn (a transaction rolled back, an undo)
+ * (O1, O2, O4, X3).
+ */
+const observed: Shape = {
+  needs: ['observe', 'addOne', 'setLeaf', 'updateOne', 'setField', 'transact', 'rollback', 'undo'],
+  weight: 2,
+  plugins: true,
+  segments: fc
+    .record({
+      keys: twoKeys,
+      v: value,
+      watchers: fc.integer({ min: 0, max: 2 ** 9 - 1 }),
+      order: fc.array(fc.nat({ max: 6 }), { minLength: 3, maxLength: 6 }),
+    })
+    .map(({ keys: [k, second], v, watchers, order }) => {
+      const watch = (reader: Reader, react: Reaction = { kind: 'none' }): Op => ({ kind: 'observe', reader, react });
+      const all: Op[] = [
+        watch({ kind: 'leaf', path: 'a' }),
+        watch({ kind: 'leaf', path: 'a' }, { kind: 'throw' }),
+        watch({ kind: 'leaf', path: 'a' }, { kind: 'write', path: 'cfg.q' }),
+        watch({ kind: 'leaf', path: 'cfg.q' }),
+        watch({ kind: 'field', id: k, field: 'n' }),
+        watch({ kind: 'field', id: k, field: 'n' }, { kind: 'throw' }),
+        watch({ kind: 'field', id: k, field: 'm' }, { kind: 'write', path: 'a' }),
+        watch({ kind: 'all' }),
+        watch({ kind: 'count' }),
+        // Subscribed after the writers, so it runs after their reentrant writes (O4).
+        watch({ kind: 'leaf', path: 'a' }),
+      ];
+      // The first and last observers on `a`, and a writer on `a` three times in four.
+      const chosen = all.filter((_, i) => i === 0 || i === all.length - 1 || (i === 2 && watchers % 4 !== 0) || (watchers >> i) % 2 === 1);
+      const writes: Step[][] = [
+        one(write({ kind: 'setLeaf', path: 'a', value: v })),
+        one(write({ kind: 'setLeaf', path: 'a', value: v })),
+        one(write({ kind: 'updateOne', id: second, field: 'n', value: v })),
+        one(write({ kind: 'setField', id: k, field: 'n', value: 0 })),
+        one(write({ kind: 'updateOne', id: k, field: 'm', value: v })),
+        [
+          step(transact([{ kind: 'setLeaf', path: 'a', value: other(v) }, { kind: 'setLeaf', path: 'cfg.p', value: v }])),
+          step(settle('rollback', 0)),
+        ],
+        [step(write({ kind: 'setLeaf', path: 'a', value: other(v) }, 'undoable')), step({ kind: 'undo' })],
+      ];
+      return [
+        [step(write({ kind: 'addOne', row: { id: k, n: 0, m: 0 } })), step(write({ kind: 'addOne', row: { id: second, n: 0, m: 0 } }))],
+        chosen.map((op) => step(op)),
+        ...order.map((i) => writes[i] as Step[]),
+      ];
+    }),
+};
+
+/** An awaiting transact() or undoable() scope, then the rollback or undo that would reverse it (W5). */
+const awaitScope: Shape = {
+  needs: ['scopeAwait', 'setLeaf', 'updateOne', 'addOne', 'rollback', 'undo'],
+  weight: 3,
+  plugins: true,
+  segments: fc
+    .record({
+      scope: fc.constantFrom<'transact' | 'undoable'>('transact', 'undoable'),
+      paths: fc.tuple(leaf, leaf).filter(([x, y]) => x !== y),
+      k: key,
+      row: fc.boolean(),
+      v: value,
+    })
+    .map(({ scope, paths: [x, y], k, row, v }) => {
+      const after: WriteOp = row ? { kind: 'updateOne', id: k, field: 'm', value: v } : { kind: 'setLeaf', path: y, value: v };
+      return [
+        ...(row ? [one(write({ kind: 'addOne', row: { id: k, n: 0, m: 0 } }))] : []),
+        one({ kind: 'scopeAwait', scope, before: [{ kind: 'setLeaf', path: x, value: v }], after: [after] }),
+        one(scope === 'transact' ? settle('rollback', 0) : { kind: 'undo' }),
+      ];
+    }),
+};
+
+/**
+ * destroy(), then reads and writes of every kind (D1). Appended to some
+ * focused sequences, after their own steps, so every shape keeps what it
+ * reaches and nothing is drawn less often.
+ */
+const disposal: fc.Arbitrary<Step[]> = fc
+  .record({ k: key, v: value, after: fc.shuffledSubarray([0, 1, 2, 3, 4, 5, 6], { minLength: 2, maxLength: 4 }) })
+  .map(({ k, v, after }) => {
+    const later: Op[] = [
+      write({ kind: 'setLeaf', path: 'a', value: v }),
+      write({ kind: 'addOne', row: { id: k, n: v, m: 0 } }),
+      transact([{ kind: 'setLeaf', path: 'cfg.p', value: v }]),
+      { kind: 'undo' },
+      { kind: 'observe', reader: { kind: 'leaf', path: 'a' }, react: { kind: 'none' } },
+      { kind: 'rowHold', id: k },
+      { kind: 'hydrate' },
+    ];
+    return [step({ kind: 'destroy' }), ...after.map((i) => step(later[i] as Op))];
+  });
+
 /** Mixes random steps into the gaps between a shape's segments, mostly none. */
 function withNoise(segments: fc.Arbitrary<Step[][]>, noise: fc.Arbitrary<Step>, maxSteps: number): fc.Arbitrary<Step[]> {
   const gap = fc.oneof(
@@ -337,13 +439,22 @@ export function focusedArb(options: {
     undoAroundTransaction,
     throwingObserver,
     disposedLink,
+    observed,
+    awaitScope,
   ].filter(
     (shape) => shape.needs.every((kind) => options.kinds.has(kind)) && !(shape.plugins && options.plugins === 'none')
   );
   if (shapes.length === 0) return undefined;
   const on = options.plugins !== 'none';
-  return fc.oneof(...shapes.map((shape) => withNoise(shape.segments, options.noise, options.maxSteps))).map((steps) => ({
+  const disposalKinds: readonly OpKind[] = ['destroy', 'setLeaf', 'addOne', 'transact', 'undo', 'observe', 'rowHold', 'hydrate'];
+  const ending = disposalKinds.every((kind) => options.kinds.has(kind))
+    ? fc.oneof({ arbitrary: fc.constant<Step[]>([]), weight: 4 }, { arbitrary: disposal, weight: 1 })
+    : fc.constant<Step[]>([]);
+  const shaped = fc.oneof(
+    ...shapes.map((shape) => ({ arbitrary: withNoise(shape.segments, options.noise, options.maxSteps), weight: shape.weight ?? 2 }))
+  );
+  return fc.tuple(shaped, ending).map(([steps, end]) => ({
     config: { transactions: on, restoration: on },
-    steps,
+    steps: [...steps, ...end].slice(0, options.maxSteps),
   }));
 }

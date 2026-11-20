@@ -3,10 +3,16 @@
 // any other row is listed with the reason it cannot be generated yet.
 // Where a row leaves room, the properties' readings are provisional pending
 // Jonathan's answer on #23 (BRIEF.md 11.2).
+import { D1 } from './d1.js';
 import { E1 } from './e1.js';
 import { E2 } from './e2.js';
+import { H1 } from './h1.js';
 import { L1 } from './l1.js';
 import { L2 } from './l2.js';
+import { O1 } from './o1.js';
+import { O2 } from './o2.js';
+import { O3 } from './o3.js';
+import { O4 } from './o4.js';
 import { R1 } from './r1.js';
 import { R2 } from './r2.js';
 import { R3 } from './r3.js';
@@ -19,14 +25,16 @@ import { T5 } from './t5.js';
 import { T6 } from './t6.js';
 import { T7 } from './t7.js';
 import { T9 } from './t9.js';
+import { W5 } from './w5.js';
 import { X1 } from './x1.js';
+import { X3 } from './x3.js';
 import { BEHAVIOR_IDS, type BehaviorId, type CatalogEntry, type Property, type Unexpressed } from './types.js';
 
 const NEW_BEHAVIOR =
   'New behavior (5.2): the published packages have no writer identity, holds or chunked ingest, so replaying them cannot exhibit it; it is tested against the new core.';
 
-const ROWS_12_4 =
-  'Added in BRIEF.md 12.4; the properties for the rows the vocabulary can express follow in this pull request.';
+const RELEASED_MEMORY =
+  'Needs a garbage-collection observation (a WeakRef or FinalizationRegistry cleared after a forced collection), which a replay cannot make deterministic; covered by hand-written tests on the new core.';
 
 const UNEXPRESSED: readonly Unexpressed[] = [
   {
@@ -81,62 +89,14 @@ const UNEXPRESSED: readonly Unexpressed[] = [
     reason: NEW_BEHAVIOR,
   },
   {
-    id: 'O1',
-    generatable: false,
-    row: '**Fine-grained observation.** A reader re-runs only when a location it read changed (as defined in T4). A write the seam skips as unchanged re-runs nothing. A row or `byId` reader does not re-run for writes to other rows.',
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'O2',
-    generatable: false,
-    row: '**Turn atomicity for observers.** Every observer sees a turn (including undo, redo, rollback and one chunk of an ingest) as one change: it runs at most once per turn and never sees part of a turn applied. History state (`canUndo`, `canRedo`, position) changes in the same turn.',
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'O3',
-    generatable: false,
-    row: '**Read-path consistency.** After every turn, all read paths (leaf, row field, `byId`, `all()`, `ids()`, `count()`, snapshot) agree.',
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'O4',
-    generatable: false,
-    row: "**Reentrant writes.** A write made by an observer while a turn is being published is applied after that turn as its own turn, attributed to the observer's writer context. It is never lost or merged into the turn being published.",
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'X3',
-    generatable: false,
-    row: '**Fault containment.** When an observer, link or plugin throws during any publication (including undo, redo and rollback), every other observer, link and plugin still runs, and state stays consistent. Errors are reported per T10 and are never thrown to the writer whose write was being published.',
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'D1',
-    generatable: false,
-    row: '**Disposal.** Destroying a tree, or the Angular injector or Vue effect scope that owns it, releases every cell, subscription, link and plugin state. Afterwards every read or write throws a typed error, and teardown errors reach `onTreeError`.',
-    reason: ROWS_12_4,
-  },
-  {
     id: 'D2',
     generatable: false,
     row: '**Released memory.** A removed row or field releases its memory once no history entry, pending transaction or held handle references it.',
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'W5',
-    generatable: false,
-    row: '**Synchronous context.** A writer context and turn membership never carry across an `await`. Async work captures its context explicitly, as the ingest handle does (ruling 6).',
-    reason: ROWS_12_4,
-  },
-  {
-    id: 'H1',
-    generatable: false,
-    row: "**Hydration.** State serialized on the server and hydrated on the client yields identical values. Hydration is one turn with origin `'server'`.",
-    reason: ROWS_12_4,
+    reason: RELEASED_MEMORY,
   },
 ];
 
-const PROPERTIES: readonly Property[] = [T1, T2, T3, T4, T5, T6, T7, T9, T10, R1, R2, R3, E1, E2, L1, L2, X1];
+const PROPERTIES: readonly Property[] = [T1, T2, T3, T4, T5, T6, T7, T9, T10, R1, R2, R3, E1, E2, L1, L2, X1, O1, O2, O3, O4, X3, D1, W5, H1];
 
 const byId = new Map<BehaviorId, CatalogEntry>([...PROPERTIES, ...UNEXPRESSED].map((e) => [e.id, e]));
 

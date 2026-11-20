@@ -43,6 +43,7 @@ export const R2 = instanceProperty({
       const { op, outcome } = s;
       const ran = outcome.status === 'ok' || outcome.status === 'error';
       if (op.kind === 'transact' && op.undoable && ran) fixed = false;
+      if (op.kind === 'scopeAwait' && op.scope === 'undoable' && ran) fixed = false;
       if (op.kind === 'redo' && outcome.status === 'ok') fixed = false;
       if (op.kind === 'write' && op.wrap === 'undoable' && ran) {
         if (outcome.status !== 'ok' || s.unknown || !s.touches || s.changed.size === 0) fixed = false;

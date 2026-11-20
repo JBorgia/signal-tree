@@ -14,6 +14,8 @@ import {
   type DeclarationKind,
   type Op,
   type OpKind,
+  type Reaction,
+  type Reader,
   type Row,
   type Sequence,
   type Step,
@@ -66,11 +68,18 @@ const WEIGHTS: Record<OpKind, number> = {
   linkRetrieve: 1,
   linkPush: 1,
   linkAck: 1,
-  declare: 3,
+  // Raised from 3 when 12.4 grew the vocabulary, so L2 keeps its share of draws.
+  declare: 4,
   observerOpen: 1,
   rowHold: 2,
   rowHeldRead: 1,
   rowHeldWrite: 2,
+  observe: 3,
+  // Never drawn uniformly: everything after a destroy() is D1's alone, so a uniform draw would cut sequences short
+  // for every other behavior. focus.ts appends it to the end of some focused sequences instead.
+  destroy: 0,
+  hydrate: 1,
+  scopeAwait: 1,
 };
 
 const small = fc.integer({ min: 0, max: 3 });
@@ -80,6 +89,18 @@ const field = fc.constantFrom(...ROW_FIELDS);
 const rows = fc.array(row, { maxLength: 4 });
 const keys = fc.array(key, { minLength: 1, maxLength: 3 });
 const ref = fc.nat({ max: 3 });
+
+const leafPath = fc.constantFrom(...LEAF_PATHS);
+const reader: fc.Arbitrary<Reader> = fc.oneof(
+  { arbitrary: leafPath.map((path): Reader => ({ kind: 'leaf', path })), weight: 3 },
+  { arbitrary: fc.record({ kind: fc.constant('field' as const), id: key, field }), weight: 3 },
+  { arbitrary: fc.constantFrom<Reader>({ kind: 'all' }, { kind: 'ids' }, { kind: 'count' }), weight: 2 }
+);
+const reaction: fc.Arbitrary<Reaction> = fc.oneof(
+  { arbitrary: fc.constant<Reaction>({ kind: 'none' }), weight: 4 },
+  { arbitrary: fc.constant<Reaction>({ kind: 'throw' }), weight: 1 },
+  { arbitrary: leafPath.map((path): Reaction => ({ kind: 'write', path })), weight: 1 }
+);
 
 /** First alternative is what fast-check shrinks towards. */
 const weighted = <T>(first: [T, number], ...rest: [T, number][]): fc.Arbitrary<T> =>
@@ -141,12 +162,21 @@ function controlArbs(write: fc.Arbitrary<WriteOp> | undefined): Partial<Record<C
     rowHold: fc.record({ kind: fc.constant('rowHold'), id: key }),
     rowHeldRead: fc.record({ kind: fc.constant('rowHeldRead'), handle: ref }),
     rowHeldWrite: fc.record({ kind: fc.constant('rowHeldWrite'), handle: ref, n: small }),
+    observe: fc.record({ kind: fc.constant('observe'), reader, react: reaction }),
+    destroy: fc.constant({ kind: 'destroy' }),
+    hydrate: fc.constant({ kind: 'hydrate' }),
   };
   if (write) {
     arbs.transact = fc.record({
       kind: fc.constant('transact'),
       body: fc.array(write, { minLength: 1, maxLength: 3 }),
       undoable: weighted<boolean>([false, 3], [true, 2]),
+    });
+    arbs.scopeAwait = fc.record({
+      kind: fc.constant('scopeAwait'),
+      scope: fc.constantFrom<'transact' | 'undoable'>('transact', 'undoable'),
+      before: fc.array(write, { minLength: 1, maxLength: 2 }),
+      after: fc.array(write, { minLength: 1, maxLength: 2 }),
     });
     arbs.declare = fc.record({
       kind: fc.constant('declare'),
@@ -192,7 +222,7 @@ export function stepArb(kinds: ReadonlySet<OpKind>): fc.Arbitrary<Step> {
     });
   }
   for (const [kind, arbitrary] of Object.entries(control) as [ControlKind, fc.Arbitrary<Op>][]) {
-    if (kinds.has(kind)) alternatives.push({ arbitrary, weight: WEIGHTS[kind] });
+    if (kinds.has(kind) && WEIGHTS[kind] > 0) alternatives.push({ arbitrary, weight: WEIGHTS[kind] });
   }
   if (alternatives.length === 0) throw new Error('no operation kinds to generate');
   return fc.record({
@@ -202,7 +232,7 @@ export function stepArb(kinds: ReadonlySet<OpKind>): fc.Arbitrary<Step> {
 }
 
 /**
- * Sequences: three in four are uniform draws over the vocabulary; one in four
+ * Sequences: two in three are uniform draws over the vocabulary; one in three
  * starts from a focused shape (focus.ts) that reaches behaviors uniform
  * draws rarely do, with random steps mixed in.
  */
@@ -217,5 +247,5 @@ export function sequenceArb(options: GenerateOptions): fc.Arbitrary<Sequence> {
     steps: fc.array(step, { minLength: 1, maxLength: options.maxSteps, size: 'max' }),
   });
   const focused = options.focus === false ? undefined : focusedArb({ kinds, plugins: options.plugins, maxSteps: options.maxSteps, noise: step });
-  return focused ? fc.oneof({ arbitrary: uniform, weight: 3 }, { arbitrary: focused, weight: 1 }) : uniform;
+  return focused ? fc.oneof({ arbitrary: uniform, weight: 2 }, { arbitrary: focused, weight: 1 }) : uniform;
 }

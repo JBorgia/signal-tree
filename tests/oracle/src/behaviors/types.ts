@@ -3,6 +3,7 @@
 // what a subject did (BRIEF.md 12.1.1, 12.1.4).
 import type { Json } from '../model.js';
 import type { SpecTrace } from '../trace.js';
+import { analyze, destroyedAt } from './analysis.js';
 
 /** Every behavior in BRIEF.md 5.1, 5.2 and 12.4, in table order. */
 export const BEHAVIOR_IDS = [
@@ -83,12 +84,15 @@ export type Instance = Verdict;
 
 /**
  * Builds a property from a function listing every place in a trace where the
- * row applies. Instances are computed once per trace.
+ * row applies. Instances are computed once per trace. Once a tree is
+ * destroyed, what it does is D1's matter alone: instances at or after a
+ * destroy() that returned are dropped unless `afterDestroy` is set.
  */
 export function instanceProperty(def: {
   readonly id: BehaviorId;
   readonly row: string;
   readonly reason?: string;
+  readonly afterDestroy?: boolean;
   readonly instances: (trace: SpecTrace) => readonly Instance[];
 }): Property {
   const cache = new WeakMap<SpecTrace, readonly Instance[]>();
@@ -96,6 +100,8 @@ export function instanceProperty(def: {
     let found = cache.get(trace);
     if (!found) {
       found = def.instances(trace);
+      const destroyed = def.afterDestroy ? undefined : destroyedAt(analyze(trace));
+      if (destroyed !== undefined) found = found.filter((i) => i.step < destroyed);
       cache.set(trace, found);
     }
     return found;
