@@ -37,6 +37,47 @@ describe('tagged test units', () => {
   });
 });
 
+describe('file context in tagged unit hashes (option 1 on #27)', () => {
+  const contextFile = (helper: string, hook: string, mock: string, untagged: string, other: string) =>
+    file(`vi.mock('vitest', async () => ({ ...(await vi.importActual('vitest')), ${mock} }));
+const check = (n: number) => ${helper};
+describe('rollback', () => {
+  beforeEach(() => { ${hook} });
+  it('${tag('T3')} refuses the older one', () => { check(1); });
+  it('an untagged sibling', () => { ${untagged} });
+});
+it('${tag('T4')} later confirmed write', () => { ${other} });
+describe('untagged group', () => { beforeEach(() => {}); it('plain', () => { ${untagged} }); });`);
+  const base = ['expect(n).toBe(1)', 'reset()', 'extra: 1', 'expect(1).toBe(1)', 'expect(2).toBe(2)'] as const;
+  const hashes = (...parts: string[]) => Object.fromEntries(taggedUnits(contextFile(...(parts as [string, string, string, string, string]))).map((u: { title: string; sha256: string }) => [u.title, u.sha256]));
+  const before = hashes(...base);
+  const withPart = (i: number, value: string) => hashes(...base.map((p, j) => (j === i ? value : p)));
+  const titles = Object.keys(before);
+
+  it('finds both tagged units', () => {
+    expect(titles).toEqual([`rollback > ${tag('T3')} refuses the older one`, `${tag('T4')} later confirmed write`]);
+  });
+
+  it.each([
+    ['a file-level helper', 0, 'expect(n).toBeTruthy()'],
+    ['a hook in an untagged describe that holds a tagged test', 1, 'reset(); skip()'],
+    ['a file-level vi.mock', 2, 'extra: 2'],
+  ])('changes every tagged unit in the file when %s changes', (_what, i, value) => {
+    const after = withPart(i as number, value as string);
+    for (const t of titles) expect(after[t]).not.toBe(before[t]);
+  });
+
+  it('ignores untagged tests, including those beside tagged ones', () => {
+    expect(withPart(3, 'expect(1).toBe(0)')).toEqual(before);
+  });
+
+  it('keeps one tagged unit unchanged when another changes', () => {
+    const after = withPart(4, 'expect(2).toBe(0)');
+    expect(after[titles[0]!]).toBe(before[titles[0]!]);
+    expect(after[titles[1]!]).not.toBe(before[titles[1]!]);
+  });
+});
+
 describe('spec-tests check', () => {
   const repo = (source: string) => {
     const root = mkdtempSync(join(tmpdir(), 'signal-tree-spec-'));

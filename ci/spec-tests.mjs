@@ -8,9 +8,14 @@
 //   node ci/spec-tests.mjs update    rewrite tests/spec-tests.json from the tests
 //
 // A tagged unit is an it(), test(), describe() or suite() call whose title
-// carries one or more IDs; its hash covers the call's exact source, so a
-// tagged describe or suite covers every test inside it. Test files are
-// *.spec.ts, *.test.ts and *.prop.ts under packages/ and tests/.
+// carries one or more IDs. Its hash covers the call's exact source, so a
+// tagged describe or suite covers every test inside it, plus the file's code
+// outside test calls (Jonathan, option 1 on #27): imports, helpers, hooks,
+// mocks, and the bodies of untagged describes that hold tagged tests. Editing
+// any of that changes every tagged unit in the file. Untagged tests, and
+// untagged describes with no tagged test inside, stay out of it and can
+// change freely. Test files are *.spec.ts, *.test.ts and *.prop.ts under
+// packages/ and tests/.
 //
 // A file with tagged tests may import only (Jonathan, review of #19): a
 // package's public entry point (an export of packages/*/package.json), a
@@ -61,29 +66,66 @@ function titleOf(call) {
   return null;
 }
 
+const sha256 = (text) => createHash('sha256').update(text).digest('hex');
+
 /** Tagged units in one file's source: [{ title, ids, sha256 }]. */
 export function taggedUnits(source, fileName = 'test.ts') {
   const file = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  const units = [];
+  const found = [];
   const seen = new Map();
+  // Pass 1: every titled test call, with its title path and whether it or a descendant is tagged.
   const visit = (node, path) => {
     let childPath = path;
+    let tagged = false;
+    let call = null;
     if (ts.isCallExpression(node) && testFunction(node.expression)) {
       const title = titleOf(node);
       if (title !== null) {
         childPath = [...path, title];
         const ids = [...new Set([...title.matchAll(BEHAVIOR_ID)].map((m) => m[1]))];
-        if (ids.length) {
-          const key = childPath.join(' > ');
-          const n = (seen.get(key) ?? 0) + 1;
-          seen.set(key, n);
-          units.push({ title: n > 1 ? `${key} (#${n})` : key, ids, sha256: createHash('sha256').update(node.getText(file)).digest('hex') });
-        }
+        call = { node, ids, childPath, children: [] };
+        found.push(call);
       }
     }
-    ts.forEachChild(node, (child) => visit(child, childPath));
+    const children = [];
+    ts.forEachChild(node, (child) => {
+      const result = visit(child, childPath);
+      tagged ||= result.tagged;
+      children.push(...result.calls);
+    });
+    if (call) {
+      call.children = children;
+      call.holdsTagged = call.ids.length > 0 || tagged;
+      return { tagged: call.holdsTagged, calls: [call] };
+    }
+    return { tagged, calls: children };
   };
-  visit(file, []);
+  const top = visit(file, []).calls;
+  // Pass 2: the file's context is its source minus the outermost tagged units and every test call with nothing tagged inside.
+  const cut = [];
+  const prune = (calls) => {
+    for (const c of calls) {
+      if (c.ids.length > 0 || !c.holdsTagged) cut.push([c.node.getStart(file), c.node.getEnd()]);
+      else prune(c.children);
+    }
+  };
+  prune(top);
+  cut.sort((a, b) => a[0] - b[0]);
+  let context = '';
+  let at = 0;
+  for (const [from, to] of cut) {
+    context += source.slice(at, from);
+    at = to;
+  }
+  context += source.slice(at);
+  const units = [];
+  for (const c of found) {
+    if (c.ids.length === 0) continue;
+    const key = c.childPath.join(' > ');
+    const n = (seen.get(key) ?? 0) + 1;
+    seen.set(key, n);
+    units.push({ title: n > 1 ? `${key} (#${n})` : key, ids: c.ids, sha256: sha256(`${c.node.getText(file)}\n\u0000context\n${context}`) });
+  }
   return units;
 }
 
