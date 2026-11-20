@@ -11,7 +11,7 @@ const greenRun = (id: number) => ({
   id,
   conclusion: 'success',
   results: Object.fromEntries(ADAPTERS.map((a: string) => [a, greenResults()])) as Record<string, Results>,
-  oracle: { runs: 100_000, uncoveredRuns: 0 },
+  oracle: { runs: 100_000, subjects: [{ name: 'v16' }, { name: 'core' }], violations: [{ behavior: 'T3', subject: 'v16', count: 144 }], determinism: { mismatches: 0 } } as Record<string, unknown> & { runs: number; subjects: { name: string }[]; violations: { behavior: string; subject: string; count: number }[]; determinism: { mismatches: number } },
 });
 
 const done = () => ({
@@ -47,7 +47,9 @@ describe('done check', () => {
     [0, 'a gate that did not run', (f) => void (f.nightly.runs[0]!.results['solid'].scenarios['S7'].status = 'not-applicable')],
     [0, 'a regression', (f) => void (f.nightly.runs[1]!.results['preact'].scenarios['M1'].regressions = [{ regressed: true }])],
     [0, 'an oracle short of 100,000 sequences', (f) => void (f.nightly.runs[0]!.oracle.runs = 10_000)],
-    [0, 'an oracle with unlisted differences', (f) => void (f.nightly.runs[1]!.oracle.uncoveredRuns = 3)],
+    [0, 'a spec violation by the new core', (f) => void f.nightly.runs[1]!.oracle.violations.push({ behavior: 'T3', subject: 'core', count: 2 })],
+    [0, 'a generator run without the new core', (f) => void (f.nightly.runs[0]!.oracle.subjects = [{ name: 'v16' }])],
+    [0, 'nondeterministic replays', (f) => void (f.nightly.runs[0]!.oracle.determinism.mismatches = 1)],
     [0, 'an S6 scan finding', (f) => void (f.s6.findings = ['unminified bundles differ'])],
     [0, 'nightly runs that could not be read', (f) => void (f.nightly = { error: 'gh: not logged in' } as never)],
     [1, 'a behavior no test covers', (f) => void f.coveredBehaviors.delete('W3')],

@@ -1,6 +1,8 @@
-// Subjects selectable with --a / --b. Each loader imports its implementation
-// lazily so a run only loads what it compares. packages/core joins here in
-// Phase 1 as one more entry.
+// Subjects selectable on the command line. Each loader imports its
+// implementation lazily so a run only loads what it replays. The published
+// kernels are replay targets only (BRIEF.md 12.1.4): their outcomes are checked
+// against the behavior properties, never used as expected values. packages/core
+// joins here in Phase 1 as one more entry, judged by `violates.core == 0`.
 import type { Subject } from '../subject.js';
 import { kernelSubject, type KernelModule } from './kernel.js';
 
@@ -23,11 +25,8 @@ export const SUBJECTS: Readonly<Record<string, () => Promise<Subject>>> = {
     }),
 };
 
-/**
- * Where a behavior is covered by v16.0.0-rc.1, v16 is the authority; other
- * subjects are compared against it, not trusted.
- */
-export const AUTHORITY = 'v16';
+/** Subjects `generate` replays when none are named. */
+export const DEFAULT_SUBJECTS = ['v15', 'v16'] as const;
 
 export async function loadSubject(name: string): Promise<Subject> {
   const load = SUBJECTS[name];

@@ -1,168 +1,178 @@
-// Writes the difference list (JSON for tools, Markdown for reading) under out/.
-import { mkdirSync, writeFileSync } from 'node:fs';
+// Writes the spec report (JSON for tools, Markdown for reading) and the
+// candidate cases under out/. Nothing under out/ is committed (BRIEF.md 6.1).
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { canonical, type FieldDiff } from './compare.js';
-import { formatSequence, type Json, type Outcome } from './model.js';
-import type { DifferenceGroup, OracleResult } from './oracle.js';
+import type { BehaviorId } from './behaviors/types.js';
+import type { DeterminismResult } from './determinism.js';
+import type { GenerateResult, SpecCase } from './generator.js';
+import { canonical } from './trace.js';
 
-const clip = (text: string, max = 160) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
+export interface BehaviorReport {
+  readonly generatable: boolean;
+  readonly reason?: string;
+  /** Sequences in which the behavior applied on at least one subject. */
+  readonly exercised: number;
+  readonly holds: Readonly<Record<string, number>>;
+  readonly violates: Readonly<Record<string, number>>;
+  /** Case ids (files under cases/) for this behavior. */
+  readonly cases: readonly string[];
+}
 
-export function describeOutcome(outcome: Outcome): string {
-  switch (outcome.status) {
-    case 'ok':
-      return outcome.value === undefined ? 'ok' : `ok ${clip(canonical(outcome.value), 80)}`;
-    case 'error': {
-      const e = outcome.error;
-      const tags = [e.causeKind, e.st, e.reason && `${e.stage}/${e.reason}`].filter(Boolean).join(', ');
-      return `throws ${e.class}${tags ? ` (${tags})` : `: ${clip(e.message, 70)}`}`;
-    }
-    case 'unsupported':
-      return 'unsupported';
-    case 'skipped':
-      return `skipped (${outcome.detail})`;
+export interface DeterminismReport {
+  readonly subject: string;
+  readonly runs: number;
+  readonly seed: number;
+  readonly mismatches: number;
+}
+
+export interface SpecReport {
+  readonly runs: number;
+  readonly seed: number;
+  readonly plugins: string;
+  readonly maxSteps: number;
+  readonly subjects: readonly { readonly name: string; readonly description: string }[];
+  readonly timing: { readonly generateMs: number; readonly shrinkMs: number };
+  readonly behaviors: Readonly<Record<BehaviorId, BehaviorReport>>;
+  readonly violations: readonly {
+    readonly behavior: BehaviorId;
+    readonly subject: string;
+    readonly kind: string;
+    readonly count: number;
+    readonly firstRun: number;
+    readonly case: string;
+  }[];
+  readonly cases: readonly string[];
+  readonly determinism?: DeterminismReport;
+}
+
+export const REPORT_JSON = 'spec-report.json';
+export const REPORT_MARKDOWN = 'spec-report.md';
+export const CASES_DIR = 'cases';
+export const DETERMINISM_JSON = 'determinism-report.json';
+
+export function specReport(result: GenerateResult): SpecReport {
+  const names = result.subjects.map((s) => s.name);
+  const zeros = () => Object.fromEntries(names.map((n) => [n, 0]));
+  const behaviors = {} as Record<BehaviorId, BehaviorReport>;
+  for (const entry of result.catalog) {
+    const stats = result.stats.get(entry.id);
+    const { reason } = entry;
+    behaviors[entry.id] = {
+      generatable: entry.generatable,
+      ...(reason ? { reason } : {}),
+      exercised: stats?.exercised ?? 0,
+      holds: stats ? { ...stats.holds } : zeros(),
+      violates: stats ? { ...stats.violates } : zeros(),
+      cases: result.cases.filter((c) => c.behaviors.includes(entry.id)).map((c) => c.id),
+    };
   }
-}
-
-/** What each side did, for the group's primary field. */
-export function sides(group: DifferenceGroup): [string, string] {
-  const d = group.example.divergence;
-  const field = d.primary.field;
-  if (field.startsWith('result.') && field !== 'result.error.message' && field !== 'result.value') {
-    return [describeOutcome(d.aOutcome), describeOutcome(d.bOutcome)];
-  }
-  return [clip(show(d.primary.a)), clip(show(d.primary.b))];
-}
-
-const show = (value: Json): string => (typeof value === 'string' ? value : canonical(value));
-
-export interface ReportContext {
-  readonly aDescription: string;
-  readonly bDescription: string;
-  readonly authority?: string;
-  /** Command replaying a fast-check path. */
-  readonly replayCommand: (path: string) => string;
-  /** Command replaying group n's minimal sequence from the JSON report. */
-  readonly replayGroupCommand: (group: number) => string;
-}
-
-export function writeReport(dir: string, result: OracleResult, ctx: ReportContext): { json: string; markdown: string } {
-  mkdirSync(dir, { recursive: true });
-  const base = join(dir, `${result.a}-vs-${result.b}`);
-  const json = `${base}.json`;
-  const markdown = `${base}.md`;
-  writeFileSync(json, `${JSON.stringify(toJsonReport(result, ctx), null, 2)}\n`);
-  writeFileSync(markdown, toMarkdown(result, ctx));
-  return { json, markdown };
-}
-
-function toJsonReport(result: OracleResult, ctx: ReportContext) {
   return {
-    a: { name: result.a, description: ctx.aDescription },
-    b: { name: result.b, description: ctx.bDescription },
-    authority: ctx.authority ?? null,
     runs: result.runs,
     seed: result.seed,
     plugins: result.plugins,
     maxSteps: result.maxSteps,
-    compareMs: Math.round(result.compareMs),
-    shrinkMs: Math.round(result.shrinkMs),
-    uncoveredGroups: result.groups.length,
-    uncoveredRuns: result.groups.reduce((sum, g) => sum + g.count, 0),
-    coveredRuns: result.coveredRuns,
-    coveredKeys: Object.fromEntries(result.coveredKeys),
-    groups: result.groups.map((g, i) => {
-      const [aSide, bSide] = sides(g);
-      const d = g.example.divergence;
-      return {
-        key: g.key,
-        pattern: g.pattern,
-        field: g.field,
-        count: g.count,
-        firstRun: g.firstRun,
-        [result.a]: aSide,
-        [result.b]: bSide,
-        example: {
-          seed: g.example.seed,
-          path: g.example.path,
-          shrunk: g.example.shrunk,
-          shrinks: g.example.shrinkRuns,
-          fastCheckSteps: g.example.fastCheckSteps,
-          replay: ctx.replayGroupCommand(i + 1),
-          replayFastCheckPath: ctx.replayCommand(g.example.path),
-          steps: formatSequence(g.example.sequence),
-          divergesAtStep: d.step,
-          fields: d.fields.map((f: FieldDiff) => ({ field: f.field, [result.a]: f.a, [result.b]: f.b })),
-          outcomes: { [result.a]: d.aOutcome, [result.b]: d.bOutcome },
-          sequence: g.example.sequence,
-        },
-      };
-    }),
+    subjects: result.subjects,
+    timing: { generateMs: Math.round(result.generateMs), shrinkMs: Math.round(result.shrinkMs) },
+    behaviors,
+    violations: result.groups.map((g) => ({ ...g })),
+    cases: result.cases.map((c) => c.id),
   };
 }
 
-function toMarkdown(result: OracleResult, ctx: ReportContext): string {
-  const { a, b } = result;
-  const label = (name: string) => (ctx.authority === name ? `${name} (authority)` : name);
-  const lines: string[] = [
-    `# Oracle differences: ${a} vs ${b}`,
+/** Writes spec-report.json, spec-report.md and cases/<id>.json, replacing earlier cases. */
+export function writeSpecReport(dir: string, result: GenerateResult): { json: string; markdown: string; cases: string } {
+  mkdirSync(dir, { recursive: true });
+  const casesDir = join(dir, CASES_DIR);
+  rmSync(casesDir, { recursive: true, force: true });
+  mkdirSync(casesDir, { recursive: true });
+  for (const c of result.cases) writeFileSync(join(casesDir, `${c.id}.json`), `${JSON.stringify(c, null, 2)}\n`);
+  const report = specReport(result);
+  const json = join(dir, REPORT_JSON);
+  const markdown = join(dir, REPORT_MARKDOWN);
+  writeFileSync(json, `${JSON.stringify(report, null, 2)}\n`);
+  writeFileSync(markdown, toMarkdown(report, result.cases));
+  return { json, markdown, cases: casesDir };
+}
+
+/**
+ * Writes determinism-report.json and, when a spec report is already in `dir`,
+ * records the result in its `determinism` field (and its Markdown) so one
+ * artifact carries both.
+ */
+export function writeDeterminismReport(dir: string, result: DeterminismResult): string {
+  mkdirSync(dir, { recursive: true });
+  const file = join(dir, DETERMINISM_JSON);
+  writeFileSync(file, `${JSON.stringify(result, null, 2)}\n`);
+  const specFile = join(dir, REPORT_JSON);
+  if (existsSync(specFile)) {
+    const report = JSON.parse(readFileSync(specFile, 'utf8')) as SpecReport;
+    const determinism: DeterminismReport = {
+      subject: result.subject,
+      runs: result.runs,
+      seed: result.seed,
+      mismatches: result.mismatches,
+    };
+    writeFileSync(specFile, `${JSON.stringify({ ...report, determinism }, null, 2)}\n`);
+    const markdown = join(dir, REPORT_MARKDOWN);
+    if (existsSync(markdown)) {
+      const text = readFileSync(markdown, 'utf8').replace(/\n## Determinism\n[\s\S]*$/, '\n');
+      writeFileSync(markdown, `${text.trimEnd()}\n\n${determinismMarkdown(determinism)}`);
+    }
+  }
+  return file;
+}
+
+const cell = (text: string) => text.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+const clip = (text: string, max = 140) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
+
+function toMarkdown(report: SpecReport, cases: readonly SpecCase[]): string {
+  const names = report.subjects.map((s) => s.name);
+  const lines = [
+    '# Spec report',
     '',
-    `- ${a}: ${ctx.aDescription}`,
-    `- ${b}: ${ctx.bDescription}`,
-    ...(ctx.authority ? [`- Authority where it covers a behavior: ${ctx.authority}`] : []),
-    `- Sequences: ${result.runs}, seed ${result.seed}, plugins ${result.plugins}, at most ${result.maxSteps} steps`,
-    `- Compare: ${(result.compareMs / 1000).toFixed(1)} s; shrink: ${(result.shrinkMs / 1000).toFixed(1)} s`,
-    `- Sequences with an unlisted difference: ${result.groups.reduce((s, g) => s + g.count, 0)} in ${result.groups.length} groups`,
-    `- Sequences whose differences were all listed as intended: ${result.coveredRuns}`,
+    `${report.runs} sequences, seed ${report.seed}, plugins ${report.plugins}, at most ${report.maxSteps} steps.`,
+    `Subjects: ${report.subjects.map((s) => `${s.name} (${s.description})`).join(', ')}.`,
+    `Generation ${(report.timing.generateMs / 1000).toFixed(1)} s, minimization ${(report.timing.shrinkMs / 1000).toFixed(1)} s.`,
     '',
-    'Each sequence is counted once, in the group of its first unlisted difference (operation pattern,',
-    'highest-priority differing field and, for vocabulary fields, both values). Later steps are not',
-    'compared because state may already have diverged.',
+    'Expected outcomes come from each behavior\'s BRIEF.md row. A subject violates a behavior when it',
+    'disagrees with the row; counts are sequences. Cases are under `cases/`.',
     '',
+    `| ID | Exercised | ${names.map((n) => `${n} holds | ${n} violates`).join(' | ')} | Notes |`,
+    `| --- | --- | ${names.map(() => '--- | ---').join(' | ')} | --- |`,
   ];
-  if (result.groups.length === 0) {
-    lines.push('No unlisted differences.', '');
-    return lines.join('\n');
+  for (const [id, b] of Object.entries(report.behaviors)) {
+    const counts = names.map((n) => (b.generatable ? `${b.holds[n] ?? 0} | ${b.violates[n] ?? 0}` : '– | –')).join(' | ');
+    const note = b.generatable ? (b.reason ? `partial: ${b.reason}` : '') : `not generated: ${b.reason}`;
+    lines.push(`| ${id} | ${b.generatable ? b.exercised : '–'} | ${counts} | ${cell(clip(note, 160))} |`);
   }
-  lines.push(`| # | Pattern | Field | ${label(a)} | ${label(b)} | Count |`, '| --- | --- | --- | --- | --- | --- |');
-  result.groups.forEach((g, i) => {
-    const [aSide, bSide] = sides(g);
-    lines.push(`| ${i + 1} | \`${g.pattern}\` | \`${g.field}\` | ${cell(aSide)} | ${cell(bSide)} | ${g.count} |`);
-  });
-  lines.push('', '### By field', '', 'One cause often surfaces under several operation patterns; this rolls the groups up by field.', '');
-  lines.push('| Field | Groups | Sequences | Patterns |', '| --- | --- | --- | --- |');
-  const byField = new Map<string, DifferenceGroup[]>();
-  for (const g of result.groups) byField.set(g.field, [...(byField.get(g.field) ?? []), g]);
-  for (const [field, groups] of [...byField].sort((x, y) => total(y[1]) - total(x[1]))) {
-    const patterns = [...new Set(groups.map((g) => g.pattern))];
-    lines.push(`| \`${field}\` | ${groups.length} | ${total(groups)} | ${cell(clip(patterns.join(', '), 200))} |`);
+  lines.push('', '## Violations', '');
+  if (report.violations.length === 0) lines.push('None.', '');
+  for (const v of report.violations) {
+    const c = cases.find((x) => x.id === v.case);
+    lines.push(`### ${v.behavior} · ${v.subject} · ${v.kind} (${v.count} sequences)`, '');
+    if (c) {
+      lines.push(
+        c.detail,
+        '',
+        '```text',
+        ...c.steps,
+        '```',
+        '',
+        `Expected at step ${c.step}: \`${clip(canonical(c.expected), 300)}\``,
+        '',
+        ...Object.entries(c.provenance).map(
+          ([name, p]) => `- ${name}: ${p}${c.observed[name] === undefined ? '' : ` — \`${clip(canonical(c.observed[name]), 240)}\``}`
+        ),
+        '',
+        `Case: \`cases/${c.id}.json\``,
+        ''
+      );
+    }
   }
-  lines.push('');
-  result.groups.forEach((g, i) => {
-    const d = g.example.divergence;
-    lines.push(
-      `## ${i + 1}. \`${g.pattern}\` · \`${g.field}\``,
-      '',
-      `${g.count} sequences. Minimal example (diverges at step ${d.step}):`,
-      '',
-      '```text',
-      ...formatSequence(g.example.sequence),
-      '```',
-      '',
-      `Seed ${g.example.seed}, fast-check path \`${g.example.path}\`${g.example.shrunk ? ` (${g.example.shrinkRuns} shrinks` : ' (not shrunk'}, ${g.example.fastCheckSteps} steps before trimming).`,
-      '',
-      `Replay: \`${ctx.replayGroupCommand(i + 1)}\``,
-      '',
-      `| Field | ${label(a)} | ${label(b)} |`,
-      '| --- | --- | --- |',
-      ...d.fields.map((f) => `| \`${f.field}\` | ${cell(clip(show(f.a), 200))} | ${cell(clip(show(f.b), 200))} |`),
-      '',
-      `Step ${d.step} outcome: ${a} ${cell(describeOutcome(d.aOutcome))}; ${b} ${cell(describeOutcome(d.bOutcome))}.`,
-      ''
-    );
-  });
+  if (report.determinism) lines.push(determinismMarkdown(report.determinism));
   return lines.join('\n');
 }
 
-const total = (groups: readonly DifferenceGroup[]) => groups.reduce((sum, g) => sum + g.count, 0);
-
-const cell = (text: string) => text.replace(/\|/g, '\\|').replace(/\n/g, ' ');
+function determinismMarkdown(d: DeterminismReport): string {
+  return `## Determinism\n\n${d.subject}: ${d.mismatches} mismatches in ${d.runs} sequences, seed ${d.seed}.\n`;
+}

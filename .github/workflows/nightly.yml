@@ -56,7 +56,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Zero unlisted differences over 100,000 sequences
-        run: pnpm oracle --a v16 --b v16 --runs 100000
+        run: |
+          pnpm oracle --determinism --subject v16 --runs 100000
+          pnpm oracle generate --runs 100000 --seed ${{ github.run_id }}
       - name: Keep the oracle report
         if: always()
         uses: actions/upload-artifact@v4

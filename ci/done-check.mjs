@@ -31,6 +31,8 @@ export const NIGHTLY_JOBS = [...ADAPTERS.map((a) => `gates (${a})`), 'oracle (10
 /** Gates the harness runs (6.3 as amended by section 10). S6a and S6c are checked here by ci/core-bundle-scan.mjs. */
 export const REQUIRED_GATES = ['M1', 'M2', 'M3', 'S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6b', 'S7'];
 export const ORACLE_MIN_RUNS = 100_000;
+/** The generator's subject for the new core; old packages violating the spec are expected (12.1.4). */
+export const ORACLE_SUBJECT = 'core';
 
 /** Why one nightly run does not show every gate green, or null. Reads the uploaded verdicts, not job success. */
 export function nightlyRunProblem(run) {
@@ -50,7 +52,10 @@ export function nightlyRunProblem(run) {
   const oracle = run.oracle;
   if (!oracle || oracle.error) return `nightly run ${run.id} has no oracle report${oracle?.error ? ` (${oracle.error})` : ''}`;
   if (!(oracle.runs >= ORACLE_MIN_RUNS)) return `nightly run ${run.id}: the oracle ran ${oracle.runs} sequences, fewer than ${ORACLE_MIN_RUNS}`;
-  if (oracle.uncoveredRuns !== 0) return `nightly run ${run.id}: the oracle found ${oracle.uncoveredRuns} sequences with unlisted differences`;
+  if (!(oracle.subjects ?? []).some((s) => s.name === ORACLE_SUBJECT)) return `nightly run ${run.id}: the generator did not run on the new core`;
+  const violations = (oracle.violations ?? []).filter((v) => v.subject === ORACLE_SUBJECT).reduce((n, v) => n + (v.count ?? 1), 0);
+  if (violations) return `nightly run ${run.id}: the new core violates the spec in ${violations} generated sequence(s)`;
+  if (oracle.determinism && oracle.determinism.mismatches !== 0) return `nightly run ${run.id}: replays were not deterministic`;
   return null;
 }
 export const BEHAVIORS = [
@@ -84,7 +89,7 @@ export const ITEMS = [
     },
   },
   {
-    title: 'Every behavior in 5.1 and 5.2 is covered by tests, and the oracle has zero unlisted differences at 100,000 sequences',
+    title: 'Every behavior in 5.1 and 5.2 is covered by tests, and the test generator finds no spec violation by the new core at 100,000 sequences',
     check: ({ coveredBehaviors }) => {
       const missing = BEHAVIORS.filter((id) => !coveredBehaviors.has(id));
       return missing.length ? `no test title carries ${missing.map((id) => `[${id}]`).join(', ')}` : null;
@@ -251,7 +256,7 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
           id: run.id,
           conclusion: run.conclusion,
           results: Object.fromEntries(ADAPTERS.map((a) => [a, artifactJson(needRepo(), artifacts, `nightly-gates-${a}`, /^results-.+-latest\.json$/)])),
-          oracle: artifactJson(needRepo(), artifacts, 'nightly-oracle', /^.+-vs-.+\.json$/),
+          oracle: artifactJson(needRepo(), artifacts, 'nightly-oracle', /^spec-report\.json$/),
         };
       }),
     };

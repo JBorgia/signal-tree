@@ -38,7 +38,7 @@ jobs:
         run: node ci/spec-tests.mjs check
 
   oracle:
-    name: Oracle, v16.0.0-rc.1 against itself, 10,000 sequences
+    name: Oracle, spec properties and determinism
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -52,8 +52,13 @@ jobs:
         run: pnpm --filter @signal-tree/oracle typecheck
       - name: Oracle self-tests
         run: pnpm --filter @signal-tree/oracle test
-      - name: Zero differences over 10,000 sequences
-        run: pnpm oracle --a v16 --b v16 --runs 10000
+      # BRIEF.md 12.1.4: the oracle is a spec-driven test generator. Replays must be
+      # deterministic (the gate); old packages violating the spec is expected and
+      # reported, because the spec wins and each such case becomes a new test.
+      - name: Replays are deterministic over 10,000 sequences
+        run: pnpm oracle --determinism --subject v16 --runs 10000
+      - name: Spec cases from the old packages (report only)
+        run: pnpm oracle generate --runs 10000 --seed 20261119
       - name: Keep the oracle report
         if: always()
         uses: actions/upload-artifact@v4

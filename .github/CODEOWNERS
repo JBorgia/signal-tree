@@ -3,7 +3,6 @@
 # which checks run or what passes.
 /BRIEF.md                         @JBorgia
 /bench/                           @JBorgia
-/tests/intended-differences.json  @JBorgia
 /tests/port-manifest.json         @JBorgia
 /tests/spec-tests.json            @JBorgia
 /tests/oracle/                    @JBorgia

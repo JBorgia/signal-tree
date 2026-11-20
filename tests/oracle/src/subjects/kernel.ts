@@ -11,6 +11,7 @@ import {
   type Json,
   type LeafPath,
   type LinkMode,
+  type ObservedPath,
   type LinkSource,
   type Observation,
   type Op,
@@ -36,6 +37,7 @@ import {
 interface KernelLocation {
   (): unknown;
   (valueOrUpdater: unknown): void;
+  subscribe(listener: () => void): () => void;
 }
 
 interface KernelRowNode extends KernelLocation {
@@ -186,8 +188,12 @@ class KernelSession implements Session {
   readonly #txs = new HandleTable<KernelPending>();
   readonly #links = new HandleTable<LinkEntry>();
   readonly #receipts = new HandleTable<KernelReceipt>();
+  readonly #rowHandles = new HandleTable<KernelRowNode>();
   readonly #probes: Probe[] = [];
   readonly #labels = new FirstSeenLabels();
+  readonly #carriers = new FirstSeenLabels('c');
+  readonly #observers: (() => void)[] = [];
+  #observerThrows = 0;
   #pushes: { link: number; value: Json }[] = [];
   #treeErrors: Observation['treeErrors'][number][] = [];
   #warnings: Observation['warnings'][number][] = [];
@@ -320,7 +326,44 @@ class KernelSession implements Session {
           const receipt = declare.call(entry.handle, declaration, () => this.#body(op.body));
           return { link, receipt: this.#receipts.add(receipt), state: toJson(receipt.read()) };
         });
+      case 'observerOpen':
+        return attempt(() => {
+          const unsubscribe = this.#observed(op.path).subscribe(() => {
+            this.#observerThrows++;
+            throw new Error('observer threw');
+          });
+          this.#observers.push(unsubscribe);
+          return { observer: this.#observers.length - 1 };
+        });
+      case 'rowHold':
+        return attempt((): Json => {
+          const node = this.#tree.$.rows.byId(op.id);
+          if (!node) return { found: false };
+          return { handle: this.#rowHandles.add(node) };
+        });
+      case 'rowHeldRead':
+        return this.#withRow(op.handle, (node, handle) => {
+          const carrier = this.#carriers.label(node.n);
+          return { handle, value: toJson(node()), carrier };
+        });
+      case 'rowHeldWrite':
+        return this.#withRow(op.handle, (node, handle) => {
+          const carrier = this.#carriers.label(node.n);
+          node.n(op.n);
+          return { handle, carrier };
+        });
     }
+  }
+
+  #observed(path: ObservedPath): KernelLocation {
+    const $ = this.#tree.$;
+    return path === 'cfg' ? $.cfg : this.#leaf(path);
+  }
+
+  #withRow(ref: number, fn: (node: KernelRowNode, handle: number) => Json): Outcome {
+    const resolved = this.#rowHandles.resolve(ref);
+    if (!resolved) return { status: 'skipped', detail: 'no row handle held' };
+    return attempt(() => fn(resolved.item, resolved.index));
   }
 
   #wrapped(wrap: 'none' | 'undoable' | 'external', fn: () => Json | undefined): Json | undefined {
@@ -493,6 +536,7 @@ class KernelSession implements Session {
       receipts: this.#receipts.all().map((r) => readOrError(() => r.read())),
       treeErrors: this.#treeErrors,
       warnings: this.#warnings,
+      observerThrows: this.#observerThrows,
     };
     if (this.#config.restoration) {
       const tree = this.#tree as Required<Pick<KernelTree, 'canUndo' | 'canRedo' | 'getCurrentIndex' | 'getRestorationHistory'>>;
@@ -506,11 +550,19 @@ class KernelSession implements Session {
     this.#pushes = [];
     this.#treeErrors = [];
     this.#warnings = [];
+    this.#observerThrows = 0;
     return observation;
   }
 
   close(): void {
     try {
+      for (const unsubscribe of this.#observers) {
+        try {
+          unsubscribe();
+        } catch {
+          // As for links below: not an outcome of the sequence.
+        }
+      }
       for (const entry of this.#links.all()) {
         try {
           entry.handle?.dispose();

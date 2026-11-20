@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
-  "description": "Differential semantics oracle: replays generated operation sequences against two subjects and reports every observable difference.",
+  "description": "Spec-driven test generator: replays generated operation sequences on each subject, checks them against the BRIEF.md 5.1 behavior properties, and writes minimized candidate spec cases.",
   "scripts": {
     "oracle": "tsx src/cli.ts",
     "test": "vitest run",
