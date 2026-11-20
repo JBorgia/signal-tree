@@ -35,9 +35,9 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'R3',
     generatable: false,
-    row: 'Undo and redo after a settled transaction, and after an overlapping rollback, behave as in 15.3.1',
+    row: "Undo after a confirmed transaction reverses that transaction's undoable writes as one operation, or refuses whole per R2. An undo entry whose transaction was rolled back has nothing to reverse: undo skips it and removes it from history. Redo re-applies exactly what undo reversed, or refuses whole if a newer write would be overwritten.",
     reason:
-      'The row defines its outcome as an old version\'s behavior ("as in 15.3.1"; ruling 3: "as in v16.0.0-rc.1"), and 12.1.1 withdraws old versions as authorities, so it states no outcome to check. It needs a restated row (#22, proposed and provisionally adopted).',
+      'Restated by Jonathan on #22; the properties for the restated row follow in their own pull request.',
   },
   {
     id: 'R4',
