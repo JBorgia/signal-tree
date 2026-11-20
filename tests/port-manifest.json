@@ -5250,28 +5250,34 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/integrated-field-facts.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts EntityPublicationSource fused-store row populations, point-support installation and field order on synthetic packets; internal publication machinery"
     },
     {
       "source": "packages/kernel/src/lib/integrated-late-history.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/integrated-point-source.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal publication-source point-membership authentication and native-only completion ordering on synthetic packets; no public API involved"
     },
     {
       "source": "packages/kernel/src/lib/internals/a1-publication-installation.spec.ts",
@@ -6100,56 +6106,58 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/joint-install-boundary-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts an internal prepared point-realization plan refuses install after source enroll/dispose; internal installation protocol"
     },
     {
       "source": "packages/kernel/src/lib/joint-install-validation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal prepared-plan validation runs before stores and refuses on source/enrollment change; internal installation protocol"
     },
     {
       "source": "packages/kernel/src/lib/joint-membership-completion.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal publication-source completion throw/reentry around a prepared rekey plan and membership-reader events; internal participant protocol"
     },
     {
       "source": "packages/kernel/src/lib/joint-membership-phase.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts membership effects join an internal prepared realization phase and refuse late enrollment or reentry; internal installation protocol"
     },
     {
       "source": "packages/kernel/src/lib/joint-membership-seal-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts scalar and collection native requirements seal after all sibling preparation in an internal plan; internal publication sealing"
     },
     {
       "source": "packages/kernel/src/lib/joint-mixed-seal.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts all mixed-source native preparations precede sealing in an internal point-realization plan; internal publication sealing"
     },
     {
       "source": "packages/kernel/src/lib/joint-readiness.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal native-requirement readiness, horizon closing and proof activation around link.declare(); only internal readiness hooks are checked"
     },
     {
       "source": "packages/kernel/src/lib/kernel-snapshot-authority.spec.ts",
@@ -6167,21 +6175,30 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/known-input-contract-review.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/leaf-address-seeds.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "V4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/leaf-contract.spec.ts",
@@ -6189,7 +6206,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/leaf-contract.typing.spec.ts",
@@ -6197,7 +6216,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time typing of the old leaf() marker; API is designed fresh (12.1.2), no row states it"
     },
     {
       "source": "packages/kernel/src/lib/legacy-payload.spec.ts",
@@ -6702,7 +6721,9 @@
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "V4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/m3-conformance.spec.ts",
@@ -6710,7 +6731,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/m3-representation.spec.ts",
@@ -6718,7 +6741,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins the old entityMap snapshot shape with its synthetic all envelope; section 4 designs the snapshot shape fresh"
     },
     {
       "source": "packages/kernel/src/lib/m3-uniform-rule.spec.ts",
@@ -6726,7 +6749,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins that the old entityMap accessor fails the neutral accessor guard and exposes methods; old API shape, no row"
     },
     {
       "source": "packages/kernel/src/lib/m4-decline-uniformity.spec.ts",
@@ -6734,7 +6757,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/m4-reconstruction.spec.ts",
@@ -6742,14 +6767,18 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/main-invocation-scope.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/marker-location-grammar.spec.ts",
@@ -6845,28 +6874,44 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/membership-input-contract.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/membership-prepared-order.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/membership-work-boundaries.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "O1",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/mut-participation.spec.ts",
@@ -6874,70 +6919,97 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "W1",
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/native-admission-handoff.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/native-anchor-diagnostic.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal entity-publication anchor shares the collection registry and address; internal diagnostic identity"
     },
     {
       "source": "packages/kernel/src/lib/native-authored-footprint.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal publication packets record whole/fields/derive authored footprints per write API; internal packet metadata"
     },
     {
       "source": "packages/kernel/src/lib/native-certificate-successor.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/native-explicit-handoff.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/native-invocation-handoff.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "X1",
+        "X3",
+        "R8",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/native-only-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal intrinsic-mutation registry refuses enrollment during prepare/finalize and preserves thrown undefined; no tree involved"
     },
     {
       "source": "packages/kernel/src/lib/native-window-preparation-audit.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/nested-absence-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/nested-structural-rollback-1.spec.ts",
@@ -6975,7 +7047,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal path-notifier meta carries the owning tree registry id for every frame; tree tagging of internal frames, no row"
     },
     {
       "source": "packages/kernel/src/lib/notifier-scope-0-identity.spec.ts",
@@ -6983,7 +7055,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts per-tree position-id namespacing and same-path two-tree delivery on the internal global path notifier; internal notifier identity"
     },
     {
       "source": "packages/kernel/src/lib/notifier-scope-0-impact.spec.ts",
@@ -6991,14 +7063,17 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "V8"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/observation-substrate-additions.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal observation claims inherited by materialized additions and their release; internal substrate bookkeeping"
     },
     {
       "source": "packages/kernel/src/lib/observation-substrate.spec.ts",
@@ -7006,35 +7081,51 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "W1",
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/occupancy-successor-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1",
+        "T12"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/occupancy-successor-point-work.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts one-field capture and rollback visit no untouched collection members; work-count test; performance is gated by the section 6 M/S gates, not by rows"
     },
     {
       "source": "packages/kernel/src/lib/occupancy-successor-realization.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T2",
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/occurrence-successor.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/opaque-current-input.spec.ts",
@@ -7091,7 +7182,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time typing of the old open-key record ownership promise; API is designed fresh (12.1.2), no row states it"
     },
     {
       "source": "packages/kernel/src/lib/open-key-reachability.spec.ts",
@@ -7099,84 +7190,109 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "expected-failure probe that an unmaterialized open-record key is not an accessor; old API access shape, designed fresh in section 4"
     },
     {
       "source": "packages/kernel/src/lib/open-record-access.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time typing of the old open-record access surface; API is designed fresh (12.1.2), no row states it"
     },
     {
       "source": "packages/kernel/src/lib/optional-diagnostic.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the test-support diagnostic file sink (no-op when unset, append/replace bytes, error propagation); test infrastructure"
     },
     {
       "source": "packages/kernel/src/lib/oracle-alignment-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-member-presence.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-member-publication-facts.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T2",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-order-indexed-work.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-order-owner-preparation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "injects faults into the internal ordinary-topology prepareInstall and asserts its indexes and rows stay unchanged; no observer/link/plugin throws"
     },
     {
       "source": "packages/kernel/src/lib/ordinary-order-source-boundaries.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-presence-discriminator.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "L1",
+        "L2",
+        "V1",
+        "V8"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-presence-independent.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/ordinary-restoration-placement.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal final-placement resolver and egress projection for restored rows on synthetic anchors; internal placement algorithm"
     },
     {
       "source": "packages/kernel/src/lib/origin-union.typing.spec.ts",
@@ -7192,7 +7308,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/owner-invalidation.spec.ts",
@@ -7200,7 +7321,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "O1",
+        "O2",
+        "X3",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/owner-location-0.spec.ts",
@@ -7208,7 +7335,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "inventories which node kinds expose positions, owner path and registry, and per-tree registries; internal ownership metadata"
     },
     {
       "source": "packages/kernel/src/lib/owner-replay-1.spec.ts",
@@ -7216,7 +7343,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/owner-replay-2.spec.ts",
@@ -7224,91 +7354,105 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/owner-transition-cancellation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal pending-owner cell transition listeners release and re-register correctly; internal publication lifecycle"
     },
     {
       "source": "packages/kernel/src/lib/packed-field-heap.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal field-proof identities survive a packed row growing a field; internal evidence storage"
     },
     {
       "source": "packages/kernel/src/lib/packet-admission-r1.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "V5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/packet-index-adversarial.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal publication-packet step/edit indexing, responsibility installation and reentry refusal on synthetic packets; internal"
     },
     {
       "source": "packages/kernel/src/lib/packet-index-review.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal packet finalizer append refusal and edit-identity priority on synthetic packets; internal publication protocol"
     },
     {
       "source": "packages/kernel/src/lib/packet-physical-pair-semantics.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal pairing of physical and ordinary packet edits by subject and step; internal publication packets"
     },
     {
       "source": "packages/kernel/src/lib/packet-physical-pair-singleton.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal singleton packet pairing keeps endpoints and records allocation; internal packets and allocation"
     },
     {
       "source": "packages/kernel/src/lib/packet-physical-pair-work.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts a clear rollback pairs physical edits without repeated scans; work-count test; performance is gated by the section 6 M/S gates, not by rows"
     },
     {
       "source": "packages/kernel/src/lib/parent-freshness-entity.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/parent-freshness-focused.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/parent-proof-safety-falsifier.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/parent-snapshot-currentness.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/path-delivery-ownership.spec.ts",
@@ -7316,7 +7460,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal path-delivery port install/reset/idempotence and facade delegation; internal delivery runtime"
     },
     {
       "source": "packages/kernel/src/lib/path-notifier-attribution.spec.ts",
@@ -7324,14 +7468,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T3",
+        "R1",
+        "R3",
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/path-notifier-enqueue.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T9",
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/path-notifier-membership.spec.ts",
@@ -7339,14 +7492,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal path-notifier membership frames: ordering, non-merging, reentrant drain and dotted-key branch identity; internal frames"
     },
     {
       "source": "packages/kernel/src/lib/path-notifier-queued-witness.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal PathNotifier queued subject-field witnesses across coalescing; internal notifier evidence"
     },
     {
       "source": "packages/kernel/src/lib/path-notifier.spec.ts",
@@ -7354,21 +7507,27 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal PathNotifier class batching/coalescing keys, flushSync and singleton reset on synthetic notify calls; internal"
     },
     {
       "source": "packages/kernel/src/lib/path-observation-demand.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "R3",
+        "D1",
+        "V8"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/pending-placement-work.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts rollback does not rebuild every pending addition prefix; work-count test; performance is gated by the section 6 M/S gates, not by rows"
     },
     {
       "source": "packages/kernel/src/lib/persistence-decompose-0.spec.ts",
@@ -7390,7 +7549,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal CheckedValueCarrier release, recycle and reacquire of value backing; internal physical storage"
     },
     {
       "source": "packages/kernel/src/lib/physical/declarative-target-binding.spec.ts",
@@ -7398,7 +7557,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/physical/entity-handle-resolution.spec.ts",
@@ -7406,7 +7567,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/physical/entity-mutation-frame.spec.ts",
@@ -7414,21 +7577,21 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal EntityMutationFrame commit, retire, forget and rollback-safety of staged structural work; internal physical frame"
     },
     {
       "source": "packages/kernel/src/lib/physical/order-restores-indexed.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal restore-ordering index handles cycles and reversed chains without rescans; internal algorithm and work count"
     },
     {
       "source": "packages/kernel/src/lib/physical/ordinary-key-evidence.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal ordinary admission key evidence for add, placement and rekey; internal physical metadata"
     },
     {
       "source": "packages/kernel/src/lib/physical/physical-value-pool.spec.ts",
@@ -7436,42 +7599,45 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal PhysicalValuePool slot generations, stale-handle rejection and authority updates; internal physical storage"
     },
     {
       "source": "packages/kernel/src/lib/physical/prepare-structural-target.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal detached structural-target preparation keeps lifetimes, typed keys and refuses malformed targets; internal"
     },
     {
       "source": "packages/kernel/src/lib/physical/prepared-placement-sharing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts an internal placement stage reuses only supplied immutable after-rows; internal physical staging"
     },
     {
       "source": "packages/kernel/src/lib/physical/prepared-placement-snapshot.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts an internal prepared placement shares completed order with immutable records; internal physical staging"
     },
     {
       "source": "packages/kernel/src/lib/physical/prepared-placement-visibility.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal placement visibility queries across admission changes and indexed runs; internal physical staging"
     },
     {
       "source": "packages/kernel/src/lib/physical/sparse-revision-storage.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/physical/structural-store.spec.ts",
@@ -7479,7 +7645,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/physical/subject-record-target.spec.ts",
@@ -7487,14 +7655,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts internal prepared subject updates, slot targets and integrity validation across authorities; internal physical storage"
     },
     {
       "source": "packages/kernel/src/lib/placement-snapshot-reuse.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "work-count bound on prepend snapshot visits plus internal frame endpoints and domain ordering; performance is an M/S gate, not a row"
     },
     {
       "source": "packages/kernel/src/lib/plain-branch-membership.spec.ts",
@@ -7502,7 +7670,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "asserts the internal plain-branch membership plan (prepare/install/publish), effect metadata and snapshot helpers"
     },
     {
       "source": "packages/kernel/src/lib/plain-member-absence-observation.spec.ts",
@@ -7510,7 +7678,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "O2",
+        "O3",
+        "V1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/point-admission-followup.spec.ts",
