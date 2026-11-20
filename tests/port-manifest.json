@@ -3084,7 +3084,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/a2-3-settlement-placement.spec.ts",
@@ -3092,7 +3094,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/a2-4-drain-ownership.spec.ts",
@@ -3108,7 +3112,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T12"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/absent-collection.spec.ts",
@@ -3173,7 +3179,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "probe of a candidate afterCommit() built in the spec on internal operation consequences (runs on confirm, dropped on rollback); not a shipped API"
     },
     {
       "source": "packages/kernel/src/lib/aggregate-installed-publication.spec.ts",
@@ -3401,7 +3407,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3",
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/change-reporting.spec.ts",
@@ -3409,7 +3418,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "X5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/cold-observation-registration.spec.ts",
@@ -3774,7 +3786,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/egress-1-observation-vs-consequence.spec.ts",
@@ -3782,7 +3797,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/enhancer-accumulation-survival.spec.ts",
@@ -4743,7 +4760,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T10",
+        "X1",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/error-surface-2.typing.spec.ts",
@@ -4751,7 +4772,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins the onTreeError event shape against the module-local type; old API types (12.1.2), no row states the event shape"
     },
     {
       "source": "packages/kernel/src/lib/exact-subject-runs.spec.ts",
@@ -4824,14 +4845,16 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/hydration-snapshot.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins hydration snapshot input/output types for markers and collections; old API types (12.1.2), H1 states values not types"
     },
     {
       "source": "packages/kernel/src/lib/identity-through-seams-0.spec.ts",
@@ -5880,7 +5903,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3",
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/keyed-construction-cleanup.spec.ts",
@@ -5925,7 +5951,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-0-three-directions.spec.ts",
@@ -5933,7 +5961,15 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T5",
+        "R1",
+        "R2",
+        "L1",
+        "X1",
+        "W1",
+        "W5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-1-relationship.spec.ts",
@@ -5941,7 +5977,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "X3",
+        "D1",
+        "L5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-2-public-contract.spec.ts",
@@ -5949,7 +5990,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L3",
+        "X3",
+        "L5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-2-x-constraint.typing.spec.ts",
@@ -5957,7 +6002,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: records what the link() source type can and cannot constrain; old API types (12.1.2), no row states them"
     },
     {
       "source": "packages/kernel/src/lib/link-absent-locations.spec.ts",
@@ -5965,7 +6010,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "O3",
+        "V1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-address-lifecycle.spec.ts",
@@ -5973,7 +6023,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-admission.typing.spec.ts",
@@ -5981,7 +6033,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins which link() sources and endpoints the old types admit (EntityMap builder exclusion); old API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/link-async-settlement.spec.ts",
@@ -5989,14 +6041,24 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "L1",
+        "L3",
+        "X3",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-audit-regression.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-authority-carrier.spec.ts",
@@ -6004,7 +6066,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T5",
+        "D1",
+        "L5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-bare-contract.spec.ts",
@@ -6012,7 +6078,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-collection-0.spec.ts",
@@ -6020,28 +6089,43 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "L1",
+        "O2",
+        "D1",
+        "L4",
+        "L5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-collection-order-demand.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "asserts the internal membership inventory order tier: which change records commit for a Link, listener copies and order-listener isolation"
     },
     {
       "source": "packages/kernel/src/lib/link-collection-reorder.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3",
+        "D1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-collection-sort-comparer.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-collection-type-0.spec.ts",
@@ -6049,7 +6133,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4",
+        "L5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-collection-type-0.typing.spec.ts",
@@ -6057,7 +6144,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins that link() infers Row[] for a collection source across endpoint shapes; old API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/link-commit-boundary-carrier.spec.ts",
@@ -6065,7 +6152,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-commit-ordering.spec.ts",
@@ -6073,21 +6162,31 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T2",
+        "T5",
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-declaration-public.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-declaration.typing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-drain-settlement.spec.ts",
@@ -6095,21 +6194,30 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-inflight-settlement-audit.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-lifetime.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-materialized-value-0.spec.ts",
@@ -6117,7 +6225,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-materialized-value-0.typing.spec.ts",
@@ -6125,14 +6235,19 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins accessor read types for collection-containing branches ({ all: Row[] }); old API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/link-native-address.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "L1",
+        "D1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-nested-collection.spec.ts",
@@ -6140,21 +6255,34 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-order-audit-regression.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3",
+        "D1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-order-rollback.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "O4",
+        "X3",
+        "R5",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-overlapping-rollback.spec.ts",
@@ -6162,14 +6290,22 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T3",
+        "R3",
+        "L1",
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-owned-demand.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-persistence-conformance.spec.ts",
@@ -6187,7 +6323,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-reactive-settlement.spec.ts",
@@ -6195,14 +6333,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3",
+        "O4",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-restore-placement.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "R5",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-root-source.spec.ts",
@@ -6210,7 +6357,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1",
+        "D1",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-same-turn-settlement.spec.ts",
@@ -6218,7 +6369,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-snapshot-egress.spec.ts",
@@ -6226,14 +6380,21 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1",
+        "O3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-state-view-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-state-view.spec.ts",
@@ -6241,28 +6402,46 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3",
+        "X2",
+        "X3",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-structured-address-audit.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "O1",
+        "V4",
+        "L4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-tree-destroy.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "X1",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/link-value-roundtrip.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3",
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/lossless-addressing-followup.spec.ts",
@@ -6324,7 +6503,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/marker-location-grammar.typing.spec.ts",
@@ -6332,7 +6513,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins how the old marker type grammar resolves markers in arrays, Maps and Sets; old API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/marker-roundtrip.spec.ts",
@@ -6340,7 +6521,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/marker-snapshot-memo.spec.ts",
@@ -6348,7 +6531,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3",
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/markers/composed-acquisition.spec.ts",
@@ -6356,7 +6542,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "T5",
+        "R1",
+        "E1",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/markers/entity-map-slice-names.typing.spec.ts",
@@ -6364,7 +6556,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins entityMap computed-slice name typing; old marker API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/markers/entity-map.spec.ts",
@@ -6372,7 +6564,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/markers/marker-contract.spec.ts",
@@ -6380,7 +6574,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/markers/marker-resolution.typing.spec.ts",
@@ -6388,7 +6584,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "compile-time: pins that each marker resolves to its materialized type on tree.$; old API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/membership-hot-paths.spec.ts",
@@ -6505,7 +6701,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/noop-write-warning.spec.ts",
@@ -6513,7 +6711,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/notifier-ownership-invariant.spec.ts",
@@ -6587,14 +6787,25 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/opaque-leaf-restoration-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T5",
+        "T9",
+        "R1",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/opaque-leaf-restoration.spec.ts",
@@ -6602,14 +6813,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T5",
+        "R1",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/opaque-terminal-snapshot.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1",
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/open-key-ownership.typing.spec.ts",
@@ -6710,7 +6930,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "pins the old WriteMetadata origin union (accepted and withdrawn spellings) via @ts-expect-error; old API types (12.1.2), no row"
     },
     {
       "source": "packages/kernel/src/lib/owner-invalidation-membership.spec.ts",
@@ -6902,7 +7122,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L3",
+        "X3",
+        "D1",
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/physical/checked-value-carrier.spec.ts",
@@ -7317,7 +7543,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/readonly.spec.ts",
@@ -7414,7 +7642,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/rehydration.spec.ts",
@@ -7422,7 +7652,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O3",
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/replace-one-subject-1.spec.ts",
@@ -7443,21 +7676,30 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "X1",
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/restoration-paired-composition.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T1",
+        "R1",
+        "E1",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/restoration-paired-work.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "work-count test: counts physical row writes and dependency reads during jumpTo; performance is gated by section 6 M/S gates, not rows"
     },
     {
       "source": "packages/kernel/src/lib/restoration-scoped-capture.spec.ts",
@@ -7465,7 +7707,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/restoration-turn-adapter.spec.ts",
@@ -7473,7 +7717,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "W5",
+        "T12"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/retained-source-public-controls.spec.ts",
@@ -7516,7 +7765,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "T5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/root-accessor-contract.spec.ts",
@@ -7554,7 +7807,10 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "L1",
+        "L2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/scalar-frame-finalize.spec.ts",
@@ -7647,7 +7903,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1",
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/signal-tree-type-matrix.typing.spec.ts",
@@ -7685,7 +7944,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/snapshot-builder.spec.ts",
@@ -7693,7 +7954,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1",
+        "O3",
+        "H1",
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/snapshot-identity-contract.spec.ts",
@@ -7701,7 +7967,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "W1",
+        "R7",
+        "H2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/staged-draft-editing-0.spec.ts",
@@ -7786,7 +8057,9 @@
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/tap-rekey-necessity.spec.ts",
@@ -7794,7 +8067,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "E1",
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/terminal-carriers.typing.spec.ts",
@@ -7845,7 +8121,17 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "T5",
+        "T10",
+        "L1",
+        "X1",
+        "O4",
+        "X3",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/transaction-reentrant-order.spec.ts",
@@ -7853,7 +8139,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T5",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/traversal-diagnostics.spec.ts",
@@ -7869,7 +8158,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X3",
+        "X6"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/tree-error-public-contract.spec.ts",
@@ -7904,7 +8196,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/undo-redo.spec.ts",
@@ -7912,7 +8207,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/unwrap-symbol-keys.spec.ts",
@@ -7928,7 +8227,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/upsert-many-reversal.spec.ts",
@@ -8012,7 +8313,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W5"
+      ]
     },
     {
       "source": "packages/kernel/src/lib/write-only-marker.spec.ts",
@@ -8020,7 +8323,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1",
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/public-barrel-carrier.typing.spec.ts",
