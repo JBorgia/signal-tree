@@ -30,6 +30,10 @@
 # The main loop always runs on Opus (MODEL below): every run passes --model and
 # the same model in its settings, extra arguments may not set a model or a
 # fallback model, and a run that reports any other model stops the supervisor.
+#
+# No tool attribution: the session's settings turn attribution off
+# ("attribution": false from Claude Code 2.1.281; on older versions the
+# commit and PR attribution texts are emptied and the session URL is off).
 #   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 set -uo pipefail
 
@@ -79,7 +83,10 @@ main() {
   local hook='git -C "$SIGNAL_TREE_VERIFY_DIR" fetch -q origin main && git -C "$SIGNAL_TREE_VERIFY_DIR" reset -q --hard origin/main && git -C "$SIGNAL_TREE_VERIFY_DIR" clean -qfdx -e node_modules && node "$SIGNAL_TREE_VERIFY_DIR/ci/unattended/stop-hook.mjs"'
   local settings
   # switchModelsOnFlag: false stops Claude Code re-running a flagged request on an older model.
-  settings=$(jq -cn --arg cmd "$hook" --arg model "$MODEL" '{model: $model, switchModelsOnFlag: false, hooks: {Stop: [{hooks: [{type: "command", command: $cmd, timeout: 600}]}]}}')
+  local attribution
+  attribution=$(attribution_setting "$(claude --version 2>/dev/null | awk '{print $1}')")
+  settings=$(jq -cn --arg cmd "$hook" --arg model "$MODEL" --argjson attribution "$attribution" \
+    '{model: $model, switchModelsOnFlag: false, attribution: $attribution, hooks: {Stop: [{hooks: [{type: "command", command: $cmd, timeout: 600}]}]}}')
 
   local backoff=60
   while true; do
@@ -124,6 +131,20 @@ main() {
       backoff=60
     fi
   done
+}
+
+# True when version $1 is at least $2 (dotted numbers).
+version_ge() {
+  [[ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -1)" == "$2" ]]
+}
+
+# The attribution setting for Claude Code version $1, as JSON.
+attribution_setting() {
+  if [[ -n $1 ]] && version_ge "$1" 2.1.281; then
+    echo false
+  else
+    echo '{"commit": "", "pr": "", "sessionUrl": false}'
+  fi
 }
 
 sync_verifier() {

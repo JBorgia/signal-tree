@@ -153,3 +153,23 @@ describe('supervisor model pin', () => {
     }
   });
 });
+
+describe('supervisor attribution setting', () => {
+  const script = new URL('./supervise.sh', import.meta.url).pathname;
+  const fn = (call: string) =>
+    // eval, not `source <(...)`: bash 3.2 (macOS) reads nothing from a sourced process substitution.
+    spawnSync('bash', ['-c', `eval "$(sed -n '/^version_ge()/,/^}/p;/^attribution_setting()/,/^}/p' "${script}")"; ${call}`], { encoding: 'utf8' }).stdout.trim();
+
+  it('turns attribution off with the single switch from 2.1.281', () => {
+    expect(fn('attribution_setting 2.1.323')).toBe('false');
+    expect(fn('attribution_setting 2.1.281')).toBe('false');
+  });
+
+  it('empties the attribution texts and the session URL on older versions or an unknown version', () => {
+    for (const v of ['2.1.280', '2.0.9', '']) expect(JSON.parse(fn(`attribution_setting '${v}'`))).toEqual({ commit: '', pr: '', sessionUrl: false });
+  });
+
+  it('passes the setting into every session', () => {
+    expect(readFileSync(script, 'utf8')).toContain('attribution: $attribution');
+  });
+});
