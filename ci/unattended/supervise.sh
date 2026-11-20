@@ -22,6 +22,12 @@
 #   SIGNAL_TREE_STATE_DIR         default ~/.signal-tree-unattended (session ID, hook state, logs)
 #   SIGNAL_TREE_VERIFY_DIR        default $SIGNAL_TREE_STATE_DIR/verify
 #   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"; may not set the model
+#   ANTHROPIC_API_KEY             required: the API key from the VM's secret store (#16)
+#
+# Authentication (Jonathan's ruling on #16): Claude Code uses an Anthropic API
+# key from the VM's secret store, never a browser login. The supervisor
+# refuses to start without one, clears any OAuth token from its environment,
+# and stops (instead of retrying) when a run ends on an authentication error.
 #
 # One session at a time: the supervisor holds the agent lock (refs/agent/lock
 # on the remote, see lock.mjs) for as long as it runs, and refuses to start
@@ -56,6 +62,11 @@ main() {
   fi
   # These would override the model the settings give (ANTHROPIC_MODEL outranks settings).
   unset ANTHROPIC_MODEL ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL
+  if [[ -z ${ANTHROPIC_API_KEY:-} ]]; then
+    echo "Refusing to start: set ANTHROPIC_API_KEY from the VM's secret store; the agent never uses a browser login (#16)." >&2
+    exit 6
+  fi
+  unset CLAUDE_CODE_OAUTH_TOKEN
   local log=$SIGNAL_TREE_STATE_DIR/session.log
   mkdir -p "$SIGNAL_TREE_STATE_DIR"
 
@@ -115,6 +126,11 @@ main() {
     local status=$?
     cat "$run_log" >> "$log"
     local ran_on
+    # An authentication failure will not fix itself: stop and say so instead of retrying.
+    if [[ -n $(auth_failure "$run_log") ]]; then
+      report "The unattended session could not authenticate: $(auth_failure "$run_log"). The supervisor has stopped; check the API key in the VM's secret store (#16)."
+      exit 7
+    fi
     # Every model the run reports: the init event and each assistant message.
     ran_on=$(jq -r 'select(.type == "system" and .subtype == "init") .model, select(.type == "assistant") .message.model' "$run_log" 2>/dev/null | sort -u | grep -v -x -e "$MODEL" -e '' | paste -sd, -)
     if [[ -n $ran_on ]]; then
@@ -131,6 +147,11 @@ main() {
       backoff=60
     fi
   done
+}
+
+# The error text of a run that failed to authenticate, or nothing.
+auth_failure() {
+  jq -r 'select(.type == "result" and .is_error == true) | .result // empty' "$1" 2>/dev/null | grep -i -m1 -E 'authenticat|api key|unauthori[sz]ed|401'
 }
 
 # True when version $1 is at least $2 (dotted numbers).
