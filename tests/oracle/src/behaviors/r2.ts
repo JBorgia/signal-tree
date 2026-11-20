@@ -1,4 +1,5 @@
-// R2 | Undo refuses the whole operation if it would overwrite a newer write
+// R2 | Undo refuses the whole operation and changes nothing if any write after
+// it, by any writer, touched a location it changed (as defined in T4)
 //
 // Applies where the history is fixed by the trace alone: every undoable
 // operation so far is a top-level undoable() write that changed something,
@@ -15,7 +16,8 @@ import { canonical } from '../trace.js';
 import { analyze, intersection, locValues, txStatus, type Loc } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
-export const ROW = 'Undo refuses the whole operation if it would overwrite a newer write';
+export const ROW =
+  'Undo refuses the whole operation and changes nothing if any write after it, by any writer, touched a location it changed (as defined in T4)';
 
 interface Entry {
   readonly step: number;

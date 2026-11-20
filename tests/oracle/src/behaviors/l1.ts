@@ -1,4 +1,7 @@
-// L1 | Links: endpoints and settled() while a transaction is pending; a
+// L1 | While a transaction that changed a linked location is pending, the link
+// sends nothing to its endpoint and settled() stays unresolved; on confirm the
+// link sends the confirmed value and settled() resolves only after the endpoint
+// acknowledges it; on rollback nothing is sent for the reversed writes. A
 // disposed link withdraws the consequences it held
 //
 // Checks the second clause: once dispose() succeeds, the link delivers
@@ -9,7 +12,7 @@ import { analyze, sourceCovers } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
-  'Links: endpoints and settled() while a transaction is pending; a disposed link withdraws the consequences it held';
+  'While a transaction that changed a linked location is pending, the link sends nothing to its endpoint and settled() stays unresolved; on confirm the link sends the confirmed value and settled() resolves only after the endpoint acknowledges it; on rollback nothing is sent for the reversed writes. A disposed link withdraws the consequences it held';
 
 export const L1 = instanceProperty({
   id: 'L1',

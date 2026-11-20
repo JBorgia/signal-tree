@@ -1,5 +1,10 @@
-// T4 | A later confirmed write that depends on the change refuses with
-// later-confirmed-dependency
+// T4 | Rolling back a transaction refuses with cause later-confirmed-dependency
+// and changes nothing when any later confirmed write touched a location it
+// changed. A location is a scalar leaf or a row (any of its fields, its key or
+// its presence). Every such write counts, including one that did not read the
+// value, wrote the same value, re-inserted a removed key, replaced the
+// collection (setAll, clear), ran in the same turn as the rollback call, or
+// came from a link; the rollback's own compensation never counts (T7)
 //
 // A later confirmed write (an ordinary or external write, or a newer
 // transaction confirmed before the rollback) depends on the change when it
@@ -11,7 +16,8 @@ import { analyze } from './analysis.js';
 import { dependents, involvesRekey, rollbackContexts, rollbackOutcome, unclassified } from './rollback.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
-export const ROW = 'A later confirmed write that depends on the change refuses with later-confirmed-dependency';
+export const ROW =
+  "Rolling back a transaction refuses with cause later-confirmed-dependency and changes nothing when any later confirmed write touched a location it changed. A location is a scalar leaf or a row (any of its fields, its key or its presence). Every such write counts, including one that did not read the value, wrote the same value, re-inserted a removed key, replaced the collection (setAll, clear), ran in the same turn as the rollback call, or came from a link; the rollback's own compensation never counts (T7)";
 
 export const T4 = instanceProperty({
   id: 'T4',

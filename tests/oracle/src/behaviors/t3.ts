@@ -1,6 +1,7 @@
-// T3 | Rolling back an older transaction while a newer overlapping one is
-// open refuses with cause later-pending-dependency; reversing the newer one
-// first, then the older, succeeds
+// T3 | Rolling back an older transaction while a newer pending transaction has
+// written a location the older one changed (as defined in T4) refuses with
+// cause later-pending-dependency and changes nothing; rolling back the newer
+// one first, then the older, succeeds
 //
 // Overlapping: both transactions changed a common location. Three checks:
 // (a) rollback of the older while the newer is pending refuses with cause
@@ -16,7 +17,7 @@ import { contextAt, involvesRekey, rollbackContexts, rollbackOutcome, writesWhol
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
-  'Rolling back an older transaction while a newer overlapping one is open refuses with cause later-pending-dependency; reversing the newer one first, then the older, succeeds';
+  'Rolling back an older transaction while a newer pending transaction has written a location the older one changed (as defined in T4) refuses with cause later-pending-dependency and changes nothing; rolling back the newer one first, then the older, succeeds';
 
 export const T3 = instanceProperty({
   id: 'T3',

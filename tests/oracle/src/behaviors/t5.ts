@@ -1,6 +1,8 @@
-// T5 | Supersession vs dependency: if newer truth removed the row
-// (superseded), rollback completes the rest of the turn; if newer truth
-// updated it (depends), rollback refuses
+// T5 | Supersession vs dependency: newer truth is a later write by another
+// writer context (for example origin 'server' or 'sync'). If it removed a row
+// the transaction changed, that row is superseded and rollback reverses the
+// rest of the turn; if it changed the row in any other way, it depends on the
+// change and rollback refuses per T4
 //
 // "Newer truth" is read as a later write inside external() (truth from
 // another authority); an ordinary write is not called truth by the row.
@@ -40,7 +42,7 @@ function replacesKey(w: WriteOp, key: string): boolean {
 }
 
 export const ROW =
-  'Supersession vs dependency: if newer truth removed the row (superseded), rollback completes the rest of the turn; if newer truth updated it (depends), rollback refuses';
+  "Supersession vs dependency: newer truth is a later write by another writer context (for example origin 'server' or 'sync'). If it removed a row the transaction changed, that row is superseded and rollback reverses the rest of the turn; if it changed the row in any other way, it depends on the change and rollback refuses per T4";
 
 /** Rows newer truth removed, when every later write is such a removal; undefined otherwise. */
 export function supersededOnly(ctx: RollbackContext): Set<Loc> | undefined {

@@ -43,7 +43,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'L3',
     generatable: false,
-    row: 'Local completion is never reported as remote durability',
+    row: 'No API reports a write as durable (settled() resolving, a receipt reading delivered) until the endpoint has acknowledged it; a local commit or confirm alone never does',
     reason:
       'The spec names no observable that reports remote durability: settled() is tied to pending transactions (L1) and PublicationReceipt has no specified fields.',
   },
