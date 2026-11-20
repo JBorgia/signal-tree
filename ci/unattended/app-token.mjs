@@ -4,8 +4,9 @@
 // supervise.sh).
 //
 //   node app-token.mjs token                  print an installation token
-//   node app-token.mjs git-credential <op>    git credential helper: answers `get` for
-//                                             https://github.com; ignores store and erase
+//   node app-token.mjs git-credential <op>    git credential helper for https://github.com:
+//                                             answers `get`, drops the cached token on
+//                                             `erase`, ignores `store`
 //
 // Environment:
 //   SIGNAL_TREE_APP_ID               the App's ID
@@ -13,8 +14,10 @@
 //   SIGNAL_TREE_APP_KEY_FILE         path to the App's private key (.pem)
 //   SIGNAL_TREE_STATE_DIR            default ~/.signal-tree-unattended; holds the token cache
 //
-// The token is cached in $SIGNAL_TREE_STATE_DIR/app-token.json (mode 0600) and
-// reused until 10 minutes before it expires; GitHub issues them for an hour.
+// Each token is limited to the signal-tree repository and the permissions in
+// TOKEN_REQUEST. It is cached in $SIGNAL_TREE_STATE_DIR/app-token.json (mode
+// 0600) and reused until 10 minutes before it expires; GitHub issues them for an
+// hour. Only installation tokens (ghs_...) are accepted, from GitHub or the cache.
 // Neither the key nor the token appears in any message; the token is written
 // only to stdout, by `token` and to git by the helper.
 //
@@ -28,11 +31,21 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
 
 export const API = 'https://api.github.com';
+/**
+ * The token's scope: this repository only, with the permissions the agent
+ * needs. Jonathan approved workflows write and actions read.
+ */
+export const TOKEN_REQUEST = {
+  repositories: ['signal-tree'],
+  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', workflows: 'write', actions: 'read' },
+};
 export const REFRESH_MARGIN_MS = 10 * 60 * 1000;
 const ATTEMPTS = 3;
 const REQUEST_TIMEOUT_MS = 30_000;
 
 const base64url = (text) => Buffer.from(text).toString('base64url');
+// Also keeps the credential helper's answer to git one line per attribute.
+const isInstallationToken = (token) => typeof token === 'string' && /^ghs_\w+$/.test(token);
 
 /** The App's JWT: RS256, issued 60 s back to allow for clock drift, expiring 9 minutes from now. */
 export function appJwt({ appId, privateKey, now = Date.now() }) {
@@ -77,7 +90,7 @@ export function readPrivateKey(keyFile) {
   return key;
 }
 
-/** The cached token, if it belongs to this App installation and has more than 10 minutes left. */
+/** The cached token, if it is an installation token for this App installation and TOKEN_REQUEST with more than 10 minutes left. */
 export function cachedToken({ appId, installationId, cacheFile }, now = Date.now()) {
   let cached;
   try {
@@ -85,7 +98,8 @@ export function cachedToken({ appId, installationId, cacheFile }, now = Date.now
   } catch {
     return null;
   }
-  if (cached?.appId !== appId || cached.installationId !== installationId || typeof cached.token !== 'string' || !cached.token) return null;
+  if (cached?.appId !== appId || cached.installationId !== installationId || !isInstallationToken(cached.token)) return null;
+  if (JSON.stringify(cached.request) !== JSON.stringify(TOKEN_REQUEST)) return null;
   return Date.parse(cached.expiresAt) - now > REFRESH_MARGIN_MS ? cached.token : null;
 }
 
@@ -133,9 +147,11 @@ export async function mintToken({ appId, installationId, privateKey, now = Date.
         headers: {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${appJwt({ appId, privateKey, now })}`,
+          'Content-Type': 'application/json',
           'User-Agent': 'signal-tree-ci',
           'X-GitHub-Api-Version': '2022-11-28',
         },
+        body: JSON.stringify(TOKEN_REQUEST),
         signal: globalThis.AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
     } catch (error) {
@@ -149,8 +165,8 @@ export async function mintToken({ appId, installationId, privateKey, now = Date.
       } catch {
         // Reported below as a response without a token.
       }
-      if (typeof body?.token !== 'string' || !body.token || Number.isNaN(Date.parse(body.expires_at))) {
-        throw new Error(`GitHub answered ${response.status} without a token and its expiry`);
+      if (!isInstallationToken(body?.token) || Number.isNaN(Date.parse(body.expires_at))) {
+        throw new Error(`GitHub answered ${response.status} without an installation token (ghs_...) and its expiry`);
       }
       return { token: body.token, expiresAt: body.expires_at };
     }
@@ -166,7 +182,7 @@ export async function getToken(config, { now = Date.now(), fetch, sleep } = {}) 
   if (cached) return cached;
   const privateKey = readPrivateKey(config.keyFile);
   const { token, expiresAt } = await mintToken({ appId: config.appId, installationId: config.installationId, privateKey, now, fetch, sleep });
-  writeCache(config.cacheFile, { appId: config.appId, installationId: config.installationId, token, expiresAt });
+  writeCache(config.cacheFile, { appId: config.appId, installationId: config.installationId, request: TOKEN_REQUEST, token, expiresAt });
   return token;
 }
 
@@ -182,15 +198,17 @@ export function parseCredentialRequest(text) {
 }
 
 /**
- * The helper's answer to git for `operation` and the request on stdin:
- * credentials for `get` on https://github.com, nothing for anything else.
- * `token` is called only when credentials are given.
+ * The helper's answer to git for `operation` and the request on stdin. For
+ * https://github.com: credentials for `get`; on `erase` (git does that when
+ * the server rejected them) `forget` drops the cached token, so the next `get`
+ * mints a new one. Nothing for other hosts or `store`.
  */
-export async function gitCredential(operation, request, token) {
-  if (operation !== 'get') return '';
+export async function gitCredential(operation, request, { token, forget }) {
   const { protocol, host } = parseCredentialRequest(request);
   if (protocol !== 'https' || host !== 'github.com') return '';
-  return `username=x-access-token\npassword=${await token()}\n`;
+  if (operation === 'get') return `username=x-access-token\npassword=${await token()}\n`;
+  if (operation === 'erase') await forget();
+  return '';
 }
 
 async function readStdin() {
@@ -210,7 +228,8 @@ async function main() {
   }
   if (mode === 'git-credential' && operation) {
     const request = await readStdin();
-    await write(process.stdout, await gitCredential(operation, request, () => getToken(configFromEnv())));
+    const forget = async () => rmSync(configFromEnv().cacheFile, { force: true });
+    await write(process.stdout, await gitCredential(operation, request, { token: () => getToken(configFromEnv()), forget }));
     return 0;
   }
   await write(process.stderr, 'usage: node app-token.mjs token | git-credential <get|store|erase>\n');
