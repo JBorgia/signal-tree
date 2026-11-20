@@ -172,7 +172,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'E3',
     generatable: false,
-    row: "**Atomic entity calls.** Every entity call is all-or-nothing. `addOne`/`addMany` on an existing key, `updateOne`/`updateMany` or `removeOne`/`removeMany` on a missing key, `changeId` from a missing key or onto an occupied one, and a key repeated within one call's input each refuse the whole call with a typed error naming the key: nothing is written, no history entry is recorded, and earlier work stays reversible. A successful update keeps the row's lifetime (E1), and `changeId` to the same key changes nothing.",
+    row: "**Atomic entity calls.** Every entity call is all-or-nothing. `addOne`/`addMany` on an existing key, `updateOne`/`updateMany` or `removeOne`/`removeMany` on a missing key, `changeId` from a missing key, a key change (by `changeId` or by an update to the selected fields) onto an occupied key, and a key repeated within one call's input each refuse the whole call with a typed error naming the key: nothing is written, no history entry is recorded, and earlier work stays reversible. A successful update keeps the row's lifetime (E1), and `changeId` to the same key changes nothing.",
     reason: ROWS_12_5,
   },
   {

@@ -3,13 +3,13 @@
 // changed, except a removal that T5 classifies as supersession. A location is a
 // scalar leaf, a row field, or a row's existence (its key and presence). A
 // write to a row field touches that field only. Adding, removing or replacing a
-// row, changing its key with changeId, and setAll or clear, touch that row's
-// existence, which every field of the row depends on. A write the seam skips as
-// unchanged is not a write and never counts. Every such write counts, including
-// one that did not read the value, wrote the same value, re-inserted a removed
-// key, replaced the collection (setAll, clear), ran in the same turn as the
-// rollback call, or came from a link; the rollback's own compensation never
-// counts (T7)
+// row, changing its key (changeId, or an update that changes what selectId
+// returns), and setAll or clear, touch that row's existence, which every field
+// of the row depends on. A write the seam skips as unchanged is not a write and
+// never counts. Every such write counts, including one that did not read the
+// value, wrote the same value, re-inserted a removed key, replaced the
+// collection (setAll, clear), ran in the same turn as the rollback call, or
+// came from a link; the rollback's own compensation never counts (T7)
 //
 // Applies at a rollback of a pending transaction when a later confirmed
 // write touched one of its locations (rollback.ts reads the location rules):
@@ -31,7 +31,7 @@ import { dependents, rollbackContexts, rollbackOutcome } from './rollback.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
-  "Rolling back a transaction refuses with cause later-confirmed-dependency and changes nothing when any later confirmed write touched a location it changed, except a removal that T5 classifies as supersession. A location is a scalar leaf, a row field, or a row's existence (its key and presence). A write to a row field touches that field only. Adding, removing or replacing a row, changing its key with changeId, and setAll or clear, touch that row's existence, which every field of the row depends on. A write the seam skips as unchanged is not a write and never counts. Every such write counts, including one that did not read the value, wrote the same value, re-inserted a removed key, replaced the collection (setAll, clear), ran in the same turn as the rollback call, or came from a link; the rollback's own compensation never counts (T7)";
+  "Rolling back a transaction refuses with cause later-confirmed-dependency and changes nothing when any later confirmed write touched a location it changed, except a removal that T5 classifies as supersession. A location is a scalar leaf, a row field, or a row's existence (its key and presence). A write to a row field touches that field only. Adding, removing or replacing a row, changing its key (changeId, or an update that changes what selectId returns), and setAll or clear, touch that row's existence, which every field of the row depends on. A write the seam skips as unchanged is not a write and never counts. Every such write counts, including one that did not read the value, wrote the same value, re-inserted a removed key, replaced the collection (setAll, clear), ran in the same turn as the rollback call, or came from a link; the rollback's own compensation never counts (T7)";
 
 export const T4 = instanceProperty({
   id: 'T4',

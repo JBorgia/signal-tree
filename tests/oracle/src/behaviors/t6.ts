@@ -1,6 +1,6 @@
-// T6 | A row whose key the transaction changed with changeId, and which a later
-// write by another writer context deleted, is superseded: rollback reverses the
-// rest of the turn
+// T6 | A row whose key the transaction changed (4.4), and which a later write
+// by another writer context deleted, is superseded: rollback reverses the rest
+// of the turn
 //
 // The transaction rekeyed a row (changeId from -> to: before it, `from` was
 // listed and `to` was not; after it, the reverse). Later another writer
@@ -16,7 +16,7 @@ import { completedRest } from './t5.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
-  'A row whose key the transaction changed with changeId, and which a later write by another writer context deleted, is superseded: rollback reverses the rest of the turn';
+  'A row whose key the transaction changed (4.4), and which a later write by another writer context deleted, is superseded: rollback reverses the rest of the turn';
 
 export const T6 = instanceProperty({
   id: 'T6',
