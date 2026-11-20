@@ -173,3 +173,41 @@ describe('supervisor attribution setting', () => {
     expect(readFileSync(script, 'utf8')).toContain('attribution: $attribution');
   });
 });
+
+describe('supervisor authentication (#16)', () => {
+  const script = new URL('./supervise.sh', import.meta.url).pathname;
+
+  it('refuses to start without an API key', () => {
+    const state = mkdtempSync(join(tmpdir(), 'signal-tree-sup-'));
+    try {
+      const env: Record<string, string | undefined> = { ...process.env, SIGNAL_TREE_ISOLATED: '1', SIGNAL_TREE_STATE_DIR: state };
+      delete env.ANTHROPIC_API_KEY;
+      const run = spawnSync('bash', [script], { env: env as NodeJS.ProcessEnv, encoding: 'utf8' });
+      expect(run.status).toBe(6);
+      expect(run.stderr).toContain('ANTHROPIC_API_KEY');
+    } finally {
+      rmSync(state, { recursive: true, force: true });
+    }
+  });
+
+  const authFailure = (lines: string[]) => {
+    const dir = mkdtempSync(join(tmpdir(), 'signal-tree-sup-'));
+    try {
+      const log = join(dir, 'run.log');
+      writeFileSync(log, lines.join('\n'));
+      return spawnSync('bash', ['-c', `eval "$(sed -n '/^auth_failure()/,/^}/p' "${script}")"; auth_failure "${log}"`], { encoding: 'utf8' }).stdout.trim();
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+
+  it('recognises a run that failed to authenticate', () => {
+    expect(authFailure(['{"type":"result","is_error":true,"result":"Failed to authenticate: OAuth session expired and could not be refreshed"}'])).toContain('authenticate');
+    expect(authFailure(['{"type":"result","is_error":true,"result":"Invalid API key"}'])).toContain('API key');
+  });
+
+  it('does not mistake another error or a success for one', () => {
+    expect(authFailure(['{"type":"result","is_error":true,"result":"Rate limited, retry later"}'])).toBe('');
+    expect(authFailure(['{"type":"result","is_error":false,"result":"done"}'])).toBe('');
+  });
+});
