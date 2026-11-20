@@ -9,6 +9,7 @@ import { L1 } from './l1.js';
 import { L2 } from './l2.js';
 import { R1 } from './r1.js';
 import { R2 } from './r2.js';
+import { R3 } from './r3.js';
 import { T1 } from './t1.js';
 import { T10 } from './t10.js';
 import { T2 } from './t2.js';
@@ -31,13 +32,6 @@ const UNEXPRESSED: readonly Unexpressed[] = [
     row: "Confirmed turns are retained only while a pending turn could need them; diagnostic history is opt-in (history: { retain: N }); truncated is reported truthfully",
     reason:
       'The vocabulary has no history option, and no subject exposes retained confirmed turns or a truncation report to observe.',
-  },
-  {
-    id: 'R3',
-    generatable: false,
-    row: 'Undo and redo after a settled transaction, and after an overlapping rollback, behave as in 15.3.1',
-    reason:
-      'The row defines its outcome as an old version\'s behavior ("as in 15.3.1"; ruling 3: "as in v16.0.0-rc.1"), and 12.1.1 withdraws old versions as authorities, so it states no outcome to check. It needs a restated row (#22, proposed and provisionally adopted).',
   },
   {
     id: 'R4',
@@ -85,7 +79,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   },
 ];
 
-const PROPERTIES: readonly Property[] = [T1, T2, T3, T4, T5, T6, T7, T9, T10, R1, R2, E1, E2, L1, L2, X1];
+const PROPERTIES: readonly Property[] = [T1, T2, T3, T4, T5, T6, T7, T9, T10, R1, R2, R3, E1, E2, L1, L2, X1];
 
 const byId = new Map<BehaviorId, CatalogEntry>([...PROPERTIES, ...UNEXPRESSED].map((e) => [e.id, e]));
 
