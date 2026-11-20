@@ -262,7 +262,7 @@ Gates measure what production feels: blocked interactions, dropped frames, heap 
 - Environment. CI Linux runner, Chrome stable via Playwright, CPU throttled 4× through CDP Emulation.setCPUThrottlingRate. Micro gates run in Node with --expose-gc.
 - Attribution. Store time is measured with marks around the seam, plugins and adapter. Long tasks come from the Long Animation Frames API with script attribution to @signal-tree/\* code.
 - Noise. Each scenario runs 5 times in fresh processes; the gate uses the median. The A/A noise of each scenario is measured in Phase 0. A regression is a median worse than main by more than the larger of 3% or the A/A noise.
-- CI. Every PR runs M1–M3, S1, S3, S6, S7 and the oracle at 10,000 sequences. Nightly runs all scenarios, S5 included, and the oracle at 100,000 sequences. Results are CI artifacts, never committed.
+- CI. Every PR runs M1–M3, S1, S3, S6, S7, S8 and the oracle at 10,000 sequences. Nightly runs all scenarios, S5 included, and the oracle at 100,000 sequences. Results are CI artifacts, never committed.
 
 ### 6.2 Scale parameters
 
@@ -292,6 +292,7 @@ These are defaults until Jonathan replaces them with first production adopter nu
 | S5 | Soak: 8 hours of S2 + S4 traffic with transactions, restoration({ retain: 100 }) and writers installed (nightly may compress time but must apply at least 2M writes) | Heap growth over the final half of the run ≤ 2%; every plugin's internal collections stay at or below their configured caps |
 | S6 | Scoped opt-in | (a) a core-only bundle contains no plugin code (symbol scan); (b) with every plugin attached to a different 10% subtree, M1, S1 and S2 stay within ±5% of a bare tree; (c) a bare tree is within ±2% of a build with the plugin folders deleted |
 | S7 | Contention: a write to a location held by 1, 2, 8 and 32 owners | Cost linear in owners (R² ≥ 0.95 against a linear fit); an uncontended write is unchanged (±10%) with 10 vs 10,000 links elsewhere (C4) |
+| S8 | Scaling: leaf write, row field write, addOne, removeOne, setAll, updateOne, transact + rollback of one row, undo of one row, all() and byId, each with 1,000 and with 100,000 rows in the collection | Per-operation median at 100,000 rows ≤ 2.0× the median at 1,000 (Node, 1×); allocations per operation for all() and byId do not grow with collection size. Baselines come from the new core in Phase 1; on the 15.4.9 shim, S8 records only |
 | Q1 | Correctness | 100% of ported tests pass; the oracle finds zero unlisted differences; every adapter passes its conformance and bypass suites |
 
 Reported, never gated: bundle sizes, nanoseconds per isolated operation, construction microseconds.
@@ -313,7 +314,7 @@ Phases run strictly in order. A phase closes only when every exit criterion is g
    - Plain cell, lazy structure, write seam, turns, writer context, entityMap, leaf(), typed errors and [ST####] codes.
    - The adapter conformance kit in @signal-tree/core/adapter.
    - Port every non-plugin spec in the manifest.
-   - Exit: M1–M3 and S3 green on the plain adapter; Q1 for the ported core tests; zero unlisted oracle differences for operations with no plugins installed.
+   - Exit: M1–M3, S3 and S8 green on the plain adapter (S8's baselines are recorded here); Q1 for the ported core tests; zero unlisted oracle differences for operations with no plugins installed.
 3. Phase 2: Angular adapter.
    - WritableSignal cells, .set and .update routing, bypass coverage for Signal Forms, model() and linkedSignal (4.5).
    - Adoption of signals passed in the initial state, injection-context lifetime binding (4.4), SSR state transfer.
