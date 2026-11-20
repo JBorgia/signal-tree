@@ -1,12 +1,18 @@
-// The behavior catalog: one entry per BRIEF.md 5.1 and 5.2 row, in table
+// The behavior catalog: one entry per BRIEF.md 5.1, 5.2 and 12.4 row, in table
 // order. A row the operation vocabulary can express has a property module;
 // any other row is listed with the reason it cannot be generated yet.
 // Where a row leaves room, the properties' readings are provisional pending
 // Jonathan's answer on #23 (BRIEF.md 11.2).
+import { D1 } from './d1.js';
 import { E1 } from './e1.js';
 import { E2 } from './e2.js';
+import { H1 } from './h1.js';
 import { L1 } from './l1.js';
 import { L2 } from './l2.js';
+import { O1 } from './o1.js';
+import { O2 } from './o2.js';
+import { O3 } from './o3.js';
+import { O4 } from './o4.js';
 import { R1 } from './r1.js';
 import { R2 } from './r2.js';
 import { R3 } from './r3.js';
@@ -19,11 +25,16 @@ import { T5 } from './t5.js';
 import { T6 } from './t6.js';
 import { T7 } from './t7.js';
 import { T9 } from './t9.js';
+import { W5 } from './w5.js';
 import { X1 } from './x1.js';
+import { X3 } from './x3.js';
 import { BEHAVIOR_IDS, type BehaviorId, type CatalogEntry, type Property, type Unexpressed } from './types.js';
 
 const NEW_BEHAVIOR =
   'New behavior (5.2): the published packages have no writer identity, holds or chunked ingest, so replaying them cannot exhibit it; it is tested against the new core.';
+
+const RELEASED_MEMORY =
+  'Needs a garbage-collection observation (a WeakRef or FinalizationRegistry cleared after a forced collection), which a replay cannot make deterministic; covered by hand-written tests on the new core.';
 
 const UNEXPRESSED: readonly Unexpressed[] = [
   {
@@ -77,9 +88,15 @@ const UNEXPRESSED: readonly Unexpressed[] = [
     row: "A large ingest can be chunked ({ chunk: 'auto' }) and yields between chunks. Each chunk is atomic to observers, and the whole ingest can be rolled back as one turn",
     reason: NEW_BEHAVIOR,
   },
+  {
+    id: 'D2',
+    generatable: false,
+    row: '**Released memory.** A removed row or field releases its memory once no history entry, pending transaction or held handle references it.',
+    reason: RELEASED_MEMORY,
+  },
 ];
 
-const PROPERTIES: readonly Property[] = [T1, T2, T3, T4, T5, T6, T7, T9, T10, R1, R2, R3, E1, E2, L1, L2, X1];
+const PROPERTIES: readonly Property[] = [T1, T2, T3, T4, T5, T6, T7, T9, T10, R1, R2, R3, E1, E2, L1, L2, X1, O1, O2, O3, O4, X3, D1, W5, H1];
 
 const byId = new Map<BehaviorId, CatalogEntry>([...PROPERTIES, ...UNEXPRESSED].map((e) => [e.id, e]));
 

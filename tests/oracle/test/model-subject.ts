@@ -2,18 +2,28 @@
 // and a few entity writes, inbound link values, optimistic transactions with
 // field-level rollback checks, optional undo/redo, and options that plant a
 // defect, fix the cause a rollback refuses with, or make replays differ.
+import { readerReads } from '../src/behaviors/analysis.js';
 import {
   payloadFor,
+  ROW_KEYS,
+  type ErrorInfo,
+  type HydrateValue,
+  type Json,
   type LeafPath,
   type LinkSource,
   type Observation,
+  type ObserverEvent,
   type Op,
   type OpKind,
   type Outcome,
+  type Reaction,
+  type ReadPaths,
+  type Reader,
   type Row,
+  type StateView,
   type WriteOp,
 } from '../src/model.js';
-import { attempt, HandleTable, type Session, type Subject } from '../src/subject.js';
+import { attempt, describeError, HandleTable, type Session, type Subject } from '../src/subject.js';
 
 export const MODEL_KINDS: readonly OpKind[] = [
   'setLeaf',
@@ -78,9 +88,33 @@ export interface ModelOptions {
   readonly redoOverwrites?: boolean;
   /** Planted: redo refuses only when a location it re-applies no longer holds the value undo left there. */
   readonly redoByValue?: boolean;
+  /** Planted (O1): every observer runs whenever an operation wrote, whatever it touched. */
+  readonly coarseReaders?: boolean;
+  /** Planted (O2): a transaction publishes each of its writes as it runs, not once at its end. */
+  readonly publishEachWrite?: boolean;
+  /** Planted (O2): history state is updated after the operation returns. */
+  readonly historyLater?: boolean;
+  /** Planted (O3): count() reads the count of the previous observation. */
+  readonly staleCount?: boolean;
+  /** Planted (O4): a reentrant write is applied at once, inside the turn being published. */
+  readonly reentrantInline?: boolean;
+  /** Planted (O4): a reentrant write is refused. */
+  readonly refuseReentrant?: boolean;
+  /** Planted (X3): a throwing observer stops the observers after it. */
+  readonly faultStops?: boolean;
+  /** Planted (X3): a throwing observer's error reaches the writer. */
+  readonly faultToWriter?: boolean;
+  /** Planted (D1): destroy() does nothing. */
+  readonly destroyKeeps?: boolean;
+  /** Planted (W5): writes after an await stay in the scope's transaction or history entry. */
+  readonly scopeCarries?: boolean;
+  /** Planted (H1): hydration writes each leaf as its own turn. */
+  readonly hydrateInParts?: boolean;
 }
 
 class ModelRefusal extends Error {}
+/** The typed error the model throws for any read or write of a destroyed tree (D1). */
+class ModelDestroyedError extends Error {}
 
 let sessions = 0;
 
@@ -205,12 +239,111 @@ class ModelSession implements Session {
   readonly #history: Entry[] = [];
   /** Index of the last applied entry; entries above it can be redone. */
   #index = -1;
+  readonly #watchers: { readonly index: number; readonly reader: Reader; readonly react: Reaction }[] = [];
+  #events: ObserverEvent[] = [];
+  #observerThrows = 0;
+  #reentrant = 0;
+  /** Writing observers that wrote since the last observation (each writes at most once in between, as in subjects/kernel.ts). */
+  readonly #wrote = new Set<number>();
+  /** Reentrant writes waiting for the turn being published to end. */
+  readonly #queued: { readonly path: LeafPath; readonly value: number }[] = [];
+  #destroyed = false;
+  #atReturn: Observation['restorationAtReturn'];
+  /** count() at the previous observation (staleCount). */
+  #lastCount = 0;
 
   constructor(supports: ReadonlySet<OpKind>, options: ModelOptions, offset: number, restoration: boolean) {
     this.#supports = supports;
     this.#options = options;
     this.#offset = offset;
     this.#restoration = restoration && !!options.restoration;
+  }
+
+  /** Runs `fn` as one turn: once it returns, observers of what it touched run, then reentrant writes run as turns of their own. */
+  #turn<T>(fn: () => T): T {
+    const logAt = this.#log.length;
+    const result = fn();
+    this.#publish(this.#log.slice(logAt));
+    return result;
+  }
+
+  #publish(entries: readonly Logged[]): void {
+    const touched = entries.flatMap((w) => [...w.touched]);
+    const due = this.#watchers.filter((o) =>
+      this.#options.coarseReaders ? entries.length > 0 : touched.some((loc) => readerReads(o.reader, loc))
+    );
+    let fault: Error | undefined;
+    for (const o of due) {
+      this.#events.push({ kind: 'run', observer: o.index, saw: this.#view() });
+      if (o.react.kind === 'throw') {
+        this.#observerThrows++;
+        if (this.#options.faultToWriter) fault ??= new Error('observer threw');
+        if (this.#options.faultStops) break;
+      } else if (o.react.kind === 'write' && !this.#wrote.has(o.index)) {
+        this.#wrote.add(o.index);
+        const event: { kind: 'write'; observer: number; path: LeafPath; value: number; error?: ErrorInfo } = {
+          kind: 'write',
+          observer: o.index,
+          path: o.react.path,
+          value: 10 + this.#reentrant++,
+        };
+        this.#events.push(event);
+        if (this.#options.refuseReentrant) event.error = describeError(new ModelRefusal('reentrant write refused'));
+        else if (this.#options.reentrantInline) this.#write({ kind: 'setLeaf', path: event.path, value: event.value - this.#offset }, false);
+        else this.#queued.push({ path: event.path, value: event.value });
+      }
+    }
+    for (let next = this.#queued.shift(); next; next = this.#queued.shift()) {
+      const { path, value } = next;
+      this.#turn(() => this.#write({ kind: 'setLeaf', path, value: value - this.#offset }, false));
+    }
+    if (fault) throw fault;
+  }
+
+  #view(state: State = this.#state): StateView {
+    const rows = [...state.rows.values()].map((r) => ({ ...r }));
+    return { a: state.a, cfg: { ...state.cfg }, rows, ids: [...state.rows.keys()] };
+  }
+
+  #paths(): ReadPaths {
+    const s = this.#state;
+    const byId: Record<string, ReadPaths['byId'][string]> = {};
+    for (const key of ROW_KEYS) {
+      const row = s.rows.get(key);
+      byId[key] = row ? { row: { ...row }, fields: { id: row.id, n: row.n, m: row.m } } : null;
+    }
+    const count = this.#options.staleCount ? this.#lastCount : s.rows.size;
+    this.#lastCount = s.rows.size;
+    return {
+      leaves: { a: s.a, 'cfg.p': s.cfg.p, 'cfg.q': s.cfg.q },
+      branch: { ...s.cfg },
+      snapshot: { a: s.a, cfg: { ...s.cfg }, rows: { all: [...s.rows.values()].map((r) => ({ ...r })) } },
+      count,
+      byId,
+    };
+  }
+
+  #restorationState(): Observation['restorationAtReturn'] {
+    if (!this.#restoration) return undefined;
+    return { canUndo: this.#index >= 0, canRedo: this.#index < this.#history.length - 1, index: this.#index, length: this.#history.length };
+  }
+
+  /** The fresh tree a hydration leaves, and what its leaf observers read: one turn, or (planted) one per leaf. */
+  #hydrate(): HydrateValue {
+    const state = this.#view();
+    const fresh: Record<'a' | 'cfg.p' | 'cfg.q', number> = { a: 0, 'cfg.p': 0, 'cfg.q': 0 };
+    const target: Record<'a' | 'cfg.p' | 'cfg.q', number> = { a: this.#state.a, 'cfg.p': this.#state.cfg.p, 'cfg.q': this.#state.cfg.q };
+    const paths = ['a', 'cfg.p', 'cfg.q'] as const;
+    return {
+      state,
+      observers: paths.map((path, i) => {
+        if (target[path] === fresh[path]) return { path, saw: [] };
+        if (!this.#options.hydrateInParts) return { path, saw: [state] };
+        // Leaves land one at a time, rows last.
+        const part = (p: (typeof paths)[number]) => (paths.indexOf(p) <= i ? target[p] : fresh[p]);
+        return { path, saw: [{ a: part('a'), cfg: { p: part('cfg.p'), q: part('cfg.q') }, rows: [], ids: [] }] };
+      }),
+    };
   }
 
   /**
@@ -346,23 +479,59 @@ class ModelSession implements Session {
     }, 'compensation');
   }
 
+  /** Runs the operation, then reads the history state as it returns (O2). */
   apply(op: Op): Outcome {
+    const prior = this.#restorationState();
+    const outcome = this.#apply(op);
+    this.#atReturn = this.#options.historyLater ? prior : this.#restorationState();
+    return outcome;
+  }
+
+  /** scope(async () => { before; await; after }): the writes after the await are later turns of their own. */
+  #scopeAwait(scope: 'transact' | 'undoable', before: readonly WriteOp[], after: readonly WriteOp[]): Json | undefined {
+    const carries = !!this.#options.scopeCarries;
+    if (scope === 'undoable') {
+      this.#turn(() =>
+        this.#recorded(true, () => {
+          for (const w of before) this.#write(w, false);
+          if (carries) for (const w of after) this.#write(w, false);
+        })
+      );
+      if (!carries) this.#turn(() => after.forEach((w) => this.#write(w, false)));
+      return undefined;
+    }
+    const start = copy(this.#state);
+    const index = this.#txs.size;
+    const logAt = this.#log.length;
+    this.#turn(() => before.forEach((w) => this.#write(w, false, index)));
+    if (carries) this.#turn(() => after.forEach((w) => this.#write(w, false, index)));
+    const tx: Tx = { before: start, changed: this.#changedIn(start, logAt), logAt, settled: false };
+    if (!carries) this.#turn(() => after.forEach((w) => this.#write(w, false)));
+    return { tx: this.#txs.add(tx) };
+  }
+
+  #apply(op: Op): Outcome {
     const kind = op.kind === 'write' ? op.write.kind : op.kind;
-    const nested = op.kind === 'transact' ? op.body.map((w) => w.kind) : [];
+    const body = op.kind === 'transact' ? op.body : op.kind === 'scopeAwait' ? [...op.before, ...op.after] : [];
+    const nested = body.map((w) => w.kind);
     if (op.kind === 'linkOpen' || op.kind === 'linkPush') {
       if (!this.#supports.has(op.kind)) return { status: 'unsupported', detail: `model has no ${op.kind}` };
+      if (this.#destroyed) return { status: 'error', error: describeError(new ModelDestroyedError('the tree is destroyed')) };
       return this.#link(op);
     }
     if (![kind, ...nested].every((k) => this.#supports.has(k))) {
       return { status: 'unsupported', detail: `model has no ${kind}` };
     }
+    if (this.#destroyed) return { status: 'error', error: describeError(new ModelDestroyedError('the tree is destroyed')) };
     switch (op.kind) {
       case 'write':
         return attempt(() => {
           let value: string | undefined;
-          this.#recorded(op.wrap === 'undoable', () => {
-            value = this.#write(op.write, op.wrap === 'external');
-          });
+          this.#turn(() =>
+            this.#recorded(op.wrap === 'undoable', () => {
+              value = this.#write(op.write, op.wrap === 'external');
+            })
+          );
           return value;
         });
       case 'transact':
@@ -370,26 +539,46 @@ class ModelSession implements Session {
           const before = copy(this.#state);
           const index = this.#txs.size;
           const logAt = this.#log.length;
-          const entry = this.#recorded(
-            op.undoable,
-            () => {
-              for (const w of op.body) if (!this.#options.dropInTransaction?.(w)) this.#write(w, false, index);
-            },
-            index
-          );
+          const body = () => {
+            for (const w of op.body) {
+              if (this.#options.dropInTransaction?.(w)) continue;
+              if (this.#options.publishEachWrite) this.#turn(() => this.#write(w, false, index));
+              else this.#write(w, false, index);
+            }
+          };
+          const entry = this.#options.publishEachWrite
+            ? this.#recorded(op.undoable, body, index)
+            : this.#turn(() => this.#recorded(op.undoable, body, index));
           const tx: Tx = { before, changed: this.#changedIn(before, logAt), logAt, settled: false, ...(entry ? { entry } : {}) };
           return { tx: this.#txs.add(tx) };
         });
       case 'undo':
         return attempt(() => {
-          this.#undo();
+          this.#turn(() => this.#undo());
           return undefined;
         });
       case 'redo':
         return attempt(() => {
-          this.#redo();
+          this.#turn(() => this.#redo());
           return undefined;
         });
+      case 'observe': {
+        const { reader, react } = op;
+        if (reader.kind === 'field' && !this.#state.rows.has(reader.id)) return { status: 'ok', value: { found: false } };
+        const index = this.#watchers.length;
+        this.#watchers.push({ index, reader, react });
+        return { status: 'ok', value: { observer: index } };
+      }
+      case 'destroy':
+        if (!this.#options.destroyKeeps) {
+          this.#destroyed = true;
+          this.#watchers.length = 0;
+        }
+        return { status: 'ok' };
+      case 'hydrate':
+        return { status: 'ok', value: this.#hydrate() as unknown as Json };
+      case 'scopeAwait':
+        return attempt(() => this.#scopeAwait(op.scope, op.before, op.after));
       case 'confirm':
       case 'rollback': {
         const resolved = this.#txs.resolve(op.tx);
@@ -400,7 +589,7 @@ class ModelSession implements Session {
           if (op.kind === 'rollback') {
             const cause = this.#options.rollbackCause;
             if (cause) throw new ModelRefusal(`rollback refused [${cause}]`, { cause: { kind: cause } });
-            this.#rollback(tx);
+            this.#turn(() => this.#rollback(tx));
             if (tx.entry) tx.entry.rolledBack = true;
           }
           tx.settled = op.kind === 'confirm' ? 'confirmed' : 'rolledBack';
@@ -426,7 +615,7 @@ class ModelSession implements Session {
           ? { kind: 'setBranch', p: op.value, q: op.value }
           : { kind: 'setAll', rows: value as unknown as Row[] };
     return attempt(() => {
-      this.#write(w, !this.#options.linkIsOrdinary);
+      this.#turn(() => this.#write(w, !this.#options.linkIsOrdinary));
       return { link: resolved.index };
     });
   }
@@ -505,26 +694,26 @@ class ModelSession implements Session {
   }
 
   observe(): Observation {
-    const rows = [...this.#state.rows.values()].map((r) => ({ ...r }));
-    return {
-      state: { a: this.#state.a, cfg: { ...this.#state.cfg }, rows, ids: [...this.#state.rows.keys()] },
+    const destroyed = { readError: describeError(new ModelDestroyedError('the tree is destroyed')) };
+    const restoration = this.#restorationState();
+    const observation: Observation = {
+      state: this.#destroyed ? destroyed : this.#view(),
       pushes: [],
       probes: [],
       receipts: [],
       treeErrors: [],
       warnings: [],
-      observerThrows: 0,
-      ...(this.#restoration
-        ? {
-            restoration: {
-              canUndo: this.#index >= 0,
-              canRedo: this.#index < this.#history.length - 1,
-              index: this.#index,
-              length: this.#history.length,
-            },
-          }
-        : {}),
+      observerThrows: this.#observerThrows,
+      observerEvents: this.#events,
+      ...(this.#destroyed ? {} : { paths: this.#paths() }),
+      ...(restoration ? { restoration } : {}),
+      ...(this.#atReturn ? { restorationAtReturn: this.#atReturn } : {}),
     };
+    this.#events = [];
+    this.#observerThrows = 0;
+    this.#wrote.clear();
+    this.#atReturn = undefined;
+    return observation;
   }
 
   close(): void {}

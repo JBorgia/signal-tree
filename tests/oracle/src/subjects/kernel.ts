@@ -5,6 +5,7 @@
 import {
   ALL_KINDS,
   INITIAL_SCALARS,
+  ROW_KEYS,
   payloadFor,
   type DeclarationKind,
   type ErrorInfo,
@@ -14,9 +15,15 @@ import {
   type ObservedPath,
   type LinkSource,
   type Observation,
+  type HydrateValue,
+  type StateView,
   type Op,
   type OpKind,
+  type ObserverEvent,
   type Outcome,
+  type Reaction,
+  type ReadPaths,
+  type Reader,
   type Row,
   type RowField,
   type TreeConfig,
@@ -42,8 +49,15 @@ interface KernelLocation {
 }
 
 interface KernelRowNode extends KernelLocation {
+  readonly id?: KernelLocation;
   readonly n: KernelLocation;
   readonly m: KernelLocation;
+}
+
+/** A collection reader: callable, and subscribable on some versions. */
+interface KernelReader {
+  (): unknown;
+  readonly subscribe?: (listener: () => void) => () => void;
 }
 
 interface KernelRows {
@@ -61,8 +75,9 @@ interface KernelRows {
   replaceOne(id: string, row: Row): void;
   clear(): void;
   byId(id: string): KernelRowNode | undefined;
-  all(): unknown;
-  ids(): unknown;
+  readonly all: KernelReader;
+  readonly ids: KernelReader;
+  readonly count: KernelReader;
 }
 
 interface KernelPending {
@@ -196,6 +211,14 @@ class KernelSession implements Session {
   readonly #carriers = new FirstSeenLabels('c');
   readonly #observers: (() => void)[] = [];
   #observerThrows = 0;
+  /** `observe` observers opened so far (their handles). */
+  #observerCount = 0;
+  #observerEvents: ObserverEvent[] = [];
+  /** Reentrant writes made so far; the next one writes 10 + this. */
+  #reentrant = 0;
+  /** Writing observers that wrote since the last observation: each writes at most once in between, so a chain of reentrant writes ends. */
+  readonly #wroteSinceObservation = new Set<number>();
+  #atReturn: Observation['restorationAtReturn'];
   #pushes: { link: number; value: Json }[] = [];
   #treeErrors: Observation['treeErrors'][number][] = [];
   #warnings: Observation['warnings'][number][] = [];
@@ -215,13 +238,15 @@ class KernelSession implements Session {
       });
     });
     this.#restoreConsole = this.#captureConsole();
+    this.#tree = this.#createTree();
+  }
+
+  #createTree(): KernelTree {
+    const kernel = this.#k;
     const enhancers: unknown[] = [];
-    if (config.transactions) enhancers.push(kernel.transactions());
-    if (config.restoration) enhancers.push(kernel.restoration());
-    this.#tree = kernel.signalTree(
-      { ...structuredClone(INITIAL_SCALARS), rows: kernel.entityMap({ selectId: (r) => r.id }) },
-      { enhancers }
-    );
+    if (this.#config.transactions) enhancers.push(kernel.transactions());
+    if (this.#config.restoration) enhancers.push(kernel.restoration());
+    return kernel.signalTree({ ...structuredClone(INITIAL_SCALARS), rows: kernel.entityMap({ selectId: (r) => r.id }) }, { enhancers });
   }
 
   #captureConsole(): () => void {
@@ -239,7 +264,31 @@ class KernelSession implements Session {
     };
   }
 
-  apply(op: Op): Outcome {
+  /** Runs the operation, then reads the restoration state before anything else can run (O2). */
+  apply(op: Op): Outcome | Promise<Outcome> {
+    const outcome = this.#apply(op);
+    if (outcome instanceof Promise) {
+      return outcome.then((o) => {
+        this.#atReturn = this.#readRestoration();
+        return o;
+      });
+    }
+    this.#atReturn = this.#readRestoration();
+    return outcome;
+  }
+
+  #readRestoration(): Observation['restorationAtReturn'] {
+    if (!this.#config.restoration) return undefined;
+    const tree = this.#tree as Required<Pick<KernelTree, 'canUndo' | 'canRedo' | 'getCurrentIndex' | 'getRestorationHistory'>>;
+    return {
+      canUndo: readOrError(() => tree.canUndo()),
+      canRedo: readOrError(() => tree.canRedo()),
+      index: readOrError(() => tree.getCurrentIndex()),
+      length: readOrError(() => tree.getRestorationHistory().length),
+    };
+  }
+
+  #apply(op: Op): Outcome | Promise<Outcome> {
     const missing = kindsOf(op).filter((kind) => !this.#supports.has(kind));
     if (missing.length) return { status: 'unsupported', detail: `${this.#profile.name} has no ${missing.join(', ')}` };
     switch (op.kind) {
@@ -354,7 +403,114 @@ class KernelSession implements Session {
           node.n(op.n);
           return { handle, carrier };
         });
+      case 'observe':
+        return this.#observe(op.reader, op.react);
+      case 'destroy':
+        return attempt(() => {
+          this.#tree.destroy();
+          return undefined;
+        });
+      case 'hydrate':
+        return attempt(() => this.#hydrate());
+      case 'scopeAwait':
+        return this.#scopeAwait(op.scope, op.before, op.after);
     }
+  }
+
+  /** The node a reader subscribes to, or why there is none. */
+  #readerNode(reader: Reader): { node: KernelReader } | { skip: string } | { found: false } {
+    const rows = this.#tree.$.rows;
+    if (reader.kind === 'leaf') return { node: this.#leaf(reader.path) };
+    if (reader.kind === 'field') {
+      const row = rows.byId(reader.id);
+      return row ? { node: row[reader.field] } : { found: false };
+    }
+    const node = rows[reader.kind];
+    return typeof node.subscribe === 'function' ? { node } : { skip: `${this.#profile.name} rows.${reader.kind} cannot be subscribed` };
+  }
+
+  #observe(reader: Reader, react: Reaction): Outcome {
+    const target = this.#readerNode(reader);
+    if ('skip' in target) return { status: 'skipped', detail: target.skip };
+    if ('found' in target) return { status: 'ok', value: { found: false } };
+    const subscribe = target.node.subscribe;
+    if (typeof subscribe !== 'function') return { status: 'skipped', detail: `${this.#profile.name} ${reader.kind} reader cannot be subscribed` };
+    return attempt(() => {
+      const observer = this.#observerCount;
+      const unsubscribe = subscribe.call(target.node, () => {
+        this.#observerEvents.push({ kind: 'run', observer, saw: readState(this.#tree) });
+        if (react.kind === 'throw') {
+          this.#observerThrows++;
+          throw new Error('observer threw');
+        }
+        if (react.kind === 'write' && !this.#wroteSinceObservation.has(observer)) {
+          this.#wroteSinceObservation.add(observer);
+          const value = 10 + this.#reentrant++;
+          // Recorded as issued, so a nested write comes after the write that caused it.
+          const event: { kind: 'write'; observer: number; path: LeafPath; value: number; error?: ErrorInfo } = {
+            kind: 'write',
+            observer,
+            path: react.path,
+            value,
+          };
+          this.#observerEvents.push(event);
+          try {
+            this.#leaf(react.path)(value);
+          } catch (thrown) {
+            event.error = describeError(thrown);
+          }
+        }
+      });
+      this.#observers.push(unsubscribe);
+      this.#observerCount++;
+      return { observer };
+    });
+  }
+
+  /** Serializes through the snapshot read and hydrates a fresh tree by a whole-value write. */
+  #hydrate(): Json {
+    const json = JSON.stringify(this.#tree.$());
+    const fresh = this.#createTree();
+    try {
+      const watched = (['a', 'cfg.p', 'cfg.q'] as const).map((path) => {
+        const saw: HydrateValue['observers'][number]['saw'][number][] = [];
+        const node = path === 'a' ? fresh.$.a : path === 'cfg.p' ? fresh.$.cfg.p : fresh.$.cfg.q;
+        node.subscribe(() => saw.push(readState(fresh)));
+        return { path, saw };
+      });
+      fresh.$(JSON.parse(json));
+      const value: HydrateValue = { state: readState(fresh), observers: watched };
+      return toJson(value);
+    } finally {
+      try {
+        fresh.destroy();
+      } catch {
+        // The fresh tree is the harness's own; its teardown is not an outcome.
+      }
+    }
+  }
+
+  /** scope(async () => { before; await; after }), waiting for the body to finish. */
+  async #scopeAwait(scope: 'transact' | 'undoable', before: readonly WriteOp[], after: readonly WriteOp[]): Promise<Outcome> {
+    let body: Promise<void> | undefined;
+    const run = (): Promise<void> => {
+      body = (async () => {
+        this.#body(before);
+        await Promise.resolve();
+        this.#body(after);
+      })();
+      return body;
+    };
+    const outcome = attempt((): Json | undefined => {
+      if (scope === 'undoable') {
+        this.#k.undoable(run);
+        return undefined;
+      }
+      const verb = this.#tree[this.#profile.transactVerb] as (fn: () => unknown) => KernelPending;
+      return { tx: this.#txs.add(verb.call(this.#tree, run)) };
+    });
+    await (body as Promise<void> | undefined)?.catch(() => undefined);
+    return outcome;
   }
 
   #observed(path: ObservedPath): KernelLocation {
@@ -539,6 +695,9 @@ class KernelSession implements Session {
       treeErrors: this.#treeErrors,
       warnings: this.#warnings,
       observerThrows: this.#observerThrows,
+      observerEvents: this.#observerEvents,
+      paths: readPaths(this.#tree),
+      ...(this.#atReturn ? { restorationAtReturn: this.#atReturn } : {}),
     };
     if (this.#config.restoration) {
       const tree = this.#tree as Required<Pick<KernelTree, 'canUndo' | 'canRedo' | 'getCurrentIndex' | 'getRestorationHistory'>>;
@@ -553,6 +712,9 @@ class KernelSession implements Session {
     this.#treeErrors = [];
     this.#warnings = [];
     this.#observerThrows = 0;
+    this.#observerEvents = [];
+    this.#wroteSinceObservation.clear();
+    this.#atReturn = undefined;
     return observation;
   }
 
@@ -572,11 +734,52 @@ class KernelSession implements Session {
           // A failing dispose is not an outcome of the sequence; the tree goes next.
         }
       }
-      this.#tree.destroy();
+      try {
+        this.#tree.destroy();
+      } catch {
+        // A sequence may have destroyed the tree already.
+      }
     } finally {
       this.#offTreeError();
       this.#restoreConsole();
     }
+  }
+}
+
+/** The state as StateView reads it, or `{ readError }`. */
+function readState(tree: KernelTree): StateView | { readError: ErrorInfo } {
+  try {
+    const rows = tree.$.rows;
+    return { a: toJson(tree.$.a()), cfg: toJson(tree.$.cfg()), rows: toJson(rows.all()), ids: toJson(rows.ids()) };
+  } catch (thrown) {
+    return { readError: describeError(thrown) };
+  }
+}
+
+/** Every read path O3 names, or `{ readError }` when one throws. */
+function readPaths(tree: KernelTree): ReadPaths | { readError: ErrorInfo } {
+  try {
+    const $ = tree.$;
+    const byId: Record<string, ReadPaths['byId'][string]> = {};
+    for (const key of ROW_KEYS) {
+      const node = $.rows.byId(key);
+      if (!node) {
+        byId[key] = null;
+        continue;
+      }
+      const fields: Record<string, Json> = { n: toJson(node.n()), m: toJson(node.m()) };
+      if (typeof node.id === 'function') fields['id'] = toJson(node.id());
+      byId[key] = { row: toJson(node()), fields };
+    }
+    return {
+      leaves: { a: toJson($.a()), 'cfg.p': toJson($.cfg.p()), 'cfg.q': toJson($.cfg.q()) },
+      branch: toJson($.cfg()),
+      snapshot: toJson($()),
+      count: toJson($.rows.count()),
+      byId,
+    };
+  } catch (thrown) {
+    return { readError: describeError(thrown) };
   }
 }
 

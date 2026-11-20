@@ -59,7 +59,10 @@ export const ROW =
 
 const ABSENT = 'absent';
 const ran = (s: StepInfo) => s.outcome.status === 'ok' || s.outcome.status === 'error';
-const marked = (s: StepInfo) => (s.op.kind === 'write' && s.op.wrap === 'undoable') || (s.op.kind === 'transact' && s.op.undoable);
+const marked = (s: StepInfo) =>
+  (s.op.kind === 'write' && s.op.wrap === 'undoable') ||
+  (s.op.kind === 'transact' && s.op.undoable) ||
+  (s.op.kind === 'scopeAwait' && s.op.scope === 'undoable');
 const succeeded = (s: StepInfo, kind: 'undo' | 'redo') => s.op.kind === kind && s.outcome.status === 'ok';
 
 /**

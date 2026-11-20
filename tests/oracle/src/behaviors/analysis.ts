@@ -9,11 +9,14 @@ import {
   INITIAL_SCALARS,
   payloadFor,
   type Json,
+  type LeafPath,
   type LinkMode,
   type LinkSource,
   type Observation,
   type Op,
   type Outcome,
+  type Reaction,
+  type Reader,
   type Row,
   type StateView,
   type StepRecord,
@@ -352,9 +355,10 @@ export interface StepInfo {
   readonly touches: Touches | undefined;
   /**
    * The change set may be incomplete (a state read failed, or rows could not
-   * be paired with ids), or may hold another step's asynchronous writes (an
-   * earlier same-tick step scheduled link or declaration work that landed in
-   * this step's drain).
+   * be paired with ids), or may hold writes that are not the operation's own:
+   * another step's asynchronous writes (an earlier same-tick step scheduled
+   * link or declaration work that landed in this step's drain), or an
+   * observer's reentrant writes.
    */
   readonly unknown: boolean;
   /** `transact` ok: the handle it opened. `inspect`, `confirm`, `rollback`: the handle it addressed. */
@@ -363,6 +367,22 @@ export interface StepInfo {
   readonly link?: number;
   /** Row handle opened (`rowHold` ok) or addressed (`rowHeldRead`, `rowHeldWrite`). */
   readonly row?: number;
+  /** Observer handle opened (`observe` ok with an observer). */
+  readonly observer?: number;
+  /**
+   * Writes observers made while this step's turn was published, in order
+   * (O4). A step with any is `unknown`: its change set holds writes that are
+   * not its operation's.
+   */
+  readonly reentrant: readonly { readonly observer: number; readonly path: LeafPath; readonly value: number }[];
+}
+
+export interface ObserverInfo {
+  readonly index: number;
+  /** The step that opened it. */
+  readonly step: number;
+  readonly reader: Reader;
+  readonly react: Reaction;
 }
 
 export interface TxInfo {
@@ -402,6 +422,7 @@ export interface Analysis {
   readonly txs: readonly TxInfo[];
   readonly links: readonly LinkInfo[];
   readonly rowHandles: readonly RowHandleInfo[];
+  readonly observers: readonly ObserverInfo[];
 }
 
 const applied = (outcome: Outcome) => outcome.status === 'ok' || outcome.status === 'error';
@@ -459,6 +480,26 @@ function touchesOf(
   return { sure, maybe: NONE };
 }
 
+/**
+ * Locations each group of writes touched, run one group after another from
+ * `before`; undefined unless together they reproduce `after`.
+ */
+export function touchesOfGroups(
+  before: StateView | undefined,
+  after: StateView | undefined,
+  groups: readonly (readonly WriteOp[])[]
+): Set<Loc>[] | undefined {
+  const sim = simOf(before);
+  if (!sim || !after) return undefined;
+  const out: Set<Loc>[] = [];
+  for (const group of groups) {
+    const sure = new Set<Loc>();
+    for (const w of group) if (!simWrite(sim, w, sure)) return undefined;
+    out.push(sure);
+  }
+  return simMatches(sim, locValues(after)) ? out : undefined;
+}
+
 const cache = new WeakMap<SpecTrace, Analysis>();
 
 /** Operations whose effects may land after they return, in the next drain. */
@@ -472,6 +513,9 @@ const ASYNC_KINDS = new Set<Op['kind']>([
   'declare',
 ]);
 
+/** Whether an operation's effects may land after it returns, in the next drain. */
+export const isAsyncKind = (kind: Op['kind']): boolean => ASYNC_KINDS.has(kind);
+
 export function analyze(trace: SpecTrace): Analysis {
   const cached = cache.get(trace);
   if (cached) return cached;
@@ -479,6 +523,7 @@ export function analyze(trace: SpecTrace): Analysis {
   const txs: { -readonly [K in keyof TxInfo]: TxInfo[K] }[] = [];
   const links: LinkInfo[] = [];
   const rowHandles: RowHandleInfo[] = [];
+  const observers: ObserverInfo[] = [];
   const resolve = (ref: number, count: number) => (count === 0 ? undefined : ref % count);
   let asyncCarried = false;
 
@@ -489,7 +534,10 @@ export function analyze(trace: SpecTrace): Analysis {
     const after = stateOf(record);
     const diffed = diff(before, after);
     const { changed } = diffed;
-    const unknown = diffed.unknown || asyncCarried;
+    const reentrant = (record.observation.observerEvents ?? []).flatMap((e) =>
+      e.kind === 'write' && !e.error ? [{ observer: e.observer, path: e.path, value: e.value }] : []
+    );
+    const unknown = diffed.unknown || asyncCarried || reentrant.length > 0;
     const { op } = step;
     asyncCarried = step.sameTick && (asyncCarried || ASYNC_KINDS.has(op.kind));
     const { outcome } = record;
@@ -503,17 +551,30 @@ export function analyze(trace: SpecTrace): Analysis {
       changed,
       touches: undefined,
       unknown,
+      reentrant,
     };
     let writes: readonly WriteOp[] | undefined;
     let inbound = false;
     if (outcome.status === 'ok') {
       if (op.kind === 'write') writes = [op.write];
       else if (op.kind === 'transact' || op.kind === 'declare') writes = op.body;
+      else if (op.kind === 'scopeAwait') writes = [...op.before, ...op.after];
     }
     switch (op.kind) {
       case 'transact':
         if (outcome.status === 'ok') info.tx = txs.length;
         break;
+      case 'scopeAwait':
+        if (op.scope === 'transact' && outcome.status === 'ok') info.tx = txs.length;
+        break;
+      case 'observe': {
+        const value = outcome.status === 'ok' ? outcome.value : undefined;
+        if (isRecord(value) && typeof value['observer'] === 'number') {
+          info.observer = observers.length;
+          observers.push({ index: observers.length, step: index, reader: op.reader, react: op.react });
+        }
+        break;
+      }
       case 'inspect':
       case 'confirm':
       case 'rollback': {
@@ -563,23 +624,26 @@ export function analyze(trace: SpecTrace): Analysis {
       default:
         break;
     }
-    info.touches = touchesOf(writes, inbound, before, after, changed);
-    if (info.tx !== undefined && op.kind === 'transact') {
+    // Reentrant writes land after the step's own (O4); they are leaf writes like any other.
+    const reentrantWrites = reentrant.map((r): WriteOp => ({ kind: 'setLeaf', path: r.path, value: r.value }));
+    info.touches = touchesOf(writes && [...writes, ...reentrantWrites], inbound, before, after, changed);
+    if (info.tx !== undefined && (op.kind === 'transact' || op.kind === 'scopeAwait')) {
       txs.push({
         index: txs.length,
         step: index,
-        body: op.body,
-        undoable: op.undoable,
+        body: op.kind === 'transact' ? op.body : op.before,
+        undoable: op.kind === 'transact' && op.undoable,
         changed,
         locs: changedLocations(changed, info.touches),
         touches: info.touches,
-        unknown,
+        // A transaction whose body awaited: which writes belong to it is W5's question, not one the other rows answer.
+        unknown: unknown || op.kind === 'scopeAwait',
       });
     }
     steps.push(info);
   });
 
-  const analysis: Analysis = { trace, steps, txs, links, rowHandles };
+  const analysis: Analysis = { trace, steps, txs, links, rowHandles, observers };
   cache.set(trace, analysis);
   return analysis;
 }
@@ -588,6 +652,50 @@ export function analyze(trace: SpecTrace): Analysis {
 export function txStatus(tx: TxInfo, step: number): 'pending' | 'confirmed' | 'rolledBack' {
   if (!tx.settled || tx.settled.step >= step) return 'pending';
   return tx.settled.how;
+}
+
+/** The step at which destroy() succeeded, if any. */
+export function destroyedAt(analysis: Analysis): number | undefined {
+  return analysis.steps.find((s) => s.op.kind === 'destroy' && s.outcome.status === 'ok')?.index;
+}
+
+/**
+ * Whether a reader reads `loc` (O1): a leaf reads itself; a field reader its
+ * field (and so the row's existence, which overlaps it); all() every row
+ * location; ids() and count() every row's existence.
+ */
+export function readerReads(reader: Reader, loc: Loc): boolean {
+  switch (reader.kind) {
+    case 'leaf':
+      return loc === reader.path;
+    case 'field':
+      return overlaps(loc, fieldLoc(reader.id, reader.field));
+    case 'all':
+      return isRowLoc(loc);
+    case 'ids':
+    case 'count':
+      return isExistenceLoc(loc);
+  }
+}
+
+/**
+ * The first step at which an observer may no longer read what it opened on:
+ * for a field reader, the first later step that touched or may have touched
+ * its row's existence (the row it subscribed through may be gone or rekeyed,
+ * E1), or whose touches cannot be seen; for any reader, the step that
+ * destroyed the tree. Infinity when there is none.
+ */
+export function observerValidUntil(analysis: Analysis, observer: ObserverInfo): number {
+  const destroyed = destroyedAt(analysis) ?? Infinity;
+  const { reader } = observer;
+  if (reader.kind !== 'field') return destroyed;
+  const exists = existenceLoc(reader.id);
+  for (const s of analysis.steps.slice(observer.step + 1)) {
+    if (s.index >= destroyed) break;
+    const t = s.touches;
+    if (s.unknown || !t || t.sure.has(exists) || t.maybe.has(exists) || s.changed.has(exists)) return s.index;
+  }
+  return destroyed;
 }
 
 /** Locations a link's source covers. Rows are matched by prefix. */
@@ -667,7 +775,14 @@ export function writeTargets(w: WriteOp): { readonly locs: readonly Loc[]; reado
 /** Whether a step that ran names a location overlapping `loc` in one of its own writes (writes, transactions, declarations). */
 export function names(op: Op, status: string, loc: Loc): boolean {
   if (status !== 'ok' && status !== 'error') return false;
-  const writes: readonly WriteOp[] = op.kind === 'write' ? [op.write] : op.kind === 'transact' || op.kind === 'declare' ? op.body : [];
+  const writes: readonly WriteOp[] =
+    op.kind === 'write'
+      ? [op.write]
+      : op.kind === 'transact' || op.kind === 'declare'
+        ? op.body
+        : op.kind === 'scopeAwait'
+          ? [...op.before, ...op.after]
+          : [];
   return writes.some((w) => {
     const t = writeTargets(w);
     return t.locs.some((l) => overlaps(l, loc)) || (t.allRows && isRowLoc(loc));
@@ -685,8 +800,10 @@ export function mayWrite(op: Op, loc: Loc): boolean {
     case 'write':
     case 'transact':
     case 'declare':
+    case 'scopeAwait':
       return names(op, 'ok', loc);
     case 'undo':
+    case 'destroy':
     case 'redo':
     case 'rollback':
     case 'linkOpen':

@@ -3,7 +3,9 @@
 // typed error that names the missing plugin
 //
 // At every undo() that succeeds, the locations it changed must all have been
-// changed by an earlier operation marked undoable (an undoable() write or an
+// changed by an earlier operation marked undoable (an undoable() write, an
+// undoable() scope that awaited (all of its writes, before and after the
+// await: which of them undo may reverse is W5's question), or an
 // undoable transaction); with none, undo() changes nothing.
 import { analyze, type Loc } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
@@ -23,7 +25,9 @@ export const R1 = instanceProperty({
     let known = true;
     for (const s of analysis.steps) {
       const marked =
-        (s.op.kind === 'write' && s.op.wrap === 'undoable') || (s.op.kind === 'transact' && s.op.undoable);
+        (s.op.kind === 'write' && s.op.wrap === 'undoable') ||
+        (s.op.kind === 'transact' && s.op.undoable) ||
+        (s.op.kind === 'scopeAwait' && s.op.scope === 'undoable');
       if (marked && s.outcome.status !== 'skipped' && s.outcome.status !== 'unsupported') {
         if (s.unknown) known = false;
         for (const loc of s.changed) undoable.add(loc);

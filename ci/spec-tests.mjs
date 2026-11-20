@@ -1,5 +1,5 @@
 // tests/spec-tests.json (BRIEF.md 12.1.6): a content hash for every test tagged
-// with a behavior ID from sections 5.1 and 5.2, for example `[T3]`. CI fails
+// with a behavior ID from sections 5.1, 5.2 and 12.4, for example `[T3]`. CI fails
 // when a tagged test is added, changed or removed without the same change to
 // tests/spec-tests.json, which is code-owned, so changing a spec test needs
 // Jonathan's review.
@@ -28,10 +28,11 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import { dirname, join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
+import { behaviorIdPattern } from './behavior-ids.mjs';
 import { publicEntries, repoRoot } from './entry-graph.mjs';
 
 export const SPEC_TESTS_PATH = join(repoRoot, 'tests', 'spec-tests.json');
-export const BEHAVIOR_ID = /\[(T10|T[1-9]|R[1-4]|E[12]|L[1-3]|X[12]|W[1-4])\]/g;
+export const BEHAVIOR_ID = behaviorIdPattern();
 const TEST_FILE = /\.(spec|test|prop)\.ts$/;
 const TEST_FUNCTIONS = new Set(['it', 'test', 'describe', 'suite']);
 export const SUPPORT_DIR = 'tests/support';

@@ -19,6 +19,7 @@ import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync } 
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { BEHAVIOR_IDS, behaviorIdPattern } from './behavior-ids.mjs';
 import { checkBoundaries } from './boundaries.mjs';
 import { CORE_ONLY_APP, pluginFolderIdentity, scanApp } from './core-bundle-scan.mjs';
 import { downloadArtifact, ghApi, repoSlug } from './github.mjs';
@@ -58,11 +59,7 @@ export function nightlyRunProblem(run) {
   if (oracle.determinism && oracle.determinism.mismatches !== 0) return `nightly run ${run.id}: replays were not deterministic`;
   return null;
 }
-export const BEHAVIORS = [
-  ...['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8', 'T9', 'T10'],
-  ...['R1', 'R2', 'R3', 'R4', 'E1', 'E2', 'L1', 'L2', 'L3', 'X1', 'X2'],
-  ...['W1', 'W2', 'W3', 'W4'],
-];
+export const BEHAVIORS = BEHAVIOR_IDS;
 /** C1–C6 and the gates that prove them (BRIEF.md 4.2 and 6.3). */
 export const COST_RULE_GATES = { C1: ['M1'], C2: ['S6'], C3: ['S6'], C4: ['S7'], C5: ['S5'], C6: ['M3'] };
 export const RELEASE_DOCS = ['README.md', 'CHANGELOG.md', 'docs/migration/from-14.md', 'docs/migration/from-15.md', 'docs/migration/from-16-rc.md'];
@@ -89,7 +86,7 @@ export const ITEMS = [
     },
   },
   {
-    title: 'Every behavior in 5.1 and 5.2 is covered by tests, and the test generator finds no spec violation by the new core at 100,000 sequences',
+    title: 'Every behavior in 5.1, 5.2 and 12.4 is covered by tests, and the test generator finds no spec violation by the new core at 100,000 sequences',
     check: ({ coveredBehaviors }) => {
       const missing = BEHAVIORS.filter((id) => !coveredBehaviors.has(id));
       return missing.length ? `no test title carries ${missing.map((id) => `[${id}]`).join(', ')}` : null;
@@ -157,9 +154,9 @@ export function evaluate(facts) {
 export function behaviorIdsIn(source) {
   const found = new Set();
   // it(...), it.only(...), describe.skip(...), and it.each(table)(...) forms.
-  const title = /\b(?:it|test|describe)(?:\.(?:only|skip|concurrent|sequential|todo|fails))*(?:\.each\((?:[^()]|\([^()]*\))*\))?\(\s*(['"`])(.*?)\1/gs;
+  const title = /\b(?:it|test|describe|suite)(?:\.(?:only|skip|concurrent|sequential|todo|fails))*(?:\.each\((?:[^()]|\([^()]*\))*\))?\(\s*(['"`])(.*?)\1/gs;
   for (const match of source.matchAll(title)) {
-    for (const id of match[2].matchAll(/\[(T10|T[1-9]|R[1-4]|E[12]|L[1-3]|X[12]|W[1-4])\]/g)) found.add(id[1]);
+    for (const id of match[2].matchAll(behaviorIdPattern())) found.add(id[1]);
   }
   return found;
 }
