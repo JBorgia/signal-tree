@@ -112,6 +112,8 @@ export interface ModelOptions {
   readonly hydrateInParts?: boolean;
   /** Planted (O3): changeId moves the row to the new key but leaves its id field, so the key is not selectId(row). */
   readonly changeIdKeepsField?: boolean;
+  /** As the published kernels: replaceOne keeps the key even when the new row has another id. */
+  readonly replaceKeepsKey?: boolean;
 }
 
 class ModelRefusal extends Error {}
@@ -686,7 +688,12 @@ class ModelSession implements Session {
       case 'replaceOne':
         // Its content is replaced; a new id is a key change (BRIEF.md 4.4: a row's key is always selectId(row)).
         if (!s.rows.has(w.id)) throw new Error(`Entity with id ${w.id} not found`);
-        if (w.row.id !== w.id && s.rows.has(w.row.id)) throw new Error(`Cannot change id to ${w.row.id}: already in use`);
+        if (this.#options.replaceKeepsKey || w.row.id === w.id) {
+          s.rows.set(w.id, { ...w.row });
+          touched.add(`rows.${w.id}`);
+          break;
+        }
+        if (s.rows.has(w.row.id)) throw new Error(`Cannot change id to ${w.row.id}: already in use`);
         s.rows.delete(w.id);
         s.rows.set(w.row.id, { ...w.row });
         touched.add(`rows.${w.id}`);

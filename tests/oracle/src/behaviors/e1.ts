@@ -6,8 +6,9 @@
 // under k again, that is another entity: a write through the old handle must
 // not change the row now under k, and a read through it must not return that
 // row (unless it is indistinguishable from the old one's last value).
-// Handles whose key is ever rekeyed (changeId) are not checked; a rekey keeps
-// the entity alive under another key.
+// Handles whose key may ever change (changeId, or a replace whose row has
+// another id: analysis.ts changesKey) are not checked; a rekey keeps the
+// entity alive under another key.
 import type { Json } from '../model.js';
 import { canonical } from '../trace.js';
 import { analyze, rekeys, rowAt } from './analysis.js';
