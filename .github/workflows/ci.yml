@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   checks:
-    name: Typecheck, lint, boundaries, S6(a), tests, port manifest
+    name: Typecheck, lint, boundaries, S6, tests, port manifest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,6 +58,81 @@ jobs:
         with:
           name: oracle-report
           path: tests/oracle/out/
+          if-no-files-found: ignore
+
+  pr-lookup:
+    # Finding 6: a branch with an open PR runs the gates through pull_request
+    # only, so a push to it does not start a second gates run.
+    name: Open PR for this branch?
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      open: ${{ steps.lookup.outputs.open }}
+    steps:
+      - id: lookup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count=$(gh pr list -R "$GITHUB_REPOSITORY" --head "$GITHUB_REF_NAME" --state open --json number -q 'length')
+          echo "open=$([ "$count" -gt 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  gates:
+    # Ruling 10: gates run on the dedicated self-hosted runner named by
+    # SIGNAL_TREE_GATES_RUNNER (#14), falling back to ubuntu-latest until it exists.
+    name: Gates (Angular reference app)
+    needs: pr-lookup
+    # Never on a fork's pull request: the gates runner is self-hosted and the repository public.
+    if: >-
+      always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+      && (github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
+      || (github.event_name == 'push' && needs.pr-lookup.outputs.open != 'true'))
+    runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
+    timeout-minutes: 120
+    permissions:
+      contents: read
+      actions: read
+    concurrency:
+      group: gates-${{ github.head_ref || github.ref_name }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install the Chromium pinned by the Playwright lock (ruling 10)
+        run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
+      - name: Typecheck the harness
+        run: pnpm --filter @signal-tree/bench typecheck
+      - name: Harness self-tests
+        run: pnpm bench:test
+      # Fails when main has a baseline that cannot be fetched, and when there is
+      # no baseline once budgets.json is approved (finding 1).
+      - name: Fetch main's latest baseline and A/A noise
+        if: github.ref != 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ci/gate-baseline.mjs --out "$RUNNER_TEMP/main-gates"
+      # --record-only takes effect only while budgets.json has "approved": false;
+      # once approved, red gates fail the job (finding 4).
+      - name: PR gates (M1–M3, S1, S3, S6, S7)
+        if: github.ref != 'refs/heads/main'
+        run: pnpm bench M1 M2 M3 S1 S3 S6 S7 --record-only $BASELINE_ARGS
+      - name: Main's baselines and A/A noise (M1–M3, S1, S2; ruling 9)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          pnpm bench M1 M2 M3 S1 S2 --aa --record-only
+          cp bench/out/aa-*-latest.json bench/out/aa-latest.json
+      - name: Keep the results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gate-results
+          path: bench/out/*.json
           if-no-files-found: ignore
 
   no-attribution:
