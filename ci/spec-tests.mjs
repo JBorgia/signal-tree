@@ -7,21 +7,34 @@
 //   node ci/spec-tests.mjs check     compare the tests with tests/spec-tests.json (CI)
 //   node ci/spec-tests.mjs update    rewrite tests/spec-tests.json from the tests
 //
-// A tagged unit is an it(), test() or describe() call whose title carries one
-// or more IDs; its hash covers the call's exact source, so a tagged describe
-// covers every test inside it. Test files are *.spec.ts, *.test.ts and
-// *.prop.ts under packages/ and tests/.
+// A tagged unit is an it(), test(), describe() or suite() call whose title
+// carries one or more IDs. Its hash covers the call's exact source, so a
+// tagged describe or suite covers every test inside it, plus the file's code
+// outside test calls (Jonathan, option 1 on #27): imports, helpers, hooks,
+// mocks, and the bodies of untagged describes that hold tagged tests. Editing
+// any of that changes every tagged unit in the file. Untagged tests, and
+// untagged describes with no tagged test inside, stay out of it and can
+// change freely. Test files are *.spec.ts, *.test.ts and *.prop.ts under
+// packages/ and tests/.
+//
+// A file with tagged tests may import only (Jonathan, review of #19): a
+// package's public entry point (an export of packages/*/package.json), a
+// module in the code-owned tests/support/ directory, or a module from outside
+// this repository (node: builtins and third-party packages). vi.mock(),
+// vi.importActual() and the like count as imports. Editing a helper a spec
+// test calls could otherwise weaken it without touching its hash.
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { dirname, join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
-import { repoRoot } from './entry-graph.mjs';
+import { publicEntries, repoRoot } from './entry-graph.mjs';
 
 export const SPEC_TESTS_PATH = join(repoRoot, 'tests', 'spec-tests.json');
 export const BEHAVIOR_ID = /\[(T10|T[1-9]|R[1-4]|E[12]|L[1-3]|X[12]|W[1-4])\]/g;
 const TEST_FILE = /\.(spec|test|prop)\.ts$/;
-const TEST_FUNCTIONS = new Set(['it', 'test', 'describe']);
+const TEST_FUNCTIONS = new Set(['it', 'test', 'describe', 'suite']);
+export const SUPPORT_DIR = 'tests/support';
 
 function walk(dir, out = []) {
   if (!existsSync(dir)) return out;
@@ -53,30 +66,117 @@ function titleOf(call) {
   return null;
 }
 
+const sha256 = (text) => createHash('sha256').update(text).digest('hex');
+
 /** Tagged units in one file's source: [{ title, ids, sha256 }]. */
 export function taggedUnits(source, fileName = 'test.ts') {
   const file = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-  const units = [];
+  const found = [];
   const seen = new Map();
+  // Pass 1: every titled test call, with its title path and whether it or a descendant is tagged.
   const visit = (node, path) => {
     let childPath = path;
+    let tagged = false;
+    let call = null;
     if (ts.isCallExpression(node) && testFunction(node.expression)) {
       const title = titleOf(node);
       if (title !== null) {
         childPath = [...path, title];
         const ids = [...new Set([...title.matchAll(BEHAVIOR_ID)].map((m) => m[1]))];
-        if (ids.length) {
-          const key = childPath.join(' > ');
-          const n = (seen.get(key) ?? 0) + 1;
-          seen.set(key, n);
-          units.push({ title: n > 1 ? `${key} (#${n})` : key, ids, sha256: createHash('sha256').update(node.getText(file)).digest('hex') });
-        }
+        call = { node, ids, childPath, children: [] };
+        found.push(call);
       }
     }
-    ts.forEachChild(node, (child) => visit(child, childPath));
+    const children = [];
+    ts.forEachChild(node, (child) => {
+      const result = visit(child, childPath);
+      tagged ||= result.tagged;
+      children.push(...result.calls);
+    });
+    if (call) {
+      call.children = children;
+      call.holdsTagged = call.ids.length > 0 || tagged;
+      return { tagged: call.holdsTagged, calls: [call] };
+    }
+    return { tagged, calls: children };
   };
-  visit(file, []);
+  const top = visit(file, []).calls;
+  // Pass 2: the file's context is its source minus the outermost tagged units and every test call with nothing tagged inside.
+  const cut = [];
+  const prune = (calls) => {
+    for (const c of calls) {
+      if (c.ids.length > 0 || !c.holdsTagged) cut.push([c.node.getStart(file), c.node.getEnd()]);
+      else prune(c.children);
+    }
+  };
+  prune(top);
+  cut.sort((a, b) => a[0] - b[0]);
+  let context = '';
+  let at = 0;
+  for (const [from, to] of cut) {
+    context += source.slice(at, from);
+    at = to;
+  }
+  context += source.slice(at);
+  const units = [];
+  for (const c of found) {
+    if (c.ids.length === 0) continue;
+    const key = c.childPath.join(' > ');
+    const n = (seen.get(key) ?? 0) + 1;
+    seen.set(key, n);
+    units.push({ title: n > 1 ? `${key} (#${n})` : key, ids: c.ids, sha256: sha256(`${c.node.getText(file)}\n\u0000context\n${context}`) });
+  }
   return units;
+}
+
+// vi.mock() and friends load or replace a module by specifier, so they count as imports.
+const VI_MODULE_CALLS = new Set(['mock', 'doMock', 'unmock', 'doUnmock', 'importActual', 'importMock']);
+
+/** Module specifiers a file loads: imports, re-exports, import(), require() and vi module calls with literal paths. */
+export function importsOf(source, fileName = 'test.ts') {
+  const file = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+  const found = [];
+  const visit = (node) => {
+    if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) && node.moduleSpecifier && ts.isStringLiteral(node.moduleSpecifier)) {
+      found.push(node.moduleSpecifier.text);
+    } else if (ts.isCallExpression(node) && node.arguments.length && ts.isStringLiteralLike(node.arguments[0])) {
+      const callee = node.expression;
+      const viCall =
+        ts.isPropertyAccessExpression(callee) && ts.isIdentifier(callee.expression) && callee.expression.text === 'vi' && VI_MODULE_CALLS.has(callee.name.text);
+      if (callee.kind === ts.SyntaxKind.ImportKeyword || (ts.isIdentifier(callee) && callee.text === 'require') || viCall) found.push(node.arguments[0].text);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(file);
+  return found;
+}
+
+/** Why a specifier is not allowed in a file with tagged tests, or null. `file` is repo-relative. */
+export function importProblem(specifier, file, publicSpecifiers) {
+  if (specifier.startsWith('.') || specifier.startsWith('/')) {
+    const target = join(dirname(file), specifier).split(sep).join('/');
+    return target === SUPPORT_DIR || target.startsWith(`${SUPPORT_DIR}/`) ? null : `"${specifier}" is not in ${SUPPORT_DIR}/`;
+  }
+  if (specifier.startsWith('@signal-tree/')) {
+    return publicSpecifiers.has(specifier) ? null : `"${specifier}" is not a package's public entry point`;
+  }
+  return null;
+}
+
+/** Import problems in files that hold tagged tests. */
+export function importProblems(root = repoRoot) {
+  const publicSpecifiers = new Set(publicEntries(root).map((e) => e.specifier));
+  const problems = [];
+  for (const path of [...walk(join(root, 'packages')), ...walk(join(root, 'tests'))]) {
+    const source = readFileSync(path, 'utf8');
+    if (taggedUnits(source, path).length === 0) continue;
+    const file = relative(root, path).split(sep).join('/');
+    for (const specifier of importsOf(source, path)) {
+      const problem = importProblem(specifier, file, publicSpecifiers);
+      if (problem) problems.push(`${file}: tagged tests may import only public entry points and ${SUPPORT_DIR}/; ${problem}`);
+    }
+  }
+  return problems;
 }
 
 /** Every tagged unit under packages/ and tests/, sorted. */
@@ -116,7 +216,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
       console.log('FAIL tests/spec-tests.json is missing');
       process.exit(1);
     }
-    const problems = compare(recorded, current);
+    const problems = [...compare(recorded, current), ...importProblems()];
     for (const p of problems) console.log(`FAIL ${p}`);
     console.log(
       problems.length
