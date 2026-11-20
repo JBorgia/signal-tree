@@ -1,8 +1,8 @@
-// R3 | Undo after a confirmed transaction reverses that transaction's
-// undoable writes as one operation, or refuses whole per R2. An undo entry
-// whose transaction was rolled back has nothing to reverse: undo skips it and
-// removes it from history. Redo re-applies exactly what undo reversed, or
-// refuses whole if a newer write would be overwritten.
+// R3 | Undo after a confirmed transaction reverses that transaction's undoable
+// writes as one operation, or refuses whole per R2. An undo entry whose
+// transaction was rolled back has nothing to reverse: undo skips it and removes
+// it from history. Redo re-applies exactly what undo reversed, or refuses whole
+// if any later write touched a location it would re-apply (as defined in T4).
 //
 // Locations and touches are T4's (analysis.ts): a newer write "on" a set of
 // locations touched one overlapping them.
@@ -53,7 +53,7 @@ import {
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
-  "Undo after a confirmed transaction reverses that transaction's undoable writes as one operation, or refuses whole per R2. An undo entry whose transaction was rolled back has nothing to reverse: undo skips it and removes it from history. Redo re-applies exactly what undo reversed, or refuses whole if a newer write would be overwritten.";
+  "Undo after a confirmed transaction reverses that transaction's undoable writes as one operation, or refuses whole per R2. An undo entry whose transaction was rolled back has nothing to reverse: undo skips it and removes it from history. Redo re-applies exactly what undo reversed, or refuses whole if any later write touched a location it would re-apply (as defined in T4).";
 
 const ABSENT = 'absent';
 const ran = (s: StepInfo) => s.outcome.status === 'ok' || s.outcome.status === 'error';
