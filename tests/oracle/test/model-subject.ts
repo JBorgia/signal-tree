@@ -1,6 +1,7 @@
 // A tiny in-memory subject for testing the generator itself: leaf, branch
-// and a few entity writes, optimistic transactions, and options that plant a
-// defect, fix the cause a rollback refuses with, or make replays differ.
+// and a few entity writes, optimistic transactions, optional undo/redo, and
+// options that plant a defect, fix the cause a rollback refuses with, or make
+// replays differ.
 import type { LeafPath, Observation, Op, OpKind, Outcome, Row, WriteOp } from '../src/model.js';
 import { attempt, HandleTable, type Session, type Subject } from '../src/subject.js';
 
@@ -24,6 +25,21 @@ export interface ModelOptions {
   readonly rollbackCause?: string;
   /** Each session adds a different offset to leaf writes, so replays of one sequence differ. */
   readonly nondeterministic?: boolean;
+  /**
+   * Adds undo and redo. Every undoable() write and undoable transaction gets a
+   * history entry when it runs; undo skips and removes entries whose
+   * transaction was rolled back, and undo and redo refuse when a newer write
+   * would be overwritten.
+   */
+  readonly restoration?: boolean;
+  /** Planted: undo restores only the first location an entry changed. */
+  readonly undoPartial?: boolean;
+  /** Planted: undo reverses even over a newer write. */
+  readonly undoOverwrites?: boolean;
+  /** Planted: undo steps past a rolled-back transaction's entry but leaves it in history. */
+  readonly keepRolledBack?: boolean;
+  /** Planted: redo re-applies even over a newer write. */
+  readonly redoOverwrites?: boolean;
 }
 
 class ModelRefusal extends Error {}
@@ -31,12 +47,12 @@ class ModelRefusal extends Error {}
 let sessions = 0;
 
 export function modelSubject(name: string, options: ModelOptions = {}): Subject {
-  const supports = new Set(options.kinds ?? MODEL_KINDS);
+  const supports = new Set<OpKind>([...(options.kinds ?? MODEL_KINDS), ...(options.restoration ? (['undo', 'redo'] as const) : [])]);
   return {
     name,
     description: 'in-memory model (generator tests only)',
     supports,
-    open: () => new ModelSession(supports, options, options.nondeterministic ? sessions++ % 2 : 0),
+    open: (config) => new ModelSession(supports, options, options.nondeterministic ? sessions++ % 2 : 0, config.restoration),
   };
 }
 
@@ -48,17 +64,87 @@ interface State {
 
 const copy = (s: State): State => ({ a: s.a, cfg: { ...s.cfg }, rows: new Map(s.rows) });
 
+/** Locations: `a`, `cfg.p`, `cfg.q`, `rows.<key>`; an absent row reads as undefined. */
+const LEAVES = ['a', 'cfg.p', 'cfg.q'] as const;
+const locsOf = (s: State) => [...LEAVES, ...[...s.rows.keys()].map((k) => `rows.${k}`)];
+function get(s: State, loc: string): string | undefined {
+  if (loc === 'a') return String(s.a);
+  if (loc === 'cfg.p') return String(s.cfg.p);
+  if (loc === 'cfg.q') return String(s.cfg.q);
+  const row = s.rows.get(loc.slice(5));
+  return row ? JSON.stringify(row) : undefined;
+}
+function put(s: State, loc: string, value: string | undefined): void {
+  if (loc === 'a') s.a = Number(value);
+  else if (loc === 'cfg.p') s.cfg = { ...s.cfg, p: Number(value) };
+  else if (loc === 'cfg.q') s.cfg = { ...s.cfg, q: Number(value) };
+  else if (value === undefined) s.rows.delete(loc.slice(5));
+  else s.rows.set(loc.slice(5), JSON.parse(value) as Row);
+}
+
+interface Entry {
+  readonly before: State;
+  readonly after: State;
+  /** Locations the operation changed. */
+  readonly locs: readonly string[];
+  readonly tx?: number;
+  rolledBack: boolean;
+}
+
 class ModelSession implements Session {
   #state: State = { a: 0, cfg: { p: 0, q: 0 }, rows: new Map() };
-  readonly #txs = new HandleTable<{ before: State; settled: boolean }>();
+  readonly #txs = new HandleTable<{ before: State; settled: boolean; entry?: Entry }>();
   readonly #supports: ReadonlySet<OpKind>;
   readonly #options: ModelOptions;
   readonly #offset: number;
+  readonly #restoration: boolean;
+  readonly #history: Entry[] = [];
+  /** Index of the last applied entry; entries above it can be redone. */
+  #index = -1;
 
-  constructor(supports: ReadonlySet<OpKind>, options: ModelOptions, offset: number) {
+  constructor(supports: ReadonlySet<OpKind>, options: ModelOptions, offset: number, restoration: boolean) {
     this.#supports = supports;
     this.#options = options;
     this.#offset = offset;
+    this.#restoration = restoration && !!options.restoration;
+  }
+
+  /** Runs `fn` and, when it is undoable and restoration is on, records a history entry. */
+  #recorded(undoable: boolean, fn: () => void, tx?: number): Entry | undefined {
+    const before = copy(this.#state);
+    fn();
+    if (!undoable || !this.#restoration) return undefined;
+    const after = copy(this.#state);
+    const locs = [...new Set([...locsOf(before), ...locsOf(after)])].filter((l) => get(before, l) !== get(after, l));
+    const entry: Entry = { before, after, locs, ...(tx === undefined ? {} : { tx }), rolledBack: false };
+    this.#history.splice(this.#index + 1);
+    this.#history.push(entry);
+    this.#index = this.#history.length - 1;
+    return entry;
+  }
+
+  #undo(): void {
+    while (this.#index >= 0 && this.#history[this.#index]?.rolledBack) {
+      if (!this.#options.keepRolledBack) this.#history.splice(this.#index, 1);
+      this.#index--;
+    }
+    const entry = this.#history[this.#index];
+    if (!entry) return;
+    if (!this.#options.undoOverwrites && entry.locs.some((l) => get(this.#state, l) !== get(entry.after, l))) {
+      throw new ModelRefusal('undo refused [newer-write]', { cause: { kind: 'newer-write' } });
+    }
+    for (const l of this.#options.undoPartial ? entry.locs.slice(0, 1) : entry.locs) put(this.#state, l, get(entry.before, l));
+    this.#index--;
+  }
+
+  #redo(): void {
+    const entry = this.#history[this.#index + 1];
+    if (!entry) return;
+    if (!this.#options.redoOverwrites && entry.locs.some((l) => get(this.#state, l) !== get(entry.before, l))) {
+      throw new ModelRefusal('redo refused [newer-write]', { cause: { kind: 'newer-write' } });
+    }
+    for (const l of entry.locs) put(this.#state, l, get(entry.after, l));
+    this.#index++;
   }
 
   apply(op: Op): Outcome {
@@ -69,12 +155,35 @@ class ModelSession implements Session {
     }
     switch (op.kind) {
       case 'write':
-        return attempt(() => this.#write(op.write));
+        return attempt(() => {
+          let value: string | undefined;
+          this.#recorded(op.wrap === 'undoable', () => {
+            value = this.#write(op.write);
+          });
+          return value;
+        });
       case 'transact':
         return attempt(() => {
           const before = copy(this.#state);
-          for (const w of op.body) if (!this.#options.dropInTransaction?.(w)) this.#write(w);
-          return { tx: this.#txs.add({ before, settled: false }) };
+          const tx = this.#txs.size;
+          const entry = this.#recorded(
+            op.undoable,
+            () => {
+              for (const w of op.body) if (!this.#options.dropInTransaction?.(w)) this.#write(w);
+            },
+            tx
+          );
+          return { tx: this.#txs.add({ before, settled: false, ...(entry ? { entry } : {}) }) };
+        });
+      case 'undo':
+        return attempt(() => {
+          this.#undo();
+          return undefined;
+        });
+      case 'redo':
+        return attempt(() => {
+          this.#redo();
+          return undefined;
         });
       case 'confirm':
       case 'rollback': {
@@ -87,6 +196,7 @@ class ModelSession implements Session {
             const cause = this.#options.rollbackCause;
             if (cause) throw new ModelRefusal(`rollback refused [${cause}]`, { cause: { kind: cause } });
             this.#state = copy(tx.before);
+            if (tx.entry) tx.entry.rolledBack = true;
           }
           tx.settled = true;
           return { tx: resolved.index };
@@ -148,6 +258,16 @@ class ModelSession implements Session {
       treeErrors: [],
       warnings: [],
       observerThrows: 0,
+      ...(this.#restoration
+        ? {
+            restoration: {
+              canUndo: this.#index >= 0,
+              canRedo: this.#index < this.#history.length - 1,
+              index: this.#index,
+              length: this.#history.length,
+            },
+          }
+        : {}),
     };
   }
 

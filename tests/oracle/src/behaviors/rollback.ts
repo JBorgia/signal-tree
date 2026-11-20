@@ -53,7 +53,7 @@ export interface LaterWrite {
 }
 
 /** Whether a step that ran names `loc` in one of its writes (writes, transactions, declarations). */
-function names(op: Op, status: string, loc: Loc): boolean {
+export function names(op: Op, status: string, loc: Loc): boolean {
   if (status !== 'ok' && status !== 'error') return false;
   const writes: readonly WriteOp[] = op.kind === 'write' ? [op.write] : op.kind === 'transact' || op.kind === 'declare' ? op.body : [];
   return writes.some((w) => {

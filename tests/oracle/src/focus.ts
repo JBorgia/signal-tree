@@ -129,7 +129,7 @@ const heldRow: Shape = {
     ]),
 };
 
-/** An undoable write, a newer write, then undo (R1, R2, X1). */
+/** An undoable write, a newer write, then undo (R1, R2, R3, X1). */
 const undoOverNewer: Shape = {
   needs: ['undo', 'redo', 'setLeaf', 'updateLeaf'],
   plugins: true,
@@ -160,6 +160,33 @@ const undoOverNewer: Shape = {
             ];
       segments.push(one({ kind: 'undo' }));
       if (redo) segments.push(one({ kind: 'redo' }), one({ kind: 'undo' }));
+      return segments;
+    }),
+};
+
+/** An undoable transaction confirmed or rolled back, then undo and redo around a newer write (R3). */
+const undoAroundTransaction: Shape = {
+  needs: ['transact', 'confirm', 'rollback', 'undo', 'redo', 'setLeaf'],
+  plugins: true,
+  segments: fc
+    .record({
+      path: leaf,
+      v: value,
+      both: fc.boolean(),
+      how: fc.constantFrom<'confirm' | 'rollback'>('confirm', 'rollback'),
+      newer: fc.constantFrom('none', 'before-undo', 'before-redo'),
+      redo: fc.boolean(),
+    })
+    .map(({ path, v, both, how, newer, redo }) => {
+      const second: LeafPath = path === 'a' ? 'cfg.p' : 'a';
+      const body: WriteOp[] = [{ kind: 'setLeaf', path, value: v }];
+      if (both) body.push({ kind: 'setLeaf', path: second, value: v });
+      const newerWrite = one(write({ kind: 'setLeaf', path, value: other(v) }));
+      const segments: Step[][] = [one(transact(body, true)), one(settle(how, 0))];
+      if (newer === 'before-undo') segments.push(newerWrite);
+      segments.push(one({ kind: 'undo' }));
+      if (newer === 'before-redo') segments.push(newerWrite);
+      if (redo || newer === 'before-redo') segments.push(one({ kind: 'redo' }));
       return segments;
     }),
 };
@@ -221,7 +248,15 @@ export function focusedArb(options: {
   readonly maxSteps: number;
   readonly noise: fc.Arbitrary<Step>;
 }): fc.Arbitrary<Sequence> | undefined {
-  const shapes = [overlapping(options.kinds.has('inspect')), newerTruth, heldRow, undoOverNewer, throwingObserver, disposedLink].filter(
+  const shapes = [
+    overlapping(options.kinds.has('inspect')),
+    newerTruth,
+    heldRow,
+    undoOverNewer,
+    undoAroundTransaction,
+    throwingObserver,
+    disposedLink,
+  ].filter(
     (shape) => shape.needs.every((kind) => options.kinds.has(kind)) && !(shape.plugins && options.plugins === 'none')
   );
   if (shapes.length === 0) return undefined;
