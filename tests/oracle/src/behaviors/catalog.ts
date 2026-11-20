@@ -43,7 +43,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'T8',
     generatable: false,
-    row: "Confirmed turns are retained only while a pending turn could need them; diagnostic history is opt-in (history: { retain: N }); truncated is reported truthfully",
+    row: 'Confirmed turns are retained only while a pending turn could need them; diagnostic history is opt-in (history: { retain: N }); truncated is reported truthfully',
     reason:
       'The vocabulary has no history option, and no subject exposes retained confirmed turns or a truncation report to observe.',
   },
@@ -100,7 +100,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'R5',
     generatable: false,
-    row: "**Exact reversal.** An undo, redo or rollback that is not refused leaves every location it reverses exactly as it was immediately before the reversed writes: scalar values, row field values and field presence (absent versus present with undefined), row existence, key and held handle, nested collections, and the absence of omitted members. Order is part of a collection's existence: a reversal restores the exact prior order, each row at its prior position. This holds when the reversed turn composed several writes to one row (update then remove, rekey then field write, remove then re-add) and when the prior value was written by another writer context.",
+    row: "**Exact reversal.** An undo, redo or rollback that is not refused leaves every location it reverses exactly as it was immediately before the reversed writes: scalar values, row field values and field presence (absent versus present with undefined), row existence, key and held handle, nested collections, and the absence of omitted members. Order is part of a collection's existence: a reversal restores the exact prior order, each row at its prior position. This holds when the reversed turn composed several writes to one row (update then remove, `changeId` then field write, remove then re-add) and when the prior value was written by another writer context.",
     reason: ROWS_12_5,
   },
   {
@@ -112,7 +112,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'R7',
     generatable: false,
-    row: '**Undo granularity.** One `undoable()` call records exactly one history entry, however many locations it writes; `undoable()` calls nested in it, or made in the same `tree.turn()`, join that entry, and `confirm()` alone records none. A turn whose undoable writes net to no change (rewriting the current value, adding then removing a row, a rekey round trip) records no entry, and writes composed in one turn record their net effect (an add then a rekey records one add under the final key).',
+    row: '**Undo granularity.** One `undoable()` call records exactly one history entry, however many locations it writes; `undoable()` calls nested in it, or made in the same `tree.turn()`, join that entry, and `confirm()` alone records none. A turn whose undoable writes net to no change (rewriting the current value, adding then removing a row, a `changeId` round trip) records no entry, and writes composed in one turn record their net effect (an add then a `changeId` records one add under the final key).',
     reason: ROWS_12_5,
   },
   {
@@ -148,7 +148,7 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'V5',
     generatable: false,
-    row: '**Caller input is never owned.** The tree never freezes, mutates or keeps a live reference to a caller-supplied object, row or array: after a write the caller may mutate its input without changing tree state, and a stored row keeps its prototype, symbol keys and non-enumerable fields.',
+    row: '**Caller input is never owned.** Plain objects and arrays a caller supplies are copied: the tree never freezes, mutates or keeps a live reference to them, so after a write the caller may mutate its input without changing tree state, and a stored row keeps its symbol keys and non-enumerable fields. Entity rows must be plain objects: a class-instance row refuses with a typed error naming its key. Opaque values (V2) stay stored by identity.',
     reason: ROWS_12_5,
   },
   {
@@ -172,13 +172,13 @@ const UNEXPRESSED: readonly Unexpressed[] = [
   {
     id: 'E3',
     generatable: false,
-    row: "**Atomic entity calls.** Every entity call is all-or-nothing. `addOne`/`addMany` on an existing key, `updateOne`/`updateMany` or `removeOne`/`removeMany` on a missing key, `rekey` onto an occupied or missing key, and a key repeated within one call's input each refuse the whole call with a typed error naming the key: nothing is written, no history entry is recorded, and earlier work stays reversible. A successful update keeps the row's lifetime (E1), and rekeying a key to itself changes nothing.",
+    row: "**Atomic entity calls.** Every entity call is all-or-nothing. `addOne`/`addMany` on an existing key, `updateOne`/`updateMany` or `removeOne`/`removeMany` on a missing key, `changeId` from a missing key or onto an occupied one, and a key repeated within one call's input each refuse the whole call with a typed error naming the key: nothing is written, no history entry is recorded, and earlier work stays reversible. A successful update keeps the row's lifetime (E1), and `changeId` to the same key changes nothing.",
     reason: ROWS_12_5,
   },
   {
     id: 'E4',
     generatable: false,
-    row: "**Collection order.** A collection has one order, which `all()`, `ids()`, snapshots and links report. New rows append after the existing tail in input order; `move` places a row where addressed; `rekey` and updates keep a row's position; `setAll` and a whole-value write set the order to the input's order; a removal closes the gap. An `all()` result already returned never changes.",
+    row: "**Collection order.** A collection's order is insertion order, which `all()`, `ids()`, snapshots and links report. New rows append after the existing tail in input order; `changeId` and updates keep a row's position; `setAll` and a whole-value write set the order to the input's order; a removal closes the gap. An `all()` result already returned never changes. Sorted views are the view layer's job.",
     reason: ROWS_12_5,
   },
   {
