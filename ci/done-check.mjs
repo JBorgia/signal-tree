@@ -86,9 +86,9 @@ export const ITEMS = [
   },
   {
     title: "Jonathan's first production adopter validation passes S1–S5 with real data on the slowest supported device",
-    check: ({ first production adopter }) => {
-      if (first production adopter.error) return `could not read issues: ${first production adopter.error}`;
-      return first production adopter.validated ? null : `no closed issue labeled adopter-validated closed by ${OWNER_LOGIN}`;
+    check: ({ adopter }) => {
+      if (adopter.error) return `could not read issues: ${adopter.error}`;
+      return adopter.validated ? null : `no closed issue labeled adopter-validated closed by ${OWNER_LOGIN}`;
     },
   },
   {
@@ -247,7 +247,7 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
     for (const line of processWordsIn(readFileSync(join(root, p), 'utf8'))) docs.processWords.push(`${p}:${line}`);
   }
 
-  const first production adopter = attempt(() => {
+  const adopter = attempt(() => {
     const issues = ghApi(`repos/${needRepo()}/issues?labels=adopter-validated&state=closed&per_page=100`).flatMap((p) => (Array.isArray(p) ? p : [p]));
     const validated = issues.some((i) => {
       const detail = ghApi(`repos/${needRepo()}/issues/${i.number}`)[0] ?? {};
@@ -286,7 +286,7 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
       .map((i) => `#${i.number} ${i.title}`),
   }));
 
-  return { nightly, coveredBehaviors, manifestProblems, budgetGates, rule7, docs, first production adopter, branches, mainTree, release, openQuestions };
+  return { nightly, coveredBehaviors, manifestProblems, budgetGates, rule7, docs, adopter, branches, mainTree, release, openQuestions };
 }
 
 // -------------------------------------------------------------------- main
