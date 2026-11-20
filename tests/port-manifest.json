@@ -575,7 +575,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Compile-time pin of the old devTools() method signatures and config typing; section 4 redesigns the API (12.1.2) and no row covers devtools"
     },
     {
       "source": "packages/kernel/src/enhancers/devtools/devtools-jump-0-1.spec.ts",
@@ -583,7 +583,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T4",
+        "X1",
+        "X2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/devtools/devtools-jump-0.spec.ts",
@@ -591,21 +595,29 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T4",
+        "R1",
+        "R2",
+        "X1",
+        "X2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/devtools/devtools-replay-interceptors.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/devtools/devtools-replay-omission.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "pins devtools time travel, which the spec drops with jumpTo (12.5, #57)"
     },
     {
       "source": "packages/kernel/src/enhancers/devtools/devtools-sanitize.spec.ts",
@@ -613,7 +625,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "H1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/devtools/devtools.spec.ts",
@@ -621,7 +635,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "D1",
+        "V8"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/enhancer-cleanup.spec.ts",
@@ -645,7 +662,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5",
+        "R8"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/add-many-overwrite-reversal.spec.ts",
@@ -653,7 +674,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/add-many-redo-order.spec.ts",
@@ -661,7 +686,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/clear-undoable.spec.ts",
@@ -669,7 +696,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/coalesced-turn-reversal-defect.spec.ts",
@@ -677,14 +707,19 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R5",
+        "R7"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/collection-order-refusals.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/committed-entity-capture.spec.ts",
@@ -692,7 +727,7 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Unit-tests internal EntityMutationFrame commit evidence and capture-runtime observer bookkeeping; these physical-store internals map to no row"
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/compensation-provenance.spec.ts",
@@ -700,21 +735,45 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T3",
+        "T7",
+        "R1",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/compound-compensation-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "T10",
+        "R2",
+        "R3",
+        "E1",
+        "X1",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/compound-compensation-retry-readiness.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T9",
+        "R2",
+        "R3",
+        "E1",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/cross-collection-lifetime.spec.ts",
@@ -722,14 +781,22 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/current-index.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R4",
+        "O2",
+        "R6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/declarative-structural-transition-0.spec.ts",
@@ -737,7 +804,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T4",
+        "R3",
+        "E1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/designated-collection-omission.spec.ts",
@@ -745,14 +817,26 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "T5",
+        "R2",
+        "R3",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/designation-coalescing.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "R7"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/documented-defects.spec.ts",
@@ -760,14 +844,25 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R4",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/entity-field-presence-capture.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "T9",
+        "R3",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/entity-field-presence.spec.ts",
@@ -775,7 +870,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/entity-membership-capture.spec.ts",
@@ -783,14 +881,25 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/external-authored-baseline-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "R1",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/external-authored-baseline.spec.ts",
@@ -798,21 +907,32 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "R5",
+        "R6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/fallback-placement.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/held-rows-window.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/hidden-collection-nesting.spec.ts",
@@ -820,14 +940,24 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T3",
+        "T5",
+        "R2",
+        "R3",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/hidden-location-v15.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/hidden-terminal-reversal.spec.ts",
@@ -835,7 +965,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T3",
+        "T5",
+        "R2",
+        "R3",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/hist0-baseline.spec.ts",
@@ -843,7 +980,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/hist0-remaining.spec.ts",
@@ -851,7 +992,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R4",
+        "X1",
+        "D2",
+        "R7"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/histc2-door.spec.ts",
@@ -859,7 +1007,14 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "X1",
+        "W5",
+        "R7",
+        "W6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/historical-materialization-0.spec.ts",
@@ -867,21 +1022,30 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R4",
+        "R6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/history-materialization-work.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "X4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/inspection-reorder-undo.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/jump-undo-equivalence.spec.ts",
@@ -889,14 +1053,20 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/large-batch-restoration-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R4",
+        "R6",
+        "V7"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/leaf-write-history.spec.ts",
@@ -904,7 +1074,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/literal-dotted-collection.spec.ts",
@@ -912,14 +1085,20 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R5",
+        "V4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/membership-declarative-delivery-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "O2",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/membership-reversal-delivery.spec.ts",
@@ -927,7 +1106,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "O2",
+        "O3",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/multi-collection-subject-collision.spec.ts",
@@ -935,7 +1120,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R4",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/never-claimed-retirement.spec.ts",
@@ -943,7 +1132,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R4",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/object-valued-field-reversal.spec.ts",
@@ -951,49 +1143,79 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/order-boundary-evidence.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Unit-tests the internal order-boundary evidence composer (interval crossing, enclosing orders, placement refusal, record visits); no row names it"
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/order-composition-readiness.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "E1",
+        "X1",
+        "O4",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/order-delta-chains.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/ordinary-capture-materialization.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/ordinary-removal-provenance.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/ordinary-removal-undo.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "R2",
+        "R3",
+        "X1",
+        "O3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/outcome-provenance.spec.ts",
@@ -1001,7 +1223,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T10",
+        "R3",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/p0c-divergence.spec.ts",
@@ -1009,7 +1235,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/p0c-row-divergence.spec.ts",
@@ -1017,21 +1246,28 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/paired-order-composer.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Unit-tests the internal paired order composer over synthetic topology intervals (physical vs ordinary continuity); no row names it"
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/paired-ordinary-boundary.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/pending-active-entity.spec.ts",
@@ -1039,14 +1275,26 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "R2",
+        "R3",
+        "X1",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/pending-footprint-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/pending-membership-admission.spec.ts",
@@ -1054,7 +1302,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1",
+        "O2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/pending-overlap-admission.spec.ts",
@@ -1062,7 +1315,12 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1",
+        "O4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/pending-overlap.spec.ts",
@@ -1070,14 +1328,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T4",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/planner-public-boundaries.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/position-capture-0.spec.ts",
@@ -1085,28 +1352,39 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/rebase-onto-rejection.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "notCarried": "Unit-tests internal rebaseOntoRejection/rebaseOrdersOntoRejection record rewriting (fields, removals, order, renames) and 20k scale; no row names it"
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/redo-truncation-claims.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/refused-jump-in-view.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/registered-slot-guards.spec.ts",
@@ -1114,21 +1392,26 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "notCarried": "Drives synthetic notifier writes to assert restoration capture/admission keyed by the internal position-registry slot; no row covers slot registration"
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/rejection-every-direction.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/rejection-order-rebase.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/rekey-claim-width-0.spec.ts",
@@ -1136,14 +1419,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R4",
+        "E1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-audit-regression.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-claim-boundary.spec.ts",
@@ -1151,7 +1443,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R4",
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-contract.typing.spec.ts",
@@ -1159,7 +1455,9 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-idle-density.spec.ts",
@@ -1167,7 +1465,13 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "R4",
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-metadata.spec.ts",
@@ -1175,14 +1479,21 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "W1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-missing-anchors.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "R2",
+        "R3",
+        "E1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-operation-outcome.spec.ts",
@@ -1190,14 +1501,21 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "X1",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-queued-authority.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "X1",
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-reactivity.spec.ts",
@@ -1205,14 +1523,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-reader-v16-controls.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "T3",
+        "R2",
+        "X1",
+        "X3",
+        "X4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-reader.spec.ts",
@@ -1220,14 +1547,26 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R4",
+        "X1",
+        "X2",
+        "O4",
+        "X3",
+        "D1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration-structured-authority.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration.behavior.spec.ts",
@@ -1235,7 +1574,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R6"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/restoration.spec.ts",
@@ -1252,7 +1594,11 @@
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "O4",
+        "X3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/reversal-known-limitations.spec.ts",
@@ -1260,21 +1606,31 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/reversal-scale.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/rollback-then-undoable.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/set-all-order-reversal.spec.ts",
@@ -1282,7 +1638,11 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "O3",
+        "R5"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/snapshot-sharing.spec.ts",
@@ -1290,14 +1650,23 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R7",
+        "X4"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/truncation-held-by-pending.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3",
+        "R4",
+        "D1",
+        "D2"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/turn-effect-composition.spec.ts",
@@ -1305,7 +1674,10 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R5",
+        "R7"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/turn-member-images.spec.ts",
@@ -1313,35 +1685,57 @@
         "v15.4.9",
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "R5",
+        "R7"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/two-setall-turn.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/unchanged-child-capture.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "X1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/write-in-view.spec.ts",
       "in": [
         "v15.4.9"
       ],
-      "pending": true
+      "covers": [
+        "R1",
+        "R3"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/restoration/zero-net-compensation.spec.ts",
       "in": [
         "v16.0.0-rc.1"
       ],
-      "pending": true
+      "covers": [
+        "T2",
+        "R2",
+        "R3",
+        "E1",
+        "X1",
+        "O1"
+      ]
     },
     {
       "source": "packages/kernel/src/enhancers/transactions/E-expanded-lifetime-anchor.spec.ts",
