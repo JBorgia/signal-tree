@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { collect, compare, taggedUnits } from './spec-tests.mjs';
+import { collect, compare, importProblems, taggedUnits } from './spec-tests.mjs';
 
 // Fixture sources are built from parts, so this file's own titles carry no behavior IDs.
 const tag = (id: string) => `[${id}]`;
@@ -98,5 +98,52 @@ describe('spec-tests check', () => {
     } finally {
       rmSync(root, { recursive: true, force: true });
     }
+  });
+});
+
+describe('spec-test imports (review of #19)', () => {
+  const pkg = (root: string) => {
+    mkdirSync(join(root, 'packages', 'core', 'src', 'transactions'), { recursive: true });
+    writeFileSync(join(root, 'packages', 'core', 'package.json'), JSON.stringify({ name: '@signal-tree/core', exports: { '.': './src/index.ts', './transactions': './src/transactions/index.ts' } }));
+    writeFileSync(join(root, 'packages', 'core', 'src', 'index.ts'), 'export {};\n');
+    writeFileSync(join(root, 'packages', 'core', 'src', 'transactions', 'index.ts'), 'export {};\n');
+  };
+  const scan = (imports: string, title = `${tag('T3')} rollback order`) => {
+    const root = mkdtempSync(join(tmpdir(), 'signal-tree-imp-'));
+    try {
+      pkg(root);
+      writeFileSync(join(root, 'packages', 'core', 'src', 'rollback.spec.ts'), `${imports}\nimport { it } from 'vitest';\nit('${title}', () => {});\n`);
+      return importProblems(root);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  };
+
+  it('allows public entry points, tests/support, node builtins and third-party modules', () => {
+    expect(scan(`import { signalTree } from '@signal-tree/core';\nimport { transactions } from '@signal-tree/core/transactions';\nimport { rows } from '../../../tests/support/rows';\nimport { readFileSync } from 'node:fs';\nimport fc from 'fast-check';`)).toEqual([]);
+  });
+
+  it.each([
+    ["import { seam } from './seam';", 'not in tests/support'],
+    ["import { seam } from '@signal-tree/core/src/seam';", 'not a package'],
+    ["export { helper } from '../../../tests/helpers';", 'not in tests/support'],
+    ["const m = await import('./internals/turns');", 'not in tests/support'],
+    ["const m = require('../index');", 'not in tests/support'],
+    ["vi.mock('./clock', () => ({ now: () => 0 }));", 'not in tests/support'],
+    ["const real = await vi.importActual('./turns');", 'not in tests/support'],
+    ["vi.mock('@signal-tree/core/src/writers');", 'not a package'],
+  ])('rejects %s in a file with tagged tests', (imports, message) => {
+    const problems = scan(imports);
+    expect(problems).toHaveLength(1);
+    expect(problems[0]).toContain(message);
+  });
+
+  it('leaves files without tagged tests alone', () => {
+    expect(scan("import { seam } from './seam';", 'an untagged test')).toEqual([]);
+  });
+
+  it('treats suite() like describe()', () => {
+    const units = taggedUnits(file(`suite('${tag('R2')} undo refuses over newer writes', () => { it('whole', () => {}); });`));
+    expect(units.map((u: { title: string; ids: string[] }) => u.ids)).toEqual([['R2']]);
   });
 });
