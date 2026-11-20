@@ -67,6 +67,8 @@ const location = fc.oneof(
 /** Two overlapping transactions settled in a chosen order (T2, T3, T4, T7, T9, X1). */
 const overlapping = (inspect: boolean): Shape => ({
   needs: ['transact', 'confirm', 'rollback', 'setLeaf', 'updateLeaf', 'addOne', 'updateOne'],
+  // T3 and T7 come almost only from here; weighted up to clear twice their floor (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
@@ -74,7 +76,12 @@ const overlapping = (inspect: boolean): Shape => ({
       v: value,
       read: fc.boolean(),
       undoable: fc.boolean(),
-      order: fc.constantFrom('older-first', 'newer-first', 'confirm-newer'),
+      // The two rollback orders reach T3 and T7; confirm-newer reaches T4, which has more sources.
+      order: fc.oneof(
+        { arbitrary: fc.constant('older-first' as const), weight: 2 },
+        { arbitrary: fc.constant('newer-first' as const), weight: 2 },
+        { arbitrary: fc.constant('confirm-newer' as const), weight: 1 }
+      ),
       look: fc.boolean(),
     })
     .map(({ at, v, read, undoable, order, look }) => {
@@ -96,6 +103,8 @@ const overlapping = (inspect: boolean): Shape => ({
 /** A transaction, then newer truth that removes or updates its row, then rollback (T4, T5, T6). */
 const newerTruth: Shape = {
   needs: ['transact', 'rollback', 'confirm', 'addOne', 'updateOne', 'removeOne', 'changeId', 'setLeaf'],
+  // Most of T5's instances come from here (#29).
+  weight: 3,
   plugins: true,
   segments: fc
     .record({
@@ -211,6 +220,8 @@ const laterTouch: Shape = {
  */
 const rekeyedRowDeleted: Shape = {
   needs: ['transact', 'rollback', 'confirm', 'addOne', 'updateOne', 'removeOne', 'removeMany', 'changeId', 'setLeaf'],
+  // T6 comes almost only from here (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
@@ -240,12 +251,21 @@ const rekeyedRowDeleted: Shape = {
 /** A held row handle whose key is removed and reused (E1, E2). */
 const heldRow: Shape = {
   needs: ['addOne', 'upsertOne', 'removeOne', 'rowHold', 'rowHeldRead', 'rowHeldWrite'],
+  // E1 and E2 come only from here (#29).
+  weight: 4,
   plugins: false,
   segments: fc
-    .record({ k: key, n: value, reuse: fc.constantFrom<'addOne' | 'upsertOne'>('addOne', 'upsertOne'), early: fc.boolean() })
-    .map(({ k, n, reuse, early }) => [
+    .record({ k: key, n: value, reuse: fc.constantFrom<'addOne' | 'upsertOne'>('addOne', 'upsertOne'), readFirst: fc.boolean() })
+    .map(({ k, n, reuse, readFirst }) => [
       one(write({ kind: 'addOne', row: { id: k, n: 0, m: 0 } })),
-      [step({ kind: 'rowHold', id: k }), ...(early ? [step({ kind: 'rowHeldRead', handle: 0 })] : [])],
+      // Two accesses while the row lives (a write of the value it already has), so E2
+      // always has a carrier to compare, whatever the handle does once the row is gone.
+      [
+        step({ kind: 'rowHold', id: k }),
+        ...(readFirst
+          ? [step({ kind: 'rowHeldRead', handle: 0 }), step({ kind: 'rowHeldWrite', handle: 0, n: 0 })]
+          : [step({ kind: 'rowHeldWrite', handle: 0, n: 0 }), step({ kind: 'rowHeldRead', handle: 0 })]),
+      ],
       one(write({ kind: 'removeOne', id: k })),
       one(write({ kind: reuse, row: { id: k, n, m: 0 } })),
       one({ kind: 'rowHeldWrite', handle: 0, n: other(n) }),
@@ -256,12 +276,20 @@ const heldRow: Shape = {
 /** An undoable write, a newer write, then undo (R1, R2, R3, X1). */
 const undoOverNewer: Shape = {
   needs: ['undo', 'redo', 'setLeaf', 'updateLeaf'],
+  // R2 comes almost only from here; weighted up to clear twice its floor (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
       path: leaf,
       v: value,
-      newer: fc.constantFrom('same', 'read', 'elsewhere', 'shared-turn'),
+      // 'same' and 'read' overwrite the undoable write and reach R2; the others reach R1 and R3.
+      newer: fc.oneof(
+        { arbitrary: fc.constant('same' as const), weight: 2 },
+        { arbitrary: fc.constant('read' as const), weight: 2 },
+        { arbitrary: fc.constant('elsewhere' as const), weight: 1 },
+        { arbitrary: fc.constant('shared-turn' as const), weight: 1 }
+      ),
       redo: fc.boolean(),
     })
     .map(({ path, v, newer, redo }) => {
@@ -291,6 +319,8 @@ const undoOverNewer: Shape = {
 /** An undoable transaction confirmed or rolled back, then undo and redo around a newer write (R3). */
 const undoAroundTransaction: Shape = {
   needs: ['transact', 'confirm', 'rollback', 'undo', 'redo', 'setLeaf'],
+  // R3's clauses (a) and (c) come mostly from here (#29).
+  weight: 4,
   plugins: true,
   segments: fc
     .record({
@@ -363,7 +393,8 @@ const disposedLink: Shape = {
  */
 const observed: Shape = {
   needs: ['observe', 'addOne', 'setLeaf', 'updateOne', 'setField', 'transact', 'rollback', 'undo'],
-  weight: 2,
+  // O4's reentrant writes come mostly from here (#29).
+  weight: 3,
   plugins: true,
   segments: fc
     .record({
