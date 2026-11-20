@@ -2,9 +2,9 @@
 // out-of-order rollbacks still succeed
 //
 // Applies to a rollback of a pending transaction whose locations were
-// changed afterwards only by rolling back newer transactions (their
-// compensation), with nothing newer still pending on them. Expected: the
-// rollback succeeds.
+// touched afterwards (T4's locations, rollback.ts) only by rolling back newer
+// transactions (their compensation), with nothing newer still pending on
+// them. Expected: the rollback succeeds.
 import { analyze } from './analysis.js';
 import { rollbackContexts, rollbackOutcome } from './rollback.js';
 import { instanceProperty, verdict, type Instance } from './types.js';

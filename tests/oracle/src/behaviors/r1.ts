@@ -1,5 +1,6 @@
-// R1 | Undo applies only to operations marked undoable() and requires
-// restoration()
+// R1 | Undo reverses only writes made inside undoable(); other writes in the
+// same turn stay. Calling undo or redo without restoration() installed throws a
+// typed error that names the missing plugin
 //
 // At every undo() that succeeds, the locations it changed must all have been
 // changed by an earlier operation marked undoable (an undoable() write or an
@@ -7,7 +8,8 @@
 import { analyze, type Loc } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
-export const ROW = 'Undo applies only to operations marked undoable() and requires restoration()';
+export const ROW =
+  'Undo reverses only writes made inside undoable(); other writes in the same turn stay. Calling undo or redo without restoration() installed throws a typed error that names the missing plugin';
 
 export const R1 = instanceProperty({
   id: 'R1',

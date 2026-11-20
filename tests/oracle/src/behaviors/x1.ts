@@ -1,5 +1,6 @@
-// X1 | [ST####] error codes and messages stay stable; refusals are typed and
-// name their cause
+// X1 | Every refusal and error the library throws is a typed error, never a
+// plain Error, carrying an [ST####] code from the published code table and
+// naming its cause; once released, a code keeps its meaning and its message
 //
 // Checks the second clause. A refusal is a rollback of a pending transaction
 // that throws, or an undo() or redo() that throws. Expected: the error is of
@@ -8,7 +9,8 @@
 import { analyze, txStatus } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
-export const ROW = '[ST####] error codes and messages stay stable; refusals are typed and name their cause';
+export const ROW =
+  'Every refusal and error the library throws is a typed error, never a plain Error, carrying an [ST####] code from the published code table and naming its cause; once released, a code keeps its meaning and its message';
 
 const BUILT_IN = new Set([
   'Error',

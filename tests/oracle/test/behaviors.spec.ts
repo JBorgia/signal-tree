@@ -43,7 +43,7 @@ describe('expected outcomes come from the property, not the subject', () => {
     const subjects = [
       modelSubject('pending', { rollbackCause: 'later-pending-dependency' }),
       modelSubject('confirmed', { rollbackCause: 'later-confirmed-dependency' }),
-      modelSubject('completes'),
+      modelSubject('completes', { conflicts: 'none' }),
     ];
     const { provenance, verdicts } = await judge(subjects, 'T3', overlapping);
     expect(provenance).toEqual({ pending: 'holds', confirmed: 'violates', completes: 'violates' });
@@ -76,13 +76,13 @@ describe('the published kernels', () => {
     const sequence: Sequence = {
       config: { transactions: true, restoration: false },
       steps: [
-        step({ kind: 'transact', undoable: false, body: [{ kind: 'setField', id: 'r0', n: 1 }] }),
-        step({ kind: 'transact', undoable: true, body: [{ kind: 'addOne', row: { id: 'r2', n: 0 } }] }),
+        step({ kind: 'transact', undoable: false, body: [{ kind: 'setField', id: 'r0', field: 'n', value: 1 }] }),
+        step({ kind: 'transact', undoable: true, body: [{ kind: 'addOne', row: { id: 'r2', n: 0, m: 0 } }] }),
         step({
           kind: 'transact',
           undoable: true,
           body: [
-            { kind: 'updateOne', id: 'r2', n: 1 },
+            { kind: 'updateOne', id: 'r2', field: 'n', value: 1 },
             { kind: 'setLeaf', path: 'a', value: 1 },
           ],
         }),

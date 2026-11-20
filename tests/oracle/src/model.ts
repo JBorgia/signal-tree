@@ -26,9 +26,18 @@ export type LeafPath = (typeof LEAF_PATHS)[number];
 export const ROW_KEYS = ['r0', 'r1', 'r2', 'r3', 'r4', 'r5'] as const;
 export type RowKey = (typeof ROW_KEYS)[number];
 
+/**
+ * A row's two data fields. Two, so a write to one field of a row can be told
+ * apart from a write to the row (T4's location model, T5's "another field of
+ * the same row").
+ */
+export const ROW_FIELDS = ['n', 'm'] as const;
+export type RowField = (typeof ROW_FIELDS)[number];
+
 export interface Row {
   readonly id: RowKey;
   readonly n: number;
+  readonly m: number;
 }
 
 /** Initial state every subject builds: `{ a: 0, cfg: { p: 0, q: 0 }, rows: <empty entity map of Row> }`. */
@@ -59,8 +68,8 @@ export type WriteOp =
   | { readonly kind: 'addOne'; readonly row: Row }
   | { readonly kind: 'addMany'; readonly rows: readonly Row[]; readonly mode: AddManyMode }
   | { readonly kind: 'setAll'; readonly rows: readonly Row[] }
-  | { readonly kind: 'updateOne'; readonly id: RowKey; readonly n: number }
-  | { readonly kind: 'updateMany'; readonly ids: readonly RowKey[]; readonly n: number }
+  | { readonly kind: 'updateOne'; readonly id: RowKey; readonly field: RowField; readonly value: number }
+  | { readonly kind: 'updateMany'; readonly ids: readonly RowKey[]; readonly field: RowField; readonly value: number }
   | { readonly kind: 'upsertOne'; readonly row: Row }
   | { readonly kind: 'upsertMany'; readonly rows: readonly Row[] }
   | { readonly kind: 'removeOne'; readonly id: RowKey }
@@ -69,8 +78,8 @@ export type WriteOp =
   | { readonly kind: 'prependOne'; readonly row: Row }
   | { readonly kind: 'replaceOne'; readonly id: RowKey; readonly row: Row }
   | { readonly kind: 'clear' }
-  /** Write one field through a row handle: `rows.byId(id).n(value)`. */
-  | { readonly kind: 'setField'; readonly id: RowKey; readonly n: number };
+  /** Write one field through a row handle: `rows.byId(id)[field](value)`. */
+  | { readonly kind: 'setField'; readonly id: RowKey; readonly field: RowField; readonly value: number };
 
 export type WriteKind = WriteOp['kind'];
 export const WRITE_KINDS: readonly WriteKind[] = [
@@ -331,12 +340,12 @@ export function payloadFor(source: LinkSource, value: number): Json {
       return { p: value, q: value };
     case 'rows': {
       const id = ROW_KEYS[value % ROW_KEYS.length] as RowKey;
-      return [{ id, n: value }];
+      return [{ id, n: value, m: value }];
     }
   }
 }
 
-const rowText = (r: Row) => `${r.id}:${r.n}`;
+const rowText = (r: Row) => `${r.id}:${r.n}/${r.m}`;
 
 export function formatWrite(w: WriteOp): string {
   switch (w.kind) {
@@ -361,9 +370,9 @@ export function formatWrite(w: WriteOp): string {
       return `${w.kind}([${w.rows.map(rowText).join(',')}])`;
     case 'updateOne':
     case 'setField':
-      return `${w.kind}(${w.id},n=${w.n})`;
+      return `${w.kind}(${w.id},${w.field}=${w.value})`;
     case 'updateMany':
-      return `updateMany([${w.ids.join(',')}],n=${w.n})`;
+      return `updateMany([${w.ids.join(',')}],${w.field}=${w.value})`;
     case 'removeOne':
       return `removeOne(${w.id})`;
     case 'removeMany':

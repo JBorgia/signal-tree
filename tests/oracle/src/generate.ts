@@ -6,6 +6,7 @@ import {
   LEAF_PATHS,
   LINK_SOURCES,
   OBSERVED_PATHS,
+  ROW_FIELDS,
   ROW_KEYS,
   WRITE_KINDS,
   pluginForKind,
@@ -74,7 +75,8 @@ const WEIGHTS: Record<OpKind, number> = {
 
 const small = fc.integer({ min: 0, max: 3 });
 const key = fc.constantFrom(...ROW_KEYS);
-const row: fc.Arbitrary<Row> = fc.record({ id: key, n: small });
+const row: fc.Arbitrary<Row> = fc.record({ id: key, n: small, m: small });
+const field = fc.constantFrom(...ROW_FIELDS);
 const rows = fc.array(row, { maxLength: 4 });
 const keys = fc.array(key, { minLength: 1, maxLength: 3 });
 const ref = fc.nat({ max: 3 });
@@ -98,8 +100,8 @@ const WRITE_ARBS: Record<WriteKind, fc.Arbitrary<WriteOp>> = {
     mode: weighted<'strict' | 'skip' | 'overwrite'>(['strict', 2], ['skip', 1], ['overwrite', 1]),
   }),
   setAll: fc.record({ kind: fc.constant('setAll'), rows }),
-  updateOne: fc.record({ kind: fc.constant('updateOne'), id: key, n: small }),
-  updateMany: fc.record({ kind: fc.constant('updateMany'), ids: keys, n: small }),
+  updateOne: fc.record({ kind: fc.constant('updateOne'), id: key, field, value: small }),
+  updateMany: fc.record({ kind: fc.constant('updateMany'), ids: keys, field, value: small }),
   upsertOne: fc.record({ kind: fc.constant('upsertOne'), row }),
   upsertMany: fc.record({ kind: fc.constant('upsertMany'), rows }),
   removeOne: fc.record({ kind: fc.constant('removeOne'), id: key }),
@@ -108,7 +110,7 @@ const WRITE_ARBS: Record<WriteKind, fc.Arbitrary<WriteOp>> = {
   prependOne: fc.record({ kind: fc.constant('prependOne'), row }),
   replaceOne: fc.record({ kind: fc.constant('replaceOne'), id: key, row }),
   clear: fc.constant({ kind: 'clear' }),
-  setField: fc.record({ kind: fc.constant('setField'), id: key, n: small }),
+  setField: fc.record({ kind: fc.constant('setField'), id: key, field, value: small }),
 };
 
 function writeArb(kinds: ReadonlySet<OpKind>): fc.Arbitrary<WriteOp> | undefined {

@@ -10,7 +10,7 @@
 // write are not checked.
 import type { Json, StateView, WriteOp } from '../model.js';
 import { canonical } from '../trace.js';
-import { analyze, locValues, rowLoc, type Loc } from './analysis.js';
+import { analyze, existenceLoc, locValues, rowAt, type Loc } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
@@ -54,8 +54,9 @@ function apply(m: Model, w: WriteOp): void {
     for (const k of keys) m.unknownRows.add(k);
   };
   const known = (key: string) => !m.allRowsUnknown && !m.unknownRows.has(key);
+  // A row is checked whole, named by its existence location.
   const touchRow = (key: string): void => {
-    m.touched.add(rowLoc(key));
+    m.touched.add(existenceLoc(key));
   };
   switch (w.kind) {
     case 'setLeaf':
@@ -69,7 +70,7 @@ function apply(m: Model, w: WriteOp): void {
       return setScalar('cfg.q', w.q);
     case 'addOne':
       if (known(w.row.id) && !m.rows.has(w.row.id)) {
-        m.rows.set(w.row.id, { id: w.row.id, n: w.row.n });
+        m.rows.set(w.row.id, { ...w.row });
         return touchRow(w.row.id);
       }
       return lose(w.row.id);
@@ -77,7 +78,7 @@ function apply(m: Model, w: WriteOp): void {
     case 'setField': {
       const row = m.rows.get(w.id);
       if (known(w.id) && row) {
-        m.rows.set(w.id, { ...row, n: w.n });
+        m.rows.set(w.id, { ...row, [w.field]: w.value });
         return touchRow(w.id);
       }
       return lose(w.id);
@@ -86,7 +87,7 @@ function apply(m: Model, w: WriteOp): void {
       const row = m.rows.get(w.row.id);
       // Present under its own id, merge and replace agree; otherwise only an absent key is unambiguous.
       if (known(w.row.id) && (!row || row['id'] === w.row.id)) {
-        m.rows.set(w.row.id, { ...(row ?? {}), id: w.row.id, n: w.row.n });
+        m.rows.set(w.row.id, { ...(row ?? {}), ...w.row });
         return touchRow(w.row.id);
       }
       return lose(w.row.id);
@@ -148,7 +149,8 @@ export const T1 = instanceProperty({
       for (const loc of model.touched) {
         const want = expectedValue(model, loc);
         if (want === undefined) continue;
-        const got = after.values.get(loc) ?? ABSENT;
+        const row = loc.startsWith('rows.') ? rowAt(s.after, loc.slice(5)) : null;
+        const got = row === null ? (after.values.get(loc) ?? ABSENT) : row === undefined ? ABSENT : canonical(row);
         expected[loc] = want === ABSENT ? ABSENT : (JSON.parse(want) as Json);
         observed[loc] = got === ABSENT ? ABSENT : (JSON.parse(got) as Json);
         if (want !== got) ok = false;

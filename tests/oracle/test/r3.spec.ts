@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { judge } from '../src/generator.js';
-import type { LeafPath, Sequence, Step } from '../src/model.js';
-import { modelSubject } from './model-subject.js';
+import type { LeafPath, Row, Sequence, Step } from '../src/model.js';
+import { MODEL_KINDS, modelSubject } from './model-subject.js';
 
 const step = (op: Step['op']): Step => ({ op, sameTick: false });
 const set = (path: LeafPath, value: number) => ({ kind: 'setLeaf', path, value }) as const;
@@ -96,5 +96,45 @@ describe('R3 (c): redo after undo', () => {
       expected: { status: 'refused', state: { a: 3 } },
       observed: { status: 'ok', state: { a: 2 } },
     });
+  });
+});
+
+describe('R3 (c), ruling on #26: redo refuses on any later touch of a location it would re-apply', () => {
+  it('expects a refusal when newer writes left the value redo would find, and catches a value-based redo', async () => {
+    const byValue = modelSubject('by-value', { restoration: true, redoByValue: true });
+    const { provenance, verdicts } = await judge(
+      [correct, byValue],
+      'R3',
+      sequence(write('a', 2, 'undoable'), step({ kind: 'undo' }), write('a', 1), write('a', 0), step({ kind: 'redo' }))
+    );
+    expect(provenance).toEqual({ correct: 'holds', 'by-value': 'violates' });
+    expect(verdicts['by-value']).toMatchObject({
+      kind: 'c-redo-over-newer-write',
+      step: 4,
+      expected: { status: 'refused', state: { a: 0 } },
+      observed: { status: 'ok', state: { a: 2 } },
+    });
+  });
+
+  it('re-applies a replaced row\'s existence, so a write to another field of it counts', async () => {
+    const kinds = [...MODEL_KINDS, 'replaceOne' as const];
+    const row = (n: number, m = 0): Row => ({ id: 'r1', n, m });
+    const subjects = [
+      modelSubject('correct', { kinds, restoration: true }),
+      modelSubject('field-only', { kinds, restoration: true, rewriteIsFieldOnly: true }),
+    ];
+    const { provenance, verdicts } = await judge(
+      subjects,
+      'R3',
+      sequence(
+        step({ kind: 'write', wrap: 'none', write: { kind: 'addOne', row: row(0) } }),
+        step({ kind: 'write', wrap: 'undoable', write: { kind: 'replaceOne', id: 'r1', row: row(1) } }),
+        step({ kind: 'undo' }),
+        step({ kind: 'write', wrap: 'none', write: { kind: 'updateOne', id: 'r1', field: 'm', value: 2 } }),
+        step({ kind: 'redo' })
+      )
+    );
+    expect(provenance).toEqual({ correct: 'holds', 'field-only': 'violates' });
+    expect(verdicts['field-only']).toMatchObject({ kind: 'c-redo-over-newer-write', expected: { status: 'refused' } });
   });
 });

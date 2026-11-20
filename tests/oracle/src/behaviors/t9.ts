@@ -14,9 +14,14 @@
 //     supersedes it, is not fixed by the row.
 // (d) once confirm() or rollback() succeeded, every later inspect() returns
 //     the same report (the snapshot).
+// Locations are T4's (analysis.ts): a path names a leaf, a row field
+// (`rows.<key>.<field>`) or a row's existence (`rows.<key>`), and a path
+// covers or is written by any location overlapping it. A write to another
+// field of a row does not write a reported field; one to the row's existence
+// does.
 import type { InspectValue, Json } from '../model.js';
 import { canonical } from '../trace.js';
-import { analyze, isRowLoc, locsOfPath, mayWrite, txStatus, type Loc, type StepInfo } from './analysis.js';
+import { analyze, isRowLoc, locsOfPath, mayWrite, overlaps, overlapsAny, txStatus, type Loc, type StepInfo } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
@@ -58,7 +63,7 @@ export const T9 = instanceProperty({
       const rekeys = tx.body.some((w) => w.kind === 'changeId');
       if (pending && !tx.unknown && !rekeys) {
         const parsed = changes.map((c) => locsOfPath(c.path));
-        const covered = (loc: Loc) => parsed.some((p) => p && (p.locs.includes(loc) || (p.allRows && isRowLoc(loc))));
+        const covered = (loc: Loc) => parsed.some((p) => p && (p.locs.some((l) => overlaps(l, loc)) || (p.allRows && isRowLoc(loc))));
         const missing = [...tx.changed].filter((loc) => !covered(loc));
         if (tx.changed.size > 0) {
           found.push(
@@ -76,7 +81,7 @@ export const T9 = instanceProperty({
       if (pending && !rekeys) {
         const between = analysis.steps.slice(tx.step + 1, s.index);
         const untouched = (locs: readonly Loc[]) =>
-          between.every((b) => !b.unknown && locs.every((loc) => !b.changed.has(loc) && !mayWrite(b.op, loc)));
+          between.every((b) => !b.unknown && !overlapsAny(b.changed, locs) && locs.every((loc) => !mayWrite(b.op, loc)));
         for (const c of changes) {
           const parsed = locsOfPath(c.path);
           if (!parsed || parsed.allRows || parsed.locs.length === 0 || !untouched(parsed.locs)) continue;

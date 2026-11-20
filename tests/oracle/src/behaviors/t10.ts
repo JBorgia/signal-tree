@@ -1,5 +1,7 @@
-// T10 | A throwing observer never strands transact(); observer errors reach
-// onTreeError (at most 50 per tree per second) and [ST2034]
+// T10 | A throwing observer of any kind (subscription, effect or plugin
+// observer) never strands transact() or its turn; each observer error reaches
+// onTreeError with code [ST2034], at most 50 reports per tree per second, after
+// which one report states how many further errors were suppressed
 //
 // The observer is the one observerOpen subscribes: it throws every time it is
 // notified. At every step where it threw:
@@ -14,7 +16,7 @@ import { analyze, outcomeSummary, txStatus } from './analysis.js';
 import { instanceProperty, verdict, type Instance } from './types.js';
 
 export const ROW =
-  'A throwing observer never strands transact(); observer errors reach onTreeError (at most 50 per tree per second) and [ST2034]';
+  'A throwing observer of any kind (subscription, effect or plugin observer) never strands transact() or its turn; each observer error reaches onTreeError with code [ST2034], at most 50 reports per tree per second, after which one report states how many further errors were suppressed';
 
 const CAP = 50;
 const SCALAR_WRITES = new Set(['setLeaf', 'updateLeaf', 'setBranch']);
