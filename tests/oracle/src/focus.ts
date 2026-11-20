@@ -1,0 +1,233 @@
+// Focused sequence shapes. Uniform draws over the vocabulary rarely line up
+// the several steps some behaviors need (two overlapping transactions rolled
+// back in a chosen order, a row removed by newer truth after a transaction
+// rekeyed it, a held handle whose key is reused). Each shape lays out those
+// steps with random parameters; random steps from the uniform vocabulary are
+// mixed in between. Shapes only arrange operations: what any outcome should
+// be is still decided by the behavior properties alone.
+import fc from 'fast-check';
+import type { PluginMode } from './generate.js';
+import {
+  LEAF_PATHS,
+  OBSERVED_PATHS,
+  ROW_KEYS,
+  type LeafPath,
+  type LinkSource,
+  type Op,
+  type OpKind,
+  type RowKey,
+  type Sequence,
+  type Step,
+  type WriteOp,
+  type Wrap,
+} from './model.js';
+
+interface Shape {
+  /** Operation kinds the shape uses; it is left out when any is not generated. */
+  readonly needs: readonly OpKind[];
+  readonly plugins: boolean;
+  /** Segments; random steps may be mixed in between them. */
+  readonly segments: fc.Arbitrary<Step[][]>;
+}
+
+const step = (op: Op, sameTick = false): Step => ({ op, sameTick });
+const write = (w: WriteOp, wrap: Wrap = 'none'): Op => ({ kind: 'write', write: w, wrap });
+const transact = (body: WriteOp[], undoable = false): Op => ({ kind: 'transact', body, undoable });
+const settle = (kind: 'confirm' | 'rollback' | 'inspect', tx: number): Op => ({ kind, tx });
+const one = (op: Op): Step[] => [step(op)];
+
+const key = fc.constantFrom(...ROW_KEYS);
+const twoKeys = fc.tuple(key, key).filter(([a, b]) => a !== b);
+const leaf = fc.constantFrom(...LEAF_PATHS);
+const value = fc.integer({ min: 1, max: 3 });
+/** A value in 1..3 other than `v`. */
+const other = (v: number) => (v % 3) + 1;
+
+/** A location two transactions both change: a leaf, or a row added first. */
+const location = fc.oneof(
+  leaf.map((path) => ({
+    setup: [] as WriteOp[],
+    write: (v: number, read: boolean): WriteOp =>
+      read ? { kind: 'updateLeaf', path, delta: v } : { kind: 'setLeaf', path, value: v },
+  })),
+  key.map((id) => ({
+    setup: [{ kind: 'addOne', row: { id, n: 0 } }] as WriteOp[],
+    write: (v: number): WriteOp => ({ kind: 'updateOne', id, n: v }),
+  }))
+);
+
+/** Two overlapping transactions settled in a chosen order (T2, T3, T4, T7, T9, X1). */
+const overlapping = (inspect: boolean): Shape => ({
+  needs: ['transact', 'confirm', 'rollback', 'setLeaf', 'updateLeaf', 'addOne', 'updateOne'],
+  plugins: true,
+  segments: fc
+    .record({
+      at: location,
+      v: value,
+      read: fc.boolean(),
+      undoable: fc.boolean(),
+      order: fc.constantFrom('older-first', 'newer-first', 'confirm-newer'),
+      look: fc.boolean(),
+    })
+    .map(({ at, v, read, undoable, order, look }) => {
+      const peek = (tx: number) => (inspect && look ? [step(settle('inspect', tx)), step(settle('inspect', tx))] : []);
+      const segments: Step[][] = [];
+      if (at.setup.length) segments.push(at.setup.map((w) => step(write(w))));
+      segments.push(one(transact([at.write(v, false)], undoable)), one(transact([at.write(other(v), read)], undoable)));
+      if (order === 'older-first') {
+        segments.push(one(settle('rollback', 0)), one(settle('rollback', 1)), [step(settle('rollback', 0)), ...peek(0)]);
+      } else if (order === 'newer-first') {
+        segments.push(one(settle('rollback', 1)), [step(settle('rollback', 0)), ...peek(1)]);
+      } else {
+        segments.push(one(settle('confirm', 1)), one(settle('rollback', 0)), one(settle('confirm', 0)));
+      }
+      return segments;
+    }),
+});
+
+/** A transaction, then newer truth that removes or updates its row, then rollback (T4, T5, T6). */
+const newerTruth: Shape = {
+  needs: ['transact', 'rollback', 'confirm', 'addOne', 'updateOne', 'removeOne', 'changeId', 'setLeaf'],
+  plugins: true,
+  segments: fc
+    .record({
+      keys: twoKeys,
+      n: value,
+      variant: fc.constantFrom('remove', 'update', 'rekey-remove', 'rekey-update'),
+      leafToo: fc.boolean(),
+      v: value,
+    })
+    .map(({ keys: [from, to], n, variant, leafToo, v }) => {
+      const rekey = variant.startsWith('rekey');
+      const body: WriteOp[] = [rekey ? { kind: 'changeId', from, to } : { kind: 'updateOne', id: from, n }];
+      if (leafToo) body.push({ kind: 'setLeaf', path: 'a', value: v });
+      const id: RowKey = rekey ? to : from;
+      const truth: WriteOp = variant.endsWith('remove') ? { kind: 'removeOne', id } : { kind: 'updateOne', id, n: other(n) };
+      return [
+        one(write({ kind: 'addOne', row: { id: from, n: 0 } })),
+        one(transact(body)),
+        one(write(truth, 'external')),
+        one(settle('rollback', 0)),
+        one(settle('confirm', 0)),
+      ];
+    }),
+};
+
+/** A held row handle whose key is removed and reused (E1, E2). */
+const heldRow: Shape = {
+  needs: ['addOne', 'upsertOne', 'removeOne', 'rowHold', 'rowHeldRead', 'rowHeldWrite'],
+  plugins: false,
+  segments: fc
+    .record({ k: key, n: value, reuse: fc.constantFrom<'addOne' | 'upsertOne'>('addOne', 'upsertOne'), early: fc.boolean() })
+    .map(({ k, n, reuse, early }) => [
+      one(write({ kind: 'addOne', row: { id: k, n: 0 } })),
+      [step({ kind: 'rowHold', id: k }), ...(early ? [step({ kind: 'rowHeldRead', handle: 0 })] : [])],
+      one(write({ kind: 'removeOne', id: k })),
+      one(write({ kind: reuse, row: { id: k, n } })),
+      one({ kind: 'rowHeldWrite', handle: 0, n: other(n) }),
+      one({ kind: 'rowHeldRead', handle: 0 }),
+    ]),
+};
+
+/** An undoable write, a newer write, then undo (R1, R2, X1). */
+const undoOverNewer: Shape = {
+  needs: ['undo', 'redo', 'setLeaf', 'updateLeaf'],
+  plugins: true,
+  segments: fc
+    .record({
+      path: leaf,
+      v: value,
+      newer: fc.constantFrom('same', 'read', 'elsewhere', 'shared-turn'),
+      redo: fc.boolean(),
+    })
+    .map(({ path, v, newer, redo }) => {
+      const elsewhere: LeafPath = path === 'a' ? 'cfg.p' : 'a';
+      const marked = step(write({ kind: 'setLeaf', path, value: v }, 'undoable'));
+      const segments: Step[][] =
+        newer === 'shared-turn'
+          ? [[step(write({ kind: 'setLeaf', path: elsewhere, value: v }), true), marked]]
+          : [
+              [marked],
+              one(
+                write(
+                  newer === 'same'
+                    ? { kind: 'setLeaf', path, value: other(v) }
+                    : newer === 'read'
+                      ? { kind: 'updateLeaf', path, delta: 1 }
+                      : { kind: 'setLeaf', path: elsewhere, value: v }
+                )
+              ),
+            ];
+      segments.push(one({ kind: 'undo' }));
+      if (redo) segments.push(one({ kind: 'redo' }), one({ kind: 'undo' }));
+      return segments;
+    }),
+};
+
+/** A throwing observer on a location a transaction writes (T10). */
+const throwingObserver: Shape = {
+  needs: ['observerOpen', 'transact', 'confirm', 'rollback', 'setLeaf'],
+  plugins: true,
+  segments: fc
+    .record({ path: fc.constantFrom(...OBSERVED_PATHS), v: value, how: fc.constantFrom<'confirm' | 'rollback'>('confirm', 'rollback') })
+    .map(({ path, v, how }) => {
+      const target: LeafPath = path === 'cfg' ? 'cfg.p' : path;
+      return [
+        one({ kind: 'observerOpen', path }),
+        one(transact([{ kind: 'setLeaf', path: target, value: v }])),
+        one(settle(how, 0)),
+        one(write({ kind: 'setLeaf', path: target, value: other(v) })),
+      ];
+    }),
+};
+
+/** A link disposed while a transaction on its source is pending (L1). */
+const disposedLink: Shape = {
+  needs: ['linkOpen', 'linkDispose', 'linkAck', 'transact', 'confirm', 'setLeaf', 'setBranch'],
+  plugins: true,
+  segments: fc
+    .record({
+      source: fc.constantFrom<LinkSource>('a', 'cfg'),
+      mode: fc.constantFrom<'sync' | 'deferred'>('sync', 'deferred'),
+      v: value,
+    })
+    .map(({ source, mode, v }) => {
+      const w = (n: number): WriteOp => (source === 'a' ? { kind: 'setLeaf', path: 'a', value: n } : { kind: 'setBranch', p: n, q: n });
+      return [
+        one({ kind: 'linkOpen', source, mode }),
+        one(transact([w(v)])),
+        one({ kind: 'linkDispose', link: 0 }),
+        one(settle('confirm', 0)),
+        one(write(w(other(v)))),
+        one({ kind: 'linkAck', link: 0, ok: true }),
+      ];
+    }),
+};
+
+/** Mixes random steps into the gaps between a shape's segments, mostly none. */
+function withNoise(segments: fc.Arbitrary<Step[][]>, noise: fc.Arbitrary<Step>, maxSteps: number): fc.Arbitrary<Step[]> {
+  const gap = fc.oneof(
+    { arbitrary: fc.constant<Step[]>([]), weight: 4 },
+    { arbitrary: fc.array(noise, { minLength: 1, maxLength: 2 }), weight: 1 }
+  );
+  return fc
+    .tuple(segments, fc.array(gap, { minLength: 8, maxLength: 8 }))
+    .map(([segs, gaps]) => segs.flatMap((seg, i) => (i === 0 ? seg : [...(gaps[i - 1] ?? []), ...seg])).slice(0, maxSteps));
+}
+
+export function focusedArb(options: {
+  readonly kinds: ReadonlySet<OpKind>;
+  readonly plugins: PluginMode;
+  readonly maxSteps: number;
+  readonly noise: fc.Arbitrary<Step>;
+}): fc.Arbitrary<Sequence> | undefined {
+  const shapes = [overlapping(options.kinds.has('inspect')), newerTruth, heldRow, undoOverNewer, throwingObserver, disposedLink].filter(
+    (shape) => shape.needs.every((kind) => options.kinds.has(kind)) && !(shape.plugins && options.plugins === 'none')
+  );
+  if (shapes.length === 0) return undefined;
+  const on = options.plugins !== 'none';
+  return fc.oneof(...shapes.map((shape) => withNoise(shape.segments, options.noise, options.maxSteps))).map((steps) => ({
+    config: { transactions: on, restoration: on },
+    steps,
+  }));
+}

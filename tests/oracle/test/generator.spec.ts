@@ -113,6 +113,12 @@ describe('the determinism check', () => {
 });
 
 describe('the published kernels', () => {
+  it('exercise every generatable behavior within 1,000 sequences', async () => {
+    const result = await generate({ subjects: [await loadSubject('v16')], runs: 1000, seed: 20261119, shrinkBudget: 10 });
+    const unexercised = [...result.stats].filter(([, s]) => s.exercised === 0).map(([id]) => id);
+    expect(unexercised).toEqual([]);
+  });
+
   it('generate cases for every generatable behavior without a generator error', async () => {
     const result = await generate({ subjects: [await loadSubject('v15'), await loadSubject('v16')], runs: 200, seed: 5, shrinkBudget: 60 });
     const generatable = CATALOG.filter((e) => e.generatable).map((e) => e.id);

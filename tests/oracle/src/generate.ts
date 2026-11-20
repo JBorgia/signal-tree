@@ -1,6 +1,7 @@
 // fast-check arbitraries for operation sequences. Every choice comes from the
 // fast-check seed; nothing reads the clock or Math.random.
 import fc from 'fast-check';
+import { focusedArb } from './focus.js';
 import {
   LEAF_PATHS,
   LINK_SOURCES,
@@ -29,6 +30,8 @@ export interface GenerateOptions {
   readonly plugins: PluginMode;
   /** Upper bound on steps per sequence. */
   readonly maxSteps: number;
+  /** Mix in focused shapes (default true). */
+  readonly focus?: boolean;
 }
 
 /** Relative frequency of each operation kind. */
@@ -196,13 +199,21 @@ export function stepArb(kinds: ReadonlySet<OpKind>): fc.Arbitrary<Step> {
   });
 }
 
+/**
+ * Sequences: three in four are uniform draws over the vocabulary; one in four
+ * starts from a focused shape (focus.ts) that reaches behaviors uniform
+ * draws rarely do, with random steps mixed in.
+ */
 export function sequenceArb(options: GenerateOptions): fc.Arbitrary<Sequence> {
   const kinds = new Set(
     [...options.kinds].filter((kind) => options.plugins !== 'none' || pluginForKind(kind) === undefined)
   );
-  return fc.record({
+  const step = stepArb(kinds);
+  const uniform = fc.record({
     config: configArb(options.plugins),
     // size 'max': lengths spread over the whole range, not fast-check's small default.
-    steps: fc.array(stepArb(kinds), { minLength: 1, maxLength: options.maxSteps, size: 'max' }),
+    steps: fc.array(step, { minLength: 1, maxLength: options.maxSteps, size: 'max' }),
   });
+  const focused = options.focus === false ? undefined : focusedArb({ kinds, plugins: options.plugins, maxSteps: options.maxSteps, noise: step });
+  return focused ? fc.oneof({ arbitrary: uniform, weight: 3 }, { arbitrary: focused, weight: 1 }) : uniform;
 }
