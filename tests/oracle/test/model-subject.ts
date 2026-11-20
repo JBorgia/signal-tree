@@ -85,6 +85,7 @@ class ModelSession implements Session {
       receipts: [],
       treeErrors: [],
       warnings: [],
+      observerThrows: 0,
     };
   }
 

@@ -1,15 +1,22 @@
-// The oracle's operation vocabulary and outcome schema. Operation names follow
-// the @signal-tree/kernel 16.0.0-rc.1 public surface (transact, inspect,
-// confirm, rollback, undoable, external, link, declare, the entityMap writes),
-// which is the authority for behavior it covers. Subjects translate these
-// operations into their own API and report outcomes in this shape, so the
-// runner and comparator stay implementation-neutral (BRIEF.md 5.3 item 2).
+// The oracle's operation vocabulary and trace schema. Operation names are the
+// spec's own (BRIEF.md section 4.4: transact, inspect, confirm, rollback,
+// undoable, external, entityMap writes, changeId) or plain descriptions of what
+// a step does. Subjects translate these operations into their own API and
+// report outcomes in this shape, so generation and the behavior properties in
+// behaviors/ stay implementation-neutral. No subject is an authority on what
+// an outcome should be (BRIEF.md 12.1.4); the properties are.
 //
-// Provisional, pending Jonathan's answers (BRIEF.md 11.2):
-// - #6: no writer identity in these operations; v15 and v16 have none. The new
-//   core's subject maps `external()` to writer 'server' and everything else to
-//   writer 'user'; W1–W4 are checked as properties of the new core alone.
-// - #7: no entityMap `move`; v16 has none, so it is covered by new-core tests.
+// Provisional (BRIEF.md 11.2):
+// - #6: no writer identity in these operations; the published packages have
+//   none, so W1–W4 are not generated from them.
+// - #7: no entityMap `move`; the published packages have none.
+//
+// Handle numbering, which the properties rely on to resolve references the
+// same way every subject does:
+// - a `transact` that returns ok opens the next transaction handle;
+// - every applied `linkOpen` (ok or error) opens the next link handle;
+// - a `rowHold` that returns ok with a `handle` opens the next row handle.
+// A step's reference is resolved modulo the handles opened before it.
 
 /** Scalar leaves in the fixture state. `cfg` is the one branch. */
 export const LEAF_PATHS = ['a', 'cfg.p', 'cfg.q'] as const;
@@ -39,6 +46,10 @@ export type LinkSource = (typeof LINK_SOURCES)[number];
 export type LinkMode = 'sync' | 'deferred' | 'failing';
 
 export type AddManyMode = 'strict' | 'skip' | 'overwrite';
+
+/** Locations an observer can subscribe to: the scalar leaves and the `cfg` branch. */
+export const OBSERVED_PATHS = ['a', 'cfg.p', 'cfg.q', 'cfg'] as const;
+export type ObservedPath = (typeof OBSERVED_PATHS)[number];
 
 /** A state write. Used top level, inside transactions and inside declarations. */
 export type WriteOp =
@@ -118,7 +129,15 @@ export type Op =
       readonly declaration: DeclarationKind;
       readonly owners: readonly number[];
       readonly body: readonly WriteOp[];
-    };
+    }
+  /** Subscribe an observer to `path` that throws every time it is notified. */
+  | { readonly kind: 'observerOpen'; readonly path: ObservedPath }
+  /** Look up `rows.byId(id)` and keep the handle. Ok with `{ found: false }` when there is no such row. */
+  | { readonly kind: 'rowHold'; readonly id: RowKey }
+  /** Read the row through a held handle: ok with `{ handle, value, carrier }`. */
+  | { readonly kind: 'rowHeldRead'; readonly handle: number }
+  /** Write field `n` through a held handle: ok with `{ handle, carrier }`. */
+  | { readonly kind: 'rowHeldWrite'; readonly handle: number; readonly n: number };
 
 export type ControlKind = Exclude<Op['kind'], 'write'>;
 /** Every operation kind a subject may or may not support. */
@@ -138,6 +157,10 @@ export const CONTROL_KINDS: readonly ControlKind[] = [
   'linkPush',
   'linkAck',
   'declare',
+  'observerOpen',
+  'rowHold',
+  'rowHeldRead',
+  'rowHeldWrite',
 ];
 
 export const ALL_KINDS: readonly OpKind[] = [...WRITE_KINDS, ...CONTROL_KINDS];
@@ -222,6 +245,18 @@ export interface Observation {
   readonly treeErrors: readonly { readonly operation: string; readonly path?: string; readonly error: ErrorInfo }[];
   /** console.warn / console.error calls since the previous observation. */
   readonly warnings: readonly { readonly level: 'warn' | 'error'; readonly st?: string; readonly message: string }[];
+  /** Times an `observerOpen` observer was notified (and threw) since the previous observation. */
+  readonly observerThrows: number;
+}
+
+/**
+ * The value an `inspect` step returns when it succeeds. `path` is the changed
+ * location in dot form: `a`, `cfg.p`, `cfg` (the branch), `rows` (the whole
+ * collection), `rows.<key>` or `rows.<key>.<field>`.
+ */
+export interface InspectValue {
+  readonly tx: number;
+  readonly changes: readonly { readonly path: string; readonly status: string }[];
 }
 
 export interface StepRecord {
@@ -271,7 +306,7 @@ export function kindsOf(op: Op): readonly OpKind[] {
   }
 }
 
-/** The operation pattern differences are grouped by. */
+/** A short label for a step, recorded in its trace record. */
 export function patternOf(op: Op): string {
   switch (op.kind) {
     case 'write':
@@ -367,6 +402,14 @@ export function formatOp(op: Op): string {
       const owners = op.declaration === 'dependent' ? `[${op.owners.map((o) => `tx${o}`).join(',')}]` : '';
       return `declare(link${op.link},${op.declaration}${owners}: ${op.body.map(formatWrite).join('; ')})`;
     }
+    case 'observerOpen':
+      return `observerOpen(${op.path}, throws)`;
+    case 'rowHold':
+      return `rowHold(${op.id})`;
+    case 'rowHeldRead':
+      return `rowHeldRead(h${op.handle})`;
+    case 'rowHeldWrite':
+      return `rowHeldWrite(h${op.handle},n=${op.n})`;
   }
 }
 

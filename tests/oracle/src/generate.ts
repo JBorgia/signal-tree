@@ -4,6 +4,7 @@ import fc from 'fast-check';
 import {
   LEAF_PATHS,
   LINK_SOURCES,
+  OBSERVED_PATHS,
   ROW_KEYS,
   WRITE_KINDS,
   pluginForKind,
@@ -62,6 +63,10 @@ const WEIGHTS: Record<OpKind, number> = {
   linkPush: 1,
   linkAck: 1,
   declare: 3,
+  observerOpen: 1,
+  rowHold: 2,
+  rowHeldRead: 1,
+  rowHeldWrite: 2,
 };
 
 const small = fc.integer({ min: 0, max: 3 });
@@ -127,6 +132,10 @@ function controlArbs(write: fc.Arbitrary<WriteOp> | undefined): Partial<Record<C
     linkRetrieve: fc.record({ kind: fc.constant('linkRetrieve'), link, value: small }),
     linkPush: fc.record({ kind: fc.constant('linkPush'), link, value: small }),
     linkAck: fc.record({ kind: fc.constant('linkAck'), link, ok: weighted<boolean>([true, 3], [false, 1]) }),
+    observerOpen: fc.record({ kind: fc.constant('observerOpen'), path: fc.constantFrom(...OBSERVED_PATHS) }),
+    rowHold: fc.record({ kind: fc.constant('rowHold'), id: key }),
+    rowHeldRead: fc.record({ kind: fc.constant('rowHeldRead'), handle: ref }),
+    rowHeldWrite: fc.record({ kind: fc.constant('rowHeldWrite'), handle: ref, n: small }),
   };
   if (write) {
     arbs.transact = fc.record({

@@ -2,11 +2,11 @@
 // is anything that can replay the vocabulary in model.ts: the published
 // kernels today, packages/core from Phase 1. Adding one means writing a
 // Subject and registering it in subjects/registry.ts; the runner, generator
-// and comparator do not change.
+// and behavior properties do not change.
 import type { ErrorInfo, Json, Observation, Op, OpKind, Outcome, TreeConfig } from './model.js';
 
 export interface Subject {
-  /** Short name used on the command line and in intended-differences.json, e.g. `v16`. */
+  /** Short name used on the command line and in reports, e.g. `v16`. */
   readonly name: string;
   /** What it is, e.g. `@signal-tree/kernel@16.0.0-rc.1`. */
   readonly description: string;
@@ -54,14 +54,19 @@ export class HandleTable<T> {
   }
 }
 
-/** Relabels opaque per-tree identities (entity subjects) as s1, s2, … in order of first appearance. */
+/** Relabels opaque per-tree identities as s1, s2, … (or another prefix) in order of first appearance. */
 export class FirstSeenLabels {
   readonly #labels = new Map<unknown, string>();
+  readonly #prefix: string;
+
+  constructor(prefix = 's') {
+    this.#prefix = prefix;
+  }
 
   label(raw: unknown): string {
     let label = this.#labels.get(raw);
     if (label === undefined) {
-      label = `s${this.#labels.size + 1}`;
+      label = `${this.#prefix}${this.#labels.size + 1}`;
       this.#labels.set(raw, label);
     }
     return label;
