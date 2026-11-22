@@ -50,11 +50,13 @@
 # GitHub identity (BRIEF.md 12.3 and Jonathan's rulings): the signal-tree-ci
 # GitHub App authenticates every push and gh call, and turns on auto-merge
 # (merge commit) for each PR it opens from a JBorgia/signal-tree branch into
-# main; commits keep Jonathan as author and committer. At start the supervisor
-# copies app-token.mjs and the gh wrapper (bin/gh) from its own directory into
-# $SIGNAL_TREE_STATE_DIR/github-app, so a branch switch in the agent's checkout
-# cannot remove them, and mints one token to fail fast. In its own environment,
-# which the session and its hooks inherit, it then
+# main that touches no code-owned path; commits keep Jonathan as author and
+# committer. At start the supervisor copies app-token.mjs and the gh wrapper
+# (bin/gh) from its own directory, and the CODEOWNERS matcher the wrapper runs
+# (ci/codeowners.mjs), into $SIGNAL_TREE_STATE_DIR/github-app, so a branch
+# switch in the agent's checkout cannot remove or change them, and mints one
+# token to fail fast. In its own environment, which the session and its hooks
+# inherit, it then
 #   - unsets GH_TOKEN and GITHUB_TOKEN, so no personal token is ever used;
 #   - replaces the machine's git config with github-app/gitconfig
 #     (GIT_CONFIG_GLOBAL, GIT_CONFIG_NOSYSTEM), so none of its insteadOf rules,
@@ -251,15 +253,13 @@ physical_path() {
 }
 
 # Sets this environment up to reach GitHub as the signal-tree-ci App (see
-# "GitHub identity" above): installs app-token.mjs and bin/gh from $1 into $2,
-# points git, gh and the commit identity at them, then mints a token and checks
-# that git would use it. Prints the reason and returns 1 on any failure.
+# "GitHub identity" above): installs the helpers from $1 into $2
+# (install_helpers), points git, gh and the commit identity at them, then mints
+# a token and checks that git would use it. Prints the reason and returns 1 on
+# any failure.
 use_github_app() {
   local from=$1 app_dir=$2 helper user
-  if ! { mkdir -p "$app_dir/bin" &&
-    install_file "$from/app-token.mjs" "$app_dir/app-token.mjs" 600 &&
-    install_file "$from/bin/gh" "$app_dir/bin/gh" 700 &&
-    write_git_config "$app_dir/gitconfig"; }; then
+  if ! { install_helpers "$from" "$app_dir" && write_git_config "$app_dir/gitconfig"; }; then
     echo "Refusing to start: could not install the GitHub App helpers into $app_dir." >&2
     return 1
   fi
@@ -292,6 +292,16 @@ use_github_app() {
     echo "Refusing to start: git would not use the App's credentials for https://github.com (the GIT_CONFIG_* environment needs git 2.31 or later)." >&2
     return 1
   fi
+}
+
+# Installs the App helpers from $1 (this directory) into $2: app-token.mjs,
+# the gh wrapper as bin/gh, and ci/codeowners.mjs, which the wrapper runs as
+# ../codeowners.mjs.
+install_helpers() {
+  mkdir -p "$2/bin" &&
+    install_file "$1/app-token.mjs" "$2/app-token.mjs" 600 &&
+    install_file "$1/../codeowners.mjs" "$2/codeowners.mjs" 600 &&
+    install_file "$1/bin/gh" "$2/bin/gh" 700
 }
 
 # Copies $1 to $2 with mode $3, replacing $2 in one step.

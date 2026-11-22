@@ -1,0 +1,50 @@
+name: Approve non-owned PRs
+
+# Jonathan's ruling: the ruleset on main requires one approving review and
+# code-owner review, with no bypass. This workflow gives that approval, as
+# github-actions[bot], to a pull request from a branch of this repository
+# whose changed files touch no CODEOWNERS path. It never approves a pull
+# request that touches a code-owned path, nor a fork's.
+#
+# pull_request_target runs main's version of this workflow and of
+# ci/approve-non-owned.mjs, with a token that can approve. So it checks out
+# main only (no ref: and no step that fetches the pull request's code) and
+# reads the pull request's files through the API (ci/workflows.mjs checks this).
+# A push dismisses the old approval (the ruleset's stale-review dismissal) and
+# runs this again for the new head.
+#
+# The approval counts only while Settings > Actions > General allows GitHub
+# Actions to create and approve pull requests.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: approve-non-owned-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  approve:
+    name: Approve if no code-owned path changed
+    # Never a fork's pull request; ci/approve-non-owned.mjs checks this again.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # main, the base branch: pull_request_target's default. Never the pull request's code.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+      - name: Approve unless a code-owned path changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ci/approve-non-owned.mjs

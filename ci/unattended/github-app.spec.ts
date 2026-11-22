@@ -14,6 +14,8 @@ import { REFRESH_MARGIN_MS, TOKEN_REQUEST, appJwt, configFromEnv, getToken, gitC
 
 const appToken = new URL('./app-token.mjs', import.meta.url).pathname;
 const wrapper = new URL('./bin/gh', import.meta.url).pathname;
+const codeownersMatcher = new URL('../codeowners.mjs', import.meta.url).pathname;
+const CODEOWNERS = readFileSync(new URL('../../.github/CODEOWNERS', import.meta.url), 'utf8');
 const unattended = new URL('.', import.meta.url).pathname.replace(/\/$/, '');
 const supervisor = new URL('./supervise.sh', import.meta.url).pathname;
 
@@ -303,38 +305,54 @@ describe('git credential helper', () => {
 
 describe('gh wrapper', () => {
   const PR = 'https://github.com/JBorgia/signal-tree/pull/77';
-  const view = (fields: object = {}) => JSON.stringify({ isCrossRepository: false, baseRefName: 'main', url: PR, ...fields });
-  const run = (args: string[], extra: Record<string, string> = {}) => {
-    const { root, env } = appFixture('ghs_app');
+  const view = (fields: object = {}) => JSON.stringify({ isCrossRepository: false, baseRefName: 'main', url: PR, changedFiles: 1, ...fields });
+  /** The REST listing of the PR's files as `gh api --paginate --slurp` prints it: one page. */
+  const files = (...entries: Array<string | { filename: string; previous_filename?: string }>) => JSON.stringify([entries.map((e) => (typeof e === 'string' ? { filename: e, status: 'modified' } : { status: 'renamed', ...e }))]);
+  /**
+   * Runs the wrapper as the supervisor installs it (install_helpers): bin/gh
+   * beside app-token.mjs and codeowners.mjs. `extra` may depend on the
+   * installed wrapper's path.
+   */
+  const run = (args: string[], extra: Record<string, string> | ((installed: string) => Record<string, string>) = {}) => {
+    const { root, env, state } = appFixture('ghs_app');
+    const app = join(state, 'github-app');
+    const install = bash(`${shellFunctions('install_helpers', 'install_file')}; install_helpers '${unattended}' '${app}'`, {});
+    expect(install.status, install.stderr).toBe(0);
+    const installed = join(app, 'bin', 'gh');
     const fake = join(root, 'real-gh');
     const decoy = join(root, 'decoy');
     mkdirSync(fake);
     mkdirSync(decoy);
     const log = join(root, 'gh.log');
     const decoyLog = join(root, 'decoy.log');
-    // The real gh: logs its token and arguments; prints a PR URL whenever an argument is create or new, and $PR_VIEW for pr view.
+    // The real gh: logs its token and arguments; prints a PR URL whenever an argument is create or new,
+    // $PR_VIEW for pr view, $PR_FILES for the PR's files and $CODEOWNERS for main's CODEOWNERS.
     writeScript(
       join(fake, 'gh'),
       [
         'printf \'%s %s %s\\n\' "${GH_TOKEN-unset}" "${GITHUB_TOKEN-unset}" "$*" >> "$GH_LOG"',
         `if [[ $1 == pr && ( " $* " == *" create "* || " $* " == *" new "* ) ]]; then [[ -n \${FAIL_CREATE-} ]] && exit 1; echo ${PR}; fi`,
         'if [[ $1 == pr && $2 == view ]]; then [[ -n ${FAIL_VIEW-} ]] && exit 1; printf "%s\\n" "$PR_VIEW"; fi',
+        'if [[ $1 == api && " $* " == *"/pulls/77/files?"* ]]; then [[ -n ${FAIL_FILES-} ]] && { echo "gh: Server Error (HTTP 502)" >&2; exit 1; }; printf "%s\\n" "$PR_FILES"; fi',
+        'if [[ $1 == api && " $* " == *"/contents/.github/CODEOWNERS?"* ]]; then [[ -n ${FAIL_CODEOWNERS-} ]] && { echo "gh: Not Found (HTTP 404)" >&2; exit 1; }; printf "%s" "$CODEOWNERS"; fi',
         'if [[ $1 == pr && $2 == merge ]]; then [[ -n ${FAIL_MERGE-} ]] && { echo "auto-merge is not allowed" >&2; exit 1; }; echo "auto-merge enabled"; fi',
         'exit "${FAKE_STATUS:-0}"',
       ].join('\n'),
     );
     // A gh the wrapper would find on PATH if it searched there.
     writeScript(join(decoy, 'gh'), `echo "$*" >> "${decoyLog}"`);
-    const result = spawnSync(wrapper, args, {
+    const result = spawnSync(installed, args, {
       env: cleanEnv({
         ...env,
         SIGNAL_TREE_REAL_GH: join(fake, 'gh'),
         GH_LOG: log,
         PR_VIEW: view(),
+        PR_FILES: files('packages/core/src/index.ts'),
+        CODEOWNERS,
         GH_TOKEN: 'personal-token',
         GITHUB_TOKEN: 'personal-token-2',
-        PATH: `${join(wrapper, '..')}:${decoy}:${process.env.PATH}`,
-        ...extra,
+        PATH: `${join(installed, '..')}:${decoy}:${process.env.PATH}`,
+        ...(typeof extra === 'function' ? extra(installed) : extra),
       }),
       encoding: 'utf8',
     });
@@ -342,19 +360,68 @@ describe('gh wrapper', () => {
     return { ...result, calls: existsSync(log) ? readFileSync(log, 'utf8').trim().split('\n') : [] };
   };
   const created = 'ghs_app unset pr create --fill';
-  const viewed = `ghs_app unset pr view ${PR} --json isCrossRepository,baseRefName,url`;
+  const viewed = `ghs_app unset pr view ${PR} --json isCrossRepository,baseRefName,url,changedFiles`;
+  const listed = 'ghs_app unset api --paginate --slurp repos/JBorgia/signal-tree/pulls/77/files?per_page=100';
+  const owners = 'ghs_app unset api -H Accept: application/vnd.github.raw+json repos/JBorgia/signal-tree/contents/.github/CODEOWNERS?ref=main';
   const merged = `ghs_app unset pr merge ${PR} --auto --merge`;
 
-  it('runs gh pr create with the App token, checks the new PR, then turns on auto-merge (merge commit)', () => {
+  it('runs gh pr create with the App token, checks the new PR and its files, then turns on auto-merge (merge commit)', () => {
     const r = run(['pr', 'create', '--title', 'S8', '--body', 'Gate S8.']);
     expect(r.status).toBe(0);
     expect(r.stdout).toBe(`${PR}\n`);
-    expect(r.calls).toEqual(['ghs_app unset pr create --title S8 --body Gate S8.', viewed, merged]);
+    expect(r.stderr).toBe('auto-merge enabled\n');
+    expect(r.calls).toEqual(['ghs_app unset pr create --title S8 --body Gate S8.', viewed, listed, owners, merged]);
   });
 
   it('recognises pr new and a --repo flag before the subcommand', () => {
-    expect(run(['pr', '-R', 'JBorgia/signal-tree', 'create', '--fill']).calls[2]).toBe(merged);
-    expect(run(['pr', '--repo=JBorgia/signal-tree', 'new', '--fill']).calls[2]).toBe(merged);
+    expect(run(['pr', '-R', 'JBorgia/signal-tree', 'create', '--fill']).calls[4]).toBe(merged);
+    expect(run(['pr', '--repo=JBorgia/signal-tree', 'new', '--fill']).calls[4]).toBe(merged);
+  });
+
+  it("leaves auto-merge off for a PR touching a code-owned path, naming the paths and Jonathan's review", () => {
+    const cases: Array<[Record<string, string>, string[]]> = [
+      [{ PR_VIEW: view({ changedFiles: 3 }), PR_FILES: files('README.md', 'ci/done-check.mjs', 'bench/budgets.json') }, ['ci/done-check.mjs', 'bench/budgets.json']],
+      // A rename away from a code-owned path still touches it.
+      [{ PR_FILES: files({ filename: 'docs/gate.mjs', previous_filename: 'ci/gate-baseline.mjs' }) }, ['ci/gate-baseline.mjs']],
+      // A CODEOWNERS line the matcher cannot parse makes every file code-owned.
+      [{ CODEOWNERS: `${CODEOWNERS}!/docs/ @JBorgia\n` }, ['packages/core/src/index.ts']],
+    ];
+    for (const [extra, paths] of cases) {
+      const r = run(['pr', 'create', '--fill'], extra);
+      expect(r.status).toBe(0);
+      expect(r.stdout).toBe(`${PR}\n`);
+      expect(r.calls).toEqual([created, viewed, listed, owners]);
+      expect(r.stderr).toContain(`${PR} touches code-owned paths, so it needs Jonathan's review and auto-merge was not turned on:\n${paths.map((p) => `  ${p}\n`).join('')}`);
+    }
+  });
+
+  it("fails closed: leaves auto-merge off when the files or main's CODEOWNERS cannot be read or matched", () => {
+    const cases: Array<[Record<string, string>, string[]]> = [
+      [{ FAIL_FILES: '1' }, [created, viewed, listed]],
+      [{ FAIL_CODEOWNERS: '1' }, [created, viewed, listed, owners]],
+      // gh pr view counts two files, the listing has one.
+      [{ PR_VIEW: view({ changedFiles: 2 }) }, [created, viewed, listed, owners]],
+      // Past GitHub's 3000-file listing limit.
+      [{ PR_VIEW: view({ changedFiles: 3001 }) }, [created, viewed, listed, owners]],
+      [{ PR_VIEW: view({ changedFiles: undefined }) }, [created, viewed, listed, owners]],
+      [{ PR_FILES: '{"message":"Not Found"}' }, [created, viewed, listed, owners]],
+    ];
+    for (const [extra, calls] of cases) {
+      const r = run(['pr', 'create', '--fill'], extra);
+      expect(r.status).toBe(0);
+      expect(r.calls).toEqual(calls);
+      expect(r.stderr).toContain(`warning: could not check ${PR}'s changed files against main's CODEOWNERS, so auto-merge was not turned on.`);
+      expect(r.stderr).not.toContain("needs Jonathan's review");
+    }
+  });
+
+  it('leaves auto-merge off when the matcher is missing beside the installed wrapper', () => {
+    const r = run(['pr', 'create', '--fill'], (installed) => {
+      rmSync(join(installed, '..', '..', 'codeowners.mjs'));
+      return {};
+    });
+    expect(r.calls).toEqual([created, viewed, listed, owners]);
+    expect(r.stderr).toContain(`warning: could not check ${PR}'s changed files`);
   });
 
   it('leaves auto-merge off, with a warning, unless the PR is from a JBorgia/signal-tree branch into main', () => {
@@ -378,7 +445,7 @@ describe('gh wrapper', () => {
   it("only warns when auto-merge cannot be turned on, keeping pr create's exit status", () => {
     const r = run(['pr', 'create', '--fill'], { FAIL_MERGE: '1' });
     expect(r.status).toBe(0);
-    expect(r.calls).toEqual([created, viewed, merged]);
+    expect(r.calls).toEqual([created, viewed, listed, owners, merged]);
     expect(r.stderr).toContain(`warning: could not turn on auto-merge for ${PR}`);
   });
 
@@ -403,8 +470,8 @@ describe('gh wrapper', () => {
   });
 
   it('runs only the gh in SIGNAL_TREE_REAL_GH, an absolute path other than itself, and never searches PATH', () => {
-    for (const real of ['', 'gh', 'real-gh/gh', wrapper]) {
-      const r = run(['issue', 'list'], { SIGNAL_TREE_REAL_GH: real });
+    for (const real of ['', 'gh', 'real-gh/gh', 'self']) {
+      const r = run(['issue', 'list'], (installed) => ({ SIGNAL_TREE_REAL_GH: real === 'self' ? installed : real }));
       expect(r.status).toBe(127);
       expect(r.stderr).toContain('SIGNAL_TREE_REAL_GH must be the absolute path of the real gh');
       expect(r.calls).toEqual([]);
@@ -485,6 +552,7 @@ describe('supervisor startup checks', () => {
     expect(mode(join(ssh.state, 'github-app'))).toBe(0o700);
     expect(mode(join(ssh.state, 'github-app', 'gitconfig'))).toBe(0o600);
     expect(mode(join(ssh.state, 'github-app', 'app-token.mjs'))).toBe(0o600);
+    expect(mode(join(ssh.state, 'github-app', 'codeowners.mjs'))).toBe(0o600);
     expect(mode(join(ssh.state, 'github-app', 'bin', 'gh'))).toBe(0o700);
 
     const token = fixture('https://x-access-token:ghp_SECRET@github.com/JBorgia/signal-tree.git');
@@ -554,7 +622,7 @@ describe('supervisor startup checks', () => {
     git(work, 'config', 'user.name', 'Someone Else');
     git(work, 'config', 'user.email', 'someone@example.com');
     const script = [
-      shellFunctions('use_github_app', 'install_file', 'write_git_config'),
+      shellFunctions('use_github_app', 'install_helpers', 'install_file', 'write_git_config'),
       'echo "before=$(git ls-remote --get-url https://github.com/JBorgia/signal-tree.git)"',
       `use_github_app '${unattended}' '${appDir}' || exit 9`,
       'echo "global=$GIT_CONFIG_GLOBAL nosystem=$GIT_CONFIG_NOSYSTEM protocols=$GIT_ALLOW_PROTOCOL askpass=[${GIT_ASKPASS-unset}] ssh_askpass=${SSH_ASKPASS-unset} prompt=$GIT_TERMINAL_PROMPT"',
@@ -583,7 +651,9 @@ describe('supervisor startup checks', () => {
     ]);
     expect(readFileSync(join(appDir, 'gitconfig'), 'utf8')).not.toMatch(/^\s*[^#\s]/m);
     expect(readFileSync(join(appDir, 'app-token.mjs'), 'utf8')).toBe(readFileSync(appToken, 'utf8'));
-    expect([mode(join(appDir, 'gitconfig')), mode(join(appDir, 'app-token.mjs')), mode(join(appDir, 'bin', 'gh'))]).toEqual([0o600, 0o600, 0o700]);
+    expect(readFileSync(join(appDir, 'codeowners.mjs'), 'utf8')).toBe(readFileSync(codeownersMatcher, 'utf8'));
+    expect(readFileSync(join(appDir, 'bin', 'gh'), 'utf8')).toBe(readFileSync(wrapper, 'utf8'));
+    expect([mode(join(appDir, 'gitconfig')), mode(join(appDir, 'app-token.mjs')), mode(join(appDir, 'codeowners.mjs')), mode(join(appDir, 'bin', 'gh'))]).toEqual([0o600, 0o600, 0o600, 0o700]);
   });
 
   it('resolves the real gh once from absolute PATH entries other than the wrapper, and drops relative ones', () => {
