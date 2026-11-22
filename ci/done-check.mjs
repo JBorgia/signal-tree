@@ -54,6 +54,8 @@ export function nightlyRunProblem(run) {
     for (const gate of REQUIRED_GATES) {
       const scenario = results.scenarios?.[gate];
       if (!scenario || scenario.status !== 'ran') return `nightly run ${run.id} (${adapter}): ${gate} ${scenario ? scenario.status : 'missing'}`;
+      // S8 off the gate runner only records (bench/budgets.json gateRunnerOnly): it is no evidence that the gate holds.
+      if (scenario.recordedOnly) return `nightly run ${run.id} (${adapter}): ${gate} was recorded only (${scenario.recordedOnly})`;
       if (scenario.pass !== true) return `nightly run ${run.id} (${adapter}): ${gate} is not green`;
       if ((scenario.regressions ?? []).some((r) => r.regressed)) return `nightly run ${run.id} (${adapter}): ${gate} regressed`;
     }

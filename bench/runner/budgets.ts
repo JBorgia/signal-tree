@@ -39,6 +39,8 @@ export interface GateEntry {
   readonly parts?: Readonly<Record<string, GateEntry>>;
   /** Run counts that replace the default for one mode (S5: { full: 1 }). */
   readonly runs?: Readonly<Record<string, unknown>>;
+  /** The gate counts toward a run's verdict only on the dedicated gate runner; anywhere else it is recorded only (S8). */
+  readonly gateRunnerOnly?: { readonly text: string };
 }
 
 export interface Budgets {

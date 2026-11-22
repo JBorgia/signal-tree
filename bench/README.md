@@ -44,6 +44,13 @@ Where the budgets leave a detail open, the harness does the following.
     5 ms of timed work (measured again after warm-up; at most 50 ms of wall
     time), and the result is the median time per operation of 21 rounds after
     5 warm-up rounds.
+  - The rounds are interleaved. Every tree and the two reference Maps are
+    built first and live until the end. Each measurement is calibrated alone,
+    then come 5 warm-up sweeps, a second calibration of each, and 21 measured
+    sweeps. A sweep times one round of every measurement in a fixed order
+    (Map.set, Map.get, then the operations), starting one measurement later
+    each sweep, so none always runs first and a disturbance during a sweep
+    reaches the references and the operations alike.
   - Row operations go to 16 rows spread evenly over the collection, the same
     16 at both sizes. A store that walks the rows to reach one walks half of
     them on average, while one that does not keeps those rows in cache at both
@@ -67,12 +74,12 @@ Where the budgets leave a detail open, the harness does the following.
     once), hence the small allowance in budgets.json.
   - An operation the subject lacks is not measured, and its conditions are
     reported as not applicable; the rest of S8 is judged without them.
-  - The bound is relative to a reference measured in every run. Before the
-    operations, each process times Map.set and Map.get, each on its own plain
-    Map holding the same rows under their ids, with the same calibration,
-    rounds and median. Map.set overwrites existing keys, writing another row
-    object on every other visit, so the map never grows and every set changes
-    the value.
+  - The bound is relative to a reference measured in every run. Each process
+    times Map.set and Map.get, each on its own plain Map holding the same rows
+    under their ids, interleaved with the operations and with the same
+    calibration, rounds and median. Map.set overwrites existing keys, writing
+    another row object on every other visit, so the map never grows and every
+    set changes the value.
   - Each reference batch visits 1,000 keys spread over the whole map (batch b
     visits k·stride + b mod stride, with stride = rows ÷ 1,000), so every key
     is visited once every stride batches. At 100,000 rows an entry has left
@@ -81,9 +88,16 @@ Where the budgets leave a detail open, the harness does the following.
     in batches of 16, the timer's own cost is about half of a Map.get at
     1,000 rows, which pulls the ratio toward 1.
   - Each S8.<op> passes when its ratio ≤ the factor in `budgets.json` × the
-    larger of the two reference ratios, both judged on the medians of the
+    larger of the two reference ratios, both judged on the medians of the 5
     runs. Each condition's result records the bound and the two reference
     ratios it came from.
+  - S8 is gated only on the dedicated gate runner (`RUNNER_ENVIRONMENT` is
+    `self-hosted`, as `ci/gate-baseline.mjs` tells it). Anywhere else, local
+    runs and GitHub-hosted runners included, S8 is recorded only: its
+    conditions are judged and reported, the summary reads "recorded only: not
+    on the gate runner", and neither its verdict nor its regressions change
+    the exit status, even with `budgets.json` approved. An S8 that errors still
+    fails the run.
 
 **Browser scenarios (S1–S5)**
 - Chromium is the build pinned by the Playwright version in the lockfile,

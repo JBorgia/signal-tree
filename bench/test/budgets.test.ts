@@ -111,6 +111,26 @@ test('the zero and never budgets are judged on every run', () => {
   assert.deepEqual(judged, ['M1.alloc', 'S2.longTasks', 'S4c.held', 'S5.caps', 'S8.allAlloc', 'S8.byIdAlloc']);
 });
 
+test('a gate recorded only (S8 off the gate runner) never fails the run unless it errors', async () => {
+  const { exitCode, isGateRunner, NOT_ON_GATE_RUNNER } = await import('../runner/harness.ts');
+  const red = { id: 'S8', title: '', status: 'ran' as const, pass: false, conditions: [], regressions: [] };
+  const regressed = { metric: 'm', mode: 'relative' as const, baseline: 1, current: 2, worseBy: 1, threshold: 0.03, regressed: true };
+  const off = { ...red, recordedOnly: NOT_ON_GATE_RUNNER };
+  assert.equal(exitCode({ S8: off }, false), 0, 'red, with record-only off (approved budgets)');
+  assert.equal(exitCode({ S8: { ...off, pass: true, regressions: [regressed] } }, false), 0, 'regressed');
+  assert.equal(exitCode({ S8: { ...off, status: 'error' } }, false), 1, 'an error still fails');
+  assert.equal(exitCode({ S8: red }, false), 1, 'on the gate runner a red S8 fails, as any gate');
+  assert.equal(exitCode({ S8: red }, true), 0, 'and is recorded only under the record-only rules');
+  assert.equal(isGateRunner('self-hosted'), true);
+  assert.equal(isGateRunner('github-hosted'), false);
+  assert.equal(isGateRunner(undefined), false, 'a local run');
+});
+
+test('only S8 is gated on the gate runner alone', () => {
+  const marked = Object.entries(budgets.gates).filter(([, gate]) => gate.gateRunnerOnly).map(([id]) => id);
+  assert.deepEqual(marked, ['S8']);
+});
+
 test('every compared metric that can read 0 has a noise floor, and every floor names one', () => {
   const floors = Object.keys(budgets.noiseFloors).filter((key) => !key.startsWith('$'));
   const needed: string[] = [];

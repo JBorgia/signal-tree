@@ -51,6 +51,8 @@ export interface FakeRunOptions {
   readonly harnessFaults?: readonly string[];
   /** The status the run must end in (default 'ran'). */
   readonly status?: ScenarioResult['status'];
+  /** Simulate a run on the dedicated gate runner (default: off it, as a local run). */
+  readonly onGateRunner?: boolean;
 }
 
 /** Runs one gate on the fake subject with `faults` planted (a fault written name@n applies to run n only). */
@@ -64,6 +66,7 @@ export async function runOnFake(id: string, faults: readonly string[], options: 
       skipBuild: true,
       s5Mode: options.s5Mode ?? 'compressed',
       runs: 'runs' in options ? options.runs : 1,
+      onGateRunner: options.onGateRunner ?? false,
       override: (request) => (options.tweak ?? ((r: RequestBase) => r))(smaller(request)),
       log: () => undefined,
     });

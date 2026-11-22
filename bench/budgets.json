@@ -206,7 +206,10 @@
         "allocationCalls": 100000
       },
       "bound": {
-        "text": "Jonathan's ruling on the S8 budget replaces the fixed 2.0× with a bound relative to a reference: each run also times Map.set (overwriting existing keys) and Map.get on a plain Map holding the same rows under their ids, at both sizes, in the same processes and the same way as the operations, and reports their ratios (referenceMapSetRatio, referenceMapGetRatio). Each S8.<op> passes when the operation's median ratio ≤ relativeTo.factor × the larger of the two reference medians. V8's own Map is slower at 100,000 entries than at 1,000 from cache effects alone, so a fixed ratio left a correct constant-time operation little headroom."
+        "text": "Jonathan's ruling on the S8 budget replaces the fixed 2.0× with a bound relative to a reference: each run also times Map.set (overwriting existing keys) and Map.get on a plain Map holding the same rows under their ids, at both sizes, in the same processes and the same way as the operations, their rounds interleaved with the operations' rounds, and reports their ratios (referenceMapSetRatio, referenceMapGetRatio). Each S8.<op> passes when the operation's median ratio over the 5 runs ≤ relativeTo.factor × the larger of the two reference ratios' medians over the same runs. V8's own Map is slower at 100,000 entries than at 1,000 from cache effects alone, so a fixed ratio left a correct constant-time operation little headroom."
+      },
+      "gateRunnerOnly": {
+        "text": "Jonathan's ruling on #79: the relative bound stands, gated only on the dedicated gate runner (RUNNER_ENVIRONMENT=self-hosted, as ci/gate-baseline.mjs tells it), with the reference measured interleaved with the operations in the same run and judged on the median of 5 runs. Off the runner, S8 records only, whether or not budgets.json is approved; on it, S8 follows the record-only and approval rules of every gate."
       },
       "baseline": {
         "text": "Recorded only until the new core's baselines exist: S8's baselines come from the new core in Phase 1 (ruling 9: each scenario gets its baseline when its phase lands). On the 15.4.9 shim it is recorded, never baselined.",

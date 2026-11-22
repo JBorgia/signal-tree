@@ -11,7 +11,10 @@
  * (true or false whenever the scenario ran or errored), conditions[] and
  * regressions[] (always arrays). conditionsNotApplicable[] lists conditions a
  * subject could not be measured on (S8's operations it lacks); they are not
- * in conditions[] and do not count toward pass.
+ * in conditions[] and do not count toward pass. recordedOnly, when present,
+ * says why a scenario's verdict and regressions do not count toward the
+ * run's exit status ('not on the gate runner' for a gate budgets.json marks
+ * gateRunnerOnly); its pass still says whether its conditions hold.
  */
 import { readFileSync } from 'node:fs';
 import { DEFINITIONS } from '../scenarios/index.ts';
@@ -51,6 +54,8 @@ export interface ScenarioResult {
   missingCapabilities?: string[];
   /** Conditions not evaluated because the subject lacks the capabilities their metric needs (S8's operations); they do not count toward pass. */
   conditionsNotApplicable?: NotApplicableCondition[];
+  /** Why this scenario only records: its verdict and regressions do not count toward the run's exit status (NOT_ON_GATE_RUNNER). */
+  recordedOnly?: string;
   owner?: string;
   error?: string;
   environment?: { runtime: string; cpuThrottlingRate: number };
@@ -91,6 +96,8 @@ export interface HarnessOptions {
   readonly s5Mode: S5Mode;
   /** Tests only: runs per scenario, also the required count. The CLI never sets it. */
   readonly runs?: number;
+  /** Whether this run is on the dedicated gate runner (isGateRunner); a gate budgets.json marks gateRunnerOnly only records anywhere else. */
+  readonly onGateRunner: boolean;
   /** Tests only; the CLI never changes what budgets.json gives a scenario. */
   readonly override?: (request: RequestBase) => RequestBase;
   readonly log?: (message: string) => void;
@@ -132,6 +139,19 @@ export function judgeConditions(
 /** A scenario passes only when it has conditions and every one passed. */
 export function verdict(conditions: readonly ConditionResult[]): boolean {
   return conditions.length > 0 && conditions.every((c) => c.pass === true);
+}
+
+/** The status of a gateRunnerOnly gate's results anywhere but the gate runner. */
+export const NOT_ON_GATE_RUNNER = 'not on the gate runner';
+
+/**
+ * Whether a run is on the dedicated gate runner: GitHub sets
+ * RUNNER_ENVIRONMENT to 'self-hosted' there and to 'github-hosted' on its
+ * own runners, and a local run has none. The same test as
+ * ci/gate-baseline.mjs's isGateRunner.
+ */
+export function isGateRunner(runnerEnvironment: string | undefined): boolean {
+  return runnerEnvironment === 'self-hosted';
 }
 
 /** --record-only is honored only while budgets.json is unapproved. */
@@ -241,6 +261,7 @@ export class Harness {
     result.conditions = judged.conditions;
     if (judged.notApplicable.length) result.conditionsNotApplicable = judged.notApplicable;
     result.pass = result.status === 'ran' && verdict(result.conditions);
+    if (gateEntry(this.budgets, definition.id).gateRunnerOnly && !this.options.onGateRunner) result.recordedOnly = NOT_ON_GATE_RUNNER;
     return result;
   }
 
@@ -322,12 +343,17 @@ export function applyBaseline(scenarios: Record<string, ScenarioResult>, budgets
   }
 }
 
-/** Exit status: errors and regressions always fail; red gates fail unless the effective record-only is on. */
+/**
+ * Exit status: errors and regressions always fail; red gates fail unless the
+ * effective record-only is on. A scenario that is recorded only (S8 off the
+ * gate runner) counts only if it errors.
+ */
 export function exitCode(scenarios: Record<string, ScenarioResult>, recordOnly: boolean): number {
   const results = Object.values(scenarios);
+  const gated = results.filter((r) => r.recordedOnly === undefined);
   const errors = results.filter((r) => r.status === 'error').length;
-  const regressions = results.flatMap((r) => r.regressions).filter((r) => r.regressed).length;
-  const red = results.filter((r) => r.status === 'ran' && r.pass !== true).length;
+  const regressions = gated.flatMap((r) => r.regressions).filter((r) => r.regressed).length;
+  const red = gated.filter((r) => r.status === 'ran' && r.pass !== true).length;
   if (errors || regressions) return 1;
   return red && !recordOnly ? 1 : 0;
 }

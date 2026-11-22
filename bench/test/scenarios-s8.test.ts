@@ -8,11 +8,12 @@
 import assert from 'node:assert/strict';
 import { test, type TestContext } from 'node:test';
 import { gateEntry } from '../runner/budgets.ts';
-import { judgeConditions, verdict, type RequestBase, type ScenarioResult } from '../runner/harness.ts';
+import { exitCode, judgeConditions, NOT_ON_GATE_RUNNER, verdict, type RequestBase, type ScenarioResult } from '../runner/harness.ts';
 import type { RunContext } from '../runner/types.ts';
 import { makeRows } from '../scenarios/data.ts';
 import { S8, S8_OPERATIONS, S8_REFERENCES } from '../scenarios/s8-scaling.ts';
-import type { ReadAllocations, ScalingArgs } from '../scenarios/scaling.ts';
+import { MICRO_TIMING } from '../scenarios/micro.ts';
+import { interleaved, measurement, type ReadAllocations, type ScalingArgs } from '../scenarios/scaling.ts';
 import { collectionSeed } from '../subjects/seed.ts';
 import { testFake } from '../subjects/test-fake.ts';
 import type { StoreSubject } from '../subjects/types.ts';
@@ -44,6 +45,24 @@ for (const subject of [v15Shim, testFake]) {
     tree.destroy();
   });
 }
+
+test('S8 interleaves the rounds of the references and the operations, each sweep starting one measurement later', () => {
+  const log: string[] = [];
+  const spin = (us: number) => {
+    const end = process.hrtime.bigint() + BigInt(us * 1000);
+    while (process.hrtime.bigint() < end);
+  };
+  const ids = ['mapSet', 'mapGet', 'byId'];
+  const measurements = ids.map((id) =>
+    measurement(id, { perBatch: 1, timed: () => (log.push(id), spin(300)), verify: () => undefined }, () => undefined),
+  );
+  interleaved(measurements);
+  for (const m of measurements) assert.equal(m.samples.length, MICRO_TIMING.rounds, `${m.id}: one sample per round`);
+  // One entry per round: consecutive batches of the same measurement collapse into one.
+  const rounds = log.filter((id, i) => id !== log[i - 1]);
+  const expected = Array.from({ length: MICRO_TIMING.rounds }, (_, r) => ids.map((_, j) => ids[(r + j) % ids.length]!)).flat();
+  assert.deepEqual(rounds.slice(-expected.length), expected);
+});
 
 /** Stub reference times: Map.set 3× and Map.get 2× slower at 100,000 rows, so the bound is 1.25 × 3. */
 const STUB_REFERENCE_NS: Record<number, { mapSet: number; mapGet: number }> = { 1000: { mapSet: 10, mapGet: 5 }, 100000: { mapSet: 30, mapGet: 10 } };
@@ -139,17 +158,24 @@ function assertJudgedAgainstReference(t: TestContext, result: ScenarioResult): v
   t.diagnostic(`bound ${bound.toFixed(2)} (Map.set ${references['referenceMapSetRatio']!.toFixed(2)}, Map.get ${references['referenceMapGetRatio']!.toFixed(2)}): ${ratios.join(', ')}`);
 }
 
-test('S8 catches an O(n) walk planted in byId, and every other criterion passes', async (t) => {
-  const planted = await runOnFake('S8', ['scanById'], { tweak: fewerCalls });
+test('on the gate runner, S8 catches an O(n) walk planted in byId and fails the run; every other criterion passes', async (t) => {
+  const planted = await runOnFake('S8', ['scanById'], { tweak: fewerCalls, onGateRunner: true });
   assertMeasuredEveryOperation(planted);
   assertJudgedAgainstReference(t, planted);
   const byId = condition(planted, 'S8.byId');
   assert.ok((byId.actual as number) > 10 * byId.bound!, `a walk over 100,000 rows against 1,000 reads ${byId.actual}x, bound ${byId.bound}`);
   assertOnlyFailing(planted, ['S8.byId']);
+  assert.equal(planted.recordedOnly, undefined);
+  assert.equal(planted.pass, false);
+  assert.equal(exitCode({ S8: planted }, false), 1, 'approved budgets: the red gate fails the run');
+  assert.equal(exitCode({ S8: planted }, true), 0, 'unapproved, --record-only: recorded as any gate');
 });
 
-test('S8 catches per-call allocation growth planted in all()', async (t) => {
+test('off the gate runner, S8 is recorded only and never fails the run, even with allocation growth planted in all()', async (t) => {
   const planted = await runOnFake('S8', ['copyAll'], { tweak: fewerCalls });
+  assert.equal(planted.recordedOnly, NOT_ON_GATE_RUNNER);
+  assert.equal(planted.pass, false, 'the conditions are still judged and reported');
+  assert.equal(exitCode({ S8: planted }, false), 0, 'even with budgets.json approved (record-only off)');
   assertMeasuredEveryOperation(planted);
   assertJudgedAgainstReference(t, planted);
   const alloc = condition(planted, 'S8.allAlloc');

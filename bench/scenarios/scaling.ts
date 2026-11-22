@@ -10,17 +10,18 @@
  * re-adding the rows removeOne removed, making the writes undo reverts) runs
  * between them. A round is enough batches for S8_SETUP.roundNs of timed work;
  * the result is the median time per operation of MICRO_TIMING.rounds rounds
- * after MICRO_TIMING.warmRounds warm-up rounds.
+ * after MICRO_TIMING.warmRounds warm-up rounds. The rounds of all the
+ * operations and the references are interleaved (interleaved()).
  *
  * Row operations go to a working set of S8_SETUP.workingSet rows spread
  * evenly over the collection, the same at both sizes, so a lookup that walks
  * the rows walks on average half of them, while an operation that does not
  * stays in cache at both sizes.
  *
- * The same process first times the references S8's bound is relative to:
- * Map.set and Map.get on a plain Map from id to row holding the same rows,
- * timed in batches with the same calibration, rounds and median
- * (referenceBench).
+ * The same process times the references S8's bound is relative to: Map.set
+ * and Map.get on a plain Map from id to row holding the same rows, timed in
+ * batches with the same calibration, rounds and median (referenceBench),
+ * their rounds interleaved with the operations' rounds.
  */
 import { setImmediate } from 'node:timers/promises';
 import { allocationProbeSelfTest, countAllocations } from '../runner/alloc-probe.ts';
@@ -95,7 +96,7 @@ function loadedTree(subject: StoreSubject, options: TreeOptions, base: readonly 
 }
 
 /** One operation, timed in batches; `verify` throws if the operation did not do what it should. */
-interface Bench {
+export interface Bench {
   /** Operations one timed batch performs (setAll: rows written). */
   readonly perBatch: number;
   before?(batch: number): void;
@@ -319,27 +320,59 @@ function timeBatches(b: Bench, count: number, state: { batch: number }): { timed
   return { timed: Number(ns), wall: Number(process.hrtime.bigint() - wallStart) };
 }
 
+/** One measurement S8 interleaves with the others: a reference or an operation. */
+export interface Measurement {
+  readonly id: string;
+  readonly bench: Bench;
+  /** Batches timed so far, timed or not: a bench's batch number keeps counting across calibration, warm-up and rounds. */
+  readonly state: { batch: number };
+  /** Batches per round. */
+  count: number;
+  /** ns per operation, one per round. */
+  readonly samples: number[];
+  /** Checks the bench and releases it after the rounds. */
+  finish(): void;
+}
+
 /**
- * Median ns per operation: batches per round doubled until a round has
- * S8_SETUP.roundNs of timed work (or takes S8_SETUP.roundWallNs), again
- * after warm-up, then the rounds.
+ * Batches per round: doubled from `from` until a round has S8_SETUP.roundNs
+ * of timed work (or takes S8_SETUP.roundWallNs).
  */
-function nsPerOperation(b: Bench): number {
-  const state = { batch: 0 };
-  const calibrate = (from: number) => {
-    let count = from;
-    for (;;) {
-      const { timed, wall } = timeBatches(b, count, state);
-      if (timed >= S8_SETUP.roundNs || wall >= S8_SETUP.roundWallNs || count >= MAX_BATCHES_PER_ROUND) return count;
-      count *= 2;
-    }
-  };
-  let count = calibrate(1);
-  for (let r = 0; r < MICRO_TIMING.warmRounds; r++) timeBatches(b, count, state);
-  count = calibrate(count);
-  const samples: number[] = [];
-  for (let r = 0; r < MICRO_TIMING.rounds; r++) samples.push(timeBatches(b, count, state).timed / (count * b.perBatch));
-  return median(samples);
+function calibrate(m: Measurement, from: number): number {
+  let count = from;
+  for (;;) {
+    const { timed, wall } = timeBatches(m.bench, count, m.state);
+    if (timed >= S8_SETUP.roundNs || wall >= S8_SETUP.roundWallNs || count >= MAX_BATCHES_PER_ROUND) return count;
+    count *= 2;
+  }
+}
+
+/** One round of every measurement, starting at measurements[offset mod length] and going round. */
+function sweep(measurements: readonly Measurement[], offset: number, record: boolean): void {
+  for (let j = 0; j < measurements.length; j++) {
+    const m = measurements[(offset + j) % measurements.length]!;
+    const { timed } = timeBatches(m.bench, m.count, m.state);
+    if (record) m.samples.push(timed / (m.count * m.bench.perBatch));
+  }
+}
+
+/**
+ * Median ns per operation of every measurement, interleaved: each is
+ * calibrated alone, then MICRO_TIMING.warmRounds warm-up sweeps, each is
+ * calibrated again, then MICRO_TIMING.rounds sweeps. Sweep i times one round
+ * of each measurement, starting with measurement i mod n and going round, so
+ * no measurement always runs first and a disturbance during a sweep reaches
+ * the references and the operations alike.
+ */
+export function interleaved(measurements: readonly Measurement[]): void {
+  for (const m of measurements) m.count = calibrate(m, 1);
+  for (let w = 0; w < MICRO_TIMING.warmRounds; w++) sweep(measurements, w, false);
+  for (const m of measurements) m.count = calibrate(m, m.count);
+  for (let r = 0; r < MICRO_TIMING.rounds; r++) sweep(measurements, r, true);
+}
+
+export function measurement(id: string, bench: Bench, finish: () => void): Measurement {
+  return { id, bench, state: { batch: 0 }, count: 1, samples: [], finish };
 }
 
 export interface ScalingArgs {
@@ -354,29 +387,38 @@ export interface ScalingArgs {
 
 /**
  * S8, one size: median ns per call of each reference (S8_REFERENCES), each on
- * its own Map, then median ns per operation (setAll: per row written) of each
- * operation, each on its own tree.
+ * its own Map, and median ns per operation (setAll: per row written) of each
+ * operation, each on its own tree, all measured interleaved (interleaved()).
+ * Every Map and tree is built first and lives until the rounds end, so the
+ * process's heap holds all of them while any one is timed.
  */
 export async function measureScaling(args: ScalingArgs): Promise<Record<string, number>> {
   const subject = await loadSubject(args.subject);
   const base = makeRows(args.rows, args.fields);
-  const out: Record<string, number> = {};
+  // setAll alternates between `base` and a second set of rows with the same ids.
+  const alternate = args.operations.includes('setAll') ? makeRows(args.rows, args.fields, 1) : base;
+  const measurements: Measurement[] = [];
   for (const { id: ref } of S8_REFERENCES) {
-    await settle();
     const b = referenceBench(ref, base);
-    out[ref] = nsPerOperation(b);
-    b.verify();
+    measurements.push(measurement(ref, b, () => b.verify()));
   }
   for (const op of args.operations) {
-    // setAll's second set of rows exists only while setAll is measured, so the other operations run in the smaller heap.
-    const alternate = op === 'setAll' ? makeRows(args.rows, args.fields, 1) : base;
-    await settle();
     const { tree, rows } = loadedTree(subject, treeOptions(op), base);
     const b = bench(op, tree, rows, base, alternate);
-    out[op] = nsPerOperation(b);
-    b.verify();
-    check(rows.count() === args.rows, () => `${op}: ${rows.count()} rows after measuring, of ${args.rows}`);
-    tree.destroy();
+    measurements.push(
+      measurement(op, b, () => {
+        b.verify();
+        check(rows.count() === args.rows, () => `${op}: ${rows.count()} rows after measuring, of ${args.rows}`);
+        tree.destroy();
+      }),
+    );
+  }
+  await settle();
+  interleaved(measurements);
+  const out: Record<string, number> = {};
+  for (const m of measurements) {
+    out[m.id] = median(m.samples);
+    m.finish();
   }
   out['sink'] = sink;
   return out;
