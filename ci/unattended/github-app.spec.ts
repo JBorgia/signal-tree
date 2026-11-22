@@ -1,16 +1,16 @@
 import { spawnSync } from 'node:child_process';
-import { generateKeyPairSync, verify } from 'node:crypto';
 import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { REFRESH_MARGIN_MS, TOKEN_REQUEST, appJwt, configFromEnv, getToken, gitCredential, mintToken } from './app-token.mjs';
+import { MINT_COMMAND, REFRESH_MARGIN_MS, configFromEnv, getToken, gitCredential } from './app-token.mjs';
 
-// Tests for the GitHub App identity of the unattended runner: app-token.mjs,
-// the gh wrapper (bin/gh) and the supervisor's setup and startup checks.
-// Nothing here reaches the network: GitHub is a fake fetch or a fake gh, the
-// command-line runs find a valid token in the cache, and every supervisor run
-// stops at a check before its first network call (git ls-remote).
+// Tests for the GitHub App identity of the unattended runner on the agent's
+// side: app-token.mjs, the gh wrapper (bin/gh) and the supervisor's setup and
+// startup checks. Tokens come from a fake mint command (the minting side has
+// its own tests in mint-token.spec.ts). Nothing here reaches the network:
+// GitHub is a fake gh, and every supervisor run stops at a check before its
+// first network call (git ls-remote).
 
 const appToken = new URL('./app-token.mjs', import.meta.url).pathname;
 const wrapper = new URL('./bin/gh', import.meta.url).pathname;
@@ -18,12 +18,6 @@ const codeownersMatcher = new URL('../codeowners.mjs', import.meta.url).pathname
 const CODEOWNERS = readFileSync(new URL('../../.github/CODEOWNERS', import.meta.url), 'utf8');
 const unattended = new URL('.', import.meta.url).pathname.replace(/\/$/, '');
 const supervisor = new URL('./supervise.sh', import.meta.url).pathname;
-
-const { privateKey, publicKey } = generateKeyPairSync('rsa', {
-  modulusLength: 2048,
-  publicKeyEncoding: { type: 'spki', format: 'pem' },
-  privateKeyEncoding: { type: 'pkcs1', format: 'pem' },
-});
 
 const dirs: string[] = [];
 const scratch = () => {
@@ -35,42 +29,42 @@ afterEach(() => {
   for (const dir of dirs.splice(0)) rmSync(dir, { recursive: true, force: true });
 });
 
-const decode = (part: string) => JSON.parse(Buffer.from(part, 'base64url').toString('utf8'));
 const mode = (path: string) => statSync(path).mode & 0o777;
 const T0 = Date.UTC(2026, 10, 20, 12, 0, 0);
 const MINUTE = 60_000;
-const noSleep = async () => {};
 const ORIGIN = 'https://github.com/JBorgia/signal-tree.git';
-const APPROVED_REQUEST = {
-  repositories: ['signal-tree'],
-  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', workflows: 'write', actions: 'read' },
-};
+const minted = (token: string, expiresAt = Date.now() + 60 * MINUTE) => JSON.stringify({ token, expires_at: new Date(expiresAt).toISOString() });
 
-/** A fake api.github.com: each request takes the next answer (a Response, or a thrown network error). */
-function fakeGitHub(answers: Array<() => Response>) {
-  const calls: Array<{ url: string; init: RequestInit }> = [];
-  const fetch = async (url: string, init: RequestInit) => {
-    calls.push({ url, init });
-    const next = answers.shift();
-    if (!next) throw new Error('unexpected request');
-    return next();
-  };
-  return { fetch, calls };
+function writeScript(path: string, body: string) {
+  writeFileSync(path, `#!/usr/bin/env bash\n${body}\n`);
+  chmodSync(path, 0o755);
 }
-const issued = (token: string, expiresAt: number) => () => new Response(JSON.stringify({ token, expires_at: new Date(expiresAt).toISOString() }), { status: 201 });
-const failed = (status: number, message: string) => () => new Response(JSON.stringify({ message }), { status });
 
-/** A state directory whose cache holds a token valid for another hour, and the App settings that match it. */
-function appFixture(token = 'ghs_cached') {
+/**
+ * The agent's setup: a state directory; a fake mint command, which logs each
+ * run and prints what setMint gave it (by default `token`, valid for an hour);
+ * and a mint config naming a key file this user cannot read (it does not exist).
+ */
+function appFixture(token = 'ghs_minted') {
   const root = scratch();
   const state = join(root, 'state');
   mkdirSync(state, { mode: 0o755 });
   const cache = join(state, 'app-token.json');
-  writeFileSync(cache, JSON.stringify({ appId: 12345, installationId: '678', request: TOKEN_REQUEST, token, expiresAt: new Date(Date.now() + 60 * MINUTE).toISOString() }), { mode: 0o600 });
-  const keyFile = join(root, 'app.pem');
-  writeFileSync(keyFile, privateKey, { mode: 0o600 });
-  const env = { SIGNAL_TREE_APP_ID: '12345', SIGNAL_TREE_APP_INSTALLATION_ID: '678', SIGNAL_TREE_APP_KEY_FILE: keyFile, SIGNAL_TREE_STATE_DIR: state };
-  return { root, state, cache, keyFile, env };
+  const at = (name: string) => join(root, `mint-${name}`);
+  const mint = join(root, 'fake-mint');
+  writeScript(mint, [`echo run >> "${at('log')}"`, `[[ -f "${at('stderr')}" ]] && cat "${at('stderr')}" >&2`, `cat "${at('output')}"`, `exit "$(cat "${at('status')}" 2> /dev/null || echo 0)"`].join('\n'));
+  const setMint = ({ output, status = 0, stderr }: { output: string; status?: number; stderr?: string }) => {
+    writeFileSync(at('output'), output);
+    writeFileSync(at('status'), String(status));
+    if (stderr === undefined) rmSync(at('stderr'), { force: true });
+    else writeFileSync(at('stderr'), stderr);
+  };
+  setMint({ output: minted(token) });
+  const mints = () => (existsSync(at('log')) ? readFileSync(at('log'), 'utf8').trim().split('\n').length : 0);
+  const appConfig = join(root, 'app.json');
+  writeFileSync(appConfig, JSON.stringify({ appId: 12345, installationId: 678, keyFile: join(root, 'st-mint', 'app.pem') }));
+  const env = { SIGNAL_TREE_STATE_DIR: state, SIGNAL_TREE_MINT_COMMAND: mint, SIGNAL_TREE_APP_CONFIG: appConfig };
+  return { root, state, cache, mint, setMint, mints, appConfig, env };
 }
 
 /** process.env without anything that would leak the developer's own setup into a run. */
@@ -80,11 +74,6 @@ function cleanEnv(extra: Record<string, string>): NodeJS.ProcessEnv {
     if (/^(GH_|GITHUB_|GIT_|SSH_ASKPASS|SIGNAL_TREE_|CLAUDE_)/.test(name) && !(name in extra)) delete env[name];
   }
   return env as NodeJS.ProcessEnv;
-}
-
-function writeScript(path: string, body: string) {
-  writeFileSync(path, `#!/usr/bin/env bash\n${body}\n`);
-  chmodSync(path, 0o755);
 }
 
 const isolatedGit = { GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1' };
@@ -107,139 +96,68 @@ function checkout(url: string) {
 const shellFunctions = (...names: string[]) => `eval "$(sed -n '/^readonly /p;${names.map((name) => `/^${name}()/,/^}/p`).join(';')}' '${supervisor}')"`;
 const bash = (script: string, env: Record<string, string>, cwd?: string) => spawnSync('/bin/bash', ['-c', script], { cwd, env: cleanEnv(env), encoding: 'utf8' });
 
-describe('GitHub App JWT', () => {
-  it('is RS256 with iss = the App ID, iat = now - 60 s and exp = now + 540 s, signed with the App key', () => {
-    const jwt = appJwt({ appId: 12345, privateKey, now: T0 + 999 });
-    expect(jwt).toMatch(/^[\w-]+\.[\w-]+\.[\w-]+$/);
-    const [header, payload, signature] = jwt.split('.');
-    expect(decode(header)).toEqual({ alg: 'RS256', typ: 'JWT' });
-    expect(decode(payload)).toEqual({ iat: T0 / 1000 - 60, exp: T0 / 1000 + 540, iss: 12345 });
-    const signed = Buffer.from(`${header}.${payload}`);
-    expect(verify('sha256', signed, publicKey, Buffer.from(signature, 'base64url'))).toBe(true);
-    const stranger = generateKeyPairSync('rsa', { modulusLength: 2048 }).publicKey;
-    expect(verify('sha256', signed, stranger, Buffer.from(signature, 'base64url'))).toBe(false);
+describe('App token on the agent side', () => {
+  it('runs the mint command as st-mint through sudo by default, or SIGNAL_TREE_MINT_COMMAND, caching in the state directory', () => {
+    expect(MINT_COMMAND).toBe('sudo -n -u st-mint /opt/signal-tree/mint-token');
+    expect(configFromEnv({ SIGNAL_TREE_STATE_DIR: '/state' })).toEqual({ command: MINT_COMMAND, cacheFile: '/state/app-token.json' });
+    expect(configFromEnv({ SIGNAL_TREE_STATE_DIR: '/state', SIGNAL_TREE_MINT_COMMAND: '/test/mint' })).toEqual({ command: '/test/mint', cacheFile: '/state/app-token.json' });
   });
 
-  it('takes its settings from the environment, refusing missing or non-numeric IDs', () => {
-    const env = { SIGNAL_TREE_APP_ID: '12345', SIGNAL_TREE_APP_INSTALLATION_ID: '678', SIGNAL_TREE_APP_KEY_FILE: '/secrets/app.pem', SIGNAL_TREE_STATE_DIR: '/state' };
-    expect(configFromEnv(env)).toEqual({ appId: 12345, installationId: '678', keyFile: '/secrets/app.pem', cacheFile: '/state/app-token.json' });
-    expect(() => configFromEnv({})).toThrow('SIGNAL_TREE_APP_ID, SIGNAL_TREE_APP_INSTALLATION_ID, SIGNAL_TREE_APP_KEY_FILE not set');
-    expect(() => configFromEnv({ ...env, SIGNAL_TREE_APP_INSTALLATION_ID: '678/../../user' })).toThrow('SIGNAL_TREE_APP_INSTALLATION_ID must be');
-    expect(() => configFromEnv({ ...env, SIGNAL_TREE_APP_ID: 'signal-tree-ci' })).toThrow('SIGNAL_TREE_APP_ID must be');
-  });
-});
-
-describe('GitHub App installation token', () => {
-  const config = () => {
-    const root = scratch();
-    const keyFile = join(root, 'app.pem');
-    writeFileSync(keyFile, privateKey);
-    return { appId: 12345, installationId: '678', keyFile, cacheFile: join(root, 'state', 'app-token.json') };
-  };
-  const cached = (c: { cacheFile: string }, record: object | string) => {
-    mkdirSync(join(c.cacheFile, '..'), { recursive: true });
-    writeFileSync(c.cacheFile, typeof record === 'string' ? record : JSON.stringify(record));
-  };
-
-  it('asks for signal-tree only, with the approved permissions, signed with the App JWT', async () => {
-    const github = fakeGitHub([issued('ghs_first', T0 + 60 * MINUTE)]);
-    await getToken(config(), { now: T0, fetch: github.fetch });
-    const [{ url, init }] = github.calls;
-    expect(url).toBe('https://api.github.com/app/installations/678/access_tokens');
-    expect(init.method).toBe('POST');
-    expect(JSON.parse(init.body as string)).toEqual(APPROVED_REQUEST);
-    const headers = init.headers as Record<string, string>;
-    expect(headers['Content-Type']).toBe('application/json');
-    expect(headers.Accept).toBe('application/vnd.github+json');
-    expect(decode(headers.Authorization.replace(/^Bearer /, '').split('.')[1])).toEqual({ iat: T0 / 1000 - 60, exp: T0 / 1000 + 540, iss: 12345 });
+  it('never reads a key: no key file, App ID, JWT or GitHub API call on this side', () => {
+    const source = readFileSync(appToken, 'utf8');
+    for (const word of ['SIGNAL_TREE_APP_KEY_FILE', 'SIGNAL_TREE_APP_ID', 'keyFile', 'createPrivateKey', 'api.github.com', 'fetch(']) expect(source).not.toContain(word);
   });
 
-  it('caches the token owner-only and reuses it until 10 minutes before it expires', async () => {
-    const c = config();
-    const github = fakeGitHub([issued('ghs_first', T0 + 60 * MINUTE), issued('ghs_second', T0 + 120 * MINUTE)]);
-    expect(await getToken(c, { now: T0, fetch: github.fetch })).toBe('ghs_first');
-    expect(mode(c.cacheFile)).toBe(0o600);
-    expect(JSON.parse(readFileSync(c.cacheFile, 'utf8'))).toEqual({ appId: 12345, installationId: '678', request: APPROVED_REQUEST, token: 'ghs_first', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() });
+  it('gets a token from the mint command, caches it owner-only, and reuses it until 10 minutes before it expires', async () => {
+    const { env, cache, setMint, mints } = appFixture();
+    const config = configFromEnv(env);
+    setMint({ output: minted('ghs_first', T0 + 60 * MINUTE) });
+    expect(await getToken(config, { now: T0 })).toBe('ghs_first');
+    expect(mints()).toBe(1);
+    expect(mode(cache)).toBe(0o600);
+    expect(JSON.parse(readFileSync(cache, 'utf8'))).toEqual({ command: config.command, token: 'ghs_first', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() });
 
-    // 11 minutes left: reused. Exactly 10 left: refreshed.
-    expect(await getToken(c, { now: T0 + 49 * MINUTE, fetch: github.fetch })).toBe('ghs_first');
-    expect(github.calls).toHaveLength(1);
-    expect(await getToken(c, { now: T0 + 60 * MINUTE - REFRESH_MARGIN_MS, fetch: github.fetch })).toBe('ghs_second');
-    expect(github.calls).toHaveLength(2);
-    expect(JSON.parse(readFileSync(c.cacheFile, 'utf8')).token).toBe('ghs_second');
-    expect(mode(c.cacheFile)).toBe(0o600);
+    // 11 minutes left: reused. Exactly 10 left: minted again.
+    expect(await getToken(config, { now: T0 + 49 * MINUTE })).toBe('ghs_first');
+    expect(mints()).toBe(1);
+    setMint({ output: minted('ghs_second', T0 + 120 * MINUTE) });
+    expect(await getToken(config, { now: T0 + 60 * MINUTE - REFRESH_MARGIN_MS })).toBe('ghs_second');
+    expect(mints()).toBe(2);
+    expect(JSON.parse(readFileSync(cache, 'utf8')).token).toBe('ghs_second');
+    expect(mode(cache)).toBe(0o600);
   });
 
-  it('mints afresh unless the cache holds an installation token (ghs_) for this installation and scope', async () => {
-    const c = config();
-    const good = { appId: 12345, installationId: '678', request: TOKEN_REQUEST, token: 'ghs_cached', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() };
-    cached(c, good);
-    expect(await getToken(c, { now: T0, fetch: fakeGitHub([]).fetch })).toBe('ghs_cached');
-
-    const rejected = ['not json', { ...good, installationId: '999' }, { ...good, token: 'gho_personal' }, { ...good, token: 'ghs_x\nusername=someone' }, { ...good, request: undefined }, { ...good, request: { repositories: ['signal-tree'], permissions: { contents: 'write' } } }];
-    for (const record of rejected) {
-      cached(c, record);
-      const github = fakeGitHub([issued('ghs_fresh', T0 + 60 * MINUTE)]);
-      expect(await getToken(c, { now: T0, fetch: github.fetch })).toBe('ghs_fresh');
-      expect(github.calls).toHaveLength(1);
+  it('mints afresh unless the cache holds an installation token (ghs_) from the same mint command', async () => {
+    const { env, cache, setMint, mints } = appFixture();
+    const config = configFromEnv(env);
+    setMint({ output: minted('ghs_fresh', T0 + 60 * MINUTE) });
+    const good = { command: config.command, token: 'ghs_cached', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() };
+    writeFileSync(cache, JSON.stringify(good));
+    expect(await getToken(config, { now: T0 })).toBe('ghs_cached');
+    const rejected = ['not json', { ...good, command: 'another mint command' }, { ...good, token: 'gho_personal' }, { ...good, token: 'ghs_x\nusername=someone' }, { ...good, expiresAt: 'soon' }];
+    for (const [i, record] of rejected.entries()) {
+      writeFileSync(cache, typeof record === 'string' ? record : JSON.stringify(record));
+      expect(await getToken(config, { now: T0 })).toBe('ghs_fresh');
+      expect(mints()).toBe(i + 1);
     }
   });
 
-  it('retries network errors and 5xx answers, then gives up with the last problem', async () => {
-    const sleeps: number[] = [];
-    const sleep = async (ms: number) => {
-      sleeps.push(ms);
-    };
-    const flaky = fakeGitHub([
-      () => {
-        throw new TypeError('fetch failed', { cause: new Error('getaddrinfo ENOTFOUND api.github.com') });
-      },
-      failed(502, 'Server Error'),
-      issued('ghs_ok', T0 + 60 * MINUTE),
-    ]);
-    expect(await mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: flaky.fetch, sleep })).toEqual({ token: 'ghs_ok', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() });
-    expect(sleeps).toEqual([1000, 2000]);
-
-    const down = fakeGitHub([failed(503, 'Unavailable'), failed(503, 'Unavailable'), failed(503, 'Unavailable')]);
-    await expect(mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: down.fetch, sleep: noSleep })).rejects.toThrow('after 3 attempts: GitHub answered 503: Unavailable.');
-    expect(down.calls).toHaveLength(3);
-  });
-
-  it("fails at once on a 4xx answer with GitHub's message and a hint, and never shows the JWT or the key", async () => {
-    const denied = fakeGitHub([failed(401, 'A JSON web token could not be decoded')]);
-    const error: Error = await mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: denied.fetch, sleep: noSleep }).catch((e: Error) => e);
-    expect(error.message).toContain('GitHub answered 401: A JSON web token could not be decoded.');
-    expect(error.message).toContain('Check SIGNAL_TREE_APP_ID');
-    expect(denied.calls).toHaveLength(1);
-    const jwt = (denied.calls[0].init.headers as Record<string, string>).Authorization.replace(/^Bearer /, '');
-    expect(error.message).not.toContain(jwt.split('.')[2]);
-    expect(error.message).not.toContain(privateKey.split('\n')[1]);
-
-    const missing = fakeGitHub([failed(404, 'Not Found')]);
-    await expect(mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: missing.fetch, sleep: noSleep })).rejects.toThrow('Check SIGNAL_TREE_APP_INSTALLATION_ID');
-  });
-
-  it('refuses an answer without an installation token (ghs_) and its expiry', async () => {
-    for (const answer of [() => new Response('{}', { status: 201 }), issued('gho_personal', T0 + 60 * MINUTE), issued('ghs_x\nusername=someone', T0 + 60 * MINUTE)]) {
-      await expect(mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: fakeGitHub([answer]).fetch, sleep: noSleep })).rejects.toThrow('without an installation token (ghs_...)');
+  it('accepts only an installation token (ghs_) with a future expiry, and quotes only stderr when the command fails', async () => {
+    const { env, cache, setMint } = appFixture();
+    const config = configFromEnv(env);
+    const outputs = ['', 'not json', minted('gho_personal', T0 + 60 * MINUTE), minted('ghs_x\nusername=someone', T0 + 60 * MINUTE), '{"token":"ghs_x"}'];
+    for (const output of outputs) {
+      setMint({ output });
+      await expect(getToken(config, { now: T0 })).rejects.toThrow(`the mint command (${config.command}) did not print an installation token (ghs_...) and its expiry`);
     }
-  });
+    setMint({ output: minted('ghs_old', T0 - 1000) });
+    await expect(getToken(config, { now: T0 })).rejects.toThrow('printed a token that expired at');
 
-  it('refuses a key file it cannot use, naming the file but never echoing its contents', async () => {
-    const c = config();
-    const github = fakeGitHub([]);
-    writeFileSync(c.keyFile, '-----BEGIN RSA PRIVATE KEY-----\nSENTINEL-NOT-A-KEY\n-----END RSA PRIVATE KEY-----\n');
-    const garbled: Error = await getToken(c, { now: T0, fetch: github.fetch }).catch((e: Error) => e);
-    expect(garbled.message).toContain(`${c.keyFile} (SIGNAL_TREE_APP_KEY_FILE) is not a PEM private key`);
-    expect(garbled.message).not.toContain('SENTINEL');
-
-    const ec = generateKeyPairSync('ec', { namedCurve: 'P-256', privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } });
-    writeFileSync(c.keyFile, ec.privateKey);
-    await expect(getToken(c, { now: T0, fetch: github.fetch })).rejects.toThrow('holds a key of type ec; GitHub App keys are RSA');
-
-    rmSync(c.keyFile);
-    await expect(getToken(c, { now: T0, fetch: github.fetch })).rejects.toThrow(`cannot read the App's private key ${c.keyFile} (SIGNAL_TREE_APP_KEY_FILE): ENOENT`);
-    expect(github.calls).toHaveLength(0);
+    setMint({ output: minted('ghs_leaked'), status: 1, stderr: 'sudo: a password is required\n' });
+    const error: Error = await getToken(config, { now: T0 }).catch((e: Error) => e);
+    expect(error.message).toBe(`the mint command (${config.command}) failed (1): sudo: a password is required`);
+    expect(error.message).not.toContain('ghs_leaked');
+    expect(existsSync(cache)).toBe(false);
   });
 });
 
@@ -272,15 +190,16 @@ describe('git credential helper', () => {
     expect(await gitCredential('store', `${request.trim()}\nusername=x-access-token\npassword=ghs_x\n\n`, never)).toBe('');
   });
 
-  it('speaks the protocol to git itself, from the cached token, and erase deletes the cache', () => {
-    const { env, cache } = appFixture('ghs_cached');
+  it('speaks the protocol to git itself with a token from the mint command, and erase deletes the cache', () => {
+    const { env, cache, mints } = appFixture('ghs_for_git');
     const fill = spawnSync('git', ['-c', 'credential.https://github.com.helper=', '-c', `credential.https://github.com.helper=!node ${appToken} git-credential`, 'credential', 'fill'], {
       input: request,
       env: cleanEnv({ ...env, ...isolatedGit, GIT_TERMINAL_PROMPT: '0' }),
       encoding: 'utf8',
     });
     expect(fill.status).toBe(0);
-    expect(fill.stdout).toContain('username=x-access-token\npassword=ghs_cached\n');
+    expect(fill.stdout).toContain('username=x-access-token\npassword=ghs_for_git\n');
+    expect([mints(), existsSync(cache)]).toEqual([1, true]);
 
     const elsewhere = spawnSync('node', [appToken, 'git-credential', 'erase'], { input: 'protocol=https\nhost=gitlab.com\n\n', env: cleanEnv(env), encoding: 'utf8' });
     expect([elsewhere.status, elsewhere.stdout, existsSync(cache)]).toEqual([0, '', true]);
@@ -288,15 +207,16 @@ describe('git credential helper', () => {
     expect([erase.status, erase.stdout, existsSync(cache)]).toEqual([0, '', false]);
   });
 
-  it('prints the cached token for `token`, and fails clearly with no output when unconfigured', () => {
-    const { env } = appFixture('ghs_cached');
+  it('prints the token for `token`, and fails clearly with no output when the mint command fails', () => {
+    const { env, setMint } = appFixture('ghs_printed');
     const ok = spawnSync('node', [appToken, 'token'], { env: cleanEnv(env), encoding: 'utf8' });
-    expect([ok.status, ok.stdout, ok.stderr]).toEqual([0, 'ghs_cached\n', '']);
+    expect([ok.status, ok.stdout, ok.stderr]).toEqual([0, 'ghs_printed\n', '']);
 
-    const unset = spawnSync('node', [appToken, 'token'], { env: cleanEnv({}), encoding: 'utf8' });
-    expect(unset.status).toBe(1);
-    expect(unset.stdout).toBe('');
-    expect(unset.stderr).toContain('SIGNAL_TREE_APP_ID, SIGNAL_TREE_APP_INSTALLATION_ID, SIGNAL_TREE_APP_KEY_FILE not set');
+    rmSync(join(env.SIGNAL_TREE_STATE_DIR, 'app-token.json'));
+    setMint({ output: '', status: 1, stderr: 'sudo: unknown user st-mint\n' });
+    const failing = spawnSync('node', [appToken, 'token'], { env: cleanEnv(env), encoding: 'utf8' });
+    expect([failing.status, failing.stdout]).toEqual([1, '']);
+    expect(failing.stderr).toBe(`app-token: the mint command (${env.SIGNAL_TREE_MINT_COMMAND}) failed (1): sudo: unknown user st-mint\n`);
 
     const usage = spawnSync('node', [appToken], { env: cleanEnv(env), encoding: 'utf8' });
     expect(usage.status).toBe(2);
@@ -463,9 +383,9 @@ describe('gh wrapper', () => {
   });
 
   it('runs nothing without an App token', () => {
-    const r = run(['issue', 'list'], { SIGNAL_TREE_APP_ID: '' });
+    const r = run(['issue', 'list'], { SIGNAL_TREE_MINT_COMMAND: 'false' });
     expect(r.status).toBe(1);
-    expect(r.stderr).toContain('SIGNAL_TREE_APP_ID');
+    expect(r.stderr).toContain('app-token: the mint command (false) failed (1)');
     expect(r.calls).toEqual([]);
   });
 
@@ -480,7 +400,10 @@ describe('gh wrapper', () => {
 });
 
 describe('supervisor startup checks', () => {
-  /** App settings with a cached token, a checkout with origin `url`, and a fake gh (no login; main's rules from $FAKE_RULES) first on PATH. */
+  const pullRequest = (parameters: object = {}) => ({ type: 'pull_request', parameters: { required_approving_review_count: 1, require_code_owner_review: true, dismiss_stale_reviews_on_push: false, ...parameters } });
+  const statusChecks = { type: 'required_status_checks', parameters: { required_status_checks: [{ context: 'tests' }], strict_required_status_checks_policy: false } };
+  const RULES = JSON.stringify([pullRequest(), statusChecks, { type: 'deletion' }]);
+  /** The agent's setup (appFixture), a checkout with origin `url`, and a fake gh (no login; main's rules from $FAKE_RULES) first on PATH. */
   const fixture = (url = ORIGIN) => {
     const app = appFixture('ghs_supervisor');
     const work = checkout(url);
@@ -497,7 +420,7 @@ describe('supervisor startup checks', () => {
         'esac',
       ].join('\n'),
     );
-    const env = { ...app.env, PATH: `${fake}:${process.env.PATH}`, FAKE_RULES: '[{"type":"pull_request"},{"type":"required_status_checks"}]' };
+    const env = { ...app.env, PATH: `${fake}:${process.env.PATH}`, FAKE_RULES: RULES };
     return { ...app, work, fake, ghLog, env };
   };
   const start = (extra: Record<string, string>, cwd?: string) =>
@@ -507,17 +430,43 @@ describe('supervisor startup checks', () => {
     expect(readFileSync(supervisor, 'utf8')).toMatch(/^set -uo pipefail\n(#.*\n)*umask 077\n/m);
   });
 
-  it('refuses to start without the App settings (exit 8)', () => {
-    const run = start({ SIGNAL_TREE_STATE_DIR: scratch() });
-    expect(run.status).toBe(8);
-    expect(run.stderr).toContain('set SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE');
+  it('refuses to start if this user can read the App key named in the mint config, or cannot read that config (exit 13)', () => {
+    const { env, work, root, appConfig, state, mints } = fixture();
+    const key = join(root, 'readable.pem');
+    writeFileSync(key, 'not really a key', { mode: 0o400 });
+    writeFileSync(appConfig, JSON.stringify({ appId: 12345, installationId: 678, keyFile: key }));
+    const readable = start(env, work);
+    expect(readable.status).toBe(13);
+    expect(readable.stderr).toContain(`can read the App's private key ${key}; only the mint user may`);
+    expect(readable.stderr).not.toContain('not really a key');
+    // Refused before anything is created or minted.
+    expect([existsSync(join(state, 'github-app')), mints()]).toEqual([false, 0]);
+
+    for (const config of ['not json', '{}', '{"keyFile":"app.pem"}', null]) {
+      if (config === null) rmSync(appConfig);
+      else writeFileSync(appConfig, config);
+      const run = start(env, work);
+      expect(run.status).toBe(13);
+      expect(run.stderr).toContain(`cannot read the key path (keyFile) from ${appConfig}`);
+    }
   });
 
-  it('refuses to start when the key file is not readable (exit 8)', () => {
-    const { env, root } = appFixture();
-    const run = start({ ...env, SIGNAL_TREE_APP_KEY_FILE: join(root, 'missing.pem') });
-    expect(run.status).toBe(8);
-    expect(run.stderr).toContain('SIGNAL_TREE_APP_KEY_FILE');
+  it('passes the key check when the key cannot be read, and ignores App settings left in the environment', () => {
+    const { root, appConfig, env } = fixture();
+    const locked = join(root, 'st-mint');
+    mkdirSync(locked);
+    writeFileSync(join(locked, 'app.pem'), 'not really a key', { mode: 0o400 });
+    writeFileSync(appConfig, JSON.stringify({ appId: 12345, installationId: 678, keyFile: join(locked, 'app.pem') }));
+    chmodSync(locked, 0o000);
+    try {
+      expect(bash(`${shellFunctions('check_key_unreadable')}; check_key_unreadable`, env).status).toBe(0);
+    } finally {
+      chmodSync(locked, 0o700);
+    }
+    expect(bash(`${shellFunctions('check_key_unreadable')}; check_key_unreadable`, env).status).toBe(1);
+    const text = readFileSync(supervisor, 'utf8');
+    expect(text).toContain('unset SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE');
+    expect(text).not.toMatch(/export[^\n]*SIGNAL_TREE_APP_(ID|KEY_FILE)/);
   });
 
   it('refuses a state directory inside the checkout or the verifier (exit 2), creating nothing', () => {
@@ -532,21 +481,30 @@ describe('supervisor startup checks', () => {
     expect(existsSync(join(root, 'verify'))).toBe(false);
   });
 
-  it('refuses to start when no token can be minted (exit 9), without showing the key', () => {
-    const { env, cache, keyFile, work } = fixture();
-    rmSync(cache);
-    writeFileSync(keyFile, '-----BEGIN RSA PRIVATE KEY-----\nSENTINEL-NOT-A-KEY\n-----END RSA PRIVATE KEY-----\n');
+  it('refuses to start when the mint command gives no token (exit 9), even with a valid token cached', () => {
+    const { env, cache, mint, work, setMint, mints } = fixture();
+    writeFileSync(cache, JSON.stringify({ command: mint, token: 'ghs_cached', expiresAt: new Date(Date.now() + 60 * MINUTE).toISOString() }));
+    setMint({ output: '', status: 1, stderr: 'sudo: a password is required\n' });
     const run = start(env, work);
     expect(run.status).toBe(9);
-    expect(run.stderr).toContain('is not a PEM private key');
-    expect(run.stderr).toContain('could not mint a GitHub App installation token');
-    expect(run.stderr).not.toContain('SENTINEL');
+    expect(run.stderr).toContain(`app-token: the mint command (${mint}) failed (1): sudo: a password is required`);
+    expect(run.stderr).toContain('the mint command gave no GitHub App installation token');
+    expect(mints()).toBe(1);
+
+    setMint({ output: minted('gho_personal') });
+    const personal = start(env, work);
+    expect(personal.status).toBe(9);
+    expect(personal.stderr).toContain('did not print an installation token (ghs_...)');
   });
 
   it('refuses an origin other than https://github.com/JBorgia/signal-tree (exit 10), without echoing credentials, with a private state directory', () => {
     const ssh = fixture('git@github.com:JBorgia/signal-tree.git');
+    // A valid cached token does not spare the startup mint.
+    writeFileSync(ssh.cache, JSON.stringify({ command: ssh.mint, token: 'ghs_cached', expiresAt: new Date(Date.now() + 60 * MINUTE).toISOString() }));
     const run = start(ssh.env, ssh.work);
     expect(run.status).toBe(10);
+    expect(ssh.mints()).toBe(1);
+    expect(JSON.parse(readFileSync(ssh.cache, 'utf8')).token).toBe('ghs_supervisor');
     expect(run.stderr).toContain('origin fetches or pushes through git@github.com:JBorgia/signal-tree.git');
     expect(mode(ssh.state)).toBe(0o700);
     expect(mode(join(ssh.state, 'github-app'))).toBe(0o700);
@@ -569,11 +527,11 @@ describe('supervisor startup checks', () => {
     expect(run.stderr).toContain('gh has a stored login');
   });
 
-  it('refuses to start unless main has a pull_request and a required_status_checks rule (exit 12), read as the App', () => {
+  it('refuses to start unless main requires an approving review, code-owner review and status checks (exit 12), read as the App', () => {
     const { env, work, ghLog } = fixture();
-    const run = start({ ...env, FAKE_RULES: '[{"type":"pull_request"},{"type":"deletion"}]' }, work);
+    const run = start({ ...env, FAKE_RULES: JSON.stringify([pullRequest({ require_code_owner_review: false }), statusChecks]) }, work);
     expect(run.status).toBe(12);
-    expect(run.stderr).toContain('has no active required_status_checks rule');
+    expect(run.stderr).toContain('lacks what a PR the App auto-merges must wait for:\n  a pull_request rule requiring code-owner review (require_code_owner_review: true)\n');
     expect(readFileSync(ghLog, 'utf8').trim().split('\n')).toEqual(['unset auth status', 'ghs_supervisor api repos/JBorgia/signal-tree/rules/branches/main']);
   });
 
@@ -693,14 +651,39 @@ describe('supervisor startup checks', () => {
     expect(existsSync(decoyLog)).toBe(false);
   });
 
-  it('reads the rules on main through gh and requires each of REQUIRED_MAIN_RULES', () => {
+  it('reads the rules on main through gh and requires an approving review, code-owner review and status checks', () => {
     const { env } = fixture();
-    const check = (extra: Record<string, string>) => bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, ...extra });
-    expect(check({ FAKE_RULES: '[{"type":"deletion"},{"type":"required_status_checks"},{"type":"pull_request"}]' }).status).toBe(0);
-    expect(check({ FAKE_RULES: '[]' }).stderr).toContain('has no active pull_request rule');
-    expect(check({ FAKE_RULES: '[{"type":"pull_request"}]' }).stderr).toContain('has no active required_status_checks rule');
-    const unreadable = check({ FAKE_RULES: '{"message":"Not Found"}', FAKE_API_STATUS: '1' });
+    const check = (...rules: object[]) => bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: JSON.stringify(rules) });
+    const approvals = 'a pull_request rule requiring at least one approving review (required_approving_review_count >= 1)';
+    const owners = 'a pull_request rule requiring code-owner review (require_code_owner_review: true)';
+    const checks = 'a required_status_checks rule';
+    const missing = (...requirements: string[]) => `lacks what a PR the App auto-merges must wait for:\n${requirements.map((r) => `  ${r}\n`).join('')}`;
+
+    expect(check({ type: 'deletion' }, statusChecks, pullRequest()).status).toBe(0);
+    expect(check(pullRequest({ required_approving_review_count: 2 }), statusChecks).status).toBe(0);
+    // Each requirement may come from a different ruleset's rule.
+    expect(check(pullRequest({ require_code_owner_review: false }), pullRequest({ required_approving_review_count: 0 }), statusChecks).status).toBe(0);
+
+    const cases: Array<[object[], string[]]> = [
+      [[], [approvals, owners, checks]],
+      [[pullRequest()], [checks]],
+      [[statusChecks, { type: 'pull_request' }], [approvals, owners]],
+      [[pullRequest({ required_approving_review_count: 0 }), statusChecks], [approvals]],
+      [[pullRequest({ required_approving_review_count: '1' }), statusChecks], [approvals]],
+      [[pullRequest({ require_code_owner_review: false }), statusChecks], [owners]],
+      [[pullRequest({ require_code_owner_review: 'true' }), statusChecks], [owners]],
+    ];
+    for (const [rules, requirements] of cases) {
+      const r = check(...rules);
+      expect(r.status, JSON.stringify(rules)).toBe(1);
+      expect(r.stderr).toContain(missing(...requirements));
+    }
+
+    const unreadable = bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: '{"message":"Not Found"}', FAKE_API_STATUS: '1' });
     expect(unreadable.status).toBe(1);
     expect(unreadable.stderr).toContain('could not read the rules for main of JBorgia/signal-tree');
+    const notRules = bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: '{"message":"Not Found"}' });
+    expect(notRules.status).toBe(1);
+    expect(notRules.stderr).toContain("GitHub's answer is not a list of rules");
   });
 });

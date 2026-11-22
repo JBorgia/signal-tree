@@ -25,22 +25,24 @@
 #   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"; may not set the model
 #   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 #   ANTHROPIC_API_KEY             required: the API key from the VM's secret store (#16)
-#   SIGNAL_TREE_APP_ID            required: the signal-tree-ci GitHub App's ID
-#   SIGNAL_TREE_APP_INSTALLATION_ID  required: the App's installation ID on JBorgia/signal-tree
-#   SIGNAL_TREE_APP_KEY_FILE      required: path to the App's private key (.pem) in the VM's secret store
+#   SIGNAL_TREE_MINT_COMMAND      default "sudo -n -u st-mint /opt/signal-tree/mint-token": prints a
+#                                 GitHub App token as the user that owns the App's key (mint-token.mjs)
+#   SIGNAL_TREE_APP_CONFIG        default /etc/signal-tree/app.json: the mint config whose keyFile this
+#                                 user must not be able to read (the mint command itself reads only the default)
 #   SIGNAL_TREE_GIT_NAME          default "Jonathan Borgia": author and committer name of every commit
 #   SIGNAL_TREE_GIT_EMAIL         default jonathanborgia@gmail.com: author and committer email
 #
 # Exit status: 0 done; 1 setup failed; 2 not the isolated machine, extra
 # arguments set a model, or the state directory is inside a checkout; 3 stuck;
 # 4 the agent lock is held or could not be taken; 5 a run used another model;
-# 6 no ANTHROPIC_API_KEY; 7 a run could not authenticate to Anthropic; 8 the
-# GitHub App variables are missing or the key file is unreadable; 9 no GitHub
-# App token could be minted, or git would not use it; 10 origin is not
-# https://github.com/JBorgia/signal-tree(.git) for fetch and push, git config
-# sets an extra HTTP header, or `git ls-remote origin` fails as the App; 11 no
-# real gh outside the wrapper, or gh has a stored login; 12 main lacks a rule
-# in REQUIRED_MAIN_RULES, or its rules could not be read.
+# 6 no ANTHROPIC_API_KEY; 7 a run could not authenticate to Anthropic; 8 is no
+# longer used; 9 the mint command gave no GitHub App token, or git would not use
+# it; 10 origin is not https://github.com/JBorgia/signal-tree(.git) for fetch
+# and push, git config sets an extra HTTP header, or `git ls-remote origin`
+# fails as the App; 11 no real gh outside the wrapper, or gh has a stored login;
+# 12 main's rules do not require an approving review, code-owner review and
+# status checks, or could not be read; 13 this user can read the App's private
+# key, or the mint config naming it cannot be read.
 #
 # Authentication (Jonathan's ruling on #16): Claude Code uses an Anthropic API
 # key from the VM's secret store, never a browser login. The supervisor
@@ -54,8 +56,14 @@
 # committer. At start the supervisor copies app-token.mjs and the gh wrapper
 # (bin/gh) from its own directory, and the CODEOWNERS matcher the wrapper runs
 # (ci/codeowners.mjs), into $SIGNAL_TREE_STATE_DIR/github-app, so a branch
-# switch in the agent's checkout cannot remove or change them, and mints one
-# token to fail fast. In its own environment, which the session and its hooks
+# switch in the agent's checkout cannot remove or change them.
+#
+# The agent never holds the App's private key (Jonathan's ruling: "the VM uses
+# a separate Unix user that owns the key. The agent may run only the
+# token-minting command through sudo and receives 1-hour tokens."). The
+# supervisor refuses to start if its own user can read the key named in the
+# mint config, and gets one token from the mint command, bypassing the cache,
+# to fail fast. In its own environment, which the session and its hooks
 # inherit, it then
 #   - unsets GH_TOKEN and GITHUB_TOKEN, so no personal token is ever used;
 #   - replaces the machine's git config with github-app/gitconfig
@@ -73,8 +81,9 @@
 #     (GH_CONFIG_DIR).
 # Before it takes the lock it refuses to start unless origin's fetch and push
 # URLs are exactly https://github.com/JBorgia/signal-tree(.git), no git config
-# sets an extra HTTP header, gh has no stored login, main has the rules in
-# REQUIRED_MAIN_RULES (so auto-merge still waits for them), and
+# sets an extra HTTP header, gh has no stored login, main's rules require at
+# least one approving review, code-owner review and status checks (so
+# auto-merge still waits for them; see check_main_rules), and
 # `git ls-remote origin` works as the App.
 #
 # One session at a time: the supervisor holds the agent lock (refs/agent/lock
@@ -94,10 +103,6 @@ umask 077
 
 readonly MODEL=claude-opus-5-5
 readonly REPO=JBorgia/signal-tree
-# Rule types (from GET /repos/{repo}/rules/branches/main) that main must have
-# before the App may auto-merge its PRs. Adjust as the code-owner review
-# mechanism is settled.
-readonly REQUIRED_MAIN_RULES='pull_request required_status_checks'
 
 main() {
   if [[ "${SIGNAL_TREE_ISOLATED:-}" != 1 ]]; then
@@ -122,22 +127,12 @@ main() {
     exit 6
   fi
   unset CLAUDE_CODE_OAUTH_TOKEN
-  # GitHub sees only the signal-tree-ci App, never a personal token.
+  # GitHub sees only the signal-tree-ci App, never a personal token. The
+  # App's key and IDs belong to the mint user, not this environment.
   unset GH_TOKEN GITHUB_TOKEN GH_ENTERPRISE_TOKEN GITHUB_ENTERPRISE_TOKEN
-  local missing='' name
-  for name in SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE; do
-    [[ -n ${!name:-} ]] || missing+=" $name"
-  done
-  if [[ -n $missing ]]; then
-    echo "Refusing to start: set$missing from the VM's secret store; the agent reaches GitHub only as the signal-tree-ci GitHub App." >&2
-    exit 8
-  fi
-  if [[ ! -f $SIGNAL_TREE_APP_KEY_FILE || ! -r $SIGNAL_TREE_APP_KEY_FILE ]]; then
-    echo "Refusing to start: SIGNAL_TREE_APP_KEY_FILE ($SIGNAL_TREE_APP_KEY_FILE) is not a readable file; it must be the App's private key." >&2
-    exit 8
-  fi
-  export SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE
+  unset SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE
   check_state_dir || exit 2
+  check_key_unreadable || exit 13
   local log=$SIGNAL_TREE_STATE_DIR/session.log
   mkdir -p "$SIGNAL_TREE_STATE_DIR" && chmod 700 "$SIGNAL_TREE_STATE_DIR" || exit 1
   use_github_app "$SCRIPT_DIR" "$SIGNAL_TREE_STATE_DIR/github-app" || exit 9
@@ -252,11 +247,27 @@ physical_path() {
   if [[ -n $rest ]]; then echo "${base%/}$rest"; else echo "$base"; fi
 }
 
+# Refuses to start if this user can read the App's private key: the keyFile
+# that the mint config ($SIGNAL_TREE_APP_CONFIG, default
+# /etc/signal-tree/app.json) names. A config it cannot read counts as a
+# failure too, so a misconfigured VM cannot expose the key unnoticed.
+check_key_unreadable() {
+  local config=${SIGNAL_TREE_APP_CONFIG:-/etc/signal-tree/app.json} key
+  if ! key=$(jq -er '.keyFile | select(type == "string" and startswith("/"))' "$config" 2> /dev/null); then
+    echo "Refusing to start: cannot read the key path (keyFile) from $config, so cannot check that $(id -un) cannot read the App's private key; see ci/unattended/mint-token.mjs." >&2
+    return 1
+  fi
+  if [[ -r $key ]]; then
+    echo "Refusing to start: $(id -un) can read the App's private key $key; only the mint user may (see ci/unattended/mint-token.mjs)." >&2
+    return 1
+  fi
+}
+
 # Sets this environment up to reach GitHub as the signal-tree-ci App (see
 # "GitHub identity" above): installs the helpers from $1 into $2
-# (install_helpers), points git, gh and the commit identity at them, then mints
-# a token and checks that git would use it. Prints the reason and returns 1 on
-# any failure.
+# (install_helpers), points git, gh and the commit identity at them, then gets
+# a token from the mint command, bypassing the cache, and checks that git
+# would use it. Prints the reason and returns 1 on any failure.
 use_github_app() {
   local from=$1 app_dir=$2 helper user
   if ! { install_helpers "$from" "$app_dir" && write_git_config "$app_dir/gitconfig"; }; then
@@ -283,8 +294,9 @@ use_github_app() {
     GIT_AUTHOR_EMAIL=$SIGNAL_TREE_GIT_EMAIL GIT_COMMITTER_EMAIL=$SIGNAL_TREE_GIT_EMAIL
   export PATH=$app_dir/bin:$PATH
 
+  rm -f "$SIGNAL_TREE_STATE_DIR/app-token.json"
   if ! node "$app_dir/app-token.mjs" token > /dev/null; then
-    echo "Refusing to start: could not mint a GitHub App installation token (the reason is above)." >&2
+    echo "Refusing to start: the mint command gave no GitHub App installation token (the reason is above)." >&2
     return 1
   fi
   user=$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill 2>/dev/null | sed -n 's/^username=//p')
@@ -383,20 +395,34 @@ use_real_gh() {
   fi
 }
 
-# Refuses to start unless main of REPO has every rule type in
-# REQUIRED_MAIN_RULES, so a PR the App auto-merges still waits for them.
+# Refuses to start unless main's active rules require at least one approving
+# review, code-owner review and status checks, so a PR the App auto-merges
+# still waits for review by the code owner where CODEOWNERS applies, an
+# approval elsewhere, and the checks. Each requirement may come from any rule
+# of the type (GitHub applies the strictest).
 check_main_rules() {
-  local rules type
-  if ! rules=$(gh api "repos/$REPO/rules/branches/main" | jq -r '.[].type'); then
+  local rules missing
+  if ! rules=$(gh api "repos/$REPO/rules/branches/main"); then
     echo "Refusing to start: could not read the rules for main of $REPO (the error is above)." >&2
     return 1
   fi
-  for type in $REQUIRED_MAIN_RULES; do
-    if ! grep -qx -- "$type" <<< "$rules"; then
-      echo "Refusing to start: main of $REPO has no active $type rule, so a PR the App auto-merges would not wait for it (REQUIRED_MAIN_RULES: $REQUIRED_MAIN_RULES)." >&2
-      return 1
-    fi
-  done
+  if ! missing=$(jq -r '
+    if type != "array" then error("not a list of rules") else . end
+    | def pr(f): any(.[]; .type == "pull_request" and (.parameters | f));
+      (if pr((.required_approving_review_count | type) == "number" and .required_approving_review_count >= 1) then empty
+       else "a pull_request rule requiring at least one approving review (required_approving_review_count >= 1)" end),
+      (if pr(.require_code_owner_review == true) then empty
+       else "a pull_request rule requiring code-owner review (require_code_owner_review: true)" end),
+      (if any(.[]; .type == "required_status_checks") then empty
+       else "a required_status_checks rule" end)' <<< "$rules" 2> /dev/null); then
+    echo "Refusing to start: could not read the rules for main of $REPO: GitHub's answer is not a list of rules." >&2
+    return 1
+  fi
+  if [[ -n $missing ]]; then
+    echo "Refusing to start: main of $REPO lacks what a PR the App auto-merges must wait for:" >&2
+    sed 's/^/  /' <<< "$missing" >&2
+    return 1
+  fi
 }
 
 # The error text of a run that failed to authenticate, or nothing.
