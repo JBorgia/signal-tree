@@ -67,6 +67,23 @@ Where the budgets leave a detail open, the harness does the following.
     once), hence the small allowance in budgets.json.
   - An operation the subject lacks is not measured, and its conditions are
     reported as not applicable; the rest of S8 is judged without them.
+  - The bound is relative to a reference measured in every run. Before the
+    operations, each process times Map.set and Map.get, each on its own plain
+    Map holding the same rows under their ids, with the same calibration,
+    rounds and median. Map.set overwrites existing keys, writing another row
+    object on every other visit, so the map never grows and every set changes
+    the value.
+  - Each reference batch visits 1,000 keys spread over the whole map (batch b
+    visits k·stride + b mod stride, with stride = rows ÷ 1,000), so every key
+    is visited once every stride batches. At 100,000 rows an entry has left
+    the nearest cache by its next visit; at 1,000 the whole map stays there.
+    1,000 keys per batch, as for the operations that cost a few nanoseconds:
+    in batches of 16, the timer's own cost is about half of a Map.get at
+    1,000 rows, which pulls the ratio toward 1.
+  - Each S8.<op> passes when its ratio ≤ the factor in `budgets.json` × the
+    larger of the two reference ratios, both judged on the medians of the
+    runs. Each condition's result records the bound and the two reference
+    ratios it came from.
 
 **Browser scenarios (S1–S5)**
 - Chromium is the build pinned by the Playwright version in the lockfile,

@@ -18,6 +18,9 @@ test('every metric a condition reads is a metric its scenario reports', () => {
       const declared = Object.keys(definition.metrics);
       const found = condition.op === 'ownerBound' ? declared.some((m) => m.startsWith(`${condition.metric}@`)) : declared.includes(condition.metric);
       assert.ok(found, `${condition.id} reads ${condition.metric}, which ${definition.id} does not report`);
+      for (const reference of condition.relativeTo?.largestOf ?? []) {
+        assert.ok(declared.includes(reference), `${condition.id} is relative to ${reference}, which ${definition.id} does not report`);
+      }
     }
     for (const reported of gateEntry(budgets, definition.id).reported ?? []) {
       assert.ok(reported.metric in definition.metrics, `${definition.id} does not report ${reported.metric}`);
@@ -46,6 +49,27 @@ test('median conditions pass or fail on the median', async () => {
   assert.equal(evaluateCondition({ ...le, op: '>=', value: 0.95 }, evidence([1, 1, 0.9, 0.9, 0.9], 0.9)).pass, false);
   assert.equal(evaluateCondition({ ...le, op: 'withinRelative', value: 0.1 }, evidence([-0.1, -0.1, -0.1, 0, 0], -0.1)).pass, true);
   assert.equal(evaluateCondition({ ...le, op: 'withinRelative', value: 0.1 }, evidence([0.11, 0.11, 0.11, 0, 0], 0.11)).pass, false);
+});
+
+test('a relative condition is judged against factor × the largest reference median, and records both', async () => {
+  const { evaluateCondition } = await import('../runner/budgets.ts');
+  const relative = { id: 'r', text: '', metric: 'm', op: '<=', relativeTo: { factor: 1.25, largestOf: ['a', 'b'] } } as const;
+  const runs = (m: number, a: number, b: number) => Array(FIVE).fill({ m, a, b });
+  const judged = evaluateCondition(relative, { median: { m: 2.4, a: 1.6, b: 2 }, runs: runs(2.4, 1.6, 2), requiredRuns: FIVE });
+  assert.equal(judged.pass, true, '2.4 <= 1.25 × 2');
+  assert.equal(judged.actual, 2.4);
+  assert.equal(judged.bound, 2.5);
+  assert.deepEqual(judged.reference, { a: 1.6, b: 2 });
+  assert.match(judged.detail!, /1\.25 × b 2/);
+  assert.equal(evaluateCondition(relative, { median: { m: 2.6, a: 1.6, b: 2 }, runs: runs(2.6, 1.6, 2), requiredRuns: FIVE }).pass, false, '2.6 > 1.25 × 2');
+  assert.equal(evaluateCondition(relative, { median: { m: 2.6, a: 2.2, b: 2 }, runs: runs(2.6, 2.2, 2), requiredRuns: FIVE }).pass, true, 'the larger reference sets the bound');
+  const noReference = evaluateCondition(relative, { median: { m: 1, a: 1 }, runs: Array(FIVE).fill({ m: 1, a: 1 }), requiredRuns: FIVE });
+  assert.equal(noReference.pass, false, 'a reference that was not measured fails the condition');
+  assert.match(noReference.detail!, /: b$/);
+  const shortReference = evaluateCondition(relative, { median: { m: 1, a: 1, b: 1 }, runs: [...runs(1, 1, 1).slice(1), { m: 1, a: 1 }], requiredRuns: FIVE });
+  assert.equal(shortReference.pass, false, 'a reference short of the required runs fails the condition');
+  const everyRun = evaluateCondition({ ...relative, judge: 'every-run' }, { median: { m: 1, a: 1, b: 1 }, runs: runs(1, 1, 1), requiredRuns: FIVE });
+  assert.equal(everyRun.pass, false, 'relative bounds are judged on the median only');
 });
 
 test('an every-run condition fails when one run fails, names it, and reports the worst run', async () => {

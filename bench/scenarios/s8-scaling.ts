@@ -24,6 +24,20 @@ export const S8_OPERATIONS = [
 
 export type S8Operation = (typeof S8_OPERATIONS)[number]['id'];
 
+/**
+ * The references S8's bound is relative to, timed in every run in the same
+ * processes as the operations: Map.set of an existing key and Map.get on a
+ * plain Map from id to row (scaling.ts, referenceBench). Each S8.<op>
+ * condition compares the operation's ratio with budgets.json's factor × the
+ * larger reference ratio.
+ */
+export const S8_REFERENCES = [
+  { id: 'mapSet', metric: 'referenceMapSet', title: 'reference: Map.set of an existing key' },
+  { id: 'mapGet', metric: 'referenceMapGet', title: 'reference: Map.get' },
+] as const satisfies readonly { id: string; metric: string; title: string }[];
+
+export type S8Reference = (typeof S8_REFERENCES)[number]['id'];
+
 /** The operations whose allocations per call are counted. */
 export const S8_ALLOCATION_OPERATIONS = ['all', 'byId'] as const satisfies readonly S8Operation[];
 
@@ -39,6 +53,14 @@ function declareMetrics(): Record<string, MetricSpec> {
     const unit = op.id === 'setAll' ? 'ns per row written' : 'ns';
     for (const rows of SIZES) metrics[`${op.id}Ns@${rows}`] = { unit, better: 'lower', description: `${op.title} with ${rows} rows (reported, never gated)` };
     metrics[`${op.id}Ratio`] = { unit: 'x', better: 'lower', description: `${op.title}: median at ${SIZES[1]} rows / median at ${SIZES[0]} rows` };
+  }
+  for (const ref of S8_REFERENCES) {
+    for (const rows of SIZES) metrics[`${ref.metric}Ns@${rows}`] = { unit: 'ns', better: 'none', description: `${ref.title} on a Map of ${rows} rows (reported, never gated)` };
+    metrics[`${ref.metric}Ratio`] = {
+      unit: 'x',
+      better: 'none',
+      description: `${ref.title}: median at ${SIZES[1]} rows / median at ${SIZES[0]} rows; the S8.<op> bounds are relative to the larger reference ratio`,
+    };
   }
   for (const op of S8_ALLOCATION_OPERATIONS) {
     for (const rows of SIZES) {
@@ -70,7 +92,9 @@ function metricRequires(): Record<string, readonly Capability[]> {
  * S8 (scaling): every operation the subject has, timed with the collection
  * at 1,000 and at 100,000 rows, in Node at 1×. Each size runs in its own
  * fresh process, each operation on its own tree; the order of the sizes
- * alternates between runs. The ratio of the two medians is gated. all() and
+ * alternates between runs. The same processes time the references (Map.set
+ * and Map.get), and each operation's ratio of the two medians is gated
+ * against budgets.json's factor × the larger reference ratio. all() and
  * byId also have their allocations per call counted at both sizes, in
  * another fresh process per size, as M1 counts allocations.
  */
@@ -102,6 +126,11 @@ export const S8: ScenarioDefinition = {
       out[`${op}Ns@${small}`] = ns[small]![op]!;
       out[`${op}Ns@${large}`] = ns[large]![op]!;
       out[`${op}Ratio`] = ns[large]![op]! / ns[small]![op]!;
+    }
+    for (const ref of S8_REFERENCES) {
+      out[`${ref.metric}Ns@${small}`] = ns[small]![ref.id]!;
+      out[`${ref.metric}Ns@${large}`] = ns[large]![ref.id]!;
+      out[`${ref.metric}Ratio`] = ns[large]![ref.id]! / ns[small]![ref.id]!;
     }
 
     const reads = S8_ALLOCATION_OPERATIONS.filter((op) => operations.includes(op));

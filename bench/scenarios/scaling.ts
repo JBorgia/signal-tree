@@ -16,6 +16,11 @@
  * evenly over the collection, the same at both sizes, so a lookup that walks
  * the rows walks on average half of them, while an operation that does not
  * stays in cache at both sizes.
+ *
+ * The same process first times the references S8's bound is relative to:
+ * Map.set and Map.get on a plain Map from id to row holding the same rows,
+ * timed in batches with the same calibration, rounds and median
+ * (referenceBench).
  */
 import { setImmediate } from 'node:timers/promises';
 import { allocationProbeSelfTest, countAllocations } from '../runner/alloc-probe.ts';
@@ -25,7 +30,7 @@ import { collectionSeed } from '../subjects/seed.ts';
 import type { StoreSubject, SubjectCollection, SubjectTree, TreeOptions } from '../subjects/types.ts';
 import { makeRows, type PlainRow } from './data.ts';
 import { MICRO_TIMING } from './micro.ts';
-import type { S8Operation } from './s8-scaling.ts';
+import { S8_REFERENCES, type S8Operation, type S8Reference } from './s8-scaling.ts';
 
 /** Harness choices S8 does not take from budgets.json. */
 export const S8_SETUP = {
@@ -39,6 +44,13 @@ export const S8_SETUP = {
   batch: { leafWrite: 1000, rowFieldWrite: 1000, addOne: 16, removeOne: 16, setAll: 1, updateOne: 1000, transactRollback: 100, undo: 50, all: 1000, byId: 1000 },
   /** restoration's cap for the undo operation; the brief configures only restoration({ retain: 100 }). */
   retain: 100,
+  /**
+   * Keys per timed batch of the Map references, as for the operations that
+   * cost a few nanoseconds. In batches of 16 the timer's own cost (about
+   * 50 ns a batch) is half of a Map.get at 1,000 rows and pulls the ratio
+   * toward 1.
+   */
+  referenceBatch: 1000,
 } as const satisfies { batch: Record<S8Operation, number> } & Record<string, unknown>;
 
 const MAX_BATCHES_PER_ROUND = 1 << 16;
@@ -238,6 +250,60 @@ function bench(op: S8Operation, tree: SubjectTree, rows: Rows, base: readonly Ro
   }
 }
 
+/**
+ * The reference `ref` (S8_REFERENCES) on its own plain Map<number, row>
+ * holding `base` under its ids. mapSet overwrites existing keys, with another
+ * row object on every other visit so that each set changes the value; the
+ * map's size never changes. mapGet reads existing keys.
+ *
+ * Each batch visits S8_SETUP.referenceBatch keys spread over the whole map:
+ * batch b visits k·stride + (b mod stride) with stride = rows ÷
+ * referenceBatch, so every key is visited once every stride batches (at
+ * 1,000 rows, all of them in every batch). At 100,000 rows an entry has gone
+ * out of the nearest cache since its last visit; at 1,000 the whole map stays
+ * there. The ratio is what the larger collection costs a constant-time keyed
+ * operation that reaches keys all over the map, as removeOne does.
+ */
+function referenceBench(ref: S8Reference, base: readonly Row[]): Bench {
+  const map = new Map<number, Row>();
+  for (const row of base) map.set(row.id, row);
+  const size = base.length;
+  const n = S8_SETUP.referenceBatch;
+  const stride = Math.floor(size / n);
+  // A row written in place of each visited row on every other visit, so every set changes the value.
+  const spare = makeRows(1, Object.keys(base[0]!).length, 1)[0]!;
+  const keys = new Array<number>(n).fill(0);
+  const values = new Array<Row>(n).fill(spare);
+  const visit = (batch: number) => {
+    const offset = batch % stride;
+    const replace = Math.floor(batch / stride) % 2 === 0;
+    for (let k = 0; k < n; k++) {
+      keys[k] = k * stride + offset;
+      values[k] = replace ? spare : base[keys[k]!]!;
+    }
+  };
+  if (ref === 'mapSet') {
+    return {
+      perBatch: n,
+      before: visit,
+      timed() {
+        for (let k = 0; k < n; k++) map.set(keys[k]!, values[k]!);
+      },
+      verify: () => check(map.size === size && map.get(keys[0]!) === values[0], () => `Map.set: ${map.size} entries of ${size}, or the last value written is not there`),
+    };
+  }
+  return {
+    perBatch: n,
+    before: visit,
+    timed() {
+      let found = 0;
+      for (let k = 0; k < n; k++) if (map.get(keys[k]!) !== undefined) found++;
+      sink ^= found;
+    },
+    verify: () => check(keys.every((id) => map.get(id) === base[id]), () => 'Map.get: a visited key does not hold its row'),
+  };
+}
+
 /** Timed nanoseconds of `count` batches, and the wall time they took with the untimed work between them. */
 function timeBatches(b: Bench, count: number, state: { batch: number }): { timed: number; wall: number } {
   let ns = 0n;
@@ -286,11 +352,21 @@ export interface ScalingArgs {
   readonly operations: readonly S8Operation[];
 }
 
-/** S8, one size: median ns per operation (setAll: per row written) for each operation, each on its own tree. */
+/**
+ * S8, one size: median ns per call of each reference (S8_REFERENCES), each on
+ * its own Map, then median ns per operation (setAll: per row written) of each
+ * operation, each on its own tree.
+ */
 export async function measureScaling(args: ScalingArgs): Promise<Record<string, number>> {
   const subject = await loadSubject(args.subject);
   const base = makeRows(args.rows, args.fields);
   const out: Record<string, number> = {};
+  for (const { id: ref } of S8_REFERENCES) {
+    await settle();
+    const b = referenceBench(ref, base);
+    out[ref] = nsPerOperation(b);
+    b.verify();
+  }
   for (const op of args.operations) {
     // setAll's second set of rows exists only while setAll is measured, so the other operations run in the smaller heap.
     const alternate = op === 'setAll' ? makeRows(args.rows, args.fields, 1) : base;

@@ -22,6 +22,10 @@
  *   copyRows       S2 heap: setAll keeps a full copy next to the rows it was given
  *   scanById       S8: byId walks every row of the collection on each call
  *   copyAll        S8: all() returns a fresh copy of the rows on each call
+ *
+ * Options, read the same way, change how the fake keeps its rows without
+ * planting a fault:
+ *   mapIndex       S8: every lookup of a row by id goes through a Map from id to position, built at the first lookup after setAll
  */
 import { signal, untracked, type Signal, type WritableSignal } from '@angular/core';
 import { measuredTurn } from './bench-flag.ts';
@@ -62,23 +66,25 @@ function busyMs(ms: number): void {
 }
 
 /**
- * Work every row write and membership change does, standing in for a store's
- * bookkeeping (about 0.5 µs). Without it these cost tens of nanoseconds, and
- * the cache misses a 100,000-row collection adds to them would decide S8's
- * ratios on their own, so S8's self-tests could not tell a planted walk from
- * a clean store.
+ * Work addOne and removeOne do, standing in for a store's bookkeeping (about
+ * 0.5 µs). S8 reaches their rows all over the collection, and removeOne
+ * touches both the index and the rows array, each cold at 100,000 rows,
+ * while the Map reference touches only its map. Without this work their
+ * ratios read 2–4.8× against bounds of 4.6–5.0 on an M4 under load, close
+ * enough that S8's self-tests would fail now and then on a clean fake. Row
+ * writes and lookups do no added work.
  */
-const ROW_OPERATION_WORK = 400;
+const MEMBERSHIP_WORK = 400;
 
 let sink = 0;
 function extraWork(iterations: number): void {
   for (let i = 0; i < iterations; i++) sink = (sink + i * 31) | 0;
 }
 
-/** ROW_OPERATION_WORK iterations of a multiply-add chain that never overflows a small integer, so it stays optimized. */
-function rowOperationWork(): void {
+/** MEMBERSHIP_WORK iterations of a multiply-add chain that never overflows a small integer, so it stays optimized. */
+function membershipWork(): void {
   let acc = sink & 0xfffff;
-  for (let i = 0; i < ROW_OPERATION_WORK; i++) acc = (acc * 31 + i) & 0xfffff;
+  for (let i = 0; i < MEMBERSHIP_WORK; i++) acc = (acc * 31 + i) & 0xfffff;
   sink = acc;
 }
 
@@ -240,7 +246,7 @@ function deepCopy(rows: readonly Record<string, unknown>[]): Record<string, unkn
 class FakeCollection<E, K extends string | number> implements SubjectCollection<E, K> {
   /** The rows array the caller gave to setAll, kept as is (a sharing store). */
   private list: Record<string, unknown>[] = [];
-  /** Position of each id, built only when ids are not their positions. */
+  /** Position of each id, built at the first lookup that needs it: after setAll with the mapIndex option, otherwise once ids are not their positions. */
   private index: Map<K, number> | undefined;
   /** copyRows fault: a full copy kept next to the given rows (a copying store). */
   private copy: Record<string, unknown>[] | undefined;
@@ -261,9 +267,9 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   private position(id: K): number | undefined {
-    // Once rows have moved (removeOne), the index answers without reading the row.
+    // Once rows have moved (removeOne), or with the mapIndex option, the index answers without reading the row.
     if (this.index) return this.index.get(id);
-    if (typeof id === 'number' && this.list[id]?.[this.idField] === id) return id;
+    if (!this.store.faults.has('mapIndex') && typeof id === 'number' && this.list[id]?.[this.idField] === id) return id;
     const index = new Map<K, number>();
     this.list.forEach((row, i) => index.set(row[this.idField] as K, i));
     this.index = index;
@@ -276,7 +282,6 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
   }
 
   private commitField(id: K, field: string, value: unknown): void {
-    rowOperationWork();
     const at = this.position(id);
     if (at !== undefined) this.list[at] = { ...this.list[at], [field]: value };
     this.cells.get(this.key(id, field))?.value.set(value);
@@ -324,14 +329,14 @@ class FakeCollection<E, K extends string | number> implements SubjectCollection<
 
   /** Appends; ids that are not their positions are found through the index from then on. */
   addOne(row: E): void {
-    rowOperationWork();
+    membershipWork();
     this.list.push(row as Record<string, unknown>);
     this.index?.set((row as Record<string, unknown>)[this.idField] as K, this.list.length - 1);
   }
 
   /** Swaps the last row into the removed row's place, so removal is O(1); the fake keeps no order. */
   removeOne(id: K): void {
-    rowOperationWork();
+    membershipWork();
     const at = this.position(id);
     if (at === undefined) return;
     const last = this.list.length - 1;
