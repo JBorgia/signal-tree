@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { parse } from 'yaml';
 import { repoRoot } from './entry-graph.mjs';
 import { ADAPTERS } from './done-check.mjs';
+import { GATE_HOST_ENV } from './gate-host.mjs';
 
 export function loadWorkflows(root = repoRoot) {
   const read = (name) => parse(readFileSync(join(root, '.github', 'workflows', name), 'utf8'));
@@ -64,6 +65,10 @@ function hostCheckProblems(job, label) {
 
 export function workflowProblems({ ci, nightly, soak, approve }) {
   const problems = approveProblems(approve);
+  // Only a passing ci/gate-host.mjs --pre may tell the bench harness it is on the gate runner.
+  for (const [name, workflow] of [['ci.yml', ci], ['nightly.yml', nightly], ['soak.yml', soak]]) {
+    if (JSON.stringify(workflow ?? {}).includes(GATE_HOST_ENV)) problems.push(`${name}: sets or names ${GATE_HOST_ENV}; only ci/gate-host.mjs --pre may set it`);
+  }
   const gates = ci?.jobs?.gates;
   if (!gates) return [...problems, 'ci.yml has no gates job'];
   if (gates.permissions?.actions !== 'read') problems.push('ci.yml gates: needs permissions.actions: read to fetch main\'s baseline');

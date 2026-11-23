@@ -112,7 +112,7 @@ test('the zero and never budgets are judged on every run', () => {
 });
 
 test('a gate recorded only (S8 off the gate runner) never fails the run unless it errors', async () => {
-  const { exitCode, isGateRunner, NOT_ON_GATE_RUNNER } = await import('../runner/harness.ts');
+  const { exitCode, NOT_ON_GATE_RUNNER } = await import('../runner/harness.ts');
   const red = { id: 'S8', title: '', status: 'ran' as const, pass: false, conditions: [], regressions: [] };
   const regressed = { metric: 'm', mode: 'relative' as const, baseline: 1, current: 2, worseBy: 1, threshold: 0.03, regressed: true };
   const off = { ...red, recordedOnly: NOT_ON_GATE_RUNNER };
@@ -121,9 +121,19 @@ test('a gate recorded only (S8 off the gate runner) never fails the run unless i
   assert.equal(exitCode({ S8: { ...off, status: 'error' } }, false), 1, 'an error still fails');
   assert.equal(exitCode({ S8: red }, false), 1, 'on the gate runner a red S8 fails, as any gate');
   assert.equal(exitCode({ S8: red }, true), 0, 'and is recorded only under the record-only rules');
-  assert.equal(isGateRunner('self-hosted'), true);
-  assert.equal(isGateRunner('github-hosted'), false);
-  assert.equal(isGateRunner(undefined), false, 'a local run');
+});
+
+test('a run is on the gate runner only when the gate-host preflight passed there and named this runner', async () => {
+  const { GATE_HOST_ENV, isGateRunner } = await import('../runner/harness.ts');
+  assert.equal(GATE_HOST_ENV, 'SIGNAL_TREE_GATE_HOST', 'the variable ci/gate-host.mjs --pre sets');
+  // Preflight passed: ci/gate-host.mjs --pre appended SIGNAL_TREE_GATE_HOST=<runner name> to $GITHUB_ENV.
+  assert.equal(isGateRunner({ RUNNER_ENVIRONMENT: 'self-hosted', RUNNER_NAME: 'ax42-gates', SIGNAL_TREE_GATE_HOST: 'ax42-gates' }), true);
+  // Not passed, or not the gate runner: S8 records only.
+  assert.equal(isGateRunner({ RUNNER_ENVIRONMENT: 'self-hosted', RUNNER_NAME: 'agent-vm' }), false, 'any other self-hosted runner, or a preflight that did not pass');
+  assert.equal(isGateRunner({ RUNNER_ENVIRONMENT: 'self-hosted', RUNNER_NAME: 'agent-vm', SIGNAL_TREE_GATE_HOST: 'ax42-gates' }), false, 'a value naming another runner');
+  assert.equal(isGateRunner({ RUNNER_ENVIRONMENT: 'self-hosted', RUNNER_NAME: '', SIGNAL_TREE_GATE_HOST: '' }), false, 'empty values');
+  assert.equal(isGateRunner({ RUNNER_ENVIRONMENT: 'github-hosted', RUNNER_NAME: 'GitHub Actions 3' }), false, 'a GitHub-hosted runner');
+  assert.equal(isGateRunner({}), false, 'a local run');
 });
 
 test('only S8 is gated on the gate runner alone', () => {

@@ -2,7 +2,7 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, wr
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { MARKER, POST_FILE, PRE_FILE, checkPre, hostProblems, preflight, readHost, recheck } from './gate-host.mjs';
+import { MARKER, POST_FILE, PRE_FILE, checkPre, gateHostEnvLine, hostProblems, preflight, readHost, recheck } from './gate-host.mjs';
 
 const roots: string[] = [];
 afterEach(() => roots.splice(0).forEach((r) => rmSync(r, { recursive: true, force: true })));
@@ -170,6 +170,18 @@ describe('gate-runner identity', () => {
     const record = pre(fakeHost({ ...GATE_RUNNER, governors: ['performance', 'schedutil'] }), { RUNNER_NAME: RUNNER });
     expect(record.enforced).toBe(true);
     expect(record.problems).toEqual([expect.stringContaining('not on the performance governor (schedutil)')]);
+  });
+});
+
+describe('the gate-host signal to the bench harness ($GITHUB_ENV)', () => {
+  it('names this runner only when the preflight passed on the gate runner', () => {
+    expect(gateHostEnvLine(pre(fakeHost(GATE_RUNNER)))).toBe('SIGNAL_TREE_GATE_HOST=ax42-gates\n');
+  });
+
+  it('is never set when the preflight failed, on another host, or on the hosted fallback', () => {
+    expect(gateHostEnvLine(pre(fakeHost({ ...GATE_RUNNER, load: 3 })))).toBeNull();
+    expect(gateHostEnvLine(pre(fakeHost({ ...GATE_RUNNER, marker: undefined }), { ...GATE_JOB, RUNNER_NAME: 'agent-vm' }))).toBeNull();
+    expect(gateHostEnvLine(pre(fakeHost({ governors: ['performance'], boost: '0' }), HOSTED_JOB))).toBeNull();
   });
 });
 

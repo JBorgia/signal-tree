@@ -36,8 +36,8 @@ const without = (job: Job, run: RegExp) => void (job.steps = job.steps.filter((s
 
 describe('gate-host checks in every gate workflow (#18)', () => {
   const gateJobs: Array<[string, (w: Workflows) => Job, RegExp]> = [
-    ['ci.yml gates', (w) => w.ci.jobs.gates, /^ci\.yml gates: /],
-    ['nightly.yml gates (angular)', (w) => w.nightly.jobs['gates-angular'], /^nightly\.yml gates \(angular\): /],
+    ['ci.yml gates', (w) => w.ci.jobs.gates, /^ci\.yml(?: gates)?: /],
+    ['nightly.yml gates (angular)', (w) => w.nightly.jobs['gates-angular'], /^nightly\.yml(?: gates \(angular\))?: /],
     ['soak.yml', (w) => w.soak.jobs['soak-angular'], /^soak\.yml: /],
   ];
   const PRE = /node ci\/gate-host\.mjs --pre/;
@@ -54,6 +54,8 @@ describe('gate-host checks in every gate workflow (#18)', () => {
     ['a job that does not say when it is aimed at the gate runner', (job) => void delete job.env, /must set env SIGNAL_TREE_GATES_RUNNER/],
     ['an upload that leaves out the gate-host records', (job) => void (job.steps.at(-1)!.with!.path = 'bench/out/results-*.json'), /upload must include bench\/out\/\*\.json/],
     ['an upload only on success', (job) => void delete job.steps.at(-1)!.if, /results upload must run with if: always\(\)/],
+    ['SIGNAL_TREE_GATE_HOST set by the workflow', (job) => void (job.env = { ...job.env, SIGNAL_TREE_GATE_HOST: '${{ runner.name }}' }), /only ci\/gate-host\.mjs --pre may set it/],
+    ['SIGNAL_TREE_GATE_HOST written by a step', (job) => void job.steps.splice(1, 0, { run: 'echo "SIGNAL_TREE_GATE_HOST=$RUNNER_NAME" >> "$GITHUB_ENV"' }), /only ci\/gate-host\.mjs --pre may set it/],
   ];
 
   it.each(gateJobs)('%s holds them as committed', (_label, job) => {

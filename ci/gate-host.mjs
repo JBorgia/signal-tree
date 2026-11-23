@@ -30,6 +30,9 @@
 //
 //   node ci/gate-host.mjs --pre  [--dir bench/out] [--settle 180]
 //     Writes <dir>/gate-host.json; exits 1 when the gate runner fails a condition.
+//     When it passes on the gate runner, it appends SIGNAL_TREE_GATE_HOST=<runner
+//     name> to $GITHUB_ENV: the only signal the bench harness gates S8 on
+//     (bench/runner/harness.ts isGateRunner). The workflows never set it.
 //   node ci/gate-host.mjs --post [--dir bench/out]
 //     Runs with if: always(), after the gates and before the upload. Re-reads
 //     the host and writes <dir>/gate-host-post.json with the start and end load.
@@ -38,7 +41,7 @@
 //     `invalid: { reason, at }` there and in every results file in <dir>, and
 //     exits 1. ci/done-check.mjs counts such results unmet, and
 //     ci/gate-baseline.mjs never compares with them.
-import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -46,6 +49,8 @@ export const MARKER = 'etc/signal-tree/gate-runner';
 export const GATE_LABEL = 'signal-tree-gates';
 export const PRE_FILE = 'gate-host.json';
 export const POST_FILE = 'gate-host-post.json';
+/** Set through $GITHUB_ENV by a passing preflight on the gate runner; read by bench/runner/harness.ts. */
+export const GATE_HOST_ENV = 'SIGNAL_TREE_GATE_HOST';
 /** The quiet-host bound: the 1-minute load average must be below this × logical CPUs. */
 export const LOAD_FACTOR = 0.5;
 const WORKER = 'Runner.Worker';
@@ -249,6 +254,17 @@ export function checkPre({ root = '/', env = process.env, selfPid = process.pid,
   };
 }
 
+/**
+ * The $GITHUB_ENV line that tells the bench harness this job is on the gate
+ * runner, or null: only for a preflight that held the gate conditions on the
+ * provisioned gate runner.
+ */
+export function gateHostEnvLine(record) {
+  const name = record.identity?.runnerName;
+  if (!record.enforced || !record.onGateRunner || record.problems.length || !name || /[\r\n=]/.test(name)) return null;
+  return `${GATE_HOST_ENV}=${name}\n`;
+}
+
 /** Synchronous sleep, so the CLI stays a plain script. */
 const sleepSync = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
@@ -384,7 +400,9 @@ function main(argv) {
       console.log('This run must not record or judge gates (#18).');
       return 1;
     }
-    console.log(`ok: gate runner ${record.identity.runnerName} may record and judge gates`);
+    const line = gateHostEnvLine(record);
+    if (line && process.env.GITHUB_ENV) appendFileSync(process.env.GITHUB_ENV, line);
+    console.log(`ok: gate runner ${record.identity.runnerName} may record and judge gates${line ? `; ${GATE_HOST_ENV} set for the harness` : ''}`);
     return 0;
   }
 

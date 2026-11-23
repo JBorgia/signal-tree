@@ -91,10 +91,10 @@ Where the budgets leave a detail open, the harness does the following.
     larger of the two reference ratios, both judged on the medians of the 5
     runs. Each condition's result records the bound and the two reference
     ratios it came from.
-  - S8 is gated only on the dedicated gate runner (`RUNNER_ENVIRONMENT` is
-    `self-hosted`; in the gate workflows `ci/gate-host.mjs --pre` has already
-    failed a self-hosted job on any host but the provisioned gate runner, the
-    one `ci/gate-baseline.mjs` compares with). Anywhere else, local
+  - S8 is gated only on the dedicated gate runner: when `ci/gate-host.mjs
+    --pre` passed on the provisioned host (its `/etc/signal-tree/gate-runner`
+    marker names the runner) and set `SIGNAL_TREE_GATE_HOST` to this job's
+    `RUNNER_NAME`. A self-hosted runner is not enough. Anywhere else, local
     runs and GitHub-hosted runners included, S8 is recorded only: its
     conditions are judged and reported, the summary reads "recorded only: not
     on the gate runner", and neither its verdict nor its regressions change
