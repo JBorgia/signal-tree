@@ -19,7 +19,7 @@ name: Approve non-owned PRs
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
+    branches: [rebuild/ruleset-test-2]
 
 permissions:
   contents: read

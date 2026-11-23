@@ -36,7 +36,7 @@ import { pathToFileURL } from 'node:url';
 import { FILE_LIMIT, changedPaths, ownedPaths, parseCodeowners } from './codeowners.mjs';
 
 export const BOT = 'github-actions[bot]';
-export const BASE = 'main';
+export const BASE = 'rebuild/ruleset-test-2';
 export const CODEOWNERS = '.github/CODEOWNERS';
 const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_PAGES = 100;
