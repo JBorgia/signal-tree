@@ -1,8 +1,8 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { LOCK_REF, acquire, holder, lockIdentity, release } from './lock.mjs';
 import { BLOCK_LIMIT, decide, isStuck } from './stop-hook.mjs';
 
@@ -61,78 +61,104 @@ describe('supervisor', () => {
 
 describe('agent lock', () => {
   const sh = (cwd: string, ...args: string[]) => spawnSync('git', args, { cwd, encoding: 'utf8' });
+  // A remote and two clones of it, a and b, made once; each test works on a copy.
+  let template = '';
+  beforeAll(() => {
+    template = mkdtempSync(join(tmpdir(), 'signal-tree-lock-template-'));
+    sh(template, 'init', '-q', '--bare', join(template, 'remote.git'));
+    for (const name of ['a', 'b']) sh(template, 'clone', '-q', join(template, 'remote.git'), join(template, name));
+  });
+  afterAll(() => rmSync(template, { recursive: true, force: true }));
+  const roots: string[] = [];
+  afterEach(() => {
+    for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  });
+  /** A copy of the template, with the clones' origin pointing at the copied remote. */
   const setup = () => {
     const root = mkdtempSync(join(tmpdir(), 'signal-tree-lock-'));
-    const remote = join(root, 'remote.git');
-    sh(root, 'init', '-q', '--bare', remote);
-    const clone = (name: string) => {
-      const dir = join(root, name);
-      sh(root, 'clone', '-q', remote, dir);
-      return dir;
-    };
-    return { root, a: clone('a'), b: clone('b') };
+    roots.push(root);
+    cpSync(template, root, { recursive: true });
+    for (const name of ['a', 'b']) {
+      const config = join(root, name, '.git', 'config');
+      writeFileSync(config, readFileSync(config, 'utf8').replaceAll(join(template, 'remote.git'), join(root, 'remote.git')));
+    }
+    return { root, a: join(root, 'a'), b: join(root, 'b') };
   };
 
   it('lets one session hold the lock and refuses another, naming the holder', () => {
-    const { root, a, b } = setup();
-    try {
-      expect(acquire({ cwd: a, session: 'session-a' })).toMatchObject({ acquired: true });
-      const refused = acquire({ cwd: b, session: 'session-b' });
-      expect(refused.acquired).toBe(false);
-      expect(refused.holder).toMatchObject({ session: 'session-a', startedAt: expect.any(String), host: expect.any(String) });
-      expect(holder({ cwd: b })).toMatchObject({ session: 'session-a' });
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+    const { a, b } = setup();
+    expect(acquire({ cwd: a, session: 'session-a' })).toMatchObject({ acquired: true });
+    const refused = acquire({ cwd: b, session: 'session-b' });
+    expect(refused.acquired).toBe(false);
+    expect(refused.holder).toMatchObject({ session: 'session-a', startedAt: expect.any(String), host: expect.any(String) });
   });
 
-  it('lets the holding session resume, and only the holder (or --force) release it', () => {
-    const { root, a, b } = setup();
-    try {
-      acquire({ cwd: a, session: 'session-a' });
-      expect(acquire({ cwd: a, session: 'session-a' })).toMatchObject({ acquired: true, reused: true });
-      expect(release({ cwd: b, session: 'session-b' })).toMatchObject({ released: false });
-      expect(release({ cwd: b, force: true })).toMatchObject({ released: true });
-      expect(acquire({ cwd: b, session: 'session-b' })).toMatchObject({ acquired: true });
-      expect(release({ cwd: b, session: 'session-b' })).toMatchObject({ released: true });
-      expect(holder({ cwd: a })).toBeNull();
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+  it('shows the holder to every clone', () => {
+    const { a, b } = setup();
+    acquire({ cwd: a, session: 'session-a' });
+    expect(holder({ cwd: b })).toMatchObject({ session: 'session-a' });
   });
 
-  it('commits the lock as Jonathan, or as SIGNAL_TREE_GIT_NAME and SIGNAL_TREE_GIT_EMAIL, whatever git config says', () => {
+  it('lets the holding session take it again', () => {
+    const { a } = setup();
+    acquire({ cwd: a, session: 'session-a' });
+    expect(acquire({ cwd: a, session: 'session-a' })).toMatchObject({ acquired: true, reused: true });
+  });
+
+  it('does not let another session release it', () => {
+    const { a, b } = setup();
+    acquire({ cwd: a, session: 'session-a' });
+    expect(release({ cwd: b, session: 'session-b' })).toMatchObject({ released: false });
+    expect(holder({ cwd: b })).toMatchObject({ session: 'session-a' });
+  });
+
+  it('lets --force release it from another clone', () => {
+    const { a, b } = setup();
+    acquire({ cwd: a, session: 'session-a' });
+    expect(release({ cwd: b, force: true })).toMatchObject({ released: true });
+    expect(holder({ cwd: a })).toBeNull();
+  });
+
+  it('lets another session take it once the holder releases it', () => {
+    const { a, b } = setup();
+    acquire({ cwd: a, session: 'session-a' });
+    expect(release({ cwd: a, session: 'session-a' })).toMatchObject({ released: true });
+    expect(acquire({ cwd: b, session: 'session-b' })).toMatchObject({ acquired: true });
+  });
+
+  it("takes the lock commit's identity from SIGNAL_TREE_GIT_NAME and SIGNAL_TREE_GIT_EMAIL, defaulting to Jonathan", () => {
     expect(lockIdentity({})).toEqual({ name: 'Jonathan Borgia', email: 'jonathanborgia@gmail.com' });
     expect(lockIdentity({ SIGNAL_TREE_GIT_NAME: 'Borgia', SIGNAL_TREE_GIT_EMAIL: 'other@example.com' })).toEqual({ name: 'Borgia', email: 'other@example.com' });
-    const { root, a } = setup();
-    try {
-      sh(a, 'config', 'user.name', 'Someone Else');
-      sh(a, 'config', 'user.email', 'someone@example.com');
-      const who = (sha: string) => sh(a, 'log', '-1', '--format=%an <%ae> / %cn <%ce>', sha).stdout.trim();
-      const first = acquire({ cwd: a, session: 'session-a' });
-      expect(who(first.holder.sha)).toBe(`${lockIdentity().name} <${lockIdentity().email}> / ${lockIdentity().name} <${lockIdentity().email}>`);
-      release({ cwd: a, session: 'session-a' });
-      const jonathan = acquire({ cwd: a, session: 'session-b', identity: lockIdentity({}) });
-      expect(who(jonathan.holder.sha)).toBe('Jonathan Borgia <jonathanborgia@gmail.com> / Jonathan Borgia <jonathanborgia@gmail.com>');
-      release({ cwd: a, session: 'session-b' });
-      const other = acquire({ cwd: a, session: 'session-c', identity: lockIdentity({ SIGNAL_TREE_GIT_NAME: 'Borgia', SIGNAL_TREE_GIT_EMAIL: 'other@example.com' }) });
-      expect(who(other.holder.sha)).toBe('Borgia <other@example.com> / Borgia <other@example.com>');
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+  });
+
+  /** The author and committer of the lock commit `acquire` makes in a clone whose git config names someone else. */
+  const lockCommitter = (identity?: { name: string; email: string }) => {
+    const { a } = setup();
+    appendFileSync(join(a, '.git', 'config'), '[user]\n\tname = Someone Else\n\temail = someone@example.com\n');
+    const held = acquire({ cwd: a, session: 'session-a', ...(identity ? { identity } : {}) });
+    return sh(a, 'log', '-1', '--format=%an <%ae> / %cn <%ce>', held.holder.sha).stdout.trim();
+  };
+
+  it("commits the lock as lockIdentity() of the environment, whatever git config says", () => {
+    const { name, email } = lockIdentity();
+    expect(lockCommitter()).toBe(`${name} <${email}> / ${name} <${email}>`);
+  });
+
+  it('commits the lock as Jonathan by default', () => {
+    expect(lockCommitter(lockIdentity({}))).toBe('Jonathan Borgia <jonathanborgia@gmail.com> / Jonathan Borgia <jonathanborgia@gmail.com>');
+  });
+
+  it('commits the lock as SIGNAL_TREE_GIT_NAME and SIGNAL_TREE_GIT_EMAIL when they are set', () => {
+    expect(lockCommitter(lockIdentity({ SIGNAL_TREE_GIT_NAME: 'Borgia', SIGNAL_TREE_GIT_EMAIL: 'other@example.com' }))).toBe('Borgia <other@example.com> / Borgia <other@example.com>');
   });
 
   it('cannot be taken by a racing session: creation is a compare-and-swap on the remote', () => {
-    const { root, a, b } = setup();
-    try {
-      acquire({ cwd: a, session: 'session-a' });
-      const sha = sh(b, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit-tree', '4b825dc642cb6eb9a060e54bf8d69288fbee4904', '-m', '{"session":"session-b"}').stdout.trim();
-      const push = sh(b, 'push', `--force-with-lease=${LOCK_REF}:`, 'origin', `${sha}:${LOCK_REF}`);
-      expect(push.status).not.toBe(0);
-      expect(holder({ cwd: b })).toMatchObject({ session: 'session-a' });
-    } finally {
-      rmSync(root, { recursive: true, force: true });
-    }
+    const { a, b } = setup();
+    acquire({ cwd: a, session: 'session-a' });
+    const sha = sh(b, '-c', 'user.name=t', '-c', 'user.email=t@t', 'commit-tree', '4b825dc642cb6eb9a060e54bf8d69288fbee4904', '-m', '{"session":"session-b"}').stdout.trim();
+    const push = sh(b, 'push', `--force-with-lease=${LOCK_REF}:`, 'origin', `${sha}:${LOCK_REF}`);
+    expect(push.status).not.toBe(0);
+    expect(holder({ cwd: b })).toMatchObject({ session: 'session-a' });
   });
 });
 
@@ -140,8 +166,8 @@ describe('supervisor model pin', () => {
   const script = new URL('./supervise.sh', import.meta.url).pathname;
   const text = () => readFileSync(script, 'utf8');
 
-  it('refuses extra arguments that set a model or a fallback model', () => {
-    for (const args of ['--model claude-sonnet-5-5', '--fallback-model claude-haiku-5-5']) {
+  for (const args of ['--model claude-sonnet-5-5', '--fallback-model claude-haiku-5-5']) {
+    it(`refuses extra arguments that set a model: ${args}`, () => {
       const state = mkdtempSync(join(tmpdir(), 'signal-tree-sup-'));
       try {
         const run = spawnSync('bash', [script], { env: { ...process.env, SIGNAL_TREE_ISOLATED: '1', SIGNAL_TREE_STATE_DIR: state, SIGNAL_TREE_CLAUDE_ARGS: args }, encoding: 'utf8' });
@@ -150,8 +176,8 @@ describe('supervisor model pin', () => {
       } finally {
         rmSync(state, { recursive: true, force: true });
       }
-    }
-  });
+    });
+  }
 
   it('passes the model on every run, in settings and on the command line, with flag-switching off', () => {
     const s = text();
@@ -181,14 +207,17 @@ describe('supervisor attribution setting', () => {
     // eval, not `source <(...)`: bash 3.2 (macOS) reads nothing from a sourced process substitution.
     spawnSync('bash', ['-c', `eval "$(sed -n '/^version_ge()/,/^}/p;/^attribution_setting()/,/^}/p' "${script}")"; ${call}`], { encoding: 'utf8' }).stdout.trim();
 
-  it('turns attribution off with the single switch from 2.1.281', () => {
-    expect(fn('attribution_setting 2.1.323')).toBe('false');
-    expect(fn('attribution_setting 2.1.281')).toBe('false');
-  });
+  for (const version of ['2.1.323', '2.1.281']) {
+    it(`turns attribution off with the single switch on ${version} (from 2.1.281)`, () => {
+      expect(fn(`attribution_setting ${version}`)).toBe('false');
+    });
+  }
 
-  it('empties the attribution texts and the session URL on older versions or an unknown version', () => {
-    for (const v of ['2.1.280', '2.0.9', '']) expect(JSON.parse(fn(`attribution_setting '${v}'`))).toEqual({ commit: '', pr: '', sessionUrl: false });
-  });
+  for (const version of ['2.1.280', '2.0.9', '']) {
+    it(`empties the attribution texts and the session URL on ${version ? `older version ${version}` : 'an unknown version'}`, () => {
+      expect(JSON.parse(fn(`attribution_setting '${version}'`))).toEqual({ commit: '', pr: '', sessionUrl: false });
+    });
+  }
 
   it('passes the setting into every session', () => {
     expect(readFileSync(script, 'utf8')).toContain('attribution: $attribution');
@@ -222,13 +251,21 @@ describe('supervisor authentication (#16)', () => {
     }
   };
 
-  it('recognises a run that failed to authenticate', () => {
-    expect(authFailure(['{"type":"result","is_error":true,"result":"Failed to authenticate: OAuth session expired and could not be refreshed"}'])).toContain('authenticate');
-    expect(authFailure(['{"type":"result","is_error":true,"result":"Invalid API key"}'])).toContain('API key');
-  });
+  for (const [result, shown] of [
+    ['Failed to authenticate: OAuth session expired and could not be refreshed', 'authenticate'],
+    ['Invalid API key', 'API key'],
+  ] as const) {
+    it(`recognises a run that failed to authenticate: ${result}`, () => {
+      expect(authFailure([JSON.stringify({ type: 'result', is_error: true, result })])).toContain(shown);
+    });
+  }
 
-  it('does not mistake another error or a success for one', () => {
-    expect(authFailure(['{"type":"result","is_error":true,"result":"Rate limited, retry later"}'])).toBe('');
-    expect(authFailure(['{"type":"result","is_error":false,"result":"done"}'])).toBe('');
-  });
+  for (const [what, line] of [
+    ['another error', '{"type":"result","is_error":true,"result":"Rate limited, retry later"}'],
+    ['a success', '{"type":"result","is_error":false,"result":"done"}'],
+  ] as const) {
+    it(`does not mistake ${what} for an authentication failure`, () => {
+      expect(authFailure([line])).toBe('');
+    });
+  }
 });

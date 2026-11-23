@@ -309,19 +309,28 @@ describe('mint command: what it prints', () => {
     expect(err.text()).toBe(`mint-token: cannot use the App's private key ${keyFile}: mode 644, readable beyond its owner; chmod 0400 it\n`);
   });
 
-  it('as a command, refuses arguments and takes no setting from the environment', () => {
+  /** The installed form: node on mint-token.mjs, with a config of the test's own in the environment. */
+  const command = (args: string[]) => {
     const { configFile } = mintFixture();
     const env = { ...process.env, SIGNAL_TREE_APP_CONFIG: configFile, SIGNAL_TREE_MINT_CONFIG: configFile };
-    const withArgs = spawnSync('node', [mintScript, configFile], { env, encoding: 'utf8' });
-    expect([withArgs.status, withArgs.stdout]).toEqual([2, '']);
-    expect(withArgs.stderr).toContain('takes no arguments');
+    return { configFile, run: spawnSync('node', [mintScript, ...args], { env, encoding: 'utf8' }) };
+  };
+
+  it('as a command, refuses arguments', () => {
+    const { configFile, run } = command(['/some/config.json']);
+    expect([run.status, run.stdout]).toEqual([2, '']);
+    expect(run.stderr).toContain('takes no arguments');
+    expect(run.stderr).not.toContain(configFile);
+  });
+
+  it('as a command, takes no setting from the environment', () => {
     // With no arguments it reads only /etc/signal-tree/app.json. Without that file it fails;
     // on the VM, as the agent, it cannot read the key. Either way it never reads the config above.
-    const plain = spawnSync('node', [mintScript], { env, encoding: 'utf8', timeout: 20_000 });
-    expect(plain.status).toBe(1);
-    expect(plain.stdout).toBe('');
-    expect(plain.stderr).toMatch(/^mint-token: /);
-    expect(plain.stderr).not.toContain(configFile);
+    const { configFile, run } = command([]);
+    expect(run.status).toBe(1);
+    expect(run.stdout).toBe('');
+    expect(run.stderr).toMatch(/^mint-token: /);
+    expect(run.stderr).not.toContain(configFile);
     expect(readFileSync(mintScript, 'utf8')).not.toMatch(/process\.env/);
   });
 });
