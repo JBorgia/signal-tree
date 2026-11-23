@@ -19,13 +19,61 @@ describe('gate workflows', () => {
     ['no oracle (100k) job', (w) => void delete w.nightly.jobs.oracle, /oracle \(100k\)/],
     ['a nightly gates job uploading under another name', (w) => void (w.nightly.jobs['gates-angular'].steps.at(-1).with.name = 'results'), /nightly-gates-angular/],
     ['a daily soak', (w) => void (w.soak.on.schedule[0].cron = '0 1 * * *'), /weekly/],
-    ['a compressed weekly soak', (w) => void (w.soak.jobs['soak-angular'].steps.at(-2).run = 'pnpm bench S5 --s5-compressed'), /full 8-hour/],
+    ['a compressed weekly soak', (w) => void (step(w.soak.jobs['soak-angular'], /--s5-full/).run = 'pnpm bench S5 --s5-compressed'), /full 8-hour/],
   ];
 
   it.each(planted)('catches %s', (_name, plant, message) => {
     const workflows = fresh();
     plant(workflows);
     expect(workflowProblems(workflows).join('\n')).toMatch(message);
+  });
+});
+
+type Step = { name?: string; uses?: string; run?: string; if?: string; with?: Record<string, unknown> };
+type Job = { env?: Record<string, string>; steps: Step[] };
+const step = (job: Job, run: RegExp) => job.steps.find((s) => run.test(String(s.run ?? '')))!;
+const without = (job: Job, run: RegExp) => void (job.steps = job.steps.filter((s) => !run.test(String(s.run ?? ''))));
+
+describe('gate-host checks in every gate workflow (#18)', () => {
+  const gateJobs: Array<[string, (w: Workflows) => Job, RegExp]> = [
+    ['ci.yml gates', (w) => w.ci.jobs.gates, /^ci\.yml gates: /],
+    ['nightly.yml gates (angular)', (w) => w.nightly.jobs['gates-angular'], /^nightly\.yml gates \(angular\): /],
+    ['soak.yml', (w) => w.soak.jobs['soak-angular'], /^soak\.yml: /],
+  ];
+  const PRE = /node ci\/gate-host\.mjs --pre/;
+  const POST = /node ci\/gate-host\.mjs --post/;
+
+  const planted: Array<[string, (job: Job) => void, RegExp]> = [
+    ['no post-run re-check', (job) => without(job, POST), /must re-check the host after the gates/],
+    ['a post-run re-check without if: always()', (job) => void delete step(job, POST).if, /re-check must run with if: always\(\)/],
+    ['a post-run re-check only on success', (job) => void (step(job, POST).if = 'success()'), /re-check must run with if: always\(\)/],
+    ['a post-run re-check after the upload', (job) => void job.steps.push(job.steps.splice(job.steps.indexOf(step(job, POST)), 1)[0]!), /re-check must run before the results upload/],
+    ['a post-run re-check before the gates', (job) => void job.steps.splice(job.steps.indexOf(step(job, PRE)) + 1, 0, job.steps.splice(job.steps.indexOf(step(job, POST)), 1)[0]!), /re-check must run after the gates/],
+    ['no preflight', (job) => without(job, PRE), /must run the gate-host preflight/],
+    ['a preflight after the gates', (job) => void job.steps.splice(job.steps.indexOf(step(job, POST)), 0, job.steps.splice(job.steps.indexOf(step(job, PRE)), 1)[0]!), /preflight must run before the gates/],
+    ['a job that does not say when it is aimed at the gate runner', (job) => void delete job.env, /must set env SIGNAL_TREE_GATES_RUNNER/],
+    ['an upload that leaves out the gate-host records', (job) => void (job.steps.at(-1)!.with!.path = 'bench/out/results-*.json'), /upload must include bench\/out\/\*\.json/],
+    ['an upload only on success', (job) => void delete job.steps.at(-1)!.if, /results upload must run with if: always\(\)/],
+  ];
+
+  it.each(gateJobs)('%s holds them as committed', (_label, job) => {
+    const workflows = fresh();
+    const steps = job(workflows).steps;
+    const index = (test: RegExp) => steps.findIndex((s) => test.test(String(s.run ?? '')));
+    expect(index(PRE)).toBeGreaterThan(-1);
+    expect(index(PRE)).toBeLessThan(index(/pnpm bench\s/));
+    expect(steps[index(POST)]!.if).toBe('always()');
+    expect(index(POST)).toBeGreaterThan(index(/pnpm bench\s/));
+    expect(steps.at(-1)).toMatchObject({ if: 'always()', with: { path: 'bench/out/*.json' } });
+    expect(job(workflows).env).toEqual({ SIGNAL_TREE_GATES_RUNNER: '${{ vars.SIGNAL_TREE_GATES_RUNNER }}' });
+  });
+
+  const cases = gateJobs.flatMap(([label, job, prefix]) => planted.map(([name, plant, message]) => [label, name, job, plant, prefix, message] as const));
+  it.each(cases)('%s: catches %s', (_label, _name, job, plant, prefix, message) => {
+    const workflows = fresh();
+    plant(job(workflows));
+    const problems = workflowProblems(workflows);
+    expect(problems.filter((p) => prefix.test(p)).join('\n')).toMatch(message);
   });
 });
 

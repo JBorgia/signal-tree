@@ -92,7 +92,8 @@ jobs:
 
   gates:
     # Ruling 10: gates run on the dedicated self-hosted runner named by
-    # SIGNAL_TREE_GATES_RUNNER (#14), falling back to ubuntu-latest until it exists.
+    # SIGNAL_TREE_GATES_RUNNER (#14; its labels include signal-tree-gates),
+    # falling back to ubuntu-latest until it exists.
     name: Gates (Angular reference app)
     needs: pr-lookup
     # Never on a fork's pull request: the gates runner is self-hosted and the repository public.
@@ -102,6 +103,10 @@ jobs:
       || (github.event_name == 'push' && needs.pr-lookup.outputs.open != 'true'))
     runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
     timeout-minutes: 120
+    # Set exactly when runs-on aims at the gate runner; ci/gate-host.mjs then
+    # requires the provisioning marker (#18).
+    env:
+      SIGNAL_TREE_GATES_RUNNER: ${{ vars.SIGNAL_TREE_GATES_RUNNER }}
     permissions:
       contents: read
       actions: read
@@ -122,10 +127,11 @@ jobs:
         run: pnpm --filter @signal-tree/bench typecheck
       - name: Harness self-tests
         run: pnpm bench:test
-      # #18: on the gate runner, gates run only with every core on the
-      # performance governor and no swap in use; off it, this only reports.
-      - name: Gate-host preflight (governor, swap, boost)
-        run: node ci/gate-host.mjs --out bench/out/gate-host.json
+      # #18: on the gate runner (the host with the provisioning marker), gates
+      # run only with every core on the performance governor, boost readable and
+      # uniform, no swap, no other job and a low load; off it, this only reports.
+      - name: Gate-host preflight (identity, governor, boost, swap, quiet host)
+        run: node ci/gate-host.mjs --pre
       # Fails when main has a baseline that cannot be fetched, and when there is
       # no baseline once budgets.json is approved (finding 1).
       - name: Fetch main's latest baseline and A/A noise
@@ -145,8 +151,16 @@ jobs:
         run: |
           pnpm bench M1 M2 M3 S1 S2 --aa --record-only
           cp bench/out/aa-*-latest.json bench/out/aa-latest.json
-          # Where the baseline was recorded; PR runs compare only with one from the gate runner.
-          printf '{"runnerEnvironment":"%s","runnerName":"%s"}\n' "$RUNNER_ENVIRONMENT" "$RUNNER_NAME" > bench/out/recorded-on.json
+          # Where and how it was recorded (runner, governor, boost) is in
+          # gate-host.json, uploaded with it; PR runs compare only with a valid
+          # baseline from the same gate runner with the same governor and boost.
+      # Re-checks the host after the gates. If it failed either check or its
+      # governor, boost or swap changed, the results are marked invalid: unmet
+      # for ci/done-check.mjs and never a baseline. Before the upload, so the
+      # marks and gate-host-post.json ride in the same artifact.
+      - name: Gate-host re-check (invalidates the results if the host changed)
+        if: always()
+        run: node ci/gate-host.mjs --post
       - name: Keep the results
         if: always()
         uses: actions/upload-artifact@v4

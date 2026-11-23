@@ -147,8 +147,10 @@ export const NOT_ON_GATE_RUNNER = 'not on the gate runner';
 /**
  * Whether a run is on the dedicated gate runner: GitHub sets
  * RUNNER_ENVIRONMENT to 'self-hosted' there and to 'github-hosted' on its
- * own runners, and a local run has none. The same test as
- * ci/gate-baseline.mjs's isGateRunner.
+ * own runners, and a local run has none. In the gate workflows,
+ * ci/gate-host.mjs --pre runs first and fails a job aimed at the gate runner
+ * on any host but the provisioned one (its /etc/signal-tree/gate-runner
+ * marker), so there this agrees with ci/gate-baseline.mjs.
  */
 export function isGateRunner(runnerEnvironment: string | undefined): boolean {
   return runnerEnvironment === 'self-hosted';

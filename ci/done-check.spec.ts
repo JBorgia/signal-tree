@@ -14,6 +14,7 @@ import {
 } from './done-check.mjs';
 
 type Results = {
+  invalid?: { reason: string };
   budgets: { approved: boolean };
   recordOnly: boolean;
   scenarios: Record<string, { status: string; pass: boolean | null; recordedOnly?: string; regressions: { regressed: boolean }[] }>;
@@ -44,10 +45,12 @@ const greenOracle = () => ({
     })
   ) as Record<string, BehaviorReport>,
 });
+type HostCheck = { phase: string; enforced: boolean; invalid: { reason: string } | null; error?: string };
 const greenRun = (id: number) => ({
   id,
   conclusion: 'success',
   results: Object.fromEntries(ADAPTERS.map((a: string) => [a, greenResults()])) as Record<string, Results>,
+  hostChecks: Object.fromEntries(ADAPTERS.map((a: string) => [a, { phase: 'post', enforced: true, invalid: null }])) as Record<string, HostCheck | undefined>,
   oracle: greenOracle(),
 });
 
@@ -85,6 +88,10 @@ describe('done check', () => {
     [[0], 'a gate that did not run', (f) => void (f.nightly.runs[0]!.results['solid'].scenarios['S7'].status = 'not-applicable')],
     [[0], 'S8 recorded only, off the gate runner', (f) => void (f.nightly.runs[0]!.results['angular'].scenarios['S8'].recordedOnly = 'not on the gate runner')],
     [[0], 'a regression', (f) => void (f.nightly.runs[1]!.results['preact'].scenarios['M1'].regressions = [{ regressed: true }])],
+    [[0], 'results the gate-host re-check marked invalid', (f) => void (f.nightly.runs[0]!.results['angular'].invalid = { reason: 'the governor changed during the run: performance → schedutil' })],
+    [[0], 'a gates artifact without the post-run gate-host check', (f) => void (f.nightly.runs[1]!.hostChecks['vue'] = undefined)],
+    [[0], 'an unreadable post-run gate-host check', (f) => void (f.nightly.runs[0]!.hostChecks['plain'] = { phase: 'post', enforced: true, invalid: null, error: 'no /^gate-host-post\\.json$/ in nightly-gates-plain' })],
+    [[0], 'a post-run gate-host check that found the run invalid', (f) => void (f.nightly.runs[0]!.hostChecks['solid'] = { phase: 'post', enforced: true, invalid: { reason: 'boost changed during the run: off → on' } })],
     [[0], 'an S6 scan finding', (f) => void (f.s6.findings = ['unminified bundles differ'])],
     [[0, 1], 'nightly runs that could not be read', (f) => void (f.nightly = { error: 'gh: not logged in' } as never)],
     [[1], 'a behavior no test covers', (f) => void f.coveredBehaviors.delete('W3')],

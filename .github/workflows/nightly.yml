@@ -20,6 +20,10 @@ jobs:
     name: gates (angular)
     runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
     timeout-minutes: 240
+    # Set exactly when runs-on aims at the gate runner; ci/gate-host.mjs then
+    # requires the provisioning marker (#18).
+    env:
+      SIGNAL_TREE_GATES_RUNNER: ${{ vars.SIGNAL_TREE_GATES_RUNNER }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -30,15 +34,23 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Install the Chromium pinned by the Playwright lock
         run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
-      # #18: on the gate runner, gates run only with every core on the
-      # performance governor and no swap in use; off it, this only reports.
-      - name: Gate-host preflight (governor, swap, boost)
-        run: node ci/gate-host.mjs --out bench/out/gate-host.json
+      # #18: on the gate runner (the host with the provisioning marker), gates
+      # run only with every core on the performance governor, boost readable and
+      # uniform, no swap, no other job and a low load; off it, this only reports.
+      - name: Gate-host preflight (identity, governor, boost, swap, quiet host)
+        run: node ci/gate-host.mjs --pre
       # --record-only takes effect only while budgets.json has "approved": false.
       # ci/done-check.mjs reads the verdicts in this job's results, not the job's
       # success, and counts record-only results as unmet.
       - name: Every scenario, S5 compressed (at least 2M writes)
         run: pnpm bench all --s5-compressed --record-only
+      # Re-checks the host after the gates. If it failed either check or its
+      # governor, boost or swap changed, the results are marked invalid: unmet
+      # for ci/done-check.mjs and never a baseline. Before the upload, so the
+      # marks and gate-host-post.json ride in the same artifact.
+      - name: Gate-host re-check (invalidates the results if the host changed)
+        if: always()
+        run: node ci/gate-host.mjs --post
       - name: Keep the results
         if: always()
         uses: actions/upload-artifact@v4

@@ -9,7 +9,10 @@
 //   (artifacts nightly-gates-<adapter> and nightly-oracle), not the jobs'
 //   success: a results file that is record-only or unapproved counts as unmet,
 //   and so does a spec-report.json in which the new core violates a property or
-//   was checked fewer than 1,000 times on any generatable behavior.
+//   was checked fewer than 1,000 times on any generatable behavior. Each gates
+//   artifact must also hold the post-run host check, gate-host-post.json
+//   (ci/gate-host.mjs --post); results it marked invalid, or that lack it, are
+//   unmet.
 // - Behavior coverage: a test title carries the behavior ID in brackets, e.g.
 //   it('[T3] refuses with later-pending-dependency', ...).
 // - Release docs (Phase 8): README.md, CHANGELOG.md, docs/migration/from-14.md,
@@ -49,6 +52,11 @@ export function nightlyRunProblem(run) {
   for (const adapter of ADAPTERS) {
     const results = run.results?.[adapter];
     if (!results || results.error) return `nightly run ${run.id} has no gate results for ${adapter}${results?.error ? ` (${results.error})` : ''}`;
+    // ci/gate-host.mjs --post marks results invalid when the gate host failed a check or changed during the run.
+    if (results.invalid) return `nightly run ${run.id} (${adapter}): its results are invalid (${results.invalid.reason ?? 'marked by ci/gate-host.mjs --post'})`;
+    const hostCheck = run.hostChecks?.[adapter];
+    if (!hostCheck || hostCheck.error) return `nightly run ${run.id} (${adapter}) has no post-run gate-host check${hostCheck?.error ? ` (${hostCheck.error})` : ''}`;
+    if (hostCheck.invalid) return `nightly run ${run.id} (${adapter}): the post-run gate-host check found the run invalid (${hostCheck.invalid.reason ?? 'no reason recorded'})`;
     if (results.budgets?.approved !== true) return `nightly run ${run.id} (${adapter}) ran against unapproved budgets`;
     if (results.recordOnly !== false) return `nightly run ${run.id} (${adapter}) was record-only`;
     for (const gate of REQUIRED_GATES) {
@@ -251,17 +259,27 @@ function walk(dir, out = []) {
   return out;
 }
 
-/** Downloads a run's artifact by name and parses the newest JSON file matching `pattern` in it. */
-function artifactJson(repo, artifacts, name, pattern) {
+/**
+ * Downloads a run's artifact by name once and parses, for each key of
+ * `patterns`, the newest JSON file in it whose name matches; a key that cannot
+ * be read maps to { error }.
+ */
+function artifactJsons(repo, artifacts, name, patterns) {
+  const all = (error) => Object.fromEntries(Object.keys(patterns).map((key) => [key, { error }]));
   const artifact = artifacts.find((a) => a.name === name && !a.expired);
-  if (!artifact) return { error: `artifact ${name} missing` };
+  if (!artifact) return all(`artifact ${name} missing`);
   const dir = mkdtempSync(join(tmpdir(), 'signal-tree-done-'));
   try {
     downloadArtifact(repo, artifact.id, dir);
-    const file = walk(dir).filter((f) => pattern.test(f.split('/').pop())).sort().pop();
-    return file ? JSON.parse(readFileSync(file, 'utf8')) : { error: `no ${pattern} in ${name}` };
+    const files = walk(dir);
+    return Object.fromEntries(
+      Object.entries(patterns).map(([key, pattern]) => {
+        const file = files.filter((f) => pattern.test(f.split('/').pop())).sort().pop();
+        return [key, file ? attempt(() => JSON.parse(readFileSync(file, 'utf8'))) : { error: `no ${pattern} in ${name}` }];
+      })
+    );
   } catch (error) {
-    return { error: String(error.message ?? error).split('\n')[0] };
+    return all(String(error.message ?? error).split('\n')[0]);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
@@ -291,11 +309,15 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
     return {
       runs: runs.map((run) => {
         const artifacts = ghApi(`repos/${needRepo()}/actions/runs/${run.id}/artifacts?per_page=100`).flatMap((p) => p.artifacts ?? []);
+        const gates = Object.fromEntries(
+          ADAPTERS.map((a) => [a, artifactJsons(needRepo(), artifacts, `nightly-gates-${a}`, { results: /^results-.+-latest\.json$/, hostCheck: /^gate-host-post\.json$/ })])
+        );
         return {
           id: run.id,
           conclusion: run.conclusion,
-          results: Object.fromEntries(ADAPTERS.map((a) => [a, artifactJson(needRepo(), artifacts, `nightly-gates-${a}`, /^results-.+-latest\.json$/)])),
-          oracle: artifactJson(needRepo(), artifacts, 'nightly-oracle', /^spec-report\.json$/),
+          results: Object.fromEntries(ADAPTERS.map((a) => [a, gates[a].results])),
+          hostChecks: Object.fromEntries(ADAPTERS.map((a) => [a, gates[a].hostCheck])),
+          oracle: artifactJsons(needRepo(), artifacts, 'nightly-oracle', { report: /^spec-report\.json$/ }).report,
         };
       }),
     };
