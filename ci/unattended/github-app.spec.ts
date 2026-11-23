@@ -1,8 +1,9 @@
-import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { spawn, spawnSync } from 'node:child_process';
+import { chmodSync, closeSync, constants, cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { MINT_COMMAND, REFRESH_MARGIN_MS, configFromEnv, getToken, gitCredential } from './app-token.mjs';
 
 // Tests for the GitHub App identity of the unattended runner on the agent's
@@ -95,6 +96,17 @@ function checkout(url: string) {
 /** Bash that defines the supervisor's constants and the named functions, as the script does. */
 const shellFunctions = (...names: string[]) => `eval "$(sed -n '/^readonly /p;${names.map((name) => `/^${name}()/,/^}/p`).join(';')}' '${supervisor}')"`;
 const bash = (script: string, env: Record<string, string>, cwd?: string) => spawnSync('/bin/bash', ['-c', script], { cwd, env: cleanEnv(env), encoding: 'utf8' });
+/** Like bash, without blocking: resolves when the script ends and its output closes. */
+const bashAsync = (script: string, env: Record<string, string>, cwd?: string) =>
+  new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve, reject) => {
+    const child = spawn('/bin/bash', ['-c', script], { cwd, env: cleanEnv(env), stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    child.stderr.on('data', (chunk) => (stderr += chunk));
+    child.on('error', reject);
+    child.on('close', (status) => resolve({ status, stdout, stderr }));
+  });
 
 describe('App token on the agent side', () => {
   it('runs the mint command as st-mint through sudo by default, or SIGNAL_TREE_MINT_COMMAND, caching in the state directory', () => {
@@ -689,6 +701,9 @@ describe('supervisor startup checks', () => {
 });
 
 describe('workflow self-test', () => {
+  // No outcome here depends on the clock. Every self-test step gets a FIFO as
+  // its deadline (with_timeout), which only a test that wants a timeout ever
+  // writes, and the slow remote blocks on a FIFO the test controls.
   const ZERO = '0000000000000000000000000000000000000000';
   const identity = { GIT_AUTHOR_NAME: 'Jonathan Borgia', GIT_AUTHOR_EMAIL: 'jonathanborgia@gmail.com', GIT_COMMITTER_NAME: 'Jonathan Borgia', GIT_COMMITTER_EMAIL: 'jonathanborgia@gmail.com' };
   /** GitHub's message for an App push of a workflow file without the workflows permission. */
@@ -705,35 +720,84 @@ describe('workflow self-test', () => {
     denied: `${log}done; echo "Permission to JBorgia/signal-tree.git denied to signal-tree-ci[bot]." >&2; exit 1`,
     // Refuses with GitHub's message, but the branch appears anyway.
     sneaky: `${log}[[ $new == ${ZERO} ]] && continue; env -u GIT_QUARANTINE_PATH git update-ref "$ref" refs/heads/main; echo "${refusal('.github/workflows/x.yml')}" >&2; exit 1; done`,
-    slow: `${log}done; sleep 10; exit 1`,
+    // Says it is running, then holds the push until the test lets it go.
+    held: `${log}done; printf 'in\\n' > "$HOOK_ENTERED"; read -r < "$HOOK_RELEASE"; exit 1`,
   };
 
-  /** A fake remote with main (holding a workflow already), the hook, and the agent's clone of it. */
-  const remoteFixture = (hook: string) => {
-    const root = scratch();
-    const remote = join(root, 'remote.git');
-    git(root, 'init', '-q', '--bare', '-b', 'main', remote);
-    const seed = join(root, 'seed');
-    git(root, 'clone', '-q', remote, seed);
+  const fifo = (path: string) => {
+    const made = spawnSync('mkfifo', [path], { encoding: 'utf8' });
+    if (made.status !== 0) throw new Error(`mkfifo ${path}: ${made.stderr}`);
+    return path;
+  };
+  /** Opens FIFO `path` for writing without waiting for a reader, and closes it: wakes a reader if there is one. */
+  const release = (path: string) => {
+    try {
+      closeSync(openSync(path, constants.O_WRONLY | constants.O_NONBLOCK));
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENXIO') throw error;
+    }
+  };
+
+  // One fake remote with main (holding a workflow already) and the agent's clone of it, built once and copied for each test.
+  let template = '';
+  beforeAll(() => {
+    template = mkdtempSync(join(tmpdir(), 'signal-tree-selftest-template-'));
+    const remote = join(template, 'remote.git');
+    git(template, 'init', '-q', '--bare', '-b', 'main', remote);
+    const seed = join(template, 'seed');
+    git(template, 'clone', '-q', remote, seed);
     mkdirSync(join(seed, '.github', 'workflows'), { recursive: true });
     writeFileSync(join(seed, '.github', 'workflows', 'tests.yml'), 'name: tests\n');
     writeFileSync(join(seed, 'README.md'), 'signal-tree\n');
     git(seed, 'add', '.');
     git(seed, '-c', 'user.name=Seed', '-c', 'user.email=seed@example.com', 'commit', '-qm', 'seed');
     git(seed, 'push', '-q', 'origin', 'HEAD:main');
+    git(template, 'clone', '-q', remote, join(template, 'work'));
+  });
+  afterAll(() => rmSync(template, { recursive: true, force: true }));
+
+  /** A copy of the template with `hook` as the remote's pre-receive hook, and the FIFOs a test may drive. */
+  const remoteFixture = (hook: string) => {
+    const root = scratch();
+    const remote = join(root, 'remote.git');
     const work = join(root, 'work');
-    git(root, 'clone', '-q', remote, work);
+    cpSync(join(template, 'remote.git'), remote, { recursive: true });
+    cpSync(join(template, 'work'), work, { recursive: true });
+    const config = join(work, '.git', 'config');
+    writeFileSync(config, readFileSync(config, 'utf8').replaceAll(join(template, 'remote.git'), remote));
     writeScript(join(remote, 'hooks', 'pre-receive'), hook);
     const tmp = join(root, 'tmp');
     mkdirSync(tmp);
     const hookLog = join(root, 'hook.log');
     const offered = () => (existsSync(hookLog) ? readFileSync(hookLog, 'utf8').trim().split('\n') : []);
     const selftestRefs = () => git(remote, 'for-each-ref', '--format=%(refname)', 'refs/heads/selftest');
-    return { root, remote, work, tmp, offered, selftestRefs };
+    return { root, remote, work, tmp, hookLog, offered, selftestRefs, deadline: fifo(join(root, 'deadline')), entered: fifo(join(root, 'entered')), held: fifo(join(root, 'held')) };
   };
-  const selftest = (f: ReturnType<typeof remoteFixture>, limit = 20, extra: Record<string, string> = {}) =>
-    bash(`${shellFunctions('workflow_selftest', 'workflow_push', 'is_workflow_refusal', 'with_timeout')}; workflow_selftest "$PWD" ${limit}`, { ...isolatedGit, ...identity, GIT_ALLOW_PROTOCOL: 'https:file', TMPDIR: f.tmp, HOOK_LOG: join(f.root, 'hook.log'), ...extra }, f.work);
-  const snapshot = (work: string) => [git(work, 'rev-parse', 'HEAD'), git(work, 'status', '--porcelain', '--untracked-files=all'), git(work, 'count-objects', '-v'), git(work, 'for-each-ref')].join('\n---\n');
+  type Fixture = ReturnType<typeof remoteFixture>;
+  const selftestScript = `${shellFunctions('workflow_selftest', 'workflow_push', 'is_workflow_refusal', 'with_timeout', 'deadline_text')}; workflow_selftest "$PWD" "$DEADLINE"`;
+  const selftestEnv = (f: Fixture, extra: Record<string, string>) => ({ ...isolatedGit, ...identity, GIT_ALLOW_PROTOCOL: 'https:file', TMPDIR: f.tmp, HOOK_LOG: f.hookLog, HOOK_ENTERED: f.entered, HOOK_RELEASE: f.held, DEADLINE: f.deadline, ...extra });
+  const selftest = (f: Fixture, extra: Record<string, string> = {}) => bash(selftestScript, selftestEnv(f, extra), f.work);
+  /** The self-test, started without waiting for it. */
+  const startSelftest = (f: Fixture) => bashAsync(selftestScript, selftestEnv(f, {}), f.work);
+  /**
+   * Every path in the checkout, its .git included, with its mode, and a file's
+   * size and modification time: any change to files, index, refs or objects
+   * shows. FETCH_HEAD is left out, since the self-test's fetch writes it.
+   */
+  const snapshot = (work: string) => {
+    const entries: string[] = [];
+    const walk = (dir: string) => {
+      for (const name of readdirSync(dir).sort()) {
+        const path = join(dir, name);
+        if (path === join(work, '.git', 'FETCH_HEAD')) continue;
+        const stat = lstatSync(path);
+        entries.push(stat.isDirectory() ? `${path} ${stat.mode.toString(8)}` : `${path} ${stat.mode.toString(8)} ${stat.size} ${stat.mtimeMs}`);
+        if (stat.isDirectory()) walk(path);
+      }
+    };
+    walk(work);
+    return entries.join('\n');
+  };
 
   it('passes when the push is refused for the missing workflows permission, leaving no branch and no trace in the checkout', () => {
     const f = remoteFixture(hooks.github);
@@ -755,9 +819,13 @@ describe('workflow self-test', () => {
     const [, commit, ref] = created.split(' ');
     const id = ref.replace('refs/heads/selftest/workflow-push-', '');
     expect(id).toMatch(/^[0-9a-f]{12}$/);
-    expect(git(f.remote, 'diff', '--name-only', 'main', commit)).toBe(`.github/workflows/selftest-${id}.yml`);
-    expect(git(f.remote, 'log', '-1', '--format=%P|%an <%ae>|%cn <%ce>', commit)).toBe(`${git(f.remote, 'rev-parse', 'main')}|Jonathan Borgia <jonathanborgia@gmail.com>|Jonathan Borgia <jonathanborgia@gmail.com>`);
-    expect(git(f.remote, 'show', `${commit}:.github/workflows/selftest-${id}.yml`)).toContain('on: workflow_dispatch');
+    // Parents, author, committer, and the change from main: one new file.
+    const [head, ...patch] = git(f.remote, 'log', '-1', '--format=%P|%an <%ae>|%cn <%ce>', '--patch', commit).split('\n');
+    const main = readFileSync(join(f.remote, 'refs', 'heads', 'main'), 'utf8').trim();
+    expect(head).toBe(`${main}|Jonathan Borgia <jonathanborgia@gmail.com>|Jonathan Borgia <jonathanborgia@gmail.com>`);
+    expect(patch.filter((line) => line.startsWith('diff --git'))).toEqual([`diff --git a/.github/workflows/selftest-${id}.yml b/.github/workflows/selftest-${id}.yml`]);
+    expect(patch).toContain('new file mode 100644');
+    expect(patch).toContain('+on: workflow_dispatch');
     expect(deleted).toBe(`${commit} ${ZERO} ${ref}`);
   });
 
@@ -771,20 +839,29 @@ describe('workflow self-test', () => {
     expect(f.offered()).toHaveLength(2);
   });
 
-  it('fails when the push is refused for any other reason, without mistaking it for the workflows refusal', () => {
-    for (const hook of [hooks.protected, hooks.disabled, hooks.denied]) {
+  // Each other reason for refusing the push is its own case, so no test does more than one self-test run.
+  for (const [reason, hook] of [
+    ['a protected branch', hooks.protected],
+    ['a workflow message without permission or refusing', hooks.disabled],
+    ['a permission message without workflow', hooks.denied],
+  ] as const) {
+    it(`fails when the push is refused for another reason, without mistaking it for the workflows refusal: ${reason}`, () => {
       const f = remoteFixture(hook);
       const r = selftest(f);
-      expect(r.status, hook).toBe(1);
+      expect(r.status, r.stderr).toBe(1);
       expect(r.stderr).toContain('GitHub refused it, but not for the missing workflows permission, so this proves nothing.');
       expect(f.selftestRefs()).toBe('');
-    }
-    // A push that cannot reach the remote at all.
+      expect(f.offered()).toHaveLength(1);
+    });
+  }
+
+  it('fails at once when the push cannot reach the remote, without mistaking it for the workflows refusal', () => {
     const f = remoteFixture(hooks.github);
-    git(f.work, 'config', 'remote.origin.pushurl', join(f.root, 'missing.git'));
-    const unreachable = selftest(f);
-    expect(unreachable.status).toBe(1);
-    expect(unreachable.stderr).toContain('not for the missing workflows permission');
+    // A local path that does not exist: git gives up at once, with no network and no connect timeout.
+    git(f.work, 'config', 'remote.origin.pushurl', `file://${join(f.root, 'missing.git')}`);
+    const r = selftest(f);
+    expect(r.status, r.stderr).toBe(1);
+    expect(r.stderr).toContain('GitHub refused it, but not for the missing workflows permission, so this proves nothing.');
     expect(f.offered()).toEqual([]);
   });
 
@@ -796,18 +873,25 @@ describe('workflow self-test', () => {
     expect(f.selftestRefs()).toBe('');
   });
 
-  it('fails when the push does not finish in time', () => {
-    const f = remoteFixture(hooks.slow);
-    const started = Date.now();
-    const r = selftest(f, 2);
-    expect(r.status).toBe(1);
-    expect(r.stderr).toContain('The push did not finish within 2 s.');
-    expect(Date.now() - started).toBeLessThan(9000);
+  it('fails when the push does not finish by its deadline, which the test sets off while the remote holds the push', async () => {
+    const f = remoteFixture(hooks.held);
+    try {
+      const run = startSelftest(f);
+      // The remote's hook is running, so the push is under way and waiting on it.
+      await readFile(f.entered, 'utf8');
+      await writeFile(f.deadline, 'now\n');
+      const r = await run;
+      expect(r.status, r.stderr).toBe(1);
+      expect(r.stderr).toContain('The push did not finish before its deadline.');
+      expect(f.selftestRefs()).toBe('');
+    } finally {
+      release(f.held);
+    }
   });
 
   it('fails when main cannot be fetched', () => {
     const f = remoteFixture(hooks.github);
-    git(f.work, 'remote', 'set-url', 'origin', join(f.root, 'missing.git'));
+    git(f.work, 'remote', 'set-url', 'origin', `file://${join(f.root, 'missing.git')}`);
     const r = selftest(f);
     expect(r.status).toBe(1);
     expect(r.stderr).toContain('the workflow self-test could not fetch main');
@@ -815,14 +899,14 @@ describe('workflow self-test', () => {
 
   it('is skipped, loudly, only with SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 and a fake remote', () => {
     const f = remoteFixture(hooks.accept);
-    const skipped = selftest(f, 20, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1' });
+    const skipped = selftest(f, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1' });
     expect(skipped.status).toBe(0);
     expect(skipped.stderr).toContain('WARNING: SKIPPING THE WORKFLOW SELF-TEST (SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1, fake remote)');
     expect(f.offered()).toEqual([]);
 
     // With origin on github.com it runs anyway (here https is not allowed, so it fails without the network).
     git(f.work, 'remote', 'set-url', 'origin', ORIGIN);
-    const github = selftest(f, 20, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1', GIT_ALLOW_PROTOCOL: 'file' });
+    const github = selftest(f, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1', GIT_ALLOW_PROTOCOL: 'file' });
     expect(github.status).toBe(1);
     expect(github.stderr).toContain('is only for tests against a fake remote; origin is on github.com, so the workflow self-test runs.');
     expect(github.stderr).toContain('could not fetch main');
@@ -843,23 +927,24 @@ describe('workflow self-test', () => {
     }
   });
 
-  it('limits a command to its time and passes its status through otherwise', () => {
-    const run = (command: string) => {
-      const started = Date.now();
-      const r = bash(`${shellFunctions('with_timeout')}; ${command}; echo "status=$?"`, {});
-      return { out: r.stdout.trim(), ms: Date.now() - started };
-    };
-    const slow = run('with_timeout 1 sleep 8');
-    expect(slow.out).toBe('status=124');
-    expect(slow.ms).toBeLessThan(6000);
-    expect(run("with_timeout 5 sh -c 'exit 3'").out).toBe('status=3');
-    const quick = run('with_timeout 8 true');
-    expect(quick.out).toBe('status=0');
-    // No sleep left behind holding the output pipe open.
-    expect(quick.ms).toBeLessThan(6000);
+  it('kills the command when its deadline is set off, and passes its status through otherwise', async () => {
+    const dir = scratch();
+    const deadline = fifo(join(dir, 'deadline'));
+    const blocked = fifo(join(dir, 'blocked'));
+    const timed = (command: string) => `${shellFunctions('with_timeout')}; ${command}; echo "status=$?"`;
+    // The command waits on a FIFO nobody writes, so only the deadline can end it.
+    const run = bashAsync(timed(`with_timeout "${deadline}" cat "${blocked}"`), {});
+    await writeFile(deadline, 'now\n');
+    expect((await run).stdout).toBe('status=124\n');
+    // With the deadline never set off, the command's own status comes back, and no watchdog is left holding the output.
+    expect(bash(timed(`with_timeout "${deadline}" sh -c 'exit 3'`), {}).stdout).toBe('status=3\n');
+    expect(bash(timed(`with_timeout "${deadline}" true`), {}).stdout).toBe('status=0\n');
+    // The production form: a number of seconds, here never reached.
+    expect(bash(timed('with_timeout 30 true'), {}).stdout).toBe('status=0\n');
+    expect(bash(`${shellFunctions('deadline_text')}; deadline_text 30; deadline_text "${deadline}"`, {}).stdout).toBe('within 30 s\nbefore its deadline\n');
   });
 
-  it('runs in the supervisor after the token, origin, gh, rules and ls-remote checks, before the lock (exit 14)', () => {
+  it('runs in the supervisor after the token, origin, gh, rules and ls-remote checks, before the lock (exit 14), with a 30 s deadline', () => {
     const text = readFileSync(supervisor, 'utf8');
     const main = text.slice(text.indexOf('main() {'), text.indexOf('\n}\n', text.indexOf('main() {')));
     const at = (snippet: string) => {

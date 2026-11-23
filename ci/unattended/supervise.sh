@@ -443,8 +443,9 @@ check_main_rules() {
 # .github/workflows/selftest-<random>.yml with `git commit-tree` (the
 # checkout's files, index and branches stay as they are, and the commit's
 # objects stay out of its object store), and pushes it to
-# refs/heads/selftest/workflow-push-<random>, allowing $2 seconds for each
-# network step. It passes only if GitHub refuses the push
+# refs/heads/selftest/workflow-push-<random>. $2 is the deadline for each
+# network step, as with_timeout takes it: 30 (seconds) in main, a FIFO in
+# tests. It passes only if GitHub refuses the push
 # with its message for the missing permission (is_workflow_refusal) and the
 # branch does not exist afterwards. Otherwise it prints why and returns 1,
 # deleting the branch if it exists.
@@ -452,7 +453,7 @@ check_main_rules() {
 # SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 skips it, with a warning, for tests
 # against a fake remote; with origin on github.com it is ignored.
 workflow_selftest() {
-  local work=$1 limit=$2 tmp status
+  local work=$1 deadline=$2 tmp status
   if [[ ${SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST:-} == 1 ]]; then
     if [[ $(git -C "$work" remote get-url --push origin 2> /dev/null) != https://github.com/* ]]; then
       echo "WARNING: SKIPPING THE WORKFLOW SELF-TEST (SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1, fake remote). Nothing has checked that the App cannot push workflow files." >&2
@@ -461,7 +462,7 @@ workflow_selftest() {
     echo "SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 is only for tests against a fake remote; origin is on github.com, so the workflow self-test runs." >&2
   fi
   tmp=$(mktemp -d "${TMPDIR:-/tmp}/signal-tree-selftest.XXXXXX") || return 1
-  workflow_push "$work" "$limit" "$tmp"
+  workflow_push "$work" "$deadline" "$tmp"
   status=$?
   rm -rf "$tmp"
   return "$status"
@@ -470,12 +471,12 @@ workflow_selftest() {
 # The body of workflow_selftest; $3 is a scratch directory that holds the
 # commit's objects, its index and the push output.
 workflow_push() {
-  local work=$1 limit=$2 tmp=$3 id ref file main objects blob tree commit status found outcome=''
+  local work=$1 deadline=$2 tmp=$3 id ref file main objects blob tree commit status found outcome=''
   local -a scratch
   id=$(od -An -N6 -tx1 /dev/urandom | tr -d ' \n')
   ref=refs/heads/selftest/workflow-push-$id
   file=.github/workflows/selftest-$id.yml
-  if ! with_timeout "$limit" git -C "$work" fetch -q --no-tags origin main 2> "$tmp/fetch.err" ||
+  if ! with_timeout "$deadline" git -C "$work" fetch -q --no-tags origin main 2> "$tmp/fetch.err" ||
     ! main=$(git -C "$work" rev-parse --verify -q 'FETCH_HEAD^{commit}'); then
     echo "Refusing to start: the workflow self-test could not fetch main:" >&2
     sed 's/^/  /' "$tmp/fetch.err" >&2
@@ -504,23 +505,23 @@ YAML
     return 1
   fi
 
-  with_timeout "$limit" "${scratch[@]}" push origin "$commit:$ref" > "$tmp/push.out" 2>&1
+  with_timeout "$deadline" "${scratch[@]}" push origin "$commit:$ref" > "$tmp/push.out" 2>&1
   status=$?
   if (( status == 0 )); then
     outcome="GitHub accepted it, so the App can change workflows: remove its Workflows permission (workflow changes come only from Jonathan)."
   elif (( status == 124 )); then
-    outcome="The push did not finish within $limit s."
+    outcome="The push did not finish $(deadline_text "$deadline")."
   elif ! is_workflow_refusal "$tmp/push.out"; then
     outcome="GitHub refused it, but not for the missing workflows permission, so this proves nothing."
   fi
 
   # Whatever happened, the branch must not exist.
-  with_timeout "$limit" git -C "$work" ls-remote --exit-code origin "$ref" > /dev/null 2>&1
+  with_timeout "$deadline" git -C "$work" ls-remote --exit-code origin "$ref" > /dev/null 2>&1
   found=$?
   if (( found == 0 )); then
     [[ -n $outcome ]] || outcome="GitHub refused the push, yet the branch exists."
-    with_timeout "$limit" git -C "$work" push -q origin ":$ref" > /dev/null 2>&1
-    with_timeout "$limit" git -C "$work" ls-remote --exit-code origin "$ref" > /dev/null 2>&1
+    with_timeout "$deadline" git -C "$work" push -q origin ":$ref" > /dev/null 2>&1
+    with_timeout "$deadline" git -C "$work" ls-remote --exit-code origin "$ref" > /dev/null 2>&1
     found=$?
     (( found == 2 )) && outcome+=" The branch has been deleted."
   fi
@@ -544,21 +545,35 @@ is_workflow_refusal() {
   awk '{ line = tolower($0) } line ~ /workflow/ && line ~ /permission|refusing/ { found = 1 } END { exit !found }' "$1"
 }
 
-# Runs the command "$@" for at most $1 seconds. Returns its status, or 124
-# when time ran out and it was killed. The watchdog's output goes nowhere and
-# it kills its own sleep, so nothing is left holding a caller's pipe.
+# Runs the command "$@" until the deadline $1 and kills it if that comes
+# first. Returns the command's status, or 124 when it was killed. $1 is a
+# number of seconds, or the path of a FIFO, in which case the deadline is the
+# moment a line, or end of file, arrives on it: tests decide when it passes,
+# rather than the clock. A watchdog waits for the deadline; when the command
+# ends first the watchdog is killed. Waiting on a FIFO it holds no other
+# process, so nothing is left behind. Waiting on the clock it leaves its
+# sleep to run out, with no caller's pipe open.
 with_timeout() {
-  local limit=$1 pid watchdog status
+  local deadline=$1 pid watchdog status
   shift
   "$@" &
   pid=$!
-  ( sleep "$limit" & trap 'kill $! 2> /dev/null; exit 1' TERM; wait $! && kill -TERM "$pid" ) > /dev/null 2>&1 &
+  # Exits 0 only if it killed the command.
+  (
+    if [[ $deadline =~ ^[0-9]+$ ]]; then sleep "$deadline"; else read -r < "$deadline"; fi
+    kill -TERM "$pid"
+  ) > /dev/null 2>&1 &
   watchdog=$!
   wait "$pid"
   status=$?
   kill "$watchdog" 2> /dev/null
   if wait "$watchdog"; then return 124; fi
   return "$status"
+}
+
+# How a message names the deadline $1 (see with_timeout).
+deadline_text() {
+  if [[ $1 =~ ^[0-9]+$ ]]; then echo "within $1 s"; else echo "before its deadline"; fi
 }
 
 # The error text of a run that failed to authenticate, or nothing.
