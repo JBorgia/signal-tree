@@ -31,6 +31,8 @@
 #                                 user must not be able to read (the mint command itself reads only the default)
 #   SIGNAL_TREE_GIT_NAME          default "Jonathan Borgia": author and committer name of every commit
 #   SIGNAL_TREE_GIT_EMAIL         default jonathanborgia@gmail.com: author and committer email
+#   SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST  for tests only: 1 skips the workflow self-test, with a
+#                                 warning, when origin is a fake remote; ignored when origin is on github.com
 #
 # Exit status: 0 done; 1 setup failed; 2 not the isolated machine, extra
 # arguments set a model, or the state directory is inside a checkout; 3 stuck;
@@ -42,7 +44,9 @@
 # fails as the App; 11 no real gh outside the wrapper, or gh has a stored login;
 # 12 main's rules do not require an approving review, code-owner review and
 # status checks, or could not be read; 13 this user can read the App's private
-# key, or the mint config naming it cannot be read.
+# key, or the mint config naming it cannot be read; 14 the workflow self-test
+# failed: GitHub accepted the App's push of a workflow file (the branch is then
+# deleted), refused it for another reason, or did not answer in time.
 #
 # Authentication (Jonathan's ruling on #16): Claude Code uses an Anthropic API
 # key from the VM's secret store, never a browser login. The supervisor
@@ -84,7 +88,8 @@
 # sets an extra HTTP header, gh has no stored login, main's rules require at
 # least one approving review, code-owner review and status checks (so
 # auto-merge still waits for them; see check_main_rules), and
-# `git ls-remote origin` works as the App.
+# `git ls-remote origin` works as the App. Last, it checks that GitHub refuses
+# the App's push of a workflow file to a scratch branch (workflow_selftest).
 #
 # One session at a time: the supervisor holds the agent lock (refs/agent/lock
 # on the remote, see lock.mjs) for as long as it runs, and refuses to start
@@ -143,6 +148,7 @@ main() {
     echo "Refusing to start: git ls-remote origin failed as the App (the error is above)." >&2
     exit 10
   fi
+  workflow_selftest "$WORK_DIR" 30 || exit 14
 
   if [[ ! -d $SIGNAL_TREE_VERIFY_DIR/.git ]]; then
     git clone -q "$(git -C "$WORK_DIR" remote get-url origin)" "$SIGNAL_TREE_VERIFY_DIR" || exit 1
@@ -423,6 +429,136 @@ check_main_rules() {
     sed 's/^/  /' <<< "$missing" >&2
     return 1
   fi
+}
+
+# Checks at startup that the App cannot change workflows. Jonathan: "The App
+# does not get Workflows permission ... Workflow changes come from me." and
+# "Add a self-test on a scratch branch: a push that adds a workflow file is
+# rejected for a non-bypass actor." GitHub offers no push rulesets on this
+# repository, so the protection is GitHub refusing any App push that creates
+# or updates a file under .github/workflows/ without that permission.
+#
+# As the App, through the credential helper, this fetches main into the
+# checkout $1, builds a commit of main's tree plus
+# .github/workflows/selftest-<random>.yml with `git commit-tree` (the
+# checkout's files, index and branches stay as they are, and the commit's
+# objects stay out of its object store), and pushes it to
+# refs/heads/selftest/workflow-push-<random>, allowing $2 seconds for each
+# network step. It passes only if GitHub refuses the push
+# with its message for the missing permission (is_workflow_refusal) and the
+# branch does not exist afterwards. Otherwise it prints why and returns 1,
+# deleting the branch if it exists.
+#
+# SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 skips it, with a warning, for tests
+# against a fake remote; with origin on github.com it is ignored.
+workflow_selftest() {
+  local work=$1 limit=$2 tmp status
+  if [[ ${SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST:-} == 1 ]]; then
+    if [[ $(git -C "$work" remote get-url --push origin 2> /dev/null) != https://github.com/* ]]; then
+      echo "WARNING: SKIPPING THE WORKFLOW SELF-TEST (SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1, fake remote). Nothing has checked that the App cannot push workflow files." >&2
+      return 0
+    fi
+    echo "SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 is only for tests against a fake remote; origin is on github.com, so the workflow self-test runs." >&2
+  fi
+  tmp=$(mktemp -d "${TMPDIR:-/tmp}/signal-tree-selftest.XXXXXX") || return 1
+  workflow_push "$work" "$limit" "$tmp"
+  status=$?
+  rm -rf "$tmp"
+  return "$status"
+}
+
+# The body of workflow_selftest; $3 is a scratch directory that holds the
+# commit's objects, its index and the push output.
+workflow_push() {
+  local work=$1 limit=$2 tmp=$3 id ref file main objects blob tree commit status found outcome=''
+  local -a scratch
+  id=$(od -An -N6 -tx1 /dev/urandom | tr -d ' \n')
+  ref=refs/heads/selftest/workflow-push-$id
+  file=.github/workflows/selftest-$id.yml
+  if ! with_timeout "$limit" git -C "$work" fetch -q --no-tags origin main 2> "$tmp/fetch.err" ||
+    ! main=$(git -C "$work" rev-parse --verify -q 'FETCH_HEAD^{commit}'); then
+    echo "Refusing to start: the workflow self-test could not fetch main:" >&2
+    sed 's/^/  /' "$tmp/fetch.err" >&2
+    return 1
+  fi
+  # The commit's objects go to $tmp, reading the checkout's as alternates.
+  objects=$(git -C "$work" rev-parse --path-format=absolute --git-path objects) && mkdir "$tmp/objects" || return 1
+  scratch=(env "GIT_OBJECT_DIRECTORY=$tmp/objects" "GIT_ALTERNATE_OBJECT_DIRECTORIES=$objects" "GIT_INDEX_FILE=$tmp/index" git -C "$work")
+  if ! { blob=$("${scratch[@]}" hash-object -w --stdin <<'YAML'
+# Pushed by the workflow self-test of ci/unattended/supervise.sh. GitHub must
+# refuse it: the signal-tree-ci App has no Workflows permission.
+name: selftest
+on: workflow_dispatch
+jobs:
+  noop:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "This workflow must never reach GitHub."
+YAML
+  ) &&
+    "${scratch[@]}" read-tree "$main" &&
+    "${scratch[@]}" update-index --add --cacheinfo "100644,$blob,$file" &&
+    tree=$("${scratch[@]}" write-tree) &&
+    commit=$("${scratch[@]}" commit-tree "$tree" -p "$main" -m "Workflow self-test by ci/unattended/supervise.sh: GitHub must refuse this push"); }; then
+    echo "Refusing to start: the workflow self-test could not build its commit." >&2
+    return 1
+  fi
+
+  with_timeout "$limit" "${scratch[@]}" push origin "$commit:$ref" > "$tmp/push.out" 2>&1
+  status=$?
+  if (( status == 0 )); then
+    outcome="GitHub accepted it, so the App can change workflows: remove its Workflows permission (workflow changes come only from Jonathan)."
+  elif (( status == 124 )); then
+    outcome="The push did not finish within $limit s."
+  elif ! is_workflow_refusal "$tmp/push.out"; then
+    outcome="GitHub refused it, but not for the missing workflows permission, so this proves nothing."
+  fi
+
+  # Whatever happened, the branch must not exist.
+  with_timeout "$limit" git -C "$work" ls-remote --exit-code origin "$ref" > /dev/null 2>&1
+  found=$?
+  if (( found == 0 )); then
+    [[ -n $outcome ]] || outcome="GitHub refused the push, yet the branch exists."
+    with_timeout "$limit" git -C "$work" push -q origin ":$ref" > /dev/null 2>&1
+    with_timeout "$limit" git -C "$work" ls-remote --exit-code origin "$ref" > /dev/null 2>&1
+    found=$?
+    (( found == 2 )) && outcome+=" The branch has been deleted."
+  fi
+  (( found == 2 )) || outcome+=" Could not confirm that the branch is gone; if it exists, delete it: git push origin :$ref"
+
+  if [[ -n $outcome ]]; then
+    echo "Refusing to start: the workflow self-test failed (it pushed $file to $ref as the App). ${outcome# } Push output:" >&2
+    sed 's/^/  /' "$tmp/push.out" >&2
+    return 1
+  fi
+  echo "Workflow self-test passed: GitHub refused the App's push of a workflow file, and left no branch."
+}
+
+# True when push output (file $1) holds GitHub's refusal of a workflow file
+# from an App without the workflows permission: one line that contains
+# "workflow" and either "permission" or "refusing", in any case. GitHub's
+# line reads
+#   ! [remote rejected] <sha> -> <branch> (refusing to allow a GitHub App to
+#   create or update workflow `<path>` without `workflows` permission)
+is_workflow_refusal() {
+  awk '{ line = tolower($0) } line ~ /workflow/ && line ~ /permission|refusing/ { found = 1 } END { exit !found }' "$1"
+}
+
+# Runs the command "$@" for at most $1 seconds. Returns its status, or 124
+# when time ran out and it was killed. The watchdog's output goes nowhere and
+# it kills its own sleep, so nothing is left holding a caller's pipe.
+with_timeout() {
+  local limit=$1 pid watchdog status
+  shift
+  "$@" &
+  pid=$!
+  ( sleep "$limit" & trap 'kill $! 2> /dev/null; exit 1' TERM; wait $! && kill -TERM "$pid" ) > /dev/null 2>&1 &
+  watchdog=$!
+  wait "$pid"
+  status=$?
+  kill "$watchdog" 2> /dev/null
+  if wait "$watchdog"; then return 124; fi
+  return "$status"
 }
 
 # The error text of a run that failed to authenticate, or nothing.

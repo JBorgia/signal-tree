@@ -14,8 +14,11 @@
 //   {"appId": 123456, "installationId": 7890123, "keyFile": "/var/lib/st-mint/app.pem"}
 //
 // The key must be readable by st-mint alone: a key file with any group or
-// other permission bit is refused. No message ever contains the key or the
-// token. Exit status: 0 printed a token; 1 any failure, with a one-line
+// other permission bit is refused. Before minting, it reads the App's
+// installation with the App JWT and refuses to mint if the App has the
+// Workflows or the Administration permission at any level, or is installed on
+// more than selected repositories (checkInstallation). No message ever
+// contains the key or the token. Exit status: 0 printed a token; 1 any failure, with a one-line
 // message on stderr; 2 called with arguments.
 //
 // This file must stay self-contained (Node builtins only): the operator
@@ -60,11 +63,14 @@ export const CONFIG_FILE = '/etc/signal-tree/app.json';
 export const API = 'https://api.github.com';
 /**
  * The token's scope: this repository only, with the permissions the agent
- * needs. Jonathan approved workflows write and actions read.
+ * needs, and Actions read-only. Never Workflows (Jonathan: "The App does not
+ * get Workflows permission ... Workflow changes come from me."), so GitHub
+ * refuses any push made with the token that touches .github/workflows/;
+ * supervise.sh checks that at startup (workflow_selftest).
  */
 export const TOKEN_REQUEST = {
   repositories: ['signal-tree'],
-  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', workflows: 'write', actions: 'read' },
+  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', actions: 'read' },
 };
 const ATTEMPTS = 3;
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -136,27 +142,27 @@ const HINTS = {
 };
 
 /**
- * Mints an installation token for TOKEN_REQUEST: { token, expires_at }.
- * Network errors and 5xx answers are retried (three attempts in all); any
- * other answer fails at once.
+ * Sends a request signed with the App JWT and returns { status, body }, the
+ * body parsed as JSON (null if it is not). Network errors and 5xx answers are
+ * retried (three attempts in all); any other failed answer throws at once,
+ * saying that it could not do `what`.
  */
-export async function mintToken({ appId, installationId, privateKey, now = Date.now(), fetch = globalThis.fetch, sleep = delay }) {
-  const url = `${API}/app/installations/${installationId}/access_tokens`;
+async function appRequest(url, { method = 'GET', body, what, appId, privateKey, now = Date.now(), fetch = globalThis.fetch, sleep = delay }) {
   let problem;
   for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
     if (attempt > 1) await sleep(1000 * 2 ** (attempt - 2));
     let response;
     try {
       response = await fetch(url, {
-        method: 'POST',
+        method,
         headers: {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${appJwt({ appId, privateKey, now })}`,
-          'Content-Type': 'application/json',
+          ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
           'User-Agent': 'signal-tree-ci',
           'X-GitHub-Api-Version': '2022-11-28',
         },
-        body: JSON.stringify(TOKEN_REQUEST),
+        body,
         signal: globalThis.AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });
     } catch (error) {
@@ -164,27 +170,75 @@ export async function mintToken({ appId, installationId, privateKey, now = Date.
       continue;
     }
     if (response.ok) {
-      let body = null;
+      let json = null;
       try {
-        body = await response.json();
+        json = await response.json();
       } catch {
-        // Reported below as a response without a token.
+        // Left to the caller as a body that is not what it expects.
       }
-      if (!isInstallationToken(body?.token) || Number.isNaN(Date.parse(body.expires_at))) {
-        throw new Error(`GitHub answered ${response.status} without an installation token (ghs_...) and its expiry`);
-      }
-      return { token: body.token, expires_at: body.expires_at };
+      return { status: response.status, body: json };
     }
     problem = `GitHub answered ${response.status}${await githubMessage(response)}.`;
-    if (response.status < 500) throw new Error(`could not mint an installation token: ${problem}${HINTS[response.status] ?? ''}`);
+    if (response.status < 500) throw new Error(`could not ${what}: ${problem}${HINTS[response.status] ?? ''}`);
   }
-  throw new Error(`could not mint an installation token after ${ATTEMPTS} attempts: ${problem}`);
+  throw new Error(`could not ${what} after ${ATTEMPTS} attempts: ${problem}`);
 }
 
-/** Reads `configFile` and the key, and mints a token: { token, expires_at }. */
+/**
+ * Refuses to mint unless the App's installation (GET /app/installations/{id})
+ * is what Jonathan's rulings allow (BRIEF.md 12.3): installed on selected
+ * repositories, not the whole account, and with neither the Workflows nor
+ * the Administration permission at any level. TOKEN_REQUEST already leaves
+ * both out of every token; this catches an App that was granted them anyway,
+ * which the supervisor's workflow self-test, pushing with a narrowed token,
+ * cannot see. GitHub's answer names the repository selection but not the
+ * repositories, so "selected" may still cover more than signal-tree; the
+ * token itself is limited to signal-tree either way.
+ */
+export async function checkInstallation({ appId, installationId, privateKey, now, fetch, sleep }) {
+  const { status, body } = await appRequest(`${API}/app/installations/${installationId}`, { what: "read the App's installation", appId, privateKey, now, fetch, sleep });
+  const permissions = body?.permissions;
+  if (typeof permissions !== 'object' || permissions === null || typeof body.repository_selection !== 'string') {
+    throw new Error(`GitHub answered ${status} without the installation's permissions and repository selection`);
+  }
+  const level = (name) => JSON.stringify(permissions[name]);
+  const problems = [];
+  if (Object.hasOwn(permissions, 'workflows')) problems.push(`the App has Workflows permission (${level('workflows')}); Jonathan's ruling says it must not`);
+  if (Object.hasOwn(permissions, 'administration')) problems.push(`the App has Administration permission (${level('administration')}); Jonathan's ruling says it must not`);
+  if (body.repository_selection !== 'selected') {
+    problems.push(`the App is installed on all of the account's repositories (repository_selection ${JSON.stringify(body.repository_selection)}); it must be installed on signal-tree only`);
+  }
+  if (problems.length) throw new Error(`refusing to mint a token: ${problems.join('; ')}. Fix the App's settings on GitHub.`);
+}
+
+/**
+ * Mints an installation token for TOKEN_REQUEST: { token, expires_at }.
+ * Network errors and 5xx answers are retried (three attempts in all); any
+ * other answer fails at once.
+ */
+export async function mintToken({ appId, installationId, privateKey, now, fetch, sleep }) {
+  const { status, body } = await appRequest(`${API}/app/installations/${installationId}/access_tokens`, {
+    method: 'POST',
+    body: JSON.stringify(TOKEN_REQUEST),
+    what: 'mint an installation token',
+    appId,
+    privateKey,
+    now,
+    fetch,
+    sleep,
+  });
+  if (!isInstallationToken(body?.token) || Number.isNaN(Date.parse(body.expires_at))) {
+    throw new Error(`GitHub answered ${status} without an installation token (ghs_...) and its expiry`);
+  }
+  return { token: body.token, expires_at: body.expires_at };
+}
+
+/** Reads `configFile` and the key, checks the App's installation, and mints a token: { token, expires_at }. */
 export async function mint({ configFile = CONFIG_FILE, now, fetch, sleep } = {}) {
   const { appId, installationId, keyFile } = readConfig(configFile);
-  return mintToken({ appId, installationId, privateKey: readPrivateKey(keyFile), now, fetch, sleep });
+  const privateKey = readPrivateKey(keyFile);
+  await checkInstallation({ appId, installationId, privateKey, now, fetch, sleep });
+  return mintToken({ appId, installationId, privateKey, now, fetch, sleep });
 }
 
 // Pipes are written asynchronously on macOS: exit only once the text is out.
