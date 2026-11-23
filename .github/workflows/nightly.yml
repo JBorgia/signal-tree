@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       # #18, first after checkout, before pnpm install runs any package code: on
-      # the gate runner (an ephemeral runner as a fresh unprivileged user), the
+      # the gate runner (one persistent runner as a dedicated unprivileged user), the
       # identity, the root-installed toolchain and the user, then every core on
       # the performance governor, boost readable and uniform, no swap, one runner,
       # no other job and a low load. Off it, this only reports.

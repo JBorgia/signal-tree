@@ -5,7 +5,7 @@
 // repository variable through, `env: SIGNAL_TREE_GATES_RUNNER:
 // ${{ vars.SIGNAL_TREE_GATES_RUNNER }}`: the same value its runs-on reads, so
 // it is set exactly when runs-on names the self-hosted labels. Such a job must
-// name the dedicated label `signal-tree-gates`, and three names must agree:
+// name the dedicated label `gates`, and three names must agree:
 //   - the repository variable SIGNAL_TREE_GATE_RUNNER_NAME, passed in as env
 //     (pins which runner is the gate runner);
 //   - RUNNER_NAME, the runner GitHub ran the job on;
@@ -20,9 +20,11 @@
 // and ci/done-check.mjs also check, through the Jobs API, that GitHub ran the
 // gates job on the runner the records name.
 //
-// Toolchain and user (Jonathan's "fresh user per job"): the gate runner runs an
-// ephemeral single-job runner as a new unprivileged user, with Node, pnpm and
-// the Playwright Chromium installed once by root. The root-owned manifest
+// Toolchain and user (Jonathan, November 23): the gate runner is one persistent
+// runner, registered once by Jonathan, running as a dedicated unprivileged user,
+// with Node, pnpm and the Playwright Chromium installed once by root. Its
+// job-started hook (ci/gate-runner/job-started.sh, listed in the manifest)
+// empties the workspace before every job. The root-owned manifest
 // /etc/signal-tree/toolchain.sha256 (sha256sum format, absolute paths) lists
 // them; --pre requires the manifest and every listed file, and every directory
 // holding one, to be root-owned and writable by nobody else, every file to
@@ -112,7 +114,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const MARKER = 'etc/signal-tree/gate-runner';
 export const TOOLCHAIN = 'etc/signal-tree/toolchain.sha256';
-export const GATE_LABEL = 'signal-tree-gates';
+export const GATE_LABEL = 'gates';
 export const PRE_FILE = 'gate-host.json';
 export const POST_FILE = 'gate-host-post.json';
 export const SAMPLES_FILE = 'gate-host-samples.json';

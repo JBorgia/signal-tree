@@ -78,7 +78,7 @@ const BUILT = [/format\s*\(/i, /\$\{\{[^}]*\benv\.[^}]*gate/i];
  *   anything else runs project or package code;
  * - a step that installs a toolchain or browser, or uses sudo, runs only on the
  *   hosted fallback (if: vars.SIGNAL_TREE_GATES_RUNNER == ''): the gate runner's
- *   fresh unprivileged user has no sudo, and uses the toolchain root installed;
+ *   dedicated unprivileged user has no sudo, and uses the toolchain root installed;
  * - neither the job nor its preflight, bench or re-check steps continue on error;
  * - exactly one step runs exactly `node ci/gate-host.mjs --pre`, with no if:,
  *   shell, working-directory or env; exactly one runs exactly

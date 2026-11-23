@@ -38,7 +38,7 @@ const tempDir = (prefix: string) => {
 const ROOT_UID = process.getuid!();
 const RUNNER = 'ax42-gates';
 const TOOLCHAIN_ENV = { PATH: '/opt/node/bin:/opt/pnpm/bin:/usr/bin', PLAYWRIGHT_BROWSERS_PATH: '/opt/ms-playwright' };
-const GATE_JOB = { SIGNAL_TREE_GATES_RUNNER: '["self-hosted","linux","x64","signal-tree-gates"]', SIGNAL_TREE_GATE_RUNNER_NAME: RUNNER, RUNNER_NAME: RUNNER, ...TOOLCHAIN_ENV };
+const GATE_JOB = { SIGNAL_TREE_GATES_RUNNER: '["self-hosted","linux","x64","gates"]', SIGNAL_TREE_GATE_RUNNER_NAME: RUNNER, RUNNER_NAME: RUNNER, ...TOOLCHAIN_ENV };
 const HOSTED_JOB = { SIGNAL_TREE_GATES_RUNNER: '', SIGNAL_TREE_GATE_RUNNER_NAME: '', RUNNER_NAME: 'GitHub Actions 12', PATH: '/usr/bin' };
 /** The fresh, unprivileged job user on bare metal, running the listed node. */
 const SYSTEM = {
@@ -202,7 +202,7 @@ describe('gate-host preflight (#18)', () => {
 });
 
 describe('gate-runner identity', () => {
-  it('passes the provisioned gate runner: marker, RUNNER_NAME and the pinned name agree, on a job aimed at signal-tree-gates', () => {
+  it('passes the provisioned gate runner: marker, RUNNER_NAME and the pinned name agree, on a job aimed at gates', () => {
     const record = pre(fakeHost(GATE_RUNNER));
     expect(record.problems).toEqual([]);
     expect(record).toMatchObject({ enforced: true, onGateRunner: true, identity: { runnerName: RUNNER, pinnedName: RUNNER, marker: { name: RUNNER } } });
@@ -241,7 +241,7 @@ describe('gate-runner identity', () => {
 
   it('fails a gate job whose runner labels leave out the dedicated label', () => {
     const record = pre(fakeHost(GATE_RUNNER), { ...GATE_JOB, SIGNAL_TREE_GATES_RUNNER: '["self-hosted","linux","x64"]' });
-    expect(record.problems).toEqual([expect.stringContaining('does not name the dedicated label signal-tree-gates')]);
+    expect(record.problems).toEqual([expect.stringContaining('does not name the dedicated label gates')]);
   });
 
   it('only reports on the hosted fallback: no marker and not aimed at the gate runner', () => {

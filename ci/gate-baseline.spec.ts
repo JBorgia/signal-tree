@@ -141,7 +141,7 @@ describe("main's baseline artifact, as ci/gate-host.mjs records it", () => {
     return d;
   };
   const uid = process.getuid!();
-  const env = { SIGNAL_TREE_GATES_RUNNER: '["self-hosted","linux","x64","signal-tree-gates"]', SIGNAL_TREE_GATE_RUNNER_NAME: 'ax42-gates', RUNNER_NAME: 'ax42-gates' };
+  const env = { SIGNAL_TREE_GATES_RUNNER: '["self-hosted","linux","x64","gates"]', SIGNAL_TREE_GATE_RUNNER_NAME: 'ax42-gates', RUNNER_NAME: 'ax42-gates' };
 
   /** A gate runner with amd-pstate boost `boost` on 2 CPUs, one runner whose Runner.Worker runs this job, and the marker. */
   function gateRunner(boost: string) {
