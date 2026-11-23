@@ -19,13 +19,125 @@ describe('gate workflows', () => {
     ['no oracle (100k) job', (w) => void delete w.nightly.jobs.oracle, /oracle \(100k\)/],
     ['a nightly gates job uploading under another name', (w) => void (w.nightly.jobs['gates-angular'].steps.at(-1).with.name = 'results'), /nightly-gates-angular/],
     ['a daily soak', (w) => void (w.soak.on.schedule[0].cron = '0 1 * * *'), /weekly/],
-    ['a compressed weekly soak', (w) => void (w.soak.jobs['soak-angular'].steps.at(-2).run = 'pnpm bench S5 --s5-compressed'), /full 8-hour/],
+    ['a compressed weekly soak', (w) => void (step(w.soak.jobs['soak-angular'], /--s5-full/).run = 'pnpm bench S5 --s5-compressed'), /full 8-hour/],
   ];
 
   it.each(planted)('catches %s', (_name, plant, message) => {
     const workflows = fresh();
     plant(workflows);
     expect(workflowProblems(workflows).join('\n')).toMatch(message);
+  });
+});
+
+type Step = { name?: string; uses?: string; run?: string; if?: string; shell?: string; with?: Record<string, unknown>; env?: Record<string, string>; 'continue-on-error'?: boolean };
+type Job = { name?: string; 'runs-on'?: string; env?: Record<string, string>; 'continue-on-error'?: boolean; steps: Step[] };
+const step = (job: Job, run: RegExp) => job.steps.find((s) => run.test(String(s.run ?? '')))!;
+const without = (job: Job, run: RegExp) => void (job.steps = job.steps.filter((s) => !run.test(String(s.run ?? ''))));
+const move = (job: Job, from: Step, before: Step | 'end') => {
+  job.steps.splice(job.steps.indexOf(from), 1);
+  if (before === 'end') job.steps.push(from);
+  else job.steps.splice(job.steps.indexOf(before), 0, from);
+};
+const PRE = /node ci\/gate-host\.mjs --pre/;
+const BROWSERS = /node ci\/gate-host\.mjs --browsers/;
+const POST = /node ci\/gate-host\.mjs --post/;
+const BENCH = /pnpm bench (?:M1|all|S5)/;
+const upload = (job: Job) => job.steps.find((s) => String(s.uses).startsWith('actions/upload-artifact'))!;
+
+describe('gate-host checks in every gate workflow (#18)', () => {
+  const gateJobs: Array<[string, (w: Workflows) => Job, RegExp]> = [
+    ['ci.yml gates', (w) => w.ci.jobs.gates, /^ci\.yml(?: gates)?: /],
+    ['nightly.yml gates (angular)', (w) => w.nightly.jobs['gates-angular'], /^nightly\.yml(?: gates \(angular\))?: /],
+    ['soak.yml', (w) => w.soak.jobs['soak-angular'], /^soak\.yml: /],
+  ];
+
+  const planted: Array<[string, (job: Job) => void, RegExp]> = [
+    ['no post-run re-check', (job) => without(job, POST), /must re-check the host after the gates/],
+    ['a post-run re-check without if: always()', (job) => void delete step(job, POST).if, /re-check must run with if: always\(\)/],
+    ['a post-run re-check only on success', (job) => void (step(job, POST).if = 'success()'), /re-check must run with if: always\(\)/],
+    ['a post-run re-check after the upload', (job) => move(job, step(job, POST), 'end'), /upload step \d+ must come after the gate-host re-check/],
+    ['a post-run re-check before the gates', (job) => move(job, step(job, POST), step(job, BENCH)), /re-check must run after every bench step/],
+    ['a post-run re-check that swallows its failure', (job) => void (step(job, POST).run = 'node ci/gate-host.mjs --post || true'), /re-check step must run exactly/],
+    ['a post-run re-check that continues on error', (job) => void (step(job, POST)['continue-on-error'] = true), /re-check step must not set continue-on-error/],
+    ['no preflight', (job) => without(job, PRE), /must run the gate-host preflight/],
+    ['a preflight after the gates', (job) => move(job, step(job, PRE), step(job, POST)), /preflight must run before every bench step/],
+    ['a preflight with an if:', (job) => void (step(job, PRE).if = "github.ref == 'refs/heads/main'"), /preflight step must not have an if:/],
+    ['a preflight that swallows its failure', (job) => void (step(job, PRE).run = 'node ci/gate-host.mjs --pre || true'), /preflight step must run exactly/],
+    ['a preflight followed by another command', (job) => void (step(job, PRE).run = 'node ci/gate-host.mjs --pre; exit 0'), /preflight step must run exactly/],
+    ['a preflight that is only echoed', (job) => void (step(job, PRE).run = 'echo node ci/gate-host.mjs --pre'), /preflight step must run exactly/],
+    ['a preflight with a trailing comment', (job) => void (step(job, PRE).run = 'node ci/gate-host.mjs --pre # skip'), /preflight step must run exactly/],
+    ['a preflight run in another shell', (job) => void (step(job, PRE).shell = 'bash --noprofile --norc {0} || true'), /preflight step must not set shell/],
+    ['a preflight that continues on error', (job) => void (step(job, PRE)['continue-on-error'] = true), /preflight step must not set continue-on-error/],
+    ['a second preflight', (job) => void job.steps.splice(1, 0, { run: 'node ci/gate-host.mjs --pre' }), /preflight in exactly one step/],
+    ['a bench step that continues on error', (job) => void (step(job, BENCH)['continue-on-error'] = true), /bench step \d+ must not continue on error/],
+    ['a job that continues on error', (job) => void (job['continue-on-error'] = true), /must not continue on error/],
+    ['pnpm run bench after the re-check', (job) => void job.steps.push({ run: 'pnpm run bench S8' }), /re-check must run after every bench step/],
+    ['pnpm --filter … bench after the re-check', (job) => void job.steps.push({ run: 'pnpm --filter @signal-tree/bench bench M1' }), /re-check must run after every bench step/],
+    ['the harness CLI before the preflight', (job) => void job.steps.splice(1, 0, { run: 'cd bench && node runner/cli.ts S8' }), /preflight must run before every bench step/],
+    ['a job that does not say when it is aimed at the gate runner', (job) => void delete job.env, /must set env SIGNAL_TREE_GATES_RUNNER:/],
+    ['no pinned gate runner name', (job) => void delete job.env!['SIGNAL_TREE_GATE_RUNNER_NAME'], /must set env SIGNAL_TREE_GATE_RUNNER_NAME/],
+    ['a runs-on that is not the gates runner variable', (job) => void (job['runs-on'] = '[self-hosted, linux]'), /runs-on must be the gates runner variable/],
+    ['an upload that leaves out the gate-host records', (job) => void (upload(job).with!.path = 'bench/out/results-*.json'), /must include bench\/out\/\*\.json/],
+    ['an upload only on success', (job) => void delete upload(job).if, /upload step \d+ must run with if: always\(\)/],
+    ['a second upload before the re-check', (job) => void job.steps.splice(1, 0, { uses: 'actions/upload-artifact@v4', if: 'always()', with: { name: 'early', path: 'bench/out/*.json' } }), /upload step 2 must come after the gate-host re-check/],
+    ['SIGNAL_TREE_GATE_HOST set by the workflow', (job) => void (job.env = { ...job.env, SIGNAL_TREE_GATE_HOST: '${{ runner.name }}' }), /only ci\/gate-host\.mjs --pre may set it/],
+    ['signal_tree_gate_host in another case', (job) => void (job.env = { ...job.env, signal_tree_gate_host: 'ax42-gates' }), /sets or names SIGNAL_TREE_GATE_HOST/],
+    ['SIGNAL_TREE_GATE_HOST written by a step', (job) => void job.steps.splice(1, 0, { run: 'echo "SIGNAL_TREE_GATE_HOST=$RUNNER_NAME" >> "$GITHUB_ENV"' }), /writes \$GITHUB_ENV/],
+    ['a value built with format()', (job) => void (job.env = { ...job.env, NAME: "${{ format('{0}_{1}', 'SIGNAL_TREE_GATE', 'HOST') }}" }), /builds a value with format\(\) or the env context/],
+    ['a value built from the env context', (job) => void (step(job, BENCH).env = { X: '${{ env.SIGNAL_TREE_GATES_RUNNER }}' }), /builds a value with format\(\) or the env context/],
+    ['an environment write spelled another way', (job) => void job.steps.splice(1, 0, { run: 'printf "%s=%s\\n" "$K" "$V" >> $github_env' }), /writes \$GITHUB_ENV/],
+    ['a preflight after pnpm install', (job) => move(job, step(job, PRE), step(job, BENCH)), /preflight must be the first step after checkout/],
+    ['a step before the preflight', (job) => void job.steps.splice(1, 0, { run: 'pnpm install --frozen-lockfile' }), /preflight must be the first step after checkout/],
+    ['setup-node on the gate runner', (job) => void job.steps.splice(2, 0, { uses: 'actions/setup-node@v4', with: { 'node-version-file': '.nvmrc' } }), /step 3 installs a toolchain or browser, or uses sudo/],
+    ['pnpm/action-setup on the gate runner', (job) => void job.steps.splice(2, 0, { uses: 'pnpm/action-setup@v4', if: "github.ref == 'refs/heads/main'" }), /step 3 installs a toolchain or browser/],
+    ['a browser install on the gate runner', (job) => void job.steps.splice(2, 0, { run: 'pnpm --filter @signal-tree/bench exec playwright install chromium' }), /step 3 installs a toolchain or browser/],
+    ['sudo on the gate runner', (job) => void job.steps.splice(2, 0, { run: 'sudo sysctl -w kernel.perf_event_paranoid=1' }), /step 3 installs a toolchain or browser, or uses sudo/],
+    ['a global package install on the gate runner', (job) => void job.steps.splice(2, 0, { run: 'npm install -g pnpm@10.17.0' }), /step 3 installs a toolchain or browser/],
+    ['a piped installer on the gate runner', (job) => void job.steps.splice(2, 0, { run: 'curl -fsSL https://get.pnpm.io/install.sh | sh -' }), /step 3 installs a toolchain or browser/],
+    ['no PLAYWRIGHT_BROWSERS_PATH for the root-installed Chromium', (job) => void delete job.env!['PLAYWRIGHT_BROWSERS_PATH'], /must set env PLAYWRIGHT_BROWSERS_PATH/],
+    ['a job that does not start with checkout', (job) => void job.steps.shift(), /must start with actions\/checkout/],
+    ['no Chromium build check', (job) => without(job, BROWSERS), /must check the preinstalled Chromium against the Playwright lock/],
+    ['a Chromium build check before pnpm install', (job) => move(job, step(job, BROWSERS), step(job, /^pnpm install/)), /Chromium build check must run after pnpm install/],
+    ['a Chromium build check after the gates', (job) => move(job, step(job, BROWSERS), step(job, POST)), /Chromium build check must run before every harness or bench step/],
+    ['a Chromium build check that swallows its failure', (job) => void (step(job, BROWSERS).run = 'node ci/gate-host.mjs --browsers || echo skipped'), /Chromium build check must run exactly/],
+    ['a Chromium build check with an if:', (job) => void (step(job, BROWSERS).if = "vars.SIGNAL_TREE_GATES_RUNNER == ''"), /Chromium build check must not have an if:/],
+    ['a second Chromium build check', (job) => void job.steps.splice(job.steps.indexOf(step(job, BROWSERS)), 0, { run: 'node ci/gate-host.mjs --browsers' }), /Chromium build in exactly one step/],
+  ];
+
+  it.each(gateJobs)('%s holds them as committed', (_label, job) => {
+    const workflows = fresh();
+    const steps = job(workflows).steps;
+    const index = (test: RegExp) => steps.findIndex((s) => test.test(String(s.run ?? '')));
+    expect(String(steps[0]!.uses)).toMatch(/^actions\/checkout@/);
+    expect(index(PRE)).toBe(1);
+    expect(steps[index(PRE)]).toEqual({ name: expect.any(String), run: 'node ci/gate-host.mjs --pre' });
+    for (const s of steps.filter((s) => /setup|playwright install/.test(`${s.uses ?? ''} ${s.run ?? ''}`))) expect(s.if).toBe("vars.SIGNAL_TREE_GATES_RUNNER == ''");
+    expect(index(PRE)).toBeLessThan(index(BENCH));
+    expect(steps[index(POST)]).toEqual({ name: expect.any(String), if: 'always()', run: 'node ci/gate-host.mjs --post' });
+    expect(index(POST)).toBeGreaterThan(index(BENCH));
+    expect(steps[index(BROWSERS)]).toEqual({ name: expect.any(String), run: 'node ci/gate-host.mjs --browsers' });
+    expect(index(BROWSERS)).toBeGreaterThan(index(/^pnpm install --frozen-lockfile$/));
+    expect(index(BROWSERS)).toBeLessThan(index(/bench:test|@signal-tree\/bench typecheck|pnpm bench /));
+    expect(steps.at(-1)).toMatchObject({ if: 'always()', with: { path: 'bench/out/*.json' } });
+    expect(job(workflows).env).toEqual({
+      SIGNAL_TREE_GATES_RUNNER: '${{ vars.SIGNAL_TREE_GATES_RUNNER }}',
+      SIGNAL_TREE_GATE_RUNNER_NAME: '${{ vars.SIGNAL_TREE_GATE_RUNNER_NAME }}',
+      PLAYWRIGHT_BROWSERS_PATH: "${{ vars.SIGNAL_TREE_GATES_RUNNER != '' && '/opt/ms-playwright' || '' }}",
+    });
+  });
+
+  const cases = gateJobs.flatMap(([label, job, prefix]) => planted.map(([name, plant, message]) => [label, name, job, plant, prefix, message] as const));
+  it.each(cases)('%s: catches %s', (_label, _name, job, plant, prefix, message) => {
+    const workflows = fresh();
+    plant(job(workflows));
+    const problems = workflowProblems(workflows);
+    expect(problems.filter((p) => prefix.test(p)).join('\n')).toMatch(message);
+  });
+
+  it('requires the gates job to keep the name ci/gate-baseline.mjs finds it by', () => {
+    const workflows = fresh();
+    workflows.ci.jobs.gates.name = 'Gates';
+    expect(workflowProblems(workflows).join('\n')).toMatch(/must be named "Gates \(Angular reference app\)"/);
   });
 });
 

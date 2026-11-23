@@ -144,14 +144,21 @@ export function verdict(conditions: readonly ConditionResult[]): boolean {
 /** The status of a gateRunnerOnly gate's results anywhere but the gate runner. */
 export const NOT_ON_GATE_RUNNER = 'not on the gate runner';
 
+/** Set by ci/gate-host.mjs --pre, through $GITHUB_ENV, to the runner's name when it passed on the gate runner. */
+export const GATE_HOST_ENV = 'SIGNAL_TREE_GATE_HOST';
+
 /**
- * Whether a run is on the dedicated gate runner: GitHub sets
- * RUNNER_ENVIRONMENT to 'self-hosted' there and to 'github-hosted' on its
- * own runners, and a local run has none. The same test as
- * ci/gate-baseline.mjs's isGateRunner.
+ * Whether a run is on the dedicated gate runner. Being self-hosted is not
+ * enough (Jonathan's review of PR #85): the gate-host preflight is the only
+ * source. ci/gate-host.mjs --pre sets SIGNAL_TREE_GATE_HOST to the runner's
+ * name only when this job runs on the provisioned gate runner (its
+ * /etc/signal-tree/gate-runner marker names RUNNER_NAME) and every gate
+ * condition held; a run counts only when that equals this job's RUNNER_NAME.
+ * Off the runner, locally, or when the preflight did not pass, it is unset.
  */
-export function isGateRunner(runnerEnvironment: string | undefined): boolean {
-  return runnerEnvironment === 'self-hosted';
+export function isGateRunner(env: Readonly<Record<string, string | undefined>>): boolean {
+  const host = env[GATE_HOST_ENV]?.trim();
+  return Boolean(host) && host === env['RUNNER_NAME']?.trim();
 }
 
 /** --record-only is honored only while budgets.json is unapproved. */

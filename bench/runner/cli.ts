@@ -29,7 +29,8 @@ const USAGE = `usage: pnpm bench [ids...] [options]
   --record-only     exit 0 when gates are red (recording baselines), only while budgets.json is unapproved;
                     errors and regressions still fail
                     gates budgets.json marks gateRunnerOnly (S8) count toward the exit status only on the
-                    gate runner (RUNNER_ENVIRONMENT=self-hosted); anywhere else they are recorded only
+                    gate runner (SIGNAL_TREE_GATE_HOST, set by a passing ci/gate-host.mjs --pre, equals
+                    RUNNER_NAME); anywhere else they are recorded only
   --s5-compressed   nightly S5 (the default): compressed time, at least the budgeted minimum of writes, 5 runs
   --s5-full         weekly S5: the full session length, with budgets.json's run count
   --skip-build      reuse the reference app already built under bench/out/apps
@@ -186,7 +187,7 @@ async function main(): Promise<number> {
     aaPairs,
     skipBuild: values['skip-build'],
     s5Mode,
-    onGateRunner: isGateRunner(process.env['RUNNER_ENVIRONMENT']),
+    onGateRunner: isGateRunner(process.env),
   });
   file.scenarios = await harness.run(selected);
   if (values.baseline) applyBaseline(file.scenarios, budgets, values.baseline, values.noise);

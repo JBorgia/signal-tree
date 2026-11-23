@@ -92,7 +92,8 @@ jobs:
 
   gates:
     # Ruling 10: gates run on the dedicated self-hosted runner named by
-    # SIGNAL_TREE_GATES_RUNNER (#14), falling back to ubuntu-latest until it exists.
+    # SIGNAL_TREE_GATES_RUNNER (#14; its labels include gates),
+    # falling back to ubuntu-latest until it exists.
     name: Gates (Angular reference app)
     needs: pr-lookup
     # Never on a fork's pull request: the gates runner is self-hosted and the repository public.
@@ -102,6 +103,15 @@ jobs:
       || (github.event_name == 'push' && needs.pr-lookup.outputs.open != 'true'))
     runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '"ubuntu-latest"') }}
     timeout-minutes: 120
+    # Set exactly when runs-on aims at the gate runner; ci/gate-host.mjs then
+    # requires the provisioning marker, and that it, RUNNER_NAME and the pinned
+    # SIGNAL_TREE_GATE_RUNNER_NAME all name the same runner (#18). There the
+    # Playwright Chromium is the one root installed under /opt/ms-playwright and
+    # the toolchain manifest lists; on the hosted fallback, Playwright's default.
+    env:
+      SIGNAL_TREE_GATES_RUNNER: ${{ vars.SIGNAL_TREE_GATES_RUNNER }}
+      SIGNAL_TREE_GATE_RUNNER_NAME: ${{ vars.SIGNAL_TREE_GATE_RUNNER_NAME }}
+      PLAYWRIGHT_BROWSERS_PATH: ${{ vars.SIGNAL_TREE_GATES_RUNNER != '' && '/opt/ms-playwright' || '' }}
     permissions:
       contents: read
       actions: read
@@ -110,14 +120,33 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
+      # #18, first after checkout, before pnpm install runs any package code: on
+      # the gate runner (one persistent runner as a dedicated unprivileged user), the
+      # identity, the root-installed toolchain and the user, then every core on
+      # the performance governor, boost readable and uniform, no swap, one runner,
+      # no other job and a low load. Off it, this only reports.
+      - name: Gate-host preflight (identity, toolchain, user, governor, boost, swap, quiet host)
+        run: node ci/gate-host.mjs --pre
+      # On the gate runner, Node, pnpm and Chromium were installed once by root and
+      # the preflight verified them; these downloads, and the browser install that
+      # needs sudo, run on the hosted fallback only.
       - uses: pnpm/action-setup@v4
+        if: vars.SIGNAL_TREE_GATES_RUNNER == ''
       - uses: actions/setup-node@v4
+        if: vars.SIGNAL_TREE_GATES_RUNNER == ''
         with:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Install the Chromium pinned by the Playwright lock (ruling 10)
+        if: vars.SIGNAL_TREE_GATES_RUNNER == ''
         run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
+      # #85: the Chromium the harness launches must be the build the Playwright
+      # lock pins. On the gate runner, PLAYWRIGHT_BROWSERS_PATH must hold
+      # chromium-<the lock's revision>, listed in the toolchain manifest, or the
+      # job fails before any harness step; off it, this only reports.
+      - name: Preinstalled Chromium matches the Playwright lock
+        run: node ci/gate-host.mjs --browsers
       - name: Typecheck the harness
         run: pnpm --filter @signal-tree/bench typecheck
       - name: Harness self-tests
@@ -141,8 +170,18 @@ jobs:
         run: |
           pnpm bench M1 M2 M3 S1 S2 --aa --record-only
           cp bench/out/aa-*-latest.json bench/out/aa-latest.json
-          # Where the baseline was recorded; PR runs compare only with one from the gate runner.
-          printf '{"runnerEnvironment":"%s","runnerName":"%s"}\n' "$RUNNER_ENVIRONMENT" "$RUNNER_NAME" > bench/out/recorded-on.json
+          # Where and how it was recorded (runner, governor, boost) is in
+          # gate-host.json, uploaded with it; PR runs compare only with a valid
+          # baseline from the same gate runner with the same governor and boost.
+      # Re-checks the host after the gates and stops the preflight's sampler. If
+      # either check failed, the sampler saw another job or runner, or the
+      # governor, boost or swap changed, the results are marked invalid: unmet
+      # for ci/done-check.mjs and never a baseline. The load is recorded, not
+      # judged. Before the upload, so the marks and the gate-host records ride
+      # in the same artifact.
+      - name: Gate-host re-check (invalidates the results if the host changed)
+        if: always()
+        run: node ci/gate-host.mjs --post
       - name: Keep the results
         if: always()
         uses: actions/upload-artifact@v4
