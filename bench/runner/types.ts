@@ -42,6 +42,13 @@ export interface ScenarioDefinition {
   readonly environment: 'node' | 'browser';
   readonly requires: readonly Capability[];
   readonly metrics: Readonly<Record<string, MetricSpec>>;
+  /**
+   * Capabilities a metric needs beyond `requires`, for a scenario whose parts
+   * a subject can lack one by one (S8's operations). The scenario does not
+   * measure a part the subject lacks, and a condition reading its metric is
+   * reported as not applicable instead of being evaluated.
+   */
+  readonly metricRequires?: Readonly<Record<string, readonly Capability[]>>;
   /** Runs once, inside a fresh child process. */
   run(context: RunContext): Promise<MetricValues>;
 }

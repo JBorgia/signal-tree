@@ -28,3 +28,44 @@ describe('gate workflows', () => {
     expect(workflowProblems(workflows).join('\n')).toMatch(message);
   });
 });
+
+describe('approve-non-owned.yml', () => {
+  type Step = { uses?: string; run?: string; with?: Record<string, unknown>; env?: Record<string, string> };
+  const steps = (w: Workflows): Step[] => w.approve.jobs.approve.steps;
+  const checkout = (w: Workflows) => steps(w).find((s) => String(s.uses).startsWith('actions/checkout@'))!;
+
+  it('runs main\'s code only, with contents: read and pull-requests: write', () => {
+    const { approve } = fresh();
+    expect(Object.keys(approve.on)).toEqual(['pull_request_target']);
+    expect(approve.permissions).toEqual({ contents: 'read', 'pull-requests': 'write' });
+    expect(checkout(fresh()).with).toEqual({ 'persist-credentials': false });
+  });
+
+  const planted: Array<[string, (w: Workflows) => void, RegExp]> = [
+    ['a checkout of the head SHA', (w) => void (checkout(w).with!.ref = '${{ github.event.pull_request.head.sha }}'), /no ref: or repository:/],
+    ['a checkout of the merge ref', (w) => void (checkout(w).with!.ref = 'refs/pull/${{ github.event.number }}/merge'), /never check it out/],
+    ['a checkout of the head repository', (w) => void (checkout(w).with!.repository = '${{ github.event.pull_request.head.repo.full_name }}'), /no ref: or repository:/],
+    ['a step that fetches the pull request', (w) => void steps(w).splice(1, 0, { run: 'git fetch origin pull/80/head && git checkout FETCH_HEAD' }), /fetches or checks out code/],
+    ['gh pr checkout', (w) => void steps(w).splice(1, 0, { run: 'gh pr checkout 80' }), /fetches or checks out code/],
+    ['the head ref in a run step', (w) => void (steps(w).at(-1)!.run = 'node ci/approve-non-owned.mjs ${{ github.head_ref }}'), /never check it out/],
+    ['a stored token', (w) => void delete checkout(w).with!['persist-credentials'], /persist-credentials: false/],
+    ['contents: write', (w) => void (w.approve.permissions.contents = 'write'), /exactly contents: read and pull-requests: write/],
+    ['an extra permission', (w) => void (w.approve.permissions.actions = 'read'), /exactly contents: read and pull-requests: write/],
+    ['write-all', (w) => void (w.approve.permissions = 'write-all'), /exactly contents: read and pull-requests: write/],
+    ['a job that widens permissions', (w) => void (w.approve.jobs.approve.permissions = { contents: 'write', 'pull-requests': 'write' }), /approve: permissions must be exactly/],
+    ['a pull_request trigger as well', (w) => void (w.approve.on.pull_request = {}), /pull_request_target only/],
+    ['a missing ready_for_review', (w) => void (w.approve.on.pull_request_target.types = ['opened', 'synchronize', 'reopened']), /ready_for_review only/],
+    ['pull requests into any branch', (w) => void delete w.approve.on.pull_request_target.branches, /into main only/],
+    ['an action pinned by tag', (w) => void (checkout(w).uses = 'actions/checkout@v4'), /pinned by full commit SHA/],
+    ['a secret', (w) => void (steps(w).at(-1)!.env = { GH_TOKEN: '${{ secrets.PAT }}' }), /uses a secret/],
+    ['no fork check on the job', (w) => void delete w.approve.jobs.approve.if, /fork/],
+    ['another decision script', (w) => void (steps(w).at(-1)!.run = 'node ci/approve.mjs'), /node ci\/approve-non-owned\.mjs/],
+    ['no workflow at all', (w) => void delete (w as Partial<Workflows>).approve, /approve-non-owned\.yml is missing/],
+  ];
+
+  it.each(planted)('catches %s', (_name, plant, message) => {
+    const workflows = fresh();
+    plant(workflows);
+    expect(workflowProblems(workflows).join('\n')).toMatch(message);
+  });
+});

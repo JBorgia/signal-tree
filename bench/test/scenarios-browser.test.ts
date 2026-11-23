@@ -110,7 +110,7 @@ test('the weekly full-length S5 takes its run count from budgets.json (1); the n
   const { Harness } = await import('../runner/harness.ts');
   const { loadSubject } = await import('../subjects/index.ts');
   const subject = await loadSubject('test-fake');
-  const options = { aa: false, aaPairs: 1, skipBuild: true } as const;
+  const options = { aa: false, aaPairs: 1, skipBuild: true, onGateRunner: false } as const;
   assert.equal(new Harness(budgets, subject, { ...options, s5Mode: 'full' }).runsFor('S5'), 1);
   assert.equal(new Harness(budgets, subject, { ...options, s5Mode: 'compressed' }).runsFor('S5'), 5);
   const full = await runOnFake('S5', [], {

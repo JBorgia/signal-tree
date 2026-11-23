@@ -16,6 +16,13 @@ export interface Condition {
   readonly op?: '<=' | '==' | '>=' | 'withinRelative' | 'ownerBound';
   readonly value?: number;
   readonly coefficientUs?: number;
+  /**
+   * A bound relative to references measured in the same runs, in place of
+   * `value`: the metric's median must be `op` factor × the largest of the
+   * medians named in largestOf (S8: 1.25 × the larger of the Map.set and
+   * Map.get ratios). Judged on the median only.
+   */
+  readonly relativeTo?: { readonly factor: number; readonly largestOf: readonly string[] };
   /** 'every-run': must hold in every run (zero and never budgets); default: judged on the median. */
   readonly judge?: 'every-run';
 }
@@ -32,6 +39,8 @@ export interface GateEntry {
   readonly parts?: Readonly<Record<string, GateEntry>>;
   /** Run counts that replace the default for one mode (S5: { full: 1 }). */
   readonly runs?: Readonly<Record<string, unknown>>;
+  /** The gate counts toward a run's verdict only on the dedicated gate runner; anywhere else it is recorded only (S8). */
+  readonly gateRunnerOnly?: { readonly text: string };
 }
 
 export interface Budgets {
@@ -96,6 +105,10 @@ export interface ConditionResult {
   /** Never null for an evaluated condition: a missing or short metric fails. */
   readonly pass: boolean;
   readonly actual: number | Record<string, number> | null;
+  /** A relative condition's bound: factor × the largest reference median. */
+  readonly bound?: number;
+  /** A relative condition's reference medians, the largest of which set the bound. */
+  readonly reference?: Readonly<Record<string, number>>;
   readonly detail?: string;
 }
 
@@ -125,12 +138,39 @@ function worst(op: NonNullable<Condition['op']>, values: readonly number[], valu
 }
 
 /**
+ * A relative condition: the metric's median against factor × the largest
+ * reference median. The metric and every reference need a finite value in
+ * each required run.
+ */
+function evaluateRelative(condition: Condition & { relativeTo: NonNullable<Condition['relativeTo']> }, evidence: Evidence): ConditionResult {
+  const base = { id: condition.id, text: condition.text };
+  const { metric, op } = condition;
+  const { factor, largestOf } = condition.relativeTo;
+  if (!metric || (op !== '<=' && op !== '>=') || condition.judge === 'every-run' || !largestOf.length || !(factor > 0)) {
+    return { ...base, pass: false, actual: null, detail: 'not a relative condition: needs a metric, op <= or >=, a positive factor and references, judged on the median' };
+  }
+  const short = [metric, ...largestOf].filter((m) => finiteRuns(evidence, m) < evidence.requiredRuns || !Number.isFinite(evidence.median[m]));
+  if (short.length) return { ...base, pass: false, actual: null, detail: `no finite value in each of the ${evidence.requiredRuns} required runs: ${short.join(', ')}` };
+  const reference = Object.fromEntries(largestOf.map((m) => [m, evidence.median[m]!]));
+  const [largestName, largest] = Object.entries(reference).reduce((a, b) => (b[1] > a[1] ? b : a));
+  const bound = factor * largest;
+  const actual = evidence.median[metric]!;
+  return { ...base, pass: holds(op, actual, bound), actual, bound, reference, detail: `bound ${round(bound)} = ${factor} × ${largestName} ${round(largest)}` };
+}
+
+function round(value: number): string {
+  return Number(value.toPrecision(3)).toString();
+}
+
+/**
  * Evaluates one condition. A gated metric that is missing, or has fewer
  * finite values than the required runs, fails. 'every-run' conditions fail
  * when any run fails (actual = the worst run, detail names the failing runs);
- * the others are judged on the median.
+ * the others are judged on the median, relative ones against a bound set by
+ * reference medians (evaluateRelative).
  */
 export function evaluateCondition(condition: Condition, evidence: Evidence): ConditionResult {
+  if (condition.relativeTo) return evaluateRelative({ ...condition, relativeTo: condition.relativeTo }, evidence);
   const base = { id: condition.id, text: condition.text };
   if (condition.op === 'ownerBound') {
     const prefix = `${condition.metric}@`;

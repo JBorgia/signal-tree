@@ -13,14 +13,14 @@ import { DEFAULT_SUBJECT, loadSubject } from '../subjects/index.ts';
 import { missingCapabilities } from '../subjects/types.ts';
 import { ALLOCATION_NODE_FLAGS, type allocationProbeSelfTest } from './alloc-probe.ts';
 import { gateParameters, loadBudgets } from './budgets.ts';
-import { applyBaseline, exitCode, Harness, resolveRecordOnly, type ResultsFile } from './harness.ts';
+import { applyBaseline, exitCode, Harness, isGateRunner, resolveRecordOnly, type ResultsFile } from './harness.ts';
 import { OUT_DIR } from './paths.ts';
 import { runChild } from './process.ts';
 import { RUNS_PER_SCENARIO } from './stats.ts';
 import type { AnyDefinition } from './types.ts';
 
 const USAGE = `usage: pnpm bench [ids...] [options]
-  ids               gate ids (M1 M2 M3 S1 S2 S3 S4a S4b S4c S5 S6a S6b S6c S7 Q1), groups (M, S, S4, S6) or all (default)
+  ids               gate ids (M1 M2 M3 S1 S2 S3 S4a S4b S4c S5 S6a S6b S6c S7 S8 Q1), groups (M, S, S4, S6) or all (default)
   --subject <id>    store subject (default ${DEFAULT_SUBJECT})
   --aa              A/A mode: two interleaved sets of ${RUNS_PER_SCENARIO} runs per scenario; records noise per metric
   --aa-pairs <n>    repeat the A/A pair n times and keep the largest noise (default 1)
@@ -28,6 +28,8 @@ const USAGE = `usage: pnpm bench [ids...] [options]
   --noise <file>    A/A file to take noise from (default: the baseline's own A/A noise, if it has one)
   --record-only     exit 0 when gates are red (recording baselines), only while budgets.json is unapproved;
                     errors and regressions still fail
+                    gates budgets.json marks gateRunnerOnly (S8) count toward the exit status only on the
+                    gate runner (RUNNER_ENVIRONMENT=self-hosted); anywhere else they are recorded only
   --s5-compressed   nightly S5 (the default): compressed time, at least the budgeted minimum of writes, 5 runs
   --s5-full         weekly S5: the full session length, with budgets.json's run count
   --skip-build      reuse the reference app already built under bench/out/apps
@@ -37,7 +39,7 @@ const USAGE = `usage: pnpm bench [ids...] [options]
 
 const GROUPS: Record<string, string[]> = {
   M: ['M1', 'M2', 'M3'],
-  S: ['S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6a', 'S6b', 'S6c', 'S7'],
+  S: ['S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6a', 'S6b', 'S6c', 'S7', 'S8'],
   S4: ['S4a', 'S4b', 'S4c'],
   S6: ['S6a', 'S6b', 'S6c'],
 };
@@ -74,10 +76,14 @@ function printSummary(file: ResultsFile): void {
       lines.push(`${result.id.padEnd(4)} checked by ${result.owner}`);
       continue;
     }
-    lines.push(`${result.id.padEnd(4)} ${result.status === 'error' ? `ERROR ${result.error?.split('\n')[0]}` : result.pass ? 'pass' : 'FAIL'}`);
+    const verdict = result.status === 'error' ? `ERROR ${result.error?.split('\n')[0]}` : result.pass ? 'pass' : 'FAIL';
+    lines.push(`${result.id.padEnd(4)} ${result.recordedOnly && result.status !== 'error' ? `recorded only: ${result.recordedOnly} (conditions: ${verdict})` : verdict}`);
     for (const condition of result.conditions) {
       const actual = typeof condition.actual === 'number' ? fmt(condition.actual) : JSON.stringify(condition.actual);
       lines.push(`     ${condition.pass ? 'ok  ' : 'FAIL'} ${condition.id}: ${actual} (${condition.text})${condition.detail ? ` — ${condition.detail}` : ''}`);
+    }
+    for (const skipped of result.conditionsNotApplicable ?? []) {
+      lines.push(`     n/a  ${skipped.id} (${skipped.text}) — subject lacks ${skipped.missingCapabilities.join(', ')}`);
     }
     if (result.aa) {
       const relative = Object.entries(result.aa.noise.relative).map(([metric, value]) => `${metric} ${(value * 100).toFixed(1)}%`);
@@ -166,6 +172,7 @@ async function main(): Promise<number> {
       cpuModel: cpus()[0]?.model ?? 'unknown',
       cpuCount: cpus().length,
       totalMemoryBytes: totalmem(),
+      runnerEnvironment: process.env['RUNNER_ENVIRONMENT'] ?? 'none',
     },
     runsPerScenario: RUNS_PER_SCENARIO,
     aaPairs: values.aa ? aaPairs : 0,
@@ -179,6 +186,7 @@ async function main(): Promise<number> {
     aaPairs,
     skipBuild: values['skip-build'],
     s5Mode,
+    onGateRunner: isGateRunner(process.env['RUNNER_ENVIRONMENT']),
   });
   file.scenarios = await harness.run(selected);
   if (values.baseline) applyBaseline(file.scenarios, budgets, values.baseline, values.noise);

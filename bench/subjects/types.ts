@@ -17,8 +17,12 @@ export type Capability =
   | 'build'
   /** Keyed collection: setAll, updateOne, per-field cells (S2). */
   | 'collection'
-  /** Writable per-field cells of a collection row (S4c). */
+  /** Writable per-field cells of a collection row (S4c, S8). */
   | 'collectionFieldWrite'
+  /** Collection addOne(row) and removeOne(id) (S8). */
+  | 'collectionAddRemove'
+  /** Collection all() and byId(id) (S8). */
+  | 'collectionReads'
   /** setAll(rows, { chunk: 'auto' }) that yields between chunks (S3, W4). */
   | 'chunkedSetAll'
   /** Writer identity: tree.as({ writer, origin }, fn) (W1). */
@@ -82,6 +86,14 @@ export interface SubjectCollection<E, K extends string | number> {
   field<F extends keyof E & string>(id: K, field: F): Signal<E[F]>;
   /** Capability 'collectionFieldWrite': a held writable cell for one field of one row. */
   writableField?<F extends keyof E & string>(id: K, field: F): WritableSignal<E[F]>;
+  /** Capability 'collectionAddRemove': adds one row at the end of the collection. */
+  addOne?(row: E): void;
+  /** Capability 'collectionAddRemove': removes one row; the others keep their order. */
+  removeOne?(id: K): void;
+  /** Capability 'collectionReads': every row, in collection order. */
+  all?(): readonly E[];
+  /** Capability 'collectionReads': the store's own handle or value for one row; undefined when absent. */
+  byId?(id: K): unknown;
   count(): number;
 }
 

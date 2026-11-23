@@ -13,7 +13,11 @@ import {
   processWordsIn,
 } from './done-check.mjs';
 
-type Results = { budgets: { approved: boolean }; recordOnly: boolean; scenarios: Record<string, { status: string; pass: boolean | null; regressions: { regressed: boolean }[] }> };
+type Results = {
+  budgets: { approved: boolean };
+  recordOnly: boolean;
+  scenarios: Record<string, { status: string; pass: boolean | null; recordedOnly?: string; regressions: { regressed: boolean }[] }>;
+};
 const greenResults = (): Results => ({
   budgets: { approved: true },
   recordOnly: false,
@@ -79,6 +83,7 @@ describe('done check', () => {
     [[0], 'a red gate inside a green job', (f) => void (f.nightly.runs[0]!.results['vue'].scenarios['S4c'].pass = false)],
     [[0], 'a gate with no verdict', (f) => void (f.nightly.runs[0]!.results['vue'].scenarios['S2'].pass = null)],
     [[0], 'a gate that did not run', (f) => void (f.nightly.runs[0]!.results['solid'].scenarios['S7'].status = 'not-applicable')],
+    [[0], 'S8 recorded only, off the gate runner', (f) => void (f.nightly.runs[0]!.results['angular'].scenarios['S8'].recordedOnly = 'not on the gate runner')],
     [[0], 'a regression', (f) => void (f.nightly.runs[1]!.results['preact'].scenarios['M1'].regressions = [{ regressed: true }])],
     [[0], 'an S6 scan finding', (f) => void (f.s6.findings = ['unminified bundles differ'])],
     [[0, 1], 'nightly runs that could not be read', (f) => void (f.nightly = { error: 'gh: not logged in' } as never)],

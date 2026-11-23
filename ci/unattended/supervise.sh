@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Supervisor for the unattended rebuild (BRIEF.md section 11.4).
 #
-# Run it inside the isolated container or VM, signed in to gh as the bot
-# account, from the agent's checkout of JBorgia/signal-tree:
+# Run it inside the isolated container or VM, from the agent's checkout of
+# JBorgia/signal-tree, with the variables under Environment set:
 #
 #   SIGNAL_TREE_ISOLATED=1 tmux new-session -d -s rebuild ci/unattended/supervise.sh
 #
@@ -19,15 +19,72 @@
 #
 # Environment:
 #   SIGNAL_TREE_ISOLATED=1        required; confirms this is the isolated machine
-#   SIGNAL_TREE_STATE_DIR         default ~/.signal-tree-unattended (session ID, hook state, logs)
+#   SIGNAL_TREE_STATE_DIR         default ~/.signal-tree-unattended (session ID, hook state, logs, App token);
+#                                 made mode 700, and refused inside the agent's checkout or the verifier
 #   SIGNAL_TREE_VERIFY_DIR        default $SIGNAL_TREE_STATE_DIR/verify
 #   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"; may not set the model
+#   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 #   ANTHROPIC_API_KEY             required: the API key from the VM's secret store (#16)
+#   SIGNAL_TREE_MINT_COMMAND      default "sudo -n -u st-mint /opt/signal-tree/mint-token": prints a
+#                                 GitHub App token as the user that owns the App's key (mint-token.mjs)
+#   SIGNAL_TREE_APP_CONFIG        default /etc/signal-tree/app.json: the mint config whose keyFile this
+#                                 user must not be able to read (the mint command itself reads only the default)
+#   SIGNAL_TREE_GIT_NAME          default "Jonathan Borgia": author and committer name of every commit
+#   SIGNAL_TREE_GIT_EMAIL         default jonathanborgia@gmail.com: author and committer email
+#
+# Exit status: 0 done; 1 setup failed; 2 not the isolated machine, extra
+# arguments set a model, or the state directory is inside a checkout; 3 stuck;
+# 4 the agent lock is held or could not be taken; 5 a run used another model;
+# 6 no ANTHROPIC_API_KEY; 7 a run could not authenticate to Anthropic; 8 is no
+# longer used; 9 the mint command gave no GitHub App token, or git would not use
+# it; 10 origin is not https://github.com/JBorgia/signal-tree(.git) for fetch
+# and push, git config sets an extra HTTP header, or `git ls-remote origin`
+# fails as the App; 11 no real gh outside the wrapper, or gh has a stored login;
+# 12 main's rules do not require an approving review, code-owner review and
+# status checks, or could not be read; 13 this user can read the App's private
+# key, or the mint config naming it cannot be read.
 #
 # Authentication (Jonathan's ruling on #16): Claude Code uses an Anthropic API
 # key from the VM's secret store, never a browser login. The supervisor
 # refuses to start without one, clears any OAuth token from its environment,
 # and stops (instead of retrying) when a run ends on an authentication error.
+#
+# GitHub identity (BRIEF.md 12.3 and Jonathan's rulings): the signal-tree-ci
+# GitHub App authenticates every push and gh call, and turns on auto-merge
+# (merge commit) for each PR it opens from a JBorgia/signal-tree branch into
+# main that touches no code-owned path; commits keep Jonathan as author and
+# committer. At start the supervisor copies app-token.mjs and the gh wrapper
+# (bin/gh) from its own directory, and the CODEOWNERS matcher the wrapper runs
+# (ci/codeowners.mjs), into $SIGNAL_TREE_STATE_DIR/github-app, so a branch
+# switch in the agent's checkout cannot remove or change them.
+#
+# The agent never holds the App's private key (Jonathan's ruling: "the VM uses
+# a separate Unix user that owns the key. The agent may run only the
+# token-minting command through sudo and receives 1-hour tokens."). The
+# supervisor refuses to start if its own user can read the key named in the
+# mint config, and gets one token from the mint command, bypassing the cache,
+# to fail fast. In its own environment, which the session and its hooks
+# inherit, it then
+#   - unsets GH_TOKEN and GITHUB_TOKEN, so no personal token is ever used;
+#   - replaces the machine's git config with github-app/gitconfig
+#     (GIT_CONFIG_GLOBAL, GIT_CONFIG_NOSYSTEM), so none of its insteadOf rules,
+#     extra headers or credential helpers apply; the checkout's own config
+#     still does;
+#   - makes app-token.mjs git's only credential helper for https://github.com,
+#     turns off askpass programs and terminal prompts, and allows only HTTPS
+#     and local paths (GIT_ALLOW_PROTOCOL=https:file), so SSH cannot be used;
+#   - sets GIT_AUTHOR_* and GIT_COMMITTER_* from SIGNAL_TREE_GIT_NAME and
+#     SIGNAL_TREE_GIT_EMAIL (the agent lock's commit uses them too);
+#   - puts the gh wrapper first on PATH, drops relative PATH entries, resolves
+#     the real gh once (SIGNAL_TREE_REAL_GH, for the wrapper), and points gh at
+#     the empty config directory $SIGNAL_TREE_STATE_DIR/gh-config
+#     (GH_CONFIG_DIR).
+# Before it takes the lock it refuses to start unless origin's fetch and push
+# URLs are exactly https://github.com/JBorgia/signal-tree(.git), no git config
+# sets an extra HTTP header, gh has no stored login, main's rules require at
+# least one approving review, code-owner review and status checks (so
+# auto-merge still waits for them; see check_main_rules), and
+# `git ls-remote origin` works as the App.
 #
 # One session at a time: the supervisor holds the agent lock (refs/agent/lock
 # on the remote, see lock.mjs) for as long as it runs, and refuses to start
@@ -40,10 +97,12 @@
 # No tool attribution: the session's settings turn attribution off
 # ("attribution": false from Claude Code 2.1.281; on older versions the
 # commit and PR attribution texts are emptied and the session URL is off).
-#   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
 set -uo pipefail
+# Everything the supervisor and the session create is private to this user.
+umask 077
 
 readonly MODEL=claude-opus-5-5
+readonly REPO=JBorgia/signal-tree
 
 main() {
   if [[ "${SIGNAL_TREE_ISOLATED:-}" != 1 ]]; then
@@ -51,6 +110,7 @@ main() {
     exit 2
   fi
 
+  SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)
   WORK_DIR=$(git rev-parse --show-toplevel)
   export SIGNAL_TREE_WORK_DIR=$WORK_DIR
   export SIGNAL_TREE_STATE_DIR=${SIGNAL_TREE_STATE_DIR:-$HOME/.signal-tree-unattended}
@@ -67,8 +127,22 @@ main() {
     exit 6
   fi
   unset CLAUDE_CODE_OAUTH_TOKEN
+  # GitHub sees only the signal-tree-ci App, never a personal token. The
+  # App's key and IDs belong to the mint user, not this environment.
+  unset GH_TOKEN GITHUB_TOKEN GH_ENTERPRISE_TOKEN GITHUB_ENTERPRISE_TOKEN
+  unset SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE
+  check_state_dir || exit 2
+  check_key_unreadable || exit 13
   local log=$SIGNAL_TREE_STATE_DIR/session.log
-  mkdir -p "$SIGNAL_TREE_STATE_DIR"
+  mkdir -p "$SIGNAL_TREE_STATE_DIR" && chmod 700 "$SIGNAL_TREE_STATE_DIR" || exit 1
+  use_github_app "$SCRIPT_DIR" "$SIGNAL_TREE_STATE_DIR/github-app" || exit 9
+  check_origin "$WORK_DIR" || exit 10
+  use_real_gh "$SIGNAL_TREE_STATE_DIR/gh-config" "$SIGNAL_TREE_STATE_DIR/github-app/bin/gh" "$SCRIPT_DIR/bin/gh" || exit 11
+  check_main_rules || exit 12
+  if ! git -C "$WORK_DIR" ls-remote -q origin HEAD > /dev/null; then
+    echo "Refusing to start: git ls-remote origin failed as the App (the error is above)." >&2
+    exit 10
+  fi
 
   if [[ ! -d $SIGNAL_TREE_VERIFY_DIR/.git ]]; then
     git clone -q "$(git -C "$WORK_DIR" remote get-url origin)" "$SIGNAL_TREE_VERIFY_DIR" || exit 1
@@ -147,6 +221,208 @@ main() {
       backoff=60
     fi
   done
+}
+
+# Refuses a state directory inside the agent's checkout or the verifier: it
+# holds the App token, which must stay out of anything treated as the repository.
+check_state_dir() {
+  local state work verify
+  state=$(physical_path "$SIGNAL_TREE_STATE_DIR")
+  work=$(physical_path "$WORK_DIR")
+  verify=$(physical_path "$SIGNAL_TREE_VERIFY_DIR")
+  if [[ $state == "$work" || $state == "$work"/* || $state == "$verify" || $state == "$verify"/* ]]; then
+    echo "Refusing to start: SIGNAL_TREE_STATE_DIR ($SIGNAL_TREE_STATE_DIR) is inside the agent's checkout or the verifier; it holds the App token, so keep it outside both." >&2
+    return 1
+  fi
+}
+
+# The absolute physical path of $1, which need not exist yet.
+physical_path() {
+  local dir=$1 rest='' base
+  while [[ ! -d $dir ]]; do
+    rest=/$(basename "$dir")$rest
+    dir=$(dirname "$dir")
+  done
+  base=$(cd "$dir" && pwd -P)
+  if [[ -n $rest ]]; then echo "${base%/}$rest"; else echo "$base"; fi
+}
+
+# Refuses to start if this user can read the App's private key: the keyFile
+# that the mint config ($SIGNAL_TREE_APP_CONFIG, default
+# /etc/signal-tree/app.json) names. A config it cannot read counts as a
+# failure too, so a misconfigured VM cannot expose the key unnoticed.
+check_key_unreadable() {
+  local config=${SIGNAL_TREE_APP_CONFIG:-/etc/signal-tree/app.json} key
+  if ! key=$(jq -er '.keyFile | select(type == "string" and startswith("/"))' "$config" 2> /dev/null); then
+    echo "Refusing to start: cannot read the key path (keyFile) from $config, so cannot check that $(id -un) cannot read the App's private key; see ci/unattended/mint-token.mjs." >&2
+    return 1
+  fi
+  if [[ -r $key ]]; then
+    echo "Refusing to start: $(id -un) can read the App's private key $key; only the mint user may (see ci/unattended/mint-token.mjs)." >&2
+    return 1
+  fi
+}
+
+# Sets this environment up to reach GitHub as the signal-tree-ci App (see
+# "GitHub identity" above): installs the helpers from $1 into $2
+# (install_helpers), points git, gh and the commit identity at them, then gets
+# a token from the mint command, bypassing the cache, and checks that git
+# would use it. Prints the reason and returns 1 on any failure.
+use_github_app() {
+  local from=$1 app_dir=$2 helper user
+  if ! { install_helpers "$from" "$app_dir" && write_git_config "$app_dir/gitconfig"; }; then
+    echo "Refusing to start: could not install the GitHub App helpers into $app_dir." >&2
+    return 1
+  fi
+  # None of the machine's git config (insteadOf rules, extra headers, credential
+  # helpers) applies; the checkout's own config still does, and check_origin
+  # rejects the bypasses it could hold.
+  export GIT_CONFIG_GLOBAL=$app_dir/gitconfig GIT_CONFIG_NOSYSTEM=1
+  unset GIT_CONFIG_PARAMETERS SSH_ASKPASS
+  # The App's helper comes after any repository config, behind an empty entry
+  # that clears every other helper. An empty GIT_ASKPASS also skips
+  # core.askPass and SSH_ASKPASS, and with terminal prompts off nothing else
+  # can supply credentials. SSH is not allowed at all.
+  printf -v helper '!node %q git-credential' "$app_dir/app-token.mjs"
+  export GIT_CONFIG_COUNT=2 \
+    GIT_CONFIG_KEY_0=credential.https://github.com.helper GIT_CONFIG_VALUE_0= \
+    GIT_CONFIG_KEY_1=credential.https://github.com.helper GIT_CONFIG_VALUE_1="$helper" \
+    GIT_ALLOW_PROTOCOL=https:file GIT_TERMINAL_PROMPT=0 GIT_ASKPASS=
+  export SIGNAL_TREE_GIT_NAME=${SIGNAL_TREE_GIT_NAME:-Jonathan Borgia}
+  export SIGNAL_TREE_GIT_EMAIL=${SIGNAL_TREE_GIT_EMAIL:-jonathanborgia@gmail.com}
+  export GIT_AUTHOR_NAME=$SIGNAL_TREE_GIT_NAME GIT_COMMITTER_NAME=$SIGNAL_TREE_GIT_NAME \
+    GIT_AUTHOR_EMAIL=$SIGNAL_TREE_GIT_EMAIL GIT_COMMITTER_EMAIL=$SIGNAL_TREE_GIT_EMAIL
+  export PATH=$app_dir/bin:$PATH
+
+  rm -f "$SIGNAL_TREE_STATE_DIR/app-token.json"
+  if ! node "$app_dir/app-token.mjs" token > /dev/null; then
+    echo "Refusing to start: the mint command gave no GitHub App installation token (the reason is above)." >&2
+    return 1
+  fi
+  user=$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill 2>/dev/null | sed -n 's/^username=//p')
+  if [[ $user != x-access-token ]]; then
+    echo "Refusing to start: git would not use the App's credentials for https://github.com (the GIT_CONFIG_* environment needs git 2.31 or later)." >&2
+    return 1
+  fi
+}
+
+# Installs the App helpers from $1 (this directory) into $2: app-token.mjs,
+# the gh wrapper as bin/gh, and ci/codeowners.mjs, which the wrapper runs as
+# ../codeowners.mjs.
+install_helpers() {
+  mkdir -p "$2/bin" &&
+    install_file "$1/app-token.mjs" "$2/app-token.mjs" 600 &&
+    install_file "$1/../codeowners.mjs" "$2/codeowners.mjs" 600 &&
+    install_file "$1/bin/gh" "$2/bin/gh" 700
+}
+
+# Copies $1 to $2 with mode $3, replacing $2 in one step.
+install_file() {
+  cp "$1" "$2.new.$$" && chmod "$3" "$2.new.$$" && mv -f "$2.new.$$" "$2"
+}
+
+# Writes the only global git config the session sees (GIT_CONFIG_GLOBAL): nothing but this note.
+write_git_config() {
+  printf '%s\n' \
+    '# Written by ci/unattended/supervise.sh at every start. The unattended session' \
+    "# uses this file instead of the machine's global git config, so no insteadOf" \
+    '# rule, extra header or credential helper from there applies. The App credential' \
+    '# helper is set in the environment (GIT_CONFIG_COUNT).' > "$1.new.$$" &&
+    chmod 600 "$1.new.$$" && mv -f "$1.new.$$" "$1"
+}
+
+# Refuses an origin through which git could reach GitHub as anyone but the
+# App: every fetch and push URL of origin in checkout $1, after insteadOf
+# rewriting, must be https://github.com/$REPO(.git) with no credentials, and no
+# git config may set an extra HTTP header (which could carry a token).
+check_origin() {
+  local work=$1 fetch push url headers
+  fetch=$(git -C "$work" remote get-url --all origin 2> /dev/null) || fetch=
+  push=$(git -C "$work" remote get-url --push --all origin 2> /dev/null) || push=
+  if [[ -z $fetch || -z $push ]]; then
+    echo "Refusing to start: $work has no origin remote." >&2
+    return 1
+  fi
+  while IFS= read -r url; do
+    if [[ $url != "https://github.com/$REPO" && $url != "https://github.com/$REPO.git" ]]; then
+      echo "Refusing to start: origin fetches or pushes through $(redact_url "$url"); it must be https://github.com/$REPO(.git), with no credentials, for both." >&2
+      return 1
+    fi
+  done <<< "$fetch
+$push"
+  headers=$(git -C "$work" config --name-only --get-regexp '^http\..*extraheader$' | paste -sd, -)
+  if [[ -n $headers ]]; then
+    echo "Refusing to start: git config sets $headers; an extra HTTP header could authenticate as someone other than the App." >&2
+    return 1
+  fi
+}
+
+# URL $1 with any user name and password replaced by ***.
+redact_url() {
+  sed -E 's#^([A-Za-z][A-Za-z0-9+.-]*://)[^/@]*@#\1***@#' <<< "$1"
+}
+
+# Resolves the real gh once, for the wrapper (SIGNAL_TREE_REAL_GH): the first
+# gh in an absolute PATH directory that is none of the wrappers $2.... Drops
+# relative and empty PATH entries (the current directory) from PATH. Then
+# points gh at the empty config directory $1 (GH_CONFIG_DIR) and refuses a
+# stored login there, so gh run past the wrapper cannot fall back to one.
+use_real_gh() {
+  local config_dir=$1 dir wrapper real='' kept='' entries
+  shift
+  IFS=: read -r -a entries <<< "$PATH"
+  for dir in "${entries[@]}"; do
+    [[ $dir == /* ]] || continue
+    kept+=${kept:+:}$dir
+    [[ -z $real && -f $dir/gh && -x $dir/gh ]] || continue
+    for wrapper in "$@"; do [[ $dir/gh -ef $wrapper ]] && continue 2; done
+    real=$(cd "$dir" && pwd -P)/gh
+  done
+  export PATH=$kept
+  if [[ -z $real ]]; then
+    echo "Refusing to start: no gh in an absolute PATH directory other than the wrapper's." >&2
+    return 1
+  fi
+  export SIGNAL_TREE_REAL_GH=$real
+  if ! { mkdir -p "$config_dir" && chmod 700 "$config_dir"; }; then
+    echo "Refusing to start: could not create $config_dir for gh." >&2
+    return 1
+  fi
+  export GH_CONFIG_DIR=$config_dir
+  if [[ -s $config_dir/hosts.yml ]] || env -u GH_TOKEN -u GITHUB_TOKEN "$real" auth status > /dev/null 2>&1; then
+    echo "Refusing to start: gh has a stored login (in $config_dir); remove it, the agent reaches GitHub only as the App." >&2
+    return 1
+  fi
+}
+
+# Refuses to start unless main's active rules require at least one approving
+# review, code-owner review and status checks, so a PR the App auto-merges
+# still waits for review by the code owner where CODEOWNERS applies, an
+# approval elsewhere, and the checks. Each requirement may come from any rule
+# of the type (GitHub applies the strictest).
+check_main_rules() {
+  local rules missing
+  if ! rules=$(gh api "repos/$REPO/rules/branches/main"); then
+    echo "Refusing to start: could not read the rules for main of $REPO (the error is above)." >&2
+    return 1
+  fi
+  if ! missing=$(jq -r '
+    if type != "array" then error("not a list of rules") else . end
+    | def pr(f): any(.[]; .type == "pull_request" and (.parameters | f));
+      (if pr((.required_approving_review_count | type) == "number" and .required_approving_review_count >= 1) then empty
+       else "a pull_request rule requiring at least one approving review (required_approving_review_count >= 1)" end),
+      (if pr(.require_code_owner_review == true) then empty
+       else "a pull_request rule requiring code-owner review (require_code_owner_review: true)" end),
+      (if any(.[]; .type == "required_status_checks") then empty
+       else "a required_status_checks rule" end)' <<< "$rules" 2> /dev/null); then
+    echo "Refusing to start: could not read the rules for main of $REPO: GitHub's answer is not a list of rules." >&2
+    return 1
+  fi
+  if [[ -n $missing ]]; then
+    echo "Refusing to start: main of $REPO lacks what a PR the App auto-merges must wait for:" >&2
+    sed 's/^/  /' <<< "$missing" >&2
+    return 1
+  fi
 }
 
 # The error text of a run that failed to authenticate, or nothing.

@@ -262,7 +262,7 @@ Gates measure what production feels: blocked interactions, dropped frames, heap 
 - Environment. CI Linux runner, Chrome stable via Playwright, CPU throttled 4× through CDP Emulation.setCPUThrottlingRate. Micro gates run in Node with --expose-gc.
 - Attribution. Store time is measured with marks around the seam, plugins and adapter. Long tasks come from the Long Animation Frames API with script attribution to @signal-tree/\* code.
 - Noise. Each scenario runs 5 times in fresh processes; the gate uses the median. The A/A noise of each scenario is measured in Phase 0. A regression is a median worse than main by more than the larger of 3% or the A/A noise.
-- CI. Every PR runs M1–M3, S1, S3, S6, S7 and the oracle at 10,000 sequences. Nightly runs all scenarios, S5 included, and the oracle at 100,000 sequences. Results are CI artifacts, never committed.
+- CI. Every PR runs M1–M3, S1, S3, S6, S7, S8 and the oracle at 10,000 sequences. Nightly runs all scenarios, S5 included, and the oracle at 100,000 sequences. Results are CI artifacts, never committed.
 
 ### 6.2 Scale parameters
 
@@ -292,6 +292,7 @@ These are defaults until Jonathan replaces them with first production adopter nu
 | S5 | Soak: 8 hours of S2 + S4 traffic with transactions, restoration({ retain: 100 }) and writers installed (nightly may compress time but must apply at least 2M writes) | Heap growth over the final half of the run ≤ 2%; every plugin's internal collections stay at or below their configured caps |
 | S6 | Scoped opt-in | (a) a core-only bundle contains no plugin code (symbol scan); (b) with every plugin attached to a different 10% subtree, M1, S1 and S2 stay within ±5% of a bare tree; (c) a bare tree is within ±2% of a build with the plugin folders deleted |
 | S7 | Contention: a write to a location held by 1, 2, 8 and 32 owners | Cost linear in owners (R² ≥ 0.95 against a linear fit); an uncontended write is unchanged (±10%) with 10 vs 10,000 links elsewhere (C4) |
+| S8 | Scaling: leaf write, row field write, addOne, removeOne, setAll, updateOne, transact + rollback of one row, undo of one row, all() and byId, each with 1,000 and with 100,000 rows in the collection | Each operation's median at 100,000 rows over its median at 1,000 is at most 1.25× the larger of Map.set's and Map.get's ratios, measured in the same run (Node, 1×); allocations per operation for all() and byId do not grow with collection size. Baselines come from the new core in Phase 1; on the 15.4.9 shim, S8 records only. Gated only on the dedicated gate runner, with the Map.set/Map.get reference measured interleaved with the operations in the same run and judged on the median of 5 runs; off the runner, S8 records only. |
 | Q1 | Correctness | 100% of ported tests pass; the oracle finds zero unlisted differences; every adapter passes its conformance and bypass suites |
 
 Reported, never gated: bundle sizes, nanoseconds per isolated operation, construction microseconds.
@@ -313,7 +314,7 @@ Phases run strictly in order. A phase closes only when every exit criterion is g
    - Plain cell, lazy structure, write seam, turns, writer context, entityMap, leaf(), typed errors and [ST####] codes.
    - The adapter conformance kit in @signal-tree/core/adapter.
    - Port every non-plugin spec in the manifest.
-   - Exit: M1–M3 and S3 green on the plain adapter; Q1 for the ported core tests; zero unlisted oracle differences for operations with no plugins installed.
+   - Exit: M1–M3, S3 and S8 green on the plain adapter (S8's baselines are recorded here); Q1 for the ported core tests; zero unlisted oracle differences for operations with no plugins installed.
 3. Phase 2: Angular adapter.
    - WritableSignal cells, .set and .update routing, bypass coverage for Signal Forms, model() and linkedSignal (4.5).
    - Adoption of signals passed in the initial state, injection-context lifetime binding (4.4), SSR state transfer.
@@ -415,7 +416,7 @@ These rulings answer the agent's review items 1–17 by number. **Where they con
 14. **signaltree.io.** Jonathan points Vercel at `release/15.x` before any branch is deleted. The agent waits for confirmation.
 15. **Removal list.** Also remove `.agents/`, `.claude/`, `.codex/`, `.cursorrules`, `RELEASE_PROCESS.md`, `V9_PLAN.md`, `apps/`, `api/`, `.github/instructions/`, `.github/skills/` and `.github/VALIDATION_GUIDE.md`. `main` keeps only `LICENSE`, `NOTICE`, `BRIEF.md`, the two pointer files and the new scaffold.
 16. **Tarballs:** "no evidence tarballs" applies to `main`'s tree. History and tags are not rewritten.
-17. **Enforcement.** Agents commit as a dedicated bot account. A ruleset on `main` requires PRs and the required status checks (tests, oracle, gates). Code-owner review is required for `BRIEF.md`, `bench/`, `tests/intended-differences.json`, `tests/port-manifest.json`, `CODEOWNERS`, and everything that decides which checks run or what passes: `ci/`, `.github/`, the oracle runner and its properties, the root `package.json` scripts, and the ESLint, Vitest and Playwright configs. The ruleset applies to admins (no bypass). Jonathan reviews collaborator write access.
+17. **Enforcement.** The agent reaches GitHub through the `signal-tree-ci` App, and the commits it writes carry Jonathan's identity (12.3). A ruleset on `main` requires PRs, one approving review with code-owner review, and the required status checks (tests, oracle, gates); a workflow approves same-repo PRs that touch no code-owned path (12.3). Code-owner review is required for `BRIEF.md`, `bench/`, `tests/intended-differences.json`, `tests/port-manifest.json`, `CODEOWNERS`, and everything that decides which checks run or what passes: `ci/`, `.github/`, the oracle runner and its properties, the root `package.json` scripts, and the ESLint, Vitest and Playwright configs. The ruleset applies to admins (no bypass). Jonathan reviews collaborator write access.
 
 **Local unpushed work.** Before the reset, commit the uncommitted changes in `~/code/signaltree_1` and in the two dirty worktrees to their own branches, push each local-only branch, and archive-tag it like the rest. Move the evidence tarballs to storage outside git.
 
@@ -446,7 +447,7 @@ Jonathan gives these in a single message: the reset (archive tags, branch deleti
 ### 11.4 Mechanics
 
 - **Done check.** Phase 0 adds `ci/done-check.mjs`, which is code-owned. It exits 0 only when every item in section 9 holds. Otherwise it prints the next unmet item and the open `needs-jonathan` issues.
-- **Environment.** Run in an isolated container or VM, signed in as the bot account, whose GitHub token has write access but not admin.
+- **Environment.** Run in an isolated VM (#18). GitHub access goes through the `signal-tree-ci` App: the agent receives 1-hour installation tokens, with write access but not admin, from a minting command it may run only through sudo, and never holds the App's private key.
 - **Continuation.** Claude Code's `/goal` with the condition "`node ci/done-check.mjs` exits 0". A `Stop` hook acts as the backstop: it blocks stopping while the done check fails, and lets the session stop after 20 consecutive blocked stops with no new commit, so a stuck session can't loop forever.
 - **Restarts.** A supervisor loop in `tmux` resumes the session with `--continue` whenever it exits before the done check passes, for example after a crash or a usage limit.
 - **Status.** At the end of each phase, and every 24 hours, the agent posts a status comment (the section 8 report format) on a pinned issue named `Rebuild status`.
@@ -485,7 +486,7 @@ Previous history must not expose the first production adopter or Jonathan's empl
 - **Reset: approved.** It runs after the scrub. `codex/v15-15.4.9-release` is archived and deleted like every other retired branch.
 - **`chaz-thoughts`:** archive-tag and delete with the rest.
 - **Version: 16.0.0.** Prereleases of the new core continue from `16.0.0-rc.2`. At the first new prerelease, deprecate `16.0.0-rc.1` on npm with: "16.0.0 was rebuilt; use 16.0.0-rc.2 or later."
-- **Agent identity:** a GitHub App installed on this repository only, with contents, pull requests, issues and checks permissions; no administration permission. Walk Jonathan through creating it, then set up ruleset 17 with no bypass for anyone.
+- **Agent identity:** a GitHub App named `signal-tree-ci`, installed on this repository only, with contents, pull requests, issues, checks and workflows (read and write) and actions (read-only) permissions; no administration permission. The App only authenticates pushes and opens PRs, and it turns on auto-merge (merge commit) for each PR it opens unless the PR touches a code-owned path. The commits the agent writes carry author and committer jonathanborgia@gmail.com; merge commits GitHub creates (the App's name as author, committer "GitHub") are accepted. On the agent VM a separate Unix user owns the private key; the agent may run only the token-minting command through sudo and receives 1-hour tokens. Ruleset 17 on `main`, with no bypass for anyone: one approving review and code-owner review on every PR, the four required checks with branches up to date, and no force-push or deletion. `.github/workflows/approve-non-owned.yml` runs on `pull_request_target`, so it always runs `main`'s version: it approves a same-repo PR whose changed files, read through the API, touch no CODEOWNERS path, and never approves a fork's PR or one touching a code-owned path. Before the ruleset goes on `main`, the App's first PRs test it on a scratch branch: one with no code-owned paths is approved by the workflow and auto-merges, and one touching `bench/` stays blocked until Jonathan approves.
 - **Vercel:** out of scope until Phase 8. Jonathan disconnects the Vercel Git integration, and the site keeps serving its last build. Phase 8 sets up deployment of the new docs.
 - **Machines:** two cloud VMs. One is a dedicated-CPU gate runner; the other is an isolated VM for the agent. File their exact specifications as one issue for Jonathan to provision.
 - **Budgets:** stay `"approved": false` until PR #15's fixes are merged and baselines are recorded on the gate runner.
