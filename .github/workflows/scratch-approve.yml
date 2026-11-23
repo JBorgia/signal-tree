@@ -1,0 +1,21 @@
+# Scratch only (ruleset test 3); never merged to main. Approves every PR to the
+# scratch base as github-actions[bot], to test whether the ruleset counts an
+# Actions approval toward the one required review and whether code-owner review
+# still blocks a PR that touches a code-owned path.
+name: scratch approve (ruleset test)
+on:
+  pull_request:
+    branches: [rebuild/ruleset-test-3]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Approve as github-actions[bot]
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: gh api -X POST "repos/$REPO/pulls/$PR/reviews" -f event=APPROVE -f body="Scratch ruleset test 3 - approval by github-actions[bot]."
