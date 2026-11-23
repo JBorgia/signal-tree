@@ -122,6 +122,10 @@ jobs:
         run: pnpm --filter @signal-tree/bench typecheck
       - name: Harness self-tests
         run: pnpm bench:test
+      # #18: on the gate runner, gates run only with every core on the
+      # performance governor and no swap in use; off it, this only reports.
+      - name: Gate-host preflight (governor, swap, boost)
+        run: node ci/gate-host.mjs --out bench/out/gate-host.json
       # Fails when main has a baseline that cannot be fetched, and when there is
       # no baseline once budgets.json is approved (finding 1).
       - name: Fetch main's latest baseline and A/A noise

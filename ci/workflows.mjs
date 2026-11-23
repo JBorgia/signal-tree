@@ -29,6 +29,7 @@ export function workflowProblems({ ci, nightly, soak, approve }) {
     problems.push('ci.yml gates: a branch with an open PR must run the gates through pull_request only');
   }
   if (!ci.jobs['pr-lookup']) problems.push('ci.yml: missing the pr-lookup job');
+  if (!runs(gates).includes('node ci/gate-host.mjs')) problems.push('ci.yml gates: must run the gate-host preflight (ci/gate-host.mjs, #18)');
   if (!condition.includes('github.event.pull_request.head.repo.full_name == github.repository')) {
     problems.push('ci.yml gates: must never run a fork\'s pull request on the self-hosted runner');
   }
@@ -44,9 +45,11 @@ export function workflowProblems({ ci, nightly, soak, approve }) {
     const job = named(`gates (${adapter})`);
     if (!runs(job).includes('--s5-compressed')) problems.push(`nightly.yml gates (${adapter}): must run the compressed S5`);
     if (!uploads(job).includes(`nightly-gates-${adapter}`)) problems.push(`nightly.yml gates (${adapter}): must upload nightly-gates-${adapter}, which done-check reads`);
+    if (!runs(job).includes('node ci/gate-host.mjs')) problems.push(`nightly.yml gates (${adapter}): must run the gate-host preflight (ci/gate-host.mjs, #18)`);
   }
 
   const soakJob = Object.values(soak?.jobs ?? {})[0];
+  if (soakJob && !runs(soakJob).includes('node ci/gate-host.mjs')) problems.push('soak.yml: must run the gate-host preflight (ci/gate-host.mjs, #18)');
   const cron = String(soak?.on?.schedule?.[0]?.cron ?? '');
   if (cron.split(/\s+/)[4] === undefined || cron.split(/\s+/)[4] === '*') problems.push('soak.yml: must run weekly');
   if (!runs(soakJob).includes('--s5-full')) problems.push('soak.yml: must run the full 8-hour S5');
