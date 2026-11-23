@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process';
-import { chmodSync, closeSync, constants, cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { appendFileSync, chmodSync, closeSync, constants, cpSync, existsSync, lstatSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -84,12 +84,22 @@ const git = (cwd: string, ...args: string[]) => {
   return r.stdout.trim();
 };
 
-/** An empty repository whose origin is `url`; nothing is fetched. */
-function checkout(url: string) {
+// An empty repository made once, which checkout() copies rather than running git each time.
+let emptyRepository = '';
+afterAll(() => {
+  if (emptyRepository) rmSync(join(emptyRepository, '..'), { recursive: true, force: true });
+});
+
+/** An empty repository whose origin is `url` (none for null), copied from a template; nothing is fetched. */
+function checkout(url: string | null) {
+  if (!emptyRepository) {
+    emptyRepository = join(mkdtempSync(join(tmpdir(), 'signal-tree-checkout-template-')), 'work');
+    mkdirSync(emptyRepository);
+    git(emptyRepository, 'init', '-q');
+  }
   const dir = join(scratch(), 'work');
-  mkdirSync(dir);
-  git(dir, 'init', '-q');
-  git(dir, 'remote', 'add', 'origin', url);
+  cpSync(emptyRepository, dir, { recursive: true });
+  if (url !== null) appendFileSync(join(dir, '.git', 'config'), `[remote "origin"]\n\turl = ${url}\n\tfetch = +refs/heads/*:refs/remotes/origin/*\n`);
   return dir;
 }
 
@@ -139,32 +149,61 @@ describe('App token on the agent side', () => {
     expect(mode(cache)).toBe(0o600);
   });
 
-  it('mints afresh unless the cache holds an installation token (ghs_) from the same mint command', async () => {
+  /** The agent's setup with `record` in the token cache, and the mint command ready with ghs_fresh. */
+  const withCache = (record: (command: string) => object | string) => {
     const { env, cache, setMint, mints } = appFixture();
     const config = configFromEnv(env);
     setMint({ output: minted('ghs_fresh', T0 + 60 * MINUTE) });
-    const good = { command: config.command, token: 'ghs_cached', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() };
-    writeFileSync(cache, JSON.stringify(good));
+    const value = record(config.command);
+    writeFileSync(cache, typeof value === 'string' ? value : JSON.stringify(value));
+    return { config, mints };
+  };
+  const good = (command: string) => ({ command, token: 'ghs_cached', expiresAt: new Date(T0 + 60 * MINUTE).toISOString() });
+
+  it('takes the token from the cache when it is an installation token from the same mint command', async () => {
+    const { config, mints } = withCache(good);
     expect(await getToken(config, { now: T0 })).toBe('ghs_cached');
-    const rejected = ['not json', { ...good, command: 'another mint command' }, { ...good, token: 'gho_personal' }, { ...good, token: 'ghs_x\nusername=someone' }, { ...good, expiresAt: 'soon' }];
-    for (const [i, record] of rejected.entries()) {
-      writeFileSync(cache, typeof record === 'string' ? record : JSON.stringify(record));
-      expect(await getToken(config, { now: T0 })).toBe('ghs_fresh');
-      expect(mints()).toBe(i + 1);
-    }
+    expect(mints()).toBe(0);
   });
 
-  it('accepts only an installation token (ghs_) with a future expiry, and quotes only stderr when the command fails', async () => {
-    const { env, cache, setMint } = appFixture();
-    const config = configFromEnv(env);
-    const outputs = ['', 'not json', minted('gho_personal', T0 + 60 * MINUTE), minted('ghs_x\nusername=someone', T0 + 60 * MINUTE), '{"token":"ghs_x"}'];
-    for (const output of outputs) {
+  for (const [what, record] of [
+    ['not JSON', () => 'not json'],
+    ['from another mint command', (command: string) => ({ ...good(command), command: 'another mint command' })],
+    ['not an installation token', (command: string) => ({ ...good(command), token: 'gho_personal' })],
+    ['a token of more than one line', (command: string) => ({ ...good(command), token: 'ghs_x\nusername=someone' })],
+    ['without a readable expiry', (command: string) => ({ ...good(command), expiresAt: 'soon' })],
+  ] as const) {
+    it(`mints afresh when the cache holds something ${what}`, async () => {
+      const { config, mints } = withCache(record);
+      expect(await getToken(config, { now: T0 })).toBe('ghs_fresh');
+      expect(mints()).toBe(1);
+    });
+  }
+
+  for (const [what, output] of [
+    ['nothing', ''],
+    ['something other than JSON', 'not json'],
+    ['a token that is not an installation token', minted('gho_personal', T0 + 60 * MINUTE)],
+    ['a token of more than one line', minted('ghs_x\nusername=someone', T0 + 60 * MINUTE)],
+    ['a token without its expiry', '{"token":"ghs_x"}'],
+  ] as const) {
+    it(`refuses a mint command that prints ${what}`, async () => {
+      const { env, setMint } = appFixture();
+      const config = configFromEnv(env);
       setMint({ output });
       await expect(getToken(config, { now: T0 })).rejects.toThrow(`the mint command (${config.command}) did not print an installation token (ghs_...) and its expiry`);
-    }
-    setMint({ output: minted('ghs_old', T0 - 1000) });
-    await expect(getToken(config, { now: T0 })).rejects.toThrow('printed a token that expired at');
+    });
+  }
 
+  it('refuses a token that has already expired', async () => {
+    const { env, setMint } = appFixture();
+    setMint({ output: minted('ghs_old', T0 - 1000) });
+    await expect(getToken(configFromEnv(env), { now: T0 })).rejects.toThrow('printed a token that expired at');
+  });
+
+  it("quotes only the mint command's stderr when it fails, and caches nothing", async () => {
+    const { env, cache, setMint } = appFixture();
+    const config = configFromEnv(env);
     setMint({ output: minted('ghs_leaked'), status: 1, stderr: 'sudo: a password is required\n' });
     const error: Error = await getToken(config, { now: T0 }).catch((e: Error) => e);
     expect(error.message).toBe(`the mint command (${config.command}) failed (1): sudo: a password is required`);
@@ -202,7 +241,15 @@ describe('git credential helper', () => {
     expect(await gitCredential('store', `${request.trim()}\nusername=x-access-token\npassword=ghs_x\n\n`, never)).toBe('');
   });
 
-  it('speaks the protocol to git itself with a token from the mint command, and erase deletes the cache', () => {
+  const helper = (operation: string, input: string, env: Record<string, string>) => spawnSync('node', [appToken, 'git-credential', operation], { input, env: cleanEnv(env), encoding: 'utf8' });
+  /** The agent's setup with a token from the mint command already in the cache. */
+  const cached = () => {
+    const fixture = appFixture('ghs_cached');
+    writeFileSync(fixture.cache, JSON.stringify({ command: fixture.mint, token: 'ghs_cached', expiresAt: new Date(Date.now() + 60 * MINUTE).toISOString() }));
+    return fixture;
+  };
+
+  it('speaks the protocol to git itself, with a token from the mint command', () => {
     const { env, cache, mints } = appFixture('ghs_for_git');
     const fill = spawnSync('git', ['-c', 'credential.https://github.com.helper=', '-c', `credential.https://github.com.helper=!node ${appToken} git-credential`, 'credential', 'fill'], {
       input: request,
@@ -212,25 +259,36 @@ describe('git credential helper', () => {
     expect(fill.status).toBe(0);
     expect(fill.stdout).toContain('username=x-access-token\npassword=ghs_for_git\n');
     expect([mints(), existsSync(cache)]).toEqual([1, true]);
+  });
 
-    const elsewhere = spawnSync('node', [appToken, 'git-credential', 'erase'], { input: 'protocol=https\nhost=gitlab.com\n\n', env: cleanEnv(env), encoding: 'utf8' });
-    expect([elsewhere.status, elsewhere.stdout, existsSync(cache)]).toEqual([0, '', true]);
-    const erase = spawnSync('node', [appToken, 'git-credential', 'erase'], { input: request, env: cleanEnv(env), encoding: 'utf8' });
+  it('deletes the cached token on erase for https://github.com', () => {
+    const { env, cache } = cached();
+    const erase = helper('erase', request, env);
     expect([erase.status, erase.stdout, existsSync(cache)]).toEqual([0, '', false]);
   });
 
-  it('prints the token for `token`, and fails clearly with no output when the mint command fails', () => {
-    const { env, setMint } = appFixture('ghs_printed');
+  it('keeps the cached token on erase for another host', () => {
+    const { env, cache } = cached();
+    const elsewhere = helper('erase', 'protocol=https\nhost=gitlab.com\n\n', env);
+    expect([elsewhere.status, elsewhere.stdout, existsSync(cache)]).toEqual([0, '', true]);
+  });
+
+  it('prints the token for `token`', () => {
+    const { env } = appFixture('ghs_printed');
     const ok = spawnSync('node', [appToken, 'token'], { env: cleanEnv(env), encoding: 'utf8' });
     expect([ok.status, ok.stdout, ok.stderr]).toEqual([0, 'ghs_printed\n', '']);
+  });
 
-    rmSync(join(env.SIGNAL_TREE_STATE_DIR, 'app-token.json'));
+  it('fails clearly, with no output, when the mint command fails', () => {
+    const { env, setMint } = appFixture();
     setMint({ output: '', status: 1, stderr: 'sudo: unknown user st-mint\n' });
     const failing = spawnSync('node', [appToken, 'token'], { env: cleanEnv(env), encoding: 'utf8' });
     expect([failing.status, failing.stdout]).toEqual([1, '']);
     expect(failing.stderr).toBe(`app-token: the mint command (${env.SIGNAL_TREE_MINT_COMMAND}) failed (1): sudo: unknown user st-mint\n`);
+  });
 
-    const usage = spawnSync('node', [appToken], { env: cleanEnv(env), encoding: 'utf8' });
+  it('exits 2 when called without a mode', () => {
+    const usage = spawnSync('node', [appToken], { env: cleanEnv(appFixture().env), encoding: 'utf8' });
     expect(usage.status).toBe(2);
   });
 });
@@ -245,11 +303,19 @@ describe('gh wrapper', () => {
    * beside app-token.mjs and codeowners.mjs. `extra` may depend on the
    * installed wrapper's path.
    */
+  // The helpers as install_helpers lays them out, installed once and copied for each run.
+  let helpers = '';
+  beforeAll(() => {
+    helpers = join(mkdtempSync(join(tmpdir(), 'signal-tree-helpers-template-')), 'github-app');
+    const install = bash(`${shellFunctions('install_helpers', 'install_file')}; install_helpers '${unattended}' '${helpers}'`, {});
+    if (install.status !== 0) throw new Error(`install_helpers: ${install.stderr}`);
+  });
+  afterAll(() => rmSync(join(helpers, '..'), { recursive: true, force: true }));
+
   const run = (args: string[], extra: Record<string, string> | ((installed: string) => Record<string, string>) = {}) => {
     const { root, env, state } = appFixture('ghs_app');
     const app = join(state, 'github-app');
-    const install = bash(`${shellFunctions('install_helpers', 'install_file')}; install_helpers '${unattended}' '${app}'`, {});
-    expect(install.status, install.stderr).toBe(0);
+    cpSync(helpers, app, { recursive: true });
     const installed = join(app, 'bin', 'gh');
     const fake = join(root, 'real-gh');
     const decoy = join(root, 'decoy');
@@ -305,47 +371,47 @@ describe('gh wrapper', () => {
     expect(r.calls).toEqual(['ghs_app unset pr create --title S8 --body Gate S8.', viewed, listed, owners, merged]);
   });
 
-  it('recognises pr new and a --repo flag before the subcommand', () => {
-    expect(run(['pr', '-R', 'JBorgia/signal-tree', 'create', '--fill']).calls[4]).toBe(merged);
-    expect(run(['pr', '--repo=JBorgia/signal-tree', 'new', '--fill']).calls[4]).toBe(merged);
-  });
+  for (const [what, args] of [
+    ['a -R flag before the subcommand', ['pr', '-R', 'JBorgia/signal-tree', 'create', '--fill']],
+    ['pr new and a --repo= flag', ['pr', '--repo=JBorgia/signal-tree', 'new', '--fill']],
+  ] as const) {
+    it(`recognises ${what}`, () => {
+      expect(run([...args]).calls[4]).toBe(merged);
+    });
+  }
 
-  it("leaves auto-merge off for a PR touching a code-owned path, naming the paths and Jonathan's review", () => {
-    const cases: Array<[Record<string, string>, string[]]> = [
-      [{ PR_VIEW: view({ changedFiles: 3 }), PR_FILES: files('README.md', 'ci/done-check.mjs', 'bench/budgets.json') }, ['ci/done-check.mjs', 'bench/budgets.json']],
-      // A rename away from a code-owned path still touches it.
-      [{ PR_FILES: files({ filename: 'docs/gate.mjs', previous_filename: 'ci/gate-baseline.mjs' }) }, ['ci/gate-baseline.mjs']],
-      // A CODEOWNERS line the matcher cannot parse makes every file code-owned.
-      [{ CODEOWNERS: `${CODEOWNERS}!/docs/ @JBorgia\n` }, ['packages/core/src/index.ts']],
-    ];
-    for (const [extra, paths] of cases) {
+  for (const [what, extra, paths] of [
+    ['several files, two of them code-owned', { PR_VIEW: view({ changedFiles: 3 }), PR_FILES: files('README.md', 'ci/done-check.mjs', 'bench/budgets.json') }, ['ci/done-check.mjs', 'bench/budgets.json']],
+    // A rename away from a code-owned path still touches it.
+    ['a rename away from a code-owned path', { PR_FILES: files({ filename: 'docs/gate.mjs', previous_filename: 'ci/gate-baseline.mjs' }) }, ['ci/gate-baseline.mjs']],
+    // A CODEOWNERS line the matcher cannot parse makes every file code-owned.
+    ['a CODEOWNERS line the matcher cannot parse', { CODEOWNERS: `${CODEOWNERS}!/docs/ @JBorgia\n` }, ['packages/core/src/index.ts']],
+  ] as const) {
+    it(`leaves auto-merge off for a PR touching a code-owned path, naming the paths and Jonathan's review: ${what}`, () => {
       const r = run(['pr', 'create', '--fill'], extra);
       expect(r.status).toBe(0);
       expect(r.stdout).toBe(`${PR}\n`);
       expect(r.calls).toEqual([created, viewed, listed, owners]);
       expect(r.stderr).toContain(`${PR} touches code-owned paths, so it needs Jonathan's review and auto-merge was not turned on:\n${paths.map((p) => `  ${p}\n`).join('')}`);
-    }
-  });
+    });
+  }
 
-  it("fails closed: leaves auto-merge off when the files or main's CODEOWNERS cannot be read or matched", () => {
-    const cases: Array<[Record<string, string>, string[]]> = [
-      [{ FAIL_FILES: '1' }, [created, viewed, listed]],
-      [{ FAIL_CODEOWNERS: '1' }, [created, viewed, listed, owners]],
-      // gh pr view counts two files, the listing has one.
-      [{ PR_VIEW: view({ changedFiles: 2 }) }, [created, viewed, listed, owners]],
-      // Past GitHub's 3000-file listing limit.
-      [{ PR_VIEW: view({ changedFiles: 3001 }) }, [created, viewed, listed, owners]],
-      [{ PR_VIEW: view({ changedFiles: undefined }) }, [created, viewed, listed, owners]],
-      [{ PR_FILES: '{"message":"Not Found"}' }, [created, viewed, listed, owners]],
-    ];
-    for (const [extra, calls] of cases) {
+  for (const [what, extra, calls] of [
+    ["the PR's files cannot be listed", { FAIL_FILES: '1' }, [created, viewed, listed]],
+    ["main's CODEOWNERS cannot be read", { FAIL_CODEOWNERS: '1' }, [created, viewed, listed, owners]],
+    ['gh pr view counts more files than the listing has', { PR_VIEW: view({ changedFiles: 2 }) }, [created, viewed, listed, owners]],
+    ["the PR is past GitHub's 3000-file listing limit", { PR_VIEW: view({ changedFiles: 3001 }) }, [created, viewed, listed, owners]],
+    ['gh pr view gives no file count', { PR_VIEW: view({ changedFiles: undefined }) }, [created, viewed, listed, owners]],
+    ['the listing is not a list of files', { PR_FILES: '{"message":"Not Found"}' }, [created, viewed, listed, owners]],
+  ] as const) {
+    it(`fails closed, leaving auto-merge off: ${what}`, () => {
       const r = run(['pr', 'create', '--fill'], extra);
       expect(r.status).toBe(0);
       expect(r.calls).toEqual(calls);
       expect(r.stderr).toContain(`warning: could not check ${PR}'s changed files against main's CODEOWNERS, so auto-merge was not turned on.`);
       expect(r.stderr).not.toContain("needs Jonathan's review");
-    }
-  });
+    });
+  }
 
   it('leaves auto-merge off when the matcher is missing beside the installed wrapper', () => {
     const r = run(['pr', 'create', '--fill'], (installed) => {
@@ -356,22 +422,24 @@ describe('gh wrapper', () => {
     expect(r.stderr).toContain(`warning: could not check ${PR}'s changed files`);
   });
 
-  it('leaves auto-merge off, with a warning, unless the PR is from a JBorgia/signal-tree branch into main', () => {
-    const cases: Array<[Record<string, string>, string]> = [
-      [{ PR_VIEW: view({ isCrossRepository: true }) }, 'cross-repository: true, base: main'],
-      [{ PR_VIEW: view({ baseRefName: 'release/15.x' }) }, 'cross-repository: false, base: release/15.x'],
-      [{ PR_VIEW: view({ url: 'https://github.com/someone/signal-tree/pull/77' }) }, 'cross-repository: false, base: main'],
-      [{ PR_VIEW: 'not json' }, 'cross-repository: ?'],
-    ];
-    for (const [extra, detail] of cases) {
+  for (const [what, extra, detail] of [
+    ["from a fork", { PR_VIEW: view({ isCrossRepository: true }) }, 'cross-repository: true, base: main'],
+    ['into another branch', { PR_VIEW: view({ baseRefName: 'release/15.x' }) }, 'cross-repository: false, base: release/15.x'],
+    ['in another repository', { PR_VIEW: view({ url: 'https://github.com/someone/signal-tree/pull/77' }) }, 'cross-repository: false, base: main'],
+    ['whose details cannot be read', { PR_VIEW: 'not json' }, 'cross-repository: ?'],
+  ] as const) {
+    it(`leaves auto-merge off, with a warning, for a PR ${what}`, () => {
       const r = run(['pr', 'create', '--fill'], extra);
       expect(r.status).toBe(0);
       expect(r.calls).toEqual([created, viewed]);
       expect(r.stderr).toContain(`warning: ${PR} is not a pull request from a JBorgia/signal-tree branch into main (${detail}`);
-    }
-    const unknown = run(['pr', 'create', '--fill'], { FAIL_VIEW: '1' });
-    expect(unknown.calls).toEqual([created, viewed]);
-    expect(unknown.stderr).toContain(`warning: could not look up ${PR}`);
+    });
+  }
+
+  it('leaves auto-merge off, with a warning, when the new PR cannot be looked up', () => {
+    const r = run(['pr', 'create', '--fill'], { FAIL_VIEW: '1' });
+    expect(r.calls).toEqual([created, viewed]);
+    expect(r.stderr).toContain(`warning: could not look up ${PR}`);
   });
 
   it("only warns when auto-merge cannot be turned on, keeping pr create's exit status", () => {
@@ -391,6 +459,9 @@ describe('gh wrapper', () => {
     const r = run(['issue', 'list', '--label', 'needs-jonathan'], { FAKE_STATUS: '3' });
     expect(r.status).toBe(3);
     expect(r.calls).toEqual(['ghs_app unset issue list --label needs-jonathan']);
+  });
+
+  it('passes another pr subcommand straight through, even with create among its arguments', () => {
     expect(run(['pr', 'comment', '5', '--body', 'create']).calls).toEqual(['ghs_app unset pr comment 5 --body create']);
   });
 
@@ -401,14 +472,19 @@ describe('gh wrapper', () => {
     expect(r.calls).toEqual([]);
   });
 
-  it('runs only the gh in SIGNAL_TREE_REAL_GH, an absolute path other than itself, and never searches PATH', () => {
-    for (const real of ['', 'gh', 'real-gh/gh', 'self']) {
+  for (const [what, real] of [
+    ['unset', ''],
+    ['a bare name', 'gh'],
+    ['a relative path', 'real-gh/gh'],
+    ['the wrapper itself', 'self'],
+  ] as const) {
+    it(`runs nothing, and never searches PATH, when SIGNAL_TREE_REAL_GH is ${what}`, () => {
       const r = run(['issue', 'list'], (installed) => ({ SIGNAL_TREE_REAL_GH: real === 'self' ? installed : real }));
       expect(r.status).toBe(127);
       expect(r.stderr).toContain('SIGNAL_TREE_REAL_GH must be the absolute path of the real gh');
       expect(r.calls).toEqual([]);
-    }
-  });
+    });
+  }
 });
 
 describe('supervisor startup checks', () => {
@@ -442,7 +518,7 @@ describe('supervisor startup checks', () => {
     expect(readFileSync(supervisor, 'utf8')).toMatch(/^set -uo pipefail\n(#.*\n)*umask 077\n/m);
   });
 
-  it('refuses to start if this user can read the App key named in the mint config, or cannot read that config (exit 13)', () => {
+  it('refuses to start if this user can read the App key named in the mint config (exit 13), before creating or minting anything', () => {
     const { env, work, root, appConfig, state, mints } = fixture();
     const key = join(root, 'readable.pem');
     writeFileSync(key, 'not really a key', { mode: 0o400 });
@@ -451,49 +527,73 @@ describe('supervisor startup checks', () => {
     expect(readable.status).toBe(13);
     expect(readable.stderr).toContain(`can read the App's private key ${key}; only the mint user may`);
     expect(readable.stderr).not.toContain('not really a key');
-    // Refused before anything is created or minted.
     expect([existsSync(join(state, 'github-app')), mints()]).toEqual([false, 0]);
+  });
 
-    for (const config of ['not json', '{}', '{"keyFile":"app.pem"}', null]) {
+  for (const [what, config] of [
+    ['is not JSON', 'not json'],
+    ['names no key', '{}'],
+    ['names a relative key path', '{"keyFile":"app.pem"}'],
+    ['is missing', null],
+  ] as const) {
+    it(`refuses to start when the mint config ${what} (exit 13)`, () => {
+      const { env, work, appConfig } = fixture();
       if (config === null) rmSync(appConfig);
       else writeFileSync(appConfig, config);
       const run = start(env, work);
       expect(run.status).toBe(13);
       expect(run.stderr).toContain(`cannot read the key path (keyFile) from ${appConfig}`);
-    }
-  });
+    });
+  }
 
-  it('passes the key check when the key cannot be read, and ignores App settings left in the environment', () => {
-    const { root, appConfig, env } = fixture();
-    const locked = join(root, 'st-mint');
+  /** The agent's setup with the mint config naming a key in a directory of its own, as on the VM. */
+  const keyInDirectory = () => {
+    const fixture = appFixture();
+    const locked = join(fixture.root, 'st-mint');
     mkdirSync(locked);
     writeFileSync(join(locked, 'app.pem'), 'not really a key', { mode: 0o400 });
-    writeFileSync(appConfig, JSON.stringify({ appId: 12345, installationId: 678, keyFile: join(locked, 'app.pem') }));
+    writeFileSync(fixture.appConfig, JSON.stringify({ appId: 12345, installationId: 678, keyFile: join(locked, 'app.pem') }));
+    return { ...fixture, locked };
+  };
+  const checkKey = (env: Record<string, string>) => bash(`${shellFunctions('check_key_unreadable')}; check_key_unreadable`, env);
+
+  it('passes the key check when the key cannot be read', () => {
+    const { env, locked } = keyInDirectory();
     chmodSync(locked, 0o000);
     try {
-      expect(bash(`${shellFunctions('check_key_unreadable')}; check_key_unreadable`, env).status).toBe(0);
+      expect(checkKey(env).status).toBe(0);
     } finally {
       chmodSync(locked, 0o700);
     }
-    expect(bash(`${shellFunctions('check_key_unreadable')}; check_key_unreadable`, env).status).toBe(1);
+  });
+
+  it('fails the key check when the same key can be read', () => {
+    expect(checkKey(keyInDirectory().env).status).toBe(1);
+  });
+
+  it('ignores App settings left in the environment', () => {
     const text = readFileSync(supervisor, 'utf8');
     expect(text).toContain('unset SIGNAL_TREE_APP_ID SIGNAL_TREE_APP_INSTALLATION_ID SIGNAL_TREE_APP_KEY_FILE');
     expect(text).not.toMatch(/export[^\n]*SIGNAL_TREE_APP_(ID|KEY_FILE)/);
   });
 
-  it('refuses a state directory inside the checkout or the verifier (exit 2), creating nothing', () => {
-    const { env, work, root } = fixture();
-    const inWork = start({ ...env, SIGNAL_TREE_STATE_DIR: join(work, '.state') }, work);
-    expect(inWork.status).toBe(2);
-    expect(inWork.stderr).toContain("is inside the agent's checkout or the verifier");
+  it('refuses a state directory inside the checkout (exit 2), creating nothing', () => {
+    const { env, work } = fixture();
+    const run = start({ ...env, SIGNAL_TREE_STATE_DIR: join(work, '.state') }, work);
+    expect(run.status).toBe(2);
+    expect(run.stderr).toContain("is inside the agent's checkout or the verifier");
     expect(existsSync(join(work, '.state'))).toBe(false);
+  });
 
-    const inVerifier = start({ ...env, SIGNAL_TREE_VERIFY_DIR: join(root, 'verify'), SIGNAL_TREE_STATE_DIR: join(root, 'verify', 'state') }, work);
-    expect(inVerifier.status).toBe(2);
+  it('refuses a state directory inside the verifier (exit 2), creating nothing', () => {
+    const { env, work, root } = fixture();
+    const run = start({ ...env, SIGNAL_TREE_VERIFY_DIR: join(root, 'verify'), SIGNAL_TREE_STATE_DIR: join(root, 'verify', 'state') }, work);
+    expect(run.status).toBe(2);
+    expect(run.stderr).toContain("is inside the agent's checkout or the verifier");
     expect(existsSync(join(root, 'verify'))).toBe(false);
   });
 
-  it('refuses to start when the mint command gives no token (exit 9), even with a valid token cached', () => {
+  it('refuses to start when the mint command fails (exit 9), even with a valid token cached', () => {
     const { env, cache, mint, work, setMint, mints } = fixture();
     writeFileSync(cache, JSON.stringify({ command: mint, token: 'ghs_cached', expiresAt: new Date(Date.now() + 60 * MINUTE).toISOString() }));
     setMint({ output: '', status: 1, stderr: 'sudo: a password is required\n' });
@@ -502,14 +602,17 @@ describe('supervisor startup checks', () => {
     expect(run.stderr).toContain(`app-token: the mint command (${mint}) failed (1): sudo: a password is required`);
     expect(run.stderr).toContain('the mint command gave no GitHub App installation token');
     expect(mints()).toBe(1);
-
-    setMint({ output: minted('gho_personal') });
-    const personal = start(env, work);
-    expect(personal.status).toBe(9);
-    expect(personal.stderr).toContain('did not print an installation token (ghs_...)');
   });
 
-  it('refuses an origin other than https://github.com/JBorgia/signal-tree (exit 10), without echoing credentials, with a private state directory', () => {
+  it('refuses to start when the mint command prints no installation token (exit 9)', () => {
+    const { env, work, setMint } = fixture();
+    setMint({ output: minted('gho_personal') });
+    const run = start(env, work);
+    expect(run.status).toBe(9);
+    expect(run.stderr).toContain('did not print an installation token (ghs_...)');
+  });
+
+  it('refuses an SSH origin (exit 10), after minting afresh, and leaves a private state directory', () => {
     const ssh = fixture('git@github.com:JBorgia/signal-tree.git');
     // A valid cached token does not spare the startup mint.
     writeFileSync(ssh.cache, JSON.stringify({ command: ssh.mint, token: 'ghs_cached', expiresAt: new Date(Date.now() + 60 * MINUTE).toISOString() }));
@@ -524,12 +627,14 @@ describe('supervisor startup checks', () => {
     expect(mode(join(ssh.state, 'github-app', 'app-token.mjs'))).toBe(0o600);
     expect(mode(join(ssh.state, 'github-app', 'codeowners.mjs'))).toBe(0o600);
     expect(mode(join(ssh.state, 'github-app', 'bin', 'gh'))).toBe(0o700);
+  });
 
+  it('refuses an origin with a token in it (exit 10), without echoing the token', () => {
     const token = fixture('https://x-access-token:ghp_SECRET@github.com/JBorgia/signal-tree.git');
-    const leaky = start(token.env, token.work);
-    expect(leaky.status).toBe(10);
-    expect(leaky.stderr).toContain('https://***@github.com/JBorgia/signal-tree.git');
-    expect(leaky.stderr).not.toContain('ghp_SECRET');
+    const run = start(token.env, token.work);
+    expect(run.status).toBe(10);
+    expect(run.stderr).toContain('https://***@github.com/JBorgia/signal-tree.git');
+    expect(run.stderr).not.toContain('ghp_SECRET');
   });
 
   it('refuses to start when gh has a stored login (exit 11)', () => {
@@ -547,86 +652,105 @@ describe('supervisor startup checks', () => {
     expect(readFileSync(ghLog, 'utf8').trim().split('\n')).toEqual(['unset auth status', 'ghs_supervisor api repos/JBorgia/signal-tree/rules/branches/main']);
   });
 
-  it('accepts only origin URLs of exactly https://github.com/JBorgia/signal-tree(.git), and no extra HTTP header', () => {
-    const check = (url: string, ...config: string[][]) => {
-      const work = checkout(url);
-      for (const args of config) git(work, ...args);
-      return bash(`${shellFunctions('check_origin', 'redact_url')}; check_origin "$PWD"`, isolatedGit, work);
-    };
-    expect(check(ORIGIN).status).toBe(0);
-    expect(check('https://github.com/JBorgia/signal-tree').status).toBe(0);
+  /** check_origin on a checkout whose origin is `url`, after the given `git config` calls. */
+  const checkOrigin = (url: string | null, ...config: string[][]) => {
+    const work = checkout(url);
+    for (const args of config) git(work, ...args);
+    return bash(`${shellFunctions('check_origin', 'redact_url')}; check_origin "$PWD"`, isolatedGit, work);
+  };
 
-    const refused: Array<[string, string[][], string]> = [
-      ['https://x-access-token:ghp_SECRET@github.com/JBorgia/signal-tree.git', [], 'https://***@github.com/'],
-      ['ssh://git@github.com/JBorgia/signal-tree.git', [], 'ssh://***@github.com/'],
-      ['https://github.com/someone/signal-tree.git', [], 'someone/signal-tree'],
-      ['http://github.com/JBorgia/signal-tree.git', [], 'http://github.com/'],
-      [ORIGIN, [['config', 'remote.origin.pushurl', 'https://github.com/someone/signal-tree.git']], 'someone/signal-tree'],
-      [ORIGIN, [['config', 'url.git@github.com:.insteadOf', 'https://github.com/']], 'git@github.com:JBorgia'],
-      [ORIGIN, [['config', 'url.git@github.com:.pushInsteadOf', 'https://github.com/']], 'git@github.com:JBorgia'],
-      [ORIGIN, [['remote', 'set-url', '--add', 'origin', 'https://x:ghp_SECRET@github.com/JBorgia/signal-tree.git']], 'https://***@github.com/'],
-      [ORIGIN, [['config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: basic SECRET']], 'http.https://github.com/.extraheader'],
-      [ORIGIN, [['config', 'http.extraheader', 'AUTHORIZATION: bearer SECRET']], 'http.extraheader'],
-    ];
-    for (const [url, config, shown] of refused) {
-      const r = check(url, ...config);
-      expect(r.status, `${url} ${JSON.stringify(config)}`).toBe(1);
+  for (const url of [ORIGIN, 'https://github.com/JBorgia/signal-tree']) {
+    it(`accepts origin ${url}`, () => {
+      const r = checkOrigin(url);
+      expect(r.status, r.stderr).toBe(0);
+    });
+  }
+
+  for (const [what, url, config, shown] of [
+    ['a token in the URL', 'https://x-access-token:ghp_SECRET@github.com/JBorgia/signal-tree.git', [], 'https://***@github.com/'],
+    ['SSH', 'ssh://git@github.com/JBorgia/signal-tree.git', [], 'ssh://***@github.com/'],
+    ['another repository', 'https://github.com/someone/signal-tree.git', [], 'someone/signal-tree'],
+    ['plain HTTP', 'http://github.com/JBorgia/signal-tree.git', [], 'http://github.com/'],
+    ['a push URL to another repository', ORIGIN, [['config', 'remote.origin.pushurl', 'https://github.com/someone/signal-tree.git']], 'someone/signal-tree'],
+    ['an insteadOf rule to SSH', ORIGIN, [['config', 'url.git@github.com:.insteadOf', 'https://github.com/']], 'git@github.com:JBorgia'],
+    ['a pushInsteadOf rule to SSH', ORIGIN, [['config', 'url.git@github.com:.pushInsteadOf', 'https://github.com/']], 'git@github.com:JBorgia'],
+    ['a second URL with a token', ORIGIN, [['remote', 'set-url', '--add', 'origin', 'https://x:ghp_SECRET@github.com/JBorgia/signal-tree.git']], 'https://***@github.com/'],
+    ['an extra header for github.com', ORIGIN, [['config', 'http.https://github.com/.extraheader', 'AUTHORIZATION: basic SECRET']], 'http.https://github.com/.extraheader'],
+    ['an extra header for every host', ORIGIN, [['config', 'http.extraheader', 'AUTHORIZATION: bearer SECRET']], 'http.extraheader'],
+  ] as const) {
+    it(`refuses an origin with ${what}, without echoing secrets`, () => {
+      const r = checkOrigin(url, ...config.map((args) => [...args]));
+      expect(r.status).toBe(1);
       expect(r.stderr).toContain(shown);
       expect(r.stderr).not.toContain('SECRET');
-    }
-    const none = join(scratch(), 'none');
-    mkdirSync(none);
-    git(none, 'init', '-q');
-    expect(bash(`${shellFunctions('check_origin', 'redact_url')}; check_origin "$PWD"`, isolatedGit, none).stderr).toContain('has no origin remote');
+    });
+  }
+
+  it('refuses a checkout without an origin', () => {
+    expect(checkOrigin(null).stderr).toContain('has no origin remote');
   });
 
-  it("gives git only the App's credentials and Jonathan's identity: no machine config, other helper, askpass or SSH", () => {
+  /**
+   * use_github_app in a checkout of ORIGIN, with the machine's own git config
+   * (as in the review: HTTPS rewritten to SSH, a personal helper and an extra
+   * header) and the checkout's (a personal helper and another identity), then
+   * `probe`, all in one shell; `before` runs first, before use_github_app.
+   */
+  const asTheApp = (probe: string[], before: string[] = []) => {
     const { env, root, state } = appFixture('ghs_env');
     const appDir = join(state, 'github-app');
-    // The machine's own git config, as in the review: HTTPS rewritten to SSH, and a personal helper.
     const machine = join(root, 'machine-gitconfig');
     const personal = '!f() { echo username=someone; echo password=personal-token; }; f';
     writeFileSync(machine, `[url "git@github.com:"]\n\tinsteadOf = https://github.com/\n[credential]\n\thelper = "${personal}"\n[http]\n\textraheader = AUTHORIZATION: basic SECRET\n`);
     const work = checkout(ORIGIN);
-    git(work, 'config', 'credential.helper', personal);
-    git(work, 'config', 'user.name', 'Someone Else');
-    git(work, 'config', 'user.email', 'someone@example.com');
-    const script = [
-      shellFunctions('use_github_app', 'install_helpers', 'install_file', 'write_git_config'),
-      'echo "before=$(git ls-remote --get-url https://github.com/JBorgia/signal-tree.git)"',
-      `use_github_app '${unattended}' '${appDir}' || exit 9`,
-      'echo "global=$GIT_CONFIG_GLOBAL nosystem=$GIT_CONFIG_NOSYSTEM protocols=$GIT_ALLOW_PROTOCOL askpass=[${GIT_ASKPASS-unset}] ssh_askpass=${SSH_ASKPASS-unset} prompt=$GIT_TERMINAL_PROMPT"',
-      'echo "gh=$(command -v gh)"',
-      'echo "after=$(git ls-remote --get-url https://github.com/JBorgia/signal-tree.git)"',
-      'echo "headers=$(git config --get-regexp extraheader)"',
-      "printf 'protocol=https\\nhost=github.com\\n\\n' | git credential fill | grep -E '^(username|password)='",
-      'git ls-remote git@github.com:JBorgia/signal-tree.git 2>&1 | grep -o "transport .ssh. not allowed"',
-      'git ls-remote ssh://git@github.com/JBorgia/signal-tree.git 2>&1 | grep -o "transport .ssh. not allowed"',
-      'git commit -q --allow-empty -m probe && git log -1 --format="commit=%an <%ae> / %cn <%ce>"',
-    ].join('\n');
+    appendFileSync(join(work, '.git', 'config'), `[credential]\n\thelper = "${personal}"\n[user]\n\tname = Someone Else\n\temail = someone@example.com\n`);
+    const script = [shellFunctions('use_github_app', 'install_helpers', 'install_file', 'write_git_config'), ...before, `use_github_app '${unattended}' '${appDir}' || exit 9`, ...probe].join('\n');
     const r = bash(script, { ...env, GIT_CONFIG_GLOBAL: machine, GIT_ASKPASS: '/bin/echo', SSH_ASKPASS: '/bin/echo', GIT_SSH_COMMAND: 'false' }, work);
     expect(r.status, r.stderr).toBe(0);
-    const jonathan = 'Jonathan Borgia <jonathanborgia@gmail.com>';
-    expect(r.stdout.trim().split('\n')).toEqual([
+    return { lines: r.stdout.trim().split('\n'), appDir };
+  };
+
+  it("leaves the machine's git config out, and gives git only the App's credentials", () => {
+    const { lines, appDir } = asTheApp([
+      'echo "global=$GIT_CONFIG_GLOBAL nosystem=$GIT_CONFIG_NOSYSTEM protocols=$GIT_ALLOW_PROTOCOL askpass=[${GIT_ASKPASS-unset}] ssh_askpass=${SSH_ASKPASS-unset} prompt=$GIT_TERMINAL_PROMPT"',
+      'echo "gh=$(command -v gh)"',
+      'echo "url=$(git ls-remote --get-url https://github.com/JBorgia/signal-tree.git)"',
+      'echo "headers=$(git config --get-regexp extraheader)"',
+      "printf 'protocol=https\\nhost=github.com\\n\\n' | git credential fill | grep -E '^(username|password)='",
+    ], ['echo "before=$(git ls-remote --get-url https://github.com/JBorgia/signal-tree.git)"']);
+    expect(lines).toEqual([
       'before=git@github.com:JBorgia/signal-tree.git',
       `global=${appDir}/gitconfig nosystem=1 protocols=https:file askpass=[] ssh_askpass=unset prompt=0`,
       `gh=${appDir}/bin/gh`,
-      `after=${ORIGIN}`,
+      `url=${ORIGIN}`,
       'headers=',
       'username=x-access-token',
       'password=ghs_env',
-      "transport 'ssh' not allowed",
-      "transport 'ssh' not allowed",
-      `commit=${jonathan} / ${jonathan}`,
     ]);
     expect(readFileSync(join(appDir, 'gitconfig'), 'utf8')).not.toMatch(/^\s*[^#\s]/m);
+  });
+
+  it('allows no SSH at all', () => {
+    const { lines } = asTheApp(['for url in git@github.com:JBorgia/signal-tree.git ssh://git@github.com/JBorgia/signal-tree.git; do git ls-remote "$url" 2>&1 | grep -o "transport .ssh. not allowed"; done']);
+    expect(lines).toEqual(["transport 'ssh' not allowed", "transport 'ssh' not allowed"]);
+  });
+
+  it("commits as Jonathan whatever the checkout's config says, and installs the helpers privately", () => {
+    const { lines, appDir } = asTheApp(['git commit -q --allow-empty -m probe && git log -1 --format="commit=%an <%ae> / %cn <%ce>"']);
+    const jonathan = 'Jonathan Borgia <jonathanborgia@gmail.com>';
+    expect(lines).toEqual([`commit=${jonathan} / ${jonathan}`]);
     expect(readFileSync(join(appDir, 'app-token.mjs'), 'utf8')).toBe(readFileSync(appToken, 'utf8'));
     expect(readFileSync(join(appDir, 'codeowners.mjs'), 'utf8')).toBe(readFileSync(codeownersMatcher, 'utf8'));
     expect(readFileSync(join(appDir, 'bin', 'gh'), 'utf8')).toBe(readFileSync(wrapper, 'utf8'));
     expect([mode(join(appDir, 'gitconfig')), mode(join(appDir, 'app-token.mjs')), mode(join(appDir, 'codeowners.mjs')), mode(join(appDir, 'bin', 'gh'))]).toEqual([0o600, 0o600, 0o600, 0o700]);
   });
 
-  it('resolves the real gh once from absolute PATH entries other than the wrapper, and drops relative ones', () => {
+  /**
+   * PATH entries for use_real_gh: '.' and a relative directory holding a decoy
+   * gh, the wrapper's directory, a directory with a link to the wrapper, and two
+   * real ones, a and b (each gh exits $FAKE_AUTH_STATUS for auth status).
+   */
+  const ghPaths = () => {
     const root = scratch();
     const cwd = join(root, 'cwd');
     const wrapperDir = join(root, 'github-app', 'bin');
@@ -634,69 +758,90 @@ describe('supervisor startup checks', () => {
     const [a, b] = [join(root, 'a'), join(root, 'b')];
     for (const dir of [join(cwd, 'rel'), wrapperDir, linked, a, b]) mkdirSync(dir, { recursive: true });
     const decoyLog = join(root, 'decoy.log');
-    for (const dir of [cwd, join(cwd, 'rel')]) writeScript(join(dir, 'gh'), `echo "$*" >> "${decoyLog}"; exit 0`);
-    writeScript(join(wrapperDir, 'gh'), `echo "$*" >> "${decoyLog}"; exit 0`);
+    for (const dir of [cwd, join(cwd, 'rel'), wrapperDir]) writeScript(join(dir, 'gh'), `echo "$*" >> "${decoyLog}"; exit 0`);
     symlinkSync(join(wrapperDir, 'gh'), join(linked, 'gh'));
     for (const dir of [a, b]) writeScript(join(dir, 'gh'), 'exit "${FAKE_AUTH_STATUS:-1}"');
     const config = join(root, 'gh-config');
     const resolve = (path: string, extra: Record<string, string> = {}) =>
       bash(`${shellFunctions('use_real_gh')}; PATH=$TEST_PATH; use_real_gh "$CONFIG" "${wrapperDir}/gh" || exit 11; echo "real=$SIGNAL_TREE_REAL_GH"; echo "config=$GH_CONFIG_DIR"; echo "path=$PATH"`, { TEST_PATH: path, CONFIG: config, ...extra }, cwd);
+    return { a, config, decoyLog, resolve, tail: `${wrapperDir}:${linked}:${a}:${b}:/usr/bin:/bin`, wrappers: `${wrapperDir}:${linked}` };
+  };
 
-    const tail = `${wrapperDir}:${linked}:${a}:${b}:/usr/bin:/bin`;
+  it('resolves the real gh once from absolute PATH entries other than the wrapper, and drops relative ones', () => {
+    const { a, config, decoyLog, resolve, tail } = ghPaths();
     const ok = resolve(`:.:rel:${tail}`);
     expect(ok.status, ok.stderr).toBe(0);
     expect(ok.stdout.trim().split('\n')).toEqual([`real=${realpathSync(a)}/gh`, `config=${config}`, `path=${tail}`]);
     expect(mode(config)).toBe(0o700);
     expect(existsSync(decoyLog)).toBe(false);
+  });
 
+  it('refuses a gh with a stored login', () => {
+    const { resolve, tail } = ghPaths();
     const login = resolve(tail, { FAKE_AUTH_STATUS: '0' });
     expect(login.status).toBe(11);
     expect(login.stderr).toContain('gh has a stored login');
+  });
 
+  it('refuses a gh config directory that holds a login', () => {
+    const { config, resolve, tail } = ghPaths();
+    mkdirSync(config);
     writeFileSync(join(config, 'hosts.yml'), 'github.com:\n  user: someone\n');
     expect(resolve(tail).status).toBe(11);
-    rmSync(join(config, 'hosts.yml'));
+  });
 
-    const none = resolve(`.:rel:${wrapperDir}:${linked}`);
+  it('refuses when the only gh is the wrapper or in a relative directory', () => {
+    const { decoyLog, resolve, wrappers } = ghPaths();
+    const none = resolve(`.:rel:${wrappers}`);
     expect(none.status).toBe(11);
     expect(none.stderr).toContain('no gh in an absolute PATH directory');
     expect(existsSync(decoyLog)).toBe(false);
   });
 
-  it('reads the rules on main through gh and requires an approving review, code-owner review and status checks', () => {
-    const { env } = fixture();
-    const check = (...rules: object[]) => bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: JSON.stringify(rules) });
-    const approvals = 'a pull_request rule requiring at least one approving review (required_approving_review_count >= 1)';
-    const owners = 'a pull_request rule requiring code-owner review (require_code_owner_review: true)';
-    const checks = 'a required_status_checks rule';
-    const missing = (...requirements: string[]) => `lacks what a PR the App auto-merges must wait for:\n${requirements.map((r) => `  ${r}\n`).join('')}`;
+  /** check_main_rules, reading `rules` from the fake gh. */
+  const checkRules = (rules: string, extra: Record<string, string> = {}) => bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...fixture().env, FAKE_RULES: rules, ...extra });
+  const approvals = 'a pull_request rule requiring at least one approving review (required_approving_review_count >= 1)';
+  const reviews = 'a pull_request rule requiring code-owner review (require_code_owner_review: true)';
+  const checks = 'a required_status_checks rule';
+  const missing = (...requirements: string[]) => `lacks what a PR the App auto-merges must wait for:\n${requirements.map((r) => `  ${r}\n`).join('')}`;
 
-    expect(check({ type: 'deletion' }, statusChecks, pullRequest()).status).toBe(0);
-    expect(check(pullRequest({ required_approving_review_count: 2 }), statusChecks).status).toBe(0);
+  for (const [what, rules] of [
+    ['the required rules among others', [{ type: 'deletion' }, statusChecks, pullRequest()]],
+    ['two approving reviews', [pullRequest({ required_approving_review_count: 2 }), statusChecks]],
     // Each requirement may come from a different ruleset's rule.
-    expect(check(pullRequest({ require_code_owner_review: false }), pullRequest({ required_approving_review_count: 0 }), statusChecks).status).toBe(0);
+    ['the requirements spread over two rulesets', [pullRequest({ require_code_owner_review: false }), pullRequest({ required_approving_review_count: 0 }), statusChecks]],
+  ] as const) {
+    it(`accepts main's rules with ${what}`, () => {
+      expect(checkRules(JSON.stringify(rules)).status).toBe(0);
+    });
+  }
 
-    const cases: Array<[object[], string[]]> = [
-      [[], [approvals, owners, checks]],
-      [[pullRequest()], [checks]],
-      [[statusChecks, { type: 'pull_request' }], [approvals, owners]],
-      [[pullRequest({ required_approving_review_count: 0 }), statusChecks], [approvals]],
-      [[pullRequest({ required_approving_review_count: '1' }), statusChecks], [approvals]],
-      [[pullRequest({ require_code_owner_review: false }), statusChecks], [owners]],
-      [[pullRequest({ require_code_owner_review: 'true' }), statusChecks], [owners]],
-    ];
-    for (const [rules, requirements] of cases) {
-      const r = check(...rules);
-      expect(r.status, JSON.stringify(rules)).toBe(1);
+  for (const [what, rules, requirements] of [
+    ['no rules', [], [approvals, reviews, checks]],
+    ['no status checks', [pullRequest()], [checks]],
+    ['a pull_request rule without parameters', [statusChecks, { type: 'pull_request' }], [approvals, reviews]],
+    ['no approving review', [pullRequest({ required_approving_review_count: 0 }), statusChecks], [approvals]],
+    ['a review count that is not a number', [pullRequest({ required_approving_review_count: '1' }), statusChecks], [approvals]],
+    ['no code-owner review', [pullRequest({ require_code_owner_review: false }), statusChecks], [reviews]],
+    ['code-owner review given as a string', [pullRequest({ require_code_owner_review: 'true' }), statusChecks], [reviews]],
+  ] as const) {
+    it(`refuses main's rules with ${what}, naming what is missing`, () => {
+      const r = checkRules(JSON.stringify(rules));
+      expect(r.status).toBe(1);
       expect(r.stderr).toContain(missing(...requirements));
-    }
+    });
+  }
 
-    const unreadable = bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: '{"message":"Not Found"}', FAKE_API_STATUS: '1' });
-    expect(unreadable.status).toBe(1);
-    expect(unreadable.stderr).toContain('could not read the rules for main of JBorgia/signal-tree');
-    const notRules = bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: '{"message":"Not Found"}' });
-    expect(notRules.status).toBe(1);
-    expect(notRules.stderr).toContain("GitHub's answer is not a list of rules");
+  it('refuses when the rules cannot be read', () => {
+    const r = checkRules('{"message":"Not Found"}', { FAKE_API_STATUS: '1' });
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('could not read the rules for main of JBorgia/signal-tree');
+  });
+
+  it("refuses an answer that is not a list of rules", () => {
+    const r = checkRules('{"message":"Not Found"}');
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain("GitHub's answer is not a list of rules");
   });
 });
 
@@ -897,51 +1042,80 @@ describe('workflow self-test', () => {
     expect(r.stderr).toContain('the workflow self-test could not fetch main');
   });
 
-  it('is skipped, loudly, only with SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 and a fake remote', () => {
+  it('is skipped, loudly, with SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 and a fake remote', () => {
     const f = remoteFixture(hooks.accept);
     const skipped = selftest(f, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1' });
     expect(skipped.status).toBe(0);
     expect(skipped.stderr).toContain('WARNING: SKIPPING THE WORKFLOW SELF-TEST (SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1, fake remote)');
     expect(f.offered()).toEqual([]);
+  });
 
-    // With origin on github.com it runs anyway (here https is not allowed, so it fails without the network).
+  it('runs despite SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 when origin is on github.com', () => {
+    const f = remoteFixture(hooks.accept);
     git(f.work, 'remote', 'set-url', 'origin', ORIGIN);
+    // https is not allowed here, so it fails at once without the network.
     const github = selftest(f, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1', GIT_ALLOW_PROTOCOL: 'file' });
     expect(github.status).toBe(1);
     expect(github.stderr).toContain('is only for tests against a fake remote; origin is on github.com, so the workflow self-test runs.');
     expect(github.stderr).toContain('could not fetch main');
   });
 
-  it("recognises GitHub's refusal: one line with workflow and permission or refusing, in any case", () => {
-    const matches = (text: string) => {
-      const file = join(scratch(), 'push.out');
-      writeFileSync(file, text);
-      return bash(`${shellFunctions('is_workflow_refusal')}; is_workflow_refusal "${file}"`, {}).status === 0;
-    };
-    const path = '.github/workflows/selftest-0123456789ab.yml';
-    expect(matches(`To https://github.com/JBorgia/signal-tree.git\n ! [remote rejected] 1a2b3c4 -> selftest/workflow-push-0123456789ab (${refusal(path)})\nerror: failed to push some refs\n`)).toBe(true);
-    expect(matches(`remote: ${refusal(path).toUpperCase()}\n`)).toBe(true);
-    expect(matches('remote: refusing to update workflow files\n')).toBe(true);
-    for (const text of ['remote: error: GH006: Protected branch update failed.\n', 'remote: workflow runs are disabled\n', 'remote: Permission to JBorgia/signal-tree.git denied.\nfatal: unable to access: The requested URL returned error: 403\n', 'remote: a workflow\nremote: permission\n', 'fatal: unable to access: Could not resolve host: github.com\n', '']) {
-      expect(matches(text), text).toBe(false);
-    }
-  });
+  /** is_workflow_refusal on push output `text`. */
+  const matches = (text: string) => {
+    const file = join(scratch(), 'push.out');
+    writeFileSync(file, text);
+    return bash(`${shellFunctions('is_workflow_refusal')}; is_workflow_refusal "${file}"`, {}).status === 0;
+  };
+  const selftestPath = '.github/workflows/selftest-0123456789ab.yml';
+  for (const [what, text] of [
+    ["GitHub's ref status line", `To https://github.com/JBorgia/signal-tree.git\n ! [remote rejected] 1a2b3c4 -> selftest/workflow-push-0123456789ab (${refusal(selftestPath)})\nerror: failed to push some refs\n`],
+    ['the same message in capitals', `remote: ${refusal(selftestPath).toUpperCase()}\n`],
+    ['workflow and refusing without permission', 'remote: refusing to update workflow files\n'],
+  ] as const) {
+    it(`recognises GitHub's refusal: ${what}`, () => {
+      expect(matches(text)).toBe(true);
+    });
+  }
+  for (const [what, text] of [
+    ['a protected branch', 'remote: error: GH006: Protected branch update failed.\n'],
+    ['workflow alone', 'remote: workflow runs are disabled\n'],
+    ['permission alone', 'remote: Permission to JBorgia/signal-tree.git denied.\nfatal: unable to access: The requested URL returned error: 403\n'],
+    ['workflow and permission on different lines', 'remote: a workflow\nremote: permission\n'],
+    ['a network failure', 'fatal: unable to access: Could not resolve host: github.com\n'],
+    ['no output', ''],
+  ] as const) {
+    it(`does not take ${what} for GitHub's refusal`, () => {
+      expect(matches(text)).toBe(false);
+    });
+  }
 
-  it('kills the command when its deadline is set off, and passes its status through otherwise', async () => {
+  /** with_timeout running `command`, then its status. */
+  const timed = (command: string) => `${shellFunctions('with_timeout')}; ${command}; echo "status=$?"`;
+
+  it('kills the command when its deadline is set off, returning 124', async () => {
     const dir = scratch();
     const deadline = fifo(join(dir, 'deadline'));
     const blocked = fifo(join(dir, 'blocked'));
-    const timed = (command: string) => `${shellFunctions('with_timeout')}; ${command}; echo "status=$?"`;
     // The command waits on a FIFO nobody writes, so only the deadline can end it.
     const run = bashAsync(timed(`with_timeout "${deadline}" cat "${blocked}"`), {});
     await writeFile(deadline, 'now\n');
     expect((await run).stdout).toBe('status=124\n');
-    // With the deadline never set off, the command's own status comes back, and no watchdog is left holding the output.
-    expect(bash(timed(`with_timeout "${deadline}" sh -c 'exit 3'`), {}).stdout).toBe('status=3\n');
-    expect(bash(timed(`with_timeout "${deadline}" true`), {}).stdout).toBe('status=0\n');
-    // The production form: a number of seconds, here never reached.
+  });
+
+  for (const [command, status] of [
+    ["sh -c 'exit 3'", 3],
+    ['true', 0],
+  ] as const) {
+    it(`passes the status of \`${command}\` through when the deadline is never set off, leaving no watchdog holding the output`, () => {
+      const deadline = fifo(join(scratch(), 'deadline'));
+      expect(bash(timed(`with_timeout "${deadline}" ${command}`), {}).stdout).toBe(`status=${status}\n`);
+    });
+  }
+
+  it('takes the production deadline as a number of seconds', () => {
+    // Never reached here: true ends first.
     expect(bash(timed('with_timeout 30 true'), {}).stdout).toBe('status=0\n');
-    expect(bash(`${shellFunctions('deadline_text')}; deadline_text 30; deadline_text "${deadline}"`, {}).stdout).toBe('within 30 s\nbefore its deadline\n');
+    expect(bash(`${shellFunctions('deadline_text')}; deadline_text 30; deadline_text /some/fifo`, {}).stdout).toBe('within 30 s\nbefore its deadline\n');
   });
 
   it('runs in the supervisor after the token, origin, gh, rules and ls-remote checks, before the lock (exit 14), with a 30 s deadline', () => {
