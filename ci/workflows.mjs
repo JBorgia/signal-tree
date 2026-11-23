@@ -28,10 +28,16 @@ export const GATE_RUNNER_NAME_ENV = '${{ vars.SIGNAL_TREE_GATE_RUNNER_NAME }}';
 /** The runs-on a gate job may have: the gates runner's labels, with the hosted fallback (ci, nightly) or without it (soak). */
 export const GATE_RUNS_ON = ["${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER || '\"ubuntu-latest\"') }}", '${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER) }}'];
 export const PRE_COMMAND = 'node ci/gate-host.mjs --pre';
+export const BROWSERS_COMMAND = 'node ci/gate-host.mjs --browsers';
 export const POST_COMMAND = 'node ci/gate-host.mjs --post';
 /** A step that mentions the gate-host checks at all; it must then be exactly one of the two commands. */
 const MENTIONS_PRE = /gate-host(?:\.mjs)?[\s\S]*--pre\b/;
 const MENTIONS_POST = /gate-host(?:\.mjs)?[\s\S]*--post\b/;
+const MENTIONS_BROWSERS = /gate-host(?:\.mjs)?[\s\S]*--browsers\b/;
+/** Installing the lock's packages (not a global install). */
+const PNPM_INSTALL = /^\s*pnpm\s+install\b(?![^\n]*\s(?:-g|--global)\b)/m;
+/** A harness step: its self-tests or typecheck, or any bench invocation. */
+const HARNESS = /\bbench:test\b|@signal-tree\/bench\s+(?:run\s+)?(?:typecheck|test)\b/;
 /**
  * A step that runs the bench harness, in any form: `pnpm bench`, `pnpm run
  * bench`, `pnpm --filter <pkg> bench`, npm, yarn or npx alike, or its CLI
@@ -78,6 +84,10 @@ const BUILT = [/format\s*\(/i, /\$\{\{[^}]*\benv\.[^}]*gate/i];
  *   shell, working-directory or env; exactly one runs exactly
  *   `node ci/gate-host.mjs --post` with if: always() and nothing else;
  * - every bench invocation runs between the two;
+ * - exactly one step runs exactly `node ci/gate-host.mjs --browsers` (the
+ *   preinstalled Chromium is the build the Playwright lock pins), with no if:,
+ *   shell, working-directory or env, after pnpm install and before every
+ *   harness or bench step;
  * - every upload comes after the re-check, with if: always(), and includes
  *   bench/out/*.json, so gate-host.json, gate-host-post.json, the sampler's
  *   record and the invalid marks ride in the same artifact as the results;
@@ -126,6 +136,20 @@ function hostCheckProblems(job, label) {
     if (String(step.run).trim() !== POST_COMMAND) problems.push(`${label}: the gate-host re-check step must run exactly \`${POST_COMMAND}\`, with nothing around or after it`);
     if (String(step.if ?? '').trim() !== 'always()') problems.push(`${label}: the gate-host re-check must run with if: always(), so a failed or cancelled run is still checked`);
     for (const key of ALTERING.filter((k) => step[k] !== undefined)) problems.push(`${label}: the gate-host re-check step must not set ${key}`);
+  }
+  const browserChecks = indexes((step) => MENTIONS_BROWSERS.test(String(step.run ?? '')));
+  const installsLock = indexes((step) => PNPM_INSTALL.test(String(step.run ?? '')));
+  const harness = indexes((step) => runsBench(step) || HARNESS.test(String(step.run ?? '')));
+  if (browserChecks.length === 0) problems.push(`${label}: must check the preinstalled Chromium against the Playwright lock (${BROWSERS_COMMAND})`);
+  else if (browserChecks.length > 1) problems.push(`${label}: must check the Chromium build in exactly one step`);
+  else {
+    const at = browserChecks[0];
+    const step = steps[at];
+    if (String(step.run).trim() !== BROWSERS_COMMAND) problems.push(`${label}: the Chromium build check must run exactly \`${BROWSERS_COMMAND}\`, with nothing around or after it`);
+    if (step.if !== undefined) problems.push(`${label}: the Chromium build check must not have an if:`);
+    for (const key of ALTERING.filter((k) => step[k] !== undefined)) problems.push(`${label}: the Chromium build check must not set ${key}`);
+    if (installsLock.length === 0 || installsLock.some((i) => i > at)) problems.push(`${label}: the Chromium build check must run after pnpm install, when the lock's Playwright is readable`);
+    if (harness.some((i) => i < at)) problems.push(`${label}: the Chromium build check must run before every harness or bench step`);
   }
   if (benches.length === 0) problems.push(`${label}: runs no bench step between the gate-host checks`);
   if (pre !== undefined && benches.some((i) => i < pre)) problems.push(`${label}: the gate-host preflight must run before every bench step`);

@@ -39,6 +39,7 @@ const move = (job: Job, from: Step, before: Step | 'end') => {
   else job.steps.splice(job.steps.indexOf(before), 0, from);
 };
 const PRE = /node ci\/gate-host\.mjs --pre/;
+const BROWSERS = /node ci\/gate-host\.mjs --browsers/;
 const POST = /node ci\/gate-host\.mjs --post/;
 const BENCH = /pnpm bench (?:M1|all|S5)/;
 const upload = (job: Job) => job.steps.find((s) => String(s.uses).startsWith('actions/upload-artifact'))!;
@@ -95,6 +96,12 @@ describe('gate-host checks in every gate workflow (#18)', () => {
     ['a piped installer on the gate runner', (job) => void job.steps.splice(2, 0, { run: 'curl -fsSL https://get.pnpm.io/install.sh | sh -' }), /step 3 installs a toolchain or browser/],
     ['no PLAYWRIGHT_BROWSERS_PATH for the root-installed Chromium', (job) => void delete job.env!['PLAYWRIGHT_BROWSERS_PATH'], /must set env PLAYWRIGHT_BROWSERS_PATH/],
     ['a job that does not start with checkout', (job) => void job.steps.shift(), /must start with actions\/checkout/],
+    ['no Chromium build check', (job) => without(job, BROWSERS), /must check the preinstalled Chromium against the Playwright lock/],
+    ['a Chromium build check before pnpm install', (job) => move(job, step(job, BROWSERS), step(job, /^pnpm install/)), /Chromium build check must run after pnpm install/],
+    ['a Chromium build check after the gates', (job) => move(job, step(job, BROWSERS), step(job, POST)), /Chromium build check must run before every harness or bench step/],
+    ['a Chromium build check that swallows its failure', (job) => void (step(job, BROWSERS).run = 'node ci/gate-host.mjs --browsers || echo skipped'), /Chromium build check must run exactly/],
+    ['a Chromium build check with an if:', (job) => void (step(job, BROWSERS).if = "vars.SIGNAL_TREE_GATES_RUNNER == ''"), /Chromium build check must not have an if:/],
+    ['a second Chromium build check', (job) => void job.steps.splice(job.steps.indexOf(step(job, BROWSERS)), 0, { run: 'node ci/gate-host.mjs --browsers' }), /Chromium build in exactly one step/],
   ];
 
   it.each(gateJobs)('%s holds them as committed', (_label, job) => {
@@ -108,6 +115,9 @@ describe('gate-host checks in every gate workflow (#18)', () => {
     expect(index(PRE)).toBeLessThan(index(BENCH));
     expect(steps[index(POST)]).toEqual({ name: expect.any(String), if: 'always()', run: 'node ci/gate-host.mjs --post' });
     expect(index(POST)).toBeGreaterThan(index(BENCH));
+    expect(steps[index(BROWSERS)]).toEqual({ name: expect.any(String), run: 'node ci/gate-host.mjs --browsers' });
+    expect(index(BROWSERS)).toBeGreaterThan(index(/^pnpm install --frozen-lockfile$/));
+    expect(index(BROWSERS)).toBeLessThan(index(/bench:test|@signal-tree\/bench typecheck|pnpm bench /));
     expect(steps.at(-1)).toMatchObject({ if: 'always()', with: { path: 'bench/out/*.json' } });
     expect(job(workflows).env).toEqual({
       SIGNAL_TREE_GATES_RUNNER: '${{ vars.SIGNAL_TREE_GATES_RUNNER }}',

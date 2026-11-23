@@ -141,6 +141,12 @@ jobs:
       - name: Install the Chromium pinned by the Playwright lock (ruling 10)
         if: vars.SIGNAL_TREE_GATES_RUNNER == ''
         run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
+      # #85: the Chromium the harness launches must be the build the Playwright
+      # lock pins. On the gate runner, PLAYWRIGHT_BROWSERS_PATH must hold
+      # chromium-<the lock's revision>, listed in the toolchain manifest, or the
+      # job fails before any harness step; off it, this only reports.
+      - name: Preinstalled Chromium matches the Playwright lock
+        run: node ci/gate-host.mjs --browsers
       - name: Typecheck the harness
         run: pnpm --filter @signal-tree/bench typecheck
       - name: Harness self-tests

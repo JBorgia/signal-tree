@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { BASELINE_FILE, WORKFLOW_PATH, baselineHost, comparableHost, decide } from './gate-baseline.mjs';
-import { MARKER, POST_FILE, PRE_FILE, SAMPLES_FILE, addSample, checkPre, newSamples, readActivity, recheck } from './gate-host.mjs';
+import { BROWSERS_FILE, MARKER, POST_FILE, PRE_FILE, SAMPLES_FILE, addSample, checkPre, newSamples, readActivity, recheck } from './gate-host.mjs';
 import { trustedRuns } from './github.mjs';
 
 const gateHost = { onGateRunner: true, runnerName: 'ax42-gates', governor: 'performance', boost: 'off', amdPstate: 'active' };
@@ -178,6 +178,7 @@ describe("main's baseline artifact, as ci/gate-host.mjs records it", () => {
     writeFileSync(join(dir, PRE_FILE), JSON.stringify(checkPre(options(root))));
     const at = new Date().toISOString();
     writeFileSync(join(dir, SAMPLES_FILE), JSON.stringify(addSample(newSamples({ pid: 9, ownWorker: 10, at }), readActivity(root, { selfPid: 20 }), at)));
+    writeFileSync(join(dir, BROWSERS_FILE), JSON.stringify({ phase: 'browsers', enforced: true, problems: [] }));
     writeFileSync(join(dir, BASELINE_FILE), JSON.stringify({ kind: 'aa', scenarios: {} }));
     return { root, dir, post: () => recheck({ dir, ...options(root), stop: () => {} }) };
   }

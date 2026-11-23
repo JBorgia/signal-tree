@@ -40,6 +40,12 @@ jobs:
       # The gate runner's Node, pnpm and Chromium were installed once by root and
       # the preflight verified them; nothing here downloads or installs a toolchain.
       - run: pnpm install --frozen-lockfile
+      # #85: the Chromium the harness launches must be the build the Playwright
+      # lock pins. On the gate runner, PLAYWRIGHT_BROWSERS_PATH must hold
+      # chromium-<the lock's revision>, listed in the toolchain manifest, or the
+      # job fails before any harness step; off it, this only reports.
+      - name: Preinstalled Chromium matches the Playwright lock
+        run: node ci/gate-host.mjs --browsers
       - name: Full 8-hour S5
         run: pnpm bench S5 --s5-full --record-only
       # Re-checks the host after the gates and stops the preflight's sampler. If

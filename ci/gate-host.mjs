@@ -49,7 +49,8 @@
 // records the peak 1-minute load and any other Runner.Worker, runner count or
 // unreadable /proc/1/stat it sees.
 //
-// After the gates (--post), the run is invalid when the preflight failed, the
+// After the gates (--post), the run is invalid when the preflight or the
+// browser check (--browsers) failed or did not run, the
 // identity or host checks above (but the load) fail again, the sampler record is
 // missing, empty or stale, the sampler saw another job, a runner count other
 // than one or an unreadable /proc/1/stat, or the runner, marker, governor,
@@ -70,6 +71,17 @@
 //     runner fails a condition. When it passes on the gate runner, it starts the
 //     sampler and appends SIGNAL_TREE_GATE_HOST=<runner name>: the only signal
 //     the bench harness gates S8 on (bench/runner/harness.ts isGateRunner).
+//   node ci/gate-host.mjs --browsers [--dir bench/out]
+//     Runs right after pnpm install, before any harness or bench step (--pre
+//     runs before the lock's packages exist). Reads the revision of the browser
+//     the harness launches (`chromium`: bench/runner/browser.ts launches channel
+//     'chromium', which `playwright install --no-shell chromium` installs) from
+//     the playwright-core browsers.json the bench package resolves
+//     (bench → @playwright/test → playwright → playwright-core), and on the gate
+//     runner requires PLAYWRIGHT_BROWSERS_PATH to hold chromium-<that revision>,
+//     with files the toolchain manifest lists. A mismatch, a missing build or an
+//     unreadable browsers.json fails, naming both revisions. Writes
+//     <dir>/gate-host-browsers.json; off the gate runner it only reports.
 //   node ci/gate-host.mjs --post [--dir bench/out]
 //     Runs with if: always(), after the gates and before the upload. Stops the
 //     sampler, re-reads the host and writes <dir>/gate-host-post.json. When the
@@ -104,6 +116,14 @@ export const GATE_LABEL = 'signal-tree-gates';
 export const PRE_FILE = 'gate-host.json';
 export const POST_FILE = 'gate-host-post.json';
 export const SAMPLES_FILE = 'gate-host-samples.json';
+export const BROWSERS_FILE = 'gate-host-browsers.json';
+/**
+ * The browser the harness launches: bench/runner/browser.ts calls
+ * chromium.launch({ channel: 'chromium' }), the full Chromium that
+ * `playwright install --no-shell chromium` installs, not chromium-headless-shell.
+ */
+export const HARNESS_BROWSER = 'chromium';
+const BENCH_DIR = fileURLToPath(new URL('../bench/', import.meta.url));
 /** Set through $GITHUB_ENV by a passing preflight on the gate runner; read by bench/runner/harness.ts. */
 export const GATE_HOST_ENV = 'SIGNAL_TREE_GATE_HOST';
 /** The quiet-host bound before the gates: the 1-minute load average must be below this × logical CPUs. */
@@ -288,24 +308,30 @@ function which(root, name, pathVariable) {
  * and pnpm on PATH, PLAYWRIGHT_BROWSERS_PATH, and the job's user. Paths in the
  * manifest and the environment are read under `root` (a fake tree in tests).
  */
+/** The toolchain manifest's entries ({ path, expected }) and why it can't be parsed, if it can't. */
+function readManifest(root) {
+  const entries = [];
+  try {
+    for (const line of readFileSync(join(root, TOOLCHAIN), 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'))) {
+      const match = line.match(/^([0-9a-f]{64})\s+\*?(\/\S.*)$/);
+      if (!match) return { entries, error: `unparseable line "${line.slice(0, 80)}"` };
+      entries.push({ path: match[2], expected: match[1] });
+    }
+  } catch (error) {
+    return { entries, error: error.code ?? error.message };
+  }
+  return { entries, error: null };
+}
+
 export function readToolchain({ root = '/', env = process.env, rootUid = 0, system = {} } = {}) {
   const sys = systemOf(system);
   const top = resolve(root);
   const manifestPath = join(root, TOOLCHAIN);
   const manifest = { ...ownership(manifestPath), entries: [], parseError: null };
   if (manifest.exists && !manifest.error && manifest.file) {
-    try {
-      for (const line of readFileSync(manifestPath, 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'))) {
-        const match = line.match(/^([0-9a-f]{64})\s+\*?(\/\S.*)$/);
-        if (!match) {
-          manifest.parseError = `unparseable line "${line.slice(0, 80)}"`;
-          break;
-        }
-        manifest.entries.push({ path: match[2], expected: match[1] });
-      }
-    } catch (error) {
-      manifest.parseError = error.code ?? error.message;
-    }
+    const parsed = readManifest(root);
+    manifest.entries = parsed.entries;
+    manifest.parseError = parsed.error;
   }
 
   const dirCache = new Map();
@@ -427,6 +453,99 @@ const summarizeToolchain = (t) => ({
   user: t.user,
   sudo: t.sudo,
 });
+
+// ------------------------------------------------------------------ browsers
+
+/**
+ * `name`'s package.json as Node finds it from `fromDir`: node_modules/<name> in
+ * that directory or an ancestor, real path. Unlike require.resolve, never
+ * NODE_PATH or a global folder, so only what this package can see counts.
+ */
+function findPackage(fromDir, name) {
+  for (let dir = fromDir; ; dir = dirname(dir)) {
+    const candidate = join(dir, 'node_modules', name, 'package.json');
+    if (existsSync(candidate)) return realpathSync(candidate);
+    if (dir === dirname(dir)) return null;
+  }
+}
+
+/**
+ * The revision of `browser` the Playwright lock pins: playwright-core's
+ * browsers.json, found from the bench package along the chain Playwright
+ * loads (bench → @playwright/test → playwright → playwright-core). { error }
+ * when it can't be read.
+ */
+export function pinnedBrowser({ benchDir = BENCH_DIR, browser = HARNESS_BROWSER } = {}) {
+  try {
+    let from = resolve(benchDir);
+    let found = null;
+    for (const name of ['@playwright/test', 'playwright', 'playwright-core']) {
+      found = findPackage(from, name);
+      if (!found) return { error: `${name} is not installed where ${from} can load it` };
+      from = dirname(found);
+    }
+    const core = JSON.parse(readFileSync(found, 'utf8'));
+    const browsersJson = join(from, 'browsers.json');
+    const descriptor = JSON.parse(readFileSync(browsersJson, 'utf8')).browsers?.find((b) => b.name === browser);
+    if (!descriptor) return { error: `${browsersJson} lists no ${browser}` };
+    if (!/^\d+$/.test(String(descriptor.revision))) return { error: `${browsersJson} gives ${browser} no numeric revision` };
+    const linuxOverrides = Object.keys(descriptor.revisionOverrides ?? {}).filter((platform) => /^(?:ubuntu|debian)/.test(platform));
+    if (linuxOverrides.length) return { error: `${browsersJson} overrides the ${browser} revision on ${linuxOverrides.join(', ')}, which this check does not resolve` };
+    return { browser, revision: String(descriptor.revision), browserVersion: descriptor.browserVersion ?? null, playwrightCore: core.version ?? null, browsersJson };
+  } catch (error) {
+    return { error: String(error.message ?? error).split('\n')[0] };
+  }
+}
+
+/**
+ * The browser check (--browsers): on the gate runner, PLAYWRIGHT_BROWSERS_PATH
+ * must hold <browser>-<the revision the lock pins>, with files the toolchain
+ * manifest lists. Off it, it only reports.
+ */
+export function checkBrowsers({ root = '/', env = process.env, rootUid = 0, benchDir = BENCH_DIR, now = Date.now } = {}) {
+  const identity = readIdentity({ root, env, rootUid });
+  const enforced = isEnforced(identity);
+  const pinned = pinnedBrowser({ benchDir });
+  const name = HARNESS_BROWSER;
+  const browsersPath = (env.PLAYWRIGHT_BROWSERS_PATH ?? '').trim().replace(/\/+$/, '') || null;
+  let installed = [];
+  let listError = null;
+  if (browsersPath) {
+    try {
+      installed = readdirSync(join(root, browsersPath))
+        .map((d) => d.match(new RegExp(`^${name}-(\\d+)$`))?.[1])
+        .filter(Boolean)
+        .sort((a, b) => Number(a) - Number(b));
+    } catch (error) {
+      listError = error.code ?? error.message;
+    }
+  }
+  const problems = [];
+  const pins = pinned.error ? null : `the Playwright lock pins ${name} ${pinned.revision} (playwright-core ${pinned.playwrightCore})`;
+  if (pinned.error) problems.push(`the ${name} revision the Playwright lock pins can't be read: ${pinned.error}`);
+  if (!browsersPath) problems.push('PLAYWRIGHT_BROWSERS_PATH is not set, so the preinstalled Chromium can\'t be found');
+  else if (listError) problems.push(`${browsersPath} can't be read (${listError})`);
+  else if (pins && !installed.includes(pinned.revision)) {
+    problems.push(`${pins}, but ${browsersPath} holds ${installed.length ? `${name} ${installed.join(', ')}` : `no ${name} build`}`);
+  } else if (pins) {
+    const manifest = readManifest(root);
+    const prefix = `${browsersPath}/${name}-${pinned.revision}/`;
+    if (manifest.error) problems.push(`the toolchain manifest can't be read (${manifest.error})`);
+    else if (!manifest.entries.some((e) => e.path.startsWith(prefix))) problems.push(`the toolchain manifest lists no file under ${prefix}`);
+  }
+  return {
+    phase: 'browsers',
+    at: new Date(now()).toISOString(),
+    enforced,
+    onGateRunner: isOnGateRunner(identity),
+    browser: name,
+    pinned,
+    browsersPath,
+    installed,
+    problems: enforced ? problems : [],
+    findings: problems,
+  };
+}
 
 // ---------------------------------------------------------------------- host
 
@@ -739,7 +858,7 @@ export function hostChanges(before, after) {
   return changes;
 }
 
-const NOT_RESULTS = new Set([PRE_FILE, POST_FILE, SAMPLES_FILE]);
+const NOT_RESULTS = new Set([PRE_FILE, POST_FILE, SAMPLES_FILE, BROWSERS_FILE]);
 
 /** Adds `invalid` to every results file in `dir` (every *.json but the gate-host records). */
 export function markResultsInvalid(dir, invalid) {
@@ -768,6 +887,7 @@ export function markResultsInvalid(dir, invalid) {
  */
 export function recheck({ dir, root = '/', env = process.env, selfPid = process.pid, rootUid = 0, system = {}, now = Date.now, stop = stopSampler } = {}) {
   const pre = readJson(join(dir, PRE_FILE));
+  const browsers = readJson(join(dir, BROWSERS_FILE));
   if (pre && !pre.error) stop(pre.sampler?.pid);
   const samples = readJson(join(dir, SAMPLES_FILE));
   const identity = readIdentity({ root, env, rootUid });
@@ -784,6 +904,11 @@ export function recheck({ dir, root = '/', env = process.env, selfPid = process.
     if (pre.problems?.length) reasons.push(`the preflight failed: ${pre.problems.join('; ')}`);
     reasons.push(...hostChanges(pre, after));
   }
+  if (enforced) {
+    if (!browsers) reasons.push(`the browser check (--browsers) did not run (${BROWSERS_FILE}), so the Chromium build was not checked against the Playwright lock`);
+    else if (browsers.error) reasons.push(`the browser check record can't be read (${browsers.error})`);
+    else if (browsers.enforced !== true || browsers.problems?.length !== 0) reasons.push(`the browser check failed: ${(browsers.problems ?? ['it was only reported']).join('; ') || 'it was only reported'}`);
+  }
   if (problems.length) reasons.push(`the post-run check failed: ${problems.join('; ')}`);
   if (during.length) reasons.push(`the sampler saw: ${during.join('; ')}`);
   const invalid = enforced && reasons.length ? { reason: reasons.join('; '), at, by: 'ci/gate-host.mjs --post' } : null;
@@ -794,6 +919,7 @@ export function recheck({ dir, root = '/', env = process.env, selfPid = process.
     onGateRunner: isOnGateRunner(identity),
     ...after,
     load: { start: pre?.host?.load ?? null, peak: samples?.maxLoad ?? null, end: after.host.load },
+    browser: browsers && !browsers.error ? { name: browsers.browser, revision: browsers.pinned?.revision ?? null, installed: browsers.installed } : null,
     sampler: samples && !samples.error ? { samples: samples.samples, lastAt: samples.lastAt, otherWorkers: samples.otherWorkers, listenerCounts: samples.listenerCounts } : null,
     problems,
     findings: reasons,
@@ -809,9 +935,9 @@ export function recheck({ dir, root = '/', env = process.env, selfPid = process.
 
 function main(argv) {
   const option = (name, fallback) => (argv.includes(name) ? argv[argv.indexOf(name) + 1] : fallback);
-  const mode = ['--pre', '--post', '--sample'].find((m) => argv.includes(m))?.slice(2) ?? null;
+  const mode = ['--pre', '--browsers', '--post', '--sample'].find((m) => argv.includes(m))?.slice(2) ?? null;
   if (!mode) {
-    console.error('usage: node ci/gate-host.mjs --pre [--dir bench/out] [--settle 180] | --post [--dir bench/out]');
+    console.error('usage: node ci/gate-host.mjs --pre [--dir bench/out] [--settle 180] | --browsers [--dir bench/out] | --post [--dir bench/out]');
     process.exit(2);
   }
   const dir = option('--dir', 'bench/out');
@@ -844,6 +970,26 @@ function main(argv) {
     }
     if (process.env.GITHUB_ENV) appendFileSync(process.env.GITHUB_ENV, gateHostEnvLine(record));
     console.log(`ok: gate runner ${record.identity.runnerName} may record and judge gates; ${GATE_HOST_ENV} set for the harness; sampler pid ${record.sampler.pid}`);
+    return 0;
+  }
+
+  if (mode === 'browsers') {
+    const record = checkBrowsers();
+    mkdirSync(dir, { recursive: true });
+    writeJson(join(dir, BROWSERS_FILE), record);
+    const pinned = record.pinned.error ? `unreadable (${record.pinned.error})` : `${record.browser} ${record.pinned.revision} (${record.pinned.browserVersion}, playwright-core ${record.pinned.playwrightCore})`;
+    console.log(`Playwright lock pins ${pinned}; ${record.browsersPath ?? 'PLAYWRIGHT_BROWSERS_PATH unset'} holds ${record.browser} ${record.installed.join(', ') || 'none'}`);
+    if (!record.enforced) {
+      for (const f of record.findings) console.log(`note: ${f}`);
+      console.log('not a gate-runner job and no gate-runner marker: reported only');
+      return 0;
+    }
+    for (const p of record.problems) console.log(`FAIL ${p}`);
+    if (record.problems.length) {
+      console.log('The gate runner\'s Chromium must be the build the Playwright lock pins (#85).');
+      return 1;
+    }
+    console.log(`ok: the preinstalled ${record.browser} ${record.pinned.revision} is the one the lock pins`);
     return 0;
   }
 

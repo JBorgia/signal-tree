@@ -4,16 +4,19 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  BROWSERS_FILE,
   MARKER,
   POST_FILE,
   PRE_FILE,
   SAMPLES_FILE,
   TOOLCHAIN,
   addSample,
+  checkBrowsers,
   checkPre,
   gateHostEnvLine,
   hostProblems,
   newSamples,
+  pinnedBrowser,
   preflight,
   readActivity,
   readHost,
@@ -349,6 +352,71 @@ describe('the root-installed toolchain and the job user', () => {
   });
 });
 
+describe('the preinstalled Chromium against the Playwright lock (--browsers)', () => {
+  /** A bench package whose @playwright/test → playwright → playwright-core chain ends in this browsers.json. */
+  function fakeBench(browsersJson: string) {
+    const bench = tempDir('gate-bench-');
+    writeFileSync(join(bench, 'package.json'), '{"name":"@signal-tree/bench","private":true}');
+    for (const name of ['@playwright/test', 'playwright', 'playwright-core']) {
+      mkdirSync(join(bench, 'node_modules', name), { recursive: true });
+      writeFileSync(join(bench, 'node_modules', name, 'package.json'), JSON.stringify({ name, version: '1.64.1' }));
+    }
+    writeFileSync(join(bench, 'node_modules/playwright-core/browsers.json'), browsersJson);
+    return bench;
+  }
+  const lockPins = (revision: string, overrides?: Record<string, string>) =>
+    JSON.stringify({
+      browsers: [
+        { name: 'chromium', revision, browserVersion: '156.0.8078.4', ...(overrides ? { revisionOverrides: overrides } : {}) },
+        { name: 'chromium-headless-shell', revision: '9999', browserVersion: '156.0.8078.4' },
+      ],
+    });
+  const browsers = (root: string, benchDir: string, env: Record<string, string> = GATE_JOB) => checkBrowsers({ root, env, rootUid: ROOT_UID, benchDir });
+
+  it('passes when PLAYWRIGHT_BROWSERS_PATH holds the chromium build the lock pins, listed in the toolchain manifest, and records it', () => {
+    const record = browsers(fakeHost(GATE_RUNNER), fakeBench(lockPins('1169')));
+    expect(record).toMatchObject({ enforced: true, browser: 'chromium', browsersPath: '/opt/ms-playwright', installed: ['1169'], problems: [] });
+    expect(record.pinned).toMatchObject({ browser: 'chromium', revision: '1169', browserVersion: '156.0.8078.4', playwrightCore: '1.64.1' });
+  });
+
+  it('fails on a mismatch, naming both revisions (the headless shell does not count)', () => {
+    expect(browsers(fakeHost(GATE_RUNNER), fakeBench(lockPins('1248'))).problems).toEqual([
+      'the Playwright lock pins chromium 1248 (playwright-core 1.64.1), but /opt/ms-playwright holds chromium 1169',
+    ]);
+  });
+
+  it('fails when the pinned build directory is missing', () => {
+    const root = fakeHost(GATE_RUNNER);
+    rmSync(join(root, 'opt/ms-playwright/chromium-1169'), { recursive: true });
+    expect(browsers(root, fakeBench(lockPins('1169'))).problems).toEqual(['the Playwright lock pins chromium 1169 (playwright-core 1.64.1), but /opt/ms-playwright holds no chromium build']);
+    expect(browsers(fakeHost({ ...GATE_RUNNER, toolchain: false }), fakeBench(lockPins('1169'))).problems).toEqual(["/opt/ms-playwright can't be read (ENOENT)"]);
+  });
+
+  it('fails when the pinned build is present but the toolchain manifest does not list it', () => {
+    const root = fakeHost(GATE_RUNNER);
+    mkdirSync(join(root, 'opt/ms-playwright/chromium-1248/chrome-linux'), { recursive: true });
+    expect(browsers(root, fakeBench(lockPins('1248'))).problems).toEqual(['the toolchain manifest lists no file under /opt/ms-playwright/chromium-1248/']);
+  });
+
+  it('fails closed when browsers.json is unreadable, lacks chromium, or overrides its revision on Linux', () => {
+    expect(browsers(fakeHost(GATE_RUNNER), fakeBench('{ not json')).problems).toEqual([expect.stringMatching(/^the chromium revision the Playwright lock pins can't be read: /)]);
+    expect(browsers(fakeHost(GATE_RUNNER), fakeBench('{"browsers":[{"name":"firefox","revision":"1490"}]}')).problems).toEqual([expect.stringMatching(/browsers\.json lists no chromium$/)]);
+    expect(browsers(fakeHost(GATE_RUNNER), fakeBench(lockPins('1169', { 'ubuntu24.04-x64': '1170' }))).problems).toEqual([expect.stringMatching(/overrides the chromium revision on ubuntu24\.04-x64/)]);
+    const noBench = tempDir('gate-bench-');
+    writeFileSync(join(noBench, 'package.json'), '{}');
+    expect(browsers(fakeHost(GATE_RUNNER), noBench).problems).toEqual([expect.stringMatching(/^the chromium revision the Playwright lock pins can't be read: @playwright\/test is not installed where .* can load it$/)]);
+  });
+
+  it('only reports off the gate runner', () => {
+    const record = browsers(fakeHost({ governors: ['performance'], toolchain: false }), fakeBench(lockPins('1248')), { ...HOSTED_JOB, PLAYWRIGHT_BROWSERS_PATH: '' });
+    expect(record).toMatchObject({ enforced: false, problems: [], findings: [expect.stringMatching(/^PLAYWRIGHT_BROWSERS_PATH is not set/)] });
+  });
+
+  it("reads this repository's lock the way Playwright resolves it, through the bench package", () => {
+    expect(pinnedBrowser()).toMatchObject({ browser: 'chromium', revision: expect.stringMatching(/^\d+$/), playwrightCore: expect.stringMatching(/^\d+\.\d+\.\d+/) });
+  });
+});
+
 describe('the gate-host signal to the bench harness ($GITHUB_ENV)', () => {
   it('names this runner only when the preflight passed on the gate runner', () => {
     expect(gateHostEnvLine(pre(fakeHost(GATE_RUNNER)))).toBe('SIGNAL_TREE_GATE_HOST=ax42-gates\n');
@@ -497,19 +565,21 @@ describe('the sampler', () => {
 });
 
 describe('post-run re-check', () => {
-  type RunOptions = { before?: Fake; env?: Record<string, string>; samples?: (root: string) => unknown };
+  type RunOptions = { before?: Fake; env?: Record<string, string>; samples?: (root: string) => unknown; browsers?: unknown };
+  const passedBrowsers = { phase: 'browsers', enforced: true, browser: 'chromium', pinned: { revision: '1169' }, installed: ['1169'], problems: [] };
   /** A healthy sampler record for this host, last sampled just now. */
   const goodSamples = (root: string) =>
     addSample(newSamples({ pid: 9, ownWorker: 200, at: new Date().toISOString() }), readActivity(root, { selfPid: SELF }), new Date().toISOString());
 
   /** A gate run: the preflight on the gate runner, results and the sampler's record written, then `during` changes the host. */
-  function gateRun(during: Fake, { before = GATE_RUNNER, env = GATE_JOB, samples = goodSamples }: RunOptions = {}) {
+  function gateRun(during: Fake, { before = GATE_RUNNER, env = GATE_JOB, samples = goodSamples, browsers = passedBrowsers }: RunOptions = {}) {
     const root = fakeHost(before);
     const dir = tempDir('gate-out-');
     const options = { root, env, selfPid: SELF, rootUid: ROOT_UID, system: SYSTEM };
     writeFileSync(join(dir, PRE_FILE), JSON.stringify({ ...preflight(options), sampler: { pid: 9 } }));
     const sampled = samples(root);
     if (sampled !== undefined) writeFileSync(join(dir, SAMPLES_FILE), JSON.stringify(sampled));
+    if (browsers !== null) writeFileSync(join(dir, BROWSERS_FILE), JSON.stringify(browsers));
     writeFileSync(join(dir, 'results-v15-shim-latest.json'), JSON.stringify({ recordOnly: true, scenarios: {} }));
     writeFileSync(join(dir, 'aa-latest.json'), JSON.stringify({ kind: 'aa', scenarios: {} }));
     writeFake(root, during);
@@ -522,7 +592,7 @@ describe('post-run re-check', () => {
   it('keeps a run valid when the host held, stops the sampler, and records the load at the start, peak and end', () => {
     const { record, json, stopped } = gateRun({ ...GATE_RUNNER, load: 1.9 });
     expect(stopped).toEqual([9]);
-    expect(record).toMatchObject({ enforced: true, invalid: null, findings: [], load: { start: { one: 0.4 }, peak: { one: 0.4 }, end: { one: 1.9 } } });
+    expect(record).toMatchObject({ enforced: true, invalid: null, findings: [], load: { start: { one: 0.4 }, peak: { one: 0.4 }, end: { one: 1.9 } }, browser: { name: 'chromium', revision: '1169' } });
     expect(json(POST_FILE).invalid).toBeNull();
     expect(json('results-v15-shim-latest.json').invalid).toBeUndefined();
   });
@@ -563,6 +633,13 @@ describe('post-run re-check', () => {
   it('invalidates the run when swap changed mid-run', () => {
     const { record } = gateRun({ ...GATE_RUNNER, swaps: ['/swapfile file 2097148 512 -2'], swapTotal: 2097148, swapFree: 2096636 });
     expect(record.findings[0]).toBe('swap changed during the run: no swap device, 0 kB in use → /swapfile, 512 kB in use');
+  });
+
+  it('invalidates the run when the browser check did not run, or failed', () => {
+    expect(gateRun(GATE_RUNNER, { browsers: null }).record.invalid?.reason).toMatch(/^the browser check \(--browsers\) did not run \(gate-host-browsers\.json\)/);
+    const failed = gateRun(GATE_RUNNER, { browsers: { ...passedBrowsers, problems: ['the Playwright lock pins chromium 1248 (playwright-core 1.64.1), but /opt/ms-playwright holds chromium 1169'] } });
+    expect(failed.record.findings).toEqual(['the browser check failed: the Playwright lock pins chromium 1248 (playwright-core 1.64.1), but /opt/ms-playwright holds chromium 1169']);
+    expect(failed.json(BROWSERS_FILE).invalid).toBeUndefined();
   });
 
   it('invalidates the run when the sampler left no record', () => {
