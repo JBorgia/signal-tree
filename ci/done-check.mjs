@@ -9,10 +9,15 @@
 //   (artifacts nightly-gates-<adapter> and nightly-oracle), not the jobs'
 //   success: a results file that is record-only or unapproved counts as unmet,
 //   and so does a spec-report.json in which the new core violates a property or
-//   was checked fewer than 1,000 times on any generatable behavior. Each gates
-//   artifact must also hold the post-run host check, gate-host-post.json
-//   (ci/gate-host.mjs --post); results it marked invalid, or that lack it, are
-//   unmet.
+//   was checked fewer than 1,000 times on any generatable behavior. Only
+//   trusted runs count: scheduled or dispatched runs of
+//   .github/workflows/nightly.yml on main that this repository started itself,
+//   whose head commit is on main. Each gates artifact must also hold the host
+//   records ci/gate-host.mjs writes, which this check reads itself: a
+//   gate-host.json that passed on the gate runner (enforced, onGateRunner, no
+//   problems) and a valid gate-host-post.json; and GitHub's Jobs API must say
+//   the job ran on the runner those records name. Results marked invalid, or
+//   lacking any of these, are unmet.
 // - Behavior coverage: a test title carries the behavior ID in brackets, e.g.
 //   it('[T3] refuses with later-pending-dependency', ...).
 // - Release docs (Phase 8): README.md, CHANGELOG.md, docs/migration/from-14.md,
@@ -27,13 +32,16 @@ import { pathToFileURL } from 'node:url';
 import { BEHAVIOR_IDS, behaviorIdPattern } from './behavior-ids.mjs';
 import { checkBoundaries } from './boundaries.mjs';
 import { CORE_ONLY_APP, pluginFolderIdentity, scanApp } from './core-bundle-scan.mjs';
-import { downloadArtifact, ghApi, repoSlug } from './github.mjs';
+import { downloadArtifact, ghApi, ghApiOnce, onMain, repoSlug, runArtifacts, runJobs, trustedRuns } from './github.mjs';
 import { repoRoot } from './entry-graph.mjs';
 import { validate as validateManifest } from './port-manifest.mjs';
 
 export const OWNER_LOGIN = 'JBorgia';
 export const ADAPTERS = ['plain', 'angular', 'vue', 'solid', 'preact', 'react'];
 export const NIGHTLY_JOBS = [...ADAPTERS.map((a) => `gates (${a})`), 'oracle (100k)'];
+export const NIGHTLY_WORKFLOW = '.github/workflows/nightly.yml';
+/** The events a trusted nightly run comes from; a push or pull request run of nightly.yml never counts. */
+export const NIGHTLY_EVENTS = ['schedule', 'workflow_dispatch'];
 /** Gates the harness runs (6.3 as amended by section 10). S6a and S6c are checked here by ci/core-bundle-scan.mjs. */
 export const REQUIRED_GATES = ['M1', 'M2', 'M3', 'S1', 'S2', 'S3', 'S4a', 'S4b', 'S4c', 'S5', 'S6b', 'S7', 'S8'];
 export const ORACLE_MIN_RUNS = 100_000;
@@ -46,17 +54,37 @@ export const ORACLE_MIN_INSTANCES = 1_000;
 /** The generator's subject for the new core (CORE_SUBJECT in tests/oracle/src/gate.ts); old packages violating the spec are expected (12.1.4). */
 export const ORACLE_SUBJECT = 'core';
 
+/**
+ * Why a nightly gates job's results can't be trusted as the gate runner's, or
+ * null: read from the host records in its artifact (ci/gate-host.mjs) and the
+ * runner GitHub reports for the job, not only from marks in the results.
+ */
+export function gateHostProblem(run, adapter) {
+  const results = run.results?.[adapter];
+  // ci/gate-host.mjs --post marks results invalid when the gate host failed a check or changed during the run.
+  if (results?.invalid) return `its results are invalid (${results.invalid.reason ?? 'marked by ci/gate-host.mjs --post'})`;
+  const pre = run.hostPre?.[adapter];
+  if (!pre || pre.error) return `has no gate-host preflight record${pre?.error ? ` (${pre.error})` : ''}`;
+  if (pre.enforced !== true || pre.onGateRunner !== true) return 'its preflight did not run on the gate runner';
+  if (!Array.isArray(pre.problems) || pre.problems.length) return `its preflight failed (${(pre.problems ?? ['no problems list']).join('; ')})`;
+  const post = run.hostPost?.[adapter];
+  if (!post || post.error) return `has no post-run gate-host check${post?.error ? ` (${post.error})` : ''}`;
+  if (post.enforced !== true) return 'its post-run gate-host check was not enforced';
+  if (post.invalid !== null) return `the post-run gate-host check found the run invalid (${post.invalid?.reason ?? 'no reason recorded'})`;
+  const runner = run.runners?.[adapter] ?? null;
+  const named = pre.identity?.runnerName ?? null;
+  if (!runner || runner !== named) return `GitHub ran the job on runner ${runner ?? 'unknown'}, but its gate-host record names ${named ?? 'none'}`;
+  return null;
+}
+
 /** Why one nightly run does not show every gate green, or null. Reads the uploaded verdicts, not job success. */
 export function nightlyRunProblem(run) {
   if (run.conclusion !== 'success') return `nightly run ${run.id} concluded ${run.conclusion}`;
   for (const adapter of ADAPTERS) {
     const results = run.results?.[adapter];
     if (!results || results.error) return `nightly run ${run.id} has no gate results for ${adapter}${results?.error ? ` (${results.error})` : ''}`;
-    // ci/gate-host.mjs --post marks results invalid when the gate host failed a check or changed during the run.
-    if (results.invalid) return `nightly run ${run.id} (${adapter}): its results are invalid (${results.invalid.reason ?? 'marked by ci/gate-host.mjs --post'})`;
-    const hostCheck = run.hostChecks?.[adapter];
-    if (!hostCheck || hostCheck.error) return `nightly run ${run.id} (${adapter}) has no post-run gate-host check${hostCheck?.error ? ` (${hostCheck.error})` : ''}`;
-    if (hostCheck.invalid) return `nightly run ${run.id} (${adapter}): the post-run gate-host check found the run invalid (${hostCheck.invalid.reason ?? 'no reason recorded'})`;
+    const hostProblem = gateHostProblem(run, adapter);
+    if (hostProblem) return `nightly run ${run.id} (${adapter}): ${hostProblem}`;
     if (results.budgets?.approved !== true) return `nightly run ${run.id} (${adapter}) ran against unapproved budgets`;
     if (results.recordOnly !== false) return `nightly run ${run.id} (${adapter}) was record-only`;
     for (const gate of REQUIRED_GATES) {
@@ -302,21 +330,31 @@ export async function gatherFacts(root = repoRoot, now = Date.now()) {
   };
 
   const nightly = attempt(() => {
-    const runs = ghApi(`repos/${needRepo()}/actions/workflows/nightly.yml/runs?branch=main&status=completed&per_page=10`)
-      .flatMap((page) => page.workflow_runs ?? [])
-      .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))
-      .slice(0, 2);
+    // The runs first, chosen by who started them and from where; then their artifacts.
+    const listed = ghApiOnce(`repos/${needRepo()}/actions/workflows/nightly.yml/runs?branch=main&status=completed&per_page=30`).workflow_runs ?? [];
+    const runs = [];
+    for (const run of trustedRuns(listed, { workflowPath: NIGHTLY_WORKFLOW, events: NIGHTLY_EVENTS })) {
+      if (runs.length === 2) break;
+      if (onMain(needRepo(), run.head_sha)) runs.push(run);
+    }
     return {
       runs: runs.map((run) => {
-        const artifacts = ghApi(`repos/${needRepo()}/actions/runs/${run.id}/artifacts?per_page=100`).flatMap((p) => p.artifacts ?? []);
+        const artifacts = runArtifacts(needRepo(), run.id);
+        const jobs = runJobs(needRepo(), run.id);
         const gates = Object.fromEntries(
-          ADAPTERS.map((a) => [a, artifactJsons(needRepo(), artifacts, `nightly-gates-${a}`, { results: /^results-.+-latest\.json$/, hostCheck: /^gate-host-post\.json$/ })])
+          ADAPTERS.map((a) => [
+            a,
+            artifactJsons(needRepo(), artifacts, `nightly-gates-${a}`, { results: /^results-.+-latest\.json$/, hostPre: /^gate-host\.json$/, hostPost: /^gate-host-post\.json$/ }),
+          ])
         );
+        const byAdapter = (key) => Object.fromEntries(ADAPTERS.map((a) => [a, gates[a][key]]));
         return {
           id: run.id,
           conclusion: run.conclusion,
-          results: Object.fromEntries(ADAPTERS.map((a) => [a, gates[a].results])),
-          hostChecks: Object.fromEntries(ADAPTERS.map((a) => [a, gates[a].hostCheck])),
+          results: byAdapter('results'),
+          hostPre: byAdapter('hostPre'),
+          hostPost: byAdapter('hostPost'),
+          runners: Object.fromEntries(ADAPTERS.map((a) => [a, jobs.find((j) => j.name === `gates (${a})`)?.runner_name ?? null])),
           oracle: artifactJsons(needRepo(), artifacts, 'nightly-oracle', { report: /^spec-report\.json$/ }).report,
         };
       }),

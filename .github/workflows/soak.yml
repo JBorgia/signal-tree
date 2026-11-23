@@ -2,7 +2,8 @@ name: Weekly soak
 
 # Ruling on #14: the full 8-hour S5 runs weekly on the dedicated gates runner
 # (the nightly runs the compressed S5). It never runs on GitHub-hosted runners,
-# whose 6-hour job limit an 8-hour soak would exceed.
+# whose 6-hour job limit an 8-hour soak would exceed, so it uses only the gate
+# runner's root-installed toolchain and has no setup or install steps.
 
 on:
   schedule:
@@ -19,30 +20,34 @@ jobs:
     runs-on: ${{ fromJSON(vars.SIGNAL_TREE_GATES_RUNNER) }}
     timeout-minutes: 600
     # Set exactly when runs-on aims at the gate runner; ci/gate-host.mjs then
-    # requires the provisioning marker (#18).
+    # requires the provisioning marker, and that it, RUNNER_NAME and the pinned
+    # SIGNAL_TREE_GATE_RUNNER_NAME all name the same runner (#18). There the
+    # Playwright Chromium is the one root installed under /opt/ms-playwright and
+    # the toolchain manifest lists; on the hosted fallback, Playwright's default.
     env:
       SIGNAL_TREE_GATES_RUNNER: ${{ vars.SIGNAL_TREE_GATES_RUNNER }}
+      SIGNAL_TREE_GATE_RUNNER_NAME: ${{ vars.SIGNAL_TREE_GATE_RUNNER_NAME }}
+      PLAYWRIGHT_BROWSERS_PATH: ${{ vars.SIGNAL_TREE_GATES_RUNNER != '' && '/opt/ms-playwright' || '' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Install the Chromium pinned by the Playwright lock
-        run: pnpm --filter @signal-tree/bench exec playwright install --with-deps --no-shell chromium
-      # #18: on the gate runner (the host with the provisioning marker), gates
-      # run only with every core on the performance governor, boost readable and
-      # uniform, no swap, no other job and a low load; off it, this only reports.
-      - name: Gate-host preflight (identity, governor, boost, swap, quiet host)
+      # #18, first after checkout, before pnpm install runs any package code: on
+      # the gate runner (an ephemeral runner as a fresh unprivileged user), the
+      # identity, the root-installed toolchain and the user, then every core on
+      # the performance governor, boost readable and uniform, no swap, one runner,
+      # no other job and a low load. Off it, this only reports.
+      - name: Gate-host preflight (identity, toolchain, user, governor, boost, swap, quiet host)
         run: node ci/gate-host.mjs --pre
+      # The gate runner's Node, pnpm and Chromium were installed once by root and
+      # the preflight verified them; nothing here downloads or installs a toolchain.
+      - run: pnpm install --frozen-lockfile
       - name: Full 8-hour S5
         run: pnpm bench S5 --s5-full --record-only
-      # Re-checks the host after the gates. If it failed either check or its
+      # Re-checks the host after the gates and stops the preflight's sampler. If
+      # either check failed, the sampler saw another job or runner, or the
       # governor, boost or swap changed, the results are marked invalid: unmet
-      # for ci/done-check.mjs and never a baseline. Before the upload, so the
-      # marks and gate-host-post.json ride in the same artifact.
+      # for ci/done-check.mjs and never a baseline. The load is recorded, not
+      # judged. Before the upload, so the marks and the gate-host records ride
+      # in the same artifact.
       - name: Gate-host re-check (invalidates the results if the host changed)
         if: always()
         run: node ci/gate-host.mjs --post

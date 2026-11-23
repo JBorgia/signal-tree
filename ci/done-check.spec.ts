@@ -8,10 +8,13 @@ import {
   behaviorIdsIn,
   evaluate,
   gateIdsIn,
+  NIGHTLY_EVENTS,
+  NIGHTLY_WORKFLOW,
   nightlyRunProblem,
   oracleReportProblem,
   processWordsIn,
 } from './done-check.mjs';
+import { trustedRuns } from './github.mjs';
 
 type Results = {
   invalid?: { reason: string };
@@ -45,12 +48,16 @@ const greenOracle = () => ({
     })
   ) as Record<string, BehaviorReport>,
 });
-type HostCheck = { phase: string; enforced: boolean; invalid: { reason: string } | null; error?: string };
+type HostPre = { phase: string; enforced: boolean; onGateRunner: boolean; problems: string[]; identity: { runnerName: string }; error?: string };
+type HostPost = { phase: string; enforced: boolean; invalid: { reason: string } | null; error?: string };
+const perAdapter = <T,>(make: () => T) => Object.fromEntries(ADAPTERS.map((a: string) => [a, make()])) as Record<string, T>;
 const greenRun = (id: number) => ({
   id,
   conclusion: 'success',
-  results: Object.fromEntries(ADAPTERS.map((a: string) => [a, greenResults()])) as Record<string, Results>,
-  hostChecks: Object.fromEntries(ADAPTERS.map((a: string) => [a, { phase: 'post', enforced: true, invalid: null }])) as Record<string, HostCheck | undefined>,
+  results: perAdapter(greenResults),
+  hostPre: perAdapter((): HostPre | undefined => ({ phase: 'pre', enforced: true, onGateRunner: true, problems: [], identity: { runnerName: 'ax42-gates' } })),
+  hostPost: perAdapter((): HostPost | undefined => ({ phase: 'post', enforced: true, invalid: null })),
+  runners: perAdapter((): string | null => 'ax42-gates'),
   oracle: greenOracle(),
 });
 
@@ -89,9 +96,16 @@ describe('done check', () => {
     [[0], 'S8 recorded only, off the gate runner', (f) => void (f.nightly.runs[0]!.results['angular'].scenarios['S8'].recordedOnly = 'not on the gate runner')],
     [[0], 'a regression', (f) => void (f.nightly.runs[1]!.results['preact'].scenarios['M1'].regressions = [{ regressed: true }])],
     [[0], 'results the gate-host re-check marked invalid', (f) => void (f.nightly.runs[0]!.results['angular'].invalid = { reason: 'the governor changed during the run: performance → schedutil' })],
-    [[0], 'a gates artifact without the post-run gate-host check', (f) => void (f.nightly.runs[1]!.hostChecks['vue'] = undefined)],
-    [[0], 'an unreadable post-run gate-host check', (f) => void (f.nightly.runs[0]!.hostChecks['plain'] = { phase: 'post', enforced: true, invalid: null, error: 'no /^gate-host-post\\.json$/ in nightly-gates-plain' })],
-    [[0], 'a post-run gate-host check that found the run invalid', (f) => void (f.nightly.runs[0]!.hostChecks['solid'] = { phase: 'post', enforced: true, invalid: { reason: 'boost changed during the run: off → on' } })],
+    [[0], 'a gates artifact without the post-run gate-host check', (f) => void (f.nightly.runs[1]!.hostPost['vue'] = undefined)],
+    [[0], 'an unreadable post-run gate-host check', (f) => void (f.nightly.runs[0]!.hostPost['plain'] = { phase: 'post', enforced: true, invalid: null, error: 'no /^gate-host-post\\.json$/ in nightly-gates-plain' })],
+    [[0], 'a post-run gate-host check that found the run invalid', (f) => void (f.nightly.runs[0]!.hostPost['solid'] = { phase: 'post', enforced: true, invalid: { reason: 'boost changed during the run: off → on' } })],
+    [[0], 'a post-run gate-host check that was only reported (hosted fallback)', (f) => void (f.nightly.runs[0]!.hostPost['angular'] = { phase: 'post', enforced: false, invalid: null })],
+    [[0], 'a gates artifact without the gate-host preflight record', (f) => void (f.nightly.runs[0]!.hostPre['react'] = undefined)],
+    [[0], 'a preflight off the gate runner', (f) => void (f.nightly.runs[1]!.hostPre['angular']!.onGateRunner = false)],
+    [[0], 'a preflight that was only reported', (f) => void (f.nightly.runs[0]!.hostPre['vue']!.enforced = false)],
+    [[0], 'a preflight with problems', (f) => void (f.nightly.runs[0]!.hostPre['preact']!.problems = ['another job is running on this host (Runner.Worker pid 901)'])],
+    [[0], 'a gates job GitHub ran on another runner than its records name', (f) => void (f.nightly.runs[0]!.runners['angular'] = 'agent-vm')],
+    [[0], 'a gates job whose runner GitHub does not report', (f) => void (f.nightly.runs[1]!.runners['plain'] = null)],
     [[0], 'an S6 scan finding', (f) => void (f.s6.findings = ['unminified bundles differ'])],
     [[0, 1], 'nightly runs that could not be read', (f) => void (f.nightly = { error: 'gh: not logged in' } as never)],
     [[1], 'a behavior no test covers', (f) => void f.coveredBehaviors.delete('W3')],
@@ -174,6 +188,20 @@ describe('gate IDs in budgets.json', () => {
 describe('nightly verdicts', () => {
   it('reads a fully green run as green', () => {
     expect(nightlyRunProblem(greenRun(9))).toBeNull();
+  });
+
+  it('counts only scheduled or dispatched nightly.yml runs on main started by this repository', () => {
+    const repository = { id: 42 };
+    const base = { status: 'completed', head_branch: 'main', path: NIGHTLY_WORKFLOW, repository, head_repository: repository, created_at: '2026-11-20T00:00:00Z' };
+    const runs = [
+      { ...base, id: 1, event: 'schedule' },
+      { ...base, id: 2, event: 'workflow_dispatch', created_at: '2026-11-21T00:00:00Z' },
+      { ...base, id: 3, event: 'push', created_at: '2026-11-22T00:00:00Z' },
+      { ...base, id: 4, event: 'pull_request', created_at: '2026-11-22T00:00:00Z' },
+      { ...base, id: 5, event: 'schedule', head_repository: { id: 7 }, created_at: '2026-11-22T00:00:00Z' },
+      { ...base, id: 6, event: 'schedule', path: '.github/workflows/ci.yml', created_at: '2026-11-22T00:00:00Z' },
+    ];
+    expect(trustedRuns(runs, { workflowPath: NIGHTLY_WORKFLOW, events: NIGHTLY_EVENTS }).map((r: { id: number }) => r.id)).toEqual([2, 1]);
   });
 });
 
