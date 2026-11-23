@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Writable } from 'node:stream';
 import { afterEach, describe, expect, it } from 'vitest';
-import { CONFIG_FILE, TOKEN_REQUEST, appJwt, mint, mintToken, readConfig, readPrivateKey, run } from './mint-token.mjs';
+import { CONFIG_FILE, TOKEN_REQUEST, appJwt, checkInstallation, mint, mintToken, readConfig, readPrivateKey, run } from './mint-token.mjs';
 
 // Tests for the minting side, which runs as st-mint on the VM: here it runs as
 // the current user, with a fake config and key in a temporary directory and a
@@ -52,6 +52,22 @@ function fakeGitHub(answers: Array<() => Response>) {
 }
 const issued = (token: string, expiresAt = T0 + HOUR) => () => new Response(JSON.stringify({ token, expires_at: new Date(expiresAt).toISOString(), permissions: {}, repository_selection: 'selected' }), { status: 201 });
 const failed = (status: number, message: string) => () => new Response(JSON.stringify({ message }), { status });
+/** GET /app/installations/{id}: by default installed on selected repositories, with the approved permissions. */
+const installation =
+  (fields: Record<string, unknown> = {}, permissions: Record<string, unknown> = {}) =>
+  () =>
+    new Response(
+      JSON.stringify({
+        id: 678,
+        app_id: 12345,
+        app_slug: 'signal-tree-ci',
+        target_type: 'User',
+        repository_selection: 'selected',
+        permissions: { metadata: 'read', contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', actions: 'read', ...permissions },
+        ...fields,
+      }),
+      { status: 200 },
+    );
 
 /** A config file and an owner-only key in a temporary directory, as /etc/signal-tree/app.json and st-mint's key would be. */
 function mintFixture(config: Record<string, unknown> = {}) {
@@ -142,9 +158,10 @@ describe('mint command: config and key', () => {
 
 describe('mint command: minting', () => {
   it('asks for signal-tree only, with the approved permissions and never Workflows, signed with the App JWT', async () => {
-    const github = fakeGitHub([issued('ghs_first')]);
+    const github = fakeGitHub([installation(), issued('ghs_first')]);
     expect(await mint({ configFile: mintFixture().configFile, now: T0, fetch: github.fetch })).toEqual({ token: 'ghs_first', expires_at: new Date(T0 + HOUR).toISOString() });
-    const [{ url, init }] = github.calls;
+    expect(github.calls).toHaveLength(2);
+    const [, { url, init }] = github.calls;
     expect(url).toBe('https://api.github.com/app/installations/678/access_tokens');
     expect(init.method).toBe('POST');
     expect(JSON.parse(init.body as string)).toEqual(APPROVED_REQUEST);
@@ -202,11 +219,67 @@ describe('mint command: minting', () => {
   });
 });
 
+describe("mint command: the App's installation", () => {
+  const check = (answer: () => Response) => {
+    const github = fakeGitHub([answer]);
+    return { github, result: checkInstallation({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: github.fetch, sleep: noSleep }) };
+  };
+  const workflows = "the App has Workflows permission (\"write\"); Jonathan's ruling says it must not";
+  const administration = "the App has Administration permission (\"read\"); Jonathan's ruling says it must not";
+  const everything = 'the App is installed on all of the account\'s repositories (repository_selection "all"); it must be installed on signal-tree only';
+
+  it('reads GET /app/installations/{id} with the App JWT, and accepts selected repositories without Workflows or Administration', async () => {
+    const { github, result } = check(installation());
+    await expect(result).resolves.toBeUndefined();
+    const [{ url, init }] = github.calls;
+    expect(url).toBe('https://api.github.com/app/installations/678');
+    expect(init.method).toBe('GET');
+    expect(init.body).toBeUndefined();
+    const headers = init.headers as Record<string, string>;
+    expect(headers).not.toHaveProperty('Content-Type');
+    expect(decode(headers.Authorization.replace(/^Bearer /, '').split('.')[1])).toEqual({ iat: T0 / 1000 - 60, exp: T0 / 1000 + 540, iss: 12345 });
+  });
+
+  it('refuses an App with the Workflows permission at any level', async () => {
+    await expect(check(installation({}, { workflows: 'write' })).result).rejects.toThrow(`refusing to mint a token: ${workflows}. Fix the App's settings on GitHub.`);
+    await expect(check(installation({}, { workflows: 'read' })).result).rejects.toThrow('the App has Workflows permission ("read")');
+    await expect(check(installation({}, { workflows: null })).result).rejects.toThrow('the App has Workflows permission (null)');
+  });
+
+  it('refuses an App with the Administration permission at any level', async () => {
+    await expect(check(installation({}, { administration: 'read' })).result).rejects.toThrow(`refusing to mint a token: ${administration}.`);
+    await expect(check(installation({}, { administration: 'write' })).result).rejects.toThrow('the App has Administration permission ("write")');
+  });
+
+  it("refuses an App installed on all of the account's repositories", async () => {
+    await expect(check(installation({ repository_selection: 'all' })).result).rejects.toThrow(`refusing to mint a token: ${everything}.`);
+  });
+
+  it('names every problem at once', async () => {
+    await expect(check(installation({ repository_selection: 'all' }, { workflows: 'write', administration: 'read' })).result).rejects.toThrow(`refusing to mint a token: ${workflows}; ${administration}; ${everything}. Fix the App's settings on GitHub.`);
+  });
+
+  it('refuses an answer without permissions or a repository selection, and fails on an unknown installation', async () => {
+    for (const answer of [installation({ permissions: undefined }), installation({ permissions: null }), installation({ repository_selection: undefined }), () => new Response('not json', { status: 200 })]) {
+      await expect(check(answer).result).rejects.toThrow("without the installation's permissions and repository selection");
+    }
+    await expect(check(failed(404, 'Not Found')).result).rejects.toThrow("could not read the App's installation: GitHub answered 404: Not Found. Check installationId");
+  });
+
+  it('mints nothing when the installation is refused', async () => {
+    for (const answer of [installation({}, { workflows: 'write' }), installation({}, { administration: 'write' }), installation({ repository_selection: 'all' })]) {
+      const github = fakeGitHub([answer, issued('ghs_never')]);
+      await expect(mint({ configFile: mintFixture().configFile, now: T0, fetch: github.fetch, sleep: noSleep })).rejects.toThrow('refusing to mint a token: ');
+      expect(github.calls.map((call) => call.init.method)).toEqual(['GET']);
+    }
+  });
+});
+
 describe('mint command: what it prints', () => {
   it('prints only {"token","expires_at"} on one line, and nothing on stderr', async () => {
     const out = sink();
     const err = sink();
-    const status = await run([], { configFile: mintFixture().configFile, fetch: fakeGitHub([issued('ghs_printed')]).fetch, stdout: out.stream, stderr: err.stream });
+    const status = await run([], { configFile: mintFixture().configFile, fetch: fakeGitHub([installation(), issued('ghs_printed')]).fetch, stdout: out.stream, stderr: err.stream });
     expect(status).toBe(0);
     expect(out.text()).toMatch(/^\{"token":"ghs_printed","expires_at":"[^"]+"\}\n$/);
     expect(Object.keys(JSON.parse(out.text()))).toEqual(['token', 'expires_at']);
@@ -215,14 +288,16 @@ describe('mint command: what it prints', () => {
 
   it('exits 1 with one short line on stderr, printing nothing on stdout, when it fails', async () => {
     const { configFile, keyFile } = mintFixture();
-    const cases: Array<[() => Response, string]> = [
-      [failed(401, 'Bad credentials'), 'GitHub answered 401: Bad credentials.'],
-      [issued('gho_personal'), 'without an installation token'],
+    const cases: Array<[Array<() => Response>, string]> = [
+      [[failed(401, 'Bad credentials')], "could not read the App's installation: GitHub answered 401: Bad credentials."],
+      [[installation(), failed(401, 'Bad credentials')], 'could not mint an installation token: GitHub answered 401: Bad credentials.'],
+      [[installation(), issued('gho_personal')], 'without an installation token'],
+      [[installation({}, { workflows: 'write' })], "refusing to mint a token: the App has Workflows permission (\"write\"); Jonathan's ruling says it must not."],
     ];
-    for (const [answer, message] of cases) {
+    for (const [answers, message] of cases) {
       const out = sink();
       const err = sink();
-      expect(await run([], { configFile, fetch: fakeGitHub([answer]).fetch, sleep: noSleep, stdout: out.stream, stderr: err.stream })).toBe(1);
+      expect(await run([], { configFile, fetch: fakeGitHub(answers).fetch, sleep: noSleep, stdout: out.stream, stderr: err.stream })).toBe(1);
       expect(out.text()).toBe('');
       expect(err.text()).toMatch(new RegExp(`^mint-token: .*${message.replace(/[.()]/g, '\\$&')}.*\\n$`));
       expect(err.text()).not.toContain(keyLine);
