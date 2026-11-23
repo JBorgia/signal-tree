@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -685,5 +685,189 @@ describe('supervisor startup checks', () => {
     const notRules = bash(`${shellFunctions('check_main_rules')}; check_main_rules`, { ...env, FAKE_RULES: '{"message":"Not Found"}' });
     expect(notRules.status).toBe(1);
     expect(notRules.stderr).toContain("GitHub's answer is not a list of rules");
+  });
+});
+
+describe('workflow self-test', () => {
+  const ZERO = '0000000000000000000000000000000000000000';
+  const identity = { GIT_AUTHOR_NAME: 'Jonathan Borgia', GIT_AUTHOR_EMAIL: 'jonathanborgia@gmail.com', GIT_COMMITTER_NAME: 'Jonathan Borgia', GIT_COMMITTER_EMAIL: 'jonathanborgia@gmail.com' };
+  /** GitHub's message for an App push of a workflow file without the workflows permission. */
+  const refusal = (path: string) => `refusing to allow a GitHub App to create or update workflow \`${path}\` without \`workflows\` permission`;
+  // pre-receive hooks for the fake remote. Each logs "<old> <new> <ref>" for every ref it is offered.
+  const log = 'while read -r old new ref; do echo "$old $new $ref" >> "$HOOK_LOG"; ';
+  const hooks = {
+    // Like GitHub for an App without the workflows permission: refuse a push that adds or changes a workflow file.
+    github: `${log}[[ $new == ${ZERO} ]] && continue; for f in $(git diff --name-only refs/heads/main "$new" -- .github/workflows/); do echo "${refusal('$f')}" >&2; exit 1; done; done`,
+    // Like GitHub for an App that has the permission.
+    accept: `${log}done`,
+    protected: `${log}done; echo "error: GH006: Protected branch update failed for refs/heads/selftest." >&2; exit 1`,
+    disabled: `${log}done; echo "workflow runs are disabled for this repository" >&2; exit 1`,
+    denied: `${log}done; echo "Permission to JBorgia/signal-tree.git denied to signal-tree-ci[bot]." >&2; exit 1`,
+    // Refuses with GitHub's message, but the branch appears anyway.
+    sneaky: `${log}[[ $new == ${ZERO} ]] && continue; env -u GIT_QUARANTINE_PATH git update-ref "$ref" refs/heads/main; echo "${refusal('.github/workflows/x.yml')}" >&2; exit 1; done`,
+    slow: `${log}done; sleep 10; exit 1`,
+  };
+
+  /** A fake remote with main (holding a workflow already), the hook, and the agent's clone of it. */
+  const remoteFixture = (hook: string) => {
+    const root = scratch();
+    const remote = join(root, 'remote.git');
+    git(root, 'init', '-q', '--bare', '-b', 'main', remote);
+    const seed = join(root, 'seed');
+    git(root, 'clone', '-q', remote, seed);
+    mkdirSync(join(seed, '.github', 'workflows'), { recursive: true });
+    writeFileSync(join(seed, '.github', 'workflows', 'tests.yml'), 'name: tests\n');
+    writeFileSync(join(seed, 'README.md'), 'signal-tree\n');
+    git(seed, 'add', '.');
+    git(seed, '-c', 'user.name=Seed', '-c', 'user.email=seed@example.com', 'commit', '-qm', 'seed');
+    git(seed, 'push', '-q', 'origin', 'HEAD:main');
+    const work = join(root, 'work');
+    git(root, 'clone', '-q', remote, work);
+    writeScript(join(remote, 'hooks', 'pre-receive'), hook);
+    const tmp = join(root, 'tmp');
+    mkdirSync(tmp);
+    const hookLog = join(root, 'hook.log');
+    const offered = () => (existsSync(hookLog) ? readFileSync(hookLog, 'utf8').trim().split('\n') : []);
+    const selftestRefs = () => git(remote, 'for-each-ref', '--format=%(refname)', 'refs/heads/selftest');
+    return { root, remote, work, tmp, offered, selftestRefs };
+  };
+  const selftest = (f: ReturnType<typeof remoteFixture>, limit = 20, extra: Record<string, string> = {}) =>
+    bash(`${shellFunctions('workflow_selftest', 'workflow_push', 'is_workflow_refusal', 'with_timeout')}; workflow_selftest "$PWD" ${limit}`, { ...isolatedGit, ...identity, GIT_ALLOW_PROTOCOL: 'https:file', TMPDIR: f.tmp, HOOK_LOG: join(f.root, 'hook.log'), ...extra }, f.work);
+  const snapshot = (work: string) => [git(work, 'rev-parse', 'HEAD'), git(work, 'status', '--porcelain', '--untracked-files=all'), git(work, 'count-objects', '-v'), git(work, 'for-each-ref')].join('\n---\n');
+
+  it('passes when the push is refused for the missing workflows permission, leaving no branch and no trace in the checkout', () => {
+    const f = remoteFixture(hooks.github);
+    const before = snapshot(f.work);
+    const r = selftest(f);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout).toBe("Workflow self-test passed: GitHub refused the App's push of a workflow file, and left no branch.\n");
+    expect(f.selftestRefs()).toBe('');
+    expect(snapshot(f.work)).toBe(before);
+    expect(readdirSync(f.tmp)).toEqual([]);
+    const [offer] = f.offered();
+    expect(offer).toMatch(new RegExp(`^${ZERO} [0-9a-f]{40} refs/heads/selftest/workflow-push-[0-9a-f]{12}$`));
+  });
+
+  it('pushes, as Jonathan, a commit of main plus only .github/workflows/selftest-<id>.yml to selftest/workflow-push-<id>', () => {
+    const f = remoteFixture(hooks.accept);
+    selftest(f);
+    const [created, deleted] = f.offered();
+    const [, commit, ref] = created.split(' ');
+    const id = ref.replace('refs/heads/selftest/workflow-push-', '');
+    expect(id).toMatch(/^[0-9a-f]{12}$/);
+    expect(git(f.remote, 'diff', '--name-only', 'main', commit)).toBe(`.github/workflows/selftest-${id}.yml`);
+    expect(git(f.remote, 'log', '-1', '--format=%P|%an <%ae>|%cn <%ce>', commit)).toBe(`${git(f.remote, 'rev-parse', 'main')}|Jonathan Borgia <jonathanborgia@gmail.com>|Jonathan Borgia <jonathanborgia@gmail.com>`);
+    expect(git(f.remote, 'show', `${commit}:.github/workflows/selftest-${id}.yml`)).toContain('on: workflow_dispatch');
+    expect(deleted).toBe(`${commit} ${ZERO} ${ref}`);
+  });
+
+  it('fails when the push is accepted (exit 14 in the supervisor), deleting the branch at once', () => {
+    const f = remoteFixture(hooks.accept);
+    const r = selftest(f);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('Refusing to start: the workflow self-test failed (it pushed .github/workflows/selftest-');
+    expect(r.stderr).toContain('GitHub accepted it, so the App can change workflows: remove its Workflows permission (workflow changes come only from Jonathan). The branch has been deleted.');
+    expect(f.selftestRefs()).toBe('');
+    expect(f.offered()).toHaveLength(2);
+  });
+
+  it('fails when the push is refused for any other reason, without mistaking it for the workflows refusal', () => {
+    for (const hook of [hooks.protected, hooks.disabled, hooks.denied]) {
+      const f = remoteFixture(hook);
+      const r = selftest(f);
+      expect(r.status, hook).toBe(1);
+      expect(r.stderr).toContain('GitHub refused it, but not for the missing workflows permission, so this proves nothing.');
+      expect(f.selftestRefs()).toBe('');
+    }
+    // A push that cannot reach the remote at all.
+    const f = remoteFixture(hooks.github);
+    git(f.work, 'config', 'remote.origin.pushurl', join(f.root, 'missing.git'));
+    const unreachable = selftest(f);
+    expect(unreachable.status).toBe(1);
+    expect(unreachable.stderr).toContain('not for the missing workflows permission');
+    expect(f.offered()).toEqual([]);
+  });
+
+  it('fails, deleting the branch, when the push is refused with the right message but the branch exists anyway', () => {
+    const f = remoteFixture(hooks.sneaky);
+    const r = selftest(f);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('GitHub refused the push, yet the branch exists. The branch has been deleted.');
+    expect(f.selftestRefs()).toBe('');
+  });
+
+  it('fails when the push does not finish in time', () => {
+    const f = remoteFixture(hooks.slow);
+    const started = Date.now();
+    const r = selftest(f, 2);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('The push did not finish within 2 s.');
+    expect(Date.now() - started).toBeLessThan(9000);
+  });
+
+  it('fails when main cannot be fetched', () => {
+    const f = remoteFixture(hooks.github);
+    git(f.work, 'remote', 'set-url', 'origin', join(f.root, 'missing.git'));
+    const r = selftest(f);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('the workflow self-test could not fetch main');
+  });
+
+  it('is skipped, loudly, only with SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1 and a fake remote', () => {
+    const f = remoteFixture(hooks.accept);
+    const skipped = selftest(f, 20, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1' });
+    expect(skipped.status).toBe(0);
+    expect(skipped.stderr).toContain('WARNING: SKIPPING THE WORKFLOW SELF-TEST (SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST=1, fake remote)');
+    expect(f.offered()).toEqual([]);
+
+    // With origin on github.com it runs anyway (here https is not allowed, so it fails without the network).
+    git(f.work, 'remote', 'set-url', 'origin', ORIGIN);
+    const github = selftest(f, 20, { SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST: '1', GIT_ALLOW_PROTOCOL: 'file' });
+    expect(github.status).toBe(1);
+    expect(github.stderr).toContain('is only for tests against a fake remote; origin is on github.com, so the workflow self-test runs.');
+    expect(github.stderr).toContain('could not fetch main');
+  });
+
+  it("recognises GitHub's refusal: one line with workflow and permission or refusing, in any case", () => {
+    const matches = (text: string) => {
+      const file = join(scratch(), 'push.out');
+      writeFileSync(file, text);
+      return bash(`${shellFunctions('is_workflow_refusal')}; is_workflow_refusal "${file}"`, {}).status === 0;
+    };
+    const path = '.github/workflows/selftest-0123456789ab.yml';
+    expect(matches(`To https://github.com/JBorgia/signal-tree.git\n ! [remote rejected] 1a2b3c4 -> selftest/workflow-push-0123456789ab (${refusal(path)})\nerror: failed to push some refs\n`)).toBe(true);
+    expect(matches(`remote: ${refusal(path).toUpperCase()}\n`)).toBe(true);
+    expect(matches('remote: refusing to update workflow files\n')).toBe(true);
+    for (const text of ['remote: error: GH006: Protected branch update failed.\n', 'remote: workflow runs are disabled\n', 'remote: Permission to JBorgia/signal-tree.git denied.\nfatal: unable to access: The requested URL returned error: 403\n', 'remote: a workflow\nremote: permission\n', 'fatal: unable to access: Could not resolve host: github.com\n', '']) {
+      expect(matches(text), text).toBe(false);
+    }
+  });
+
+  it('limits a command to its time and passes its status through otherwise', () => {
+    const run = (command: string) => {
+      const started = Date.now();
+      const r = bash(`${shellFunctions('with_timeout')}; ${command}; echo "status=$?"`, {});
+      return { out: r.stdout.trim(), ms: Date.now() - started };
+    };
+    const slow = run('with_timeout 1 sleep 8');
+    expect(slow.out).toBe('status=124');
+    expect(slow.ms).toBeLessThan(6000);
+    expect(run("with_timeout 5 sh -c 'exit 3'").out).toBe('status=3');
+    const quick = run('with_timeout 8 true');
+    expect(quick.out).toBe('status=0');
+    // No sleep left behind holding the output pipe open.
+    expect(quick.ms).toBeLessThan(6000);
+  });
+
+  it('runs in the supervisor after the token, origin, gh, rules and ls-remote checks, before the lock (exit 14)', () => {
+    const text = readFileSync(supervisor, 'utf8');
+    const main = text.slice(text.indexOf('main() {'), text.indexOf('\n}\n', text.indexOf('main() {')));
+    const at = (snippet: string) => {
+      expect(main).toContain(snippet);
+      return main.indexOf(snippet);
+    };
+    const selftestAt = at('workflow_selftest "$WORK_DIR" 30 || exit 14');
+    for (const before of ['|| exit 9', 'check_origin "$WORK_DIR" || exit 10', '|| exit 11', 'check_main_rules || exit 12', 'ls-remote -q origin HEAD']) expect(at(before)).toBeLessThan(selftestAt);
+    for (const after of ['git clone -q', 'acquire --session']) expect(at(after)).toBeGreaterThan(selftestAt);
   });
 });

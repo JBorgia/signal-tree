@@ -36,7 +36,7 @@ const HOUR = 3_600_000;
 const noSleep = async () => {};
 const APPROVED_REQUEST = {
   repositories: ['signal-tree'],
-  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', workflows: 'write', actions: 'read' },
+  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', actions: 'read' },
 };
 
 /** A fake api.github.com: each request takes the next answer (a Response, or a thrown network error). */
@@ -141,7 +141,7 @@ describe('mint command: config and key', () => {
 });
 
 describe('mint command: minting', () => {
-  it('asks for signal-tree only, with the approved permissions, signed with the App JWT', async () => {
+  it('asks for signal-tree only, with the approved permissions and never Workflows, signed with the App JWT', async () => {
     const github = fakeGitHub([issued('ghs_first')]);
     expect(await mint({ configFile: mintFixture().configFile, now: T0, fetch: github.fetch })).toEqual({ token: 'ghs_first', expires_at: new Date(T0 + HOUR).toISOString() });
     const [{ url, init }] = github.calls;
@@ -149,6 +149,8 @@ describe('mint command: minting', () => {
     expect(init.method).toBe('POST');
     expect(JSON.parse(init.body as string)).toEqual(APPROVED_REQUEST);
     expect(TOKEN_REQUEST).toEqual(APPROVED_REQUEST);
+    // Jonathan: the App does not get Workflows permission.
+    expect(JSON.parse(init.body as string).permissions).not.toHaveProperty('workflows');
     const headers = init.headers as Record<string, string>;
     expect(headers['Content-Type']).toBe('application/json');
     expect(headers.Accept).toBe('application/vnd.github+json');

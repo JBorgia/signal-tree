@@ -60,11 +60,14 @@ export const CONFIG_FILE = '/etc/signal-tree/app.json';
 export const API = 'https://api.github.com';
 /**
  * The token's scope: this repository only, with the permissions the agent
- * needs. Jonathan approved workflows write and actions read.
+ * needs, and Actions read-only. Never Workflows (Jonathan: "The App does not
+ * get Workflows permission ... Workflow changes come from me."), so GitHub
+ * refuses any push made with the token that touches .github/workflows/;
+ * supervise.sh checks that at startup (workflow_selftest).
  */
 export const TOKEN_REQUEST = {
   repositories: ['signal-tree'],
-  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', workflows: 'write', actions: 'read' },
+  permissions: { contents: 'write', pull_requests: 'write', issues: 'write', checks: 'write', actions: 'read' },
 };
 const ATTEMPTS = 3;
 const REQUEST_TIMEOUT_MS = 30_000;
