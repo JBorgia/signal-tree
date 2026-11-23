@@ -154,3 +154,5 @@ Where the budgets leave a detail open, the harness does the following.
   in `budgets.json` (for example one frame, or the 5 µs timer step).
 - A metric that is missing, or did not produce a value in every required run,
   fails.
+
+Ruleset test 3 line (scratch; never merged to main).
