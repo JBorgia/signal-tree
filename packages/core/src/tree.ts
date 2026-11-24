@@ -14,7 +14,10 @@
  */
 import type { CellAdapter, NativeCell, PlainAdapter, Route } from './cell';
 import { NODE, PlainCell, createPlainAdapter, isPlainAdapter } from './cell';
+import type { TreeErrorEvent } from './errors';
 import { SignalTreeError, SignalTreeRefusal } from './errors';
+import type { Attachment, Interceptor, ObserveListener, Plugin, ScopeHandle, TurnHandle, TurnInfo, WriteEffect, WriteKind, WriteOp, WriterContext } from './seam';
+import { ErrorChannel, USER_CONTEXT, isAsyncFunction, isThenable, writerContext } from './seam';
 
 // ------------------------------------------------------------------ values
 
@@ -144,6 +147,8 @@ class BranchNode {
   snap: unknown = undefined;
   snapValid = false;
   handle: object | null = null;
+  /** The nearest scope covering this branch, or null: the seam's fast path checks only this. */
+  scope: Scope | null = null;
   /** The plain object whose own keys are the members and whose values back unread members. */
   base: Record<PropertyKey, unknown>;
   readonly parent: BranchNode | null;
@@ -158,10 +163,44 @@ class BranchNode {
 
 type AnyNode = LeafNode | BranchNode;
 
+/** Whether `value` has the branch's members, with the same values for those not yet read. */
+function sameMembers(branch: BranchNode, value: Record<PropertyKey, unknown>): boolean {
+  const before = memberKeys(branch.base);
+  const after = memberKeys(value);
+  if (before.length !== after.length) return false;
+  for (const key of after) {
+    if (!Object.prototype.hasOwnProperty.call(branch.base, key)) return false;
+    if (!branch.children?.has(key) && !sameValue(branch.base[key], value[key])) return false;
+  }
+  return true;
+}
+
 function pathOf(node: AnyNode): PropertyKey[] {
   const path: PropertyKey[] = [];
   for (let n: AnyNode | null = node; n && n.parent; n = n.parent) path.push(n.key);
   return path.reverse();
+}
+
+// ------------------------------------------------------------------ scopes
+
+/** The plugins' attachment point on one branch (BRIEF.md 4.2 layer 5). */
+class Scope {
+  readonly node: BranchNode;
+  /** The nearest enclosing scope. */
+  readonly parent: Scope | null;
+  readonly interceptors: Interceptor[] = [];
+  readonly observers: ObserveListener[] = [];
+  constructor(node: BranchNode, parent: Scope | null) {
+    this.node = node;
+    this.parent = parent;
+  }
+}
+
+/** A scope and its ancestors, outermost first. */
+function scopeChain(scope: Scope): Scope[] {
+  const chain: Scope[] = [];
+  for (let s: Scope | null = scope; s; s = s.parent) chain.push(s);
+  return chain.reverse();
 }
 
 // --------------------------------------------------------------- the tree
@@ -186,11 +225,26 @@ export class TreeCore<Tag extends string> {
   /** Undo journal of the open explicit turn (T13); null outside one. */
   private journal: JournalEntry[] | null = null;
   private turnSerial = 0;
+  readonly errors: ErrorChannel;
+  /** The writer context of the code running now (W5: it never outlives the synchronous call that set it). */
+  private context: WriterContext = USER_CONTEXT;
+  /** The writer context the open turn was opened under. */
+  private turnContext: WriterContext = USER_CONTEXT;
+  /** The open turn, once something in a scope needs it. */
+  private currentTurn: TurnInfo | null = null;
+  /** The context, with its turn, that effects of the open turn carry. */
+  private effectContextCache: { base: WriterContext; turn: TurnHandle; context: WriterContext } | null = null;
+  private effects: { scope: Scope; effect: WriteEffect }[] = [];
+  private publishing = false;
+  private readonly publishQueue: { turn: TurnInfo; effects: { scope: Scope; effect: WriteEffect }[] }[] = [];
+  private readonly attachments: { name: string; attachment: Attachment<unknown>; disposers: (() => void)[] }[] = [];
+  private readonly scopes = new Map<BranchNode, Scope>();
   private readonly snapshotCache = new WeakMap<object, unknown>();
   private readonly cells = new Set<object>();
   private readonly isForeign = (value: unknown) => handles.has(value as object) || (value as Record<symbol, unknown>)[NODE] !== undefined;
 
-  constructor(state: object, adapter: CellAdapter<Tag>) {
+  constructor(state: object, adapter: CellAdapter<Tag>, onTreeError?: (event: TreeErrorEvent) => void) {
+    this.errors = new ErrorChannel(onTreeError);
     if (!isPlainObject(state)) throw new SignalTreeError('ST1001', { detail: 'the initial state must be a plain object' });
     this.adapter = adapter;
     this.plain = isPlainAdapter(adapter);
@@ -225,6 +279,7 @@ export class TreeCore<Tag extends string> {
     const value = present ? branch.base[key] : undefined;
     if (present && isPlainObject(value) && !isLeafMarker(value)) {
       const created = new BranchNode(branch, key, value, false);
+      created.scope = branch.scope;
       this.validate(created);
       // Keeps the invariant invalidate() relies on: a valid snapshot's materialized children are valid too.
       if (branch.snapValid) {
@@ -301,7 +356,7 @@ export class TreeCore<Tag extends string> {
   /** The seam for a leaf write: equality, then commit. A skipped write is not a write. */
   writeLeaf(node: LeafNode, next: unknown): void {
     if (this.destroyed) throw new SignalTreeError('ST1003');
-    if (typeof next !== 'object' && !node.absent) {
+    if (typeof next !== 'object' && !node.absent && node.parent.scope === null) {
       // The common case, allocation-free (C1): a primitive written to a present leaf.
       const cell = node.cell as NativeCell<Tag, unknown>;
       if (this.plain) {
@@ -320,6 +375,15 @@ export class TreeCore<Tag extends string> {
       return;
     }
     const value = typeof next === 'object' && next !== null ? copyIn(next, pathOf(node), this.isForeign) : next;
+    if (node.parent.scope !== null) {
+      this.writeCovered(node, node.parent.scope, value, 'set');
+      return;
+    }
+    this.applyLeaf(node, value);
+  }
+
+  /** Applies an already copied value to a leaf: skipped when unchanged; re-adds an absent leaf's path (V1). */
+  private applyLeaf(node: LeafNode, value: unknown): void {
     if (!node.absent && sameValue(this.readLeaf(node), value)) return;
     if (node.absent) {
       this.batch(() => {
@@ -334,13 +398,185 @@ export class TreeCore<Tag extends string> {
   }
 
   /** A whole-value write to a branch (V1), one implicit turn. Copies and checks everything before changing anything. */
-  writeBranch(branch: BranchNode, next: unknown): void {
+  writeBranch(branch: BranchNode, next: unknown, kind: WriteKind = 'set'): void {
     this.assertLive();
     const value = copyIn(next, pathOf(branch), this.isForeign);
+    if (branch.scope !== null) {
+      this.writeCovered(branch, branch.scope, value, kind);
+      return;
+    }
+    this.batch(() => this.applyWhole(branch, value));
+  }
+
+  private applyWhole(branch: BranchNode, value: unknown): void {
+    if (branch.absent) this.present(branch.parent!);
+    this.applyBranch(branch, value);
+  }
+
+  // ------------------------------------------------------ the covered seam
+
+  /** A write inside a scope: interceptors outermost first, then the change, then the effect for observers. */
+  private writeCovered(node: AnyNode, scope: Scope, value: unknown, kind: WriteKind): void {
     this.batch(() => {
-      if (branch.absent) this.present(branch.parent!);
-      this.applyBranch(branch, value);
+      const chain = scopeChain(scope);
+      const interceptors: Interceptor[] = [];
+      for (const s of chain) interceptors.push(...s.interceptors);
+      const op: WriteOp = Object.freeze({ location: Object.freeze(pathOf(node)), kind, next: value, context: this.effectContext() });
+      const effect = this.runInterceptors(interceptors, 0, op, node, value);
+      if (!effect.changed) return;
+      for (const s of chain) if (s.observers.length > 0) this.effects.push({ scope: s, effect });
     });
+  }
+
+  private runInterceptors(interceptors: Interceptor[], index: number, op: WriteOp, node: AnyNode, original: unknown): WriteEffect {
+    if (index === interceptors.length) return this.applyOp(node, op, original);
+    let called = false;
+    return interceptors[index]!.intercept(op, (next) => {
+      if (called) throw new SignalTreeError('ST1008', { path: pathOf(node), detail: interceptors[index]!.name });
+      called = true;
+      return this.runInterceptors(interceptors, index + 1, next, node, original);
+    });
+  }
+
+  /** The end of the interceptor chain: applies the op and describes what changed. */
+  private applyOp(node: AnyNode, op: WriteOp, original: unknown): WriteEffect {
+    const value = op.next === original ? original : copyIn(op.next, pathOf(node), this.isForeign);
+    const context = op.context;
+    if (node instanceof LeafNode) {
+      const wasAbsent = node.absent;
+      const before = this.readLeaf(node);
+      this.applyLeaf(node, value);
+      const after = this.readLeaf(node);
+      return Object.freeze({ location: op.location, before, after, changed: wasAbsent || !sameValue(before, after), context });
+    }
+    const before = this.snap(node);
+    const mutations = this.mutations;
+    this.applyWhole(node, value);
+    return Object.freeze({ location: op.location, before, after: this.snap(node), changed: this.mutations !== mutations, context });
+  }
+
+  /** The current writer context, carrying the open turn (W1). */
+  private effectContext(): WriterContext {
+    const turn = this.openTurnInfo().turn;
+    const cache = this.effectContextCache;
+    if (cache && cache.base === this.context && cache.turn === turn) return cache.context;
+    const context = Object.freeze({ ...this.context, turn });
+    this.effectContextCache = { base: this.context, turn, context };
+    return context;
+  }
+
+  private openTurnInfo(): TurnInfo {
+    return (this.currentTurn ??= Object.freeze({ turn: Object.freeze({ id: ++this.turnSerial }), context: this.turnContext }));
+  }
+
+  /** Publishes a closed turn's effects to each scope's observers, once (O2); a turn closed during publication waits its turn (O4). */
+  private publish(turn: TurnInfo, effects: { scope: Scope; effect: WriteEffect }[]): void {
+    this.publishQueue.push({ turn, effects });
+    if (this.publishing) return;
+    this.publishing = true;
+    try {
+      while (this.publishQueue.length > 0) {
+        const next = this.publishQueue.shift()!;
+        const byScope = new Map<Scope, WriteEffect[]>();
+        for (const { scope, effect } of next.effects) {
+          const list = byScope.get(scope);
+          if (list) list.push(effect);
+          else byScope.set(scope, [effect]);
+        }
+        for (const [scope, list] of byScope) {
+          const frozen = Object.freeze(list);
+          for (const observer of scope.observers.slice()) {
+            try {
+              observer(frozen, next.turn);
+            } catch (error) {
+              this.errors.observerError(error, pathOf(scope.node));
+            }
+          }
+        }
+      }
+    } finally {
+      this.publishing = false;
+    }
+  }
+
+  /** Runs `fn` with `context` as the writer context (W1); refuses async callbacks (W5, W6). */
+  as<R>(input: WriterContext, fn: () => R): R {
+    this.assertLive();
+    if (typeof fn !== 'function') throw new SignalTreeError('ST1006', { detail: 'as() takes a function' });
+    if (isAsyncFunction(fn)) throw new SignalTreeRefusal('ST1005', { detail: 'as()' });
+    const context = writerContext(input);
+    const previous = this.context;
+    this.context = context;
+    let result: R;
+    try {
+      result = fn();
+    } finally {
+      this.context = previous;
+    }
+    if (isThenable(result)) {
+      (result as PromiseLike<unknown>).then(undefined, () => {});
+      throw new SignalTreeRefusal('ST1005', { detail: 'as() callback returned a promise; its writes after the first await would lose the writer context' });
+    }
+    return result;
+  }
+
+  // -------------------------------------------------------------- plugins
+
+  /** Attaches a plugin to the scope at `node`, creating the scope on first use. */
+  attach<Api>(node: BranchNode, plugin: Plugin<Api>): Api {
+    this.assertLive();
+    if (!plugin || typeof plugin.attach !== 'function') throw new SignalTreeError('ST1006', { path: pathOf(node), detail: 'use() takes a plugin' });
+    const scope = this.scopeAt(node);
+    const disposers: (() => void)[] = [];
+    const removers: (() => void)[] = [];
+    const handle: ScopeHandle = Object.freeze({
+      path: Object.freeze(pathOf(node)),
+      intercept: (interceptor: Interceptor) => {
+        scope.interceptors.push(interceptor);
+        const remove = () => {
+          const index = scope.interceptors.indexOf(interceptor);
+          if (index >= 0) scope.interceptors.splice(index, 1);
+        };
+        removers.push(remove);
+        return remove;
+      },
+      observe: (listener: ObserveListener) => {
+        scope.observers.push(listener);
+        const remove = () => {
+          const index = scope.observers.indexOf(listener);
+          if (index >= 0) scope.observers.splice(index, 1);
+        };
+        removers.push(remove);
+        return remove;
+      },
+      snapshot: () => this.snapshot(node),
+      onDispose: (fn: () => void) => {
+        disposers.push(fn);
+      },
+    });
+    const attachment = plugin.attach(handle);
+    const record = { name: plugin.name, attachment: attachment as Attachment<unknown>, disposers };
+    this.attachments.push(record);
+    disposers.unshift(() => {
+      for (const remove of removers) remove();
+    });
+    return attachment.api;
+  }
+
+  private scopeAt(node: BranchNode): Scope {
+    const existing = this.scopes.get(node);
+    if (existing) return existing;
+    const previous = node.scope;
+    const scope = new Scope(node, previous);
+    this.scopes.set(node, scope);
+    const cover = (branch: BranchNode) => {
+      if (branch.scope !== previous) return;
+      branch.scope = scope;
+      for (const child of branch.children?.values() ?? []) if (child instanceof BranchNode) cover(child);
+    };
+    cover(node);
+    // Scopes attached later beneath this one keep it as their parent.
+    return scope;
   }
 
   /** Runs `fn` as one turn: observers see its writes as one change; if it throws, every write in it is reverted (T13). */
@@ -351,6 +587,7 @@ export class TreeCore<Tag extends string> {
     const mark = outer ? outer.length : 0;
     const journal = outer ?? [];
     this.journal = journal;
+    const effectsMark = this.effects.length;
     let result!: R;
     try {
       this.batch(() => {
@@ -358,6 +595,7 @@ export class TreeCore<Tag extends string> {
           result = fn();
         } catch (error) {
           this.revert(journal, mark);
+          this.effects.length = effectsMark;
           throw error;
         }
       });
@@ -368,12 +606,24 @@ export class TreeCore<Tag extends string> {
   }
 
   private batch(fn: () => void): void {
+    if (this.turnDepth === 0) this.turnContext = this.context;
     this.turnDepth++;
     try {
       this.adapter.batch(fn);
     } finally {
       this.turnDepth--;
+      if (this.turnDepth === 0) this.closeTurn();
     }
+  }
+
+  private closeTurn(): void {
+    const turn = this.currentTurn;
+    if (turn === null) return;
+    this.currentTurn = null;
+    const effects = this.effects;
+    if (effects.length === 0) return;
+    this.effects = [];
+    this.publish(turn, effects);
   }
 
   private revert(journal: JournalEntry[], mark: number): void {
@@ -401,7 +651,11 @@ export class TreeCore<Tag extends string> {
     else journal.push({ node, value: node.scalar, absent: node.absent, base: node.base, owned: node.owned });
   }
 
+  /** Counts changes, so a branch write can tell whether it changed anything. */
+  private mutations = 0;
+
   private commitLeaf(node: LeafNode, value: unknown, absent: boolean): void {
+    this.mutations++;
     if (this.journal) this.record(node);
     node.absent = absent;
     this.adapter.commit(node.cell as NativeCell<Tag, unknown>, value);
@@ -429,6 +683,7 @@ export class TreeCore<Tag extends string> {
   /** Makes `branch` and its ancestors hold members again, so a write beneath an absent member re-adds only its own path (V1). */
   private present(branch: BranchNode): void {
     if (!branch.absent && branch.scalar === NONE) return;
+    this.mutations++;
     if (branch.parent) {
       this.present(branch.parent);
       this.ownBase(branch.parent)[branch.key] = undefined;
@@ -445,6 +700,7 @@ export class TreeCore<Tag extends string> {
   private applyBranch(branch: BranchNode, value: unknown): void {
     if (this.journal) this.record(branch);
     if (!isPlainObject(value)) {
+      if (!sameValue(branch.scalar, value)) this.mutations++;
       branch.scalar = value;
       branch.absent = false;
       branch.base = {};
@@ -453,6 +709,7 @@ export class TreeCore<Tag extends string> {
       this.invalidate(branch);
       return;
     }
+    if (branch.scalar !== NONE || branch.absent || !sameMembers(branch, value)) this.mutations++;
     branch.absent = false;
     branch.scalar = NONE;
     branch.base = value;
@@ -479,6 +736,7 @@ export class TreeCore<Tag extends string> {
       return;
     }
     if (node.absent) return;
+    this.mutations++;
     if (this.journal) this.record(node);
     for (const child of node.children?.values() ?? []) this.remove(child);
     node.absent = true;
@@ -498,8 +756,9 @@ export class TreeCore<Tag extends string> {
       set: (value: unknown) => this.writeBranch(node, value),
       update: (fn: (current: unknown) => unknown) => {
         if (typeof fn !== 'function') throw new SignalTreeError('ST1006', { path: pathOf(node), detail: 'update() takes a function' });
-        this.writeBranch(node, fn(this.snapshot(node)));
+        this.writeBranch(node, fn(this.snapshot(node)), 'update');
       },
+      use: (plugin: Plugin<unknown>) => this.attach(node, plugin),
     };
     const handle = new Proxy(Object.create(null) as object, {
       get: (_target, key) => {
@@ -524,6 +783,26 @@ export class TreeCore<Tag extends string> {
   destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
+    for (const { attachment, disposers } of this.attachments.splice(0).reverse()) {
+      try {
+        attachment.detach();
+      } catch (error) {
+        this.errors.observerError(error, [], 'ST2036');
+      }
+      for (const dispose of disposers) {
+        try {
+          dispose();
+        } catch (error) {
+          this.errors.observerError(error, [], 'ST2036');
+        }
+      }
+    }
+    for (const scope of this.scopes.values()) {
+      scope.interceptors.length = 0;
+      scope.observers.length = 0;
+    }
+    this.scopes.clear();
+    this.errors.dispose();
     const plain = this.adapter as unknown as Partial<PlainAdapter>;
     for (const cell of this.cells) plain.destroyCell?.(cell);
     this.cells.clear();
@@ -553,43 +832,79 @@ export interface BranchMethods<T> {
   /** Replaces the whole branch. Its members become exactly the value's own keys. */
   set(value: T): void;
   update(fn: (current: Unwrap<T>) => T): void;
+  /** Attaches a plugin to this branch only, and returns its API. */
+  use<Api>(plugin: Plugin<Api>): Api;
 }
 
 export type BranchHandle<Tag extends string, T> = { readonly [K in keyof T]-?: Handle<Tag, T[K]> } & BranchMethods<T>;
 
-export interface TreeOptions<Tag extends string = 'plain'> {
+type PluginApis<P extends readonly Plugin<unknown>[]> = P extends readonly [] ? unknown : UnionToIntersection<P[number] extends Plugin<infer A> ? (A extends object ? A : unknown) : unknown>;
+type UnionToIntersection<U> = (U extends unknown ? (u: U) => void : never) extends (i: infer I) => void ? I : never;
+
+export interface TreeOptions<Tag extends string = 'plain', P extends readonly Plugin<unknown>[] = readonly Plugin<unknown>[]> {
   /** The adapter whose native cells hold the state. Defaults to a plain adapter for this tree. */
   readonly adapter?: CellAdapter<Tag>;
+  /** Plugins attached to the whole tree. Their APIs join the tree object. */
+  readonly plugins?: P;
+  /** Receives every error an observer, subscriber or plugin throws while a change is published, and teardown errors. Defaults to console.error. */
+  readonly onTreeError?: (event: TreeErrorEvent) => void;
 }
 
-export interface SignalTree<Tag extends string, S> {
+export interface SignalTreeBase<Tag extends string, S> {
   /** The root handle. */
   readonly $: BranchHandle<Tag, S>;
+  /** Stable for the tree's lifetime and distinct between live trees. */
+  readonly id: string;
   /** Runs `fn` as one turn: observers see its writes as one change; if it throws, its writes are reverted. */
   turn<R>(fn: () => R): R;
-  /** Releases every cell. Afterwards reads and writes throw. */
+  /** Runs `fn` with its writes attributed to `context`. `fn` must be synchronous. */
+  as<R>(context: WriterContext, fn: () => R): R;
+  /** Releases every cell, subscription and plugin. Afterwards reads and writes throw. */
   destroy(): void;
 }
 
-export type SignalTreeFactory<Tag extends string> = <S extends object>(state: S, options?: TreeOptions<Tag>) => SignalTree<Tag, S>;
+export type SignalTree<Tag extends string, S, Api = unknown> = SignalTreeBase<Tag, S> & Api;
 
-function buildTree<Tag extends string, S extends object>(state: S, adapter: CellAdapter<Tag>): SignalTree<Tag, S> {
-  const core = new TreeCore(state, adapter);
-  return {
-    $: core.handle(core.root) as BranchHandle<Tag, S>,
-    turn: (fn) => core.turn(fn),
+export type SignalTreeFactory<Tag extends string> = <S extends object, const P extends readonly Plugin<unknown>[] = []>(
+  state: S,
+  options?: TreeOptions<Tag, P>,
+) => SignalTree<Tag, S, PluginApis<P>>;
+
+function buildTree<Tag extends string, S extends object>(state: S, adapter: CellAdapter<Tag>, options: TreeOptions<string, readonly Plugin<unknown>[]> | undefined, ownAdapter: boolean): SignalTree<Tag, S> {
+  const core = new TreeCore(state, adapter, options?.onTreeError);
+  if (ownAdapter) (adapter as unknown as PlainAdapter).setListenerErrorHandler((error) => core.errors.observerError(error, []));
+  const tree: Record<string, unknown> = {
+    $: core.handle(core.root),
+    id: core.errors.treeId,
+    turn: <R>(fn: () => R) => core.turn(fn),
+    as: <R>(context: WriterContext, fn: () => R) => core.as(context, fn),
     destroy: () => core.destroy(),
   };
+  for (const plugin of options?.plugins ?? []) {
+    const api = core.attach(core.root, plugin);
+    if (api === null || typeof api !== 'object') continue;
+    for (const key of Object.keys(api)) {
+      if (key in tree) throw new SignalTreeError('ST1009', { detail: `${plugin.name} exposes "${key}"` });
+      tree[key] = (api as Record<string, unknown>)[key];
+    }
+  }
+  return tree as unknown as SignalTree<Tag, S>;
 }
 
 /** One factory per adapter (decision 4). The `adapter` option overrides it per call, for tests. */
 export function createSignalTreeFactory<Tag extends string>(adapter: CellAdapter<Tag>): SignalTreeFactory<Tag> {
-  return (state, options) => buildTree(state, options?.adapter ?? adapter);
+  return ((state: object, options?: TreeOptions<Tag, readonly Plugin<unknown>[]>) =>
+    buildTree(state, options?.adapter ?? adapter, options as TreeOptions<string, readonly Plugin<unknown>[]>, false)) as SignalTreeFactory<Tag>;
 }
 
 /** Builds a tree on plain cells, or on the adapter given in options. */
-export function signalTree<S extends object>(state: S): SignalTree<'plain', S>;
-export function signalTree<S extends object, Tag extends string>(state: S, options: TreeOptions<Tag>): SignalTree<Tag, S>;
-export function signalTree<S extends object>(state: S, options?: TreeOptions<string>): SignalTree<string, S> {
-  return buildTree(state, (options?.adapter ?? createPlainAdapter()) as CellAdapter<string>);
+export function signalTree<S extends object, const P extends readonly Plugin<unknown>[] = []>(state: S, options?: TreeOptions<'plain', P>): SignalTree<'plain', S, PluginApis<P>>;
+export function signalTree<S extends object, Tag extends string, const P extends readonly Plugin<unknown>[] = []>(
+  state: S,
+  options: TreeOptions<Tag, P> & { readonly adapter: CellAdapter<Tag> },
+): SignalTree<Tag, S, PluginApis<P>>;
+export function signalTree(state: object, options?: TreeOptions<string, readonly Plugin<unknown>[]>): unknown {
+  const own = options?.adapter === undefined;
+  const adapter = (options?.adapter ?? createPlainAdapter()) as CellAdapter<string>;
+  return buildTree(state, adapter, options, own);
 }

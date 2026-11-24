@@ -16,9 +16,13 @@ export const ERROR_CODES = {
   ST1012: { cause: 'invalid-key', message: 'An entity key cannot be null or undefined' },
   ST1013: { cause: 'invalid-row', message: 'An entity row must be a plain object' },
   ST1014: { cause: 'change-id-unavailable', message: 'changeId is only available with the default selector (row => row.id)' },
+  ST1007: { cause: 'invalid-writer-context', message: 'A writer context needs a writer and an origin, both non-empty strings' },
+  ST1008: { cause: 'interceptor-misuse', message: 'An interceptor called next() more than once' },
+  ST1009: { cause: 'plugin-conflict', message: 'Two plugins on the tree expose the same name' },
   ST1020: { cause: 'missing-plugin', message: 'This operation needs a plugin that is not installed' },
   ST2034: { cause: 'observer-error', message: 'An observer threw while a change was being published' },
   ST2035: { cause: 'observer-errors-suppressed', message: 'Further observer errors were suppressed' },
+  ST2036: { cause: 'teardown-error', message: 'A plugin or observer threw while the tree was being destroyed' },
 } as const;
 
 export type ErrorCode = keyof typeof ERROR_CODES;
