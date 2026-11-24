@@ -455,7 +455,7 @@ describe('supervisor session loop', () => {
     runs.forEach((events, i) => writeFileSync(join(root, `run-${i + 1}.jsonl`), events.map((e) => JSON.stringify(e)).join('\n') + '\n'));
     const at = (name: string) => join(root, name);
     const log = join(state, 'session.log');
-    const functions = ['run_sessions', 'usage_limit', 'pause_for_usage_limit', 'utc_time', 'auth_failure', 'report'];
+    const functions = ['run_sessions', 'usage_limit', 'pause_for_usage_limit', 'utc_time', 'duration_text', 'auth_failure', 'report'];
     const shell = [
       `eval "$(sed -n '/^readonly /p;${functions.map((name) => `/^${name}()/,/^}/p`).join(';')}' "${script}")"`,
       'sync_verifier() { :; }',
@@ -468,6 +468,7 @@ describe('supervisor session loop', () => {
     const lines = (name: string) => (existsSync(at(name)) ? readFileSync(at(name), 'utf8').trim().split('\n') : []);
     return {
       ...run,
+      log,
       claude: lines('claude.log'),
       sleeps: lines('sleep.log'),
       gh: lines('gh.log'),
@@ -475,7 +476,7 @@ describe('supervisor session loop', () => {
       notes: readFileSync(log, 'utf8').split('\n').filter((line) => line !== '' && !line.startsWith('{')),
     };
   };
-  const paused = (type: string, until: string) => `2026-11-23T12:00:00Z usage limit (${type}) reached; paused until ${until}`;
+  const paused = (type: string, until: string, length: string) => `2026-11-23T12:00:00Z usage limit (${type}) reached; paused until ${until} (${length})`;
 
   it('waits until a minute after the reset time, then resumes the same session, which finishes: exit 0, no report', () => {
     const r = loop([limited({ resetsAt: NOW + 3600 }), worked]);
@@ -487,10 +488,16 @@ describe('supervisor session loop', () => {
     expect(r.claude[0]).toContain(`--session-id ${SESSION} `);
     expect(r.claude[1]).toContain(`--resume ${SESSION} `);
     expect(r.claude[1]).toContain('Continue the rebuild from BRIEF.md');
-    expect(r.notes[0]).toBe(paused('five_hour', '2026-11-23T13:00:00Z'));
+    expect(r.notes[0]).toBe(paused('five_hour', '2026-11-23T13:00:00Z', '1 h 1 min'));
     expect(r.notes[1]).toMatch(/^\S+Z claude exited with 1 after \d+s$/);
     expect(r.notes).toHaveLength(2);
     expect(r.gh).toEqual([]);
+  });
+
+  it('notes the pause so that the daily usage report lists it with its length', () => {
+    const r = loop([limited({ resetsAt: NOW + 3600 }), worked]);
+    const usage = spawnSync('bash', ['-c', `eval "$(sed -n '/^usage_report()/,/^}/p' "${script}")"; usage_report "${r.log}" /nonexistent ${NOW + 600}`], { encoding: 'utf8' });
+    expect(usage.stdout).toContain('Usage-limit pauses in the last 24 hours: 1: five_hour from 2026-11-23T12:00:00Z, 1 h 1 min (still paused).\n');
   });
 
   for (const [what, info] of [
@@ -503,7 +510,7 @@ describe('supervisor session loop', () => {
       expect(r.status, r.stderr).toBe(0);
       expect(r.sleeps).toEqual(['1800', '60']);
       expect(r.claude[1]).toContain(`--resume ${SESSION} `);
-      expect(r.notes[0]).toBe(paused('five_hour', '2026-11-23T12:30:00Z'));
+      expect(r.notes[0]).toBe(paused('five_hour', '2026-11-23T12:30:00Z', '30 min'));
       expect(r.gh).toEqual([]);
     });
   }
@@ -724,4 +731,169 @@ describe("supervisor installed copy (Jonathan's ruling of 2026-11-24)", () => {
       expect(r.stdout).toBe('');
     });
   }
+});
+
+describe("daily usage report (Jonathan's ruling of 2026-11-24)", () => {
+  const script = new URL('./supervise.sh', import.meta.url).pathname;
+  const NOW = Date.UTC(2026, 10, 24, 12, 0, 0) / 1000;
+  const iso = (seconds: number) => new Date(seconds * 1000).toISOString().replace('.000Z', 'Z');
+  const roots: string[] = [];
+  afterEach(() => {
+    for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  });
+  const scratch = () => {
+    const root = mkdtempSync(join(tmpdir(), 'signal-tree-usage-'));
+    roots.push(root);
+    return root;
+  };
+  const functions = (...names: string[]) => `eval "$(sed -n '/^readonly /p;${names.map((name) => `/^${name}()/,/^}/p`).join(';')}' "${script}")"`;
+  const shell = (body: string, env: Record<string, string> = {}) => spawnSync('bash', ['-c', body], { env: claudeEnv(env), encoding: 'utf8' });
+
+  for (const [seconds, text] of [
+    [0, '0 min'],
+    [1, '1 min'],
+    [60, '1 min'],
+    [61, '2 min'],
+    [1800, '30 min'],
+    [3600, '1 h'],
+    [3660, '1 h 1 min'],
+    [6 * 86400 + 2 * 3600, '6 d 2 h'],
+    [8 * 86400 + 60, '8 d 1 min'],
+  ] as const) {
+    it(`writes ${seconds} s as "${text}"`, () => {
+      expect(shell(`${functions('duration_text')}; duration_text ${seconds}`).stdout).toBe(`${text}\n`);
+    });
+  }
+
+  /** A rate_limit_event as Claude Code 2.1.331 writes it, with both windows. */
+  const event = (fiveHour: number, sevenDay: number, extra: object = {}) => ({
+    type: 'rate_limit_event',
+    rate_limit_info: {
+      status: 'allowed_warning',
+      resetsAt: NOW + 6 * 86400,
+      rateLimitType: 'seven_day',
+      utilization: sevenDay,
+      overageStatus: 'rejected',
+      isUsingOverage: false,
+      unifiedWindows: { five_hour: { utilization: fiveHour, resetsAt: NOW + 3600, status: 'allowed' }, seven_day: { utilization: sevenDay, resetsAt: NOW + 6 * 86400, status: 'allowed' } },
+      ...extra,
+    },
+    uuid: 'u',
+    session_id: 's',
+  });
+  const note = (start: number, until: number, type = 'five_hour') => `${iso(start)} usage limit (${type}) reached; paused until ${iso(until)} (${type === 'five_hour' ? '20 min' : '3 d'})`;
+  /** usage_report on a session log and, unless null, a run log, each given as lines (objects become JSON). */
+  const report = (session: (object | string)[], run: (object | string)[] | null = null) => {
+    const root = scratch();
+    const write = (name: string, lines: (object | string)[]) => writeFileSync(join(root, name), lines.map((line) => (typeof line === 'string' ? line : JSON.stringify(line))).join('\n') + '\n');
+    write('session.log', session);
+    if (run) write('run.log', run);
+    const r = shell(`${functions('usage_report')}; usage_report "${join(root, 'session.log')}" "${join(root, 'run.log')}" ${NOW}`);
+    expect(r.stderr).toBe('');
+    return r.stdout.split('\n').filter(Boolean);
+  };
+  const USAGE = `Subscription usage, from the latest rate_limit_event: 5-hour 7% (resets ${iso(NOW + 3600)}), 7-day 43% (resets ${iso(NOW + 6 * 86400)}).`;
+
+  it('reports both windows from the last rate_limit_event, skipping lines that are not JSON or notes', () => {
+    expect(report(['Error: on stderr', event(0.88, 0.41), `${iso(NOW - 60)} claude exited with 0 after 178s`, event(0.07, 0.43)])).toEqual([USAGE, 'Usage-limit pauses in the last 24 hours: none.']);
+  });
+
+  it("takes the current run's log over the session log, since its events are newer", () => {
+    expect(report([event(0.5, 0.2)], [event(0.07, 0.43)])[0]).toBe(USAGE);
+  });
+
+  it('reads the session log alone when there is no run log', () => {
+    expect(report([event(0.07, 0.43)])[0]).toBe(USAGE);
+  });
+
+  it('says so when Claude Code has written no rate_limit_event yet', () => {
+    expect(report(['nothing here'])).toEqual(['Subscription usage: no rate_limit_event from Claude Code yet.', 'Usage-limit pauses in the last 24 hours: none.']);
+  });
+
+  it('falls back to the event\'s own window when it has no unifiedWindows, and shows the other as unknown', () => {
+    const plain = { type: 'rate_limit_event', rate_limit_info: { status: 'allowed', rateLimitType: 'seven_day', utilization: 0.5, resetsAt: (NOW + 86400) * 1000 } };
+    expect(report([plain])[0]).toBe(`Subscription usage, from the latest rate_limit_event: 5-hour unknown, 7-day 50% (resets ${iso(NOW + 86400)}).`);
+  });
+
+  it('lists every pause that overlaps the last 24 hours with its length, marking one still running', () => {
+    const lines = report([
+      note(NOW - 30 * 3600, NOW - 29 * 3600),
+      event(0.07, 0.43),
+      note(NOW - 26 * 3600, NOW - 23 * 3600, 'seven_day'),
+      note(NOW - 3 * 3600, NOW - 3 * 3600 + 1200),
+      note(NOW - 3600, NOW + 3600),
+    ]);
+    expect(lines).toEqual([
+      USAGE,
+      `Usage-limit pauses in the last 24 hours: 3: seven_day from ${iso(NOW - 26 * 3600)}, 3 d; five_hour from ${iso(NOW - 3 * 3600)}, 20 min; five_hour from ${iso(NOW - 3600)}, 20 min (still paused).`,
+    ]);
+  });
+
+  /**
+   * usage_ticker, called directly by a bash that stands in for the
+   * supervisor, with fakes first on PATH: date prints the next of `times`,
+   * sleep logs and, once no time is left, ends the ticker with TERM, and gh
+   * logs (exiting with $T/gh-status).
+   */
+  const ticker = ({ times, stamp, ghStatus = 0, supervisor }: { times: number[]; stamp?: number; ghStatus?: number; supervisor?: number }) => {
+    const root = scratch();
+    const [bin, state] = [join(root, 'bin'), join(root, 'state')];
+    mkdirSync(bin);
+    mkdirSync(state);
+    const fake = (name: string, body: string) => {
+      writeFileSync(join(bin, name), `#!/usr/bin/env bash\n${body}\n`);
+      chmodSync(join(bin, name), 0o755);
+    };
+    writeFileSync(join(root, 'times'), times.map(String).join('\n') + '\n');
+    fake('date', 'head -1 "$T/times"; sed -i.bak 1d "$T/times"');
+    fake('sleep', 'echo "$*" >> "$T/sleep.log"; [[ -s $T/times ]] || kill -TERM "$PPID"');
+    fake('gh', `printf '%s\\n' "$*" >> "$T/gh.log"; exit ${ghStatus}`);
+    if (stamp !== undefined) writeFileSync(join(state, 'usage-reported'), `${stamp}\n`);
+    writeFileSync(join(state, 'session.log'), `${JSON.stringify(event(0.07, 0.43))}\n`);
+    const r = spawnSync('bash', ['-c', `${functions('usage_ticker', 'usage_report', 'report')}; usage_ticker "${join(state, 'session.log')}" "${join(state, 'run.log')}" ${supervisor ?? '$$'}`], {
+      env: claudeEnv({ PATH: `${bin}:${process.env.PATH}`, T: root, SIGNAL_TREE_STATE_DIR: state, SIGNAL_TREE_STATUS_ISSUE: '7' }),
+      encoding: 'utf8',
+      timeout: 20_000,
+    });
+    const read = (path: string) => (existsSync(path) ? readFileSync(path, 'utf8') : '');
+    return { ...r, gh: read(join(root, 'gh.log')), sleeps: read(join(root, 'sleep.log')).trim().split('\n').filter(Boolean), stamp: read(join(state, 'usage-reported')).trim() };
+  };
+
+  it('posts nothing at the first start, and the first report 24 hours later on the Rebuild status issue', () => {
+    const r = ticker({ times: [NOW, NOW + 600, NOW + 86400] });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.sleeps).toEqual(['600', '600', '600']);
+    expect(r.gh).toBe(`issue comment 7 --body ${USAGE}\nUsage-limit pauses in the last 24 hours: none.\n`);
+    expect(r.stamp).toBe(String(NOW + 86400));
+  });
+
+  it('keeps the rhythm across restarts: posts once 24 hours have passed since the last post, not before', () => {
+    const r = ticker({ times: [NOW, NOW + 600], stamp: NOW + 600 - 86400 + 1 });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.gh).toBe('');
+    const due = ticker({ times: [NOW, NOW + 600], stamp: NOW + 600 - 86400 });
+    expect(due.gh.match(/^issue comment 7 --body /gm)).toHaveLength(1);
+    expect(due.stamp).toBe(String(NOW + 600));
+  });
+
+  it('retries a failed post at the next check, keeping the time of the last good one', () => {
+    const r = ticker({ times: [NOW, NOW + 600], stamp: NOW - 86400, ghStatus: 1 });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.gh.match(/^issue comment 7 --body /gm)).toHaveLength(2);
+    expect(r.stamp).toBe(String(NOW - 86400));
+  });
+
+  it('exits at once, posting nothing, when the supervisor is gone', () => {
+    const gone = spawnSync('true').pid;
+    const r = ticker({ times: [NOW + 86400], stamp: NOW - 86400, supervisor: gone });
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.gh).toBe('');
+    expect(r.sleeps).toEqual([]);
+  });
+
+  it('runs beside the session loop and is stopped by the exit trap', () => {
+    const text = readFileSync(script, 'utf8');
+    expect(text).toContain('  usage_ticker "$log" "$SIGNAL_TREE_STATE_DIR/run.log" "$$" &\n  local ticker=$!\n  trap \'kill \'"$ticker"\' 2> /dev/null; ');
+    expect(text.indexOf('usage_ticker "$log"')).toBeLessThan(text.indexOf('run_sessions "$session_id"'));
+  });
 });

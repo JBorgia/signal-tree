@@ -90,11 +90,19 @@
 #
 # A usage limit of the subscription is a pause, not a failure (the same
 # ruling). When a run ends on one (usage_limit), the supervisor notes
-# "<time> usage limit (<type>) reached; paused until <reset>" in the session
-# log, waits until a minute after the limit resets (30 minutes when the run
-# gives no usable reset time), and resumes the same session. It never exits,
-# reports or counts toward stuck for it. The wait reads the time once
+# "<time> usage limit (<type>) reached; paused until <reset> (<length>)" in the
+# session log, waits until a minute after the limit resets (30 minutes when the
+# run gives no usable reset time), and resumes the same session. It never
+# exits, reports or counts toward stuck for it. The wait reads the time once
 # (date +%s) and runs sleep through PATH.
+#
+# Daily usage (Jonathan's ruling of 2026-11-24, replacing the Console spend
+# figure): every 24 hours while it runs, the supervisor posts on the Rebuild
+# status issue the subscription's 5-hour and 7-day usage, from the latest
+# rate_limit_event Claude Code wrote, and every usage-limit pause of the last
+# 24 hours with its length (usage_ticker, usage_report). It keeps the time of
+# its last post in $SIGNAL_TREE_STATE_DIR/usage-reported, so restarts keep the
+# rhythm.
 #
 # GitHub identity (BRIEF.md 12.3 and Jonathan's rulings): the signal-tree-ci
 # GitHub App authenticates every push and gh call, and turns on auto-merge
@@ -236,6 +244,10 @@ main() {
   local lock_cmd="node $SIGNAL_TREE_VERIFY_DIR/ci/unattended/lock.mjs"
   (cd "$WORK_DIR" && $lock_cmd acquire --session "$session_id") || exit 4
   trap '(cd "$WORK_DIR" && '"$lock_cmd"' release --session '"$session_id"')' EXIT
+  # The daily usage report runs beside the session loop and stops with it.
+  usage_ticker "$log" "$SIGNAL_TREE_STATE_DIR/run.log" "$$" &
+  local ticker=$!
+  trap 'kill '"$ticker"' 2> /dev/null; (cd "$WORK_DIR" && '"$lock_cmd"' release --session '"$session_id"')' EXIT
 
   # The hook command resets the verifier to origin/main before running the hook
   # from it, so the hook and the done check are always main's versions.
@@ -754,13 +766,71 @@ pause_for_usage_limit() {
   else
     wait=1800 resume=$(( now + 1800 ))
   fi
-  echo "$(utc_time "$now") usage limit ($type) reached; paused until $(utc_time "$resume")" >> "$2"
+  echo "$(utc_time "$now") usage limit ($type) reached; paused until $(utc_time "$resume") ($(duration_text "$wait"))" >> "$2"
   sleep "$wait"
 }
 
 # Epoch seconds $1 as UTC, in the form date -u +%FT%TZ prints, without GNU or BSD date options.
 utc_time() {
   jq -rn --argjson t "$1" '$t | todate' 2>/dev/null
+}
+
+# $1 seconds as days, hours and minutes, rounded up to the minute: "30 min", "1 h 1 min", "6 d 2 h".
+duration_text() {
+  local minutes=$(( ($1 + 59) / 60 )) text=''
+  local days=$(( minutes / 1440 )) hours=$(( minutes % 1440 / 60 )) rest=$(( minutes % 60 ))
+  (( days > 0 )) && text+="$days d "
+  (( hours > 0 )) && text+="$hours h "
+  (( rest > 0 || days + hours == 0 )) && text+="$rest min "
+  echo "${text% }"
+}
+
+# The daily usage report (Jonathan's ruling of 2026-11-24), two lines: the
+# subscription's 5-hour and 7-day utilization, with their reset times, from
+# the last rate_limit_event in the session log $1 or, newer, the current run's
+# log $2 (a window missing from that event shows as unknown); then every
+# usage-limit pause the session log notes that overlaps the 24 hours up to $3
+# (epoch seconds), with its length. Lines that are not JSON or notes are skipped.
+usage_report() {
+  cat "$1" "$2" 2> /dev/null | jq -nrR --argjson now "$3" '
+    [inputs] as $lines
+    | ([$lines[] | fromjson? | objects | select(.type == "rate_limit_event") | .rate_limit_info | objects] | last) as $info
+    | def time: if type == "number" and . > 0 then (if . > 1e12 then . / 1000 else . end | floor | todate) else null end;
+      def window($name; $label):
+        ($info.unifiedWindows[$name]? // (if $info.rateLimitType? == $name then $info else null end)) as $w
+        | if ($w.utilization? | type) != "number" then "\($label) unknown"
+          else "\($label) \($w.utilization * 100 | round)%" + (($w.resetsAt | time) as $reset | if $reset then " (resets \($reset))" else "" end)
+          end;
+      def pauses:
+        [$lines[] | capture("^(?<start>[0-9T:-]+Z) usage limit \\((?<type>[A-Za-z0-9_]+)\\) reached; paused until (?<until>[0-9T:-]+Z) \\((?<length>[0-9a-z ]+)\\)$")?
+          | select((.until | fromdateiso8601) > $now - 86400)
+          | "\(.type) from \(.start), \(.length)" + (if (.until | fromdateiso8601) > $now then " (still paused)" else "" end)];
+    (if $info == null then "Subscription usage: no rate_limit_event from Claude Code yet."
+     else "Subscription usage, from the latest rate_limit_event: \(window("five_hour"; "5-hour")), \(window("seven_day"; "7-day"))." end),
+    (pauses | "Usage-limit pauses in the last 24 hours: " + (if length == 0 then "none." else "\(length): \(join("; "))." end))'
+}
+
+# Every 24 hours while the supervisor (process $3) runs, posts usage_report on
+# the Rebuild status issue, for the session log $1 and the run log $2. The time
+# of the last post is kept in $SIGNAL_TREE_STATE_DIR/usage-reported; with no
+# such file, the first report comes 24 hours after the start. A failed post is
+# retried at the next check, every 10 minutes. It exits when the supervisor is
+# gone, or on TERM, stopping its sleep. date and sleep run through PATH.
+usage_ticker() {
+  local session_log=$1 run_log=$2 supervisor=$3 stamp=$SIGNAL_TREE_STATE_DIR/usage-reported now last nap=''
+  trap '[[ -n $nap ]] && kill "$nap" 2> /dev/null; exit 0' TERM
+  while kill -0 "$supervisor" 2> /dev/null; do
+    now=$(date +%s)
+    last=$(cat "$stamp" 2> /dev/null)
+    if [[ ! $last =~ ^[0-9]+$ ]]; then
+      echo "$now" > "$stamp"
+    elif (( now - last >= 86400 )); then
+      report "$(usage_report "$session_log" "$run_log" "$now")" && echo "$now" > "$stamp"
+    fi
+    sleep 600 &
+    nap=$!
+    wait "$nap"
+  done
 }
 
 # True when version $1 is at least $2 (dotted numbers).
