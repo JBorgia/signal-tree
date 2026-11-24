@@ -559,3 +559,14 @@ These parts of adopted proposals are dropped too: `jumpTo` (#36), a public `inte
 - form bindings that write through (F1);
 - the history reader (X4, W1, W3, T8);
 - turn lifecycle events, already decided by ruling 4 (X4).
+
+### 12.6 Phase 1 before Phase 0 closes
+
+Jonathan's decision of November 24, which amends ruling 2 (section 10) for now:
+
+- Phase 1 development may start before Phase 0 closes.
+- Phase 1 PRs merge on tests, the oracle and every check that runs without the gate runner.
+- M1–M3 run on hosted runners as recorded only, never as a pass.
+- Phase 1 cannot close until Phase 0 has closed and every Phase 1 gate is green on the gate runner; if a merged change fails a gate there, fixing it is the next task.
+
+While this holds, it also replaces, for Phase 1, section 7's "No work from a later phase merges early" and 12.3's condition that `bench/budgets.json` be approved on gate-runner baselines before Phase 1 opens.
