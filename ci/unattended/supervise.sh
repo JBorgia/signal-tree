@@ -248,14 +248,17 @@ run_sessions() {
     local status=$?
     cat "$run_log" >> "$log"
     local ran_on
-    # Every model the run reports: the init event and each assistant message.
-    ran_on=$(jq -r 'select(.type == "system" and .subtype == "init") .model, select(.type == "assistant") .message.model' "$run_log" 2>/dev/null | sort -u | grep -v -x -e "$MODEL" -e '' | paste -sd, -)
+    # Every model the run reports other than Opus: the init event and each
+    # assistant message. <synthetic> is not a model: Claude Code writes its own
+    # messages under that name, such as "Goal set: ..." when /goal starts a
+    # session, an API error or a usage limit, so it never counts as another
+    # model.
+    ran_on=$(jq -r 'select(.type == "system" and .subtype == "init") .model, select(.type == "assistant") .message.model' "$run_log" 2>/dev/null | sort -u | grep -v -x -e "$MODEL" -e '<synthetic>' -e '' | paste -sd, -)
     # A usage limit is a pause, not a failure (Jonathan's ruling of 2026-11-23):
-    # wait for the reset, then resume the same session. Claude Code writes the
-    # limit's error message itself, under the model name <synthetic>; a run
-    # that reports any other model still stops below.
+    # wait for the reset, then resume the same session. A run that reports
+    # another model still stops below.
     limit=$(usage_limit "$run_log")
-    if [[ -n $limit && ( -z $ran_on || $ran_on == '<synthetic>' ) ]]; then
+    if [[ -n $limit && -z $ran_on ]]; then
       pause_for_usage_limit "$limit" "$log"
       backoff=60
       continue
