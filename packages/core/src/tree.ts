@@ -18,7 +18,7 @@ import type { TreeErrorEvent } from './errors';
 import { SignalTreeError, SignalTreeRefusal } from './errors';
 import type { Attachment, Interceptor, ObserveListener, Plugin, ScopeHandle, TurnHandle, TurnInfo, WriteEffect, WriteKind, WriteOp, WriterContext } from './seam';
 import { ErrorChannel, USER_CONTEXT, isAsyncFunction, isThenable, writerContext } from './seam';
-import type { CollectionHost, EntityKey, EntityMapMarker, FieldRef } from './entities';
+import type { CollectionHost, EntityKey, EntityMapMarker, FieldRef, SetAllOptions } from './entities';
 import { EntityCollection, isEntityMapMarker } from './entities';
 
 // ------------------------------------------------------------------ values
@@ -83,6 +83,17 @@ function copyIn(value: unknown, path: readonly PropertyKey[], foreign: (v: unkno
   }
   if (!isPlainObject(value)) return value;
   const out: Record<PropertyKey, unknown> = Object.getPrototypeOf(value) === null ? Object.create(null) : {};
+  const keys = Object.keys(value);
+  if (Object.getOwnPropertySymbols(value).length === 0 && Object.getOwnPropertyNames(value).length === keys.length) {
+    // Only enumerable string keys: reading each once also reads a getter once.
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i]!;
+      if (key === '__proto__') throw new SignalTreeRefusal('ST1002', { path: [...path, key] });
+      const read = (value as Record<string, unknown>)[key];
+      out[key] = typeof read === 'object' && read !== null ? copyIn(read, [...path, key], foreign) : read;
+    }
+    return out;
+  }
   for (const key of Reflect.ownKeys(value)) {
     checkKey(key, path);
     const descriptor = Object.getOwnPropertyDescriptor(value, key)!;
@@ -277,6 +288,18 @@ export class TreeCore<Tag extends string> {
         this.invalidate(collection);
       },
       copy: (value, path) => copyIn(value, path, this.isForeign),
+      capture: () => {
+        const context = this.context;
+        return (fn) => {
+          const previous = this.context;
+          this.context = context;
+          try {
+            fn();
+          } finally {
+            this.context = previous;
+          }
+        };
+      },
       frozen: (value) => frozenCopy(value, this.snapshotCache),
       registerCell: (cell) => this.cells.add(cell),
       isPlainObject,
@@ -830,7 +853,7 @@ export class TreeCore<Tag extends string> {
       return (node.handle ??= Object.freeze({
         addOne: (row: unknown) => node.addOne(row),
         addMany: (rows: readonly unknown[]) => node.addMany(rows),
-        setAll: (rows: readonly unknown[]) => node.setAll(rows),
+        setAll: (rows: readonly unknown[], options?: SetAllOptions) => node.setAll(rows, options),
         updateOne: (id: EntityKey, changes: unknown) => node.updateOne(id, changes),
         updateMany: (updates: readonly { id: EntityKey; changes: unknown }[]) => node.updateMany(updates),
         upsertOne: (row: unknown) => node.upsertOne(row),
@@ -919,6 +942,8 @@ export interface CollectionHandle<Tag extends string, E, K extends EntityKey> {
   addMany(rows: readonly E[]): void;
   /** Replaces every row. Rows whose key stays keep their handles; the order becomes the input's. */
   setAll(rows: readonly E[]): void;
+  /** setAll in chunks that yield between them; each chunk is one change to observers. */
+  setAll(rows: readonly E[], options: SetAllOptions): Promise<void>;
   updateOne(id: K, changes: Partial<E>): void;
   updateMany(updates: readonly { readonly id: K; readonly changes: Partial<E> }[]): void;
   upsertOne(row: E): void;

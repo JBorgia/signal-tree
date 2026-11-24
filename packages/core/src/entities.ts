@@ -64,6 +64,8 @@ export interface CollectionHost {
   /** The collection changed: snapshots that contain it are stale. */
   changed(collection: EntityCollection): void;
   copy(value: unknown, path: readonly PropertyKey[]): unknown;
+  /** Captures the current writer context; the returned runner runs code under it later (ruling 6, W5). */
+  capture(): (fn: () => void) => void;
   frozen(value: unknown): unknown;
   registerCell(cell: object): void;
   isPlainObject(value: unknown): value is Record<PropertyKey, unknown>;
@@ -313,19 +315,21 @@ export class EntityCollection {
     const next: Record<PropertyKey, unknown> = merge ? Object.assign(Object.create(Object.getPrototypeOf(before)), before) : row;
     if (merge) for (const field of Reflect.ownKeys(row)) copyField(next, row, field);
     const effects: WriteEffect[] = [];
-    const fields = new Set<PropertyKey>([...Reflect.ownKeys(before), ...Reflect.ownKeys(next)]);
     let changed = false;
-    for (const field of fields) {
-      const had = Object.prototype.hasOwnProperty.call(before, field);
+    const compare = (field: PropertyKey, had: boolean) => {
       const has = Object.prototype.hasOwnProperty.call(next, field);
       const a = before[field];
       const b = next[field];
-      if (had === has && Object.is(a, b)) continue;
+      if (had === has && Object.is(a, b)) return;
       changed = true;
       const cell = entity.cells?.get(field);
       if (cell) this.host.adapter.commit(cell as NativeCell<string, unknown>, has ? b : undefined);
       if (op) effects.push(effect([...this.path, entity.key, field], a, b, op));
-    }
+    };
+    const beforeKeys = Reflect.ownKeys(before);
+    for (let i = 0; i < beforeKeys.length; i++) compare(beforeKeys[i]!, true);
+    const nextKeys = Reflect.ownKeys(next);
+    for (let i = 0; i < nextKeys.length; i++) if (!Object.prototype.hasOwnProperty.call(before, nextKeys[i]!)) compare(nextKeys[i]!, false);
     if (!changed) return effects;
     entity.row = next;
     this.host.journal(() => {
@@ -403,8 +407,93 @@ export class EntityCollection {
   }
 
   /** Replaces the collection: rows keep their lifetime when their key stays; the order becomes the input's (E4). */
-  setAll(rows: readonly unknown[]): void {
+  setAll(rows: readonly unknown[], options?: SetAllOptions): void | Promise<void> {
+    if (options?.chunk !== undefined) return this.setAllChunked(rows, options.chunk);
     this.run('set', rows, (payload, op) => this.applySetAll(this.prepareRows(payload, false), op));
+  }
+
+  /**
+   * setAll in chunks that yield between them (W4). Every row is checked and
+   * copied first, so a bad row rejects before anything changes. Then rows
+   * missing from the input are removed, the input rows are written, and the
+   * order becomes the input's; each chunk is one turn under the writer
+   * context captured when setAll was called. Rows another writer adds
+   * meanwhile are kept, after the input rows.
+   */
+  private async setAllChunked(rows: readonly unknown[], chunk: 'auto' | number): Promise<void> {
+    this.assertPresent();
+    if (chunk !== 'auto' && !(Number.isInteger(chunk) && chunk > 0)) throw new SignalTreeError('ST1006', { path: this.path, detail: "chunk is 'auto' or a positive whole number of rows" });
+    if (!Array.isArray(rows)) throw new SignalTreeError('ST1013', { path: this.path, detail: 'expected an array of rows' });
+    const run = this.host.capture();
+    const input = rows.slice();
+    // Only rows that exist now may be removed; rows other writers add while this runs stay.
+    const existing = this.order();
+    const prepared: [EntityKey, Record<PropertyKey, unknown>][] = new Array(input.length);
+    const incoming = new Set<EntityKey>();
+    await chunks(input.length, chunk, (start, stop) => {
+      this.host.assertLive();
+      let i = start;
+      do {
+        const row = this.prepareRow(input[i]);
+        const key = this.selectId(row);
+        if (incoming.has(key)) throw new SignalTreeRefusal('ST1010', { path: this.path, key });
+        incoming.add(key);
+        prepared[i] = [key, row];
+        i++;
+      } while (i < input.length && !stop(i));
+      return i;
+    });
+    const leaving = existing.filter((entity) => entity.alive && !incoming.has(entity.key));
+    await chunks(leaving.length, chunk, (start, stop) => {
+      let i = start;
+      run(() =>
+        this.run('remove', leaving, (_payload, op) => {
+          const effects: WriteEffect[] = [];
+          do {
+            const entity = leaving[i]!;
+            if (entity.alive) effects.push(...this.drop(entity, op));
+            i++;
+          } while (i < leaving.length && !stop(i));
+          return effects;
+        }),
+      );
+      return i;
+    });
+    await chunks(prepared.length, chunk, (start, stop) => {
+      let i = start;
+      run(() =>
+        this.run('insert', prepared, (_payload, op) => {
+          const effects: WriteEffect[] = [];
+          do {
+            const [key, row] = prepared[i]!;
+            const existing = this.byKey.get(key);
+            effects.push(...(existing ? this.replaceRow(existing, row, op, false) : this.insert(key, row, op)));
+            i++;
+          } while (i < prepared.length && !stop(i));
+          return effects;
+        }),
+      );
+      return i;
+    });
+    run(() =>
+      this.run('set', prepared, () => {
+        const current = this.order();
+        const ordered: Entity[] = [];
+        for (const [key] of prepared) {
+          const entity = this.byKey.get(key);
+          if (entity) ordered.push(entity);
+        }
+        for (const entity of current) if (!incoming.has(entity.key)) ordered.push(entity);
+        if (ordered.every((entity, i) => current[i] === entity)) return [];
+        this.restoreOrder(ordered);
+        this.host.journal(() => {
+          this.restoreOrder(current);
+          this.touchOrder();
+        });
+        this.touchOrder();
+        return [];
+      }),
+    );
   }
 
   /** @internal setAll on prepared rows, also used by a whole-value write to the parent branch. */
@@ -571,6 +660,39 @@ export class EntityCollection {
       });
       this.touchOrder();
     }
+  }
+}
+
+export interface SetAllOptions {
+  /** 'auto' sizes chunks to a few milliseconds of work; a number sets the rows per chunk. */
+  readonly chunk: 'auto' | number;
+}
+
+/** Milliseconds of work an 'auto' chunk aims for: at 4× CPU throttle, with garbage collection on top, still under a 50 ms long task. */
+const SLICE_MS = 5;
+
+const now = (): number => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+
+/** Lets the host run other work between chunks. */
+function yieldToHost(): Promise<void> {
+  const scheduler = (globalThis as { scheduler?: { yield?: () => Promise<void> } }).scheduler;
+  if (typeof scheduler?.yield === 'function') return scheduler.yield();
+  return new Promise((resolve) => setTimeout(resolve, 0));
+}
+
+/**
+ * Runs `body` over [0, total) in chunks, yielding between them. `body` gets the
+ * first index and a `stop(i)` test, does at least one item, and returns the
+ * next index.
+ */
+async function chunks(total: number, size: 'auto' | number, body: (start: number, stop: (i: number) => boolean) => number): Promise<void> {
+  let index = 0;
+  while (index < total) {
+    const started = now();
+    const limit = size === 'auto' ? Infinity : index + size;
+    const stop = size === 'auto' ? (i: number) => (i & 31) === 0 && now() - started >= SLICE_MS : (i: number) => i >= limit;
+    index = body(index, stop);
+    if (index < total) await yieldToHost();
   }
 }
 

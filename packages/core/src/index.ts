@@ -21,4 +21,4 @@ export type {
   WriterContext,
 } from './seam';
 export { entityMap } from './entities';
-export type { EntityKey, EntityMapConfig, EntityMapMarker } from './entities';
+export type { EntityKey, EntityMapConfig, EntityMapMarker, SetAllOptions } from './entities';
