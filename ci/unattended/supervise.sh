@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 # Supervisor for the unattended rebuild (BRIEF.md section 11.4).
 #
-# Run it inside the isolated container or VM, from the agent's checkout of
-# JBorgia/signal-tree, with the variables under Environment set:
+# Run it inside the isolated container or VM, in the agent's checkout of
+# JBorgia/signal-tree, from main's copy of this script installed root-owned and
+# read-only under /opt/signal-tree (see Installed copy), with the variables
+# under Environment set. On the agent VM, /opt/signal-tree/start-supervisor
+# does this (#18):
 #
-#   SIGNAL_TREE_ISOLATED=1 tmux new-session -d -s rebuild ci/unattended/supervise.sh
+#   cd ~/signal-tree && SIGNAL_TREE_ISOLATED=1 tmux new-session -d -s rebuild /opt/signal-tree/ci/unattended/supervise.sh
+#
+# `supervise.sh --self-test` runs every startup check, through the workflow
+# self-test, prints "Startup self-test: PASS" and exits 0, without taking the
+# agent lock or starting a session (the startup self-test in #18).
 #
 # Each pass: sync a clean checkout of origin/main (the verifier), run the done
 # check there, and stop when it passes. Otherwise start or resume one Claude
@@ -40,8 +47,9 @@
 #   SIGNAL_TREE_SKIP_WORKFLOW_SELFTEST  for tests only: 1 skips the workflow self-test, with a
 #                                 warning, when origin is a fake remote; ignored when origin is on github.com
 #
-# Exit status: 0 done; 1 setup failed; 2 not the isolated machine, extra
-# arguments set a model, or the state directory is inside a checkout; 3 stuck;
+# Exit status: 0 done, or the self-test passed; 1 setup failed; 2 not the
+# isolated machine, an argument other than --self-test, extra arguments set a
+# model, or the state directory is inside a checkout; 3 stuck;
 # 4 the agent lock is held or could not be taken; 5 a run used another model;
 # 6 no CLAUDE_CODE_OAUTH_TOKEN, or ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN is
 # set; 7 a run could not authenticate to Anthropic (a usage limit is not a
@@ -54,7 +62,19 @@
 # status checks, or could not be read; 13 this user can read the App's private
 # key, or the mint config naming it cannot be read; 14 the workflow self-test
 # failed: GitHub accepted the App's push of a workflow file (the branch is then
-# deleted), refused it for another reason, or did not answer in time.
+# deleted), refused it for another reason, or did not answer in time; 15 this
+# script or a helper it installs is not main's, or main could not be fetched to
+# compare them (check_installed_copy).
+#
+# Installed copy (BRIEF.md 11.4 and rule 4; Jonathan's ruling of 2026-11-24):
+# the supervisor runs from main's copy, installed root-owned and read-only
+# under /opt/signal-tree as mint-token.mjs is, never from the agent's checkout,
+# whose branch the agent controls. Before it takes the lock it refuses to start
+# (exit 15) unless this script and the helpers it installs (see GitHub
+# identity) have the SHA-256 hashes of ci/unattended/supervise.sh,
+# ci/unattended/app-token.mjs, ci/unattended/bin/gh and ci/codeowners.mjs at
+# origin/main, fetched as the App. A copy that main has moved past is
+# reinstalled from main before the supervisor can start again.
 #
 # Authentication (Jonathan's ruling of 2026-11-23, replacing the API-key ruling
 # on #16): Claude Code uses Jonathan's Claude subscription, never an API key or
@@ -111,8 +131,9 @@
 # sets an extra HTTP header, gh has no stored login, main's rules require at
 # least one approving review, code-owner review and status checks (so
 # auto-merge still waits for them; see check_main_rules), and
-# `git ls-remote origin` works as the App. Last, it checks that GitHub refuses
-# the App's push of a workflow file to a scratch branch (workflow_selftest).
+# `git ls-remote origin` works as the App, and this script and its helpers are
+# main's (check_installed_copy). Last, it checks that GitHub refuses the App's
+# push of a workflow file to a scratch branch (workflow_selftest).
 #
 # One session at a time: the supervisor holds the agent lock (refs/agent/lock
 # on the remote, see lock.mjs) for as long as it runs, and refuses to start
@@ -131,8 +152,18 @@ umask 077
 
 readonly MODEL=claude-opus-5-5
 readonly REPO=JBorgia/signal-tree
+# The files that make up the supervisor, as "<path under this script's
+# directory>:<path in the repository>": this script and what install_helpers copies.
+readonly SUPERVISOR_FILES='supervise.sh:ci/unattended/supervise.sh app-token.mjs:ci/unattended/app-token.mjs bin/gh:ci/unattended/bin/gh ../codeowners.mjs:ci/codeowners.mjs'
 
 main() {
+  local self_test=0
+  if [[ $# -eq 1 && $1 == --self-test ]]; then
+    self_test=1
+  elif (( $# > 0 )); then
+    echo "Usage: supervise.sh [--self-test]" >&2
+    exit 2
+  fi
   if [[ "${SIGNAL_TREE_ISOLATED:-}" != 1 ]]; then
     echo "Refusing to start: run this only in the isolated container or VM (BRIEF.md 11.4), with SIGNAL_TREE_ISOLATED=1." >&2
     exit 2
@@ -180,7 +211,12 @@ main() {
     echo "Refusing to start: git ls-remote origin failed as the App (the error is above)." >&2
     exit 10
   fi
+  check_installed_copy "$WORK_DIR" "$SCRIPT_DIR" 30 || exit 15
   workflow_selftest "$WORK_DIR" 30 || exit 14
+  if (( self_test )); then
+    echo "Startup self-test: PASS (every startup check, through the workflow self-test; no lock taken, no session started)."
+    exit 0
+  fi
 
   if [[ ! -d $SIGNAL_TREE_VERIFY_DIR/.git ]]; then
     git clone -q "$(git -C "$WORK_DIR" remote get-url origin)" "$SIGNAL_TREE_VERIFY_DIR" || exit 1
@@ -484,6 +520,49 @@ check_main_rules() {
     sed 's/^/  /' <<< "$missing" >&2
     return 1
   fi
+}
+
+# Refuses to start unless this script and the helpers it installs are main's
+# (see Installed copy): fetches main into the checkout $1, within the deadline
+# $3 (as with_timeout takes it), and compares the SHA-256 of each file of
+# SUPERVISOR_FILES under $2, this script's directory, with that of its path at
+# the fetched commit. Prints both hashes of every file that differs or is
+# missing, and returns 1.
+check_installed_copy() {
+  local work=$1 dir=$2 deadline=$3 err main entry file path mine theirs differs=''
+  err=$(mktemp "${TMPDIR:-/tmp}/signal-tree-fetch.XXXXXX") || return 1
+  if ! with_timeout "$deadline" git -C "$work" fetch -q --no-tags origin main 2> "$err" ||
+    ! main=$(git -C "$work" rev-parse --verify -q 'FETCH_HEAD^{commit}'); then
+    echo "Refusing to start: could not fetch main to check that the supervisor is main's:" >&2
+    sed 's/^/  /' "$err" >&2
+    rm -f "$err"
+    return 1
+  fi
+  rm -f "$err"
+  for entry in $SUPERVISOR_FILES; do
+    file=$dir/${entry%%:*} path=${entry#*:}
+    if [[ -f $file ]]; then mine=$(sha256 < "$file"); else mine=missing; fi
+    if git -C "$work" cat-file -e "$main:$path" 2> /dev/null; then
+      theirs=$(git -C "$work" cat-file blob "$main:$path" | sha256)
+    else
+      theirs=missing
+    fi
+    if [[ $mine == missing || $mine != "$theirs" ]]; then
+      differs+="  $file: $mine; main's $path: $theirs"$'\n'
+    fi
+  done
+  if [[ -n $differs ]]; then
+    echo "Refusing to start: the supervisor is not main's (origin/main ${main:0:12}). SHA-256 of each file that differs:" >&2
+    printf '%s' "$differs" >&2
+    echo "Run main's copy, installed root-owned and read-only under /opt/signal-tree from main (#18)." >&2
+    return 1
+  fi
+  echo "Supervisor check passed: this script and its helpers are main's (origin/main ${main:0:12})."
+}
+
+# The SHA-256 of standard input, in hex: sha256sum, or shasum where there is none (macOS).
+sha256() {
+  if command -v sha256sum > /dev/null; then sha256sum; else shasum -a 256; fi | awk '{print $1}'
 }
 
 # Checks at startup that the App cannot change workflows. Jonathan: "The App

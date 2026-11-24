@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { appendFileSync, chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -573,4 +574,154 @@ describe('supervisor session loop', () => {
     expect(r.gh[0]).toContain('ran on ');
     expect(r.gh[0]).toContain('claude-sonnet-5-5');
   });
+});
+
+describe("supervisor installed copy (Jonathan's ruling of 2026-11-24)", () => {
+  // check_installed_copy against a local bare remote whose main holds the four
+  // supervisor files as they are in this checkout. The installed copy is a
+  // directory laid out like ci/ under /opt/signal-tree. Each fetch gets a FIFO
+  // as its deadline, which nothing writes, so no outcome depends on the clock.
+  const script = new URL('./supervise.sh', import.meta.url).pathname;
+  const source = new URL('..', import.meta.url).pathname;
+  const FILES = ['unattended/supervise.sh', 'unattended/app-token.mjs', 'unattended/bin/gh', 'codeowners.mjs'];
+  const sha256 = (path: string) => createHash('sha256').update(readFileSync(path)).digest('hex');
+  const roots: string[] = [];
+  afterEach(() => {
+    for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  });
+  const gitEnv = { ...claudeEnv({}), GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_NOSYSTEM: '1', GIT_AUTHOR_NAME: 'Seed', GIT_AUTHOR_EMAIL: 'seed@example.com', GIT_COMMITTER_NAME: 'Seed', GIT_COMMITTER_EMAIL: 'seed@example.com' };
+  const git = (cwd: string, ...args: string[]) => {
+    const r = spawnSync('git', args, { cwd, env: gitEnv, encoding: 'utf8' });
+    if (r.status !== 0) throw new Error(`git ${args.join(' ')}: ${r.stderr}`);
+    return r.stdout.trim();
+  };
+  /** Copies the four files from the directory holding ci/ files at `from` into `to`, laid out the same way. */
+  const copyFiles = (from: string, to: string) => {
+    for (const file of FILES) cpSync(join(from, file), join(to, file));
+  };
+  const fixture = () => {
+    const root = mkdtempSync(join(tmpdir(), 'signal-tree-installed-'));
+    roots.push(root);
+    const [remote, seed, work, installed] = ['remote.git', 'seed', 'work', join('opt', 'ci')].map((name) => join(root, name));
+    git(root, 'init', '-q', '--bare', '-b', 'main', remote);
+    git(root, 'clone', '-q', remote, seed);
+    copyFiles(source, join(seed, 'ci'));
+    git(seed, 'add', '.');
+    git(seed, 'commit', '-qm', 'seed');
+    git(seed, 'push', '-q', 'origin', 'HEAD:main');
+    git(root, 'clone', '-q', remote, work);
+    copyFiles(source, installed);
+    const deadline = join(root, 'deadline');
+    expect(spawnSync('mkfifo', [deadline]).status).toBe(0);
+    const check = () => {
+      const functions = ['check_installed_copy', 'sha256', 'with_timeout'];
+      const shell = `eval "$(sed -n '/^readonly /p;${functions.map((name) => `/^${name}()/,/^}/p`).join(';')}' "${script}")"; check_installed_copy "${work}" "${join(installed, 'unattended')}" "${deadline}"`;
+      return spawnSync('bash', ['-c', shell], { env: { ...gitEnv, TMPDIR: root }, encoding: 'utf8' });
+    };
+    return { root, remote, seed, work, installed, check };
+  };
+
+  it('passes when this script and every helper hash like main\'s', () => {
+    const f = fixture();
+    const r = f.check();
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout).toMatch(/^Supervisor check passed: this script and its helpers are main's \(origin\/main [0-9a-f]{12}\)\.\n$/);
+    expect(r.stderr).toBe('');
+  });
+
+  for (const file of FILES) {
+    it(`refuses (exit 15 in the supervisor) when the installed ${file} differs from main's, naming it and both hashes`, () => {
+      const f = fixture();
+      const path = join(f.installed, file);
+      const theirs = sha256(path);
+      appendFileSync(path, '\n');
+      const r = f.check();
+      expect(r.status).toBe(1);
+      // The script names each file under its own directory, so codeowners.mjs as .../unattended/../codeowners.mjs.
+      const shown = `${join(f.installed, 'unattended')}/${file.startsWith('unattended/') ? file.slice('unattended/'.length) : `../${file}`}`;
+      expect(r.stderr).toContain("Refusing to start: the supervisor is not main's (origin/main ");
+      expect(r.stderr).toContain(`  ${shown}: ${sha256(path)}; main's ci/${file}: ${theirs}\n`);
+      expect(r.stderr.split('\n').filter((line) => line.startsWith('  '))).toHaveLength(1);
+      expect(r.stderr).toContain('installed root-owned and read-only under /opt/signal-tree from main (#18)');
+    });
+  }
+
+  it('refuses when a helper is missing', () => {
+    const f = fixture();
+    rmSync(join(f.installed, 'unattended', 'bin', 'gh'));
+    const r = f.check();
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain(`  ${join(f.installed, 'unattended', 'bin', 'gh')}: missing; main's ci/unattended/bin/gh: ${sha256(join(source, 'unattended', 'bin', 'gh'))}`);
+  });
+
+  it('refuses a copy that main has moved past', () => {
+    const f = fixture();
+    appendFileSync(join(f.seed, 'ci', 'unattended', 'supervise.sh'), '# a later change on main\n');
+    git(f.seed, 'commit', '-qam', 'later');
+    git(f.seed, 'push', '-q', 'origin', 'HEAD:main');
+    const r = f.check();
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain(`  ${join(f.installed, 'unattended', 'supervise.sh')}: ${sha256(join(source, 'unattended', 'supervise.sh'))}; main's ci/unattended/supervise.sh: ${sha256(join(f.seed, 'ci', 'unattended', 'supervise.sh'))}`);
+  });
+
+  it("ignores the agent's checkout: a changed supervise.sh on its branch does not matter, the copy that runs does", () => {
+    const f = fixture();
+    appendFileSync(join(f.work, 'ci', 'unattended', 'supervise.sh'), '# the agent\'s branch\n');
+    git(f.work, 'commit', '-qam', 'agent change');
+    expect(f.check().status).toBe(0);
+  });
+
+  it('refuses when main cannot be fetched', () => {
+    const f = fixture();
+    rmSync(f.remote, { recursive: true, force: true });
+    const r = f.check();
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain("Refusing to start: could not fetch main to check that the supervisor is main's:");
+  });
+
+  // main() with every check and every step after them replaced by a stub that
+  // logs its name, to show where --self-test stops.
+  const runMain = (args: string[]) => {
+    const root = mkdtempSync(join(tmpdir(), 'signal-tree-main-'));
+    roots.push(root);
+    const stubs = ['check_state_dir', 'check_key_unreadable', 'use_github_app', 'check_origin', 'use_real_gh', 'check_main_rules', 'check_installed_copy', 'workflow_selftest', 'sync_verifier']
+      .map((name) => `${name}() { echo "${name}"; }`)
+      .join('; ');
+    const shell = [
+      `eval "$(sed -n '/^readonly /p;/^main()/,/^}/p' "${script}")"`,
+      stubs,
+      `git() { if [[ $1 == rev-parse ]]; then echo "${root}"; else echo "git $1 $2 $3"; fi; }`,
+      'node() { echo "node ${1##*/} $2"; return 1; }',
+      `main ${args.join(' ')}`,
+    ].join('\n');
+    return spawnSync('bash', ['-c', shell], { cwd: root, env: claudeEnv({ SIGNAL_TREE_ISOLATED: '1', CLAUDE_CODE_OAUTH_TOKEN: TOKEN, SIGNAL_TREE_STATE_DIR: join(root, 'state') }), encoding: 'utf8' });
+  };
+  const CHECKS = ['check_state_dir', 'check_key_unreadable', 'use_github_app', 'check_origin', 'use_real_gh', 'check_main_rules'];
+
+  it('--self-test runs every startup check, the installed copy before the workflow self-test, and exits 0 before the lock', () => {
+    const r = runMain(['--self-test']);
+    expect(r.status, r.stderr).toBe(0);
+    const steps = r.stdout.trim().split('\n');
+    expect(steps.slice(0, 6)).toEqual(CHECKS);
+    expect(steps.slice(6)).toEqual(['check_installed_copy', 'workflow_selftest', 'Startup self-test: PASS (every startup check, through the workflow self-test; no lock taken, no session started).']);
+    expect(r.stdout).not.toMatch(/sync_verifier|lock\.mjs|git clone/);
+  });
+
+  it('without --self-test goes on past the same checks to the agent lock', () => {
+    const r = runMain([]);
+    expect(r.status).toBe(4);
+    const steps = r.stdout.trim().split('\n');
+    expect(steps.slice(0, 6)).toEqual(CHECKS);
+    expect(steps.slice(6, 8)).toEqual(['check_installed_copy', 'workflow_selftest']);
+    expect(steps.at(-1)).toMatch(/^node lock\.mjs acquire$/);
+  });
+
+  for (const args of [['--bogus'], ['--self-test', '--self-test'], ['self-test']]) {
+    it(`refuses the arguments ${args.join(' ')} (exit 2)`, () => {
+      const r = runMain(args);
+      expect(r.status).toBe(2);
+      expect(r.stderr).toBe('Usage: supervise.sh [--self-test]\n');
+      expect(r.stdout).toBe('');
+    });
+  }
 });
