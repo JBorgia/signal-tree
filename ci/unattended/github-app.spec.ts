@@ -149,6 +149,14 @@ describe('App token on the agent side', () => {
     expect(mode(cache)).toBe(0o600);
   });
 
+  it("accepts GitHub's current installation tokens: about 390 characters, with . and -", async () => {
+    const { env, setMint } = appFixture();
+    const config = configFromEnv(env);
+    const token = `ghs_${'Ab1_'.repeat(30)}.${'x-Y9'.repeat(40)}.${'Zq_8'.repeat(16)}-${'k'.repeat(39)}`;
+    setMint({ output: minted(token, T0 + 60 * MINUTE) });
+    expect(await getToken(config, { now: T0 })).toBe(token);
+  });
+
   /** The agent's setup with `record` in the token cache, and the mint command ready with ghs_fresh. */
   const withCache = (record: (command: string) => object | string) => {
     const { env, cache, setMint, mints } = appFixture();
@@ -185,6 +193,8 @@ describe('App token on the agent side', () => {
     ['something other than JSON', 'not json'],
     ['a token that is not an installation token', minted('gho_personal', T0 + 60 * MINUTE)],
     ['a token of more than one line', minted('ghs_x\nusername=someone', T0 + 60 * MINUTE)],
+    ['a token with a space', minted('ghs_x y', T0 + 60 * MINUTE)],
+    ['a token with =', minted('ghs_x=y', T0 + 60 * MINUTE)],
     ['a token without its expiry', '{"token":"ghs_x"}'],
   ] as const) {
     it(`refuses a mint command that prints ${what}`, async () => {

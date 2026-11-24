@@ -76,8 +76,13 @@ const ATTEMPTS = 3;
 const REQUEST_TIMEOUT_MS = 30_000;
 
 const base64url = (text) => Buffer.from(text).toString('base64url');
-/** An installation token: ghs_ and word characters, so it is always one line. */
-export const isInstallationToken = (token) => typeof token === 'string' && /^ghs_\w+$/.test(token);
+/**
+ * An installation token: ghs_, then letters, digits, _, . and -, so it is
+ * always one line with no space or =. GitHub's installation tokens grew to
+ * about 390 characters containing . and - (seen 2026-11-23 on the agent VM);
+ * the old ghs_ + word-characters check refused every real one.
+ */
+export const isInstallationToken = (token) => typeof token === 'string' && /^ghs_[\w.-]+$/.test(token);
 
 /** The App's JWT: RS256, issued 60 s back to allow for clock drift, expiring 9 minutes from now. */
 export function appJwt({ appId, privateKey, now = Date.now() }) {
