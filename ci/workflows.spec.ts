@@ -181,3 +181,43 @@ describe('approve-non-owned.yml', () => {
     expect(workflowProblems(workflows).join('\n')).toMatch(message);
   });
 });
+
+describe('spec-test-entries.yml (ruling of 2026-11-24 on test tags)', () => {
+  type Step = { uses?: string; run?: string; if?: string; with?: Record<string, unknown>; env?: Record<string, string>; 'continue-on-error'?: boolean };
+  const job = (w: Workflows) => w.entries!.jobs.entries;
+  const steps = (w: Workflows): Step[] => job(w).steps;
+  const checkout = (w: Workflows) => steps(w).find((s) => String(s.uses).startsWith('actions/checkout@'))!;
+
+  it('runs on every pull request and each review, read-only, under the required name', () => {
+    const { entries } = fresh();
+    expect(Object.keys(entries!.on).sort()).toEqual(['pull_request', 'pull_request_review']);
+    expect(entries!.permissions).toEqual({ contents: 'read', 'pull-requests': 'read' });
+    expect(job(fresh()).name).toBe("Existing spec-test entries change only with JBorgia's approval");
+  });
+
+  const planted: Array<[string, (w: Workflows) => void, RegExp]> = [
+    ['no workflow at all', (w) => void delete (w as Partial<Workflows>).entries, /spec-test-entries\.yml is missing/],
+    ['a job-level if:', (w) => void (job(w).if = "github.actor != 'signal-tree-ci[bot]'"), /no if:/],
+    ['continue-on-error on the job', (w) => void (job(w)['continue-on-error'] = true), /no continue-on-error/],
+    ['a step that may be skipped', (w) => void (steps(w).at(-1)!.if = 'false'), /no step may have if:/],
+    ['a step allowed to fail', (w) => void (steps(w).at(-1)!['continue-on-error'] = true), /no step may have if:/],
+    ['another job name', (w) => void (job(w).name = 'Spec test entries'), /the name the main ruleset requires/],
+    ['a push trigger as well', (w) => void (w.entries!.on.push = {}), /pull_request and pull_request_review only/],
+    ['a paths filter', (w) => void (w.entries!.on.pull_request = { paths: ['tests/spec-tests.json'] }), /no types, branches or paths filter/],
+    ['no rerun on a dismissal', (w) => void (w.entries!.on.pull_request_review.types = ['submitted']), /submitted or dismissed/],
+    ['a write token', (w) => void (w.entries!.permissions['pull-requests'] = 'write'), /exactly contents: read and pull-requests: read/],
+    ['a job that widens permissions', (w) => void (job(w).permissions = { contents: 'write' }), /entries: permissions must be exactly/],
+    ['a shallow checkout', (w) => void delete checkout(w).with!['fetch-depth'], /fetch-depth: 2/],
+    ['a checkout of the head instead of the merge commit', (w) => void (checkout(w).with!.ref = '${{ github.event.pull_request.head.sha }}'), /merge commit/],
+    ['an action pinned by tag', (w) => void (checkout(w).uses = 'actions/checkout@v4'), /pinned by full commit SHA/],
+    ['another decision script', (w) => void (steps(w).at(-1)!.run = 'node ci/spec-tests.mjs check'), /node ci\/spec-test-entries\.mjs/],
+    ['a secret', (w) => void (steps(w).at(-1)!.env = { GH_TOKEN: '${{ secrets.PAT }}' }), /uses a secret/],
+    ['a second job', (w) => void (w.entries!.jobs.other = { 'runs-on': 'ubuntu-latest', steps: [] }), /exactly one job/],
+  ];
+
+  it.each(planted)('catches %s', (_name, plant, message) => {
+    const workflows = fresh();
+    plant(workflows);
+    expect(workflowProblems(workflows).join('\n')).toMatch(message);
+  });
+});
