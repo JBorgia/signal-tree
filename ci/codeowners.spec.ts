@@ -25,7 +25,6 @@ describe('the real .github/CODEOWNERS', () => {
     'bench/budgets.json',
     'bench/scenarios/s8.ts',
     'tests/port-manifest.json',
-    'tests/spec-tests.json',
     'tests/support/fixtures.ts',
     'tests/oracle/src/gate.ts',
     'ci/done-check.mjs',
@@ -51,6 +50,8 @@ describe('the real .github/CODEOWNERS', () => {
     'packages/angular/src/ci/helper.ts',
     'packages/core/src/bench/marks.ts',
     'tests/spec/s8.spec.ts',
+    // Ruling of 2026-11-24 on test tags: protected by spec-test-entries.yml instead.
+    'tests/spec-tests.json',
     'tests/port-manifest.json.bak',
     'tests/supporting.md',
     'benchmarks/notes.md',
