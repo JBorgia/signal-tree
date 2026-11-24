@@ -537,6 +537,34 @@ describe('supervisor session loop', () => {
     ]);
   });
 
+  it('does not count <synthetic> as another model: a new session\'s "Goal set" message, then a normal stop, resumes (no exit 5)', () => {
+    // Claude Code 2.1.331 writes "Goal set: ..." under the model name <synthetic> when /goal starts a session.
+    const goalSet = { type: 'assistant', message: { model: '<synthetic>', content: [{ type: 'text', text: 'Goal set: node ci/done-check.mjs exits 0' }] }, session_id: SESSION };
+    const r = loop([[init, goalSet, answer(), { type: 'result', subtype: 'success', is_error: false, result: 'Stopped.' }], worked]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.claude).toHaveLength(2);
+    expect(r.claude[1]).toContain(`--resume ${SESSION} `);
+    expect(r.gh).toEqual([]);
+  });
+
+  it('does not count an API error message (<synthetic>) as another model: it backs off and resumes (no exit 5)', () => {
+    const outage = { type: 'assistant', message: { model: '<synthetic>', content: [{ type: 'text', text: 'API Error: 529 Overloaded' }] }, session_id: SESSION };
+    const r = loop([[init, answer(), outage, { type: 'result', subtype: 'success', is_error: true, result: 'API Error: 529 Overloaded' }], worked]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.sleeps[0]).toBe('60');
+    expect(r.claude).toHaveLength(2);
+    expect(r.gh).toEqual([]);
+  });
+
+  it('still stops on a real other model next to <synthetic> messages (exit 5)', () => {
+    const goalSet = { type: 'assistant', message: { model: '<synthetic>', content: [{ type: 'text', text: 'Goal set: node ci/done-check.mjs exits 0' }] }, session_id: SESSION };
+    const r = loop([[init, goalSet, answer('claude-sonnet-5-5'), { type: 'result', subtype: 'success', is_error: false, result: 'Stopped.' }]]);
+    expect(r.status).toBe(5);
+    expect(r.gh).toHaveLength(1);
+    expect(r.gh[0]).toContain('ran on claude-sonnet-5-5 instead of claude-opus-5-5');
+    expect(r.gh[0]).not.toContain('<synthetic>');
+  });
+
   it('still stops when a run that hit the limit reported another model (exit 5), without waiting', () => {
     const r = loop([limited({ resetsAt: NOW + 3600 }, 'claude-sonnet-5-5')]);
     expect(r.status).toBe(5);
