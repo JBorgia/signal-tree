@@ -37,8 +37,9 @@ export const REFRESH_MARGIN_MS = 10 * 60 * 1000;
 // Three attempts with 30 s timeouts and backoff fit well inside this.
 const MINT_TIMEOUT_MS = 120_000;
 
-// Also keeps the credential helper's answer to git one line per attribute.
-const isInstallationToken = (token) => typeof token === 'string' && /^ghs_\w+$/.test(token);
+// The same check as mint-token.mjs (ghs_, then letters, digits, _, . and -):
+// it also keeps the credential helper's answer to git one line per attribute.
+const isInstallationToken = (token) => typeof token === 'string' && /^ghs_[\w.-]+$/.test(token);
 
 /** The settings from the environment. */
 export function configFromEnv(env = process.env) {

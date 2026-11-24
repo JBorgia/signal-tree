@@ -50,6 +50,8 @@ function fakeGitHub(answers: Array<() => Response>) {
   };
   return { fetch, calls };
 }
+/** A made-up token in GitHub's current installation-token shape: ghs_, 390 characters, with . and -. */
+const CURRENT_TOKEN = `ghs_${'Ab1_'.repeat(30)}.${'x-Y9'.repeat(40)}.${'Zq_8'.repeat(16)}-${'k'.repeat(39)}`;
 const issued = (token: string, expiresAt = T0 + HOUR) => () => new Response(JSON.stringify({ token, expires_at: new Date(expiresAt).toISOString(), permissions: {}, repository_selection: 'selected' }), { status: 201 });
 const failed = (status: number, message: string) => () => new Response(JSON.stringify({ message }), { status });
 /** GET /app/installations/{id}: by default installed on selected repositories, with the approved permissions. */
@@ -212,8 +214,13 @@ describe('mint command: minting', () => {
     }
   });
 
+  it("accepts GitHub's current installation tokens: about 390 characters, with . and -", async () => {
+    expect(CURRENT_TOKEN).toHaveLength(390);
+    expect(await mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: fakeGitHub([issued(CURRENT_TOKEN)]).fetch, sleep: noSleep })).toEqual({ token: CURRENT_TOKEN, expires_at: new Date(T0 + HOUR).toISOString() });
+  });
+
   it('refuses an answer without an installation token (ghs_) and its expiry', async () => {
-    for (const answer of [() => new Response('{}', { status: 201 }), issued('gho_personal'), issued('ghs_x\nusername=someone'), () => new Response('{"token":"ghs_x"}', { status: 201 })]) {
+    for (const answer of [() => new Response('{}', { status: 201 }), issued('gho_personal'), issued('ghs_x\nusername=someone'), issued('ghs_x\r'), issued('ghs_x y'), issued('ghs_x=y'), issued('ghs_'), () => new Response('{"token":"ghs_x"}', { status: 201 })]) {
       await expect(mintToken({ appId: 12345, installationId: '678', privateKey, now: T0, fetch: fakeGitHub([answer]).fetch, sleep: noSleep })).rejects.toThrow('without an installation token (ghs_...)');
     }
   });
