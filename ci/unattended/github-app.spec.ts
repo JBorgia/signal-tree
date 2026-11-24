@@ -72,7 +72,7 @@ function appFixture(token = 'ghs_minted') {
 function cleanEnv(extra: Record<string, string>): NodeJS.ProcessEnv {
   const env: Record<string, string | undefined> = { ...process.env, ...extra };
   for (const name of Object.keys(env)) {
-    if (/^(GH_|GITHUB_|GIT_|SSH_ASKPASS|SIGNAL_TREE_|CLAUDE_)/.test(name) && !(name in extra)) delete env[name];
+    if (/^(GH_|GITHUB_|GIT_|SSH_ASKPASS|SIGNAL_TREE_|CLAUDE_|ANTHROPIC_)/.test(name) && !(name in extra)) delete env[name];
   }
   return env as NodeJS.ProcessEnv;
 }
@@ -522,7 +522,7 @@ describe('supervisor startup checks', () => {
     return { ...app, work, fake, ghLog, env };
   };
   const start = (extra: Record<string, string>, cwd?: string) =>
-    spawnSync('bash', [supervisor], { cwd, env: cleanEnv({ SIGNAL_TREE_ISOLATED: '1', ANTHROPIC_API_KEY: 'test-key', ...extra }), encoding: 'utf8' });
+    spawnSync('bash', [supervisor], { cwd, env: cleanEnv({ SIGNAL_TREE_ISOLATED: '1', CLAUDE_CODE_OAUTH_TOKEN: 'sk-ant-oat01-test', ...extra }), encoding: 'utf8' });
 
   it('sets a private umask before anything else runs', () => {
     expect(readFileSync(supervisor, 'utf8')).toMatch(/^set -uo pipefail\n(#.*\n)*umask 077\n/m);
