@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { appendFileSync, cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
@@ -224,20 +224,64 @@ describe('supervisor attribution setting', () => {
   });
 });
 
-describe('supervisor authentication (#16)', () => {
+/** process.env without the developer's own Claude or Anthropic settings, plus `extra`. */
+function claudeEnv(extra: Record<string, string>): NodeJS.ProcessEnv {
+  const env: Record<string, string | undefined> = { ...process.env };
+  for (const name of Object.keys(env)) if (/^(ANTHROPIC_|CLAUDE_)/.test(name)) delete env[name];
+  return { ...env, ...extra } as NodeJS.ProcessEnv;
+}
+
+const TOKEN = 'sk-ant-oat01-test-subscription-token';
+
+describe("supervisor authentication (Jonathan's ruling of 2026-11-23)", () => {
   const script = new URL('./supervise.sh', import.meta.url).pathname;
 
-  it('refuses to start without an API key', () => {
+  /** The whole supervisor with `extra` set. With no mint config it stops at the key check (exit 13), after the credential checks. */
+  const start = (extra: Record<string, string>) => {
     const state = mkdtempSync(join(tmpdir(), 'signal-tree-sup-'));
     try {
-      const env: Record<string, string | undefined> = { ...process.env, SIGNAL_TREE_ISOLATED: '1', SIGNAL_TREE_STATE_DIR: state };
-      delete env.ANTHROPIC_API_KEY;
-      const run = spawnSync('bash', [script], { env: env as NodeJS.ProcessEnv, encoding: 'utf8' });
-      expect(run.status).toBe(6);
-      expect(run.stderr).toContain('ANTHROPIC_API_KEY');
+      return spawnSync('bash', [script], { env: claudeEnv({ SIGNAL_TREE_ISOLATED: '1', SIGNAL_TREE_STATE_DIR: state, SIGNAL_TREE_APP_CONFIG: join(state, 'missing.json'), ...extra }), encoding: 'utf8' });
     } finally {
       rmSync(state, { recursive: true, force: true });
     }
+  };
+
+  it('refuses to start without CLAUDE_CODE_OAUTH_TOKEN (exit 6)', () => {
+    const run = start({});
+    expect(run.status).toBe(6);
+    expect(run.stderr).toContain('set CLAUDE_CODE_OAUTH_TOKEN');
+    expect(run.stderr).toContain('`claude setup-token`');
+  });
+
+  it('refuses to start with an empty CLAUDE_CODE_OAUTH_TOKEN (exit 6)', () => {
+    const run = start({ CLAUDE_CODE_OAUTH_TOKEN: '' });
+    expect(run.status).toBe(6);
+    expect(run.stderr).toContain('set CLAUDE_CODE_OAUTH_TOKEN');
+  });
+
+  for (const name of ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN']) {
+    for (const [what, value] of [
+      ['set', 'sk-ant-api03-SECRET'],
+      ['set but empty', ''],
+    ] as const) {
+      it(`refuses to start when ${name} is ${what}, even with the subscription token (exit 6)`, () => {
+        const run = start({ CLAUDE_CODE_OAUTH_TOKEN: TOKEN, [name]: value });
+        expect(run.status).toBe(6);
+        expect(run.stderr).toContain(`Refusing to start: ${name} is set. This VM uses Jonathan's Claude subscription (CLAUDE_CODE_OAUTH_TOKEN) as its only Claude credential`);
+        expect(run.stderr).not.toContain('SECRET');
+      });
+    }
+  }
+
+  it('passes the credential checks with the subscription token alone, stopping only later at the key check', () => {
+    const run = start({ CLAUDE_CODE_OAUTH_TOKEN: TOKEN });
+    expect(run.status).toBe(13);
+    expect(run.stderr).toContain('cannot read the key path (keyFile)');
+    expect(run.stderr).not.toMatch(/CLAUDE_CODE_OAUTH_TOKEN|ANTHROPIC_/);
+  });
+
+  it('never removes CLAUDE_CODE_OAUTH_TOKEN from the environment the session inherits', () => {
+    expect(readFileSync(script, 'utf8')).not.toMatch(/unset[^\n]*CLAUDE_CODE_OAUTH_TOKEN|-u *CLAUDE_CODE_OAUTH_TOKEN/);
   });
 
   const authFailure = (lines: string[]) => {
@@ -254,6 +298,9 @@ describe('supervisor authentication (#16)', () => {
   for (const [result, shown] of [
     ['Failed to authenticate: OAuth session expired and could not be refreshed', 'authenticate'],
     ['Invalid API key', 'API key'],
+    ['OAuth token revoked · Please run /login', 'OAuth token revoked'],
+    ['Login expired · Please run /login', 'Please run /login'],
+    ['API Error: 401 {"type":"error","error":{"type":"authentication_error","message":"OAuth token has expired."}}', '401'],
   ] as const) {
     it(`recognises a run that failed to authenticate: ${result}`, () => {
       expect(authFailure([JSON.stringify({ type: 'result', is_error: true, result })])).toContain(shown);
@@ -263,9 +310,239 @@ describe('supervisor authentication (#16)', () => {
   for (const [what, line] of [
     ['another error', '{"type":"result","is_error":true,"result":"Rate limited, retry later"}'],
     ['a success', '{"type":"result","is_error":false,"result":"done"}'],
+    // 1764014010 contains 401.
+    ['a usage limit whose reset time contains 401', '{"type":"result","is_error":true,"result":"Claude AI usage limit reached|1764014010"}'],
+    ['a usage limit', JSON.stringify({ type: 'result', is_error: true, result: "You've hit your limit · resets 1pm (UTC)" })],
+    // Hypothetical wording: no usage-limit text counts, whatever else it says.
+    ['a usage limit message that also names an API key','{"type":"result","is_error":true,"result":"Usage limit reached · resets 1pm (UTC) · or continue with an API key"}'],
+    ['an outage whose request ID contains 401', '{"type":"result","is_error":true,"result":"API Error: 529 Overloaded · request req_0114017"}'],
   ] as const) {
     it(`does not mistake ${what} for an authentication failure`, () => {
       expect(authFailure([line])).toBe('');
     });
   }
+});
+
+describe('usage limit detection', () => {
+  const script = new URL('./supervise.sh', import.meta.url).pathname;
+  const RESET = 1795438800;
+  /** usage_limit on a run log of `lines` (objects are written as JSON). */
+  const usageLimit = (lines: (object | string)[]) => {
+    const dir = mkdtempSync(join(tmpdir(), 'signal-tree-sup-'));
+    try {
+      const log = join(dir, 'run.log');
+      writeFileSync(log, lines.map((line) => (typeof line === 'string' ? line : JSON.stringify(line))).join('\n'));
+      return spawnSync('bash', ['-c', `eval "$(sed -n '/^usage_limit()/,/^}/p' "${script}")"; usage_limit "${log}"`], { encoding: 'utf8' }).stdout;
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  };
+  const event = (info: object) => ({ type: 'rate_limit_event', rate_limit_info: info, uuid: 'u', session_id: 's' });
+
+  it("reads the type and reset time of a rejected rate_limit_event, skipping lines that are not JSON", () => {
+    expect(usageLimit(['Error: something on stderr', event({ status: 'rejected', resetsAt: RESET, rateLimitType: 'five_hour', isUsingOverage: false })])).toBe(`five_hour ${RESET}\n`);
+  });
+
+  it('takes a reset time above 1e12 as milliseconds', () => {
+    expect(usageLimit([event({ status: 'rejected', resetsAt: RESET * 1000, rateLimitType: 'seven_day' })])).toBe(`seven_day ${RESET}\n`);
+  });
+
+  it('gives an unknown type and no reset time when the event has neither', () => {
+    expect(usageLimit([event({ status: 'rejected' })])).toBe('unknown \n');
+  });
+
+  for (const status of ['allowed', 'allowed_warning']) {
+    it(`does not take an event with status ${status} for a limit`, () => {
+      expect(usageLimit([event({ status, resetsAt: RESET, rateLimitType: 'five_hour' })])).toBe('');
+    });
+  }
+
+  it('does not take a rejection that a later allowed event replaced for a limit', () => {
+    expect(usageLimit([event({ status: 'rejected', resetsAt: RESET }), event({ status: 'allowed', resetsAt: RESET })])).toBe('');
+  });
+
+  for (const [what, line] of [
+    ['an assistant error rate_limit', { type: 'assistant', message: { model: '<synthetic>' }, error: 'rate_limit' }],
+    ['a result with apiError usage_limit_reached', { type: 'result', is_error: true, apiError: 'usage_limit_reached' }],
+    ['an assistant message with api_error usage_limit_reached', { type: 'assistant', message: { model: '<synthetic>' }, api_error: 'usage_limit_reached' }],
+  ] as const) {
+    it(`recognises ${what} without a rate_limit_event, with no reset time`, () => {
+      expect(usageLimit([line])).toBe('unknown \n');
+    });
+  }
+
+  for (const [what, line] of [
+    ['an authentication failure', { type: 'result', is_error: true, result: 'Invalid API key · Please run /login' }],
+    ['a success', { type: 'result', is_error: false, result: 'done' }],
+  ] as const) {
+    it(`does not take ${what} for a limit`, () => {
+      expect(usageLimit([line])).toBe('');
+    });
+  }
+});
+
+describe('supervisor session loop', () => {
+  // The loop (run_sessions) runs with fakes first on PATH: claude; sleep and
+  // date, so no test waits on the clock; gh, which only logs; and node, which
+  // answers for the verifier's done check (it passes after claude's last
+  // scripted run) and stop hook (never stuck), the loop's only node commands.
+  // sync_verifier does nothing, so nothing reaches the network.
+  const script = new URL('./supervise.sh', import.meta.url).pathname;
+  const NOW = Date.UTC(2026, 10, 23, 12, 0, 0) / 1000;
+  const SESSION = '0f6f2c4e-1b7a-4c1e-9d0e-3b7f5a2c9e11';
+  const writeScript = (path: string, body: string) => {
+    writeFileSync(path, `#!/usr/bin/env bash\n${body}\n`);
+    chmodSync(path, 0o755);
+  };
+  // The fakes, made once. Each works in the test's directory, $LOOP: claude
+  // prints run-<n>.jsonl on its nth run and, after the last one, marks the
+  // done check as passing.
+  let fake = '';
+  beforeAll(() => {
+    fake = mkdtempSync(join(tmpdir(), 'signal-tree-loop-bin-'));
+    writeScript(
+      join(fake, 'claude'),
+      [
+        'n=$(( $(cat "$LOOP/count" 2> /dev/null || echo 0) + 1 )); echo "$n" > "$LOOP/count"',
+        '[[ -f $LOOP/run-$n.jsonl ]] || { echo "unexpected run $n" >> "$LOOP/claude.log"; kill "$PPID"; exit 1; }',
+        `printf 'token=%s args=%s\\n' "\${CLAUDE_CODE_OAUTH_TOKEN-unset}" "$*" >> "$LOOP/claude.log"`,
+        'cat "$LOOP/run-$n.jsonl"',
+        '[[ -f $LOOP/run-$((n + 1)).jsonl ]] || : > "$LOOP/done"',
+        'exit 1',
+      ].join('\n'),
+    );
+    writeScript(join(fake, 'sleep'), 'echo "$*" >> "$LOOP/sleep.log"');
+    writeScript(join(fake, 'date'), `if [[ $* == +%s ]]; then echo ${NOW}; else exec /bin/date "$@"; fi`);
+    writeScript(join(fake, 'gh'), `printf '%s\\n' "$*" >> "$LOOP/gh.log"`);
+    writeScript(
+      join(fake, 'node'),
+      ['case "$*" in', '  ci/done-check.mjs) [[ -f $LOOP/done ]] ;;', '  "$SIGNAL_TREE_VERIFY_DIR/ci/unattended/stop-hook.mjs --is-stuck") exit 1 ;;', '  *) echo "unexpected node $*" >&2; exit 2 ;;', 'esac'].join('\n'),
+    );
+  });
+  afterAll(() => rmSync(fake, { recursive: true, force: true }));
+  const roots: string[] = [];
+  afterEach(() => {
+    for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
+  });
+
+  const init = { type: 'system', subtype: 'init', model: 'claude-opus-5-5', session_id: SESSION };
+  const answer = (model = 'claude-opus-5-5') => ({ type: 'assistant', message: { model, content: [{ type: 'text', text: 'Working on it.' }] }, session_id: SESSION });
+  /** A run that ends without reaching a limit. */
+  const worked = [init, answer(), { type: 'result', subtype: 'success', is_error: false, result: 'Stopped.' }];
+  /**
+   * A run that hits the subscription's limit, as Claude Code 2.1.331 writes it:
+   * a rejected rate_limit_event (with `info`), then its own error message, under
+   * the model name <synthetic>, and an error result.
+   */
+  const limited = (info: object, model = 'claude-opus-5-5') => [
+    init,
+    answer(model),
+    { type: 'rate_limit_event', rate_limit_info: { status: 'rejected', rateLimitType: 'five_hour', isUsingOverage: false, ...info }, uuid: 'u', session_id: SESSION },
+    { type: 'assistant', message: { model: '<synthetic>', content: [{ type: 'text', text: "You've hit your limit · resets 1pm (UTC)" }] }, error: 'rate_limit', session_id: SESSION },
+    { type: 'result', subtype: 'success', is_error: true, result: "You've hit your limit · resets 1pm (UTC)" },
+  ];
+
+  /**
+   * run_sessions on a new session whose nth claude run prints runs[n - 1] and
+   * exits 1. A claude run beyond those ends the loop, so a test cannot hang.
+   */
+  const loop = (runs: object[][]) => {
+    const root = mkdtempSync(join(tmpdir(), 'signal-tree-loop-'));
+    roots.push(root);
+    const [state, verify] = [join(root, 'state'), join(root, 'verify')];
+    for (const dir of [state, verify]) mkdirSync(dir);
+    runs.forEach((events, i) => writeFileSync(join(root, `run-${i + 1}.jsonl`), events.map((e) => JSON.stringify(e)).join('\n') + '\n'));
+    const at = (name: string) => join(root, name);
+    const log = join(state, 'session.log');
+    const functions = ['run_sessions', 'usage_limit', 'pause_for_usage_limit', 'utc_time', 'auth_failure', 'report'];
+    const shell = [
+      `eval "$(sed -n '/^readonly /p;${functions.map((name) => `/^${name}()/,/^}/p`).join(';')}' "${script}")"`,
+      'sync_verifier() { :; }',
+      `run_sessions ${SESSION} 1 '{"model":"claude-opus-5-5"}' '--permission-mode bypassPermissions' "${log}"`,
+    ].join('\n');
+    const run = spawnSync('bash', ['-c', shell], {
+      env: claudeEnv({ PATH: `${fake}:${process.env.PATH}`, LOOP: root, CLAUDE_CODE_OAUTH_TOKEN: TOKEN, SIGNAL_TREE_STATE_DIR: state, SIGNAL_TREE_VERIFY_DIR: verify, SIGNAL_TREE_STATUS_ISSUE: '7' }),
+      encoding: 'utf8',
+    });
+    const lines = (name: string) => (existsSync(at(name)) ? readFileSync(at(name), 'utf8').trim().split('\n') : []);
+    return {
+      ...run,
+      claude: lines('claude.log'),
+      sleeps: lines('sleep.log'),
+      gh: lines('gh.log'),
+      /** The supervisor's own lines in the session log, without the runs' events. */
+      notes: readFileSync(log, 'utf8').split('\n').filter((line) => line !== '' && !line.startsWith('{')),
+    };
+  };
+  const paused = (type: string, until: string) => `2026-11-23T12:00:00Z usage limit (${type}) reached; paused until ${until}`;
+
+  it('waits until a minute after the reset time, then resumes the same session, which finishes: exit 0, no report', () => {
+    const r = loop([limited({ resetsAt: NOW + 3600 }), worked]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.stdout).toContain('Done: node ci/done-check.mjs passes on origin/main.');
+    // 3660 s for the limit; then the usual 60 s backoff after the second run's quick exit.
+    expect(r.sleeps).toEqual(['3660', '60']);
+    expect(r.claude).toHaveLength(2);
+    expect(r.claude[0]).toContain(`--session-id ${SESSION} `);
+    expect(r.claude[1]).toContain(`--resume ${SESSION} `);
+    expect(r.claude[1]).toContain('Continue the rebuild from BRIEF.md');
+    expect(r.notes[0]).toBe(paused('five_hour', '2026-11-23T13:00:00Z'));
+    expect(r.notes[1]).toMatch(/^\S+Z claude exited with 1 after \d+s$/);
+    expect(r.notes).toHaveLength(2);
+    expect(r.gh).toEqual([]);
+  });
+
+  for (const [what, info] of [
+    ['no reset time', {}],
+    ['a reset time in the past', { resetsAt: NOW - 60 }],
+    ['a reset time more than 8 days ahead', { resetsAt: NOW + 9 * 86400 }],
+  ] as const) {
+    it(`waits 30 minutes, then resumes, when the limit gives ${what}`, () => {
+      const r = loop([limited(info), worked]);
+      expect(r.status, r.stderr).toBe(0);
+      expect(r.sleeps).toEqual(['1800', '60']);
+      expect(r.claude[1]).toContain(`--resume ${SESSION} `);
+      expect(r.notes[0]).toBe(paused('five_hour', '2026-11-23T12:30:00Z'));
+      expect(r.gh).toEqual([]);
+    });
+  }
+
+  it('waits 30 minutes again each time the limit persists with no reset time', () => {
+    const r = loop([limited({}), limited({}), worked]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.sleeps).toEqual(['1800', '1800', '60']);
+    expect(r.claude).toHaveLength(3);
+    expect(r.gh).toEqual([]);
+  });
+
+  it('resets the quick-exit backoff to 60 s after a usage limit', () => {
+    // Without the reset, the last backoff would be 120 s, doubled after the first run.
+    const r = loop([worked, limited({ resetsAt: NOW + 600 }), worked]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.sleeps).toEqual(['60', '660', '60']);
+  });
+
+  it('gives the session the subscription token from its environment', () => {
+    const r = loop([worked]);
+    expect(r.status, r.stderr).toBe(0);
+    expect(r.claude).toEqual([expect.stringMatching(new RegExp(`^token=${TOKEN} args=-p --session-id ${SESSION} `))]);
+  });
+
+  it('still stops on an authentication failure (exit 7), reporting how to replace the token, without waiting', () => {
+    const r = loop([[init, { type: 'result', subtype: 'success', is_error: true, result: 'OAuth token revoked · Please run /login' }]]);
+    expect(r.status).toBe(7);
+    expect(r.sleeps).toEqual([]);
+    expect(r.gh).toEqual([
+      "issue comment 7 --body The unattended session could not authenticate: OAuth token revoked · Please run /login. The supervisor has stopped; as the agent user, re-run `claude setup-token` and replace the token in the agent user's secret store (#18).",
+    ]);
+  });
+
+  it('still stops when a run that hit the limit reported another model (exit 5), without waiting', () => {
+    const r = loop([limited({ resetsAt: NOW + 3600 }, 'claude-sonnet-5-5')]);
+    expect(r.status).toBe(5);
+    expect(r.sleeps).toEqual([]);
+    expect(r.gh).toHaveLength(1);
+    expect(r.gh[0]).toContain('ran on ');
+    expect(r.gh[0]).toContain('claude-sonnet-5-5');
+  });
 });

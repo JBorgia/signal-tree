@@ -9,10 +9,12 @@
 # Each pass: sync a clean checkout of origin/main (the verifier), run the done
 # check there, and stop when it passes. Otherwise start or resume one Claude
 # Code session with /goal and the Stop hook from the verifier checkout. A crash
-# or usage limit ends the claude process; the loop resumes the same session
-# with backoff. If the Stop hook let the session stop as stuck (20 blocked
-# stops with no new commit) and nothing has been committed since, the
-# supervisor posts on the Rebuild status issue and exits instead of looping.
+# ends the claude process; the loop resumes the same session with backoff. A
+# usage limit pauses it: the loop waits until the limit resets, then resumes
+# the same session (see Authentication). If the Stop hook let the session stop
+# as stuck (20 blocked stops with no new commit) and nothing has been committed
+# since, the supervisor posts on the Rebuild status issue and exits instead of
+# looping.
 #
 # Sessions run with -p, which `--continue` does not pick up, so the session is
 # resumed by its fixed ID with `--resume`.
@@ -24,7 +26,11 @@
 #   SIGNAL_TREE_VERIFY_DIR        default $SIGNAL_TREE_STATE_DIR/verify
 #   SIGNAL_TREE_CLAUDE_ARGS       default "--permission-mode bypassPermissions"; may not set the model
 #   SIGNAL_TREE_STATUS_ISSUE      issue number of "Rebuild status" (looked up by title if unset)
-#   ANTHROPIC_API_KEY             required: the API key from the VM's secret store (#16)
+#   CLAUDE_CODE_OAUTH_TOKEN       required: the long-lived token of Jonathan's Claude subscription, made with
+#                                 `claude setup-token` as the agent user; the root-owned launcher reads it
+#                                 from the agent user's secret store and exports it (#18)
+#   ANTHROPIC_API_KEY             must not be set, not even empty: the subscription is the only Claude credential
+#   ANTHROPIC_AUTH_TOKEN          must not be set, not even empty, for the same reason
 #   SIGNAL_TREE_MINT_COMMAND      default "sudo -n -u st-mint /opt/signal-tree/mint-token": prints a
 #                                 GitHub App token as the user that owns the App's key (mint-token.mjs)
 #   SIGNAL_TREE_APP_CONFIG        default /etc/signal-tree/app.json: the mint config whose keyFile this
@@ -37,7 +43,9 @@
 # Exit status: 0 done; 1 setup failed; 2 not the isolated machine, extra
 # arguments set a model, or the state directory is inside a checkout; 3 stuck;
 # 4 the agent lock is held or could not be taken; 5 a run used another model;
-# 6 no ANTHROPIC_API_KEY; 7 a run could not authenticate to Anthropic; 8 is no
+# 6 no CLAUDE_CODE_OAUTH_TOKEN, or ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN is
+# set; 7 a run could not authenticate to Anthropic (a usage limit is not a
+# failure and never ends the supervisor); 8 is no
 # longer used; 9 the mint command gave no GitHub App token, or git would not use
 # it; 10 origin is not https://github.com/JBorgia/signal-tree(.git) for fetch
 # and push, git config sets an extra HTTP header, or `git ls-remote origin`
@@ -48,10 +56,25 @@
 # failed: GitHub accepted the App's push of a workflow file (the branch is then
 # deleted), refused it for another reason, or did not answer in time.
 #
-# Authentication (Jonathan's ruling on #16): Claude Code uses an Anthropic API
-# key from the VM's secret store, never a browser login. The supervisor
-# refuses to start without one, clears any OAuth token from its environment,
-# and stops (instead of retrying) when a run ends on an authentication error.
+# Authentication (Jonathan's ruling of 2026-11-23, replacing the API-key ruling
+# on #16): Claude Code uses Jonathan's Claude subscription, never an API key or
+# a browser login. Its credential is the long-lived token that
+# `claude setup-token` makes as the agent user, kept in that user's secret
+# store and exported by the launcher as CLAUDE_CODE_OAUTH_TOKEN; the session
+# inherits it. The supervisor refuses to start (exit 6) without that token, or
+# with ANTHROPIC_API_KEY or ANTHROPIC_AUTH_TOKEN set at all, even empty, so the
+# subscription is the only Claude credential. When a run ends on an
+# authentication error it stops (exit 7) instead of retrying, and its report
+# says to re-run `claude setup-token` as the agent user and replace the token
+# in the secret store (#18).
+#
+# A usage limit of the subscription is a pause, not a failure (the same
+# ruling). When a run ends on one (usage_limit), the supervisor notes
+# "<time> usage limit (<type>) reached; paused until <reset>" in the session
+# log, waits until a minute after the limit resets (30 minutes when the run
+# gives no usable reset time), and resumes the same session. It never exits,
+# reports or counts toward stuck for it. The wait reads the time once
+# (date +%s) and runs sleep through PATH.
 #
 # GitHub identity (BRIEF.md 12.3 and Jonathan's rulings): the signal-tree-ci
 # GitHub App authenticates every push and gh call, and turns on auto-merge
@@ -127,11 +150,20 @@ main() {
   fi
   # These would override the model the settings give (ANTHROPIC_MODEL outranks settings).
   unset ANTHROPIC_MODEL ANTHROPIC_DEFAULT_OPUS_MODEL ANTHROPIC_DEFAULT_SONNET_MODEL ANTHROPIC_DEFAULT_HAIKU_MODEL
-  if [[ -z ${ANTHROPIC_API_KEY:-} ]]; then
-    echo "Refusing to start: set ANTHROPIC_API_KEY from the VM's secret store; the agent never uses a browser login (#16)." >&2
+  # The subscription token is the only Claude credential (Jonathan's ruling of
+  # 2026-11-23); the session inherits it. ${!name+set} is "set at all, even
+  # empty", like [[ -v ]], which bash 3.2 lacks.
+  local credential
+  for credential in ANTHROPIC_API_KEY ANTHROPIC_AUTH_TOKEN; do
+    if [[ -n ${!credential+set} ]]; then
+      echo "Refusing to start: $credential is set. This VM uses Jonathan's Claude subscription (CLAUDE_CODE_OAUTH_TOKEN) as its only Claude credential; unset $credential, even if empty." >&2
+      exit 6
+    fi
+  done
+  if [[ -z ${CLAUDE_CODE_OAUTH_TOKEN:-} ]]; then
+    echo "Refusing to start: set CLAUDE_CODE_OAUTH_TOKEN to the token of Jonathan's Claude subscription, made with \`claude setup-token\` as the agent user, from that user's secret store (#18). This VM uses the subscription, never an API key or a browser login." >&2
     exit 6
   fi
-  unset CLAUDE_CODE_OAUTH_TOKEN
   # GitHub sees only the signal-tree-ci App, never a personal token. The
   # App's key and IDs belong to the mint user, not this environment.
   unset GH_TOKEN GITHUB_TOKEN GH_ENTERPRISE_TOKEN GITHUB_ENTERPRISE_TOKEN
@@ -179,7 +211,17 @@ main() {
   settings=$(jq -cn --arg cmd "$hook" --arg model "$MODEL" --argjson attribution "$attribution" \
     '{model: $model, switchModelsOnFlag: false, attribution: $attribution, hooks: {Stop: [{hooks: [{type: "command", command: $cmd, timeout: 600}]}]}}')
 
-  local backoff=60
+  run_sessions "$session_id" "$fresh" "$settings" "$claude_args" "$log"
+}
+
+# Starts session $1 (when $2 is 1) or resumes it, with settings $3 and the
+# extra arguments $4, until the done check passes on origin/main (exit 0),
+# appending each run's events to the session log $5. Exits when a run is stuck
+# (3), used another model (5) or could not authenticate (7); waits out a usage
+# limit (pause_for_usage_limit) and backs off after any other quick exit.
+run_sessions() {
+  local session_id=$1 fresh=$2 settings=$3 claude_args=$4 log=$5
+  local backoff=60 limit
   while true; do
     sync_verifier
     if (cd "$SIGNAL_TREE_VERIFY_DIR" && node ci/done-check.mjs); then
@@ -206,20 +248,30 @@ main() {
     local status=$?
     cat "$run_log" >> "$log"
     local ran_on
-    # An authentication failure will not fix itself: stop and say so instead of retrying.
-    if [[ -n $(auth_failure "$run_log") ]]; then
-      report "The unattended session could not authenticate: $(auth_failure "$run_log"). The supervisor has stopped; check the API key in the VM's secret store (#16)."
-      exit 7
-    fi
     # Every model the run reports: the init event and each assistant message.
     ran_on=$(jq -r 'select(.type == "system" and .subtype == "init") .model, select(.type == "assistant") .message.model' "$run_log" 2>/dev/null | sort -u | grep -v -x -e "$MODEL" -e '' | paste -sd, -)
+    # A usage limit is a pause, not a failure (Jonathan's ruling of 2026-11-23):
+    # wait for the reset, then resume the same session. Claude Code writes the
+    # limit's error message itself, under the model name <synthetic>; a run
+    # that reports any other model still stops below.
+    limit=$(usage_limit "$run_log")
+    if [[ -n $limit && ( -z $ran_on || $ran_on == '<synthetic>' ) ]]; then
+      pause_for_usage_limit "$limit" "$log"
+      backoff=60
+      continue
+    fi
+    # An authentication failure will not fix itself: stop and say so instead of retrying.
+    if [[ -n $(auth_failure "$run_log") ]]; then
+      report "The unattended session could not authenticate: $(auth_failure "$run_log"). The supervisor has stopped; as the agent user, re-run \`claude setup-token\` and replace the token in the agent user's secret store (#18)."
+      exit 7
+    fi
     if [[ -n $ran_on ]]; then
       report "The unattended session ran on $ran_on instead of $MODEL. The supervisor has stopped; the main loop must run on Opus."
       exit 5
     fi
     echo "$(date -u +%FT%TZ) claude exited with $status after $((SECONDS - started))s" >> "$log"
 
-    # A quick exit usually means a usage limit or an outage: back off, up to 30 minutes.
+    # A quick exit usually means an outage (a usage limit is waited out above): back off, up to 30 minutes.
     if (( SECONDS - started < 300 )); then
       sleep "$backoff"
       backoff=$(( backoff * 2 > 1800 ? 1800 : backoff * 2 ))
@@ -576,9 +628,57 @@ deadline_text() {
   if [[ $1 =~ ^[0-9]+$ ]]; then echo "within $1 s"; else echo "before its deadline"; fi
 }
 
-# The error text of a run that failed to authenticate, or nothing.
+# The error text of a run that failed to authenticate, or nothing. A usage
+# limit is not an authentication failure: a line about a usage or rate limit
+# never counts, and 401 counts only as a number of its own, not inside a reset
+# time such as 1764014010.
 auth_failure() {
-  jq -r 'select(.type == "result" and .is_error == true) | .result // empty' "$1" 2>/dev/null | grep -i -m1 -E 'authenticat|api key|unauthori[sz]ed|401'
+  jq -r 'select(.type == "result" and .is_error == true) | .result // empty' "$1" 2>/dev/null |
+    grep -i -v -E 'usage limit|hit your limit|rate limit' |
+    grep -i -m1 -E 'authenticat|api key|oauth token|please run /login|unauthori[sz]ed|(^|[^0-9])401([^0-9]|$)'
+}
+
+# The usage limit that the run with log $1 ended on, as
+# "<rateLimitType> <resetsAt>", or nothing. Claude Code's stream-json reports
+# the subscription's limits in rate_limit_event lines; a limit was hit when the
+# run's last one has rate_limit_info.status "rejected" ("allowed" and
+# "allowed_warning" are not limits), or when an assistant or result event has
+# error "rate_limit" or apiError (api_error) "usage_limit_reached". The type and
+# reset time come from the last rejected event: the type is "unknown" when
+# there is none or it is not a plain word, and resetsAt, in epoch seconds
+# (milliseconds when above 1e12), is empty when there is no positive number.
+# Lines that are not JSON are skipped.
+usage_limit() {
+  jq -nrR '
+    [inputs | fromjson? | objects] as $events
+    | [$events[] | select(.type == "rate_limit_event") | .rate_limit_info | objects] as $infos
+    | select(($infos | last | .status) == "rejected"
+        or any($events[]; (.type == "assistant" or .type == "result")
+          and (.error == "rate_limit" or .apiError == "usage_limit_reached" or .api_error == "usage_limit_reached")))
+    | ([$infos[] | select(.status == "rejected")] | last // {})
+    | "\((.rateLimitType | strings | select(test("^[A-Za-z0-9_]{1,40}$"))) // "unknown") \((.resetsAt | numbers | select(. > 0) | if . > 1e12 then . / 1000 else . end | floor) // "")"' "$1" 2>/dev/null
+}
+
+# Waits out the usage limit $1 (as usage_limit prints it), first noting it in
+# the session log $2: until a minute after the reset time, or for 30 minutes
+# when the reset time is missing, not in the future or more than 8 days ahead.
+# It reads the current time once, with date +%s, and runs sleep through PATH,
+# so tests can supply both.
+pause_for_usage_limit() {
+  local type=${1%% *} resets=${1#* } now wait resume
+  now=$(date +%s)
+  if [[ $resets =~ ^[0-9]+$ ]] && (( resets > now && resets - now <= 8 * 86400 )); then
+    wait=$(( resets + 60 - now )) resume=$resets
+  else
+    wait=1800 resume=$(( now + 1800 ))
+  fi
+  echo "$(utc_time "$now") usage limit ($type) reached; paused until $(utc_time "$resume")" >> "$2"
+  sleep "$wait"
+}
+
+# Epoch seconds $1 as UTC, in the form date -u +%FT%TZ prints, without GNU or BSD date options.
+utc_time() {
+  jq -rn --argjson t "$1" '$t | todate' 2>/dev/null
 }
 
 # True when version $1 is at least $2 (dotted numbers).
