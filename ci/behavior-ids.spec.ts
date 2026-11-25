@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { BEHAVIOR_IDS, behaviorIdPattern } from './behavior-ids.mjs';
+import { BEHAVIOR_IDS, COST_RULE_TAGS, CONTRACT_TAGS, SPEC_TAGS, behaviorIdPattern, specTagPattern } from './behavior-ids.mjs';
 import { repoRoot } from './entry-graph.mjs';
 
 /** The IDs in the first column of the tables under one BRIEF.md heading. */
@@ -24,5 +24,15 @@ describe('behavior IDs', () => {
   it('match in titles without reading T10 as T1', () => {
     const found = [...'[T10][T1][T13][O4][X3][W5][H1][D2][V8][F1] [T14] [Q1]'.matchAll(behaviorIdPattern())].map((m) => m[1]);
     expect(found).toEqual(['T10', 'T1', 'T13', 'O4', 'X3', 'W5', 'H1', 'D2', 'V8', 'F1']);
+  });
+
+  it('spec tags add the cost rules and the section-4 contracts, which coverage does not count', () => {
+    expect(COST_RULE_TAGS).toEqual(['C1', 'C2', 'C3', 'C4', 'C5', 'C6']);
+    expect(CONTRACT_TAGS).toEqual(['4.3', '4.5']);
+    expect(SPEC_TAGS).toEqual([...BEHAVIOR_IDS, ...COST_RULE_TAGS, ...CONTRACT_TAGS]);
+    for (const rule of COST_RULE_TAGS) expect(brief).toContain(`- ${rule}: `);
+    const found = [...'[4.3] [C1][T10][4.5][C7][4.4][4x3][T1]'.matchAll(specTagPattern())].map((m) => m[1]);
+    expect(found).toEqual(['4.3', 'C1', 'T10', '4.5', 'T1']);
+    expect([...'[C1][4.3]'.matchAll(behaviorIdPattern())]).toEqual([]);
   });
 });
