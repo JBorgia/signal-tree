@@ -13,10 +13,19 @@ import { parse } from 'yaml';
 import { repoRoot } from './entry-graph.mjs';
 import { ADAPTERS } from './done-check.mjs';
 import { GATES_JOB } from './gate-baseline.mjs';
+import { SPEC_TEST_ENTRIES_JOB } from './spec-test-entries.mjs';
 
 export function loadWorkflows(root = repoRoot) {
   const read = (name) => parse(readFileSync(join(root, '.github', 'workflows', name), 'utf8'));
-  return { ci: read('ci.yml'), nightly: read('nightly.yml'), soak: read('soak.yml'), approve: read('approve-non-owned.yml') };
+  const optional = (name) => {
+    try {
+      return read(name);
+    } catch (error) {
+      if (error.code === 'ENOENT') return undefined;
+      throw error;
+    }
+  };
+  return { ci: read('ci.yml'), nightly: read('nightly.yml'), soak: read('soak.yml'), approve: read('approve-non-owned.yml'), entries: optional('spec-test-entries.yml') };
 }
 
 const runs = (job) => (job?.steps ?? []).map((s) => s.run ?? '').join('\n');
@@ -180,8 +189,8 @@ function gateHostEnvProblems(name, workflow) {
   return problems;
 }
 
-export function workflowProblems({ ci, nightly, soak, approve }) {
-  const problems = approveProblems(approve);
+export function workflowProblems({ ci, nightly, soak, approve, entries }) {
+  const problems = [...approveProblems(approve), ...entriesProblems(entries)];
   for (const [name, workflow] of [['ci.yml', ci], ['nightly.yml', nightly], ['soak.yml', soak]]) problems.push(...gateHostEnvProblems(name, workflow));
   const gates = ci?.jobs?.gates;
   if (!gates) return [...problems, 'ci.yml has no gates job'];
@@ -268,6 +277,52 @@ function approveProblems(approve) {
       if (/\b(git\s+(fetch|checkout|switch|pull|worktree)|gh\s+pr\s+checkout|gh\s+repo\s+clone)\b/.test(String(step.run ?? ''))) problems.push(`${name} ${id}: a step fetches or checks out code; only actions/checkout of the base may`);
     }
     if (!steps.some((step) => String(step.run ?? '').trim() === 'node ci/approve-non-owned.mjs')) problems.push(`${name} ${id}: must decide with node ci/approve-non-owned.mjs`);
+  }
+  return problems;
+}
+
+const ENTRIES_PERMISSIONS = { contents: 'read', 'pull-requests': 'read' };
+const PINNED = /^[\w.-]+\/[\w.-]+@[0-9a-f]{40}$/;
+
+/**
+ * spec-test-entries.yml decides whether an existing spec-test entry may change
+ * (Jonathan's ruling of 2026-11-24 on test tags). A required check that is
+ * skipped or allowed to fail counts as passing, so its one job has no if: and no
+ * continue-on-error, nor does any step. It must run on every pull request and
+ * again on each review submitted or dismissed, on the merge commit with its
+ * parents, with a read-only token, and decide with node ci/spec-test-entries.mjs
+ * under the name the ruleset requires.
+ */
+function entriesProblems(entries) {
+  const name = 'spec-test-entries.yml';
+  if (!entries) return [`${name} is missing`];
+  const problems = [];
+  const on = entries.on ?? {};
+  if (!sameKeys(on, { pull_request: 1, pull_request_review: 1 })) problems.push(`${name}: must run on pull_request and pull_request_review only`);
+  if (on.pull_request !== null && on.pull_request !== undefined && !sameKeys(on.pull_request, {})) problems.push(`${name}: must run on every pull request event it gets by default, with no types, branches or paths filter`);
+  if (JSON.stringify([...(on.pull_request_review?.types ?? [])].sort()) !== '["dismissed","submitted"]') problems.push(`${name}: must run again for each review submitted or dismissed`);
+  const readOnly = (p) => typeof p === 'object' && p !== null && sameKeys(p, ENTRIES_PERMISSIONS) && Object.entries(ENTRIES_PERMISSIONS).every(([k, v]) => p[k] === v);
+  if (!readOnly(entries.permissions)) problems.push(`${name}: permissions must be exactly contents: read and pull-requests: read`);
+  if (/secrets\./.test(JSON.stringify(entries))) problems.push(`${name}: uses a secret; it needs only the GITHUB_TOKEN`);
+  const jobs = Object.entries(entries.jobs ?? {});
+  if (jobs.length !== 1) problems.push(`${name}: must have exactly one job`);
+  for (const [id, job] of jobs) {
+    if (job.name !== SPEC_TEST_ENTRIES_JOB) problems.push(`${name} ${id}: must be named "${SPEC_TEST_ENTRIES_JOB}", the name the main ruleset requires`);
+    if (job.if !== undefined) problems.push(`${name} ${id}: must have no if:, since a skipped required check passes`);
+    if (job['continue-on-error'] !== undefined) problems.push(`${name} ${id}: must have no continue-on-error`);
+    if (job.permissions !== undefined && !readOnly(job.permissions)) problems.push(`${name} ${id}: permissions must be exactly contents: read and pull-requests: read`);
+    if (job.uses) problems.push(`${name} ${id}: must not call another workflow`);
+    const steps = job.steps ?? [];
+    for (const step of steps) {
+      const uses = String(step.uses ?? '');
+      if (uses && !PINNED.test(uses)) problems.push(`${name} ${id}: ${uses} must be pinned by full commit SHA`);
+      if (step.if !== undefined || step['continue-on-error'] !== undefined) problems.push(`${name} ${id}: no step may have if: or continue-on-error`);
+      if (uses.startsWith('actions/checkout@')) {
+        if (step.with?.ref !== undefined || step.with?.repository !== undefined) problems.push(`${name} ${id}: checkout must take the merge commit (no ref: or repository:)`);
+        if (step.with?.['fetch-depth'] !== 2) problems.push(`${name} ${id}: checkout needs fetch-depth: 2, for the merge commit's parents`);
+      }
+    }
+    if (!steps.some((step) => String(step.run ?? '').trim() === 'node ci/spec-test-entries.mjs')) problems.push(`${name} ${id}: must decide with node ci/spec-test-entries.mjs`);
   }
   return problems;
 }
