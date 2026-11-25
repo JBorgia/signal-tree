@@ -31,7 +31,7 @@ const codeOf = (fn: () => unknown) => {
 };
 
 describe('entityMap reads', () => {
-  it('reads rows by id, in order, with ids() and count()', () => {
+  it('[E4] reads rows by id, in order, with ids() and count()', () => {
     const { $ } = make();
     expect($.orders.count()).toBe(3);
     expect($.orders.ids()).toEqual([1, 2, 3]);
@@ -40,7 +40,7 @@ describe('entityMap reads', () => {
     expect($.orders.byId(9)).toBeUndefined();
   });
 
-  it('returns frozen rows, and the same all() array while nothing changes', () => {
+  it('[E4][H2] returns frozen rows, and the same all() array while nothing changes', () => {
     const { $ } = make();
     const first = $.orders.all();
     expect(Object.isFrozen(first)).toBe(true);
@@ -49,7 +49,7 @@ describe('entityMap reads', () => {
     expect($.orders.ids()).toBe($.orders.ids());
   });
 
-  it('never changes an all() result already returned (E4)', () => {
+  it('[E4] never changes an all() result already returned (E4)', () => {
     const { $ } = make();
     const first = $.orders.all();
     $.orders.updateOne(1, { qty: 9 });
@@ -58,7 +58,7 @@ describe('entityMap reads', () => {
     expect($.orders.all()).not.toBe(first);
   });
 
-  it('includes the rows in tree snapshots, read or not', () => {
+  it('[H2][O3] includes the rows in tree snapshots, read or not', () => {
     const tree = make();
     expect(tree.$.get().orders).toEqual(rows());
     tree.$.orders.updateOne(1, { name: 'z' });
@@ -67,7 +67,7 @@ describe('entityMap reads', () => {
 });
 
 describe('row handles and field cells', () => {
-  it('creates field cells on first access, stable per handle (E2)', () => {
+  it('[E2] creates field cells on first access, stable per handle (E2)', () => {
     const { $ } = make();
     const row = $.orders.byId(1)!;
     expect($.orders.byId(1)).toBe(row);
@@ -79,7 +79,7 @@ describe('row handles and field cells', () => {
     expect((row as unknown as Record<string, unknown>)['then']).toBeUndefined();
   });
 
-  it('writes a field through its cell as an update of that row', () => {
+  it('[E2] writes a field through its cell as an update of that row', () => {
     const { $ } = make();
     const qty = $.orders.byId(2)!.qty;
     const seen: number[] = [];
@@ -99,7 +99,7 @@ describe('row handles and field cells', () => {
     }).toThrow(/ST1004/);
   });
 
-  it('follows a key change, and never retargets to a row that reuses a removed key (E1)', () => {
+  it('[E1] follows a key change, and never retargets to a row that reuses a removed key (E1)', () => {
     const { $ } = make();
     const row = $.orders.byId(1)!;
     const name = row.name;
@@ -118,7 +118,7 @@ describe('row handles and field cells', () => {
     expect(row.get()).toBeUndefined();
   });
 
-  it('sees fields added and removed by updates', () => {
+  it('[E2][V1] sees fields added and removed by updates', () => {
     const { $ } = make();
     const note = $.orders.byId(1)!.note;
     expect(note.get()).toBeUndefined();
@@ -131,7 +131,7 @@ describe('row handles and field cells', () => {
 });
 
 describe('writes', () => {
-  it('adds rows at the end, in input order, and copies them (E4, V5)', () => {
+  it('[E4][V5] adds rows at the end, in input order, and copies them (E4, V5)', () => {
     const { $ } = make();
     const input = { id: 4, name: 'd', qty: 4 };
     $.orders.addOne(input);
@@ -141,7 +141,7 @@ describe('writes', () => {
     expect($.orders.byId(4)!.get()!.name).toBe('d');
   });
 
-  it('setAll keeps rows whose key stays, drops the rest, and takes the input order', () => {
+  it('[E1][E4] setAll keeps rows whose key stays, drops the rest, and takes the input order', () => {
     const { $ } = make();
     const two = $.orders.byId(2)!;
     $.orders.setAll([{ id: 3, name: 'C', qty: 3 }, { id: 2, name: 'b', qty: 2 }, { id: 7, name: 'g', qty: 7 }]);
@@ -151,7 +151,7 @@ describe('writes', () => {
     expect($.orders.byId(3)!.get()!.name).toBe('C');
   });
 
-  it('updateOne merges changes; upsert adds or merges', () => {
+  it('[E3] updateOne merges changes; upsert adds or merges', () => {
     const { $ } = make();
     $.orders.updateOne(1, { qty: 5 });
     expect($.orders.byId(1)!.get()).toEqual({ id: 1, name: 'a', qty: 5 });
@@ -163,7 +163,7 @@ describe('writes', () => {
     expect($.orders.byId(1)!.get()!.name).toBe('A');
   });
 
-  it('removes rows and closes the gap; clear removes every row', () => {
+  it('[E4] removes rows and closes the gap; clear removes every row', () => {
     const { $ } = make();
     $.orders.removeOne(2);
     expect($.orders.ids()).toEqual([1, 3]);
@@ -174,7 +174,7 @@ describe('writes', () => {
     expect($.orders.all()).toEqual([]);
   });
 
-  it('changeId keeps the row position and changes nothing when the key is the same', () => {
+  it('[E1][E4][E3] changeId keeps the row position and changes nothing when the key is the same', () => {
     const { $ } = make();
     const listener = vi.fn();
     $.orders.byId(2)!.id.subscribe(listener);
@@ -186,7 +186,7 @@ describe('writes', () => {
   });
 });
 
-describe('every call is all-or-nothing (E3)', () => {
+describe('[E3] every call is all-or-nothing (E3)', () => {
   const unchanged = (fn: (t: ReturnType<typeof make>) => void, code: string) => {
     const tree = make();
     const before = tree.$.orders.all();
@@ -216,7 +216,7 @@ describe('every call is all-or-nothing (E3)', () => {
     expect($.orders.all().map((r) => [r.id, r.name])).toEqual([[2, 'a'], [1, 'b'], [3, 'c']]);
   });
 
-  it('refuses null keys, class-instance rows naming their key, and bad payloads', () => {
+  it('[V4][V5] refuses null keys, class-instance rows naming their key, and bad payloads', () => {
     class OrderRow {
       id = 5;
     }
@@ -242,7 +242,7 @@ describe('every call is all-or-nothing (E3)', () => {
 });
 
 describe('keys and selectors', () => {
-  it('keeps 1 and "1" apart (V4)', () => {
+  it('[V4] keeps 1 and "1" apart (V4)', () => {
     const tree = signalTree({ items: entityMap<{ id: number | string; v: string }, number | string>() });
     tree.$.items.addMany([{ id: 1, v: 'number' }, { id: '1', v: 'string' }]);
     expect(tree.$.items.byId(1)!.get()!.v).toBe('number');
@@ -250,7 +250,7 @@ describe('keys and selectors', () => {
     expect(tree.$.items.count()).toBe(2);
   });
 
-  it('uses a custom selector, where an update to the selected fields is a key change; changeId is unavailable', () => {
+  it('[E1] uses a custom selector, where an update to the selected fields is a key change; changeId is unavailable', () => {
     const tree = signalTree({ people: entityMap<{ first: string; last: string; age: number }, string>({ selectId: (p) => `${p.first} ${p.last}` }) });
     tree.$.people.addOne({ first: 'Ada', last: 'Lovelace', age: 36 });
     const ada = tree.$.people.byId('Ada Lovelace')!;
@@ -261,7 +261,7 @@ describe('keys and selectors', () => {
     expect(codeOf(() => tree.$.people.changeId('Ada King', 'x'))).toBe('ST1014');
   });
 
-  it('copies rows from the initial state when the tree first reads them (#95)', () => {
+  it('[V5] copies rows from the initial state when the tree first reads them (#95)', () => {
     const initial = rows();
     const tree = make(initial);
     tree.$.orders.count();
@@ -271,7 +271,7 @@ describe('keys and selectors', () => {
 });
 
 describe('collections in the tree', () => {
-  it('a whole-value parent write sets the rows, or makes the collection absent', () => {
+  it('[V1][E4] a whole-value parent write sets the rows, or makes the collection absent', () => {
     const tree = signalTree({ shop: { orders: entityMap<Order, number>({ rows: rows() }), open: true } as Record<string, unknown> });
     const shop = tree.$.shop as unknown as { set(v: unknown): void; get(): Record<string, unknown>; orders: { ids(): number[]; addOne(r: Order): void; count(): number } };
     const orders = shop.orders;
@@ -285,7 +285,7 @@ describe('collections in the tree', () => {
     expect(orders.ids()).toEqual([1]);
   });
 
-  it('a whole-value write with a bad collection value refuses before anything changes', () => {
+  it('[E3][V1] a whole-value write with a bad collection value refuses before anything changes', () => {
     const tree = signalTree({ shop: { orders: entityMap<Order, number>({ rows: rows() }), open: true } as Record<string, unknown> });
     const shop = tree.$.shop as unknown as { set(v: unknown): void; get(): unknown; orders: { count(): number } };
     shop.orders.count();
@@ -295,7 +295,7 @@ describe('collections in the tree', () => {
     expect(shop.orders.count()).toBe(3);
   });
 
-  it('a turn that throws reverts every collection call in it (T13)', () => {
+  it('[T13] a turn that throws reverts every collection call in it (T13)', () => {
     const tree = make();
     const row = tree.$.orders.byId(1)!;
     const before = tree.$.get();
@@ -316,7 +316,7 @@ describe('collections in the tree', () => {
     expect(row.id.get()).toBe(1);
   });
 
-  it('a turn that throws reverts a whole-value write that made a collection absent', () => {
+  it('[T13][V1] a turn that throws reverts a whole-value write that made a collection absent', () => {
     const tree = signalTree({ shop: { orders: entityMap<Order, number>({ rows: rows() }) } as Record<string, unknown> });
     const shop = tree.$.shop as unknown as { set(v: unknown): void; orders: { ids(): number[] } };
     shop.orders.ids();
@@ -329,7 +329,7 @@ describe('collections in the tree', () => {
     expect(shop.orders.ids()).toEqual([1, 2, 3]);
   });
 
-  it('collection calls in a scope go through interceptors and reach observers with row and field effects', () => {
+  it('[W1][4.3] collection calls in a scope go through interceptors and reach observers with row and field effects', () => {
     const listener = vi.fn<ObserveListener>();
     const kinds: string[] = [];
     const tree = signalTree({ orders: entityMap<Order, number>({ rows: rows() }) }, {
@@ -355,7 +355,7 @@ describe('collections in the tree', () => {
     expect(listener).toHaveBeenCalledTimes(5);
   });
 
-  it('an interceptor may refuse a collection call, which then changes nothing', () => {
+  it('[4.3][E3] an interceptor may refuse a collection call, which then changes nothing', () => {
     const tree = signalTree({ orders: entityMap<Order, number>({ rows: rows() }) }, {
       plugins: [probe((s) => s.intercept({ name: 'no', intercept: () => {
         throw new SignalTreeRefusal('ST1004', { detail: 'read-only' });
@@ -365,7 +365,7 @@ describe('collections in the tree', () => {
     expect(tree.$.orders.count()).toBe(3);
   });
 
-  it('collection reads and writes throw after destroy', () => {
+  it('[D1] collection reads and writes throw after destroy', () => {
     const tree = make();
     const orders = tree.$.orders;
     const qty = orders.byId(1)!.qty;
