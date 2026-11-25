@@ -569,6 +569,46 @@
       "sha256": "0b4b7a202b194fb85575112c40f1a4c5242cfd8fc826bcd73e46a22d2049f9ff"
     },
     {
+      "file": "packages/core/src/spec/lifetime.spec.ts",
+      "title": "hydration > [H1] hydration is one turn with origin \"server\"",
+      "ids": [
+        "H1"
+      ],
+      "sha256": "2bc6aaec5b1d1edc43e5766c8d4f533f42fb26b94b6817061247dbedbf660f81"
+    },
+    {
+      "file": "packages/core/src/spec/lifetime.spec.ts",
+      "title": "hydration > [H1] state serialized on the server and hydrated on the client yields identical values",
+      "ids": [
+        "H1"
+      ],
+      "sha256": "bd4505badecd45e5f2b24e3a54a4bf5ac2d30a3e990bd808fe0462c4dfe72805"
+    },
+    {
+      "file": "packages/core/src/spec/lifetime.spec.ts",
+      "title": "released memory > [D2] a held handle keeps a removed row reachable, and releasing it releases the row",
+      "ids": [
+        "D2"
+      ],
+      "sha256": "8f899cf5aff984afa4643911cba9a6796633e282cc628a3612c0e91896a07752"
+    },
+    {
+      "file": "packages/core/src/spec/lifetime.spec.ts",
+      "title": "released memory > [D2] a removed field releases its memory",
+      "ids": [
+        "D2"
+      ],
+      "sha256": "2b1a0bca8dfbd800a70ae011e0a61fe57d256e591bd65f178ed2612d70b39637"
+    },
+    {
+      "file": "packages/core/src/spec/lifetime.spec.ts",
+      "title": "released memory > [D2] a removed row releases its memory once nothing references it",
+      "ids": [
+        "D2"
+      ],
+      "sha256": "e9bf3ef377d3d474fec0d1a260d6a7aa87072fe018ce27ee5b509a9349b59978"
+    },
+    {
       "file": "packages/core/src/spec/regressions.spec.ts",
       "title": "found by the generator > [O4] a write a subscriber makes while a bare write is published runs after it, in the subscriber’s writer context",
       "ids": [

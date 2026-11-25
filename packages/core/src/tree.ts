@@ -456,7 +456,10 @@ export class TreeCore<Tag extends string> {
       const previous = cell._value;
       if (sameValue(previous, next)) return;
       cell._value = next;
-      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
+      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) {
+        branch.snapValid = false;
+        branch.snap = undefined;
+      }
       if (cell._listeners !== null) this.notifyPlain(cell, previous);
       return;
     }
@@ -482,7 +485,10 @@ export class TreeCore<Tag extends string> {
       const cell = node.cell as NativeCell<Tag, unknown>;
       if (sameValue(this.adapter.peek(cell), next)) return;
       if (this.journal !== null) this.record(node);
-      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
+      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) {
+        branch.snapValid = false;
+        branch.snap = undefined;
+      }
       this.commitNotifying(cell, next);
       return;
     }
@@ -895,10 +901,16 @@ export class TreeCore<Tag extends string> {
     this.invalidate(node);
   }
 
-  /** Clears cached snapshots from `node` up to the root. */
+  /** Clears cached snapshots from `node` up to the root, releasing them: an invalidated snapshot is never returned again (D2). */
   private invalidate(node: AnyNode): void {
-    if (node instanceof BranchNode) node.snapValid = false;
-    for (let branch = node.parent as BranchNode | null; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
+    if (node instanceof BranchNode) {
+      node.snapValid = false;
+      node.snap = undefined;
+    }
+    for (let branch = node.parent as BranchNode | null; branch !== null && branch.snapValid; branch = branch.parent) {
+      branch.snapValid = false;
+      branch.snap = undefined;
+    }
   }
 
   /** The branch's own base, copied first if it is still the caller's object or was taken before this turn. */
@@ -972,6 +984,9 @@ export class TreeCore<Tag extends string> {
     }
     if (node instanceof LeafNode) {
       if (!node.absent) this.commitLeaf(node, undefined, true);
+      // A removed field keeps no copy of its last value (D2).
+      node.snapFor = NONE;
+      node.snap = undefined;
       return;
     }
     if (node.absent) return;
