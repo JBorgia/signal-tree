@@ -9,6 +9,217 @@
       "sha256": "efcfdd688132d071366b026c97777d4d80a53ad8e2d083e800e46746805a56cb"
     },
     {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "[E3] every call is all-or-nothing (E3)",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "1cb092f2da79e37b86ec4736b8c7e732396dadffe29243eb48e67dcc486eb2a8"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "[E3] every call is all-or-nothing (E3) > [V4][V5] refuses null keys, class-instance rows naming their key, and bad payloads",
+      "ids": [
+        "V4",
+        "V5"
+      ],
+      "sha256": "fa5146b8f3fd13dcbbab3d31ac3088e6cc425bec1970b3cd0483dec70dc765fc"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [4.3][E3] an interceptor may refuse a collection call, which then changes nothing",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "2c6d1f1ae5d5eab73e4e57695b2d3b4817b87fa947644125dc97b455a9647568"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [D1] collection reads and writes throw after destroy",
+      "ids": [
+        "D1"
+      ],
+      "sha256": "40f18a9c127d5f20dc8fe5ccefc9eea0d64258ad5f6d7ea9925702331999e593"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [E3][V1] a whole-value write with a bad collection value refuses before anything changes",
+      "ids": [
+        "E3",
+        "V1"
+      ],
+      "sha256": "98d3822edb129480e427906c3e450665c4a891a46e1a13a63742e77013a53463"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [T13] a turn that throws reverts every collection call in it (T13)",
+      "ids": [
+        "T13"
+      ],
+      "sha256": "bca352249148b1e53d9729a87c6bb35e4e368e1e459a4b7d5c5a2787cdcda4e5"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [T13][V1] a turn that throws reverts a whole-value write that made a collection absent",
+      "ids": [
+        "T13",
+        "V1"
+      ],
+      "sha256": "2c62417761825971c5c18d4b13728836d964027959942e2c0f10c4ec987353e6"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [V1][E4] a whole-value parent write sets the rows, or makes the collection absent",
+      "ids": [
+        "V1",
+        "E4"
+      ],
+      "sha256": "ac7f84272659b503bfa62b27defb8ec6319e4ed8ec7413faefab10fd663a1c22"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "collections in the tree > [W1][4.3] collection calls in a scope go through interceptors and reach observers with row and field effects",
+      "ids": [
+        "W1"
+      ],
+      "sha256": "8e4d5a12bcbca82baf8cc8ba84e671414a986f9d0a9ff644271a7e120cb0c3c6"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "entityMap reads > [E4] never changes an all() result already returned (E4)",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "d5d0791fd13a213a154182a4f02f59eb3de0f3d3134b6f8b12950785b489ca8e"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "entityMap reads > [E4] reads rows by id, in order, with ids() and count()",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "0d62527805e0d6d5c0987c21d2d9eba9d520b773ebb9956c5e32cb7192a3365d"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "entityMap reads > [E4][H2] returns frozen rows, and the same all() array while nothing changes",
+      "ids": [
+        "E4",
+        "H2"
+      ],
+      "sha256": "905812225ae0e538cfdca514342ffb2ae0c9b82e702dbbbc5d91420478c592b2"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "entityMap reads > [H2][O3] includes the rows in tree snapshots, read or not",
+      "ids": [
+        "H2",
+        "O3"
+      ],
+      "sha256": "e8e8c53e1ff98997fbc0d24a5ab340204ece4cebad0f3f966ee482368c108d64"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "keys and selectors > [E1] uses a custom selector, where an update to the selected fields is a key change; changeId is unavailable",
+      "ids": [
+        "E1"
+      ],
+      "sha256": "f373fb16df1fcea6a1f83a8da69d9974102b1548feb04b727c280066e3fab9c0"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "keys and selectors > [V4] keeps 1 and \"1\" apart (V4)",
+      "ids": [
+        "V4"
+      ],
+      "sha256": "4cb8199fce6a63f6677db3aa4a94b9816fe31624e4096ddd3f6a0acaf2deefd5"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "keys and selectors > [V5] copies rows from the initial state when the tree first reads them (#95)",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "f17d3b7a3686317a4e5f8aeb3e5795a6131f4c6e8a1e916a391dae8dbfffee2b"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "row handles and field cells > [E1] follows a key change, and never retargets to a row that reuses a removed key (E1)",
+      "ids": [
+        "E1"
+      ],
+      "sha256": "c8cda76d74735acbe56cd08fb5b7760f1061dd137c82824912335705cd312e18"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "row handles and field cells > [E2] creates field cells on first access, stable per handle (E2)",
+      "ids": [
+        "E2"
+      ],
+      "sha256": "627458b62eb3d513b625045b96f695c7f4dd94b4c0a1364b0cb1d49a809f80ec"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "row handles and field cells > [E2] writes a field through its cell as an update of that row",
+      "ids": [
+        "E2"
+      ],
+      "sha256": "a81913fba12fdaba4e839b09fc5b07557f88be702928fea5df455011bdd4e7a1"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "row handles and field cells > [E2][V1] sees fields added and removed by updates",
+      "ids": [
+        "E2",
+        "V1"
+      ],
+      "sha256": "4cd723afd48f67128e3ae82950b7cc296375036823982c8630b096f88b874e6d"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "writes > [E1][E4] setAll keeps rows whose key stays, drops the rest, and takes the input order",
+      "ids": [
+        "E1",
+        "E4"
+      ],
+      "sha256": "40827d25552ba5c0f5c0237b6e65d08faa31bb91f7c679c031be53b563b9ea8d"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "writes > [E1][E4][E3] changeId keeps the row position and changes nothing when the key is the same",
+      "ids": [
+        "E1",
+        "E4",
+        "E3"
+      ],
+      "sha256": "b3433575f2a1e12fa89bb0d77bc12f11aee1bedb7ca402cfc10d790ba868b257"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "writes > [E3] updateOne merges changes; upsert adds or merges",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "f28343b1cb89fe11e92448a10da7fe10e76426ca211548c3bd5f297b8ad58bcd"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "writes > [E4] removes rows and closes the gap; clear removes every row",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "14b732ca873bfe299bbb431f70b2fecece123fbfa32514742dd5b3bcaacd62c3"
+    },
+    {
+      "file": "packages/core/src/entities.spec.ts",
+      "title": "writes > [E4][V5] adds rows at the end, in input order, and copies them (E4, V5)",
+      "ids": [
+        "E4",
+        "V5"
+      ],
+      "sha256": "140d21dcb4d17215fa6154e61ce7a29102cc04fe5f85540def47f3dc9ace1a98"
+    },
+    {
       "file": "packages/core/src/errors.spec.ts",
       "title": "[X1] typed errors",
       "ids": [

@@ -18,6 +18,8 @@ import type { TreeErrorEvent } from './errors';
 import { SignalTreeError, SignalTreeRefusal } from './errors';
 import type { Attachment, Interceptor, ObserveListener, Plugin, ScopeHandle, TurnHandle, TurnInfo, WriteEffect, WriteKind, WriteOp, WriterContext } from './seam';
 import { ErrorChannel, USER_CONTEXT, isAsyncFunction, isThenable, writerContext } from './seam';
+import type { CollectionHost, EntityKey, EntityMapMarker, FieldRef } from './entities';
+import { EntityCollection, isEntityMapMarker } from './entities';
 
 // ------------------------------------------------------------------ values
 
@@ -138,7 +140,7 @@ class LeafNode {
 }
 
 class BranchNode {
-  children: Map<PropertyKey, LeafNode | BranchNode> | null = null;
+  children: Map<PropertyKey, LeafNode | BranchNode | EntityCollection> | null = null;
   /** Whether `base` is the tree's own copy, which it may change. */
   owned: boolean;
   /** A non-plain value written over the whole branch; NONE while it holds members. */
@@ -161,7 +163,7 @@ class BranchNode {
   }
 }
 
-type AnyNode = LeafNode | BranchNode;
+type AnyNode = LeafNode | BranchNode | EntityCollection;
 
 /** Whether `value` has the branch's members, with the same values for those not yet read. */
 function sameMembers(branch: BranchNode, value: Record<PropertyKey, unknown>): boolean {
@@ -177,7 +179,7 @@ function sameMembers(branch: BranchNode, value: Record<PropertyKey, unknown>): b
 
 function pathOf(node: AnyNode): PropertyKey[] {
   const path: PropertyKey[] = [];
-  for (let n: AnyNode | null = node; n && n.parent; n = n.parent) path.push(n.key);
+  for (let n: AnyNode | null = node; n && n.parent; n = n.parent as AnyNode | null) path.push(n.key);
   return path.reverse();
 }
 
@@ -205,8 +207,10 @@ function scopeChain(scope: Scope): Scope[] {
 
 // --------------------------------------------------------------- the tree
 
-interface JournalEntry {
-  readonly node: AnyNode;
+type JournalEntry = NodeEntry | { readonly undo: () => void };
+
+interface NodeEntry {
+  readonly node: LeafNode | BranchNode;
   readonly value: unknown;
   readonly absent: boolean;
   readonly base?: Record<PropertyKey, unknown>;
@@ -239,6 +243,9 @@ export class TreeCore<Tag extends string> {
   private readonly publishQueue: { turn: TurnInfo; effects: { scope: Scope; effect: WriteEffect }[] }[] = [];
   private readonly attachments: { name: string; attachment: Attachment<unknown>; disposers: (() => void)[] }[] = [];
   private readonly scopes = new Map<BranchNode, Scope>();
+  private readonly host: CollectionHost;
+  /** Collections a whole-value write is about to change, checked before anything changes. */
+  private pendingCollections: Map<EntityCollection, ReturnType<EntityCollection['prepareWhole']>> | null = null;
   private readonly snapshotCache = new WeakMap<object, unknown>();
   private readonly cells = new Set<object>();
   private readonly isForeign = (value: unknown) => handles.has(value as object) || (value as Record<symbol, unknown>)[NODE] !== undefined;
@@ -249,6 +256,31 @@ export class TreeCore<Tag extends string> {
     this.adapter = adapter;
     this.plain = isPlainAdapter(adapter);
     this.route = (cell, next) => this.writeLeaf((cell as Record<symbol, LeafNode>)[NODE]!, next);
+    const fieldRoute: Route = (cell, next) => {
+      const ref = (cell as Record<symbol, FieldRef>)[NODE]!;
+      ref.collection.writeField(ref, next);
+    };
+    this.host = {
+      adapter: adapter as CellAdapter<string>,
+      fieldRoute,
+      assertLive: () => this.assertLive(),
+      write: (collection, kind, payload, apply) => {
+        const scope = (collection.parent as BranchNode).scope;
+        if (scope === null) this.batch(() => void apply(payload, null));
+        else this.covered(scope, collection.path, kind, payload, (op) => apply(op.next, op));
+      },
+      journal: (undo) => {
+        if (this.journal) this.journal.push({ undo });
+      },
+      changed: (collection) => {
+        this.mutations++;
+        this.invalidate(collection);
+      },
+      copy: (value, path) => copyIn(value, path, this.isForeign),
+      frozen: (value) => frozenCopy(value, this.snapshotCache),
+      registerCell: (cell) => this.cells.add(cell),
+      isPlainObject,
+    };
     this.root = new BranchNode(null, '', state, false);
     this.validate(this.root);
   }
@@ -272,12 +304,14 @@ export class TreeCore<Tag extends string> {
 
   /** The node for member `key` of `branch`, created on first access. Absent members get an absent leaf. */
   child(branch: BranchNode, key: PropertyKey): AnyNode {
-    let node = branch.children?.get(key);
+    let node: AnyNode | undefined = branch.children?.get(key);
     if (node) return node;
     checkKey(key, pathOf(branch));
     const present = branch.scalar === NONE && !branch.absent && Object.prototype.hasOwnProperty.call(branch.base, key);
     const value = present ? branch.base[key] : undefined;
-    if (present && isPlainObject(value) && !isLeafMarker(value)) {
+    if (present && isEntityMapMarker(value)) {
+      node = new EntityCollection(this.host, branch, key, Object.freeze([...pathOf(branch), key]), value);
+    } else if (present && isPlainObject(value) && !isLeafMarker(value)) {
       const created = new BranchNode(branch, key, value, false);
       created.scope = branch.scope;
       this.validate(created);
@@ -329,7 +363,9 @@ export class TreeCore<Tag extends string> {
       for (const key of memberKeys(branch.base)) {
         const node = branch.children?.get(key);
         if (node instanceof LeafNode) copy[key] = this.snapLeaf(node);
+        else if (node instanceof EntityCollection) copy[key] = node.snapshot();
         else if (node) copy[key] = this.snap(node);
+        else if (isEntityMapMarker(branch.base[key])) copy[key] = (this.child(branch, key) as EntityCollection).snapshot();
         else copy[key] = frozenCopy(branch.base[key], this.snapshotCache);
       }
       out = Object.freeze(copy);
@@ -409,37 +445,67 @@ export class TreeCore<Tag extends string> {
   }
 
   private applyWhole(branch: BranchNode, value: unknown): void {
-    if (branch.absent) this.present(branch.parent!);
-    this.applyBranch(branch, value);
+    const pending = new Map<EntityCollection, ReturnType<EntityCollection['prepareWhole']>>();
+    this.prepareCollections(branch, value, true, pending);
+    const outer = this.pendingCollections;
+    this.pendingCollections = pending;
+    try {
+      if (branch.absent) this.present(branch.parent!);
+      this.applyBranch(branch, value);
+    } finally {
+      this.pendingCollections = outer;
+    }
+  }
+
+  /** Checks what a whole-value write gives each collection beneath `branch`, so a bad one refuses before anything changes. */
+  private prepareCollections(branch: BranchNode, value: unknown, present: boolean, out: Map<EntityCollection, ReturnType<EntityCollection['prepareWhole']>>): void {
+    for (const [key, node] of branch.children ?? []) {
+      const has = present && isPlainObject(value) && Object.prototype.hasOwnProperty.call(value, key);
+      const incoming = has ? (value as Record<PropertyKey, unknown>)[key] : undefined;
+      if (node instanceof EntityCollection) out.set(node, node.prepareWhole(incoming, has));
+      else if (node instanceof BranchNode) this.prepareCollections(node, incoming, has, out);
+    }
   }
 
   // ------------------------------------------------------ the covered seam
 
   /** A write inside a scope: interceptors outermost first, then the change, then the effect for observers. */
-  private writeCovered(node: AnyNode, scope: Scope, value: unknown, kind: WriteKind): void {
+  private writeCovered(node: LeafNode | BranchNode, scope: Scope, value: unknown, kind: WriteKind): void {
+    this.covered(scope, pathOf(node), kind, value, (op) => {
+      const effect = this.applyOp(node, op, value);
+      return effect.changed ? [effect] : [];
+    });
+  }
+
+  /** Runs one write through the interceptors in scope, then `final`, and files the effects it returns for observers. */
+  private covered(scope: Scope, location: readonly PropertyKey[], kind: WriteKind, payload: unknown, final: (op: WriteOp) => readonly WriteEffect[]): void {
     this.batch(() => {
       const chain = scopeChain(scope);
       const interceptors: Interceptor[] = [];
       for (const s of chain) interceptors.push(...s.interceptors);
-      const op: WriteOp = Object.freeze({ location: Object.freeze(pathOf(node)), kind, next: value, context: this.effectContext() });
-      const effect = this.runInterceptors(interceptors, 0, op, node, value);
-      if (!effect.changed) return;
-      for (const s of chain) if (s.observers.length > 0) this.effects.push({ scope: s, effect });
+      const op: WriteOp = Object.freeze({ location: Object.freeze([...location]), kind, next: payload, context: this.effectContext() });
+      let produced: readonly WriteEffect[] = [];
+      this.runInterceptors(interceptors, 0, op, (last) => {
+        produced = final(last);
+        if (produced.length === 1) return produced[0]!;
+        return Object.freeze({ location: last.location, before: undefined, after: undefined, changed: produced.length > 0, context: last.context });
+      });
+      for (const effect of produced) for (const s of chain) if (s.observers.length > 0) this.effects.push({ scope: s, effect });
     });
   }
 
-  private runInterceptors(interceptors: Interceptor[], index: number, op: WriteOp, node: AnyNode, original: unknown): WriteEffect {
-    if (index === interceptors.length) return this.applyOp(node, op, original);
+  private runInterceptors(interceptors: Interceptor[], index: number, op: WriteOp, final: (op: WriteOp) => WriteEffect): WriteEffect {
+    if (index === interceptors.length) return final(op);
     let called = false;
     return interceptors[index]!.intercept(op, (next) => {
-      if (called) throw new SignalTreeError('ST1008', { path: pathOf(node), detail: interceptors[index]!.name });
+      if (called) throw new SignalTreeError('ST1008', { path: [...op.location], detail: interceptors[index]!.name });
       called = true;
-      return this.runInterceptors(interceptors, index + 1, next, node, original);
+      return this.runInterceptors(interceptors, index + 1, next, final);
     });
   }
 
   /** The end of the interceptor chain: applies the op and describes what changed. */
-  private applyOp(node: AnyNode, op: WriteOp, original: unknown): WriteEffect {
+  private applyOp(node: LeafNode | BranchNode, op: WriteOp, original: unknown): WriteEffect {
     const value = op.next === original ? original : copyIn(op.next, pathOf(node), this.isForeign);
     const context = op.context;
     if (node instanceof LeafNode) {
@@ -629,6 +695,10 @@ export class TreeCore<Tag extends string> {
   private revert(journal: JournalEntry[], mark: number): void {
     for (let i = journal.length - 1; i >= mark; i--) {
       const entry = journal[i]!;
+      if ('undo' in entry) {
+        entry.undo();
+        continue;
+      }
       const node = entry.node;
       if (node instanceof LeafNode) {
         node.absent = entry.absent;
@@ -644,7 +714,7 @@ export class TreeCore<Tag extends string> {
     journal.length = mark;
   }
 
-  private record(node: AnyNode): void {
+  private record(node: LeafNode | BranchNode): void {
     const journal = this.journal;
     if (!journal) return;
     if (node instanceof LeafNode) journal.push({ node, value: this.readLeaf(node), absent: node.absent });
@@ -665,7 +735,7 @@ export class TreeCore<Tag extends string> {
   /** Clears cached snapshots from `node` up to the root. */
   private invalidate(node: AnyNode): void {
     if (node instanceof BranchNode) node.snapValid = false;
-    for (let branch = node.parent; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
+    for (let branch = node.parent as BranchNode | null; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
   }
 
   /** The branch's own base, copied first if it is still the caller's object or was taken before this turn. */
@@ -720,7 +790,9 @@ export class TreeCore<Tag extends string> {
         continue;
       }
       const incoming = value[key];
-      if (node instanceof LeafNode) {
+      if (node instanceof EntityCollection) {
+        node.applyWhole(this.pendingCollections?.get(node) ?? null);
+      } else if (node instanceof LeafNode) {
         if (node.absent || !sameValue(this.readLeaf(node), incoming)) this.commitLeaf(node, incoming, false);
       } else {
         this.applyBranch(node, incoming);
@@ -731,6 +803,10 @@ export class TreeCore<Tag extends string> {
 
   /** Makes a materialized node absent (V1). */
   private remove(node: AnyNode): void {
+    if (node instanceof EntityCollection) {
+      node.applyWhole(null);
+      return;
+    }
     if (node instanceof LeafNode) {
       if (!node.absent) this.commitLeaf(node, undefined, true);
       return;
@@ -750,6 +826,25 @@ export class TreeCore<Tag extends string> {
 
   handle(node: AnyNode): unknown {
     if (node instanceof LeafNode) return node.cell;
+    if (node instanceof EntityCollection) {
+      return (node.handle ??= Object.freeze({
+        addOne: (row: unknown) => node.addOne(row),
+        addMany: (rows: readonly unknown[]) => node.addMany(rows),
+        setAll: (rows: readonly unknown[]) => node.setAll(rows),
+        updateOne: (id: EntityKey, changes: unknown) => node.updateOne(id, changes),
+        updateMany: (updates: readonly { id: EntityKey; changes: unknown }[]) => node.updateMany(updates),
+        upsertOne: (row: unknown) => node.upsertOne(row),
+        upsertMany: (rows: readonly unknown[]) => node.upsertMany(rows),
+        removeOne: (id: EntityKey) => node.removeOne(id),
+        removeMany: (ids: readonly EntityKey[]) => node.removeMany(ids),
+        changeId: (from: EntityKey, to: EntityKey) => node.changeId(from, to),
+        clear: () => node.clear(),
+        byId: (id: EntityKey) => node.byId(id),
+        ids: () => node.ids(),
+        all: () => node.all(),
+        count: () => node.count(),
+      }));
+    }
     if (node.handle) return node.handle;
     const methods = {
       get: () => this.snapshot(node),
@@ -813,9 +908,39 @@ export class TreeCore<Tag extends string> {
 
 type Opaque = ((...args: never[]) => unknown) | Date | RegExp | Map<unknown, unknown> | Set<unknown> | WeakMap<object, unknown> | WeakSet<object> | ArrayBufferView | ArrayBuffer | Promise<unknown>;
 
+/** The handle of one row: each field as a native cell, and the row as a frozen snapshot. */
+export type RowHandle<Tag extends string, E> = { readonly [F in keyof E]-?: NativeCell<Tag, E[F]> } & {
+  /** A frozen snapshot of the row, or undefined once it is gone. */
+  get(): Readonly<E> | undefined;
+};
+
+export interface CollectionHandle<Tag extends string, E, K extends EntityKey> {
+  addOne(row: E): void;
+  addMany(rows: readonly E[]): void;
+  /** Replaces every row. Rows whose key stays keep their handles; the order becomes the input's. */
+  setAll(rows: readonly E[]): void;
+  updateOne(id: K, changes: Partial<E>): void;
+  updateMany(updates: readonly { readonly id: K; readonly changes: Partial<E> }[]): void;
+  upsertOne(row: E): void;
+  upsertMany(rows: readonly E[]): void;
+  removeOne(id: K): void;
+  removeMany(ids: readonly K[]): void;
+  /** Sets a row's id, keeping its handle and position. Only with the default selector (row => row.id). */
+  changeId(from: K, to: K): void;
+  clear(): void;
+  /** The row's handle, stable for the row's lifetime, or undefined. */
+  byId(id: K): RowHandle<Tag, E> | undefined;
+  ids(): readonly K[];
+  /** Every row, in insertion order. A result once returned never changes. */
+  all(): readonly Readonly<E>[];
+  count(): number;
+}
+
 /** The handle for a value of type T: a native cell for a leaf, a branch handle for a plain object. */
 export type Handle<Tag extends string, T> =
-  T extends LeafMarker<infer U>
+  T extends EntityMapMarker<infer E, infer K>
+    ? CollectionHandle<Tag, E, K>
+    : T extends LeafMarker<infer U>
     ? NativeCell<Tag, U>
     : T extends readonly unknown[] | Opaque | null | undefined | string | number | boolean | bigint | symbol
       ? NativeCell<Tag, T>
@@ -824,7 +949,7 @@ export type Handle<Tag extends string, T> =
         : NativeCell<Tag, T>;
 
 /** Unwraps leaf() markers, the values a branch reads as. */
-export type Unwrap<T> = T extends LeafMarker<infer U> ? U : T extends readonly unknown[] | Opaque ? T : T extends object ? { readonly [K in keyof T]: Unwrap<T[K]> } : T;
+export type Unwrap<T> = T extends EntityMapMarker<infer E, EntityKey> ? readonly Readonly<E>[] : T extends LeafMarker<infer U> ? U : T extends readonly unknown[] | Opaque ? T : T extends object ? { readonly [K in keyof T]: Unwrap<T[K]> } : T;
 
 export interface BranchMethods<T> {
   /** A frozen snapshot of the branch. */
