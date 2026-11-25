@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { generateKeyPairSync, verify } from 'node:crypto';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Writable } from 'node:stream';
@@ -71,11 +71,21 @@ const installation =
       { status: 200 },
     );
 
+/**
+ * Writes a key file with exactly this mode. writeFileSync's mode is masked by the
+ * umask, and the supervisor runs with umask 077 (supervise.sh), which would turn
+ * 0644 into 0600; chmod is not masked.
+ */
+function writeKey(file: string, contents: string, mode: number) {
+  writeFileSync(file, contents);
+  chmodSync(file, mode);
+}
+
 /** A config file and an owner-only key in a temporary directory, as /etc/signal-tree/app.json and st-mint's key would be. */
 function mintFixture(config: Record<string, unknown> = {}) {
   const root = scratch();
   const keyFile = join(root, 'app.pem');
-  writeFileSync(keyFile, privateKey, { mode: 0o400 });
+  writeKey(keyFile, privateKey, 0o400);
   const configFile = join(root, 'app.json');
   writeFileSync(configFile, JSON.stringify({ appId: 12345, installationId: 678, keyFile, ...config }));
   return { root, keyFile, configFile };
@@ -136,11 +146,11 @@ describe('mint command: config and key', () => {
     expect(readPrivateKey(keyFile).asymmetricKeyType).toBe('rsa');
     for (const mode of [0o440, 0o404, 0o644]) {
       rmSync(keyFile);
-      writeFileSync(keyFile, privateKey, { mode });
+      writeKey(keyFile, privateKey, mode);
       expect(() => readPrivateKey(keyFile)).toThrow(`mode ${mode.toString(8)}, readable beyond its owner; chmod 0400 it`);
     }
     rmSync(keyFile);
-    writeFileSync(keyFile, '-----BEGIN RSA PRIVATE KEY-----\nSENTINEL-NOT-A-KEY\n-----END RSA PRIVATE KEY-----\n', { mode: 0o400 });
+    writeKey(keyFile, '-----BEGIN RSA PRIVATE KEY-----\nSENTINEL-NOT-A-KEY\n-----END RSA PRIVATE KEY-----\n', 0o400);
     const garbled = (() => {
       try {
         readPrivateKey(keyFile);
@@ -151,7 +161,7 @@ describe('mint command: config and key', () => {
     expect(garbled).toContain(`${keyFile} is not a PEM private key`);
     expect(garbled).not.toContain('SENTINEL');
     rmSync(keyFile);
-    writeFileSync(keyFile, generateKeyPairSync('ec', { namedCurve: 'P-256', privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } }).privateKey, { mode: 0o400 });
+    writeKey(keyFile, generateKeyPairSync('ec', { namedCurve: 'P-256', privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } }).privateKey, 0o400);
     expect(() => readPrivateKey(keyFile)).toThrow('holds a key of type ec; GitHub App keys are RSA');
     rmSync(keyFile);
     expect(() => readPrivateKey(keyFile)).toThrow(`cannot use the App's private key ${keyFile}: ENOENT`);
@@ -310,7 +320,7 @@ describe('mint command: what it prints', () => {
       expect(err.text()).not.toContain(keyLine);
     }
     rmSync(keyFile);
-    writeFileSync(keyFile, privateKey, { mode: 0o644 });
+    writeKey(keyFile, privateKey, 0o644);
     const err = sink();
     expect(await run([], { configFile, fetch: fakeGitHub([]).fetch, stdout: sink().stream, stderr: err.stream })).toBe(1);
     expect(err.text()).toBe(`mint-token: cannot use the App's private key ${keyFile}: mode 644, readable beyond its owner; chmod 0400 it\n`);

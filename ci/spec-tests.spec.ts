@@ -71,6 +71,25 @@ describe('untagged group', () => { beforeEach(() => {}); it('plain', () => { ${u
     expect(withPart(3, 'expect(1).toBe(0)')).toEqual(before);
   });
 
+  it('keeps every tagged unit unchanged when tests are added or removed beside it (ruling of 2026-11-24 on test tags)', () => {
+    const source = contextFile(...base);
+    const sibling = `  it('an untagged sibling', () => { ${base[3]} });\n`;
+    expect(source).toContain(sibling);
+    const edited = source
+      .replace(sibling, `  // a new spec test, with a comment\n  it('${tag('T5')} a new one', () => { check(2); });\n\n  it.each([1, 2])('${tag('T6')} each %i', (n) => { check(n); });\n`)
+      .replace("describe('untagged group'", `test('another plain test', () => {});\ndescribe('${tag('T7')} a new group', () => { it('inside', () => {}); });\ndescribe('untagged group'`);
+    const after = Object.fromEntries(taggedUnits(edited).map((u: { title: string; sha256: string }) => [u.title, u.sha256]));
+    expect(Object.keys(after)).toEqual(expect.arrayContaining([...titles, `rollback > ${tag('T5')} a new one`, `${tag('T7')} a new group`]));
+    for (const t of titles) expect(after[t]).toBe(before[t]);
+  });
+
+  it('still changes every tagged unit when code beside the tests changes', () => {
+    const source = contextFile(...base);
+    const edited = source.replace("describe('untagged group'", "const added = 1;\ndescribe('untagged group'");
+    const after = Object.fromEntries(taggedUnits(edited).map((u: { title: string; sha256: string }) => [u.title, u.sha256]));
+    for (const t of titles) expect(after[t]).not.toBe(before[t]);
+  });
+
   it('keeps one tagged unit unchanged when another changes', () => {
     const after = withPart(4, 'expect(2).toBe(0)');
     expect(after[titles[0]!]).toBe(before[titles[0]!]);
