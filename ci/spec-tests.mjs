@@ -1,5 +1,7 @@
 // tests/spec-tests.json (BRIEF.md 12.1.6): a content hash for every test tagged
-// with a behavior ID from sections 5.1, 5.2, 12.4 and 12.5, for example `[T3]`. CI fails
+// with a spec tag: a behavior ID from sections 5.1, 5.2, 12.4 and 12.5, for
+// example `[T3]`, a cost rule `[C1]`–`[C6]`, or a section-4 contract `[4.3]` or
+// `[4.5]` (Jonathan's ruling on test tags, 2026-11-24). CI fails
 // when a tagged test is added, changed or removed without the same change to
 // tests/spec-tests.json. Adding entries needs no review, but changing or
 // removing an existing one needs Jonathan's approval (his ruling of 2026-11-24
@@ -32,11 +34,12 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from '
 import { dirname, join, relative, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import ts from 'typescript';
-import { behaviorIdPattern } from './behavior-ids.mjs';
+import { specTagPattern } from './behavior-ids.mjs';
 import { publicEntries, repoRoot } from './entry-graph.mjs';
 
 export const SPEC_TESTS_PATH = join(repoRoot, 'tests', 'spec-tests.json');
-export const BEHAVIOR_ID = behaviorIdPattern();
+/** Any spec tag: a behavior ID, a cost rule or a section-4 contract (ci/behavior-ids.mjs). */
+export const BEHAVIOR_ID = specTagPattern();
 const TEST_FILE = /\.(spec|test|prop)\.ts$/;
 const TEST_FUNCTIONS = new Set(['it', 'test', 'describe', 'suite']);
 export const SUPPORT_DIR = 'tests/support';

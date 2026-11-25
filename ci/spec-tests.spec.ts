@@ -26,6 +26,18 @@ describe('tagged test units', () => {
     ]);
   });
 
+  it('treats cost-rule and section-4 contract tags as spec tags, including a looped template title', () => {
+    const source = file(`
+it('${tag('C1')} a write allocates nothing', () => { expect(0).toBe(0); });
+for (const c of cases) it(\`${tag('4.3')} \${c.name}\`, c.run);
+it('${tag('C7')} not a rule', () => {});
+`);
+    expect(taggedUnits(source).map((u: { title: string; ids: string[] }) => [u.title, u.ids])).toEqual([
+      [`${tag('C1')} a write allocates nothing`, ['C1']],
+      [`${tag('4.3')} \${c.name}`, ['4.3']],
+    ]);
+  });
+
   it('ignores IDs that only appear inside strings in a test body', () => {
     expect(taggedUnits(file(`it('plain', () => { const s = '${tag('T3')} not a title'; });`))).toEqual([]);
   });
