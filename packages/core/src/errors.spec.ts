@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ERROR_CODES, SignalTreeError, SignalTreeRefusal } from '@signal-tree/core';
 
-describe('typed errors', () => {
+describe('[X1] typed errors', () => {
   it('formats the code, message, path, key and detail', () => {
     const error = new SignalTreeError('ST1011', { path: ['orders', 3, Symbol('s')], key: 'a', detail: 'more' });
     expect(error.message).toBe('[ST1011] No entity has this key at "orders" > 3 > Symbol(s) (key "a"): more');
