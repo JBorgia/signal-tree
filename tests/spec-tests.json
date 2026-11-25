@@ -425,6 +425,590 @@
       "sha256": "3802d8285b99e13f1a10dcfd3479353d09a82bf03785bab47448e806a5680360"
     },
     {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "atomic entity calls > [E3] a key repeated within one call’s input refuses the whole call",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "f11bfecad23d6e96f66849e1f82fb19afd52cc17f5c24e5c1a307fdc5016d31e"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "atomic entity calls > [E3] a refused call leaves earlier work reversible",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "7e52395ef8013ed4fae2d3f0ed6ce86d0a2198318da95e7023949440ef4be6bd"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "atomic entity calls > [E3] a successful update keeps the row’s lifetime, and changeId to the same key changes nothing",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "5f3510c40d74bbdea3a3b59ad954a3921a41941ab28d8f68cb42b500bd5a60f6"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "atomic entity calls > [E3] addOne and addMany on an existing key refuse the whole call, naming the key",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "2878b1213d86cd84bc7cca03f6e74b3d0c2e9bcd40603e0767b6017fee59b949"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "atomic entity calls > [E3] changeId from a missing key, or a key change onto an occupied key, refuses",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "43a96bf270d408376049ef5439c3c5041aad3fa94d075f08b647cd23e3e2dd5a"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "atomic entity calls > [E3] updateOne, updateMany, removeOne and removeMany on a missing key refuse the whole call",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "f2177a4435ce3b199b48e601a07a501fab4938725a822fb245539138bf88d454"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "collection order > [E4] a removal closes the gap",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "2d39649d4ec6b8426b6f0374adb6656b775651e2228ec7de0d1a6d100054c3b4"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "collection order > [E4] an all() result already returned never changes",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "8d346f91a82f0260df582c96926a1ef71806e39967fb199ad4942b9d620fc24b"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "collection order > [E4] changeId and updates keep a row’s position",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "b86f08b491b1781dcbe68b5f53fa42bd51ea10631a8dc14f92f2fcc2cd137c7e"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "collection order > [E4] new rows append after the existing tail in input order",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "cb3ccfbfbc858e6a2487d9f3b4772dbb274abc1ce958585408b2ab2f5e39d0e4"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "collection order > [E4] order is insertion order, reported by all() and ids()",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "04fbaa565ba5eed445bf08eb66aa0252639cd606f0eeca2abbb87dec2ea76f3a"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "collection order > [E4] setAll and a whole-value write set the order to the input’s order",
+      "ids": [
+        "E4"
+      ],
+      "sha256": "b7fb5518188cb87485d773b1150adcb8cb25286efc4bda91287975552d78bb50"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "row handles and entity lifetime > [E1] a held row handle follows its row through a key change by changeId",
+      "ids": [
+        "E1"
+      ],
+      "sha256": "1d5633c81c52e1ca01242f1e7578f86d83c493c7aacdc37ccb042c5225066688"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "row handles and entity lifetime > [E1] a key freed by a key change, then reused, does not retarget the moved row’s handle",
+      "ids": [
+        "E1"
+      ],
+      "sha256": "4d990d9260e724c339556ff14dda9037a812547248a948ad0ed75c7c5bae8eec"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "row handles and entity lifetime > [E1] a reused key never retargets an old handle",
+      "ids": [
+        "E1"
+      ],
+      "sha256": "1f52e4d5ee4a156bfabe581cbc6c153f292ca106d6449372b1c7a1eb265f2592"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "row handles and entity lifetime > [E1] an update that changes what selectId returns is a key change that keeps the row’s lifetime",
+      "ids": [
+        "E1"
+      ],
+      "sha256": "c50b6b2d4377f3b3548a6aa74604a6907ac80b0e48f0c50a74f5939a2647c450"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "row handles and entity lifetime > [E2] a field carrier reads and writes the row’s field",
+      "ids": [
+        "E2"
+      ],
+      "sha256": "ae16695a0bfa95fbaa26ee8b881cf64de974fc9592cfc4f2d175228accf523b3"
+    },
+    {
+      "file": "packages/core/src/spec/entities.spec.ts",
+      "title": "row handles and entity lifetime > [E2] field carriers are created on first access and stable per handle",
+      "ids": [
+        "E2"
+      ],
+      "sha256": "0b4b7a202b194fb85575112c40f1a4c5242cfd8fc826bcd73e46a22d2049f9ff"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "disposal > [D1] after destroy every read or write throws a typed error",
+      "ids": [
+        "D1"
+      ],
+      "sha256": "0888a48c5dae25f519ec904fce7b4b7e23d0d91de05a2cd1f164cca76bfeb134"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "disposal > [D1] destroy releases every subscription and plugin; teardown errors reach onTreeError",
+      "ids": [
+        "D1"
+      ],
+      "sha256": "3a448385aa5d7850f0470a84582e9364536fc653f1ca2585ea3e588d4373be85"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "error attribution > [X6] every onTreeError event carries the tree’s id, stable for its lifetime and distinct between live trees, and the location",
+      "ids": [
+        "X6"
+      ],
+      "sha256": "33d2501e6aff2fb95d45e057edec4e4df406188e8c60aa1c19baf9e9ba7a3737"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "explicit turns > [T13] if fn throws, every write in the turn is reverted, nothing is published, and the error is rethrown",
+      "ids": [
+        "T13"
+      ],
+      "sha256": "a74c287e8dbfd09721da455bcd65e9f2f9bc8d48f62619989ecca0917572ea14"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "explicit turns > [T13] inside tree.turn(fn) each write applies immediately and later reads in fn see it",
+      "ids": [
+        "T13"
+      ],
+      "sha256": "632e260a0d20d17cda5bce90f4ff6f2af165569bfa744e204eb6382b6c70d206"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "explicit turns > [T13] observers run once after fn",
+      "ids": [
+        "T13"
+      ],
+      "sha256": "65beb1b55f7540026428580241cd3a68df7f8aae5328406c7f9aae57f57ea7b9"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "explicit turns > [T13] the values and writer contexts after the turn equal those from the same writes without it",
+      "ids": [
+        "T13"
+      ],
+      "sha256": "38cea32eb4c53dd922218c3dcae2bccde1ef886d83c0eda06b0da991e7520765"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "fault containment > [X3] when an observer throws, every other observer still runs, state stays consistent, and the writer sees no error",
+      "ids": [
+        "X3"
+      ],
+      "sha256": "edeb4a63ce33e7a6d088bbe5bd6e1c09c08a13bbfc957fd4c67b3354f9d4be04"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "fine-grained observation > [O1] a reader re-runs only when a location it read changed",
+      "ids": [
+        "O1"
+      ],
+      "sha256": "7c695e1c3e3b6e5b43f0d0dd40ceb3c06057db8f4cae7e52a460e637952cbe35"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "fine-grained observation > [O1] a row or byId reader does not re-run for writes to other rows",
+      "ids": [
+        "O1"
+      ],
+      "sha256": "984dbc096e10c903aee6c77eaef2bbd593a8635ca0f76950930932a012e48554"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "fine-grained observation > [O1] a turn whose writes net to no change re-runs no reader",
+      "ids": [
+        "O1"
+      ],
+      "sha256": "1f3d2ea126a4494137be5ac30ed6d1a98731ec4b137b20b055a0c0be68aa46f3"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "fine-grained observation > [O1] a write the seam skips as unchanged re-runs nothing",
+      "ids": [
+        "O1"
+      ],
+      "sha256": "e43af9e02d44472a5bfb716744849d668fbc85362843cbca38fb8f561f66c9d5"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "read-path consistency > [O3] after every turn, leaf, row field, byId, all(), ids(), count() and snapshot agree",
+      "ids": [
+        "O3"
+      ],
+      "sha256": "35e2fd7819d4518a8dca0ccd237411f1db4b2709008f19fa0b99ecece8cc106b"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "reentrant writes > [O4] a write a subscriber makes during a turn’s notifications is never merged into that turn",
+      "ids": [
+        "O4"
+      ],
+      "sha256": "72d5f37cb2c9abef20b89b08f33f673aa5daadd148a7537cb485ab1f1474e57f"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "reentrant writes > [O4] a write an observer makes while a turn is published is applied after it, as its own turn, in the observer’s writer context",
+      "ids": [
+        "O4"
+      ],
+      "sha256": "3a67ba7204a1362d855f5f5ebc640c0f9cf5e74e30769949878dc400ff663cab"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "synchronous context > [W5] a context-setting scope refuses an async callback with a typed error",
+      "ids": [
+        "W5"
+      ],
+      "sha256": "0b5ab462fc5496a522310deab54e7e6f22ab1a1e3dac2ecbc77b3452c666bd06"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "synchronous context > [W5] a writer context never carries across an await",
+      "ids": [
+        "W5"
+      ],
+      "sha256": "a70b391a8a8c30577d3ad19c19b5a55bc026da883a627e30abc8b13d2398af4f"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "synchronous context > [W5] turn membership never carries across an await",
+      "ids": [
+        "W5"
+      ],
+      "sha256": "3b4ec4b7f07bece7f4354d6b1b3c154773117ae4a2d47060587b7b89b94c783c"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "tree isolation > [V8] destroying one tree leaves another, created before or after, untouched",
+      "ids": [
+        "V8"
+      ],
+      "sha256": "e0b3700e323dbbb35d6abce7f8663c2f4fbe28c7656c32c270adf5b3935d30c0"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "tree isolation > [V8] two trees of the same or different shape share nothing observable",
+      "ids": [
+        "V8"
+      ],
+      "sha256": "1a62c42750154e727ee0e30f0f21105d29bfa88c8183670d3e014198b098caef"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "turn atomicity for observers > [O2] a whole-value branch write and each entity call are one change each",
+      "ids": [
+        "O2"
+      ],
+      "sha256": "dfe3298b900c6faf9b830a61fad1678e34965f48d362ff198d38098f992a550b"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "turn atomicity for observers > [O2] every observer runs at most once per turn and never sees part of it applied",
+      "ids": [
+        "O2"
+      ],
+      "sha256": "a8ef4919f5659b5682edab63aa450f9d15f0e7d4b51944c7577e4ae380cf6a86"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "turn atomicity for observers > [O2] one chunk of an ingest is one change",
+      "ids": [
+        "O2"
+      ],
+      "sha256": "4821a765b88ba70cfab87e3591df5fd7a3574f2ab8b1e7810da7cc7176a03f01"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "typed errors > [X1] every refusal and error the core throws is a typed error carrying a published [ST####] code and naming its cause",
+      "ids": [
+        "X1"
+      ],
+      "sha256": "ca7a7fdfed8d50144a495d98c09760fd343526a4665eef548e91f00db4a6aedb"
+    },
+    {
+      "file": "packages/core/src/spec/seam.spec.ts",
+      "title": "typed errors > [X1] the published code table maps each code to one stable cause and message",
+      "ids": [
+        "X1"
+      ],
+      "sha256": "a7e6720f604406d47875fc08510738906c29eb902741f1fe3a90a99e5b1d806b"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "caller input is never owned > [V5] a class-instance row refuses with a typed error naming its key",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "a49ad1ab5e81fcbbdf567fb0d9c15157df98bba31ed71eee166434bcf8c316f2"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "caller input is never owned > [V5] a stored row keeps its symbol keys and non-enumerable fields",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "2f757cca84395d8813691d532662124eb8b3bd1a45e2e199af8e72ad0efe78c0"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "caller input is never owned > [V5] after a write the caller may mutate its input without changing tree state",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "b9df872a6847c0d93c48bd4010b4698feb6a141ec66d9b16f8c7001bc0d903e0"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "caller input is never owned > [V5] opaque values stay stored by identity",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "a119108b5ee1a8b019736a45a109985ba3f330169730852811089252d3ca0538"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "caller input is never owned > [V5] the tree never freezes or mutates caller input",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "2285688ace213f349f0e2fb923c1a4311ea45fcdd8bf0a1d61dab6c2f42d6e3f"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "construction input > [V3] a cell or handle belonging to another tree refuses with a typed error naming its path (#95: when the tree first reads it)",
+      "ids": [
+        "V3"
+      ],
+      "sha256": "abb420985984a717d6d1130e7eb877e6fa2cb01d376a9378776204f8d5a929e1"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "construction input > [V3] a non-object initial state refuses with a typed error",
+      "ids": [
+        "V3"
+      ],
+      "sha256": "18e0d17b59cd9f0b3f4792fc3f2c62fa97a73db3a599559c6db923b08cb91213"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "depth and size > [V7] entity calls larger than the engine’s call-argument limit behave as small ones",
+      "ids": [
+        "V7"
+      ],
+      "sha256": "2dc28d90b35692c29238e1a2e44f68f66abe0c897e3beeb7a860192565715475"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "depth and size > [V7] writes, observation, turn reverts and snapshots behave the same at any depth",
+      "ids": [
+        "V7"
+      ],
+      "sha256": "6e5665675cc9085bacd75424c8d5efab66e636c77df51a09a530c88b7d86dba8"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "key identity > [V4] a literal key containing \".\" or \"@\", or the empty key, is its own location",
+      "ids": [
+        "V4"
+      ],
+      "sha256": "9721821f74ade7200a3a26bfd4d5a286ceddfe150be6f960939cd9c73b6876ee"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "key identity > [V4] a null or undefined entity key refuses with a typed error",
+      "ids": [
+        "V4"
+      ],
+      "sha256": "572b84c2bd3b8fea1b59003fdfddb38ffcd9e6b521ede978c87cc7957a5de9dd"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "key identity > [V4] entity keys keep their type, so 1 and \"1\" are different rows, through writes and reverts",
+      "ids": [
+        "V4"
+      ],
+      "sha256": "af40783d4f346fba39e5f4780f906221d9bdac5d131e3ace0b52cc7fcad589da"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "membership by whole-value write > [V1] a turn that throws restores absence and presence exactly",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "a5a34f3d2087718368e83e354c92c80f13ea5b4d2a184eb667069f1c4c13a738"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "membership by whole-value write > [V1] a write beneath an absent member re-adds only its own path",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "fae0207fff32f4d2a1aa857bddba771abab9b0f85cc6f533acf9169dcf41788a"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "membership by whole-value write > [V1] a write that names a row of an absent collection refuses with a typed error",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "6d8281d2419ee54803f0d346936c33b3553df4c870db4fdb152bd4bf9e331f89"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "membership by whole-value write > [V1] an omitted member is absent, not present with undefined, on every read path",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "9e4814eaa85ec4cfad9d0e39d71889c32c7e1abebb2d827c60f9e9643dd3a1a3"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "membership by whole-value write > [V1] an updater on an absent member receives undefined",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "1055c96d1d3ad6ed6bbe22ca59873c180e98ca06f9583101735ab482e68e4758"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "membership by whole-value write > [V1] makes a branch’s members exactly the written value’s own keys",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "98dd2fa171142109a94ad202895588837cee1bf9c7138c574b5f65b44703c575"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "opaque values > [V2] class instances, built-ins, functions and leaf() values are single locations stored by identity",
+      "ids": [
+        "V2"
+      ],
+      "sha256": "73a1618d573f6041ff285b9dc9dffdf9884f4c90a93154ca9c783ade1c59e4d5"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "opaque values > [V2] opaque values are never walked into, copied or invoked, and are written and compared as a whole",
+      "ids": [
+        "V2"
+      ],
+      "sha256": "ac3a6ba0ca61ad40e6582b4ba6cdbdb0b8b3711cd52f9d73e8bace5855566cbc"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "opaque values > [V2] snapshots and turn reverts keep opaque values by identity",
+      "ids": [
+        "V2"
+      ],
+      "sha256": "d6b5da41cbb36374fa760ca8411ae635f19d2fe9b1a686e74f3a6f84ed5a3992"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "prototype safety > [X5] a \"__proto__\" key refuses with a typed error naming its path, from initial state, writes, updaters and rows",
+      "ids": [
+        "X5"
+      ],
+      "sha256": "f475d4b37a9cb3f802dc0c1670a7082f0017e3dda56d5471261bf92568103986"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "prototype safety > [X5] inherited properties are never read as state",
+      "ids": [
+        "X5"
+      ],
+      "sha256": "1fdfb8fc4fe9b18b0c98dc66363c0859a4e911cd431e7a51d13d85731c85573b"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "prototype safety > [X5] keys named \"constructor\" or \"prototype\" are own data",
+      "ids": [
+        "X5"
+      ],
+      "sha256": "1d305bd265a8d14c63c281505c1779fcdd35be843a438203e090ba181543f640"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "snapshots > [H2] a snapshot contains exactly the tree’s state, with no markers, internal references or brands",
+      "ids": [
+        "H2"
+      ],
+      "sha256": "56ce18e2929468f8fa610867a024444428405dc77139ccba371168eaee3df96d"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "snapshots > [H2] an unchanged subtree keeps its reference from one snapshot to the next; a changed one gets a new reference",
+      "ids": [
+        "H2"
+      ],
+      "sha256": "59d0a8a8f61aaebaa8ae73ea84358e2a6636b8138d7435b1e678e6aa192aa5d0"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "snapshots > [H2] its plain objects and arrays are frozen, never change after it is taken, and are not objects live state holds",
+      "ids": [
+        "H2"
+      ],
+      "sha256": "1082d3b0b2552a84aa2bde772677d2e2fce5eb0538e12e8b997845d13d13dddc"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "snapshots > [H2] user symbol keys are kept, and opaque values appear by identity",
+      "ids": [
+        "H2"
+      ],
+      "sha256": "e77c174316db5dc45795cb1b62da2782ebe669f7f639b6877c87f2538271d264"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "stable handles > [V6] reading the same path returns the same handle every time, before and after whole-value writes that remove and re-add it",
+      "ids": [
+        "V6"
+      ],
+      "sha256": "f924d9d8780704ae71767784a4d0f109781fc68909a0a5db3eb180143584c5d9"
+    },
+    {
+      "file": "packages/core/src/spec/structure.spec.ts",
+      "title": "stable handles > [V6] the same handle inside and outside turns, always reading the current value",
+      "ids": [
+        "V6"
+      ],
+      "sha256": "c3bf082a5a852802c476b32cd12d824a5c7d71363a4f7eca4dda77b25d828048"
+    },
+    {
       "file": "packages/core/src/tree.spec.ts",
       "title": "construction input > [V3] refuses a handle or cell of another tree in the initial state",
       "ids": [

@@ -120,10 +120,23 @@ function frozenCopy(value: unknown, cache: WeakMap<object, unknown>): unknown {
   if (isArray) {
     out = Object.freeze(value.map((item) => frozenCopy(item, cache)));
   } else {
+    const source = value as Record<PropertyKey, unknown>;
     const copy: Record<PropertyKey, unknown> = Object.getPrototypeOf(value) === null ? Object.create(null) : {};
-    for (const key of memberKeys(value)) {
-      if (key === '__proto__') throw new SignalTreeRefusal('ST1002', { path: [key] });
-      copy[key] = frozenCopy((value as Record<PropertyKey, unknown>)[key], cache);
+    const keys = Object.keys(source);
+    if (Object.getOwnPropertySymbols(source).length === 0 && Object.getOwnPropertyNames(source).length === keys.length) {
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]!;
+        if (key === '__proto__') throw new SignalTreeRefusal('ST1002', { path: [key] });
+        copy[key] = frozenCopy(source[key], cache);
+      }
+    } else {
+      // Keeps symbol keys and non-enumerable fields as they are stored (V5, H2).
+      for (const key of Reflect.ownKeys(source)) {
+        if (key === '__proto__') throw new SignalTreeRefusal('ST1002', { path: [key] });
+        const descriptor = Object.getOwnPropertyDescriptor(source, key)!;
+        const read = 'value' in descriptor ? descriptor.value : descriptor.get?.call(source);
+        Object.defineProperty(copy, key, { value: frozenCopy(read, cache), enumerable: descriptor.enumerable ?? false, writable: false, configurable: false });
+      }
     }
     out = Object.freeze(copy);
   }
@@ -558,10 +571,9 @@ export class TreeCore<Tag extends string> {
     return (this.currentTurn ??= Object.freeze({ turn: Object.freeze({ id: ++this.turnSerial }), context: this.turnContext }));
   }
 
-  /** Publishes a closed turn's effects to each scope's observers, once (O2); a turn closed during publication waits its turn (O4). */
-  private publish(turn: TurnInfo, effects: { scope: Scope; effect: WriteEffect }[]): void {
-    this.publishQueue.push({ turn, effects });
-    if (this.publishing) return;
+  /** Publishes closed turns' effects to each scope's observers, once per turn and in turn order (O2, O4). */
+  private drain(): void {
+    if (this.publishing || this.publishQueue.length === 0) return;
     this.publishing = true;
     try {
       while (this.publishQueue.length > 0) {
@@ -694,14 +706,26 @@ export class TreeCore<Tag extends string> {
     return result;
   }
 
+  /**
+   * Runs `fn` as (part of) one turn. The outermost call closes the turn inside
+   * the adapter's batch, before subscribers run, so a write a subscriber or
+   * observer makes is a turn of its own, published after this one (O4).
+   */
   private batch(fn: () => void): void {
-    if (this.turnDepth === 0) this.turnContext = this.context;
-    this.turnDepth++;
+    const outermost = this.turnDepth === 0;
+    if (outermost) this.turnContext = this.context;
     try {
-      this.adapter.batch(fn);
+      this.adapter.batch(() => {
+        this.turnDepth++;
+        try {
+          fn();
+        } finally {
+          this.turnDepth--;
+          if (this.turnDepth === 0) this.closeTurn();
+        }
+      });
     } finally {
-      this.turnDepth--;
-      if (this.turnDepth === 0) this.closeTurn();
+      if (outermost) this.drain();
     }
   }
 
@@ -712,7 +736,7 @@ export class TreeCore<Tag extends string> {
     const effects = this.effects;
     if (effects.length === 0) return;
     this.effects = [];
-    this.publish(turn, effects);
+    this.publishQueue.push({ turn, effects });
   }
 
   private revert(journal: JournalEntry[], mark: number): void {
@@ -961,15 +985,18 @@ export interface CollectionHandle<Tag extends string, E, K extends EntityKey> {
   count(): number;
 }
 
-/** The handle for a value of type T: a native cell for a leaf, a branch handle for a plain object. */
-export type Handle<Tag extends string, T> =
-  T extends EntityMapMarker<infer E, infer K>
-    ? CollectionHandle<Tag, E, K>
-    : T extends LeafMarker<infer U>
+/**
+ * The handle for a value of type T: a native cell for a leaf, a branch handle
+ * for a plain object. Not distributed over unions, so a `Date | null` member is
+ * one leaf whose cell takes either.
+ */
+export type Handle<Tag extends string, T> = [T] extends [EntityMapMarker<infer E, infer K>]
+  ? CollectionHandle<Tag, E, K>
+  : [T] extends [LeafMarker<infer U>]
     ? NativeCell<Tag, U>
-    : T extends readonly unknown[] | Opaque | null | undefined | string | number | boolean | bigint | symbol
+    : [T] extends [readonly unknown[] | Opaque | null | undefined | string | number | boolean | bigint | symbol]
       ? NativeCell<Tag, T>
-      : T extends object
+      : [T] extends [object]
         ? BranchHandle<Tag, T>
         : NativeCell<Tag, T>;
 
