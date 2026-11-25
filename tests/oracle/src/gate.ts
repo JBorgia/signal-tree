@@ -26,6 +26,32 @@ export function instanceFloor(runs: number): number {
   return Math.ceil(runs / SEQUENCES_PER_INSTANCE);
 }
 
+/**
+ * Behaviors every generated instance of which needs a plugin the core does
+ * not have yet (#107, adopted provisionally). Until the phase that builds the
+ * plugin, the core floor skips them and the result lists them; the core is
+ * still gated on any violation of them, and ci/done-check.mjs still requires
+ * each one's nightly floor, so the definition of done cannot pass without
+ * them. A behavior leaves this list in the PR that makes the core replay it.
+ */
+export const AWAITING_PLUGINS: Readonly<Record<string, string>> = {
+  T1: 'transactions (Phase 3)',
+  T2: 'transactions (Phase 3)',
+  T3: 'transactions (Phase 3)',
+  T4: 'transactions (Phase 3)',
+  T5: 'transactions (Phase 3)',
+  T6: 'transactions (Phase 3)',
+  T7: 'transactions (Phase 3)',
+  T9: 'transactions (Phase 3)',
+  R1: 'restoration (Phase 4)',
+  R2: 'restoration (Phase 4)',
+  R3: 'restoration (Phase 4)',
+  L1: 'writers (Phase 5)',
+  L2: 'writers (Phase 5)',
+  X1: 'transactions and restoration (Phases 3–4): its generated refusals are rollback, undo and redo',
+  W5: 'transactions and restoration (Phases 3–4): its awaiting scopes are transact() and undoable()',
+};
+
 /** `oracle generate` exit codes. Bits 1 and 4 combine, so each failure stays distinguishable. */
 export const EXIT = {
   /** Done; the core was not selected, or it holds every property above the floor. */
@@ -58,6 +84,8 @@ export interface GateResult {
   readonly violations: number;
   readonly violated: readonly { readonly behavior: string; readonly sequences: number }[];
   readonly belowFloor: readonly { readonly behavior: string; readonly instances: number }[];
+  /** Behaviors below the floor that wait for a plugin (AWAITING_PLUGINS): reported, not failed. */
+  readonly awaitingPlugins: readonly { readonly behavior: string; readonly instances: number; readonly plugin: string }[];
   readonly exitCode: number;
 }
 
@@ -65,14 +93,18 @@ export interface GateResult {
 export function coreGate(result: GateInput, subject: string = CORE_SUBJECT): GateResult {
   const floor = instanceFloor(result.runs);
   const applied = result.subjects.some((s) => s.name === subject);
-  if (!applied) return { subject, applied, floor, violations: 0, violated: [], belowFloor: [], exitCode: EXIT.ok };
+  if (!applied) return { subject, applied, floor, violations: 0, violated: [], belowFloor: [], awaitingPlugins: [], exitCode: EXIT.ok };
   const violated: { behavior: string; sequences: number }[] = [];
   const belowFloor: { behavior: string; instances: number }[] = [];
+  const awaitingPlugins: { behavior: string; instances: number; plugin: string }[] = [];
   for (const [behavior, stats] of result.stats) {
     const v = stats.violates[subject] ?? 0;
     const instances = (stats.holds[subject] ?? 0) + v;
     if (v > 0) violated.push({ behavior, sequences: v });
-    if (instances < floor) belowFloor.push({ behavior, instances });
+    if (instances >= floor) continue;
+    const plugin = subject === CORE_SUBJECT ? AWAITING_PLUGINS[behavior] : undefined;
+    if (plugin) awaitingPlugins.push({ behavior, instances, plugin });
+    else belowFloor.push({ behavior, instances });
   }
   const exitCode = (violated.length ? EXIT.coreViolation : 0) | (belowFloor.length ? EXIT.belowFloor : 0);
   return {
@@ -82,6 +114,7 @@ export function coreGate(result: GateInput, subject: string = CORE_SUBJECT): Gat
     violations: violated.reduce((n, v) => n + v.sequences, 0),
     violated,
     belowFloor,
+    awaitingPlugins,
     exitCode,
   };
 }

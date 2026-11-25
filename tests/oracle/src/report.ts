@@ -275,11 +275,16 @@ function toMarkdown(report: SpecReport, cases: readonly SpecCase[]): string {
 
 function gateMarkdown(gate: GateResult): string[] {
   if (!gate.applied) return [`**Core gate:** not applied; \`${gate.subject}\` is not a subject of this run.`, ''];
-  if (gate.exitCode === 0) return [`**Core gate:** passed; \`${gate.subject}\` holds every property with at least ${gate.floor} instances of each.`, ''];
+  const awaiting = gate.awaitingPlugins.map((a) => `- ${a.behavior}: ${a.instances} instance(s), not floored until the core has ${a.plugin}`);
+  if (gate.exitCode === 0) {
+    const scope = gate.awaitingPlugins.length ? 'every property it can replay' : 'every property';
+    return [`**Core gate:** passed; \`${gate.subject}\` holds ${scope} with at least ${gate.floor} instances of each.`, ...(awaiting.length ? ['', 'Waiting for plugins:', ...awaiting] : []), ''];
+  }
   return [
     `**Core gate: failed** (exit ${gate.exitCode}).`,
     ...gate.violated.map((v) => `- ${v.behavior}: violated in ${v.sequences} sequence(s)`),
     ...gate.belowFloor.map((b) => `- ${b.behavior}: ${b.instances} instance(s), below the floor of ${gate.floor}`),
+    ...(awaiting.length ? ['', 'Waiting for plugins:', ...awaiting] : []),
     '',
   ];
 }
