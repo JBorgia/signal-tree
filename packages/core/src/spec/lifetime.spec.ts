@@ -70,7 +70,11 @@ describe('released memory', () => {
     const handleRef = new WeakRef(handle!);
     const snapshotRef = new WeakRef(snapshot);
     tree.$.rows.removeOne('r1');
+    // Dropping the reference is the point: the collection below must find nothing holding it.
+    // eslint-disable-next-line no-useless-assignment
     handle = undefined;
+    // Dropping the reference is the point: the collection below must find nothing holding it.
+    // eslint-disable-next-line no-useless-assignment
     snapshot = undefined;
     tree.$.rows.all();
     await collect();
@@ -86,6 +90,8 @@ describe('released memory', () => {
     tree.$.rows.removeOne('r1');
     await collect();
     expect(ref.deref()).toBe(held);
+    // Dropping the reference is the point: the collection below must find nothing holding it.
+    // eslint-disable-next-line no-useless-assignment
     held = undefined;
     await collect();
     expect(ref.deref()).toBeUndefined();
@@ -96,6 +102,8 @@ describe('released memory', () => {
     let value: object | undefined = (tree.$.panel as unknown as { big: { get(): object } }).big.get();
     const ref = new WeakRef(value);
     tree.$.panel.set({ keep: 1 });
+    // Dropping the reference is the point: the collection below must find nothing holding it.
+    // eslint-disable-next-line no-useless-assignment
     value = undefined;
     tree.$.get();
     await collect();
