@@ -1,3 +1,20 @@
 {
-  "tests": []
+  "tests": [
+    {
+      "file": "packages/core/src/cell.spec.ts",
+      "title": "[4.3] plain cell > [X3] keeps notifying the other subscribers when one throws, and reports the error",
+      "ids": [
+        "X3"
+      ],
+      "sha256": "efcfdd688132d071366b026c97777d4d80a53ad8e2d083e800e46746805a56cb"
+    },
+    {
+      "file": "packages/core/src/errors.spec.ts",
+      "title": "[X1] typed errors",
+      "ids": [
+        "X1"
+      ],
+      "sha256": "851b318d1f39ec2d67376c8fb9a5823d7e535a1bf0bd094294f0a315a76ef64b"
+    }
+  ]
 }

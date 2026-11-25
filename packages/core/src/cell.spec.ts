@@ -9,10 +9,10 @@ const plainHarness = {
 };
 
 describe('plain adapter conformance', () => {
-  for (const c of conformanceCases(createPlainAdapter(), plainHarness)) it(c.name, c.run);
+  for (const c of conformanceCases(createPlainAdapter(), plainHarness)) it(`[4.3] ${c.name}`, c.run);
 });
 
-describe('plain cell', () => {
+describe('[4.3] plain cell', () => {
   const routeTo = (adapter = createPlainAdapter()) => {
     const route: Route = (cell, next) => adapter.commit(cell as PlainCell<unknown>, next);
     return { adapter, route };
@@ -64,7 +64,7 @@ describe('plain cell', () => {
     expect(seen).toEqual([6]);
   });
 
-  it('keeps notifying the other subscribers when one throws, and reports the error', () => {
+  it('[X3] keeps notifying the other subscribers when one throws, and reports the error', () => {
     const errors: unknown[] = [];
     const { adapter, route } = routeTo(createPlainAdapter({ onListenerError: (e) => errors.push(e) }));
     const cell = adapter.createCell(0, route);
