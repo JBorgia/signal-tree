@@ -1,0 +1,47 @@
+name: Spec test entries
+
+# Jonathan's ruling of 2026-11-24 on test tags (BRIEF.md 12.1.3 and 12.1.6):
+# a pull request may add entries to tests/spec-tests.json and merge once CI is
+# green, but changing or removing an existing entry waits for his review. This
+# job, a required check of the main ruleset, fails when a pull request changes
+# or removes an existing entry, unless JBorgia's latest review approves its
+# head commit (ci/spec-test-entries.mjs).
+#
+# It runs on pull_request, and again on pull_request_review, so an approval or
+# its dismissal changes the result. Runs for one pull request queue rather than
+# cancel, so the latest event's run finishes last. It runs the pull request's
+# merge commit with a read-only token; the script, this workflow and the rest of
+# ci/ and .github/ are code-owned, so weakening it needs Jonathan's review.
+# ci/workflows.mjs checks this file's shape.
+
+on:
+  pull_request:
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: spec-test-entries-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  entries:
+    name: Existing spec-test entries change only with JBorgia's approval
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # The merge commit and its parents: the base, and the pull request's head.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+      - name: Existing entries of tests/spec-tests.json unchanged, or approved by JBorgia
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node ci/spec-test-entries.mjs

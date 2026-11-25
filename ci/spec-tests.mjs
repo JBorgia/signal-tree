@@ -1,8 +1,9 @@
 // tests/spec-tests.json (BRIEF.md 12.1.6): a content hash for every test tagged
 // with a behavior ID from sections 5.1, 5.2, 12.4 and 12.5, for example `[T3]`. CI fails
 // when a tagged test is added, changed or removed without the same change to
-// tests/spec-tests.json, which is code-owned, so changing a spec test needs
-// Jonathan's review.
+// tests/spec-tests.json. Adding entries needs no review, but changing or
+// removing an existing one needs Jonathan's approval (his ruling of 2026-11-24
+// on test tags; ci/spec-test-entries.mjs), so changing a spec test does too.
 //
 //   node ci/spec-tests.mjs check     compare the tests with tests/spec-tests.json (CI)
 //   node ci/spec-tests.mjs update    rewrite tests/spec-tests.json from the tests
@@ -14,7 +15,10 @@
 // mocks, and the bodies of untagged describes that hold tagged tests. Editing
 // any of that changes every tagged unit in the file. Untagged tests, and
 // untagged describes with no tagged test inside, stay out of it and can
-// change freely. Test files are *.spec.ts, *.test.ts and *.prop.ts under
+// change freely. A test call that is a statement leaves the context with its
+// whole statement, including the comments and whitespace before it, so adding
+// or removing a test beside tagged ones leaves their hashes, and so their
+// entries, unchanged. Test files are *.spec.ts, *.test.ts and *.prop.ts under
 // packages/ and tests/.
 //
 // A file with tagged tests may import only (Jonathan, review of #19): a
@@ -104,9 +108,12 @@ export function taggedUnits(source, fileName = 'test.ts') {
   const top = visit(file, []).calls;
   // Pass 2: the file's context is its source minus the outermost tagged units and every test call with nothing tagged inside.
   const cut = [];
+  // A call that is a whole statement goes with the statement and the trivia before it, so nothing of an added test stays behind.
+  const span = (node) =>
+    ts.isExpressionStatement(node.parent) && node.parent.expression === node ? [node.parent.getFullStart(), node.parent.getEnd()] : [node.getStart(file), node.getEnd()];
   const prune = (calls) => {
     for (const c of calls) {
-      if (c.ids.length > 0 || !c.holdsTagged) cut.push([c.node.getStart(file), c.node.getEnd()]);
+      if (c.ids.length > 0 || !c.holdsTagged) cut.push(span(c.node));
       else prune(c.children);
     }
   };
@@ -221,7 +228,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
     for (const p of problems) console.log(`FAIL ${p}`);
     console.log(
       problems.length
-        ? `${problems.length} spec test change(s) not recorded. Run node ci/spec-tests.mjs update in the same pull request; tests/spec-tests.json is code-owned.`
+        ? `${problems.length} spec test change(s) not recorded. Run node ci/spec-tests.mjs update in the same pull request; changing or removing an existing entry needs JBorgia's approval (ci/spec-test-entries.mjs).`
         : `ok: ${current.length} tagged test unit(s) match tests/spec-tests.json.`,
     );
     process.exit(problems.length ? 1 : 0);

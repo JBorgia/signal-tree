@@ -4,7 +4,6 @@
 /BRIEF.md                         @JBorgia
 /bench/                           @JBorgia
 /tests/port-manifest.json         @JBorgia
-/tests/spec-tests.json            @JBorgia
 /tests/support/                   @JBorgia
 /tests/oracle/                    @JBorgia
 /ci/                              @JBorgia
@@ -25,3 +24,8 @@
 # tsconfig.base.json sets the strictness the typecheck enforces; tsconfig.json what it covers.
 /tsconfig.base.json               @JBorgia
 /tsconfig.json                    @JBorgia
+
+# tests/spec-tests.json is not code-owned (Jonathan's ruling of 2026-11-24 on
+# test tags): a pull request may add entries without review, and the required
+# check in .github/workflows/spec-test-entries.yml fails when one changes or
+# removes an existing entry without JBorgia's approval.
