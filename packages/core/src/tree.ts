@@ -469,8 +469,18 @@ export class TreeCore<Tag extends string> {
   /** Notifies a plain cell's subscribers as the publication of a one-write turn: what they write runs after (O4). */
   private notifyPlain(cell: PlainCell<unknown>, previous: unknown): void {
     this.notifying = true;
-    // Never throws: the plain adapter reports each subscriber's error and goes on.
-    plainCommitted(cell, previous);
+    const listeners = cell._listeners!;
+    if (listeners.length === 1 && cell._adapter.depth === 0) {
+      // One subscriber and no open batch, the common case: call it here, as the adapter would.
+      try {
+        listeners[0]!();
+      } catch (error) {
+        cell._adapter.onListenerError(error);
+      }
+    } else {
+      // Never throws: the plain adapter reports each subscriber's error and goes on.
+      plainCommitted(cell, previous);
+    }
     this.notifying = false;
     if (this.deferred.length > 0) this.runDeferred();
   }
