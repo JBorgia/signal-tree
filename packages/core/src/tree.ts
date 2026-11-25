@@ -13,7 +13,7 @@
  * provisionally). Every value a write supplies is copied (V5).
  */
 import type { CellAdapter, NativeCell, PlainAdapter, Route } from './cell.ts';
-import { NODE, PlainCell, createPlainAdapter, isPlainAdapter } from './cell.ts';
+import { NODE, PlainCell, createPlainAdapter, isPlainAdapter, plainCommitted } from './cell.ts';
 import type { TreeErrorEvent } from './errors.ts';
 import { SignalTreeError, SignalTreeRefusal } from './errors.ts';
 import type { Attachment, Interceptor, ObserveListener, Plugin, ScopeHandle, TurnHandle, TurnInfo, WriteEffect, WriteKind, WriteOp, WriterContext } from './seam.ts';
@@ -189,6 +189,16 @@ class BranchNode {
 
 type AnyNode = LeafNode | BranchNode | EntityCollection;
 
+/** Whether a plain object holds an entityMap marker at any depth. */
+function containsCollection(value: Record<PropertyKey, unknown>): boolean {
+  for (const key of memberKeys(value)) {
+    const member = value[key];
+    if (isEntityMapMarker(member)) return true;
+    if (isPlainObject(member) && !isLeafMarker(member) && containsCollection(member)) return true;
+  }
+  return false;
+}
+
 /** Whether `value` has the branch's members, with the same values for those not yet read. */
 function sameMembers(branch: BranchNode, value: Record<PropertyKey, unknown>): boolean {
   const before = memberKeys(branch.base);
@@ -264,6 +274,11 @@ export class TreeCore<Tag extends string> {
   private effectContextCache: { base: WriterContext; turn: TurnHandle; context: WriterContext } | null = null;
   private effects: { scope: Scope; effect: WriteEffect }[] = [];
   private publishing = false;
+  /** True while a closed turn is being published, to subscribers and then to observers. Writes made meanwhile wait (O4). */
+  private notifying = false;
+  /** Writes made during a publication, each with its writer context, run after it as turns of their own (O4). */
+  private readonly deferred: (() => void)[] = [];
+  private runningDeferred = false;
   private readonly publishQueue: { turn: TurnInfo; effects: { scope: Scope; effect: WriteEffect }[] }[] = [];
   private readonly attachments: { name: string; attachment: Attachment<unknown>; disposers: (() => void)[] }[] = [];
   private readonly scopes = new Map<BranchNode, Scope>();
@@ -289,6 +304,10 @@ export class TreeCore<Tag extends string> {
       fieldRoute,
       assertLive: () => this.assertLive(),
       write: (collection, kind, payload, apply) => {
+        if (this.notifying) {
+          this.defer(() => this.host.write(collection, kind, payload, apply));
+          return;
+        }
         const scope = (collection.parent as BranchNode).scope;
         if (scope === null) this.batch(() => void apply(payload, null));
         else this.covered(scope, collection.path, kind, payload, (op) => apply(op.next, op));
@@ -425,25 +444,62 @@ export class TreeCore<Tag extends string> {
     if (this.destroyed) throw new SignalTreeError('ST1003');
   }
 
-  /** The seam for a leaf write: equality, then commit. A skipped write is not a write. */
+  /**
+   * The seam for a leaf write: equality, then commit. A skipped write is not a
+   * write. Only the hottest case lives here, small enough for V8 to inline: a
+   * primitive written to a present plain leaf outside every scope, explicit
+   * turn and publication, with no subscriber; it allocates nothing (C1).
+   */
   writeLeaf(node: LeafNode, next: unknown): void {
-    if (this.destroyed) throw new SignalTreeError('ST1003');
-    if (typeof next !== 'object' && !node.absent && node.parent.scope === null) {
-      // The common case, allocation-free (C1): a primitive written to a present leaf.
-      const cell = node.cell as NativeCell<Tag, unknown>;
-      if (this.plain) {
-        // The tree's own plain cells: read and store the field directly, which the adapter's commit also does.
-        const plainCell = cell as unknown as PlainCell<unknown>;
-        if (sameValue(plainCell._value, next)) return;
-        if (this.journal !== null) this.record(node);
-        if (plainCell._listeners === null) plainCell._value = next;
-        else this.adapter.commit(cell, next);
-      } else {
-        if (sameValue(this.adapter.peek(cell), next)) return;
-        if (this.journal !== null) this.record(node);
-        this.adapter.commit(cell, next);
+    if (this.plain && typeof next !== 'object' && !node.absent && node.parent.scope === null && this.journal === null && !this.notifying && !this.destroyed) {
+      const cell = node.cell as unknown as PlainCell<unknown>;
+      const previous = cell._value;
+      if (sameValue(previous, next)) return;
+      cell._value = next;
+      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) {
+        branch.snapValid = false;
+        branch.snap = undefined;
       }
-      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
+      if (cell._listeners !== null) this.notifyPlain(cell, previous);
+      return;
+    }
+    this.writeLeafRest(node, next);
+  }
+
+  /** Notifies a plain cell's subscribers as the publication of a one-write turn: what they write runs after (O4). */
+  private notifyPlain(cell: PlainCell<unknown>, previous: unknown): void {
+    this.notifying = true;
+    const listeners = cell._listeners!;
+    if (listeners.length === 1 && cell._adapter.depth === 0) {
+      // One subscriber and no open batch, the common case: call it here, as the adapter would.
+      try {
+        listeners[0]!();
+      } catch (error) {
+        cell._adapter.onListenerError(error);
+      }
+    } else {
+      // Never throws: the plain adapter reports each subscriber's error and goes on.
+      plainCommitted(cell, previous);
+    }
+    this.notifying = false;
+    if (this.deferred.length > 0) this.runDeferred();
+  }
+
+  private writeLeafRest(node: LeafNode, next: unknown): void {
+    if (this.destroyed) throw new SignalTreeError('ST1003');
+    if (this.notifying) {
+      this.deferLeaf(node, next);
+      return;
+    }
+    if (typeof next !== 'object' && !node.absent && node.parent.scope === null) {
+      const cell = node.cell as NativeCell<Tag, unknown>;
+      if (sameValue(this.adapter.peek(cell), next)) return;
+      if (this.journal !== null) this.record(node);
+      for (let branch: BranchNode | null = node.parent; branch !== null && branch.snapValid; branch = branch.parent) {
+        branch.snapValid = false;
+        branch.snap = undefined;
+      }
+      this.commitNotifying(cell, next);
       return;
     }
     const value = typeof next === 'object' && next !== null ? copyIn(next, pathOf(node), this.isForeign) : next;
@@ -452,6 +508,11 @@ export class TreeCore<Tag extends string> {
       return;
     }
     this.applyLeaf(node, value);
+  }
+
+  /** Kept out of writeLeaf: a closure there would make every call allocate its context, the fast path included (C1). */
+  private deferLeaf(node: LeafNode, next: unknown): void {
+    this.defer(() => this.writeLeaf(node, next));
   }
 
   /** Applies an already copied value to a leaf: skipped when unchanged; re-adds an absent leaf's path (V1). */
@@ -472,6 +533,10 @@ export class TreeCore<Tag extends string> {
   /** A whole-value write to a branch (V1), one implicit turn. Copies and checks everything before changing anything. */
   writeBranch(branch: BranchNode, next: unknown, kind: WriteKind = 'set'): void {
     this.assertLive();
+    if (this.notifying) {
+      this.defer(() => this.writeBranch(branch, next, kind));
+      return;
+    }
     const value = copyIn(next, pathOf(branch), this.isForeign);
     if (branch.scope !== null) {
       this.writeCovered(branch, branch.scope, value, kind);
@@ -495,6 +560,14 @@ export class TreeCore<Tag extends string> {
 
   /** Checks what a whole-value write gives each collection beneath `branch`, so a bad one refuses before anything changes. */
   private prepareCollections(branch: BranchNode, value: unknown, present: boolean, out: Map<EntityCollection, ReturnType<EntityCollection['prepareWhole']>>): void {
+    // A collection not read yet still has to take the written rows, not be replaced by a plain array (H1, V1).
+    if (branch.scalar === NONE && !branch.absent) {
+      for (const key of memberKeys(branch.base)) {
+        if (branch.children?.has(key)) continue;
+        const member = branch.base[key];
+        if (isEntityMapMarker(member) || (isPlainObject(member) && !isLeafMarker(member) && containsCollection(member))) this.child(branch, key);
+      }
+    }
     for (const [key, node] of branch.children ?? []) {
       const has = present && isPlainObject(value) && Object.prototype.hasOwnProperty.call(value, key);
       const incoming = has ? (value as Record<PropertyKey, unknown>)[key] : undefined;
@@ -684,6 +757,11 @@ export class TreeCore<Tag extends string> {
   turn<R>(fn: () => R): R {
     this.assertLive();
     if (typeof fn !== 'function') throw new SignalTreeError('ST1006', { detail: 'turn() takes a function' });
+    if (this.notifying) {
+      // A turn opened while another is published runs after it, as its own turn (O4); its result is not available here.
+      this.defer(() => void this.turn(fn));
+      return undefined as R;
+    }
     const outer = this.journal;
     const mark = outer ? outer.length : 0;
     const journal = outer ?? [];
@@ -721,11 +799,65 @@ export class TreeCore<Tag extends string> {
           fn();
         } finally {
           this.turnDepth--;
-          if (this.turnDepth === 0) this.closeTurn();
+          if (this.turnDepth === 0) {
+            this.closeTurn();
+            // From here the adapter notifies subscribers, then observers run: the turn is being published.
+            this.notifying = true;
+          }
         }
       });
     } finally {
-      if (outermost) this.drain();
+      if (outermost) {
+        try {
+          this.drain();
+        } finally {
+          this.notifying = false;
+        }
+        this.runDeferred();
+      }
+    }
+  }
+
+  /** Commits a value to a cell that has subscribers, treating their notification as the publication of a one-write turn (O4). */
+  private commitNotifying(cell: NativeCell<Tag, unknown>, value: unknown): void {
+    this.notifying = true;
+    try {
+      this.adapter.commit(cell, value);
+    } finally {
+      this.notifying = false;
+    }
+    if (this.deferred.length > 0) this.runDeferred();
+  }
+
+  /** Queues a write made during a publication, with the writer context it was made in. */
+  private defer(write: () => void): void {
+    const context = this.context;
+    this.deferred.push(() => {
+      const previous = this.context;
+      this.context = context;
+      try {
+        write();
+      } finally {
+        this.context = previous;
+      }
+    });
+  }
+
+  /** Runs queued writes in order, each as its own turn; a write that fails goes to onTreeError, as the writer is gone. */
+  private runDeferred(): void {
+    if (this.runningDeferred) return;
+    this.runningDeferred = true;
+    try {
+      while (this.deferred.length > 0) {
+        const write = this.deferred.shift()!;
+        try {
+          write();
+        } catch (error) {
+          this.errors.observerError(error, []);
+        }
+      }
+    } finally {
+      this.runningDeferred = false;
     }
   }
 
@@ -779,10 +911,16 @@ export class TreeCore<Tag extends string> {
     this.invalidate(node);
   }
 
-  /** Clears cached snapshots from `node` up to the root. */
+  /** Clears cached snapshots from `node` up to the root, releasing them: an invalidated snapshot is never returned again (D2). */
   private invalidate(node: AnyNode): void {
-    if (node instanceof BranchNode) node.snapValid = false;
-    for (let branch = node.parent as BranchNode | null; branch !== null && branch.snapValid; branch = branch.parent) branch.snapValid = false;
+    if (node instanceof BranchNode) {
+      node.snapValid = false;
+      node.snap = undefined;
+    }
+    for (let branch = node.parent as BranchNode | null; branch !== null && branch.snapValid; branch = branch.parent) {
+      branch.snapValid = false;
+      branch.snap = undefined;
+    }
   }
 
   /** The branch's own base, copied first if it is still the caller's object or was taken before this turn. */
@@ -856,6 +994,9 @@ export class TreeCore<Tag extends string> {
     }
     if (node instanceof LeafNode) {
       if (!node.absent) this.commitLeaf(node, undefined, true);
+      // A removed field keeps no copy of its last value (D2).
+      node.snapFor = NONE;
+      node.snap = undefined;
       return;
     }
     if (node.absent) return;
