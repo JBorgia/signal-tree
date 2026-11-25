@@ -2,11 +2,27 @@
   "tests": [
     {
       "file": "packages/core/src/cell.spec.ts",
+      "title": "[4.3] plain cell",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "1aa4c8f7cdb51e424037cca1d72f5f1b9cde37c4c7eee56c98071f52a3098d59"
+    },
+    {
+      "file": "packages/core/src/cell.spec.ts",
       "title": "[4.3] plain cell > [X3] keeps notifying the other subscribers when one throws, and reports the error",
       "ids": [
         "X3"
       ],
-      "sha256": "efcfdd688132d071366b026c97777d4d80a53ad8e2d083e800e46746805a56cb"
+      "sha256": "948a20072a15ea8205a5d07441fcb04bd5e119584652294cc0e00cb058a88bc5"
+    },
+    {
+      "file": "packages/core/src/cell.spec.ts",
+      "title": "plain adapter conformance > [4.3] ${c.name}",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "5c83ece2e3c790aba23e8c4c2c94932dd490a24f597b1b91be934ef13f30ce1c"
     },
     {
       "file": "packages/core/src/chunked.spec.ts",
@@ -69,6 +85,7 @@
       "file": "packages/core/src/entities.spec.ts",
       "title": "collections in the tree > [4.3][E3] an interceptor may refuse a collection call, which then changes nothing",
       "ids": [
+        "4.3",
         "E3"
       ],
       "sha256": "2c6d1f1ae5d5eab73e4e57695b2d3b4817b87fa947644125dc97b455a9647568"
@@ -120,7 +137,8 @@
       "file": "packages/core/src/entities.spec.ts",
       "title": "collections in the tree > [W1][4.3] collection calls in a scope go through interceptors and reach observers with row and field effects",
       "ids": [
-        "W1"
+        "W1",
+        "4.3"
       ],
       "sha256": "8e4d5a12bcbca82baf8cc8ba84e671414a986f9d0a9ff644271a7e120cb0c3c6"
     },
@@ -269,8 +287,33 @@
     },
     {
       "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [4.3] cover branches read before the scope was attached",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "494b5e4ecfb4bd9d56d5732d630125e811c62a940bb2315f2ad05693e5a30bb4"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [4.3] may refuse a write, which then changes nothing and reaches the writer",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "63fb292b9dca2caa7316962168c759095ab4839dbd4112cc68550bab1c1ef6f8"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [4.3] stop after removal",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "23d9cb42d63c341c0446b40d9daaf205cacf344b5e26e2726f09189ea3e58610"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
       "title": "interceptors > [4.3][V5] may transform a write; the transformed value is copied",
       "ids": [
+        "4.3",
         "V5"
       ],
       "sha256": "b386afbbe528affc56511c330b892aa96e56efa7168e598568ff53cb6fc72ffa"
@@ -279,9 +322,19 @@
       "file": "packages/core/src/scopes.spec.ts",
       "title": "interceptors > [4.3][X1] may call next() only once",
       "ids": [
+        "4.3",
         "X1"
       ],
       "sha256": "38bbfef38573073e97fb7144e82613717cc129ef3fbafddd77275c3553b99f79"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [C3][4.3] run outermost first for writes in their scope only",
+      "ids": [
+        "C3",
+        "4.3"
+      ],
+      "sha256": "1141d6800a90c26fed4fc2eaca9bfc86c8708edaf44664691be31d02e18a90af"
     },
     {
       "file": "packages/core/src/scopes.spec.ts",
@@ -295,9 +348,18 @@
       "file": "packages/core/src/scopes.spec.ts",
       "title": "interceptors > [W1][4.3] see the kind, the writer context and the turn",
       "ids": [
-        "W1"
+        "W1",
+        "4.3"
       ],
       "sha256": "61f41c6574cc8acf31082a3a8feded2cbcddfbe5e845054275facdf749b67794"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [4.3] stop after unsubscribing",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "cbd9e4951b52459ae11152ab45febe60dcac238e7f5e473ad5d51f4f505e029d"
     },
     {
       "file": "packages/core/src/scopes.spec.ts",
@@ -349,6 +411,30 @@
         "X6"
       ],
       "sha256": "b5862ed8c95a260c56a46ebc55ea6005b31bb179591cb01a5e66714886c12c06"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "plugins > [4.3] a second plugin on the same branch shares its scope",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "94e633dcf25f97e1402696eedcecd4cbb49dfc56007a08fd086bb6d40292c2c0"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "plugins > [4.3] join the tree with their APIs and refuse a name clash",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "80ac1db14560be65aeedb3b13c02d5f9d2553d5d4d22cad6993fc480910e1fd5"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "plugins > [4.3] use() returns the API, gives the scope its path and snapshot, and refuses a non-plugin",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "bbfdb1cb844c720c17fe48b6dd4f1acc8fc2446c645fc0740f7fcc01567551e3"
     },
     {
       "file": "packages/core/src/scopes.spec.ts",
@@ -1175,6 +1261,22 @@
         "V6"
       ],
       "sha256": "967fe941111cab3c54990d9de10f9b99d6f07c8326f7f528a9d232c1cae12b27"
+    },
+    {
+      "file": "packages/core/src/tree.spec.ts",
+      "title": "trees and adapters > [4.3] builds on the factory adapter, or on a per-call adapter",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "68cced925d999d29d3645865a21956bc69239a2dd0f56da40910ec8ae87bf414"
+    },
+    {
+      "file": "packages/core/src/tree.spec.ts",
+      "title": "trees and adapters > [4.3] commits through a non-plain adapter for every write path",
+      "ids": [
+        "4.3"
+      ],
+      "sha256": "53969d2fc83281f621ea7112cafa76448f5c9d2723f3a49bf9bc235bd401352e"
     },
     {
       "file": "packages/core/src/tree.spec.ts",
