@@ -127,6 +127,25 @@ function notify(cell: PlainCell<unknown>, state: PlainAdapterState): void {
   }
 }
 
+/**
+ * @internal The plain adapter's commit for a cell whose new value is already
+ * stored: notifies now, or queues the cell when a batch is open.
+ */
+export function plainCommitted(cell: PlainCell<unknown>, previous: unknown): void {
+  const listeners = cell._listeners;
+  if (listeners === null || listeners.length === 0) return;
+  const state = cell._adapter;
+  if (state.depth > 0) {
+    if (!cell._queued) {
+      cell._queued = true;
+      cell._queuedFrom = previous;
+      state.queue.push(cell);
+    }
+    return;
+  }
+  notify(cell, state);
+}
+
 function flush(state: PlainAdapterState): void {
   const queue = state.queue;
   // A subscriber may write; its notifications join this flush.
