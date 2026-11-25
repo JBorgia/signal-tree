@@ -12,14 +12,14 @@
  * object is validated the first time the tree reads into it (#95, adopted
  * provisionally). Every value a write supplies is copied (V5).
  */
-import type { CellAdapter, NativeCell, PlainAdapter, Route } from './cell';
-import { NODE, PlainCell, createPlainAdapter, isPlainAdapter } from './cell';
-import type { TreeErrorEvent } from './errors';
-import { SignalTreeError, SignalTreeRefusal } from './errors';
-import type { Attachment, Interceptor, ObserveListener, Plugin, ScopeHandle, TurnHandle, TurnInfo, WriteEffect, WriteKind, WriteOp, WriterContext } from './seam';
-import { ErrorChannel, USER_CONTEXT, isAsyncFunction, isThenable, writerContext } from './seam';
-import type { CollectionHost, EntityKey, EntityMapMarker, FieldRef, SetAllOptions } from './entities';
-import { EntityCollection, isEntityMapMarker } from './entities';
+import type { CellAdapter, NativeCell, PlainAdapter, Route } from './cell.ts';
+import { NODE, PlainCell, createPlainAdapter, isPlainAdapter } from './cell.ts';
+import type { TreeErrorEvent } from './errors.ts';
+import { SignalTreeError, SignalTreeRefusal } from './errors.ts';
+import type { Attachment, Interceptor, ObserveListener, Plugin, ScopeHandle, TurnHandle, TurnInfo, WriteEffect, WriteKind, WriteOp, WriterContext } from './seam.ts';
+import { ErrorChannel, USER_CONTEXT, isAsyncFunction, isThenable, writerContext } from './seam.ts';
+import type { CollectionHost, EntityKey, EntityMapMarker, FieldRef, SetAllOptions } from './entities.ts';
+import { EntityCollection, isEntityMapMarker } from './entities.ts';
 
 // ------------------------------------------------------------------ values
 

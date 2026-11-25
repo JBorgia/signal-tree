@@ -1,9 +1,9 @@
-export { ERROR_CODES, SignalTreeError, SignalTreeRefusal } from './errors';
-export type { ErrorCause, ErrorCode, SignalTreeErrorDetails, TreeErrorEvent } from './errors';
-export { PlainCell, createPlainAdapter, isPlainCell } from './cell';
-export type { CellAdapter, CellTypes, NativeCell, PlainAdapter, PlainAdapterOptions, Route } from './cell';
-export { createSignalTreeFactory, leaf, signalTree } from './tree';
-export type { BranchHandle, BranchMethods, CollectionHandle, Handle, RowHandle, LeafMarker, SignalTree, SignalTreeBase, SignalTreeFactory, TreeOptions, Unwrap } from './tree';
+export { ERROR_CODES, SignalTreeError, SignalTreeRefusal } from './errors.ts';
+export type { ErrorCause, ErrorCode, SignalTreeErrorDetails, TreeErrorEvent } from './errors.ts';
+export { PlainCell, createPlainAdapter, isPlainCell } from './cell.ts';
+export type { CellAdapter, CellTypes, NativeCell, PlainAdapter, PlainAdapterOptions, Route } from './cell.ts';
+export { createSignalTreeFactory, leaf, signalTree } from './tree.ts';
+export type { BranchHandle, BranchMethods, CollectionHandle, Handle, RowHandle, LeafMarker, SignalTree, SignalTreeBase, SignalTreeFactory, TreeOptions, Unwrap } from './tree.ts';
 export type {
   Attachment,
   Interceptor,
@@ -19,6 +19,6 @@ export type {
   WriteKind,
   WriteOp,
   WriterContext,
-} from './seam';
-export { entityMap } from './entities';
-export type { EntityKey, EntityMapConfig, EntityMapMarker, SetAllOptions } from './entities';
+} from './seam.ts';
+export { entityMap } from './entities.ts';
+export type { EntityKey, EntityMapConfig, EntityMapMarker, SetAllOptions } from './entities.ts';

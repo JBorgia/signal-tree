@@ -4,7 +4,7 @@
  *
  *   for (const c of conformanceCases(myAdapter, harness)) it(c.name, c.run);
  */
-import type { CellAdapter, NativeCell, Route } from '../cell';
+import type { CellAdapter, NativeCell, Route } from '../cell.ts';
 
 export interface ConformanceHarness<Tag extends string> {
   /** Writes through the cell's own public API (for example .set() or .value =). */

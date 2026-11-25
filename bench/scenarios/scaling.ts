@@ -110,7 +110,12 @@ function check(condition: boolean, message: () => string): void {
 }
 
 function fieldValue(rows: Rows, id: number): unknown {
-  return rows.field(id, WRITTEN_FIELD)();
+  return readHandle(rows.field(id, WRITTEN_FIELD));
+}
+
+/** Reads a handle outside the timed code: an Angular signal by calling it, a plain cell with .get() (#103). */
+function readHandle<T>(handle: unknown): T {
+  return typeof handle === 'function' ? (handle as () => T)() : (handle as { get(): T }).get();
 }
 
 /** The operation `op` on `rows` rows, with values that always differ from the current ones. */
@@ -129,7 +134,7 @@ function bench(op: S8Operation, tree: SubjectTree, rows: Rows, base: readonly Ro
         timed() {
           for (let i = 0; i < n; i++) leaf.set(next++);
         },
-        verify: () => check(leaf() === next - 1, () => `leaf write: read ${leaf()} after writing ${next - 1}`),
+        verify: () => check(readHandle(leaf) === next - 1, () => `leaf write: read ${readHandle(leaf)} after writing ${next - 1}`),
       };
     }
     case 'rowFieldWrite': {

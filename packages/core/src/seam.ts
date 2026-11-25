@@ -1,8 +1,8 @@
 /**
  * The write seam's public types (BRIEF.md 4.3) and the error channel.
  */
-import type { ErrorCode, TreeErrorEvent } from './errors';
-import { SignalTreeError } from './errors';
+import type { ErrorCode, TreeErrorEvent } from './errors.ts';
+import { SignalTreeError } from './errors.ts';
 
 export type PathSegment = string | number | symbol;
 /** A location: the path from the root to a leaf or branch. */

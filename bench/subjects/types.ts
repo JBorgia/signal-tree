@@ -138,6 +138,13 @@ export interface StoreSubject {
   /** Exact versions of the store packages the subject wraps. */
   readonly packages: Readonly<Record<string, string>>;
   readonly capabilities: ReadonlySet<Capability>;
+  /**
+   * The framework of the subject's leaf handles. 'angular' (the default):
+   * Angular signals, read by calling them, compared with signal(). 'plain':
+   * the core's plain cells, read with .get(), compared with a bare plain cell
+   * (#103, adopted provisionally).
+   */
+  readonly framework?: 'angular' | 'plain';
   createTree(state: object, options?: TreeOptions): SubjectTree;
 }
 
