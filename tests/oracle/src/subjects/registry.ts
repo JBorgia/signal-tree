@@ -4,6 +4,7 @@
 // against the behavior properties, never used as expected values. packages/core
 // joins here in Phase 1 as one more entry, judged by `violates.core == 0`.
 import type { Subject } from '../subject.js';
+import { coreSubject } from './core.js';
 import { kernelSubject, type KernelModule } from './kernel.js';
 
 export const SUBJECTS: Readonly<Record<string, () => Promise<Subject>>> = {
@@ -23,6 +24,8 @@ export const SUBJECTS: Readonly<Record<string, () => Promise<Subject>>> = {
       inspect: true,
       declare: true,
     }),
+  /** The new core: gated by gate.ts (`violates.core == 0`, and the floor). */
+  core: async () => coreSubject(),
 };
 
 /**

@@ -169,6 +169,9 @@ async function main(): Promise<number> {
     const gate = report.gate;
     if (!gate.applied) out.write(`core gate: not applied ("${gate.subject}" is not a subject of this run)\n`);
     else if (gate.exitCode === EXIT.ok) out.write(`core gate: passed\n`);
+    if (gate.applied) {
+      for (const a of gate.awaitingPlugins) out.write(`core gate: ${a.behavior} not floored yet, ${a.instances} instance(s): needs ${a.plugin}\n`);
+    }
     else {
       const reasons = [
         ...gate.violated.map((v) => `${v.behavior} violated in ${v.sequences} sequence(s)`),

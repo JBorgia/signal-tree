@@ -11,6 +11,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "devDependencies": {
+    "@signal-tree/core": "workspace:*",
     "@types/node": "^22.10.0",
     "fast-check": "4.10.2",
     "kernel-v15": "npm:@signal-tree/kernel@15.4.9",

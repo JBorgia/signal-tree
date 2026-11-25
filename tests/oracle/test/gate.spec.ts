@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { CATALOG } from '../src/behaviors/catalog.js';
 import type { CatalogEntry } from '../src/behaviors/types.js';
-import { CORE_SUBJECT, EXIT, NIGHTLY_FLOOR, PR_FLOOR, coreGate, instanceFloor } from '../src/gate.js';
+import { AWAITING_PLUGINS, CORE_SUBJECT, EXIT, NIGHTLY_FLOOR, PR_FLOOR, coreGate, instanceFloor } from '../src/gate.js';
 import { generate } from '../src/generator.js';
 import type { WriteOp } from '../src/model.js';
 import { REPORT_JSON, writeSpecReport, type SpecReport } from '../src/report.js';
@@ -28,6 +28,36 @@ describe('the instance floor', () => {
     expect(instanceFloor(250)).toBe(3);
     expect(instanceFloor(1)).toBe(1);
     expect(instanceFloor(0)).toBe(0);
+  });
+});
+
+describe('behaviors waiting for a plugin (#107)', () => {
+  const stats = (entries: Record<string, [number, number]>, subject = CORE_SUBJECT) =>
+    new Map(Object.entries(entries).map(([id, [holds, violates]]) => [id, { holds: { [subject]: holds }, violates: { [subject]: violates } }]));
+
+  it('are reported, not failed, when the core has too few instances of them', () => {
+    const gate = coreGate({ runs: 1000, subjects: [{ name: CORE_SUBJECT }], stats: stats({ T1: [0, 0], R1: [3, 0], E1: [10, 0] }) });
+    expect(gate.exitCode).toBe(EXIT.ok);
+    expect(gate.belowFloor).toEqual([]);
+    expect(gate.awaitingPlugins).toEqual([
+      { behavior: 'T1', instances: 0, plugin: AWAITING_PLUGINS['T1'] },
+      { behavior: 'R1', instances: 3, plugin: AWAITING_PLUGINS['R1'] },
+    ]);
+  });
+
+  it('still fail the gate when the core violates them', () => {
+    const gate = coreGate({ runs: 1000, subjects: [{ name: CORE_SUBJECT }], stats: stats({ T1: [0, 1] }) });
+    expect(gate.exitCode).toBe(EXIT.coreViolation);
+    expect(gate.violated).toEqual([{ behavior: 'T1', sequences: 1 }]);
+  });
+
+  it('apply to the core only, and never to a behavior the core can already replay', () => {
+    const other = coreGate({ runs: 1000, subjects: [{ name: 'other' }], stats: stats({ T1: [0, 0] }, 'other') }, 'other');
+    expect(other.exitCode).toBe(EXIT.belowFloor);
+    expect(other.awaitingPlugins).toEqual([]);
+    for (const id of ['O1', 'O2', 'O3', 'O4', 'E1', 'E2', 'D1', 'H1', 'X3', 'T10']) expect(AWAITING_PLUGINS[id]).toBeUndefined();
+    const below = coreGate({ runs: 1000, subjects: [{ name: CORE_SUBJECT }], stats: stats({ E1: [2, 0] }) });
+    expect(below.belowFloor).toEqual([{ behavior: 'E1', instances: 2 }]);
   });
 });
 
@@ -89,7 +119,9 @@ describe('the report', () => {
       expect.objectContaining({ clause: 'c', subjects: ['core', 'v16'] }),
     ]);
     expect(report.gate).toMatchObject({ subject: CORE_SUBJECT, applied: true, floor: 3 });
-    expect(report.gate.belowFloor.map((b) => b.behavior)).toContain('R3');
+    // R3 needs restoration, which the core does not have yet (#107): reported as waiting, not failed.
+    expect(report.gate.awaitingPlugins.map((b) => b.behavior)).toContain('R3');
+    expect(report.gate.belowFloor.map((b) => b.behavior)).not.toContain('R3');
     expect(readFileSync(join(dir, 'spec-report.md'), 'utf8')).toContain('**Clauses never reached:**');
   });
 });
