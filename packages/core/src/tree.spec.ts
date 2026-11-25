@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { PlainCell, SignalTreeError, createPlainAdapter, createSignalTreeFactory, leaf, signalTree } from '@signal-tree/core';
 
 describe('structure and reads', () => {
-  it('reads leaves through plain cells and branches as frozen snapshots', () => {
+  it('[H2] reads leaves through plain cells and branches as frozen snapshots', () => {
     const tree = signalTree({ user: { name: 'Ada', age: 36 }, count: 1 });
     expect(tree.$.count).toBeInstanceOf(PlainCell);
     expect(tree.$.count.get()).toBe(1);
@@ -12,13 +12,13 @@ describe('structure and reads', () => {
     expect(Object.isFrozen(snap)).toBe(true);
   });
 
-  it('returns the same handle for the same path', () => {
+  it('[V6] returns the same handle for the same path', () => {
     const tree = signalTree({ a: { b: 1 } });
     expect(tree.$.a).toBe(tree.$.a);
     expect(tree.$.a.b).toBe(tree.$.a.b);
   });
 
-  it('never mutates or freezes the initial state', () => {
+  it('[V5] never mutates or freezes the initial state', () => {
     const state = { a: { b: 1, list: [1, 2] }, c: 2 };
     const tree = signalTree(state);
     tree.$.a.b.set(5);
@@ -28,7 +28,7 @@ describe('structure and reads', () => {
     expect(Object.isFrozen(state.a)).toBe(false);
   });
 
-  it('copies an array leaf from the initial state when the tree first reads it (#95)', () => {
+  it('[V5] copies an array leaf from the initial state when the tree first reads it (#95)', () => {
     const list = [1, 2];
     const tree = signalTree({ list });
     tree.$.list.get();
@@ -36,7 +36,7 @@ describe('structure and reads', () => {
     expect(tree.$.list.get()).toEqual([1, 2]);
   });
 
-  it('treats members named like methods as members', () => {
+  it('[V4] treats members named like methods as members', () => {
     const tree = signalTree({ form: { set: 1, get: 2 } });
     expect(tree.$.form.set.get()).toBe(1);
     expect(tree.$.form.get.get()).toBe(2);
@@ -57,14 +57,14 @@ describe('structure and reads', () => {
     }).toThrow(SignalTreeError);
   });
 
-  it('refuses a non-object initial state', () => {
+  it('[V3] refuses a non-object initial state', () => {
     expect(() => signalTree(5 as unknown as object)).toThrow(/ST1001/);
     expect(() => signalTree([] as unknown as object)).toThrow(/ST1001/);
   });
 });
 
 describe('leaf writes', () => {
-  it('writes through the cell and notifies subscribers', () => {
+  it('[O1] writes through the cell and notifies subscribers', () => {
     const tree = signalTree({ a: { b: 1 } });
     const seen: number[] = [];
     tree.$.a.b.subscribe(() => seen.push(tree.$.a.b.get()));
@@ -73,7 +73,7 @@ describe('leaf writes', () => {
     expect(seen).toEqual([2, 3]);
   });
 
-  it('skips a write of the same value', () => {
+  it('[O1] skips a write of the same value', () => {
     const tree = signalTree({ a: 1 });
     const runs = vi.fn();
     tree.$.a.subscribe(runs);
@@ -81,7 +81,7 @@ describe('leaf writes', () => {
     expect(runs).not.toHaveBeenCalled();
   });
 
-  it('copies plain objects and arrays a write supplies', () => {
+  it('[V5] copies plain objects and arrays a write supplies', () => {
     const tree = signalTree({ list: [0] as number[], meta: leaf({ x: 1 }) });
     const input = [1, 2];
     tree.$.list.set(input);
@@ -89,7 +89,7 @@ describe('leaf writes', () => {
     expect(tree.$.list.get()).toEqual([1, 2]);
   });
 
-  it('keeps opaque values by identity', () => {
+  it('[V2] keeps opaque values by identity', () => {
     const date = new Date(0);
     const map = new Map([[1, 2]]);
     const fn = () => 1;
@@ -105,7 +105,7 @@ describe('leaf writes', () => {
     expect(tree.$.marked).toBeInstanceOf(PlainCell);
   });
 
-  it('unwraps leaf() when it is written', () => {
+  it('[V2] unwraps leaf() when it is written', () => {
     const tree = signalTree({ meta: leaf({ x: 1 }) as unknown });
     const value = { y: 2 };
     tree.$.meta.set(leaf(value));
@@ -114,7 +114,7 @@ describe('leaf writes', () => {
 });
 
 describe('whole-value branch writes', () => {
-  it('makes the members exactly the written keys', () => {
+  it('[V1] makes the members exactly the written keys', () => {
     const tree = signalTree({ user: { name: 'Ada', age: 36 } as Record<string, unknown> });
     const age = tree.$.user['age']!;
     tree.$.user.set({ name: 'Grace', role: 'admiral' });
@@ -124,7 +124,7 @@ describe('whole-value branch writes', () => {
     expect(tree.$.user['role']!.get()).toBe('admiral');
   });
 
-  it('notifies each changed leaf once and leaves unchanged leaves alone', () => {
+  it('[O1] notifies each changed leaf once and leaves unchanged leaves alone', () => {
     const tree = signalTree({ user: { name: 'Ada', age: 36 } });
     const name = vi.fn();
     const age = vi.fn();
@@ -135,14 +135,14 @@ describe('whole-value branch writes', () => {
     expect(age).not.toHaveBeenCalled();
   });
 
-  it('updates a branch from its snapshot', () => {
+  it('[V1][X1] updates a branch from its snapshot', () => {
     const tree = signalTree({ counter: { n: 1 } });
     tree.$.counter.update((c) => ({ n: c.n + 1 }));
     expect(tree.$.counter.n.get()).toBe(2);
     expect(() => tree.$.counter.update(5 as never)).toThrow(/ST1006/);
   });
 
-  it('re-adds only its own path when written beneath an absent member', () => {
+  it('[V1] re-adds only its own path when written beneath an absent member', () => {
     const tree = signalTree({ a: { b: { c: 1, d: 2 } } as Record<string, unknown> });
     const a = tree.$.a as unknown as { set(v: unknown): void; b: { c: PlainCell<number>; d: PlainCell<number> } };
     const c = a.b.c;
@@ -154,7 +154,7 @@ describe('whole-value branch writes', () => {
     expect(d.get()).toBeUndefined();
   });
 
-  it('holds a non-plain value written over a branch, and re-adds members written beneath it', () => {
+  it('[V1] holds a non-plain value written over a branch, and re-adds members written beneath it', () => {
     const tree = signalTree({ a: { b: 1 } as { b: number } | null });
     const handle = tree.$.a as unknown as { set(v: unknown): void; get(): unknown; b: PlainCell<number> };
     const b = handle.b;
@@ -166,7 +166,7 @@ describe('whole-value branch writes', () => {
     expect(handle.get()).toEqual({ b: 3 });
   });
 
-  it('copies and checks the whole value before changing anything', () => {
+  it('[X5] copies and checks the whole value before changing anything', () => {
     const tree = signalTree({ a: { x: 1, y: 2 } as Record<string, unknown> });
     const bad = JSON.parse('{"x": 5, "y": {"__proto__": {"polluted": true}}}');
     expect(() => tree.$.a.set(bad)).toThrow(/ST1002/);
@@ -174,13 +174,13 @@ describe('whole-value branch writes', () => {
     expect(({} as Record<string, unknown>)['polluted']).toBeUndefined();
   });
 
-  it('refuses a cell or handle written as a value', () => {
+  it('[X1] refuses a cell or handle written as a value', () => {
     const tree = signalTree({ a: { b: 1 }, c: 0 as unknown });
     expect(() => tree.$.c.set(tree.$.a)).toThrow(/ST1001/);
     expect(() => tree.$.c.set(tree.$.a.b)).toThrow(/ST1001/);
   });
 
-  it('copies the written value, keeping symbol keys and non-enumerable fields, reading getters once', () => {
+  it('[V5] copies the written value, keeping symbol keys and non-enumerable fields, reading getters once', () => {
     const tree = signalTree({ a: {} as Record<PropertyKey, unknown>, opaque: 0 as unknown });
     const sym = Symbol('s');
     let reads = 0;
@@ -200,7 +200,7 @@ describe('whole-value branch writes', () => {
 });
 
 describe('snapshots', () => {
-  it('keeps the reference of an unchanged subtree and replaces a changed one', () => {
+  it('[H2] keeps the reference of an unchanged subtree and replaces a changed one', () => {
     const tree = signalTree({ a: { x: 1 }, b: { y: [1, 2] }, c: { z: 1 } });
     tree.$.c.z.get();
     const first = tree.$.get();
@@ -213,7 +213,7 @@ describe('snapshots', () => {
     expect(Object.isFrozen(second.b.y)).toBe(true);
   });
 
-  it('is not an object live state holds', () => {
+  it('[H2] is not an object live state holds', () => {
     const tree = signalTree({ list: [1, 2], meta: { tags: ['a'] } });
     const snap = tree.$.get();
     expect(snap.list).not.toBe(tree.$.list.get());
@@ -221,7 +221,7 @@ describe('snapshots', () => {
     expect(Object.isFrozen(tree.$.list.get())).toBe(false);
   });
 
-  it('keeps user symbol keys and stays fresh for branches read after it', () => {
+  it('[H2] keeps user symbol keys and stays fresh for branches read after it', () => {
     const sym = Symbol('k');
     const tree = signalTree({ a: { [sym]: 1, b: { c: 1 } } });
     const first = tree.$.get();
@@ -232,7 +232,7 @@ describe('snapshots', () => {
 });
 
 describe('turns', () => {
-  it('applies each write immediately and notifies once after the turn', () => {
+  it('[T13] applies each write immediately and notifies once after the turn', () => {
     const tree = signalTree({ a: 1, b: 1 });
     const seen: string[] = [];
     tree.$.a.subscribe(() => seen.push(`a${tree.$.a.get()}`));
@@ -247,7 +247,7 @@ describe('turns', () => {
     expect(seen).toEqual(['a3']);
   });
 
-  it('reverts every write and publishes nothing when the turn throws', () => {
+  it('[T13] reverts every write and publishes nothing when the turn throws', () => {
     const tree = signalTree({ a: 1, user: { name: 'Ada', age: 1 } as Record<string, unknown> });
     const runs = vi.fn();
     tree.$.a.subscribe(runs);
@@ -265,7 +265,7 @@ describe('turns', () => {
     expect(runs).not.toHaveBeenCalled();
   });
 
-  it('reverts only an inner turn that throws when the outer turn catches it', () => {
+  it('[T13] reverts only an inner turn that throws when the outer turn catches it', () => {
     const tree = signalTree({ a: 1, b: 1 });
     tree.turn(() => {
       tree.$.a.set(2);
@@ -282,27 +282,27 @@ describe('turns', () => {
     expect(tree.$.b.get()).toBe(1);
   });
 
-  it('refuses a turn without a function', () => {
+  it('[X1] refuses a turn without a function', () => {
     const tree = signalTree({ a: 1 });
     expect(() => tree.turn(5 as never)).toThrow(/ST1006/);
   });
 });
 
 describe('construction input', () => {
-  it('refuses a __proto__ key, naming its path, when the tree reads into it', () => {
+  it('[X5] refuses a __proto__ key, naming its path, when the tree reads into it', () => {
     const state = JSON.parse('{"a": {"__proto__": {"x": 1}}}');
     const tree = signalTree(state);
     expect(() => (tree.$ as unknown as Record<string, unknown>)['a']).toThrow(/ST1002.*"a" > "__proto__"/);
     expect(() => signalTree(JSON.parse('{"__proto__": 1}'))).toThrow(/ST1002/);
   });
 
-  it('refuses a handle or cell of another tree in the initial state', () => {
+  it('[V3] refuses a handle or cell of another tree in the initial state', () => {
     const other = signalTree({ x: { y: 1 } });
     expect(() => signalTree({ h: other.$.x })).toThrow(/ST1001/);
     expect(() => signalTree({ c: other.$.x.y })).toThrow(/ST1001/);
   });
 
-  it('keeps literal dotted and empty keys apart from nested paths', () => {
+  it('[V4] keeps literal dotted and empty keys apart from nested paths', () => {
     const tree = signalTree({ 'a.b': 1, a: { b: 2 }, '': 3 } as Record<string, unknown>);
     const root = tree.$ as unknown as Record<string, PlainCell<number>> & { a: { b: PlainCell<number> } };
     expect(root['a.b']!.get()).toBe(1);
@@ -312,7 +312,7 @@ describe('construction input', () => {
 });
 
 describe('trees and adapters', () => {
-  it('shares nothing between two trees', () => {
+  it('[V8] shares nothing between two trees', () => {
     const one = signalTree({ a: 1 });
     const two = signalTree({ a: 1 });
     const runs = vi.fn();
@@ -322,7 +322,7 @@ describe('trees and adapters', () => {
     expect(runs).not.toHaveBeenCalled();
   });
 
-  it('builds on the factory adapter, or on a per-call adapter', () => {
+  it('[4.3] builds on the factory adapter, or on a per-call adapter', () => {
     const shared = createPlainAdapter();
     const factory = createSignalTreeFactory(shared);
     const createCell = vi.spyOn(shared, 'createCell');
@@ -339,7 +339,7 @@ describe('trees and adapters', () => {
     expect(signalTree({ a: 1 }, { adapter: own }).$.a.get()).toBe(1);
   });
 
-  it('commits through a non-plain adapter for every write path', () => {
+  it('[4.3] commits through a non-plain adapter for every write path', () => {
     const inner = createPlainAdapter();
     const adapter = {
       tag: 'wrapped' as const,
@@ -361,7 +361,7 @@ describe('trees and adapters', () => {
     expect(inner.peek(root.a)).toBe(5);
   });
 
-  it('throws a typed error for reads and writes after destroy', () => {
+  it('[D1] throws a typed error for reads and writes after destroy', () => {
     const tree = signalTree({ a: { b: 1 } });
     const b = tree.$.a.b;
     const a = tree.$.a;
@@ -374,7 +374,7 @@ describe('trees and adapters', () => {
     expect(() => tree.turn(() => 1)).toThrow(/ST1003/);
   });
 
-  it('behaves the same at any depth', () => {
+  it('[V7] behaves the same at any depth', () => {
     let state: Record<string, unknown> = { leaf: 0 };
     for (let i = 0; i < 200; i++) state = { next: state };
     const tree = signalTree(state);
