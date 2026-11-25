@@ -12,6 +12,11 @@ export const SUBJECTS: Readonly<Record<string, SubjectEntry>> = {
     load: async () => (await import('./v15-shim.ts')).v15Shim,
     angularConfiguration: 'bench',
   },
+  /** The new core on its plain adapter (Phase 1). Node scenarios only until an adapter builds the reference app. */
+  'core-plain': {
+    load: async () => (await import('./core-plain.ts')).corePlain,
+    angularConfiguration: 'bench,core-plain',
+  },
   /** The harness's own test double (bench/test); never a gate subject. */
   'test-fake': {
     load: async () => (await import('./test-fake.ts')).testFake,

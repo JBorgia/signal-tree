@@ -1,4 +1,4 @@
-import { SignalTreeError } from './errors';
+import { SignalTreeError } from './errors.ts';
 
 /**
  * The adapter contract (BRIEF.md 4.3, with ruling 8) and the plain cell, the

@@ -6,10 +6,10 @@
  * follows the row through key changes and never retargets to a row that
  * reuses a removed key (E1). Every call is all-or-nothing (E3).
  */
-import type { CellAdapter, NativeCell, Route } from './cell';
-import { NODE } from './cell';
-import { SignalTreeError, SignalTreeRefusal } from './errors';
-import type { Location, PathSegment, WriteEffect, WriteKind, WriteOp } from './seam';
+import type { CellAdapter, NativeCell, Route } from './cell.ts';
+import { NODE } from './cell.ts';
+import { SignalTreeError, SignalTreeRefusal } from './errors.ts';
+import type { Location, PathSegment, WriteEffect, WriteKind, WriteOp } from './seam.ts';
 
 const ENTITY_MAP = Symbol('signal-tree.entityMap');
 

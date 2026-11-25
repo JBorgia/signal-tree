@@ -7,6 +7,7 @@
  * side run the same code against a different cell.
  */
 import { signal, type WritableSignal } from '@angular/core';
+import { createPlainAdapter } from '@signal-tree/core';
 import { setImmediate } from 'node:timers/promises';
 import { getHeapStatistics } from 'node:v8';
 import { allocationProbeSelfTest, countAllocations } from '../runner/alloc-probe.ts';
@@ -72,6 +73,33 @@ function readLoop(cell: WritableSignal<number>, n: number): void {
   readSink += sum;
 }
 
+/** A plain cell reads with .get() (BRIEF.md 4.4); its own loop keeps each side's read site monomorphic. */
+interface PlainReadable {
+  get(): number;
+  set(value: number): void;
+  subscribe(listener: () => void): () => void;
+}
+function plainReadLoop(cell: PlainReadable, n: number): void {
+  let sum = 0;
+  for (let i = 0; i < n; i++) sum += cell.get();
+  readSink += sum;
+}
+
+let subscriberRuns = 0;
+/**
+ * #103 (adopted provisionally): for a plain subject, the native side is a bare
+ * plain cell routed straight to the adapter's commit, and both sides carry one
+ * subscriber, the plain framework's equivalent of a signal with a consumer.
+ */
+function plainNative(initial: number): PlainReadable {
+  const adapter = createPlainAdapter();
+  const cell = adapter.createCell(initial, (target, next) => adapter.commit(target as never, next));
+  cell.subscribe(() => {
+    subscriberRuns++;
+  });
+  return cell as unknown as PlainReadable;
+}
+
 interface SideArgs {
   readonly side: 'native' | 'subject';
   readonly subject: string;
@@ -79,12 +107,34 @@ interface SideArgs {
 }
 
 async function microCell(args: SideArgs, initial: number): Promise<WritableSignal<number>> {
-  if (args.side === 'native') return signal(initial);
   const subject = await loadSubject(args.subject);
+  const plain = subject.framework === 'plain';
+  if (args.side === 'native') return plain ? (plainNative(initial) as unknown as WritableSignal<number>) : signal(initial);
   const tree = subject.createTree(microState(), { variant: args.variant });
   const leaf = tree.leaf<number>(MICRO_LEAF);
   leaf.set(initial);
+  if (plain) {
+    (leaf as unknown as PlainReadable).subscribe(() => {
+      subscriberRuns++;
+    });
+  }
   return leaf;
+}
+
+/** Reads a subject's leaf the way its framework reads it. */
+function readLeaf(subject: StoreSubject, handle: WritableSignal<number>): number {
+  return subject.framework === 'plain' ? (handle as unknown as PlainReadable).get() : handle();
+}
+
+/** A native cell of the subject's framework, for M3's comparison (a plain cell for a plain subject). */
+function nativeCellFor(subject: StoreSubject): (value: number) => unknown {
+  if (subject.framework !== 'plain') return (value) => signal(value);
+  const adapter = createPlainAdapter();
+  return (value) => adapter.createCell(value, (target, next) => adapter.commit(target as never, next));
+}
+
+async function isPlain(args: SideArgs): Promise<boolean> {
+  return (await loadSubject(args.subject)).framework === 'plain';
 }
 
 /** M1, one side: median ns per leaf write. */
@@ -124,8 +174,9 @@ export async function measureWriteAllocations(args: SideArgs & { readonly alloca
 /** M2, one side: ns per read through a held handle. */
 export async function measureRead(args: SideArgs): Promise<{ nsPerRead: number; sink: number }> {
   const cell = await microCell(args, 7);
-  const nsPerRead = nsPerOp((n) => readLoop(cell, n), MICRO_TIMING.opsPerRound, MICRO_TIMING.warmRounds, MICRO_TIMING.rounds);
-  return { nsPerRead, sink: readSink };
+  const loop = (await isPlain(args)) ? (n: number) => plainReadLoop(cell as unknown as PlainReadable, n) : (n: number) => readLoop(cell, n);
+  const nsPerRead = nsPerOp(loop, MICRO_TIMING.opsPerRound, MICRO_TIMING.warmRounds, MICRO_TIMING.rounds);
+  return { nsPerRead, sink: readSink + subscriberRuns };
 }
 
 export interface BuildArgs {
@@ -142,7 +193,7 @@ function buildAndAccess(subject: StoreSubject, args: BuildArgs): { ms: number; t
   const start = process.hrtime.bigint();
   const tree = subject.createTree(state, { variant: args.variant });
   let sum = 0;
-  for (const path of accessedPaths) sum += tree.leaf<number>(path)();
+  for (const path of accessedPaths) sum += readLeaf(subject, tree.leaf<number>(path));
   const ms = Number(process.hrtime.bigint() - start) / 1e6;
   readSink += sum;
   return { ms, tree };
@@ -175,13 +226,14 @@ export async function measureBuildHeap(args: BuildArgs): Promise<{ plainBytes: n
   buildAndAccess(subject, { ...args, leaves: Math.min(args.leaves, 1000) }).tree.destroy();
 
   // Warm native cell creation too (feedback vectors are heap objects).
-  readSink += Array.from({ length: CELL_SAMPLE }, (_, k) => signal(k)).length;
+  const nativeCell = nativeCellFor(subject);
+  readSink += Array.from({ length: CELL_SAMPLE }, (_, k) => nativeCell(k)).length;
 
   const base = await usedHeap();
   let built: { state: object; accessedPaths: string[][] } | undefined = makeLeafState(args.leaves, args.perBranch, args.accessed);
   const withState = await usedHeap();
   // 10 cells are below heap-counter noise, so measure CELL_SAMPLE cells and scale to `accessed`.
-  const cells = Array.from({ length: CELL_SAMPLE }, (_, k) => signal(k));
+  const cells = Array.from({ length: CELL_SAMPLE }, (_, k) => nativeCell(k));
   const withCells = await usedHeap();
   const plainBytes = withState - base;
   const cellsBytes = ((withCells - withState) * args.accessed) / CELL_SAMPLE;
@@ -190,7 +242,7 @@ export async function measureBuildHeap(args: BuildArgs): Promise<{ plainBytes: n
   const tree = subject.createTree(built.state, { variant: args.variant });
   const handles = built.accessedPaths.map((path) => tree.leaf<number>(path));
   let sum = 0;
-  for (const handle of handles) sum += handle();
+  for (const handle of handles) sum += readLeaf(subject, handle);
   readSink += sum;
   // Drop the plain state so only what the tree retains is in the next heap reading.
   // eslint-disable-next-line no-useless-assignment
