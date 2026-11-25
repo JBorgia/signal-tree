@@ -17,6 +17,163 @@
       "sha256": "851b318d1f39ec2d67376c8fb9a5823d7e535a1bf0bd094294f0a315a76ef64b"
     },
     {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [4.3][V5] may transform a write; the transformed value is copied",
+      "ids": [
+        "V5"
+      ],
+      "sha256": "b386afbbe528affc56511c330b892aa96e56efa7168e598568ff53cb6fc72ffa"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [4.3][X1] may call next() only once",
+      "ids": [
+        "X1"
+      ],
+      "sha256": "38bbfef38573073e97fb7144e82613717cc129ef3fbafddd77275c3553b99f79"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [V1] see a write to an absent member, whose effect is a change",
+      "ids": [
+        "V1"
+      ],
+      "sha256": "6361b86698c3c2e8cfb931cdad925657c872a717c99989bbf89b0673441ea068"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "interceptors > [W1][4.3] see the kind, the writer context and the turn",
+      "ids": [
+        "W1"
+      ],
+      "sha256": "61f41c6574cc8acf31082a3a8feded2cbcddfbe5e845054275facdf749b67794"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [O2] see a whole-value branch write as one effect at the branch",
+      "ids": [
+        "O2"
+      ],
+      "sha256": "a0377865ea4c220c56e8f870b5447a9ed8299cfb636b8b2ca8f9cc80a865b81e"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [O2][O1] see a bare write as its own turn, and nothing for a skipped write",
+      "ids": [
+        "O2",
+        "O1"
+      ],
+      "sha256": "890f144adefa7d19bafee50616dd72a5067b9b7d227cf1e55bbab9c5c1835a46"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [O2][W1] see each turn once, with every effect and its writer context",
+      "ids": [
+        "O2",
+        "W1"
+      ],
+      "sha256": "f449833df201392e6f0b01b464eec0a7c9b9e0443aa18a0b3b1a1c9417537321"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [O4] publish a write an observer makes as its own turn, after the turn being published",
+      "ids": [
+        "O4"
+      ],
+      "sha256": "9c1ae5132539c81dca52a27d69fb17777308d9a3eb7437e7315a81c694db5e31"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [T13] see nothing from a turn that throws",
+      "ids": [
+        "T13"
+      ],
+      "sha256": "b88021037cadeb9ab8a7603dcd63e7a6b8b795a3678d6df7a76959b0636383a6"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "observers > [X3][X6] keep running when one throws, and report it to onTreeError with ST2034, the tree id and the scope path",
+      "ids": [
+        "X3",
+        "X6"
+      ],
+      "sha256": "b5862ed8c95a260c56a46ebc55ea6005b31bb179591cb01a5e66714886c12c06"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "plugins > [D1] are detached and disposed on destroy; teardown errors reach onTreeError",
+      "ids": [
+        "D1"
+      ],
+      "sha256": "dc8eebd9b6b8ff590d251267c0845d264d3fdc06497a034f0cf22e468249ddb7"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "the error channel > [T10] reports at most 50 observer errors a second, then how many were suppressed",
+      "ids": [
+        "T10"
+      ],
+      "sha256": "9557b30b6d0e666393316bd63a52f5e56938ef44a89ee300912bc95ea3b253c4"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "the error channel > [T10] reports subscriber errors of the tree’s own cells",
+      "ids": [
+        "T10"
+      ],
+      "sha256": "541c6835bc58778185faaaab30b206a880d44047f0101890d23989f4ed89b147"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "the error channel > [T10][X3] reports suppressed errors when the next window opens, and survives a throwing handler",
+      "ids": [
+        "T10",
+        "X3"
+      ],
+      "sha256": "90200afb2442cd36aead0d874b25a3c33821535843e049ea3fe599d6bf1d5caa"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "the error channel > [X6] gives each live tree its own id",
+      "ids": [
+        "X6"
+      ],
+      "sha256": "071831cc578a2032cc513e62d8fdf0ffa53a0d9c5eb68d338edb30c2e4a5beb6"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "writer context > [W1] as() attributes writes, restores the previous context, and returns the result",
+      "ids": [
+        "W1"
+      ],
+      "sha256": "efb4d9b51a298d9637eb9f77102397e4688e2e3e13c80845556a92ede930cdef"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "writer context > [W5] restores the context when the callback throws",
+      "ids": [
+        "W5"
+      ],
+      "sha256": "52f70654a4f5986b7b8ca403b51a332c370a935f15296e1d9942aa4c0a91c36f"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "writer context > [W6][W5] refuses async callbacks and callbacks that return a promise",
+      "ids": [
+        "W6",
+        "W5"
+      ],
+      "sha256": "83999bbf958de2bc319ac1dd78d87bc9166369e2519b6d78b489b043e46226c1"
+    },
+    {
+      "file": "packages/core/src/scopes.spec.ts",
+      "title": "writer context > [X1] refuses a malformed context",
+      "ids": [
+        "X1"
+      ],
+      "sha256": "3802d8285b99e13f1a10dcfd3479353d09a82bf03785bab47448e806a5680360"
+    },
+    {
       "file": "packages/core/src/tree.spec.ts",
       "title": "construction input > [V3] refuses a handle or cell of another tree in the initial state",
       "ids": [
