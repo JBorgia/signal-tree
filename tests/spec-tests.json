@@ -9,6 +9,46 @@
       "sha256": "efcfdd688132d071366b026c97777d4d80a53ad8e2d083e800e46746805a56cb"
     },
     {
+      "file": "packages/core/src/chunked.spec.ts",
+      "title": "[W4] setAll in chunks",
+      "ids": [
+        "W4"
+      ],
+      "sha256": "145e061371c4548251eddb73ca97bdac0f5787314d359dfbf5e858f89c9a4892"
+    },
+    {
+      "file": "packages/core/src/chunked.spec.ts",
+      "title": "[W4] setAll in chunks > [D1] rejects when the tree is destroyed between chunks",
+      "ids": [
+        "D1"
+      ],
+      "sha256": "424163073a343b588e9d96c38511d66e5d0673cb396a1bc36505eaae339e3531"
+    },
+    {
+      "file": "packages/core/src/chunked.spec.ts",
+      "title": "[W4] setAll in chunks > [E3] rejects on a bad row before changing anything",
+      "ids": [
+        "E3"
+      ],
+      "sha256": "3feb30f3bb1726602cec01c3fe1281da4cdee0832c23874e2fd2ce962c9ef108"
+    },
+    {
+      "file": "packages/core/src/chunked.spec.ts",
+      "title": "[W4] setAll in chunks > [O2] publishes each chunk as its own turn, and yields between chunks",
+      "ids": [
+        "O2"
+      ],
+      "sha256": "62e783828979dcf4f1b49303ee966923fa18c94cd2efdea1cbf2fa1f089537f8"
+    },
+    {
+      "file": "packages/core/src/chunked.spec.ts",
+      "title": "[W4] setAll in chunks > [W5] attributes every chunk to the writer context of the call, even after it ends",
+      "ids": [
+        "W5"
+      ],
+      "sha256": "61c0384faf562546de8b3f2b2d84b1d172e325444cce9ab8265c2afc4907e988"
+    },
+    {
       "file": "packages/core/src/entities.spec.ts",
       "title": "[E3] every call is all-or-nothing (E3)",
       "ids": [
