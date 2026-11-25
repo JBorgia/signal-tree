@@ -13,7 +13,7 @@ function probe(onAttach: (scope: ScopeHandle) => void): Plugin<object> {
   return { name: 'probe', attach: (scope) => (onAttach(scope), { api: {}, detach: () => {} }) };
 }
 
-describe('setAll in chunks', () => {
+describe('[W4] setAll in chunks', () => {
   it('ends where a single setAll ends: rows replaced, handles kept, input order', async () => {
     const tree = signalTree({ rows: entityMap<Row, number>({ rows: range(0, 10) }) });
     const five = tree.$.rows.byId(5)!;
@@ -26,7 +26,7 @@ describe('setAll in chunks', () => {
     expect(five.v.get()).toBe(1);
   });
 
-  it('publishes each chunk as its own turn, and yields between chunks', async () => {
+  it('[O2] publishes each chunk as its own turn, and yields between chunks', async () => {
     const listener = vi.fn<ObserveListener>();
     const tree = signalTree({ rows: entityMap<Row, number>() }, { plugins: [probe((s) => s.observe(listener))] });
     let ticks = 0;
@@ -40,7 +40,7 @@ describe('setAll in chunks', () => {
     expect(ticks).toBeGreaterThan(0);
   });
 
-  it('rejects on a bad row before changing anything', async () => {
+  it('[E3] rejects on a bad row before changing anything', async () => {
     const tree = signalTree({ rows: entityMap<Row, number>({ rows: range(0, 3) }) });
     const input = [...range(10, 20), { id: 10, v: 9 }];
     await expect(tree.$.rows.setAll(input, { chunk: 2 })).rejects.toMatchObject({ code: 'ST1010' });
@@ -51,7 +51,7 @@ describe('setAll in chunks', () => {
     await expect(tree.$.rows.setAll([], { chunk: 1.5 })).rejects.toMatchObject({ code: 'ST1006' });
   });
 
-  it('attributes every chunk to the writer context of the call, even after it ends', async () => {
+  it('[W5] attributes every chunk to the writer context of the call, even after it ends', async () => {
     const writers = new Set<string>();
     const tree = signalTree({ rows: entityMap<Row, number>({ rows: range(0, 4) }) }, { plugins: [probe((s) => s.observe((effects) => effects.forEach((e) => writers.add(e.context.writer))))] });
     const ingest = tree.as({ writer: 'sync:feed', origin: 'sync' }, () => {
@@ -82,7 +82,7 @@ describe('setAll in chunks', () => {
     expect(tree.$.rows.all().every((r) => r.v === 1)).toBe(true);
   });
 
-  it('rejects when the tree is destroyed between chunks', async () => {
+  it('[D1] rejects when the tree is destroyed between chunks', async () => {
     const tree = signalTree({ rows: entityMap<Row, number>() });
     const ingest = tree.$.rows.setAll(range(0, 10), { chunk: 2 });
     tree.destroy();

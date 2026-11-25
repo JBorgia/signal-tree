@@ -16,7 +16,7 @@ function probe(onAttach: (scope: ScopeHandle) => void, api: object = {}): Plugin
 }
 
 describe('observers', () => {
-  it('see each turn once, with every effect and its writer context', () => {
+  it('[O2][W1] see each turn once, with every effect and its writer context', () => {
     const calls: { effects: readonly WriteEffect[]; turn: TurnInfo }[] = [];
     const tree = signalTree({ a: 1, b: { c: 1 } }, { plugins: [probe((s) => s.observe((effects, turn) => calls.push({ effects, turn })))] });
     tree.turn(() => {
@@ -34,7 +34,7 @@ describe('observers', () => {
     expect(calls[0]!.turn.context.writer).toBe('user');
   });
 
-  it('see a bare write as its own turn, and nothing for a skipped write', () => {
+  it('[O2][O1] see a bare write as its own turn, and nothing for a skipped write', () => {
     const listener = vi.fn<ObserveListener>();
     const tree = signalTree({ a: 1 }, { plugins: [probe((s) => s.observe(listener))] });
     tree.$.a.set(1);
@@ -45,7 +45,7 @@ describe('observers', () => {
     expect(listener.mock.calls[0]![1].turn.id).not.toBe(listener.mock.calls[1]![1].turn.id);
   });
 
-  it('see a whole-value branch write as one effect at the branch', () => {
+  it('[O2] see a whole-value branch write as one effect at the branch', () => {
     const listener = vi.fn<ObserveListener>();
     const tree = signalTree({ user: { name: 'Ada', age: 1 } }, { plugins: [probe((s) => s.observe(listener))] });
     tree.$.user.update((u) => ({ ...u, age: 2 }));
@@ -58,7 +58,7 @@ describe('observers', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 
-  it('see nothing from a turn that throws', () => {
+  it('[T13] see nothing from a turn that throws', () => {
     const listener = vi.fn<ObserveListener>();
     const tree = signalTree({ a: 1 }, { plugins: [probe((s) => s.observe(listener))] });
     expect(() =>
@@ -71,7 +71,7 @@ describe('observers', () => {
     expect(tree.$.a.get()).toBe(1);
   });
 
-  it('publish a write an observer makes as its own turn, after the turn being published', () => {
+  it('[O4] publish a write an observer makes as its own turn, after the turn being published', () => {
     const order: string[] = [];
     let scope!: ScopeHandle;
     const tree = signalTree({ a: 0, echo: 0 }, { plugins: [probe((s) => (scope = s))] });
@@ -85,7 +85,7 @@ describe('observers', () => {
     expect(order).toEqual(['first:1:a', 'second:1:user', 'first:2:echo', 'second:2:observer']);
   });
 
-  it('keep running when one throws, and report it to onTreeError with ST2034, the tree id and the scope path', () => {
+  it('[X3][X6] keep running when one throws, and report it to onTreeError with ST2034, the tree id and the scope path', () => {
     const events: TreeErrorEvent[] = [];
     const after = vi.fn();
     let scope!: ScopeHandle;
@@ -105,7 +105,7 @@ describe('observers', () => {
     expect((events[0]!.error.cause as Error).message).toBe('observer broke');
   });
 
-  it('stop after unsubscribing', () => {
+  it('[4.3] stop after unsubscribing', () => {
     const listener = vi.fn();
     let stop!: () => void;
     const tree = signalTree({ a: 1 }, { plugins: [probe((s) => (stop = s.observe(listener)))] });
@@ -119,7 +119,7 @@ describe('observers', () => {
 describe('the error channel', () => {
   afterEach(() => vi.useRealTimers());
 
-  it('reports at most 50 observer errors a second, then how many were suppressed', () => {
+  it('[T10] reports at most 50 observer errors a second, then how many were suppressed', () => {
     vi.useFakeTimers();
     const events: TreeErrorEvent[] = [];
     const tree = signalTree({ a: 0 }, { onTreeError: (e) => events.push(e), plugins: [probe((s) => s.observe(() => {
@@ -135,7 +135,7 @@ describe('the error channel', () => {
     expect(events.filter((e) => e.code === 'ST2034')).toHaveLength(51);
   });
 
-  it('reports suppressed errors when the next window opens, and survives a throwing handler', () => {
+  it('[T10][X3] reports suppressed errors when the next window opens, and survives a throwing handler', () => {
     const now = vi.spyOn(Date, 'now');
     let t = 10_000;
     now.mockImplementation(() => t);
@@ -153,7 +153,7 @@ describe('the error channel', () => {
     now.mockRestore();
   });
 
-  it('reports subscriber errors of the tree’s own cells', () => {
+  it('[T10] reports subscriber errors of the tree’s own cells', () => {
     const events: TreeErrorEvent[] = [];
     const tree = signalTree({ a: 0 }, { onTreeError: (e) => events.push(e) });
     tree.$.a.subscribe(() => {
@@ -163,7 +163,7 @@ describe('the error channel', () => {
     expect(events.map((e) => e.code)).toEqual(['ST2034']);
   });
 
-  it('gives each live tree its own id', () => {
+  it('[X6] gives each live tree its own id', () => {
     expect(signalTree({}).id).not.toBe(signalTree({}).id);
   });
 
@@ -187,7 +187,7 @@ describe('interceptors', () => {
     },
   });
 
-  it('run outermost first for writes in their scope only', () => {
+  it('[C3][4.3] run outermost first for writes in their scope only', () => {
     const log: string[] = [];
     const tree = signalTree({ outer: { inner: { x: 1 }, y: 1 }, z: 1 });
     tree.$.outer.use(probe((s) => s.intercept(tap('outer', log))));
@@ -198,7 +198,7 @@ describe('interceptors', () => {
     expect(log).toEqual(['outer:outer.inner.x', 'inner:outer.inner.x', 'outer:outer.y']);
   });
 
-  it('cover branches read before the scope was attached', () => {
+  it('[4.3] cover branches read before the scope was attached', () => {
     const log: string[] = [];
     const tree = signalTree({ a: { b: { c: 1 } } });
     const c = tree.$.a.b.c;
@@ -207,7 +207,7 @@ describe('interceptors', () => {
     expect(log).toEqual(['a:a.b.c']);
   });
 
-  it('may refuse a write, which then changes nothing and reaches the writer', () => {
+  it('[4.3] may refuse a write, which then changes nothing and reaches the writer', () => {
     const tree = signalTree({ a: 1, b: { c: 1 } });
     const refuse: Interceptor = {
       name: 'refuse',
@@ -221,7 +221,7 @@ describe('interceptors', () => {
     expect(tree.$.b.get()).toEqual({ c: 1 });
   });
 
-  it('may transform a write; the transformed value is copied', () => {
+  it('[4.3][V5] may transform a write; the transformed value is copied', () => {
     const tree = signalTree({ s: { v: 0 as unknown } });
     const shared = { n: 1 };
     tree.$.s.use(probe((s) => s.intercept({ name: 'double', intercept: (op, next) => next({ ...op, next: typeof op.next === 'number' ? op.next * 2 : shared }) })));
@@ -232,7 +232,7 @@ describe('interceptors', () => {
     expect(tree.$.s.v.get()).not.toBe(shared);
   });
 
-  it('may call next() only once', () => {
+  it('[4.3][X1] may call next() only once', () => {
     const tree = signalTree({ s: { v: 0 } });
     tree.$.s.use(probe((s) => s.intercept({ name: 'twice', intercept: (op, next) => {
       next(op);
@@ -241,7 +241,7 @@ describe('interceptors', () => {
     expect(() => tree.$.s.v.set(1)).toThrow(/ST1008.*twice/);
   });
 
-  it('see the kind, the writer context and the turn', () => {
+  it('[W1][4.3] see the kind, the writer context and the turn', () => {
     const ops: unknown[] = [];
     const tree = signalTree({ s: { v: 0, w: { x: 1 } } });
     tree.$.s.use(probe((s) => s.intercept({ name: 'log', intercept: (op, next) => {
@@ -256,7 +256,7 @@ describe('interceptors', () => {
     ]);
   });
 
-  it('stop after removal', () => {
+  it('[4.3] stop after removal', () => {
     const log: string[] = [];
     let remove!: () => void;
     const tree = signalTree({ a: 1 }, { plugins: [probe((s) => (remove = s.intercept(tap('t', log))))] });
@@ -266,7 +266,7 @@ describe('interceptors', () => {
     expect(log).toEqual([]);
   });
 
-  it('see a write to an absent member, whose effect is a change', () => {
+  it('[V1] see a write to an absent member, whose effect is a change', () => {
     const listener = vi.fn<ObserveListener>();
     const tree = signalTree({ s: { a: 1 } as Record<string, number> }, { plugins: [probe((s) => s.observe(listener))] });
     tree.$.s['b']!.set(undefined as unknown as number);
@@ -276,7 +276,7 @@ describe('interceptors', () => {
 });
 
 describe('writer context', () => {
-  it('as() attributes writes, restores the previous context, and returns the result', () => {
+  it('[W1] as() attributes writes, restores the previous context, and returns the result', () => {
     const writers: string[] = [];
     const tree = signalTree({ a: 0 }, { plugins: [probe((s) => s.observe((effects) => writers.push(effects[0]!.context.writer)))] });
     const result = tree.as({ writer: 'agent:a', origin: 'agent', meta: { run: 1 } }, () => {
@@ -290,7 +290,7 @@ describe('writer context', () => {
     expect(writers).toEqual(['agent:a', 'sync:b', 'agent:a', 'user']);
   });
 
-  it('restores the context when the callback throws', () => {
+  it('[W5] restores the context when the callback throws', () => {
     const writers: string[] = [];
     const tree = signalTree({ a: 0 }, { plugins: [probe((s) => s.observe((effects) => writers.push(effects[0]!.context.writer)))] });
     expect(() => tree.as({ writer: 'agent:a', origin: 'agent' }, () => {
@@ -300,14 +300,14 @@ describe('writer context', () => {
     expect(writers).toEqual(['user']);
   });
 
-  it('refuses async callbacks and callbacks that return a promise', () => {
+  it('[W6][W5] refuses async callbacks and callbacks that return a promise', () => {
     const tree = signalTree({ a: 0 });
     expect(() => tree.as({ writer: 'w', origin: 'agent' }, async () => {})).toThrow(/ST1005/);
     expect(() => tree.as({ writer: 'w', origin: 'agent' }, () => Promise.resolve(1))).toThrow(/ST1005/);
     expect(() => tree.as({ writer: 'w', origin: 'agent' }, 1 as never)).toThrow(/ST1006/);
   });
 
-  it('refuses a malformed context', () => {
+  it('[X1] refuses a malformed context', () => {
     const tree = signalTree({ a: 0 });
     for (const bad of [null, {}, { writer: '', origin: 'x' }, { writer: 'w' }, { writer: 'w', origin: 3 }]) {
       expect(() => tree.as(bad as never, () => {})).toThrow(/ST1007/);
@@ -316,14 +316,14 @@ describe('writer context', () => {
 });
 
 describe('plugins', () => {
-  it('join the tree with their APIs and refuse a name clash', () => {
+  it('[4.3] join the tree with their APIs and refuse a name clash', () => {
     const tree = signalTree({ a: 1 }, { plugins: [probe(() => {}, { hello: () => 'hi' })] });
     expect((tree as unknown as { hello(): string }).hello()).toBe('hi');
     expect(() => signalTree({ a: 1 }, { plugins: [probe(() => {}, { turn: 1 })] })).toThrow(/ST1009/);
     expect(() => signalTree({ a: 1 }, { plugins: [probe(() => {}, null as never)] })).not.toThrow();
   });
 
-  it('use() returns the API, gives the scope its path and snapshot, and refuses a non-plugin', () => {
+  it('[4.3] use() returns the API, gives the scope its path and snapshot, and refuses a non-plugin', () => {
     let scope!: ScopeHandle;
     const tree = signalTree({ orders: { open: 2 } });
     const api = tree.$.orders.use(probe((s) => (scope = s), { size: 1 }));
@@ -333,7 +333,7 @@ describe('plugins', () => {
     expect(() => tree.$.orders.use({} as never)).toThrow(/ST1006/);
   });
 
-  it('are detached and disposed on destroy; teardown errors reach onTreeError', () => {
+  it('[D1] are detached and disposed on destroy; teardown errors reach onTreeError', () => {
     const events: TreeErrorEvent[] = [];
     const disposed = vi.fn();
     const listener = vi.fn();
@@ -361,7 +361,7 @@ describe('plugins', () => {
     expect(() => tree.as({ writer: 'w', origin: 'agent' }, () => {})).toThrow(/ST1003/);
   });
 
-  it('a second plugin on the same branch shares its scope', () => {
+  it('[4.3] a second plugin on the same branch shares its scope', () => {
     const log: string[] = [];
     const tree = signalTree({ s: { v: 0 } });
     tree.$.s.use(probe((s) => s.intercept({ name: 'one', intercept: (op, next) => (log.push('one'), next(op)) })));
